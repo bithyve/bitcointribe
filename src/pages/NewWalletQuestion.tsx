@@ -61,23 +61,24 @@ export default function NewWalletQuestion(props) {
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   if (isInitialized) {
     props.navigation.navigate('HomeNav');
-  }  
+  }
 
   const setConfirm = confirmAnswer1 => {
     if (confirmAnswer1) {
-      if(tempAns.indexOf('*') > -1) {
-        let temp = tempAns.replace(/[^a-zA-Z ]/g, "");
+      if (tempAns.indexOf('*') > -1) {
+        let temp = tempAns.replace(/[^a-zA-Z ]/g, '');
         setConfirmAnswer(confirmAnswer.concat(temp));
-        console.log(tempAns.replace(/[^a-zA-Z ]/g, ""));
-        
-      }else{
-        setConfirmAnswer(tempAns)
-      }                
+        console.log(tempAns.replace(/[^a-zA-Z ]/g, ''));
+        console.log('in if', temp);
+      } else {
+        setConfirmAnswer(tempAns);
+          console.log('in else', tempAns);
+      }
       if (answer && confirmAnswer != answer) {
         setAnsError('Answers do not match');
         //counter++;
-       // setCounter(counter);
-       // console.log('counter', counter);
+        // setCounter(counter);
+        // console.log('counter', counter);
         // if (counter > 3) {
         //   console.log('global.ansCounter', counter);
         //   setHdeShowAnswer(!hideShowAnswer);
@@ -95,13 +96,12 @@ export default function NewWalletQuestion(props) {
 
     if (event.nativeEvent.key == 'Backspace') {
       setTimeout(() => {
-      setAnsError('');
-      setConfirmAnswer('')
-      setConfirmAnswerMasked('');
-    }, 70);
+        setAnsError('');
+        setConfirmAnswer('');
+        setConfirmAnswerMasked('');
+      }, 70);
     }
   };
-
 
   useEffect(() => {
     if (answer.trim() == confirmAnswer.trim()) {
@@ -113,7 +113,7 @@ export default function NewWalletQuestion(props) {
     //setAnsError('');
     return (
       <TouchableOpacity
-        onPress={async() => {
+        onPress={async () => {
           const security = {
             question: dropdownBoxValue.question,
             answer,
@@ -121,13 +121,25 @@ export default function NewWalletQuestion(props) {
           setIsEditable(false);
           setIsDisabled(true);
           dispatch(initializeSetup(walletName, security));
-          await AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(Date.now()));
-          await AsyncStorage.setItem('secondaryDeviceAutoHighlightFlags',"false");
-          await AsyncStorage.setItem('contact1AutoHighlightFlags',"false");
-          await AsyncStorage.setItem('contact2AutoHighlightFlags',"false");
-          await AsyncStorage.setItem('personalCopy1AutoHighlightFlags',"false");
-          await AsyncStorage.setItem('personalCopy2AutoHighlightFlags',"false");
-          await AsyncStorage.setItem('securityAutoHighlightFlags',"true");
+          await AsyncStorage.setItem(
+            'SecurityAnsTimestamp',
+            JSON.stringify(Date.now()),
+          );
+          await AsyncStorage.setItem(
+            'secondaryDeviceAutoHighlightFlags',
+            'false',
+          );
+          await AsyncStorage.setItem('contact1AutoHighlightFlags', 'false');
+          await AsyncStorage.setItem('contact2AutoHighlightFlags', 'false');
+          await AsyncStorage.setItem(
+            'personalCopy1AutoHighlightFlags',
+            'false',
+          );
+          await AsyncStorage.setItem(
+            'personalCopy2AutoHighlightFlags',
+            'false',
+          );
+          await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
         }}
         style={styles.buttonView}
       >
@@ -174,7 +186,6 @@ export default function NewWalletQuestion(props) {
               Keyboard.dismiss();
             }}
             disabled={isDisabled}
-                      
           >
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
@@ -194,7 +205,6 @@ export default function NewWalletQuestion(props) {
                 setDropdownBoxOpenClose(!dropdownBoxOpenClose);
               }}
               disabled={isDisabled}
-                      
             >
               <Text style={styles.dropdownBoxText}>
                 {dropdownBoxValue.question
@@ -273,7 +283,7 @@ export default function NewWalletQuestion(props) {
                       editable={isEditable}
                       autoCapitalize="none"
                       onChangeText={text => {
-                        setAnswer(text)
+                        setAnswer(text);
                         setAnswerMasked(text);
                       }}
                       onFocus={() => {
@@ -283,19 +293,19 @@ export default function NewWalletQuestion(props) {
                       onBlur={() => {
                         setAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
-                        let temp='';
-                        for(let i = 0; i<answer.length;i++){
-                          temp+='*'
+                        let temp = '';
+                        for (let i = 0; i < answer.length; i++) {
+                          temp += '*';
                         }
-                        console.log("temp", temp, answer)
+                        console.log('temp', temp, answer);
                         setAnswerMasked(temp);
                       }}
                       onKeyPress={e => {
-                        if (e.nativeEvent.key === "Backspace") {
+                        if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
-                        setAnswer('')
-                        setAnswerMasked('');
-                      }, 70);
+                            setAnswer('');
+                            setAnswerMasked('');
+                          }, 70);
                         }
                       }}
                     />
@@ -327,7 +337,9 @@ export default function NewWalletQuestion(props) {
                       style={styles.modalInputBox}
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
-                      value={hideShowConfirmAnswer ? confirmAnswerMasked : tempAns}
+                      value={
+                        hideShowConfirmAnswer ? confirmAnswerMasked : !confirmAnswer ? tempAns : confirmAnswer
+                      }
                       textContentType="none"
                       autoCompleteType="off"
                       autoCorrect={false}
@@ -347,24 +359,37 @@ export default function NewWalletQuestion(props) {
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={event => 
-                        setConfirm(tempAns)}
-                      
+                      onSubmitEditing={event => setConfirm(tempAns)}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
                       }}
                       onBlur={() => {
+                      //  if(!confirmAnswer){
+                      //   setConfirmAnswer(tempAns);
+                      //   console.log('in else', tempAns);
+                      //   let temp = '';
+                      //   for (let i = 0; i < tempAns.length; i++) {
+                      //     temp += '*';
+                      //   }
+                      //   console.log('temp', temp, tempAns);
+                      //   setConfirmAnswerMasked(temp);
+                      //   console.log('confirmAnswerMasked', confirmAnswerMasked);
+                      //   setConfirm(tempAns)
+                      // } else {
+                         let temp = '';
+                        for (let i = 0; i < tempAns.length; i++) {
+                          temp += '*';
+                        }
+                        console.log('temp', temp, confirmAnswer, tempAns);
+                        setConfirmAnswerMasked(temp);
+                        console.log('confirmAnswerMasked', confirmAnswerMasked);
+                     // } 
+
                         setConfirmAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
-                        let temp='';
-                        for(let i = 0; i<confirmAnswer.length;i++){
-                          temp+='*'
-                        }
-                        console.log("temp", temp, confirmAnswer)
-                        setConfirmAnswerMasked(temp);
+                        //setConfirm(tempAns)
                       }}
-                      
                     />
                     <TouchableWithoutFeedback
                       onPress={() => {
@@ -425,7 +450,9 @@ export default function NewWalletQuestion(props) {
             {dropdownBoxValue.id.trim() == '' ? (
               <BottomInfoBox
                 title={'Note'}
-                infoText={'Secret question and answer are very important for your wallet and it’s backup'}
+                infoText={
+                  'Secret question and answer are very important for your wallet and it’s backup'
+                }
               />
             ) : null}
           </TouchableOpacity>
@@ -537,6 +564,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(13),
+    marginRight: 15,
   },
   dropdownBoxModal: {
     borderRadius: 10,

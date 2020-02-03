@@ -117,6 +117,7 @@ const GoogleAuthenticatorOTP = props => {
                       keyboardType="email-address"
                       selectTextOnFocus={true}
                       contextMenuHidden={true}
+                      autoFocus = {true}
                       autoCorrect={false}
                       ref={input => {
                         this.textInput = input;
