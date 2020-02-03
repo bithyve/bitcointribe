@@ -1019,13 +1019,17 @@ export default function ManageBackup(props) {
     );
     setContacts(contactList);
     if (contactList.length) {
-      if (contactList.findIndex(value => value && value.type == 'contact1') != -1) {
+      if (
+        contactList.findIndex(value => value && value.type == 'contact1') != -1
+      ) {
         pageData[1].personalInfo =
           contactList[
             contactList.findIndex(value => value && value.type == 'contact1')
           ];
       }
-      if (contactList.findIndex(value => value && value.type == 'contact2') != -1) {
+      if (
+        contactList.findIndex(value => value && value.type == 'contact2') != -1
+      ) {
         pageData[2].personalInfo =
           contactList[
             contactList.findIndex(value => value && value.type == 'contact2')
@@ -1033,9 +1037,9 @@ export default function ManageBackup(props) {
       }
     }
     setPageData([...pageData]);
-  }
+  };
 
-  const setAutoHighlightFlagsFromAsync = async() =>{
+  const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
     if (highlightFlags) {
       setAutoHighlightFlags(JSON.parse(highlightFlags));
@@ -1054,7 +1058,7 @@ export default function ManageBackup(props) {
         JSON.stringify(autoHighlightFlags),
       );
     }
-  }
+  };
 
   useEffect(() => {
     let focusListener = props.navigation.addListener('didFocus', () => {
@@ -1401,12 +1405,24 @@ export default function ManageBackup(props) {
         selectedStatus: pageData[1].status,
         selectedTime: getTime(pageData[1].time),
         selectedTitle: pageData[1].title,
+        updateAutoHighlightFlags: () =>
+          setAutoHighlightFlags({
+            ...autoHighlightFlags,
+            trustedContact1: true,
+          }),
+        next: 'true',
       });
     } else if (!trustedContact2) {
       props.navigation.navigate('TrustedContactHistory', {
         selectedStatus: pageData[2].status,
         selectedTime: getTime(pageData[2].time),
         selectedTitle: pageData[2].title,
+        updateAutoHighlightFlags: () =>
+          setAutoHighlightFlags({
+            ...autoHighlightFlags,
+            trustedContact2: true,
+          }),
+        next: 'true',
       });
     } else if (!personalCopy1) {
       // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
@@ -1481,7 +1497,13 @@ export default function ManageBackup(props) {
             selectedStatus: pageData[1].status,
             selectedTime: getTime(pageData[1].time),
             selectedTitle: pageData[1].title,
-            isConfirm:true
+            isConfirm: true,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                trustedContact1: true,
+              }),
+            next: 'true',
           });
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[2].time));
@@ -1494,7 +1516,13 @@ export default function ManageBackup(props) {
             selectedStatus: pageData[2].status,
             selectedTime: getTime(pageData[2].time),
             selectedTitle: pageData[2].title,
-            isConfirm:true
+            isConfirm: true,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                trustedContact2: true,
+              }),
+            next: 'true',
           });
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[3].time));
@@ -1578,19 +1606,43 @@ export default function ManageBackup(props) {
             next: 'true',
           });
         } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
-          setSelectedTime(getTime(pageData[1].time));
-          setSelectedStatus(pageData[1].status);
-          setSelectTypeToReshare('contact1');
+          // setSelectedTime(getTime(pageData[1].time));
+          // setSelectedStatus(pageData[1].status);
+          // setSelectTypeToReshare('contact1');
           //Trusted contact 1
           // ConfirmBottomSheet.current.snapTo(1);
+          props.navigation.navigate('TrustedContactHistory', {
+            selectedStatus: pageData[1].status,
+            selectedTime: getTime(pageData[1].time),
+            selectedTitle: pageData[1].title,
+            isConfirm: true,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                trustedContact1: true,
+              }),
+            next: 'true',
+          });
 
           setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
-          setSelectedTime(getTime(pageData[2].time));
-          setSelectedStatus(pageData[2].status);
-          setSelectTypeToReshare('contact2');
+          // setSelectedTime(getTime(pageData[2].time));
+          // setSelectedStatus(pageData[2].status);
+          // setSelectTypeToReshare('contact2');
           //Trusted contact 2
           // ConfirmBottomSheet.current.snapTo(1);
+          props.navigation.navigate('TrustedContactHistory', {
+            selectedStatus: pageData[2].status,
+            selectedTime: getTime(pageData[2].time),
+            selectedTitle: pageData[2].title,
+            isConfirm: true,
+            updateAutoHighlightFlags: () =>
+              setAutoHighlightFlags({
+                ...autoHighlightFlags,
+                trustedContact2: true,
+              }),
+            next: 'true',
+          });
 
           setTimeout(() => {}, 10);
         } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
@@ -1680,13 +1732,21 @@ export default function ManageBackup(props) {
 
   const onContactsUpdate = async () => {
     if (contacts.length) {
-      if (contacts.findIndex(value => value && value.type == 'contact1') != -1) {
+      if (
+        contacts.findIndex(value => value && value.type == 'contact1') != -1
+      ) {
         pageData[1].personalInfo =
-          contacts[contacts.findIndex(value => value && value.type == 'contact1')];
+          contacts[
+            contacts.findIndex(value => value && value.type == 'contact1')
+          ];
       }
-      if (contacts.findIndex(value => value && value.type == 'contact2') != -1) {
+      if (
+        contacts.findIndex(value => value && value.type == 'contact2') != -1
+      ) {
         pageData[2].personalInfo =
-          contacts[contacts.findIndex(value => value && value.type == 'contact2')];
+          contacts[
+            contacts.findIndex(value => value && value.type == 'contact2')
+          ];
       }
     }
     setPageData(pageData);
