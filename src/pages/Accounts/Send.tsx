@@ -287,7 +287,6 @@ export default function Send(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback onPress={() => {SendHelperBottomSheet.current.snapTo(0)}}>
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -295,6 +294,9 @@ export default function Send(props) {
           enabled
         >
           <ScrollView>
+          <TouchableWithoutFeedback onPress={() => {SendHelperBottomSheet.current.snapTo(0)}}>
+      
+          <View onStartShouldSetResponder={() => true}>
             <View style={styles.modalHeaderTitleView}>
               <View
                 style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
@@ -672,6 +674,8 @@ export default function Send(props) {
             }
           />
         </View>
+        </View>
+        </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet
@@ -707,7 +711,7 @@ export default function Send(props) {
           renderHeader={renderHeader}
         />
       </View>
-      </TouchableWithoutFeedback>
+      
     </View>
   );
 }

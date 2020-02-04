@@ -80,11 +80,10 @@ const SecureScan = props => {
             Activate Secure Account
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Please scan the following QR in Google Authenticator{'\n'}on to
-            activate your secure account
+            Please scan the following QR on your authenticator app like Google Authenticator
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Google Authenticator app should be{'\n'}installed on another device
+          The authenticator app should be{'\n'}installed on another device like your Secondary Device
           </Text>
         </View>
       </View>
