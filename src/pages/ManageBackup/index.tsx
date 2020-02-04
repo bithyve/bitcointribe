@@ -956,7 +956,7 @@ export default function ManageBackup(props) {
   });
 
   const autoHighlight = async () => {
-    const {
+    let {
       secondaryDevice,
       trustedContact1,
       trustedContact2,
@@ -965,20 +965,37 @@ export default function ManageBackup(props) {
       securityAns,
     } = autoHighlightFlags;
 
-    console.log('At AutoHighlight');
+    console.log('@AutoHighlight');
     console.log({ autoHighlightFlags });
 
-    if (!secondaryDevice) {
+    if (!overallHealth) {
+      if (!secondaryDevice) {
+        setSelectedType('secondaryDevice');
+      } else if (!trustedContact1) {
+        setSelectedType('contact1');
+      } else if (!trustedContact2) {
+        setSelectedType('contact2');
+      } else if (!personalCopy1) {
+        setSelectedType('copy1');
+      } else if (!personalCopy2) {
+        setSelectedType('copy2');
+      } else if (!securityAns) {
+        setSelectedType('security');
+      }
+      return;
+    }
+
+    if (!secondaryDevice && !overallHealth.sharesInfo[0].updatedAt) {
       setSelectedType('secondaryDevice');
-    } else if (!trustedContact1) {
+    } else if (!trustedContact1 && !overallHealth.sharesInfo[1].updatedAt) {
       setSelectedType('contact1');
-    } else if (!trustedContact2) {
+    } else if (!trustedContact2 && !overallHealth.sharesInfo[2].updatedAt) {
       setSelectedType('contact2');
-    } else if (!personalCopy1) {
+    } else if (!personalCopy1 && !overallHealth.sharesInfo[3].updatedAt) {
       setSelectedType('copy1');
-    } else if (!personalCopy2) {
+    } else if (!personalCopy2 && !overallHealth.sharesInfo[4].updatedAt) {
       setSelectedType('copy2');
-    } else if (!securityAns) {
+    } else if (!securityAns && !overallHealth.qaStatus.updatedAt) {
       setSelectedType('security');
     } else {
       if (overallHealth) {
@@ -1083,7 +1100,26 @@ export default function ManageBackup(props) {
         JSON.stringify(autoHighlightFlags),
       );
     }
-  }, [autoHighlightFlags]);
+  }, [autoHighlightFlags, , overallHealth]);
+
+  // useEffect(() => {
+  //   if (overallHealth) {
+  //     const updatedAutoHighlightFlags = {
+  //       secondaryDevice: overallHealth.sharesInfo[0].updatedAt ? true : false,
+  //       trustedContact1: overallHealth.sharesInfo[1].updatedAt ? true : false,
+  //       trustedContact2: overallHealth.sharesInfo[2].updatedAt ? true : false,
+  //       personalCopy1: overallHealth.sharesInfo[3].updatedAt ? true : false,
+  //       personalCopy2: overallHealth.sharesInfo[4].updatedAt ? true : false,
+  //       securityAns: overallHealth.qaStatus.updatedAt ? true : false, // due to auto-health (during initialization)
+  //     };
+
+  //     if (
+  //       JSON.stringify(autoHighlightFlags) !==
+  //       JSON.stringify(updatedAutoHighlightFlags)
+  //     )
+  //       setAutoHighlightFlags(updatedAutoHighlightFlags);
+  //   }
+  // }, [overallHealth]);
 
   // const setSetupFlowAsync = async () => {
   //   let secondaryDeviceAutoHighlightFlags = await AsyncStorage.getItem(
@@ -1391,7 +1427,7 @@ export default function ManageBackup(props) {
       securityAns,
     } = autoHighlightFlags;
 
-    if (!secondaryDevice) {
+    if (!secondaryDevice && !overallHealth.sharesInfo[0].updatedAt) {
       const data = pageData[0];
       // secondaryDeviceBottomSheet.current.snapTo(1);
       props.navigation.navigate('SecondaryDeviceHistory', {
@@ -1405,7 +1441,7 @@ export default function ManageBackup(props) {
           }),
         next: 'true',
       });
-    } else if (!trustedContact1) {
+    } else if (!trustedContact1 && !overallHealth.sharesInfo[1].updatedAt) {
       props.navigation.navigate('TrustedContactHistory', {
         selectedStatus: pageData[1].status,
         selectedTime: getTime(pageData[1].time),
@@ -1416,8 +1452,9 @@ export default function ManageBackup(props) {
             trustedContact1: true,
           }),
         next: 'true',
+        shared: overallHealth.sharesInfo[1].updatedAt ? true : false,
       });
-    } else if (!trustedContact2) {
+    } else if (!trustedContact2 && !overallHealth.sharesInfo[2].updatedAt) {
       props.navigation.navigate('TrustedContactHistory', {
         selectedStatus: pageData[2].status,
         selectedTime: getTime(pageData[2].time),
@@ -1428,8 +1465,9 @@ export default function ManageBackup(props) {
             trustedContact2: true,
           }),
         next: 'true',
+        shared: overallHealth.sharesInfo[2].updatedAt ? true : false,
       });
-    } else if (!personalCopy1) {
+    } else if (!personalCopy1 && !overallHealth.sharesInfo[3].updatedAt) {
       // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
       const data = pageData[3];
       props.navigation.navigate('PersonalCopyHistory', {
@@ -1444,7 +1482,7 @@ export default function ManageBackup(props) {
           }),
         next: 'true',
       });
-    } else if (!personalCopy2) {
+    } else if (!personalCopy2 && !overallHealth.sharesInfo[4].updatedAt) {
       // (PersonalCopy2ShareBottomSheet as any).current.snapTo(1);
       const data = pageData[4];
       props.navigation.navigate('PersonalCopyHistory', {
@@ -1459,7 +1497,7 @@ export default function ManageBackup(props) {
           }),
         next: 'true',
       });
-    } else if (!securityAns) {
+    } else if (!securityAns && !overallHealth.qaStatus.updatedAt) {
       const data = pageData[5];
       props.navigation.navigate('SecurityQuestionHistory', {
         selectedStatus: data.status,
@@ -1509,6 +1547,7 @@ export default function ManageBackup(props) {
                 trustedContact1: true,
               }),
             next: 'true',
+            shared: overallHealth.sharesInfo[1].updatedAt ? true : false,
           });
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[2].time));
@@ -1528,6 +1567,7 @@ export default function ManageBackup(props) {
                 trustedContact2: true,
               }),
             next: 'true',
+            shared: overallHealth.sharesInfo[2].updatedAt ? true : false,
           });
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[3].time));
@@ -1627,6 +1667,7 @@ export default function ManageBackup(props) {
                 trustedContact1: true,
               }),
             next: 'true',
+            shared: overallHealth.sharesInfo[1].updatedAt ? true : false,
           });
 
           setTimeout(() => {}, 10);
@@ -1647,6 +1688,7 @@ export default function ManageBackup(props) {
                 trustedContact2: true,
               }),
             next: 'true',
+            shared: overallHealth.sharesInfo[2].updatedAt ? true : false,
           });
 
           setTimeout(() => {}, 10);
@@ -1936,6 +1978,14 @@ export default function ManageBackup(props) {
                         selectedStatus: item.status,
                         selectedTime: getTime(item.time),
                         selectedTitle: item.title,
+                        updateAutoHighlightFlags: () =>
+                          setAutoHighlightFlags({
+                            ...autoHighlightFlags,
+                            trustedContact1: true,
+                          }),
+                        shared: overallHealth.sharesInfo[2].updatedAt
+                          ? true
+                          : false,
                       });
                       // setLoadOnTrustedContactBottomSheet(true);
                       // setTimeout(() => {
@@ -1954,6 +2004,14 @@ export default function ManageBackup(props) {
                         selectedStatus: item.status,
                         selectedTime: getTime(item.time),
                         selectedTitle: item.title,
+                        updateAutoHighlightFlags: () =>
+                          setAutoHighlightFlags({
+                            ...autoHighlightFlags,
+                            trustedContact2: true,
+                          }),
+                        shared: overallHealth.sharesInfo[2].updatedAt
+                          ? true
+                          : false,
                       });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('contact2');
