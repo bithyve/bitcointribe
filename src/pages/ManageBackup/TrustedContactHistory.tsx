@@ -63,14 +63,14 @@ const TrustedContactHistory = props => {
   let [SelectedContacts, setSelectedContacts] = useState([]);
   const [isSecretShared1, setIsSecretShared1] = useState(false);
   const [isSecretShared2, setIsSecretShared2] = useState(false);
-  const [autoHighlightFlags, setAutoHighlightFlags] = useState({
-    secondaryDevice: false,
-    trustedContact1: false,
-    trustedContact2: false,
-    personalCopy1: false,
-    personalCopy2: false,
-    securityAns: false,
-  });
+  //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
+  //     secondaryDevice: false,
+  //     trustedContact1: false,
+  //     trustedContact2: false,
+  //     personalCopy1: false,
+  //     personalCopy2: false,
+  //     securityAns: false,
+  //   });
   const index =
     props.navigation.state.params &&
     props.navigation.state.params.selectedTitle == 'Trusted Contact 1'
@@ -150,12 +150,12 @@ const TrustedContactHistory = props => {
         ConfirmBottomSheet.current.snapTo(1);
       }
     }
-    let setupFlowFlags = JSON.parse(
-      await AsyncStorage.getItem('AutoHighlightFlags'),
-    );
-    if (setupFlowFlags) {
-      setAutoHighlightFlags(setupFlowFlags);
-    }
+    // let setupFlowFlags = JSON.parse(
+    //   await AsyncStorage.getItem('AutoHighlightFlags'),
+    // );
+    // if (setupFlowFlags) {
+    //   setAutoHighlightFlags(setupFlowFlags);
+    // }
   };
 
   function renderTrustedContactsContent() {
@@ -423,6 +423,7 @@ const TrustedContactHistory = props => {
     'updateAutoHighlightFlags',
   );
   const next = props.navigation.getParam('next');
+  const shared = props.navigation.getParam('shared');
   useEffect(() => {
     if (next) {
       setLoadContacts(true);
@@ -488,16 +489,18 @@ const TrustedContactHistory = props => {
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
-          IsReshare={
-            (autoHighlightFlags.trustedContact1 &&
-              props.navigation.state.params.selectedTitle ==
-                'Trusted Contact 1') ||
-            (autoHighlightFlags.trustedContact2 &&
-              props.navigation.state.params.selectedTitle ==
-                'Trusted Contact 2')
-              ? true
-              : false
-          }
+          //   IsReshare={
+          //     (autoHighlightFlags.trustedContact1 &&
+          //       props.navigation.state.params.selectedTitle ==
+          //         'Trusted Contact 1') ||
+          //     (autoHighlightFlags.trustedContact2 &&
+          //       props.navigation.state.params.selectedTitle ==
+          //         'Trusted Contact 2')
+          //       ? true
+          //       : false
+          //   }
+
+          IsReshare={shared}
           onPressContinue={() => {
             setTimeout(() => {
               setLoadContacts(true);

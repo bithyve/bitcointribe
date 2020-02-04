@@ -3,7 +3,6 @@ import { ENC_KEY_STORAGE_IDENTIFIER } from 'react-native-dotenv';
 
 export const store = async (hash, enc_key) => {
   try {
-    console.log({ ENC_KEY_STORAGE_IDENTIFIER });
     if (await SecureStore.getItemAsync(ENC_KEY_STORAGE_IDENTIFIER)) {
       console.log('Old key identified, removing...');
       await SecureStore.deleteItemAsync(ENC_KEY_STORAGE_IDENTIFIER);
