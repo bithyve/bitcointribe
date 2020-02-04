@@ -149,7 +149,8 @@ export default function Accounts(props) {
   //}, 2000);
   };
   const [isTestHelperDone, setIsTestHelperDone] = useState(true);
-
+  const [isRegularAccountHelperDone, setIsRegularAccountHelperDone] = useState(true);
+  const [isSecureAccountHelperDone, setIsSecureAccountHelperDone] = useState(true);
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
@@ -310,12 +311,13 @@ export default function Accounts(props) {
                   padding: 10,
                 }}
                 onPress={() => {
+                  console.log("item.accountType", item.accountType);
                   if (item.accountType == 'Test Account')
                     TestAccountHelperBottomSheet.current.snapTo(2);
                   else if (item.accountType == 'Savings Account')
-                    SecureAccountHelperBottomSheet.current.snapTo(1);
+                    SecureAccountHelperBottomSheet.current.snapTo(2);
                   else if (item.accountType == 'Regular Account')
-                    RegularAccountHelperBottomSheet.current.snapTo(1);
+                    RegularAccountHelperBottomSheet.current.snapTo(2);
                 }}
               >
                 Know more
@@ -738,7 +740,16 @@ export default function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+          //(SecureAccountHelperBottomSheet as any).current.snapTo(0);
+          console.log("isSecureAccountHelperDone",isSecureAccountHelperDone);
+          if (isSecureAccountHelperDone) {
+          (SecureAccountHelperBottomSheet as any).current.snapTo(2);
+          setTimeout(() => {
+            setIsSecureAccountHelperDone(false);
+          }, 10);
+          } else{
+            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
@@ -768,7 +779,16 @@ export default function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+          
+          console.log("isRegularAccountHelperDone",isRegularAccountHelperDone);
+          if (isRegularAccountHelperDone) {
+          (RegularAccountHelperBottomSheet as any).current.snapTo(2);
+          setTimeout(() => {
+            setIsRegularAccountHelperDone(false);
+          }, 10);
+          } else{
+            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+          }
         }}
       />
     );
@@ -796,8 +816,34 @@ export default function Accounts(props) {
     if (serviceType === SECURE_ACCOUNT) {
       AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
         if (!done) {
-          SecureAccountHelperBottomSheet.current.snapTo(1);
           AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
+          setTimeout(() => {
+            setIsSecureAccountHelperDone(true);
+          }, 10);
+          setTimeout(() => {
+            SecureAccountHelperBottomSheet.current.snapTo(1);
+          }, 1000);
+        } else {
+            setTimeout(() => {
+              setIsSecureAccountHelperDone(false);
+            }, 10);
+        }
+      });
+    }
+    if (serviceType === REGULAR_ACCOUNT) {
+      AsyncStorage.getItem('isRegularAccountHelperDone').then(done => {
+        if (!done) {
+          AsyncStorage.setItem('isRegularAccountHelperDone', 'true');
+          setTimeout(() => {
+            setIsRegularAccountHelperDone(true);
+          }, 10);
+          setTimeout(() => {
+            RegularAccountHelperBottomSheet.current.snapTo(1);
+          }, 1000);
+        } else {
+            setTimeout(() => {
+              setIsRegularAccountHelperDone(false);
+            }, 10);
         }
       });
     }
@@ -1421,6 +1467,11 @@ export default function Accounts(props) {
         ref={SecureAccountHelperBottomSheet}
         snapPoints={[
           -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('10%')
+          : Platform.OS == 'android'
+          ? hp('16%')
+          : hp('10%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderSecureAccountsHelperContents}
@@ -1431,6 +1482,11 @@ export default function Accounts(props) {
         ref={RegularAccountHelperBottomSheet}
         snapPoints={[
           -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('10%')
+          : Platform.OS == 'android'
+          ? hp('16%')
+          : hp('10%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderRegularAccountsHelperContents}
