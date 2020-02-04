@@ -1433,7 +1433,7 @@ export default function Home(props) {
   // };
 
   let isNavigate = false;
-  const handleAppStateChange = async (nextAppState) => {
+  const handleAppStateChange = async nextAppState => {
     console.log('nextAppState', nextAppState);
     let isContactOpen = await AsyncStorage.getItem('isContactOpen');
     // if (!isContactOpen) {
@@ -1443,17 +1443,17 @@ export default function Home(props) {
     // if (!isCameraOpen) {
     //   await AsyncStorage.setItem('isCameraOpen', 'true');
     // }
-    console.log("global.isCameraOpen",isCameraOpen, isContactOpen, isNavigate);
+    console.log('global.isCameraOpen', isCameraOpen, isContactOpen, isNavigate);
     if (isCameraOpen) {
       await AsyncStorage.setItem('isCameraOpen', 'false');
     }
     if (isContactOpen) {
       await AsyncStorage.setItem('isContactOpen', 'false');
     }
-    
+
     var blockApp = setTimeout(() => {
       if (isNavigate) {
-        console.log("isNavigate",isNavigate);
+        console.log('isNavigate', isNavigate);
         props.navigation.navigate('ReLogin');
       }
     }, 30000);
@@ -1462,7 +1462,7 @@ export default function Home(props) {
         ? nextAppState == 'active'
         : nextAppState == 'background'
     ) {
-      console.log("isNavigate",isNavigate);
+      console.log('isNavigate', isNavigate);
       clearTimeout(blockApp);
       isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
     } else {
@@ -1529,7 +1529,10 @@ export default function Home(props) {
           const netBalance = testAccService
             ? balances.balance + balances.unconfirmedBalance
             : 0;
-          if (!netBalance) dispatch(getTestcoins(TEST_ACCOUNT));
+          if (!netBalance) {
+            console.log('Getting Testcoins');
+            dispatch(getTestcoins(TEST_ACCOUNT));
+          }
         }
     })();
   }, [testAccService]);
