@@ -194,8 +194,8 @@ export default function ContactList(props) {
   }
  
   return (
-    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, ...props.style }}>
+        <SafeAreaView style={{ flex: 0 }} />
         <View style={styles.selectedContactContainer}>
           {selectedContacts.length > 0 ? selectedContacts.map(value => {
             return(
@@ -213,8 +213,7 @@ export default function ContactList(props) {
           )}): null}
         </View>
         <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto', marginRight: 10, padding: 10}} onPress={() => addContact()}>
-          <Text style={{fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
+          <Text style={{fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
         </AppBottomSheetTouchableWrapper>
         <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
@@ -228,7 +227,7 @@ export default function ContactList(props) {
             onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
           />
         </View>
-        <View style={{ flex: 1, flexDirection: "row" }}>
+        <View style={{ flex: 1, flexDirection: "row", position:'relative' }}>
           <View style={{ flex: 11 }}>
             {filterContactData ? <FlatList
               data={filterContactData}
@@ -285,17 +284,16 @@ export default function ContactList(props) {
           </View>*/}
         </View> 
         {selectedContacts.length >= 1 && (
-          <View style={{marginTop:'auto',}}>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressContinue()}
-            style={styles.bottomButtonView}
-          >
-            <Text style={styles.buttonText}>Confirm & Proceed</Text>
-          </AppBottomSheetTouchableWrapper>
+          <View style={{ position: "absolute", bottom: 0, }}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressContinue()}
+              style={styles.bottomButtonView}
+            >
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            </AppBottomSheetTouchableWrapper>
           </View>
          )} 
       </View>
-    </SafeAreaView>
   );
 }
 
@@ -372,7 +370,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     height: 40,
     justifyContent: 'center',
-
   },
   searchBoxIcon: {
     justifyContent: 'center',
