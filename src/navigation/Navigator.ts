@@ -60,6 +60,7 @@ import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory
 import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
+import SettingGetNewPin from '../pages/SettingGetNewPin';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -157,6 +158,7 @@ const HomeNavigator = createStackNavigator(
     TrustedContactHistory,
     PersonalCopyHistory,
     SecurityQuestionHistory,
+    SettingGetNewPin
   },
   {
     headerLayoutPreset: 'center',

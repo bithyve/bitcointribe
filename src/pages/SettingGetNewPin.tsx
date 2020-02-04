@@ -20,7 +20,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
 import { storeCreds } from "../store/actions/setupAndAuth";
 
-export default function PasscodeConfirm( props ) {
+export default function SettingGetNewPin( props ) {
   const [ passcode, setPasscode ] = useState( "" );
   const [ confirmPasscode, setConfirmPasscode ] = useState( "" );
   const [ passcodeFlag, setPasscodeFlag ] = useState( true );
@@ -83,18 +83,26 @@ export default function PasscodeConfirm( props ) {
   }, [ passcode, confirmPasscode ] );
 
   const dispatch = useDispatch();
-  const { hasCreds } = useSelector( state => state.setupAndAuth );
-  if ( hasCreds ) props.navigation.replace( "RestoreAndRecoverWallet" );
+//   const { hasCreds } = useSelector( state => state.setupAndAuth );
+//   if ( hasCreds ) props.navigation.replace( "RestoreAndRecoverWallet" );
 
   return (
     <SafeAreaView style={ { flex: 1 } }>
       <StatusBar />
       <View style={ { flex: 1 } }>
         <View style={ {} }>
-          <Text style={ styles.headerTitleText }>Hello!</Text>
+        <View style={styles.modalHeaderTitleView}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity onPress={() => props.navigation.goBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
+                        <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+                    </TouchableOpacity>
+                    <Text style={styles.modalHeaderTitleText}>{"Manage Pin"}</Text>
+                </View>
+            </View>
+          {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
           <View>
             <Text style={ styles.headerInfoText }>
-              Please enter a <Text style={ styles.boldItalicText }>passcode</Text>
+              Please enter the <Text style={ styles.boldItalicText }>passcode</Text>
             </Text>
 
             <View>
@@ -116,7 +124,7 @@ export default function PasscodeConfirm( props ) {
                     { passcode.length >= 1 ? (
                       <Text
                         style={ {
-                          fontSize: RFValue( 10, 812 ),
+                          fontSize: RFValue( 10),
                           textAlignVertical: "center",
                           justifyContent: "center",
                           alignItems: "center"
@@ -229,7 +237,6 @@ export default function PasscodeConfirm( props ) {
             <View>
               <Text style={ styles.headerInfoText }>
                 Re-enter the <Text style={ styles.boldItalicText }>passcode</Text>{ " " }
-                to <Text style={ styles.boldItalicText }>verify and login.</Text>
               </Text>
               <View>
                 <View style={ { flexDirection: "row", marginTop: hp( "1.5%" ) } }>
@@ -592,13 +599,13 @@ const styles = StyleSheet.create( {
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue( 13, 812 ),
+    fontSize: RFValue( 13),
     textAlign: "center",
     lineHeight: 18
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue( 13, 812 ),
+    fontSize: RFValue( 13),
     textAlign: "center",
     lineHeight: 18
   },
@@ -609,13 +616,13 @@ const styles = StyleSheet.create( {
   keyPadElementTouchable: {
     flex: 1,
     height: hp( "8%" ),
-    fontSize: RFValue( 18, 812 ),
+    fontSize: RFValue( 18),
     justifyContent: "center",
     alignItems: "center"
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue( 25, 812 ),
+    fontSize: RFValue( 25),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: "normal"
   },
@@ -634,7 +641,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue( 13, 812 ),
+    fontSize: RFValue( 13),
     fontFamily: Fonts.FiraSansMedium
   },
   boldItalicText: {
@@ -644,14 +651,14 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 25, 812 ),
+    fontSize: RFValue( 25),
     marginLeft: 20,
     marginTop: hp( "10%" ),
     fontFamily: Fonts.FiraSansRegular
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12, 812 ),
+    fontSize: RFValue( 12),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
@@ -664,5 +671,27 @@ const styles = StyleSheet.create( {
     flexDirection: "row",
     marginTop: hp( "4.5%" ),
     marginBottom: hp( "4.5%" )
-  }
+  },
+  modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingRight: 10,
+    paddingBottom: 15,
+    paddingTop: 10,
+    marginLeft: 20,
+    marginBottom: 15,
+},
+modalHeaderTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansMedium
+},
+modalContentView: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+},
 } );

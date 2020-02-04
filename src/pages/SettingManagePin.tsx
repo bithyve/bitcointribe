@@ -23,6 +23,8 @@ import ErrorModalContents from '../components/ErrorModalContents';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../components/ModalHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth';
 
 export default function SettingManagePin(props) {
     const [
@@ -43,6 +45,18 @@ export default function SettingManagePin(props) {
             setPin(pin.slice(0, -1));
         }
     }
+
+    const dispatch = useDispatch();
+    const { reLogin, authenticationFailed } = useSelector(
+      state => state.setupAndAuth,
+    );
+  
+    if (reLogin) {
+        props.navigation.navigate('SettingGetNewPin')
+    } else{
+        console.log("wrong passcode")
+    }
+
     const [switchOn, setSwitchOn] = useState(false);
     const renderPinChangeSuccessModalContent = () => {
         return (
@@ -126,7 +140,9 @@ export default function SettingManagePin(props) {
                         <TouchableOpacity
                             disabled={pin.length == 4 ? false : true}
                             onPress={() => {
-                                PinChangeSuccessBottomSheet.current.snapTo(1);
+                                dispatch(credsAuth(pin, true));
+                                //props.navigation.navigate('SettingGetNewPin')
+                                //PinChangeSuccessBottomSheet.current.snapTo(1);
                             }}
                             style={{ ...styles.proceedButtonView, backgroundColor: pin.length == 4 ? Colors.blue : Colors.lightBlue, }}
                         >
