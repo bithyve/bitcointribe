@@ -135,8 +135,10 @@ const PersonalCopyHistory = props => {
   useEffect(() => {
     if (selectedPersonalCopy.type === 'copy1' && shared.personalCopy1) {
       setPersonalCopyShared(true);
+      updateAutoHighlightFlags();
     } else if (selectedPersonalCopy.type === 'copy2' && shared.personalCopy2) {
       setPersonalCopyShared(true);
+      updateAutoHighlightFlags();
     }
   }, [shared]);
 

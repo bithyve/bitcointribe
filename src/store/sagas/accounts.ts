@@ -210,7 +210,7 @@ function* testcoinsWorker({ payload }) {
     console.log('testcoins received');
     yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
     yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
-    yield put(fetchBalance(payload.serviceType));
+    yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
     yield put(fetchTransactions(payload.serviceType, service));
   } else console.log('Failed to get testcoins');
   yield put(switchLoader(payload.serviceType, 'testcoins'));

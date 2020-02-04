@@ -1060,14 +1060,19 @@ export default function ManageBackup(props) {
     }
   };
 
+  // useEffect(() => {
+  //   let focusListener = props.navigation.addListener('didFocus', () => {
+  //     setContactsFromAsync();
+  //     setAutoHighlightFlagsFromAsync();
+  //   });
+  //   return () => {
+  //     focusListener.remove();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    let focusListener = props.navigation.addListener('didFocus', () => {
-      setContactsFromAsync();
-      setAutoHighlightFlagsFromAsync();
-    });
-    return () => {
-      focusListener.remove();
-    };
+    setContactsFromAsync();
+    setAutoHighlightFlagsFromAsync();
   }, []);
 
   useEffect(() => {
@@ -1764,8 +1769,11 @@ export default function ManageBackup(props) {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
+        console.log({ healthCheckInitialized });
         dispatch(checkMSharesHealth());
       } else {
+        console.log({ healthCheckInitialized });
+
         dispatch(initHealthCheck());
       }
     }
