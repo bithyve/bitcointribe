@@ -33,13 +33,14 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
+import moment from 'moment';
 
 const PersonalCopyHistory = props => {
-  const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
+  const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
+      title: 'Recovery Secret Created',
+      date: '',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
@@ -143,6 +144,23 @@ const PersonalCopyHistory = props => {
   }, [shared]);
 
   useEffect(() => {
+    (async () => {
+      const shareHistory = JSON.parse(
+        await AsyncStorage.getItem('shareHistory'),
+      );
+      if (shareHistory) {
+        const updatedPersonalCopyHistory = [...personalCopyHistory];
+        updatedPersonalCopyHistory[0].date = moment(
+          shareHistory[selectedPersonalCopy.type === 'copy1' ? 3 : 4].createdAt,
+        )
+          .utc()
+          .format('DD MMMM YYYY');
+        setPersonalCopyHistory(updatedPersonalCopyHistory);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     if (selectedPersonalCopy.type === 'copy1') {
       AsyncStorage.getItem('personalCopy1Shared').then(shared => {
         if (shared) {
@@ -218,7 +236,7 @@ const PersonalCopyHistory = props => {
         <HistoryPageComponent
           // IsReshare
           IsReshare={personalCopyShared ? true : false}
-          data={secondaryDeviceHistory}
+          data={personalCopyHistory}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }
