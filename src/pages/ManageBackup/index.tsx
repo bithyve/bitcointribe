@@ -938,13 +938,13 @@ export default function ManageBackup(props) {
   //   await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
   // };
 
-  const secretSharedTrustedContact1 = isSecretShared1 => {
-    setIsSecretShared1(isSecretShared1);
-  };
+  // const secretSharedTrustedContact1 = isSecretShared1 => {
+  //   setIsSecretShared1(isSecretShared1);
+  // };
 
-  const secretSharedTrustedContact2 = isSecretShared2 => {
-    setIsSecretShared2(isSecretShared2);
-  };
+  // const secretSharedTrustedContact2 = isSecretShared2 => {
+  //   setIsSecretShared2(isSecretShared2);
+  // };
 
   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
     secondaryDevice: false,
@@ -1821,27 +1821,27 @@ export default function ManageBackup(props) {
     }
   }, [s3Service]);
 
-  const getStatusIcon = (item) =>{
-    if(item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice ){
+  const getStatusIcon = item => {
+    if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
       return getIconByStatus(item.status);
     }
-    if(item.type == 'contact1' && autoHighlightFlags.trustedContact1 ){
+    if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
       return getIconByStatus(item.status);
     }
-    if(item.type == 'contact2' && autoHighlightFlags.trustedContact2){
+    if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
       return getIconByStatus(item.status);
     }
-    if(item.type == 'copy1' && autoHighlightFlags.personalCopy1 ){
+    if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
       return getIconByStatus(item.status);
     }
-    if(item.type == 'copy2' && autoHighlightFlags.personalCopy2){
+    if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
       return getIconByStatus(item.status);
     }
-    if(item.type == 'security' && autoHighlightFlags.securityAns){
+    if (item.type == 'security' && autoHighlightFlags.securityAns) {
       return getIconByStatus(item.status);
     }
-    return require("../../assets/images/icons/settings.png");
-  }
+    return require('../../assets/images/icons/settings.png');
+  };
 
   return (
     <View style={{ flex: 1 }}>

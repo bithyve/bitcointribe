@@ -33,6 +33,7 @@ import TrustedContacts from './TrustedContacts';
 import CommunicationMode from './CommunicationMode';
 import AsyncStorage from '@react-native-community/async-storage';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
+import moment from 'moment';
 
 const TrustedContactHistory = props => {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -76,11 +77,12 @@ const TrustedContactHistory = props => {
     props.navigation.state.params.selectedTitle == 'Trusted Contact 1'
       ? 1
       : 2;
-  const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
+
+  const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
+      title: 'Recovery Secret Created',
+      date: '',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
@@ -424,12 +426,30 @@ const TrustedContactHistory = props => {
   );
   const next = props.navigation.getParam('next');
   const shared = props.navigation.getParam('shared');
+
   useEffect(() => {
     if (next) {
       setLoadContacts(true);
       (trustedContactsBottomSheet as any).current.snapTo(1);
     }
   }, [next]);
+
+  useEffect(() => {
+    (async () => {
+      const shareHistory = JSON.parse(
+        await AsyncStorage.getItem('shareHistory'),
+      );
+      if (shareHistory) {
+        const updatedTrustedContactHistory = [...trustedContactHistory];
+        updatedTrustedContactHistory[0].date = moment(
+          shareHistory[index].createdAt,
+        )
+          .utc()
+          .format('DD MMMM YYYY');
+        setTrustedContactHistory(updatedTrustedContactHistory);
+      }
+    })();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -507,7 +527,7 @@ const TrustedContactHistory = props => {
             }, 2);
             trustedContactsBottomSheet.current.snapTo(1);
           }}
-          data={secondaryDeviceHistory}
+          data={trustedContactHistory}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }

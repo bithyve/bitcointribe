@@ -3,6 +3,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { take, fork } from 'redux-saga/effects';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -30,6 +31,27 @@ export const serviceGenerator = async (
   const s3Service = new S3Service(primaryMnemonic);
   res = s3Service.generateShares(securityAns); // TODO: Generates new shares, swap with a mech that re-stores the shares used for wallet restoration
   if (res.status !== 200) throw new Error('Share generation failed');
+
+  // share history initialization
+  const createdAt = Date.now();
+  const shareHistory = [
+    {
+      createdAt,
+    },
+    {
+      createdAt,
+    },
+    {
+      createdAt,
+    },
+    {
+      createdAt,
+    },
+    {
+      createdAt,
+    },
+  ];
+  await AsyncStorage.setItem('shareHistory', JSON.stringify(shareHistory));
 
   let secondaryXpub = '';
   let bhXpub = '';

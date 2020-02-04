@@ -32,13 +32,15 @@ import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
+import AsyncStorage from '@react-native-community/async-storage';
+import moment from 'moment';
 
 const SecondaryDeviceHistory = props => {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
+      title: 'Recovery Secret Created',
+      date: '',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
@@ -108,6 +110,22 @@ const SecondaryDeviceHistory = props => {
   useEffect(() => {
     if (next) (secondaryDeviceBottomSheet as any).current.snapTo(1);
   }, [next]);
+
+  useEffect(() => {
+    (async () => {
+      const shareHistory = JSON.parse(
+        await AsyncStorage.getItem('shareHistory'),
+      );
+      console.log({ shareHistory });
+      if (shareHistory) {
+        const updatedSecondaryHistory = [...secondaryDeviceHistory];
+        updatedSecondaryHistory[0].date = moment(shareHistory[0].createdAt)
+          .utc()
+          .format('DD MMMM YYYY');
+        setSecondaryDeviceHistory(updatedSecondaryHistory);
+      }
+    })();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
