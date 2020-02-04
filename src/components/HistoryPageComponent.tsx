@@ -13,6 +13,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 const HistoryPageComponent = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
@@ -25,7 +26,7 @@ const HistoryPageComponent = props => {
   };
 
   return (
-    <View style={{ flex:1 }}>
+    <View style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }}>
         {props.data.map(value => {
           if (SelectedOption == value.id) {
@@ -129,18 +130,18 @@ const HistoryPageComponent = props => {
           );
         })}
       </ScrollView>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: hp('25%'),
-            backgroundColor: Colors.white,
-          }}
-        >
-          {props.reshareInfo ? 
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: hp('25%'),
+          backgroundColor: Colors.white,
+        }}
+      >
+        {props.reshareInfo ? (
           <Text
             style={{
-              opacity:props.IsReshare?1:0.5,
+              opacity: props.IsReshare ? 1 : 0.5,
               marginTop: hp('1%'),
               marginBottom: hp('1%'),
               color: Colors.textColorGrey,
@@ -151,18 +152,19 @@ const HistoryPageComponent = props => {
             {props.reshareInfo}
             <Text
               onPress={() => {
-                props.IsReshare ? props.onPressReshare() : {}
+                props.IsReshare ? props.onPressReshare() : {};
               }}
               style={{ color: Colors.blue, textDecorationLine: 'underline' }}
             >
               Reshare
             </Text>
           </Text>
-          : null }
+        ) : null}
 
-          {props.changeInfo ? <Text
+        {props.changeInfo ? (
+          <Text
             style={{
-              opacity:props.IsReshare?1:0.5,
+              opacity: props.IsReshare ? 1 : 0.5,
               marginTop: hp('1%'),
               marginBottom: hp('1%'),
               color: Colors.textColorGrey,
@@ -173,46 +175,47 @@ const HistoryPageComponent = props => {
             {props.changeInfo}
             <Text
               onPress={() => {
-                props.IsReshare ? props.onPressChange() : {}
+                props.IsReshare ? props.onPressChange() : {};
               }}
               style={{ color: Colors.blue, textDecorationLine: 'underline' }}
             >
               Change Source
             </Text>
           </Text>
-          : null }
+        ) : null}
 
-        {props.IsReshare ? 
-          <TouchableOpacity
-          onPress={() => {
-            props.onPressConfirm();
-          }}
-          style={{
-            backgroundColor: Colors.blue,
-            height: wp('13%'),
-            width: wp('40%'),
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 10,
-            marginTop: hp('3%'),
-            marginBottom: hp('3%'),
-            elevation: 10,
-            shadowColor: Colors.shadowBlue,
-            shadowOpacity: 1,
-            shadowOffset: { width: 15, height: 15 },
-          }}
-        >
-          <Text
+        {props.IsReshare ? (
+          <AppBottomSheetTouchableWrapper
+            onPress={() => {
+              props.onPressConfirm();
+            }}
             style={{
-              color: Colors.white,
-              fontSize: RFValue(10),
-              fontFamily: Fonts.FiraSansMedium,
+              backgroundColor: Colors.blue,
+              height: wp('13%'),
+              width: wp('40%'),
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 10,
+              marginTop: hp('3%'),
+              marginBottom: hp('3%'),
+              elevation: 10,
+              shadowColor: Colors.shadowBlue,
+              shadowOpacity: 1,
+              shadowOffset: { width: 15, height: 15 },
             }}
           >
-            Confirm
-          </Text>
-        </TouchableOpacity>
-        : <TouchableOpacity
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue(10),
+                fontFamily: Fonts.FiraSansMedium,
+              }}
+            >
+              Confirm
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+        ) : (
+          <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressContinue();
             }}
@@ -240,16 +243,13 @@ const HistoryPageComponent = props => {
             >
               Backup Now
             </Text>
-          </TouchableOpacity>
-      }
-          
-        </View>
+          </AppBottomSheetTouchableWrapper>
+        )}
+      </View>
     </View>
   );
 };
 
 export default HistoryPageComponent;
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
