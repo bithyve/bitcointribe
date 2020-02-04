@@ -1843,6 +1843,47 @@ export default function ManageBackup(props) {
     return require("../../assets/images/icons/settings.png");
   }
 
+  const getImageIcon = (item) =>{
+    if(item.type == 'contact1' || item.type == 'contact2'){
+      if(item.personalInfo){
+        if(item.personalInfo.imageAvailable){
+          return <Image
+            source={item.personalInfo.image}
+            style={{ width: 35, height: 35, borderRadius:35/2, resizeMode:'contain'}}
+          />
+        }
+        else{
+          return  <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: Colors.shadowBlue,
+              width: 35,
+              height: 35,
+              borderRadius: 30,
+            }}
+          >
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 13,
+                lineHeight: 13, //... One for top and one for bottom alignment
+              }}
+            >
+              {item.personalInfo && item.personalInfo.name
+                ? nameToInitials(item.personalInfo.name)
+                : ''}
+            </Text>
+          </View>
+        }
+      }
+    }
+    return <Image
+        style={styles.cardImage}
+        source={getImageByType(item)}
+      />            
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -2160,37 +2201,7 @@ export default function ManageBackup(props) {
                       selectedType && item.type == selectedType ? 10 : 0,
                   }}
                 >
-                  {(item.type == 'contact1' || item.type == 'contact2') &&
-                  item.personalInfo &&
-                  !item.personalInfo.imageAvailable ? (
-                    <View
-                      style={{
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: Colors.shadowBlue,
-                        width: 35,
-                        height: 35,
-                        borderRadius: 30,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          fontSize: 13,
-                          lineHeight: 13, //... One for top and one for bottom alignment
-                        }}
-                      >
-                        {item.personalInfo && item.personalInfo.name
-                          ? nameToInitials(item.personalInfo.name)
-                          : ''}
-                      </Text>
-                    </View>
-                  ) : (
-                    <Image
-                      style={styles.cardImage}
-                      source={getImageByType(item)}
-                    />
-                  )}
+                  {getImageIcon(item)}
                   <View style={{ marginLeft: 15 }}>
                     <Text style={styles.cardTitleText}>
                       {item.personalInfo &&
