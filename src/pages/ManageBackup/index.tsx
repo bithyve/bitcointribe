@@ -1779,6 +1779,28 @@ export default function ManageBackup(props) {
     }
   }, [s3Service]);
 
+  const getStatusIcon = (item) =>{
+    if(item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice ){
+      return getIconByStatus(item.status);
+    }
+    if(item.type == 'contact1' && autoHighlightFlags.trustedContact1 ){
+      return getIconByStatus(item.status);
+    }
+    if(item.type == 'contact2' && autoHighlightFlags.trustedContact2){
+      return getIconByStatus(item.status);
+    }
+    if(item.type == 'copy1' && autoHighlightFlags.personalCopy1 ){
+      return getIconByStatus(item.status);
+    }
+    if(item.type == 'copy2' && autoHighlightFlags.personalCopy2){
+      return getIconByStatus(item.status);
+    }
+    if(item.type == 'security' && autoHighlightFlags.securityAns){
+      return getIconByStatus(item.status);
+    }
+    return require("../../assets/images/icons/settings.png");
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -2133,7 +2155,7 @@ export default function ManageBackup(props) {
                   </View>
                   <Image
                     style={styles.cardIconImage}
-                    source={getIconByStatus(item.status)}
+                    source={getStatusIcon(item)}
                   />
                 </TouchableOpacity>
               </View>
