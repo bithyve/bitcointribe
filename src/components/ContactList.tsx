@@ -228,7 +228,6 @@ export default function ContactList(props) {
           />
         </View>
         <View style={{ flex: 1, flexDirection: "row", position:'relative' }}>
-          <View style={{ flex: 11 }}>
             {filterContactData ? <FlatList
               data={filterContactData}
               extraData={props.onSelectContact}
@@ -264,7 +263,6 @@ export default function ContactList(props) {
               }
               }
             /> : null}
-          </View>
           {/* <View style={styles.contactIndexView}>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -284,7 +282,7 @@ export default function ContactList(props) {
           </View>*/}
         </View> 
         {selectedContacts.length >= 1 && (
-          <View style={{ position: "absolute", bottom: 0, }}>
+          <View style={{ position: "absolute", bottom: 0, width: wp("50%"), alignSelf:'center' }}>
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressContinue()}
               style={styles.bottomButtonView}
@@ -306,10 +304,7 @@ const styles = StyleSheet.create({
   bottomButtonView: {
     height: 50,
     width: wp("50%"),
-    // position: "absolute",
     backgroundColor: Colors.blue,
-    // bottom: 0,
-    left: wp("25%"),
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
