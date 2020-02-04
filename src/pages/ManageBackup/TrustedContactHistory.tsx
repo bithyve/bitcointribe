@@ -279,19 +279,20 @@ const TrustedContactHistory = props => {
       'SelectedContacts',
       JSON.stringify(selectedContactList),
     );
-    let setupFlowFlags = JSON.parse(
-      await AsyncStorage.getItem('AutoHighlightFlags'),
-    );
-    if (index == 1) {
-      setupFlowFlags.trustedContact1 = true;
-    } else {
-      setupFlowFlags.trustedContact2 = true;
-    }
-    setAutoHighlightFlags(setupFlowFlags);
-    await AsyncStorage.setItem(
-      'AutoHighlightFlags',
-      JSON.stringify(setupFlowFlags),
-    );
+    // let setupFlowFlags = JSON.parse(
+    //   await AsyncStorage.getItem('AutoHighlightFlags'),
+    // );
+    // if (index == 1) {
+    //   setupFlowFlags.trustedContact1 = true;
+    // } else {
+    //   setupFlowFlags.trustedContact2 = true;
+    // }
+    // setAutoHighlightFlags(setupFlowFlags);
+    // await AsyncStorage.setItem(
+    //   'AutoHighlightFlags',
+    //   JSON.stringify(setupFlowFlags),
+    // );
+    updateAutoHighlightFlags();
     // remaining Set setup flag
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
   };
@@ -418,6 +419,9 @@ const TrustedContactHistory = props => {
     );
   };
 
+  const updateAutoHighlightFlags = props.navigation.getParam(
+    'updateAutoHighlightFlags',
+  );
   const next = props.navigation.getParam('next');
   useEffect(() => {
     if (next) {

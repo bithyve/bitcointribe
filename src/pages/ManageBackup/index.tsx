@@ -1060,14 +1060,19 @@ export default function ManageBackup(props) {
     }
   };
 
+  // useEffect(() => {
+  //   let focusListener = props.navigation.addListener('didFocus', () => {
+  //     setContactsFromAsync();
+  //     setAutoHighlightFlagsFromAsync();
+  //   });
+  //   return () => {
+  //     focusListener.remove();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    let focusListener = props.navigation.addListener('didFocus', () => {
-      setContactsFromAsync();
-      setAutoHighlightFlagsFromAsync();
-    });
-    return () => {
-      focusListener.remove();
-    };
+    setContactsFromAsync();
+    setAutoHighlightFlagsFromAsync();
   }, []);
 
   useEffect(() => {
