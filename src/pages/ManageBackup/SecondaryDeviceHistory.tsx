@@ -230,9 +230,9 @@ const SecondaryDeviceHistory = props => {
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
           data={sortedHistory(secondaryDeviceHistory)}
-          reshareInfo={
-            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
-          }
+          // reshareInfo={
+          //   'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+          // }
           onPressConfirm={() => {
             // ConfirmBottomSheet.current.snapTo(1);
             alert('confirm');

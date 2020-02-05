@@ -46,40 +46,28 @@ const SecurityQuestionHistory = props => {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
+      title: 'Recovery Secret Created',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret Received',
-      date: '1 June ‘19, 9:00am',
+      title: 'Recovery Secret In-Transit',
+      date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret In-Transit',
-      date: '30 May ‘19, 11:00am',
+      title: 'Recovery Secret Accessible',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret Accessible',
-      date: '24 May ‘19, 5:00pm',
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 5,
-      title: 'Recovery Secret In-Transit',
-      date: '20 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 6,
       title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      date: null,
+      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
   const [
