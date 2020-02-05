@@ -48,8 +48,18 @@ import QrCodeModalContents from '../../components/QrCodeModalContents';
 // import HealthCheckGoogleAuthModalContents from '../../components/HealthCheckGoogleAuthModalContents';
 import AsyncStorage from '@react-native-community/async-storage';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import SendConfirmationContent from './SendConfirmationContent';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function Send(props) {
+  const [SendConfirmationBottomSheet, setSendConfirmationBottomSheet] = useState(React.createRef());
+  const [SendSuccessWithAddressBottomSheet, setSuccessWithAddressBottomSheet] = useState(React.createRef());
+  const [SendUnSuccessWithAddressBottomSheet, setUnSuccessWithAddressBottomSheet] = useState(React.createRef());
+
+  const [SendConfirmationWithContactBottomSheet, setSendConfirmationWithContactBottomSheet] = useState(React.createRef());
+  const [SendSuccessWithContactBottomSheet, setSuccessWithContactBottomSheet] = useState(React.createRef());
+  const [SendUnSuccessWithContactBottomSheet, setUnSuccessWithContactBottomSheet] = useState(React.createRef());
+
   const staticFees = props.navigation.getParam('staticFees');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
@@ -70,6 +80,16 @@ export default function Send(props) {
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
     React.createRef(),
   );
+
+  const userInfo = {
+      to:"2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR",
+      from: "Secure Account",
+      amount:"0.00012",
+      fee:"0.0001",
+      total:"0.00022",
+      estDeliveryTime:"2 hours",
+      description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a."
+    }
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -269,6 +289,127 @@ export default function Send(props) {
   //     />
   //   );
   // }, []);
+
+  const renderSendConfirmationContents = () =>{
+    return <SendConfirmationContent 
+          title = {"Send Confirmation"}
+          info={"Confirm the follow details"}
+          userInfo = {userInfo}
+          isFromContact = {false}
+          okButtonText={"confirm"}
+          cancelButtonText={"Back"}
+          isCancel={true}
+          onPressOk={()=>{}}
+          onPressCancel={()=>{}}
+          onPressBack = {()=>{SendConfirmationBottomSheet.current.snapTo(0)}}
+      />
+  }
+
+  const renderSendConfirmationHeader = () =>{
+    return <ModalHeader onPressHeader={()=>{SendConfirmationBottomSheet.current.snapTo(0)}} />
+  }
+
+  const renderSendSuccessWithAddressContents = () =>{
+    return <SendConfirmationContent 
+          title = {"Sent Successfully"}
+          info={"Confirm the follow details"}
+          userInfo = {userInfo}
+          isFromContact = {false}
+          okButtonText={"View Account"}
+          cancelButtonText={"Back"}
+          isCancel={false}
+          onPressOk={()=>{}}
+          onPressCancel={()=>{}}
+          onPressBack = {()=>{SendSuccessWithAddressBottomSheet.current.snapTo(0)}}
+          isSuccess={true}
+      />
+  }
+
+  const renderSendSuccessWithAddressHeader = () =>{
+    return <ModalHeader onPressHeader={()=>{SendSuccessWithAddressBottomSheet.current.snapTo(0)}} />
+  }
+
+  const renderSendUnSuccessWithAddressContents = () =>{
+    return <SendConfirmationContent 
+          title = {"Sent Unsuccessful"}
+          info={"Confirm the follow details"}
+          userInfo = {userInfo}
+          isFromContact = {false}
+          okButtonText={"Try Again"}
+          cancelButtonText={"Back"}
+          isCancel={true}
+          onPressOk={()=>{}}
+          onPressCancel={()=>{}}
+          onPressBack = {()=>{SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}}
+          isUnSuccess={true}
+      />
+  }
+
+  const renderSendUnSuccessWithAddressHeader = () =>{
+    return <ModalHeader onPressHeader={()=>{SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}} />
+  }
+
+  const renderSendConfirmationWithContactContents = () =>{
+    let userInfoTemp = {...userInfo, to: "Henk Williamson"}
+    return <SendConfirmationContent 
+          title = {"Send Confirmation"}
+          info={"Confirm the follow details"}
+          userInfo = {userInfoTemp}
+          isFromContact = {true}
+          okButtonText={"confirm"}
+          cancelButtonText={"Back"}
+          isCancel={true}
+          onPressOk={()=>{}}
+          onPressCancel={()=>{}}
+          onPressBack = {()=>{SendConfirmationWithContactBottomSheet.current.snapTo(0)}}
+      />
+  }
+
+  const renderSendConfirmationWithContactHeader = () =>{
+    return <ModalHeader onPressHeader={()=>{SendConfirmationWithContactBottomSheet.current.snapTo(0)}} />
+  }
+
+  const renderSendSuccessWithContactContents = () =>{
+    let userInfoTemp = {...userInfo, to: "Henk Williamson"}
+    return <SendConfirmationContent 
+          title = {"Sent Successfully"}
+          info={"Confirm the follow details"}
+          userInfo = {userInfoTemp}
+          isFromContact = {true}
+          okButtonText={"View Account"}
+          cancelButtonText={"Back"}
+          isCancel={false}
+          onPressOk={()=>{}}
+          onPressCancel={()=>{}}
+          onPressBack = {()=>{SendSuccessWithContactBottomSheet.current.snapTo(0)}}
+          isSuccess={true}
+      />
+  }
+
+  const renderSendSuccessWithContactHeader = () =>{
+    return <ModalHeader onPressHeader={()=>{SendSuccessWithContactBottomSheet.current.snapTo(0)}} />
+  }
+
+  const renderSendUnSuccessWithContactContents = () =>{
+    let userInfoTemp = {...userInfo, to: "Henk Williamson"}
+    return <SendConfirmationContent 
+          title = {"Sent Unsuccessful"}
+          info={"Confirm the follow details"}
+          userInfo = {userInfoTemp}
+          isFromContact = {true}
+          okButtonText={"Try Again"}
+          cancelButtonText={"Back"}
+          isCancel={true}
+          onPressOk={()=>{}}
+          onPressCancel={()=>{}}
+          onPressBack = {()=>{SendUnSuccessWithContactBottomSheet.current.snapTo(0)}}
+          isUnSuccess={true}
+      />
+  }
+
+  const renderSendUnSuccessWithContactHeader = () =>{
+    return <ModalHeader onPressHeader={()=>{SendUnSuccessWithContactBottomSheet.current.snapTo(0)}} />
+  }
 
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
@@ -709,6 +850,49 @@ export default function Send(props) {
           snapPoints={[0, hp('90%')]}
           renderContent={renderContent1}
           renderHeader={renderHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendConfirmationBottomSheet}
+          snapPoints={[-50, hp('50%')]}
+          renderContent={renderSendConfirmationContents}
+          renderHeader={renderSendConfirmationHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendSuccessWithAddressBottomSheet}
+          snapPoints={[-50, hp('50%')]}
+          renderContent={renderSendSuccessWithAddressContents}
+          renderHeader={renderSendSuccessWithAddressHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendUnSuccessWithAddressBottomSheet}
+          snapPoints={[-50, hp('50%')]}
+          renderContent={renderSendUnSuccessWithAddressContents}
+          renderHeader={renderSendUnSuccessWithAddressHeader}
+        />
+
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendConfirmationWithContactBottomSheet}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={renderSendConfirmationWithContactContents}
+          renderHeader={renderSendConfirmationWithContactHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendSuccessWithContactBottomSheet}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={renderSendSuccessWithContactContents}
+          renderHeader={renderSendSuccessWithContactHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendUnSuccessWithContactBottomSheet}
+          snapPoints={[-50, hp('50%')]}
+          renderContent={renderSendUnSuccessWithContactContents}
+          renderHeader={renderSendUnSuccessWithContactHeader}
         />
       </View>
       
