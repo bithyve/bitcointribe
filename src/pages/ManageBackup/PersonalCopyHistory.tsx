@@ -271,12 +271,14 @@ const PersonalCopyHistory = props => {
           IsReshare={personalCopyShared ? true : false}
           data={sortedHistory(personalCopyHistory)}
           reshareInfo={
-            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+            personalCopyShared
+              ? 'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+              : null
           }
           onPressConfirm={onConfirm}
           onPressReshare={() => {
-            alert('reshare');
-            // ReshareBottomSheet.current.snapTo(1);
+            // alert('reshare');
+            (PersonalCopyShareBottomSheet as any).current.snapTo(1);
           }}
           onPressContinue={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);

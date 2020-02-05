@@ -570,9 +570,13 @@ const TrustedContactHistory = props => {
           }}
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
-            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+            shared
+              ? 'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+              : null
           }
-          changeInfo={'Lorem ipsum dolor sit amet, consectetur sit amet '}
+          changeInfo={
+            shared ? 'Lorem ipsum dolor sit amet, consectetur sit amet ' : null
+          }
           onPressChange={() => {
             ChangeBottomSheet.current.snapTo(1);
           }}
