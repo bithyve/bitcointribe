@@ -540,6 +540,34 @@ export const checkPDFHealthWatcher = createWatcher(
   CHECK_PDF_HEALTH,
 );
 
+const updateHistory = async overallHealth => {
+  console.log({ overallHealth });
+  const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+  if (shareHistory) {
+    const updatedShareHistory = [...shareHistory];
+    for (let index = 0; index < overallHealth.sharesInfo.length; index++) {
+      if (overallHealth.sharesInfo[index].updatedAt) {
+        if (overallHealth.sharesInfo[index].shareStage !== 'Ugly') {
+          updatedShareHistory[index] = {
+            ...updatedShareHistory[index],
+            accessible: Date.now(),
+          };
+        } else {
+          updatedShareHistory[index] = {
+            ...updatedShareHistory[index],
+            notAccessible: Date.now(),
+          };
+        }
+      }
+    }
+    console.log({ updatedShareHistory });
+    await AsyncStorage.setItem(
+      'shareHistory',
+      JSON.stringify(updatedShareHistory),
+    );
+  }
+};
+
 function* overallHealthWorker({ payload }) {
   const service = payload.s3Service
     ? payload.s3Service
@@ -582,6 +610,7 @@ function* overallHealthWorker({ payload }) {
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
+    yield call(updateHistory, overallHealth);
 
     yield call(
       AsyncStorage.setItem,

@@ -34,6 +34,7 @@ import CommunicationMode from './CommunicationMode';
 import AsyncStorage from '@react-native-community/async-storage';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
+import _ from 'underscore';
 
 const TrustedContactHistory = props => {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -82,26 +83,26 @@ const TrustedContactHistory = props => {
     {
       id: 1,
       title: 'Recovery Secret Created',
-      date: '',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
       title: 'Recovery Secret In-Transit',
-      date: '',
+      date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
       title: 'Recovery Secret Accessible',
-      date: '',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
       title: 'Recovery Secret Not Accessible',
-      date: '',
+      date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
@@ -449,22 +450,36 @@ const TrustedContactHistory = props => {
     }
   }, [next]);
 
+  const sortedHistory = history => {
+    const currentHistory = history.filter(element => {
+      if (element.date) return element;
+    });
+
+    const sortedHistory = _.sortBy(currentHistory, 'date');
+    sortedHistory.forEach(element => {
+      element.date = moment(element.date)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    });
+
+    return sortedHistory;
+  };
+
   const updateHistory = shareHistory => {
     const updatedTrustedContactHistory = [...trustedContactHistory];
     if (shareHistory[index].createdAt)
-      updatedTrustedContactHistory[0].date = moment(
-        shareHistory[index].createdAt,
-      )
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
+      updatedTrustedContactHistory[0].date = shareHistory[index].createdAt;
     if (shareHistory[index].inTransit)
-      updatedTrustedContactHistory[1].date = moment(
-        shareHistory[index].inTransit,
-      )
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
+      updatedTrustedContactHistory[1].date = shareHistory[index].inTransit;
+
+    if (shareHistory[index].accessible)
+      updatedTrustedContactHistory[2].date = shareHistory[index].accessible;
+
+    if (shareHistory[index].notAccessible)
+      updatedTrustedContactHistory[3].date = shareHistory[index].notAccessible;
+
+    console.log({ updatedTrustedContactHistory });
     setTrustedContactHistory(updatedTrustedContactHistory);
   };
 
@@ -553,9 +568,7 @@ const TrustedContactHistory = props => {
             }, 2);
             trustedContactsBottomSheet.current.snapTo(1);
           }}
-          data={trustedContactHistory.filter(element => {
-            if (element.date) return element;
-          })}
+          data={sortedHistory(trustedContactHistory)}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }
