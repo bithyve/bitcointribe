@@ -87,34 +87,22 @@ const TrustedContactHistory = props => {
     },
     {
       id: 2,
-      title: 'Recovery Secret Received',
-      date: '1 June ‘19, 9:00am',
+      title: 'Recovery Secret In-Transit',
+      date: '',
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret In-Transit',
-      date: '30 May ‘19, 11:00am',
+      title: 'Recovery Secret Accessible',
+      date: '',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret Accessible',
-      date: '24 May ‘19, 5:00pm',
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 5,
-      title: 'Recovery Secret In-Transit',
-      date: '20 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 6,
       title: 'Recovery Secret Not Accessible',
-      date: '19 May ‘19, 11:00am',
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      date: '',
+      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
 
@@ -264,6 +252,22 @@ const TrustedContactHistory = props => {
     );
   }
 
+  const saveInTransitHistory = async () => {
+    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+    if (shareHistory) {
+      const updatedShareHistory = [...shareHistory];
+      updatedShareHistory[index] = {
+        ...updatedShareHistory[index],
+        inTransit: Date.now(),
+      };
+      updateHistory(updatedShareHistory);
+      await AsyncStorage.setItem(
+        'shareHistory',
+        JSON.stringify(updatedShareHistory),
+      );
+    }
+  };
+
   const onOTPShare = async index => {
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
     let selectedContactList = JSON.parse(
@@ -295,6 +299,7 @@ const TrustedContactHistory = props => {
     //   JSON.stringify(setupFlowFlags),
     // );
     updateAutoHighlightFlags();
+    saveInTransitHistory();
     // remaining Set setup flag
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
   };
@@ -425,7 +430,17 @@ const TrustedContactHistory = props => {
     'updateAutoHighlightFlags',
   );
   const next = props.navigation.getParam('next');
-  const shared = props.navigation.getParam('shared');
+  //   const shared = props.navigation.getParam('shared');
+
+  const overallHealth = useSelector(state => state.sss.overallHealth);
+  const [shared, setShared] = useState(false);
+  useEffect(() => {
+    if (overallHealth) {
+      if (overallHealth.sharesInfo[2].updatedAt) {
+        setShared(true);
+      }
+    }
+  }, [overallHealth]);
 
   useEffect(() => {
     if (next) {
@@ -434,20 +449,31 @@ const TrustedContactHistory = props => {
     }
   }, [next]);
 
+  const updateHistory = shareHistory => {
+    const updatedTrustedContactHistory = [...trustedContactHistory];
+    if (shareHistory[index].createdAt)
+      updatedTrustedContactHistory[0].date = moment(
+        shareHistory[index].createdAt,
+      )
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    if (shareHistory[index].inTransit)
+      updatedTrustedContactHistory[1].date = moment(
+        shareHistory[index].inTransit,
+      )
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    setTrustedContactHistory(updatedTrustedContactHistory);
+  };
+
   useEffect(() => {
     (async () => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if (shareHistory) {
-        const updatedTrustedContactHistory = [...trustedContactHistory];
-        updatedTrustedContactHistory[0].date = moment(
-          shareHistory[index].createdAt,
-        )
-          .utc()
-          .format('DD MMMM YYYY');
-        setTrustedContactHistory(updatedTrustedContactHistory);
-      }
+      if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
 
@@ -527,7 +553,9 @@ const TrustedContactHistory = props => {
             }, 2);
             trustedContactsBottomSheet.current.snapTo(1);
           }}
-          data={trustedContactHistory}
+          data={trustedContactHistory.filter(element => {
+            if (element.date) return element;
+          })}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }
