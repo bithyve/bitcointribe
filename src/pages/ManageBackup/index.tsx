@@ -1186,6 +1186,15 @@ export default function ManageBackup(props) {
   // };
 
   useEffect(() => {
+    (async () => {
+      const storedHealth = await AsyncStorage.getItem('overallHealth');
+      if (storedHealth) {
+        setOverallHealth(JSON.parse(storedHealth));
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     if (health) setOverallHealth(health);
   }, [health]);
 
@@ -1452,7 +1461,6 @@ export default function ManageBackup(props) {
             trustedContact1: true,
           }),
         next: 'true',
-        shared: overallHealth.sharesInfo[1].updatedAt ? true : false,
       });
     } else if (!trustedContact2 && !overallHealth.sharesInfo[2].updatedAt) {
       props.navigation.navigate('TrustedContactHistory', {
@@ -1465,7 +1473,6 @@ export default function ManageBackup(props) {
             trustedContact2: true,
           }),
         next: 'true',
-        shared: overallHealth.sharesInfo[2].updatedAt ? true : false,
       });
     } else if (!personalCopy1 && !overallHealth.sharesInfo[3].updatedAt) {
       // (PersonalCopy1ShareBottomSheet as any).current.snapTo(1);
@@ -1547,7 +1554,6 @@ export default function ManageBackup(props) {
                 trustedContact1: true,
               }),
             next: 'true',
-            shared: overallHealth.sharesInfo[1].updatedAt ? true : false,
           });
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[2].time));
@@ -1567,7 +1573,6 @@ export default function ManageBackup(props) {
                 trustedContact2: true,
               }),
             next: 'true',
-            shared: overallHealth.sharesInfo[2].updatedAt ? true : false,
           });
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
           // setSelectedTime(getTime(pageData[3].time));
@@ -1667,7 +1672,6 @@ export default function ManageBackup(props) {
                 trustedContact1: true,
               }),
             next: 'true',
-            shared: overallHealth.sharesInfo[1].updatedAt ? true : false,
           });
 
           setTimeout(() => {}, 10);
@@ -1688,7 +1692,6 @@ export default function ManageBackup(props) {
                 trustedContact2: true,
               }),
             next: 'true',
-            shared: overallHealth.sharesInfo[2].updatedAt ? true : false,
           });
 
           setTimeout(() => {}, 10);
@@ -1843,46 +1846,51 @@ export default function ManageBackup(props) {
     return require('../../assets/images/icons/settings.png');
   };
 
-  const getImageIcon = (item) =>{
-    if(item.type == 'contact1' || item.type == 'contact2'){
-      if(item.personalInfo){
-        if(item.personalInfo.imageAvailable){
-          return <Image
-            source={item.personalInfo.image}
-            style={{ width: 35, height: 35, borderRadius:35/2, resizeMode:'contain'}}
-          />
-        }
-        else{
-          return  <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: Colors.shadowBlue,
-              width: 35,
-              height: 35,
-              borderRadius: 30,
-            }}
-          >
-            <Text
+  const getImageIcon = item => {
+    if (item.type == 'contact1' || item.type == 'contact2') {
+      if (item.personalInfo) {
+        if (item.personalInfo.imageAvailable) {
+          return (
+            <Image
+              source={item.personalInfo.image}
               style={{
-                textAlign: 'center',
-                fontSize: 13,
-                lineHeight: 13, //... One for top and one for bottom alignment
+                width: 35,
+                height: 35,
+                borderRadius: 35 / 2,
+                resizeMode: 'contain',
+              }}
+            />
+          );
+        } else {
+          return (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: Colors.shadowBlue,
+                width: 35,
+                height: 35,
+                borderRadius: 30,
               }}
             >
-              {item.personalInfo && item.personalInfo.name
-                ? nameToInitials(item.personalInfo.name)
-                : ''}
-            </Text>
-          </View>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 13,
+                  lineHeight: 13, //... One for top and one for bottom alignment
+                }}
+              >
+                {item.personalInfo && item.personalInfo.name
+                  ? nameToInitials(item.personalInfo.name)
+                  : ''}
+              </Text>
+            </View>
+          );
         }
       }
     }
-    return <Image
-        style={styles.cardImage}
-        source={getImageByType(item)}
-      />            
-  }
+    return <Image style={styles.cardImage} source={getImageByType(item)} />;
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -2024,9 +2032,6 @@ export default function ManageBackup(props) {
                             ...autoHighlightFlags,
                             trustedContact1: true,
                           }),
-                        shared: overallHealth.sharesInfo[2].updatedAt
-                          ? true
-                          : false,
                       });
                       // setLoadOnTrustedContactBottomSheet(true);
                       // setTimeout(() => {
@@ -2050,9 +2055,6 @@ export default function ManageBackup(props) {
                             ...autoHighlightFlags,
                             trustedContact2: true,
                           }),
-                        shared: overallHealth.sharesInfo[2].updatedAt
-                          ? true
-                          : false,
                       });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('contact2');
