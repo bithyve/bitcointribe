@@ -252,6 +252,22 @@ const TrustedContactHistory = props => {
     );
   }
 
+  const saveInTransitHistory = async () => {
+    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+    if (shareHistory) {
+      const updatedShareHistory = [...shareHistory];
+      updatedShareHistory[index] = {
+        ...updatedShareHistory[index],
+        inTransit: Date.now(),
+      };
+      updateHistory(updatedShareHistory);
+      await AsyncStorage.setItem(
+        'shareHistory',
+        JSON.stringify(updatedShareHistory),
+      );
+    }
+  };
+
   const onOTPShare = async index => {
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
     let selectedContactList = JSON.parse(
@@ -283,6 +299,7 @@ const TrustedContactHistory = props => {
     //   JSON.stringify(setupFlowFlags),
     // );
     updateAutoHighlightFlags();
+    saveInTransitHistory();
     // remaining Set setup flag
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
   };
@@ -432,20 +449,31 @@ const TrustedContactHistory = props => {
     }
   }, [next]);
 
+  const updateHistory = shareHistory => {
+    const updatedTrustedContactHistory = [...trustedContactHistory];
+    if (shareHistory[index].createdAt)
+      updatedTrustedContactHistory[0].date = moment(
+        shareHistory[index].createdAt,
+      )
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    if (shareHistory[index].inTransit)
+      updatedTrustedContactHistory[1].date = moment(
+        shareHistory[index].inTransit,
+      )
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    setTrustedContactHistory(updatedTrustedContactHistory);
+  };
+
   useEffect(() => {
     (async () => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if (shareHistory) {
-        const updatedTrustedContactHistory = [...trustedContactHistory];
-        updatedTrustedContactHistory[0].date = moment(
-          shareHistory[index].createdAt,
-        )
-          .utc()
-          .format('DD MMMM YYYY');
-        setTrustedContactHistory(updatedTrustedContactHistory);
-      }
+      if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
 

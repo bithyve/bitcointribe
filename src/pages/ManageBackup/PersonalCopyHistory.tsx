@@ -120,31 +120,58 @@ const PersonalCopyHistory = props => {
 
   const [personalCopyShared, setPersonalCopyShared] = useState(false);
 
+  const saveInTransitHistory = async () => {
+    const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
+    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+    if (shareHistory) {
+      const updatedShareHistory = [...shareHistory];
+      updatedShareHistory[index] = {
+        ...updatedShareHistory[index],
+        inTransit: Date.now(),
+      };
+      updateHistory(updatedShareHistory);
+      await AsyncStorage.setItem(
+        'shareHistory',
+        JSON.stringify(updatedShareHistory),
+      );
+    }
+  };
+
   const shared = useSelector(state => state.manageBackup.shared);
   useEffect(() => {
     if (selectedPersonalCopy.type === 'copy1' && shared.personalCopy1) {
       setPersonalCopyShared(true);
       updateAutoHighlightFlags();
+      saveInTransitHistory();
     } else if (selectedPersonalCopy.type === 'copy2' && shared.personalCopy2) {
       setPersonalCopyShared(true);
       updateAutoHighlightFlags();
+      saveInTransitHistory();
     }
   }, [shared]);
+
+  const updateHistory = shareHistory => {
+    const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
+    const updatedPersonalCopyHistory = [...personalCopyHistory];
+    if (shareHistory[index].createdAt)
+      updatedPersonalCopyHistory[0].date = moment(shareHistory[index].createdAt)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    if (shareHistory[index].inTransit)
+      updatedPersonalCopyHistory[1].date = moment(shareHistory[index].inTransit)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    setPersonalCopyHistory(updatedPersonalCopyHistory);
+  };
 
   useEffect(() => {
     (async () => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if (shareHistory) {
-        const updatedPersonalCopyHistory = [...personalCopyHistory];
-        updatedPersonalCopyHistory[0].date = moment(
-          shareHistory[selectedPersonalCopy.type === 'copy1' ? 3 : 4].createdAt,
-        )
-          .utc()
-          .format('DD MMMM YYYY');
-        setPersonalCopyHistory(updatedPersonalCopyHistory);
-      }
+      if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
 

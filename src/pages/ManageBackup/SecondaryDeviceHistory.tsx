@@ -83,11 +83,28 @@ const SecondaryDeviceHistory = props => {
   );
   const next = props.navigation.getParam('next');
 
+  const saveInTransitHistory = async () => {
+    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+    if (shareHistory) {
+      const updatedShareHistory = [...shareHistory];
+      updatedShareHistory[0] = {
+        ...updatedShareHistory[0],
+        inTransit: Date.now(),
+      };
+      updateHistory(updatedShareHistory);
+      await AsyncStorage.setItem(
+        'shareHistory',
+        JSON.stringify(updatedShareHistory),
+      );
+    }
+  };
+
   const renderSecondaryDeviceContents = useCallback(() => {
     return (
       <SecondaryDevice
-        onPressOk={() => {
+        onPressOk={async () => {
           updateAutoHighlightFlags();
+          saveInTransitHistory();
           secondaryDeviceBottomSheet.current.snapTo(0);
         }}
         onPressBack={() => {
@@ -111,19 +128,28 @@ const SecondaryDeviceHistory = props => {
     if (next) (secondaryDeviceBottomSheet as any).current.snapTo(1);
   }, [next]);
 
+  const updateHistory = shareHistory => {
+    const updatedSecondaryHistory = [...secondaryDeviceHistory];
+    if (shareHistory[0].createdAt)
+      updatedSecondaryHistory[0].date = moment(shareHistory[0].createdAt)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    if (shareHistory[0].inTransit)
+      updatedSecondaryHistory[1].date = moment(shareHistory[0].inTransit)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    setSecondaryDeviceHistory(updatedSecondaryHistory);
+  };
+
   useEffect(() => {
     (async () => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
       console.log({ shareHistory });
-      if (shareHistory) {
-        const updatedSecondaryHistory = [...secondaryDeviceHistory];
-        updatedSecondaryHistory[0].date = moment(shareHistory[0].createdAt)
-          .utc()
-          .format('DD MMMM YYYY');
-        setSecondaryDeviceHistory(updatedSecondaryHistory);
-      }
+      if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
 
