@@ -31,6 +31,7 @@ import {
   transferST2,
   fetchTransactions,
   transferST3,
+  fetchBalance
 } from '../../store/actions/accounts';
 import DeviceInfo from 'react-native-device-info';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
@@ -81,12 +82,12 @@ export default function Send(props) {
     React.createRef(),
   );
 
-  const userInfo = {
+  let userInfo = {
       to:"2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR",
       from: "Secure Account",
       amount:"0.00012",
       fee:"0.0001",
-      total:"0.00022",
+      total:0.00022,
       estDeliveryTime:"2 hours",
       description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a."
     }
@@ -167,12 +168,22 @@ export default function Send(props) {
   );
 
   useEffect(() => {
-    if (transfer.executed === 'ST1')
-      props.navigation.navigate('Confirmation', {
+    if(transfer.txid){
+      SendConfirmationBottomSheet.current.snapTo(0);
+      SendSuccessWithAddressBottomSheet.current.snapTo(1)
+    }
+    else if (transfer.executed === 'ST1'){
+      SendConfirmationBottomSheet.current.snapTo(1)
+    }
+    else if (!transfer.txid && transfer.executed === 'ST2'){
+      props.navigation.navigate('TwoFAToken', {
         serviceType,
         recipientAddress,
-        amount,
       });
+    }
+    // else if(transfer ) {
+    //   SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
+    // }
   }, [transfer]);
 
   const renderSendHelperContents = () => {
@@ -291,6 +302,17 @@ export default function Send(props) {
   // }, []);
 
   const renderSendConfirmationContents = () =>{
+    if(transfer){
+      userInfo = {
+        to:recipientAddress,
+        from: getAccountFromType(),
+        amount:amount,
+        fee:transfer.stage1.fee,
+        total:parseInt(amount,10)+parseInt(transfer.stage1.fee,10),
+        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks*10),
+        description:description
+      }
+    }
     return <SendConfirmationContent 
           title = {"Send Confirmation"}
           info={"Confirm the follow details"}
@@ -299,9 +321,8 @@ export default function Send(props) {
           okButtonText={"confirm"}
           cancelButtonText={"Back"}
           isCancel={true}
-          onPressOk={()=>{}}
-          onPressCancel={()=>{}}
-          onPressBack = {()=>{SendConfirmationBottomSheet.current.snapTo(0)}}
+          onPressOk={()=>{dispatch(transferST2(serviceType))}}
+          onPressCancel={()=>{dispatch(clearTransfer(serviceType)); SendConfirmationBottomSheet.current.snapTo(0);}}
       />
   }
 
@@ -310,6 +331,17 @@ export default function Send(props) {
   }
 
   const renderSendSuccessWithAddressContents = () =>{
+    if(transfer){
+      userInfo = {
+        to:recipientAddress,
+        from: getAccountFromType(),
+        amount:amount,
+        fee:transfer.stage1.fee,
+        total:parseInt(amount,10)+parseInt(transfer.stage1.fee,10),
+        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks*10),
+        description:description
+      }
+    }
     return <SendConfirmationContent 
           title = {"Sent Successfully"}
           info={"Confirm the follow details"}
@@ -318,9 +350,10 @@ export default function Send(props) {
           okButtonText={"View Account"}
           cancelButtonText={"Back"}
           isCancel={false}
-          onPressOk={()=>{}}
-          onPressCancel={()=>{}}
-          onPressBack = {()=>{SendSuccessWithAddressBottomSheet.current.snapTo(0)}}
+          onPressOk={()=>{dispatch(clearTransfer(serviceType));
+            dispatch(fetchBalance(serviceType));
+            dispatch(fetchTransactions(serviceType));
+            props.navigation.navigate('Accounts');}}
           isSuccess={true}
       />
   }
@@ -349,68 +382,6 @@ export default function Send(props) {
     return <ModalHeader onPressHeader={()=>{SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}} />
   }
 
-  const renderSendConfirmationWithContactContents = () =>{
-    let userInfoTemp = {...userInfo, to: "Henk Williamson"}
-    return <SendConfirmationContent 
-          title = {"Send Confirmation"}
-          info={"Confirm the follow details"}
-          userInfo = {userInfoTemp}
-          isFromContact = {true}
-          okButtonText={"confirm"}
-          cancelButtonText={"Back"}
-          isCancel={true}
-          onPressOk={()=>{}}
-          onPressCancel={()=>{}}
-          onPressBack = {()=>{SendConfirmationWithContactBottomSheet.current.snapTo(0)}}
-      />
-  }
-
-  const renderSendConfirmationWithContactHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{SendConfirmationWithContactBottomSheet.current.snapTo(0)}} />
-  }
-
-  const renderSendSuccessWithContactContents = () =>{
-    let userInfoTemp = {...userInfo, to: "Henk Williamson"}
-    return <SendConfirmationContent 
-          title = {"Sent Successfully"}
-          info={"Confirm the follow details"}
-          userInfo = {userInfoTemp}
-          isFromContact = {true}
-          okButtonText={"View Account"}
-          cancelButtonText={"Back"}
-          isCancel={false}
-          onPressOk={()=>{}}
-          onPressCancel={()=>{}}
-          onPressBack = {()=>{SendSuccessWithContactBottomSheet.current.snapTo(0)}}
-          isSuccess={true}
-      />
-  }
-
-  const renderSendSuccessWithContactHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{SendSuccessWithContactBottomSheet.current.snapTo(0)}} />
-  }
-
-  const renderSendUnSuccessWithContactContents = () =>{
-    let userInfoTemp = {...userInfo, to: "Henk Williamson"}
-    return <SendConfirmationContent 
-          title = {"Sent Unsuccessful"}
-          info={"Confirm the follow details"}
-          userInfo = {userInfoTemp}
-          isFromContact = {true}
-          okButtonText={"Try Again"}
-          cancelButtonText={"Back"}
-          isCancel={true}
-          onPressOk={()=>{}}
-          onPressCancel={()=>{}}
-          onPressBack = {()=>{SendUnSuccessWithContactBottomSheet.current.snapTo(0)}}
-          isUnSuccess={true}
-      />
-  }
-
-  const renderSendUnSuccessWithContactHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{SendUnSuccessWithContactBottomSheet.current.snapTo(0)}} />
-  }
-
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
       (async () => {
@@ -423,6 +394,36 @@ export default function Send(props) {
       })();
     }
   }, []);
+
+  const getAccountFromType = () =>{
+    if(serviceType=="TEST_ACCOUNT"){
+      return "Test Account";
+    }
+    if(serviceType=="SECURE_ACCOUNT"){
+      return "Secure Account";
+    }
+    if(serviceType=="REGULAR_ACCOUNT"){
+      return "Regular Account";
+    }
+    if(serviceType=="S3_SERVICE"){
+      return "S3 Service";
+    }
+  }
+
+  function timeConvert(valueInMinutes) {
+    var num = valueInMinutes;
+    var hours = Math.round((num / 60));
+    var days = Math.round(hours/24);
+    if(valueInMinutes < 60){
+      return valueInMinutes + " minutes";
+    }
+    else if(hours < 24){
+      return hours + " hours";
+    }
+    else if(days>0){
+      return days==1 ? days + " day" : days + " days";
+    }
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -872,30 +873,7 @@ export default function Send(props) {
           renderContent={renderSendUnSuccessWithAddressContents}
           renderHeader={renderSendUnSuccessWithAddressHeader}
         />
-
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SendConfirmationWithContactBottomSheet}
-          snapPoints={[-50, hp('65%')]}
-          renderContent={renderSendConfirmationWithContactContents}
-          renderHeader={renderSendConfirmationWithContactHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SendSuccessWithContactBottomSheet}
-          snapPoints={[-50, hp('65%')]}
-          renderContent={renderSendSuccessWithContactContents}
-          renderHeader={renderSendSuccessWithContactHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SendUnSuccessWithContactBottomSheet}
-          snapPoints={[-50, hp('50%')]}
-          renderContent={renderSendUnSuccessWithContactContents}
-          renderHeader={renderSendUnSuccessWithContactHeader}
-        />
       </View>
-      
     </View>
   );
 }
