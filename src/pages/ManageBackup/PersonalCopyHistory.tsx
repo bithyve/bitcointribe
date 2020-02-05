@@ -34,32 +34,33 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
+import _ from 'underscore';
 
 const PersonalCopyHistory = props => {
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
       title: 'Recovery Secret Created',
-      date: '',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
       title: 'Recovery Secret In-Transit',
-      date: '',
+      date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
       title: 'Recovery Secret Accessible',
-      date: '',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
       title: 'Recovery Secret Not Accessible',
-      date: '',
+      date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
@@ -150,19 +151,36 @@ const PersonalCopyHistory = props => {
     }
   }, [shared]);
 
+  const sortedHistory = history => {
+    const currentHistory = history.filter(element => {
+      if (element.date) return element;
+    });
+
+    const sortedHistory = _.sortBy(currentHistory, 'date');
+    sortedHistory.forEach(element => {
+      element.date = moment(element.date)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    });
+
+    return sortedHistory;
+  };
+
   const updateHistory = shareHistory => {
     const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
     const updatedPersonalCopyHistory = [...personalCopyHistory];
     if (shareHistory[index].createdAt)
-      updatedPersonalCopyHistory[0].date = moment(shareHistory[index].createdAt)
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
+      updatedPersonalCopyHistory[0].date = shareHistory[index].createdAt;
     if (shareHistory[index].inTransit)
-      updatedPersonalCopyHistory[1].date = moment(shareHistory[index].inTransit)
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
+      updatedPersonalCopyHistory[1].date = shareHistory[index].inTransit;
+
+    if (shareHistory[index].accessible)
+      updatedPersonalCopyHistory[2].date = shareHistory[index].accessible;
+
+    if (shareHistory[index].notAccessible)
+      updatedPersonalCopyHistory[3].date = shareHistory[index].notAccessible;
+
     setPersonalCopyHistory(updatedPersonalCopyHistory);
   };
 
@@ -251,9 +269,7 @@ const PersonalCopyHistory = props => {
         <HistoryPageComponent
           // IsReshare
           IsReshare={personalCopyShared ? true : false}
-          data={personalCopyHistory.filter(element => {
-            if (element.date) return element;
-          })}
+          data={sortedHistory(personalCopyHistory)}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }

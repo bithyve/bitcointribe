@@ -34,32 +34,33 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
+import _ from 'underscore';
 
 const SecondaryDeviceHistory = props => {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
       title: 'Recovery Secret Created',
-      date: '',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
       title: 'Recovery Secret In-Transit',
-      date: '',
+      date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
       title: 'Recovery Secret Accessible',
-      date: '',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
       title: 'Recovery Secret Not Accessible',
-      date: '',
+      date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     // {
@@ -128,18 +129,35 @@ const SecondaryDeviceHistory = props => {
     if (next) (secondaryDeviceBottomSheet as any).current.snapTo(1);
   }, [next]);
 
+  const sortedHistory = history => {
+    const currentHistory = history.filter(element => {
+      if (element.date) return element;
+    });
+
+    const sortedHistory = _.sortBy(currentHistory, 'date');
+    sortedHistory.forEach(element => {
+      element.date = moment(element.date)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    });
+
+    return sortedHistory;
+  };
+
   const updateHistory = shareHistory => {
     const updatedSecondaryHistory = [...secondaryDeviceHistory];
     if (shareHistory[0].createdAt)
-      updatedSecondaryHistory[0].date = moment(shareHistory[0].createdAt)
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
+      updatedSecondaryHistory[0].date = shareHistory[0].createdAt;
     if (shareHistory[0].inTransit)
-      updatedSecondaryHistory[1].date = moment(shareHistory[0].inTransit)
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
+      updatedSecondaryHistory[1].date = shareHistory[0].inTransit;
+
+    if (shareHistory[0].accessible)
+      updatedSecondaryHistory[2].date = shareHistory[0].accessible;
+
+    if (shareHistory[0].notAccessible)
+      updatedSecondaryHistory[3].date = shareHistory[0].notAccessible;
+    console.log({ updatedSecondaryHistory });
     setSecondaryDeviceHistory(updatedSecondaryHistory);
   };
 
@@ -211,9 +229,7 @@ const SecondaryDeviceHistory = props => {
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
-          data={secondaryDeviceHistory.filter(element => {
-            if (element.date) return element;
-          })}
+          data={sortedHistory(secondaryDeviceHistory)}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }
