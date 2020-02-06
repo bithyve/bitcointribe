@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
@@ -7,7 +7,7 @@ import {
     StyleSheet,
     SafeAreaView,
     StatusBar,
-    Platform
+    
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -18,19 +18,12 @@ import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import ToggleSwitch from '../components/ToggleSwitch';
 import Ionicons from "react-native-vector-icons/Ionicons";
-import BottomSheet from 'reanimated-bottom-sheet';
-import ErrorModalContents from '../components/ErrorModalContents';
-import TransparentHeaderModal from '../components/TransparentHeaderModal';
-import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../components/ModalHeader';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth';
 
 export default function SettingManagePin(props) {
-    const [
-        PinChangeSuccessBottomSheet,
-        setPinChangeSuccessBottomSheet,
-    ] = useState(React.createRef());
+
     const [pin, setPin] = useState('');
     const [pinFlag, setPinFlag] = useState(true);
     function onPressNumber(text) {
@@ -43,49 +36,27 @@ export default function SettingManagePin(props) {
         }
         if (pin && text == 'x') {
             setPin(pin.slice(0, -1));
+            setCheckAuth(false);
         }
     }
-
+     const [checkAuth, setCheckAuth] = useState(false);
+    
     const dispatch = useDispatch();
-    const { reLogin, authenticationFailed } = useSelector(
-      state => state.setupAndAuth,
-    );
-  
-    if (reLogin) {
-        props.navigation.navigate('SettingGetNewPin')
-    } else{
-        console.log("wrong passcode")
-    }
+  const { reLogin, authenticationFailed } = useSelector(
+    state => state.setupAndAuth,
+  );
 
+  if (reLogin) {
+    props.navigation.navigate('SettingGetNewPin')
+     dispatch(switchReLogin(false, true));
+  }
+
+  useEffect(() => {
+    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
+  }, [authenticationFailed]);
+    
     const [switchOn, setSwitchOn] = useState(false);
-    const renderPinChangeSuccessModalContent = () => {
-        return (
-            <ErrorModalContents
-                modalRef={PinChangeSuccessBottomSheet}
-                title={'Pin Changed Successfully'}
-                info={'Lorem ipsum dolor sit amet, consectetur'}
-                note={'sed do eiusmod tempor incididunt ut labore et'}
-                proceedButtonText={'View Settings'}
-                isIgnoreButton={false}
-                onPressProceed={() => {
-                    (PinChangeSuccessBottomSheet as any).current.snapTo(0);
-                    props.navigation.state.params.managePinSuccessProceed(pin);
-                    props.navigation.goBack();
-                }}
-                isBottomImage={true}
-            />
-        );
-    };
-
-    const renderPinChangeSuccessModalHeader = () => {
-        return (
-            <ModalHeader
-                onPressHeader={() => {
-                    (PinChangeSuccessBottomSheet as any).current.snapTo(0);
-                }}
-            />
-        );
-    };
+    
 
     return (<SafeAreaView style={{ flex: 1 }}>
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -111,7 +82,7 @@ export default function SettingManagePin(props) {
                 </View>
             </View>
             <View style={{ flex: 1 }}>
-                <View style={{}}>
+            <View style={{alignSelf:'baseline'}}>
                     <View>
                         <Text style={styles.headerInfoText}>Please enter your <Text style={styles.boldItalicText}>existing pin</Text></Text>
                         <View style={styles.passcodeTextInputView}>
@@ -133,7 +104,13 @@ export default function SettingManagePin(props) {
                             </View>
                         </View>
                     </View>
-
+                    {checkAuth ? (
+            <View style={{marginLeft: 'auto'}}>
+              <Text style={styles.errorText}>
+              Incorrect passcode, try again!
+              </Text>
+            </View>
+          ) : null}
                 </View>
                 {
                     pin.length == 4 ? <View style={{ marginTop: 'auto' }}>
@@ -229,16 +206,7 @@ export default function SettingManagePin(props) {
                     </View>
                 </View>
             </View>
-            <BottomSheet
-                enabledInnerScrolling={true}
-                ref={PinChangeSuccessBottomSheet}
-                snapPoints={[
-                    -50,
-                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
-                ]}
-                renderContent={renderPinChangeSuccessModalContent}
-                renderHeader={renderPinChangeSuccessModalHeader}
-            />
+           
         </View>
     </SafeAreaView>
     )
@@ -248,6 +216,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: hp('8%')
     },
+    errorText: {
+        fontFamily: Fonts.FiraSansMediumItalic,
+        color: Colors.red,
+        fontSize: RFValue(11, 812),
+        fontStyle: 'italic',
+      },
     keyPadElementTouchable: {
         flex: 1,
         height: hp('8%'),

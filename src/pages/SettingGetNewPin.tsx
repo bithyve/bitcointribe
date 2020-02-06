@@ -6,7 +6,10 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   TouchableOpacity,
-  StatusBar
+  StatusBar,
+  Platform,
+    AsyncStorage,
+    Alert
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Colors from "../common/Colors";
@@ -19,8 +22,17 @@ import { RFValue } from "react-native-responsive-fontsize";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
 import { storeCreds } from "../store/actions/setupAndAuth";
+import BottomSheet from 'reanimated-bottom-sheet';
+import ErrorModalContents from '../components/ErrorModalContents';
+import TransparentHeaderModal from '../components/TransparentHeaderModal';
+import DeviceInfo from 'react-native-device-info';
+import ModalHeader from '../components/ModalHeader';
 
 export default function SettingGetNewPin( props ) {
+  const [
+    PinChangeSuccessBottomSheet,
+    setPinChangeSuccessBottomSheet,
+] = useState(React.createRef());
   const [ passcode, setPasscode ] = useState( "" );
   const [ confirmPasscode, setConfirmPasscode ] = useState( "" );
   const [ passcodeFlag, setPasscodeFlag ] = useState( true );
@@ -83,8 +95,39 @@ export default function SettingGetNewPin( props ) {
   }, [ passcode, confirmPasscode ] );
 
   const dispatch = useDispatch();
-//   const { hasCreds } = useSelector( state => state.setupAndAuth );
-//   if ( hasCreds ) props.navigation.replace( "RestoreAndRecoverWallet" );
+  const { hasCreds } = useSelector( state => state.setupAndAuth );
+  console.log("hasCreds",hasCreds);
+  if ( hasCreds ) {
+    PinChangeSuccessBottomSheet && (PinChangeSuccessBottomSheet as any).current.snapTo(1);
+  }
+  const renderPinChangeSuccessModalContent = () => {
+    return (
+        <ErrorModalContents
+            modalRef={PinChangeSuccessBottomSheet}
+            title={'Pin Changed Successfully'}
+            info={'Lorem ipsum dolor sit amet, consectetur'}
+            note={'sed do eiusmod tempor incididunt ut labore et'}
+            proceedButtonText={'View Settings'}
+            isIgnoreButton={false}
+            onPressProceed={() => {
+                (PinChangeSuccessBottomSheet as any).current.snapTo(0);
+               // props.navigation.state.params.managePinSuccessProceed(passcode);
+                props.navigation.popToTop();
+            }}
+            isBottomImage={true}
+        />
+    );
+};
+
+const renderPinChangeSuccessModalHeader = () => {
+    return (
+        <ModalHeader
+            onPressHeader={() => {
+                (PinChangeSuccessBottomSheet as any).current.snapTo(0);
+            }}
+        />
+    );
+};
 
   return (
     <SafeAreaView style={ { flex: 1 } }>
@@ -565,6 +608,16 @@ export default function SettingGetNewPin( props ) {
             </TouchableOpacity>
           </View>
         </View>
+        <BottomSheet
+                enabledInnerScrolling={true}
+                ref={PinChangeSuccessBottomSheet}
+                snapPoints={[
+                    -50,
+                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+                ]}
+                renderContent={renderPinChangeSuccessModalContent}
+                renderHeader={renderPinChangeSuccessModalHeader}
+            />
       </View>
     </SafeAreaView>
   );
