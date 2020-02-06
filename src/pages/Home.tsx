@@ -570,7 +570,6 @@ export default function Home(props) {
   };
 
   const getQrCodeData = qrData => {
-    // console.log('Qrcodedata', data);
     const scannedData = JSON.parse(qrData);
     console.log({ scannedData });
     switch (scannedData.type) {
@@ -579,6 +578,7 @@ export default function Home(props) {
           requester: scannedData.requester,
           ek: scannedData.ENCRYPTED_KEY,
           otp: scannedData.OTP,
+          isTrustedContact : false
         };
         props.navigation.navigate('Home', { custodyRequest });
         break;
@@ -851,7 +851,13 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('CustodianRequestOTP', { custodyRequest });
+          console.log("custodyRequest", custodyRequest)
+          if(custodyRequest.isTrustedContact){
+            props.navigation.navigate('CustodianRequestOTP', { custodyRequest });
+          }
+          else{
+            dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek))
+          }
         }}
         onPressRejectSecret={() => {
           setTimeout(() => {
