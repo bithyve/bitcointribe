@@ -79,6 +79,19 @@ const SecondaryDeviceHistory = props => {
   const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
     React.createRef(),
   );
+  const [secondaryQR, setSecondaryQR] = useState('');
+  const SHARES_TRANSFER_DETAILS = useSelector(
+    state =>
+      state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+  );
+  const WALLET_SETUP = useSelector(
+    state => state.storage.database.WALLET_SETUP,
+  );
+
+  const uploadMetaShare = useSelector(
+    state => state.sss.loading.uploadMetaShare,
+  );
+
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
   );
@@ -103,17 +116,19 @@ const SecondaryDeviceHistory = props => {
   const renderSecondaryDeviceContents = useCallback(() => {
     return (
       <SecondaryDevice
+        secondaryQR={secondaryQR}
+        uploadMetaShare={uploadMetaShare}
         onPressOk={async () => {
           updateAutoHighlightFlags();
           saveInTransitHistory();
-          secondaryDeviceBottomSheet.current.snapTo(0);
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
         }}
         onPressBack={() => {
-          secondaryDeviceBottomSheet.current.snapTo(0);
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
         }}
       />
     );
-  }, []);
+  }, [secondaryQR, uploadMetaShare]);
 
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
@@ -171,6 +186,26 @@ const SecondaryDeviceHistory = props => {
     })();
   }, []);
 
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (SHARES_TRANSFER_DETAILS[0]) {
+      if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
+        dispatch(uploadEncMShare(0));
+      } else {
+        // do nothing
+      }
+      setSecondaryQR(
+        JSON.stringify({
+          requester: WALLET_SETUP.walletName,
+          ...SHARES_TRANSFER_DETAILS[0],
+          type: 'secondaryDeviceQR',
+        }),
+      );
+    } else {
+      dispatch(uploadEncMShare(0));
+    }
+  }, []);
+  console.log({ secondaryQR });
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView

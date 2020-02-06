@@ -29,7 +29,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Contacts from 'react-native-contacts';
 import * as ExpoContacts from 'expo-contacts';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import {ScrollView} from "react-native-gesture-handler";
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function CommunicationMode(props) {
   // const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
@@ -60,20 +60,22 @@ export default function CommunicationMode(props) {
           type: number ? 'number' : 'email',
         };
       }
-    }));
+    }),
+  );
 
-  useEffect(()=>{
+  useEffect(() => {
     setContact(contact);
   });
-  
-  useEffect(()=>{
-    updateNewContactInfo();
-  },[Contact]);
 
-  const updateNewContactInfo = () =>{
+  useEffect(() => {
+    updateNewContactInfo();
+  }, [Contact]);
+
+  const updateNewContactInfo = () => {
     let communicationInfo = [];
     if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
     if (contact.emails) communicationInfo.push(...contact.emails);
+
     if(contactInfo.length == 0 || (contactInfo.length>0 && communicationInfo.findIndex((value)=>value.email ==contactInfo[0].info || value.number ==contactInfo[0].info)==-1 )){
       let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
         if (number || email) {
@@ -91,11 +93,12 @@ export default function CommunicationMode(props) {
         isSelected: false,
         type: 'qrcode',
       }) 
+
       setTimeout(() => {
         setContactInfo(contactInfoTemp);
       }, 2);
     }
-  }
+  };
 
   const getIconByStatus = status => {
     if (status == 'Ugly') {
@@ -131,13 +134,14 @@ export default function CommunicationMode(props) {
     }
   };
 
-  useEffect(()=>{
-    if(!selectedContactMode){
-      let temp = [];setTimeout(() => {
+  useEffect(() => {
+    if (!selectedContactMode) {
+      let temp = [];
+      setTimeout(() => {
         setContactInfo(temp);
       }, 1000);
     }
-  }, [selectedContactMode])
+  }, [selectedContactMode]);
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
@@ -204,7 +208,7 @@ export default function CommunicationMode(props) {
       dispatch(uploadEncMShare(index));
     else {
       //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      // console.log(SHARES_TRANSFER_DETAILS[index]);
+      console.log(SHARES_TRANSFER_DETAILS[index]);
     }
   }, [SHARES_TRANSFER_DETAILS[index]]);
 

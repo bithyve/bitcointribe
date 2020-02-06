@@ -117,7 +117,6 @@ function* uploadEncMetaShareWorker({ payload }) {
   const { DECENTRALIZED_BACKUP } = yield select(
     state => state.storage.database,
   );
-
   // preventing re-uploads till expiry
   if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
     if (
@@ -125,11 +124,11 @@ function* uploadEncMetaShareWorker({ payload }) {
         DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
           .UPLOADED_AT <
       600000
-    )
-      console.log('Re-upload after 10 minutes'); // re-upload after 10 minutes (removal sync w/ relayer)
-    return;
+    ) {
+      // re-upload after 10 minutes (removal sync w/ relayer)
+      return;
+    }
   }
-
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
