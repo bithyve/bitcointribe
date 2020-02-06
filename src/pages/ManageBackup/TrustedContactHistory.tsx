@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -35,6 +35,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
+import SecondaryDevice from './SecondaryDevice';
 
 const TrustedContactHistory = props => {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -65,6 +66,9 @@ const TrustedContactHistory = props => {
   let [SelectedContacts, setSelectedContacts] = useState([]);
   const [isSecretShared1, setIsSecretShared1] = useState(false);
   const [isSecretShared2, setIsSecretShared2] = useState(false);
+  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+    React.createRef(),
+  );
   //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
   //     secondaryDevice: false,
   //     trustedContact1: false,
@@ -208,13 +212,19 @@ const TrustedContactHistory = props => {
         onPressBack={() => {
           CommunicationModeBottomSheet.current.snapTo(0);
         }}
-        onPressContinue={(OTP, index) => {
-          setTimeout(() => {
-            setOTP(OTP);
-            setChosenContactIndex(index);
-          }, 10);
-          CommunicationModeBottomSheet.current.snapTo(0);
-          shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+        onPressContinue={(OTP, index, selectedContactMode) => {
+          if(selectedContactMode.type == 'qrcode'){
+            secondaryDeviceBottomSheet.current.snapTo(1);
+            CommunicationModeBottomSheet.current.snapTo(0);
+          }
+          else{
+            setTimeout(() => {
+              setOTP(OTP);
+              setChosenContactIndex(index);
+            }, 10);
+            CommunicationModeBottomSheet.current.snapTo(0);
+            shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+          }
         }}
       />
     );
@@ -492,6 +502,30 @@ const TrustedContactHistory = props => {
     })();
   }, []);
 
+  const onShareSecrete = () =>{
+    updateAutoHighlightFlags();
+    saveInTransitHistory();
+    secondaryDeviceBottomSheet.current.snapTo(0);
+  }
+
+  const renderSecondaryDeviceContents = useCallback(() => {
+    return (
+      <SecondaryDevice
+        isTrustedContact = {true}
+        onPressOk={async () => onShareSecrete()}
+        onPressBack={() => onShareSecrete()}
+      />
+    );
+  }, []);
+
+  const renderSecondaryDeviceHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => onShareSecrete()}
+      />
+    );
+  }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -638,6 +672,14 @@ const TrustedContactHistory = props => {
         ]}
         renderContent={renderConfirmContent}
         renderHeader={renderConfirmHeader}
+      />
+      <BottomSheet
+        onCloseStart={() => onShareSecrete()}
+        enabledInnerScrolling={true}
+        ref={secondaryDeviceBottomSheet}
+        snapPoints={[-30, hp('90%')]}
+        renderContent={renderSecondaryDeviceContents}
+        renderHeader={renderSecondaryDeviceHeader}
       />
     </View>
   );
