@@ -204,7 +204,7 @@ const SecondaryDeviceHistory = props => {
     } else {
       dispatch(uploadEncMShare(0));
     }
-  }, []);
+  }, [SHARES_TRANSFER_DETAILS]);
   console.log({ secondaryQR });
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
