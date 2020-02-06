@@ -66,9 +66,10 @@ const TrustedContactHistory = props => {
   let [SelectedContacts, setSelectedContacts] = useState([]);
   const [isSecretShared1, setIsSecretShared1] = useState(false);
   const [isSecretShared2, setIsSecretShared2] = useState(false);
-  const [trustedContactQrBottomSheet, setTrustedContactQrBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [
+    trustedContactQrBottomSheet,
+    setTrustedContactQrBottomSheet,
+  ] = useState(React.createRef());
   //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
   //     secondaryDevice: false,
   //     trustedContact1: false,
@@ -110,6 +111,9 @@ const TrustedContactHistory = props => {
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
+  const [activateReshare, setActivateReshare] = useState(
+    props.navigation.getParam('activateReshare'),
+  );
 
   const secretSharedTrustedContact1 = isSecretShared1 => {
     setIsSecretShared1(isSecretShared1);
@@ -213,11 +217,10 @@ const TrustedContactHistory = props => {
           CommunicationModeBottomSheet.current.snapTo(0);
         }}
         onPressContinue={(OTP, index, selectedContactMode) => {
-          if(selectedContactMode.type == 'qrcode'){
+          if (selectedContactMode.type == 'qrcode') {
             trustedContactQrBottomSheet.current.snapTo(1);
             CommunicationModeBottomSheet.current.snapTo(0);
-          }
-          else{
+          } else {
             setTimeout(() => {
               setOTP(OTP);
               setChosenContactIndex(index);
@@ -311,6 +314,7 @@ const TrustedContactHistory = props => {
     // );
     updateAutoHighlightFlags();
     saveInTransitHistory();
+    setActivateReshare(true);
     // remaining Set setup flag
     shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
   };
@@ -502,16 +506,16 @@ const TrustedContactHistory = props => {
     })();
   }, []);
 
-  const onShareSecrete = () =>{
+  const onShareSecrete = () => {
     updateAutoHighlightFlags();
     saveInTransitHistory();
     trustedContactQrBottomSheet.current.snapTo(0);
-  }
+  };
 
   const renderTrustedContactQrContents = useCallback(() => {
     return (
       <TrustedContactQr
-        isTrustedContact = {true}
+        isTrustedContact={true}
         onPressOk={async () => onShareSecrete()}
         onPressBack={() => onShareSecrete()}
       />
@@ -519,11 +523,7 @@ const TrustedContactHistory = props => {
   }, []);
 
   const renderTrustedContactQrHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => onShareSecrete()}
-      />
-    );
+    return <ModalHeader onPressHeader={() => onShareSecrete()} />;
   }, []);
 
   return (
@@ -595,7 +595,7 @@ const TrustedContactHistory = props => {
           //       : false
           //   }
 
-          IsReshare={shared}
+          IsReshare={shared || activateReshare}
           onPressContinue={() => {
             setTimeout(() => {
               setLoadContacts(true);
@@ -604,12 +604,14 @@ const TrustedContactHistory = props => {
           }}
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
-            shared
+            shared || activateReshare
               ? 'consectetur Lorem ipsum dolor sit amet, consectetur sit '
               : null
           }
           changeInfo={
-            shared ? 'Lorem ipsum dolor sit amet, consectetur sit amet ' : null
+            shared || activateReshare
+              ? 'Lorem ipsum dolor sit amet, consectetur sit amet '
+              : null
           }
           onPressChange={() => {
             ChangeBottomSheet.current.snapTo(1);
