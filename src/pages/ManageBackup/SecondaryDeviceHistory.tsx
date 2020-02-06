@@ -189,10 +189,10 @@ const SecondaryDeviceHistory = props => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (SHARES_TRANSFER_DETAILS[0]) {
-      if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT < 600000) {
-        // do nothing
-      } else {
+      if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
         dispatch(uploadEncMShare(0));
+      } else {
+        // do nothing
       }
       setSecondaryQR(
         JSON.stringify({
