@@ -54,8 +54,11 @@ export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED';
 export const TRANSFER_ST1_EXECUTED = 'TRANSFER_ST1_EXECUTED';
+export const TRANSFER_ST1_FAILED = 'TRANSFER_ST1_FAILED';
 export const TRANSFER_ST2_EXECUTED = 'TRANSFER_ST2_EXECUTED';
+export const TRANSFER_ST2_FAILED = 'TRANSFER_ST2_FAILED';
 export const TRANSFER_ST3_EXECUTED = 'TRANSFER_SECURE_ST3_EXECUTED';
+export const TRANSFER_ST3_FAILED = 'TRANSFER_ST3_FAILED';
 export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING';
 
 export const addressFetched = (serviceType, address) => {
@@ -74,13 +77,25 @@ export const executedST1 = (serviceType, result) => {
   return { type: TRANSFER_ST1_EXECUTED, payload: { serviceType, result } };
 };
 
+export const failedST1 = serviceType => {
+  return { type: TRANSFER_ST1_FAILED, payload: { serviceType } };
+};
+
 export const executedST2 = (serviceType, result) => {
   return { type: TRANSFER_ST2_EXECUTED, payload: { serviceType, result } };
+};
+
+export const failedST2 = serviceType => {
+  return { type: TRANSFER_ST2_FAILED, payload: { serviceType } };
 };
 
 export const executedST3 = (serviceType, result) => {
   // Secure account specific
   return { type: TRANSFER_ST3_EXECUTED, payload: { serviceType, result } };
+};
+
+export const failedST3 = serviceType => {
+  return { type: TRANSFER_ST3_FAILED, payload: { serviceType } };
 };
 
 export const switchLoader = (serviceType, beingLoaded) => {

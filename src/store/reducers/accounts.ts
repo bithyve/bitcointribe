@@ -7,6 +7,9 @@ import {
   CLEAR_TRANSFER,
   TRANSFER_ST3_EXECUTED,
   ACCOUNTS_LOADING,
+  TRANSFER_ST1_FAILED,
+  TRANSFER_ST2_FAILED,
+  TRANSFER_ST3_FAILED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -30,6 +33,7 @@ const ACCOUNT_VARS: {
     executed: string;
     stage1: any;
     stage2: any;
+    stage3: any;
     txid: String;
   };
   loading: {
@@ -51,6 +55,7 @@ const ACCOUNT_VARS: {
     executed: '',
     stage1: {},
     stage2: {},
+    stage3: {},
     txid: '',
   },
   loading: {
@@ -128,6 +133,22 @@ export default (state = initialState, action) => {
         },
       };
 
+    case TRANSFER_ST1_FAILED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            stage1: { ...state[account].transfer.stage1, failed: true },
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
     case CLEAR_TRANSFER:
       return {
         ...state,
@@ -157,6 +178,7 @@ export default (state = initialState, action) => {
               },
             },
           };
+
         case SECURE_ACCOUNT:
           return {
             ...state,
@@ -175,6 +197,22 @@ export default (state = initialState, action) => {
           };
       }
 
+    case TRANSFER_ST2_FAILED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            stage2: { ...state[account].transfer.stage2, failed: true },
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
     case TRANSFER_ST3_EXECUTED:
       return {
         ...state,
@@ -184,6 +222,22 @@ export default (state = initialState, action) => {
             ...state[account].transfer,
             txid: action.payload.result,
             executing: false,
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
+    case TRANSFER_ST3_FAILED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            stage3: { ...state[account].transfer.stage3, failed: true },
           },
           loading: {
             ...state[account].loading,
