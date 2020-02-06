@@ -75,27 +75,25 @@ export default function CommunicationMode(props) {
     let communicationInfo = [];
     if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
     if (contact.emails) communicationInfo.push(...contact.emails);
-    if (
-      contactInfo.length == 0 ||
-      (contactInfo.length > 0 &&
-        communicationInfo.findIndex(
-          value =>
-            value.email == contactInfo[0].info ||
-            value.number == contactInfo[0].info,
-        ) == -1)
-    ) {
-      let contactInfoTemp = communicationInfo.map(
-        ({ number, email }, index) => {
-          if (number || email) {
-            return {
-              id: index,
-              info: number || email,
-              isSelected: false,
-              type: number ? 'number' : 'email',
-            };
-          }
-        },
-      );
+
+    if(contactInfo.length == 0 || (contactInfo.length>0 && communicationInfo.findIndex((value)=>value.email ==contactInfo[0].info || value.number ==contactInfo[0].info)==-1 )){
+      let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
+        if (number || email) {
+          return {
+            id: index,
+            info: number || email,
+            isSelected: false,
+            type: number ? 'number' : 'email',
+          };
+        }
+      });
+      contactInfoTemp.push({
+        id: contactInfoTemp.length,
+        info: 'Qr code',
+        isSelected: false,
+        type: 'qrcode',
+      }) 
+
       setTimeout(() => {
         setContactInfo(contactInfoTemp);
       }, 2);
@@ -191,6 +189,7 @@ export default function CommunicationMode(props) {
         ? SHARES_TRANSFER_DETAILS[index].OTP
         : null,
       index,
+      selectedContactMode
     );
     // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
     //   OTP:'123456'
@@ -414,10 +413,7 @@ export default function CommunicationMode(props) {
         </View>
         {selectedContactMode ? (
           <AppBottomSheetTouchableWrapper
-            onPress={() => {
-              setSelectedContactMode(null);
-              communicate(selectedContactMode);
-            }}
+            onPress={() =>{ communicate(selectedContactMode)}}
             disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,

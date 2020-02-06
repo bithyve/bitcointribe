@@ -31,7 +31,6 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 
 export default function SecondaryDeviceModelContents(props) {
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  console.log({ props });
   const getIconByStatus = status => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
