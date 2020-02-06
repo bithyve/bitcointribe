@@ -18,6 +18,9 @@ import {
   executedST3,
   fetchTransactions,
   ACCUMULATIVE_BAL_AND_TX,
+  failedST1,
+  failedST2,
+  failedST3,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -134,9 +137,11 @@ function* transferST1Worker({ payload }) {
     amount,
     priority,
   );
-  res.status === 200
-    ? yield put(executedST1(payload.serviceType, res.data))
-    : yield put(switchLoader(payload.serviceType, 'transfer'));
+  if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
+  else {
+    yield put(failedST1(payload.serviceType));
+    yield put(switchLoader(payload.serviceType, 'transfer'));
+  }
 }
 
 export const transferST1Watcher = createWatcher(
@@ -162,6 +167,7 @@ function* transferST2Worker({ payload }) {
       yield put(executedST2(payload.serviceType, res.data));
     } else yield put(executedST2(payload.serviceType, res.data.txid));
   } else {
+    yield put(failedST2(payload.serviceType));
     yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
@@ -189,6 +195,7 @@ function* transferST3Worker({ payload }) {
   if (res.status === 200) {
     yield put(executedST3(payload.serviceType, res.data.txid));
   } else {
+    yield put(failedST3(payload.serviceType));
     yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
