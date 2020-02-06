@@ -31,39 +31,6 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 
 export default function SecondaryDeviceModelContents(props) {
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  const [secondaryQR, setSecondaryQR] = useState('');
-  const [TrustedContactSecrete, setTrustedContactSecrete] = useState('testing ... ');
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
-  );
-  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
-  const { loading } = useSelector(state => state.sss);
-
-  // const deepLink = SHARES_TRANSFER_DETAILS[0]
-  //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-  //     SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
-  //   : '';
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (SHARES_TRANSFER_DETAILS[0]) {
-      if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT < 600000) {
-        // do nothing
-      } else {
-        dispatch(uploadEncMShare(0));
-      }
-      setSecondaryQR(
-        JSON.stringify({
-          requester: WALLET_SETUP.walletName,
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: 'secondaryDeviceQR',
-        }),
-      );
-    } else {
-      dispatch(uploadEncMShare(0));
-    }
-  }, [SHARES_TRANSFER_DETAILS[0]]);
-
   const getIconByStatus = status => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
@@ -127,14 +94,12 @@ export default function SecondaryDeviceModelContents(props) {
         />
       </View>
       <View style={BackupStyles.modalContentView}>
-        {
-        props.isTrustedContact ? <QRCode value={TrustedContactSecrete} size={hp('27%')} /> : 
-        loading.uploadMetaShare || !secondaryQR ? (
+        {props.uploadMetaShare || !props.secondaryQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={secondaryQR} size={hp('27%')} />
+          <QRCode value={props.secondaryQR} size={hp('27%')} />
         )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
