@@ -32,6 +32,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 export default function SecondaryDeviceModelContents(props) {
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [secondaryQR, setSecondaryQR] = useState('');
+  const [TrustedContactSecrete, setTrustedContactSecrete] = useState('testing ... ');
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
   );
@@ -126,7 +127,9 @@ export default function SecondaryDeviceModelContents(props) {
         />
       </View>
       <View style={BackupStyles.modalContentView}>
-        {loading.uploadMetaShare || !secondaryQR ? (
+        {
+        props.isTrustedContact ? <QRCode value={TrustedContactSecrete} size={hp('27%')} /> : 
+        loading.uploadMetaShare || !secondaryQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
             <ActivityIndicator size="large" />
           </View>

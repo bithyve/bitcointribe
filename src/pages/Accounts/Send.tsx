@@ -168,7 +168,11 @@ export default function Send(props) {
   );
 
   useEffect(() => {
-    if(transfer.txid){
+    if(transfer.stage1.failed || transfer.stage2.failed || transfer.stage3.failed){
+      SendConfirmationBottomSheet.current.snapTo(0);
+      SendUnSuccessWithAddressBottomSheet.current.snapTo(1)
+    }
+    else if(transfer.txid){
       SendConfirmationBottomSheet.current.snapTo(0);
       SendSuccessWithAddressBottomSheet.current.snapTo(1)
     }
@@ -181,9 +185,6 @@ export default function Send(props) {
         recipientAddress,
       });
     }
-    // else if(transfer ) {
-    //   SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
-    // }
   }, [transfer]);
 
   const renderSendHelperContents = () => {
@@ -344,7 +345,7 @@ export default function Send(props) {
     }
     return <SendConfirmationContent 
           title = {"Sent Successfully"}
-          info={"Confirm the follow details"}
+          info={"Bitcoins successfully sent to Contact"}
           userInfo = {userInfo}
           isFromContact = {false}
           okButtonText={"View Account"}
@@ -353,33 +354,37 @@ export default function Send(props) {
           onPressOk={()=>{dispatch(clearTransfer(serviceType));
             dispatch(fetchBalance(serviceType));
             dispatch(fetchTransactions(serviceType));
+            SendSuccessWithAddressBottomSheet.current.snapTo(0)
             props.navigation.navigate('Accounts');}}
           isSuccess={true}
       />
   }
 
   const renderSendSuccessWithAddressHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{SendSuccessWithAddressBottomSheet.current.snapTo(0)}} />
+    return <ModalHeader onPressHeader={()=>{dispatch(clearTransfer(serviceType));
+      dispatch(fetchBalance(serviceType));
+      dispatch(fetchTransactions(serviceType));
+      SendSuccessWithAddressBottomSheet.current.snapTo(0);
+      props.navigation.navigate('Accounts'); }} />
   }
 
   const renderSendUnSuccessWithAddressContents = () =>{
     return <SendConfirmationContent 
           title = {"Sent Unsuccessful"}
-          info={"Confirm the follow details"}
+          info={"There seems to be a problem"}
           userInfo = {userInfo}
           isFromContact = {false}
           okButtonText={"Try Again"}
           cancelButtonText={"Back"}
           isCancel={true}
-          onPressOk={()=>{}}
-          onPressCancel={()=>{}}
-          onPressBack = {()=>{SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}}
+          onPressOk={()=>{dispatch(clearTransfer(serviceType));SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}}
+          onPressCancel={()=>{dispatch(clearTransfer(serviceType));SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}}
           isUnSuccess={true}
       />
   }
 
   const renderSendUnSuccessWithAddressHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}} />
+    return <ModalHeader onPressHeader={()=>{dispatch(clearTransfer(serviceType));SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}} />
   }
 
   useEffect(() => {
@@ -860,6 +865,10 @@ export default function Send(props) {
           renderHeader={renderSendConfirmationHeader}
         />
         <BottomSheet
+          onCloseStart={()=>{{dispatch(clearTransfer(serviceType));
+            dispatch(fetchBalance(serviceType));
+            dispatch(fetchTransactions(serviceType));
+            props.navigation.navigate('Accounts');}}}
           enabledInnerScrolling={true}
           ref={SendSuccessWithAddressBottomSheet}
           snapPoints={[-50, hp('50%')]}
@@ -867,6 +876,10 @@ export default function Send(props) {
           renderHeader={renderSendSuccessWithAddressHeader}
         />
         <BottomSheet
+          onCloseStart={()=>{
+            dispatch(clearTransfer(serviceType));
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0)
+          }}
           enabledInnerScrolling={true}
           ref={SendUnSuccessWithAddressBottomSheet}
           snapPoints={[-50, hp('50%')]}

@@ -85,6 +85,12 @@ export default function CommunicationMode(props) {
           };
         }
       });
+      contactInfoTemp.push({
+        id: contactInfoTemp.length,
+        info: 'Qr code',
+        isSelected: false,
+        type: 'qrcode',
+      }) 
       setTimeout(() => {
         setContactInfo(contactInfoTemp);
       }, 2);
@@ -179,6 +185,7 @@ export default function CommunicationMode(props) {
         ? SHARES_TRANSFER_DETAILS[index].OTP
         : null,
       index,
+      selectedContactMode
     );
     // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
     //   OTP:'123456'
@@ -402,7 +409,7 @@ export default function CommunicationMode(props) {
         </View>
         {selectedContactMode ? (
           <AppBottomSheetTouchableWrapper
-            onPress={() =>{ setSelectedContactMode(null); communicate(selectedContactMode)}}
+            onPress={() =>{ communicate(selectedContactMode)}}
             disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
