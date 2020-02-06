@@ -1460,6 +1460,7 @@ export default function ManageBackup(props) {
             ...autoHighlightFlags,
             trustedContact1: true,
           }),
+        activateReshare: autoHighlightFlags.trustedContact1,
         next: 'true',
       });
     } else if (!trustedContact2 && !overallHealth.sharesInfo[2].updatedAt) {
@@ -1472,6 +1473,7 @@ export default function ManageBackup(props) {
             ...autoHighlightFlags,
             trustedContact2: true,
           }),
+        activateReshare: autoHighlightFlags.trustedContact2,
         next: 'true',
       });
     } else if (!personalCopy1 && !overallHealth.sharesInfo[3].updatedAt) {
@@ -1553,6 +1555,7 @@ export default function ManageBackup(props) {
                 ...autoHighlightFlags,
                 trustedContact1: true,
               }),
+            activateReshare: autoHighlightFlags.trustedContact1,
             next: 'true',
           });
         } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
@@ -1572,6 +1575,7 @@ export default function ManageBackup(props) {
                 ...autoHighlightFlags,
                 trustedContact2: true,
               }),
+            activateReshare: autoHighlightFlags.trustedContact2,
             next: 'true',
           });
         } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
@@ -1671,6 +1675,7 @@ export default function ManageBackup(props) {
                 ...autoHighlightFlags,
                 trustedContact1: true,
               }),
+            activateReshare: autoHighlightFlags.trustedContact1,
             next: 'true',
           });
 
@@ -1691,6 +1696,7 @@ export default function ManageBackup(props) {
                 ...autoHighlightFlags,
                 trustedContact2: true,
               }),
+            activateReshare: autoHighlightFlags.trustedContact2,
             next: 'true',
           });
 
@@ -2032,6 +2038,7 @@ export default function ManageBackup(props) {
                             ...autoHighlightFlags,
                             trustedContact1: true,
                           }),
+                        activateReshare: autoHighlightFlags.trustedContact1,
                       });
                       // setLoadOnTrustedContactBottomSheet(true);
                       // setTimeout(() => {
@@ -2055,6 +2062,7 @@ export default function ManageBackup(props) {
                             ...autoHighlightFlags,
                             trustedContact2: true,
                           }),
+                        activateReshare: autoHighlightFlags.trustedContact2,
                       });
                       // setTimeout(() => {
                       //   setSelectTypeToReshare('contact2');
