@@ -35,7 +35,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
-import SecondaryDevice from './SecondaryDevice';
+import TrustedContactQr from './TrustedContactQr';
 
 const TrustedContactHistory = props => {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -66,7 +66,7 @@ const TrustedContactHistory = props => {
   let [SelectedContacts, setSelectedContacts] = useState([]);
   const [isSecretShared1, setIsSecretShared1] = useState(false);
   const [isSecretShared2, setIsSecretShared2] = useState(false);
-  const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+  const [trustedContactQrBottomSheet, setTrustedContactQrBottomSheet] = useState(
     React.createRef(),
   );
   //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
@@ -214,7 +214,7 @@ const TrustedContactHistory = props => {
         }}
         onPressContinue={(OTP, index, selectedContactMode) => {
           if(selectedContactMode.type == 'qrcode'){
-            secondaryDeviceBottomSheet.current.snapTo(1);
+            trustedContactQrBottomSheet.current.snapTo(1);
             CommunicationModeBottomSheet.current.snapTo(0);
           }
           else{
@@ -505,12 +505,12 @@ const TrustedContactHistory = props => {
   const onShareSecrete = () =>{
     updateAutoHighlightFlags();
     saveInTransitHistory();
-    secondaryDeviceBottomSheet.current.snapTo(0);
+    trustedContactQrBottomSheet.current.snapTo(0);
   }
 
-  const renderSecondaryDeviceContents = useCallback(() => {
+  const renderTrustedContactQrContents = useCallback(() => {
     return (
-      <SecondaryDevice
+      <TrustedContactQr
         isTrustedContact = {true}
         onPressOk={async () => onShareSecrete()}
         onPressBack={() => onShareSecrete()}
@@ -518,7 +518,7 @@ const TrustedContactHistory = props => {
     );
   }, []);
 
-  const renderSecondaryDeviceHeader = useCallback(() => {
+  const renderTrustedContactQrHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => onShareSecrete()}
@@ -676,10 +676,10 @@ const TrustedContactHistory = props => {
       <BottomSheet
         onCloseStart={() => onShareSecrete()}
         enabledInnerScrolling={true}
-        ref={secondaryDeviceBottomSheet}
+        ref={trustedContactQrBottomSheet}
         snapPoints={[-30, hp('90%')]}
-        renderContent={renderSecondaryDeviceContents}
-        renderHeader={renderSecondaryDeviceHeader}
+        renderContent={renderTrustedContactQrContents}
+        renderHeader={renderTrustedContactQrHeader}
       />
     </View>
   );
