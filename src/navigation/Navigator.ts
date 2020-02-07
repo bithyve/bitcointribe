@@ -61,6 +61,7 @@ import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
 import SettingGetNewPin from '../pages/SettingGetNewPin';
+import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -158,7 +159,8 @@ const HomeNavigator = createStackNavigator(
     TrustedContactHistory,
     PersonalCopyHistory,
     SecurityQuestionHistory,
-    SettingGetNewPin
+    SettingGetNewPin,
+    ContactsListForAssociateContact
   },
   {
     headerLayoutPreset: 'center',
