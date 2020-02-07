@@ -32,6 +32,9 @@ import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
+import moment from 'moment';
+import _ from 'underscore';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const SecurityQuestionHistory = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
@@ -43,31 +46,25 @@ const SecurityQuestionHistory = props => {
     }
   };
 
-  const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
+  const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Created',
+      title: 'Security Questions Created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret In-Transit',
+      title: 'Security Questions Confirmed',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret Accessible',
+      title: 'Security Questions Unconfirmed',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 4,
-      title: 'Recovery Secret Not Accessible',
-      date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
   const [
@@ -91,6 +88,7 @@ const SecurityQuestionHistory = props => {
         bottomSheetRef={SecurityQuestionBottomSheet}
         onPressConfirm={async () => {
           updateAutoHighlightFlags();
+          saveConfirmationHistory();
           SecurityQuestionBottomSheet.current.snapTo(0);
           (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
@@ -136,9 +134,67 @@ const SecurityQuestionHistory = props => {
     );
   }, []);
 
+  const sortedHistory = history => {
+    const currentHistory = history.filter(element => {
+      if (element.date) return element;
+    });
+
+    const sortedHistory = _.sortBy(currentHistory, 'date');
+    sortedHistory.forEach(element => {
+      element.date = moment(element.date)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    });
+
+    return sortedHistory;
+  };
+
+  const updateHistory = securityQuestionHistory => {
+    const updatedSecurityQuestionsHistory = [...securityQuestionsHistory];
+    if (securityQuestionHistory.created)
+      updatedSecurityQuestionsHistory[0].date = securityQuestionHistory.created;
+
+    if (securityQuestionHistory.confirmed)
+      updatedSecurityQuestionsHistory[1].date =
+        securityQuestionHistory.confirmed;
+
+    if (securityQuestionHistory.unconfirmed)
+      updatedSecurityQuestionsHistory[2].date =
+        securityQuestionHistory.unconfirmed;
+    setSecuirtyQuestionHistory(updatedSecurityQuestionsHistory);
+  };
+
+  const saveConfirmationHistory = async () => {
+    const securityQuestionHistory = JSON.parse(
+      await AsyncStorage.getItem('securityQuestionHistory'),
+    );
+    if (securityQuestionHistory) {
+      const updatedSecurityQuestionsHistory = {
+        ...securityQuestionHistory,
+        confirmed: Date.now(),
+      };
+      updateHistory(updatedSecurityQuestionsHistory);
+      await AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify(updatedSecurityQuestionsHistory),
+      );
+    }
+  };
+
   useEffect(() => {
     if (next) (SecurityQuestionBottomSheet as any).current.snapTo(1);
   }, [next]);
+
+  useEffect(() => {
+    (async () => {
+      const securityQuestionHistory = JSON.parse(
+        await AsyncStorage.getItem('securityQuestionHistory'),
+      );
+      console.log({ securityQuestionHistory });
+      if (securityQuestionHistory) updateHistory(securityQuestionHistory);
+    })();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -199,7 +255,7 @@ const SecurityQuestionHistory = props => {
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
           IsReshare
-          data={secondaryDeviceHistory}
+          data={sortedHistory(securityQuestionsHistory)}
           reshareInfo={
             'consectetur Lorem ipsum dolor sit amet, consectetur sit '
           }

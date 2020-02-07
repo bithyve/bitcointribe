@@ -72,7 +72,7 @@ export default function NewWalletQuestion(props) {
         console.log('in if', temp);
       } else {
         setConfirmAnswer(tempAns);
-          console.log('in else', tempAns);
+        console.log('in else', tempAns);
       }
       if (answer && confirmAnswer != answer) {
         setAnsError('Answers do not match');
@@ -125,21 +125,30 @@ export default function NewWalletQuestion(props) {
             'SecurityAnsTimestamp',
             JSON.stringify(Date.now()),
           );
+          // await AsyncStorage.setItem(
+          //   'secondaryDeviceAutoHighlightFlags',
+          //   'false',
+          // );
+          // await AsyncStorage.setItem('contact1AutoHighlightFlags', 'false');
+          // await AsyncStorage.setItem('contact2AutoHighlightFlags', 'false');
+          // await AsyncStorage.setItem(
+          //   'personalCopy1AutoHighlightFlags',
+          //   'false',
+          // );
+          // await AsyncStorage.setItem(
+          //   'personalCopy2AutoHighlightFlags',
+          //   'false',
+          // );
+          // await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
+          const current = Date.now();
+          const securityQuestionHistory = {
+            created: current,
+            confirmed: current,
+          };
           await AsyncStorage.setItem(
-            'secondaryDeviceAutoHighlightFlags',
-            'false',
+            'securityQuestionHistory',
+            JSON.stringify(securityQuestionHistory),
           );
-          await AsyncStorage.setItem('contact1AutoHighlightFlags', 'false');
-          await AsyncStorage.setItem('contact2AutoHighlightFlags', 'false');
-          await AsyncStorage.setItem(
-            'personalCopy1AutoHighlightFlags',
-            'false',
-          );
-          await AsyncStorage.setItem(
-            'personalCopy2AutoHighlightFlags',
-            'false',
-          );
-          await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
         }}
         style={styles.buttonView}
       >
@@ -338,7 +347,11 @@ export default function NewWalletQuestion(props) {
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
                       value={
-                        hideShowConfirmAnswer ? confirmAnswerMasked : !confirmAnswer ? tempAns : confirmAnswer
+                        hideShowConfirmAnswer
+                          ? confirmAnswerMasked
+                          : !confirmAnswer
+                          ? tempAns
+                          : confirmAnswer
                       }
                       textContentType="none"
                       autoCompleteType="off"
@@ -365,26 +378,26 @@ export default function NewWalletQuestion(props) {
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
                       }}
                       onBlur={() => {
-                      //  if(!confirmAnswer){
-                      //   setConfirmAnswer(tempAns);
-                      //   console.log('in else', tempAns);
-                      //   let temp = '';
-                      //   for (let i = 0; i < tempAns.length; i++) {
-                      //     temp += '*';
-                      //   }
-                      //   console.log('temp', temp, tempAns);
-                      //   setConfirmAnswerMasked(temp);
-                      //   console.log('confirmAnswerMasked', confirmAnswerMasked);
-                      //   setConfirm(tempAns)
-                      // } else {
-                         let temp = '';
+                        //  if(!confirmAnswer){
+                        //   setConfirmAnswer(tempAns);
+                        //   console.log('in else', tempAns);
+                        //   let temp = '';
+                        //   for (let i = 0; i < tempAns.length; i++) {
+                        //     temp += '*';
+                        //   }
+                        //   console.log('temp', temp, tempAns);
+                        //   setConfirmAnswerMasked(temp);
+                        //   console.log('confirmAnswerMasked', confirmAnswerMasked);
+                        //   setConfirm(tempAns)
+                        // } else {
+                        let temp = '';
                         for (let i = 0; i < tempAns.length; i++) {
                           temp += '*';
                         }
                         console.log('temp', temp, confirmAnswer, tempAns);
                         setConfirmAnswerMasked(temp);
                         console.log('confirmAnswerMasked', confirmAnswerMasked);
-                     // } 
+                        // }
 
                         setConfirmAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
