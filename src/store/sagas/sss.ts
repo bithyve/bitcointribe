@@ -25,6 +25,7 @@ import {
   overallHealthCalculated,
   CHECK_PDF_HEALTH,
   RESTORE_SHARE_FROM_QR,
+  updateMSharesHealth,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -302,8 +303,13 @@ function* downloadMetaShareWorker({ payload }) {
         RECOVERY_SHARES: updatedRecoveryShares,
       };
     }
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    // yield put(
+    //   insertIntoDB({
+    //     DECENTRALIZED_BACKUP: updatedBackup,
+    //   }),
+    // ); // connecting insertion at updateMSharesHealth
     yield put(downloadedMShare(otp, true));
+    yield put(updateMSharesHealth(updatedBackup));
   } else {
     Alert.alert('Download Failed!', res.err);
     console.log({ err: res.err });
@@ -401,13 +407,17 @@ export const generatePDFWatcher = createWatcher(
   GENERATE_PDF,
 );
 
-function* updateMSharesHealthWorker() {
+function* updateMSharesHealthWorker({ payload }) {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader('updateMSharesHealth'));
 
-  const { DECENTRALIZED_BACKUP } = yield select(
-    state => state.storage.database,
-  );
+  let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
+  if (!DECENTRALIZED_BACKUP) {
+    DECENTRALIZED_BACKUP = yield select(
+      state => state.storage.database.DECENTRALIZED_BACKUP,
+    );
+  }
+
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
   const metaShares = Object.keys(UNDER_CUSTODY).map(
     tag => UNDER_CUSTODY[tag].META_SHARE,

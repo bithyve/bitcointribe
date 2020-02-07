@@ -578,7 +578,7 @@ export default function Home(props) {
           requester: scannedData.requester,
           ek: scannedData.ENCRYPTED_KEY,
           otp: scannedData.OTP,
-          isTrustedContact : false
+          isQR: true,
         };
         props.navigation.navigate('Home', { custodyRequest });
         break;
@@ -587,6 +587,7 @@ export default function Home(props) {
           requester: scannedData.requester,
           rk: scannedData.ENCRYPTED_KEY,
           otp: scannedData.OTP,
+          isQR: true,
         };
         props.navigation.navigate('Home', { recoveryRequest });
 
@@ -851,12 +852,13 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
-          console.log("custodyRequest", custodyRequest)
-          if(custodyRequest.isTrustedContact){
-            props.navigation.navigate('CustodianRequestOTP', { custodyRequest });
-          }
-          else{
-            dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek))
+          console.log('custodyRequest', custodyRequest);
+          if (custodyRequest.isQR) {
+            dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+          } else {
+            props.navigation.navigate('CustodianRequestOTP', {
+              custodyRequest,
+            });
           }
         }}
         onPressRejectSecret={() => {
@@ -1505,11 +1507,11 @@ export default function Home(props) {
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
-  // const health = useSelector(state => state.sss.overallHealth);
-  // useEffect(() => {
-  //   console.log({ health });
-  //   if (health) setOverallHealth(health);
-  // }, [health]);
+  const health = useSelector(state => state.sss.overallHealth);
+  useEffect(() => {
+    console.log({ health });
+    if (health) setOverallHealth(health);
+  }, [health]);
 
   // const s3Service = useSelector(state => state.sss.service);
   // useEffect(() => {

@@ -51,8 +51,8 @@ export const generatePDF = shareIndex => {
   };
 };
 
-export const updateMSharesHealth = () => {
-  return { type: UPDATE_MSHARES_HEALTH };
+export const updateMSharesHealth = (DECENTRALIZED_BACKUP?) => {
+  return { type: UPDATE_MSHARES_HEALTH, payload: { DECENTRALIZED_BACKUP } };
 };
 
 export const checkMSharesHealth = () => {
