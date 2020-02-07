@@ -552,6 +552,7 @@ export const checkPDFHealthWatcher = createWatcher(
 const updateHistory = async overallHealth => {
   console.log({ overallHealth });
   const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+
   if (shareHistory) {
     const updatedShareHistory = [...shareHistory];
     for (let index = 0; index < overallHealth.sharesInfo.length; index++) {
@@ -574,6 +575,24 @@ const updateHistory = async overallHealth => {
       'shareHistory',
       JSON.stringify(updatedShareHistory),
     );
+  }
+
+  const securityQuestionHistory = JSON.parse(
+    await AsyncStorage.getItem('securityQuestionHistory'),
+  ); //TODO: use multiGet on async storage
+
+  if (securityQuestionHistory) {
+    if (overallHealth.qaStatus.stage === 'Ugly') {
+      const updatedSecurityQuestionHistory = {
+        ...securityQuestionHistory,
+        unconfirmed: Date.now(),
+      };
+
+      await AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify(updatedSecurityQuestionHistory),
+      );
+    }
   }
 };
 
