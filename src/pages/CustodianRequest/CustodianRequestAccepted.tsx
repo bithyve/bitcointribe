@@ -18,7 +18,9 @@ export default function CustodianRequestAccepted(props) {
     dispatch(updateMSharesHealth());
   }, []);
 
-  const onPressAssociateContacts = () => {};
+  const onPressAssociateContacts = () => {
+    props.navigation.navigate("ContactsListForAssociateContact");
+  };
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>

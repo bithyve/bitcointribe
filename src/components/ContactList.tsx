@@ -46,7 +46,6 @@ async function requestContactsPermission() {
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
-  const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactData, setContactData] = useState([]);
   const [alphabetsList] = useState([
     "A",
@@ -78,7 +77,7 @@ export default function ContactList(props) {
   ]);
   const [searchBox, setSearchBox] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
-
+  const [radioOnOff, setRadioOnOff] = useState(false);
   const getContactsAsync = async () => {
     if (Platform.OS === "android") {
       if (!(await requestContactsPermission())) {
@@ -135,6 +134,7 @@ export default function ContactList(props) {
   }
 
   function onContactSelect(index) {
+    console.log("onContactSelect", index);
     let contacts = filterContactData;
     if(props.isTrustedContact){
       if (contacts[index].checked) {
@@ -166,8 +166,8 @@ export default function ContactList(props) {
         contacts[i].checked = false;
       }
     }
-    setFilterContactData(contacts);
     setRadioOnOff(!radioOnOff);
+    setFilterContactData(contacts);
     props.onSelectContact(selectedContacts);
   }
 
@@ -182,7 +182,6 @@ export default function ContactList(props) {
       1
     );
     setSelectedContacts(selectedContacts);
-    setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
   }
 
@@ -237,26 +236,30 @@ export default function ContactList(props) {
         <View style={{ flex: 1, flexDirection: "row", position:'relative' }}>
             {filterContactData ? <FlatList
               data={filterContactData}
-              extraData={props.onSelectContact}
+              extraData={radioOnOff}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
-                let selected = false;
-                if (
-                  selectedContacts.findIndex(temp => temp.id == item.id) > -1
-                ) {
-                  selected = true;
-                }
+                // let selected = false;
+                // if (
+                //   selectedContacts.findIndex(temp => temp.id == item.id) > -1
+                // ) {
+                //   selected = true;
+                //   console.log("Selected", selected);
+                // } else{
+                //   selected = false;
+                //   console.log("Selected else", selected);
+                // }
                 return (
                   <AppBottomSheetTouchableWrapper
                     onPress={() => onContactSelect(index)}
                     style={styles.contactView}
-                    key={index}
                   >
                     <RadioButton
+                    isOnModal={true}
                       size={15}
                       color={Colors.lightBlue}
                       borderColor={Colors.borderColor}
-                      isChecked={selected}
+                      isChecked={item.checked}
                       onpress={() => onContactSelect(index)}
                     />
                     <Text style={styles.contactText}>
