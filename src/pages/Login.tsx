@@ -21,12 +21,28 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import AsyncStorage from '@react-native-community/async-storage';
+import BottomSheet from 'reanimated-bottom-sheet';
+import LoaderModal from '../components/LoaderModal';
+import SmallHeaderModal from '../components/SmallHeaderModal';
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../common/constants/serviceTypes';
+import {
+  getTestcoins,
+  fetchBalance,
+  fetchTransactions,
+} from '../store/actions/accounts';
+import axios from 'axios';
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-
+const [loaderBottomSheet, setLoaderBottomSheet] = useState(
+    React.createRef(),
+  );
   const onPressNumber = useCallback(
     text => {
       let tmpPasscode = passcode;
@@ -44,26 +60,144 @@ export default function Login(props) {
     [passcode],
   );
 
+  const [exchangeRates, setExchangeRates] = useState();
+  const accounts = useSelector(state => state.accounts);
+  const testAccService = accounts[TEST_ACCOUNT].service;
+  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
   );
   const { dbFetched } = useSelector(state => state.storage);
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  const [transactions, setTransactions] = useState([]);
+  console.log("loading.authenticating", loading.authenticating);
+  useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+          .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
+
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+  }, [accounts]);
 
   useEffect(() => {
-    const custodyRequest = props.navigation.getParam('custodyRequest');
-    const recoveryRequest = props.navigation.getParam('recoveryRequest');
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          setExchangeRates(exchangeRates);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+    // if(dbFetched){
+      
+    // }
+    
+
+  }, []);
+
+  useEffect(() => {
+    
     if (isAuthenticated)
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
-          if (dbFetched)
-            props.navigation.navigate('Home', {
-              custodyRequest,
-              recoveryRequest,
-            });
+          if (dbFetched) {
+            dispatch(fetchBalance(TEST_ACCOUNT));
+            dispatch(fetchBalance(REGULAR_ACCOUNT));
+            dispatch(fetchBalance(SECURE_ACCOUNT));
+            dispatch(fetchTransactions(TEST_ACCOUNT));
+            dispatch(fetchTransactions(REGULAR_ACCOUNT));
+            dispatch(fetchTransactions(SECURE_ACCOUNT));
+          }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
   }, [isAuthenticated, dbFetched]);
+
+    const custodyRequest = props.navigation.getParam('custodyRequest');
+    const recoveryRequest = props.navigation.getParam('recoveryRequest');
+    if(exchangeRates && balances.testBalance && balances.regularBalance >=0 && balances.secureBalance >=0 && transactions.length > 0) {
+      console.log("isInitialized && exchangeRates && testBalance && testTransactions.length", exchangeRates && balances.testBalance && balances.regularBalance && balances.secureBalance && transactions.length);
+      (loaderBottomSheet as any).current.snapTo(0);
+      props.navigation.navigate('Home', {
+        custodyRequest,
+        recoveryRequest,
+        exchangeRates
+      });
+    }
+ 
+
+  const renderLoaderModalContent = () => {
+      return (
+        <LoaderModal
+        headerText = {'Loading data'}
+        messageText = {'Please wait for some time'}
+        />
+      );
+    };
+    const renderLoaderModalHeader = () => {
+      return (
+        <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {
+        }}
+      />
+      );
+    };
 
   useEffect(() => {
     authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
@@ -223,6 +357,7 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
+                  (loaderBottomSheet as any).current.snapTo(1);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
@@ -231,7 +366,12 @@ export default function Login(props) {
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                {!loading.authenticating ? (
+          <Text style={styles.proceedButtonText}>Proceed</Text>
+        ) : (
+          <ActivityIndicator size="small" />
+        )}
+                
               </TouchableOpacity>
             </View>
           ) : null}
@@ -371,6 +511,15 @@ export default function Login(props) {
             </TouchableOpacity>
           </View>
         </View>
+        <BottomSheet
+        onCloseEnd={() => { }}
+        enabledGestureInteraction= {false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[-50, hp('40%')]}
+        renderContent={renderLoaderModalContent}
+        //renderHeader={renderLoaderModalHeader}
+      />
       </View>
     </SafeAreaView>
   );

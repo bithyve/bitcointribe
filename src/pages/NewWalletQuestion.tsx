@@ -33,6 +33,24 @@ import BottomInfoBox from '../components/BottomInfoBox';
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
 import AsyncStorage from '@react-native-community/async-storage';
+import BottomSheet from 'reanimated-bottom-sheet';
+import LoaderModal from '../components/LoaderModal';
+import SmallHeaderModal from '../components/SmallHeaderModal';
+import {
+  getTestcoins,
+} from '../store/actions/accounts';
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../common/constants/serviceTypes';
+import axios from 'axios';
+import {
+  checkMSharesHealth,
+  updateMSharesHealth,
+  downloadMShare,
+  initHealthCheck,
+} from '../store/actions/sss';
 
 export default function NewWalletQuestion(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -59,8 +77,112 @@ export default function NewWalletQuestion(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
-  if (isInitialized) {
-    props.navigation.navigate('HomeNav');
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
+    React.createRef(),
+  );
+
+  const [exchangeRates, setExchangeRates] = useState();
+  const accounts = useSelector(state => state.accounts);
+  const testAccService = accounts[TEST_ACCOUNT].service;
+  
+  const [testBalance, setTestBalance] = useState(0);
+  const [testTransactions, setTestTransactions] = useState([]);
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  const [transactions, setTransactions] = useState([]);
+  useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+          .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
+
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+  }, [accounts]);
+
+
+  useEffect(() => {
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          setExchangeRates(exchangeRates);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
+        if (!(await AsyncStorage.getItem('Received Testcoins'))) {
+          const { balances } = testAccService.hdWallet;
+          const netBalance = testAccService
+            ? balances.balance + balances.unconfirmedBalance
+            : 0;
+          if (!netBalance) {
+            console.log('Getting Testcoins');
+            dispatch(getTestcoins(TEST_ACCOUNT));
+          }
+        }
+    })();
+  }, [testAccService]);
+
+  if (isInitialized && exchangeRates && balances.testBalance && transactions.length > 0) {
+    console.log("isInitialized && exchangeRates && testBalance && testTransactions.length", isInitialized && exchangeRates && testBalance && testTransactions.length);
+    (loaderBottomSheet as any).current.snapTo(0);
+    props.navigation.navigate('HomeNav', exchangeRates);
   }
 
   const setConfirm = confirmAnswer1 => {
@@ -120,6 +242,7 @@ export default function NewWalletQuestion(props) {
           };
           setIsEditable(false);
           setIsDisabled(true);
+          (loaderBottomSheet as any).current.snapTo(1);
           dispatch(initializeSetup(walletName, security));
           await AsyncStorage.setItem(
             'SecurityAnsTimestamp',
@@ -158,6 +281,24 @@ export default function NewWalletQuestion(props) {
           <ActivityIndicator size="small" />
         )}
       </TouchableOpacity>
+    );
+  };
+  const renderLoaderModalContent = () => {
+    return (
+      <LoaderModal
+      headerText = {'Loading data'}
+      messageText = {'Please wait for some time'}
+      />
+    );
+  };
+  const renderLoaderModalHeader = () => {
+    return (
+      <SmallHeaderModal
+      borderColor={Colors.white}
+      backgroundColor={Colors.white}
+      onPressHeader={() => {
+      }}
+    />
     );
   };
 
@@ -470,6 +611,15 @@ export default function NewWalletQuestion(props) {
             ) : null}
           </TouchableOpacity>
         </KeyboardAvoidingView>
+        <BottomSheet
+        onCloseEnd={() => { }}
+        enabledGestureInteraction= {false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[-50, hp('40%')]}
+        renderContent={renderLoaderModalContent}
+        //renderHeader={renderLoaderModalHeader}
+      />
       </View>
     </SafeAreaView>
   );
