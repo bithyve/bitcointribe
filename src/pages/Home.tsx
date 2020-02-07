@@ -572,6 +572,7 @@ export default function Home(props) {
 
   const getQrCodeData = qrData => {
     const scannedData = JSON.parse(qrData);
+    console.log({ scannedData });
     switch (scannedData.type) {
       case 'secondaryDeviceQR' || 'trustedContactQR':
         const custodyRequest = {
@@ -1598,10 +1599,12 @@ export default function Home(props) {
           }, 2);
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
           if (recoveryRequest.isQR) {
-            uploadRequestedShare(
-              recoveryRequest.requester,
-              recoveryRequest.rk,
-              recoveryRequest.otp,
+            dispatch(
+              uploadRequestedShare(
+                recoveryRequest.requester,
+                recoveryRequest.rk,
+                recoveryRequest.otp,
+              ),
             );
           } else {
             props.navigation.navigate('RecoveryRequestOTP', {

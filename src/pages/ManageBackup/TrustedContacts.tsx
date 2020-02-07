@@ -31,82 +31,99 @@ const TrustedContacts = props => {
   const [contacts, setContacts] = useState([]);
   const index = props.index;
 
-  function selectedContactsList( list ) {
-    if ( list.length > 0 ) setContacts( [ ...list ] );
+  function selectedContactsList(list) {
+    if (list.length > 0) setContacts([...list]);
   }
 
-  const onPressContinue = () =>{
-    if(contacts.length==2){
-      contacts[0].type="contact1";
-      contacts[1].type="contact2";
-    }
-    else if(contacts.length==1){
-      if(index==1) {
-        contacts[0].type="contact1";
-      } else if(index==2){
-        contacts[0].type="contact2";
+  const onPressContinue = () => {
+    if (contacts.length == 2) {
+      contacts[0].type = 'contact1';
+      contacts[1].type = 'contact2';
+    } else if (contacts.length == 1) {
+      if (index == 1) {
+        contacts[0].type = 'contact1';
+      } else if (index == 2) {
+        contacts[0].type = 'contact2';
       }
     }
     props.onPressContinue(contacts, index);
-  }
+  };
 
   return (
-    <View style={{
-      height: "100%",
-      backgroundColor: Colors.white,
-      alignSelf: "center",
-      width: "100%"
-    }}>
-      <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 10, marginRight: 10, }}>
+    <View
+      style={{
+        height: '100%',
+        backgroundColor: Colors.white,
+        alignSelf: 'center',
+        width: '100%',
+      }}
+    >
+      <View
+        style={{
+          ...BackupStyles.modalHeaderTitleView,
+          marginLeft: 10,
+          marginRight: 10,
+        }}
+      >
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30, }} >
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
+          <TouchableOpacity
+            onPress={() => {
+              props.onPressBack();
+            }}
+            style={{ height: 30, width: 30 }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <View style={{ alignSelf: "center", flex: 1, justifyContent: "center" }}>
-            <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
+          <View
+            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
+          >
+            <Text style={BackupStyles.modalHeaderTitleText}>
+              Trusted Contact
+            </Text>
             <Text style={BackupStyles.modalHeaderInfoText}>
               Never backed up
-                    </Text>
+            </Text>
           </View>
         </View>
-        <Image style={BackupStyles.cardIconImage} source={getIconByStatus(selectedStatus)} />
+        <Image
+          style={BackupStyles.cardIconImage}
+          source={getIconByStatus(selectedStatus)}
+        />
       </View>
-      <View style={ { flex: 1 } }>
+      <View style={{ flex: 1 }}>
         <Text
-          style={ {
+          style={{
             marginLeft: 30,
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue( 12 ),
+            fontSize: RFValue(12),
             marginTop: 5,
-          } }
+          }}
         >
-          Select two contacts to { ' ' }
+          Select two contacts to{' '}
           <Text
-            style={ {
+            style={{
               fontFamily: Fonts.FiraSansMediumItalic,
               fontWeight: 'bold',
-            } }
+            }}
           >
             send Recovery Secrets
           </Text>
         </Text>
-        {props.LoadContacts ?
-        <ContactList
-          style={{}}
-          onPressContinue={onPressContinue}
-          onSelectContact={selectedContactsList}
-        />: null}
+        {props.LoadContacts ? (
+          <ContactList
+            isTrustedContact={true}
+            style={{}}
+            onPressContinue={onPressContinue}
+            onSelectContact={selectedContactsList}
+          />
+        ) : null}
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   modalHeaderContainer: {
     paddingTop: 20,
   },
@@ -119,6 +136,6 @@ const styles = StyleSheet.create( {
     marginTop: 7,
     marginBottom: 7,
   },
-} );
+});
 
 export default TrustedContacts;
