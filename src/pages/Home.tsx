@@ -115,7 +115,9 @@ export default function Home(props) {
   );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
-  const exchangeRate= props.navigation.state.params ? props.navigation.state.params.exchangeRates : null;
+  const exchangeRate = props.navigation.state.params
+    ? props.navigation.state.params.exchangeRates
+    : null;
   const [exchangeRates, setExchangeRates] = useState(exchangeRate);
   const [balances, setBalances] = useState({
     testBalance: 0,
@@ -417,7 +419,7 @@ export default function Home(props) {
     (QrTabBarBottomSheet as any).current.snapTo(0);
     (moreTabBarBottomSheet as any).current.snapTo(0);
     AppState.addEventListener('change', handleAppStateChange);
-    
+
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
     // HC up-streaming
@@ -1595,10 +1597,12 @@ export default function Home(props) {
           }, 2);
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
           if (recoveryRequest.isQR) {
-            uploadRequestedShare(
-              recoveryRequest.requester,
-              recoveryRequest.rk,
-              recoveryRequest.otp,
+            dispatch(
+              uploadRequestedShare(
+                recoveryRequest.requester,
+                recoveryRequest.rk,
+                recoveryRequest.otp,
+              ),
             );
           } else {
             props.navigation.navigate('RecoveryRequestOTP', {
