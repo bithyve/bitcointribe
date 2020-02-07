@@ -46,16 +46,16 @@ export default function RecoveryRequestOTP(props) {
     let tempPasscode = passcode;
     tempPasscode[i] = text;
     setPasscode(tempPasscode);
-    if(passcode.join('').length == 6){
+    if (passcode.join('').length == 6) {
       Keyboard.dismiss();
     }
   }
 
   const dispatch = useDispatch();
   const { loading, requestedShareUpload } = useSelector(state => state.sss);
-  const { UNDER_CUSTODY } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+  // const { UNDER_CUSTODY } = useSelector(
+  //   state => state.storage.database.DECENTRALIZED_BACKUP,
+  // );
 
   const onOTPSubmit = () => {
     if (passcode.join('').length !== 6 || !rk) return;
@@ -116,7 +116,7 @@ export default function RecoveryRequestOTP(props) {
                 value={otp ? otp[0] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
-                autoFocus = {true}
+                autoFocus={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;
