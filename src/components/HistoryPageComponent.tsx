@@ -54,7 +54,7 @@ const HistoryPageComponent = props => {
                 >
                   {value.title}
                 </Text>
-                <Text
+                {/* <Text
                   style={{
                     color: Colors.textColorGrey,
                     fontSize: RFValue(10),
@@ -63,7 +63,7 @@ const HistoryPageComponent = props => {
                   }}
                 >
                   Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit
-                </Text>
+                </Text> */}
                 <Text
                   style={{
                     color: Colors.textColorGrey,
@@ -113,7 +113,7 @@ const HistoryPageComponent = props => {
                   {value.date}
                 </Text>
               </View>
-              <Text
+              {/* <Text
                 style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue(8),
@@ -125,7 +125,7 @@ const HistoryPageComponent = props => {
                 <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                   dolor sit
                 </Text>
-              </Text>
+              </Text> */}
             </TouchableOpacity>
           );
         })}

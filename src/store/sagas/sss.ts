@@ -256,9 +256,12 @@ function* downloadMetaShareWorker({ payload }) {
       existingShares,
     );
   } else {
+    console.log('HERE');
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
+    console.log({ res });
   }
 
+  console.log({ res });
   if (res.status === 200) {
     const { metaShare, dynamicNonPMDD } = res.data;
     let updatedBackup;
@@ -279,6 +282,8 @@ function* downloadMetaShareWorker({ payload }) {
             : [metaShare],
         },
       };
+      yield put(downloadedMShare(otp, true));
+      yield put(updateMSharesHealth(updatedBackup));
     } else {
       const updatedRecoveryShares = {};
       Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(key => {
@@ -302,17 +307,17 @@ function* downloadMetaShareWorker({ payload }) {
         ...DECENTRALIZED_BACKUP,
         RECOVERY_SHARES: updatedRecoveryShares,
       };
+      yield put(downloadedMShare(otp, true));
+      yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
     }
     // yield put(
     //   insertIntoDB({
     //     DECENTRALIZED_BACKUP: updatedBackup,
     //   }),
     // ); // connecting insertion at updateMSharesHealth
-    yield put(downloadedMShare(otp, true));
-    yield put(updateMSharesHealth(updatedBackup));
   } else {
+    console.log({ res });
     Alert.alert('Download Failed!', res.err);
-    console.log({ err: res.err });
     yield put(downloadedMShare(otp, false, res.err));
   }
   yield put(switchS3Loader('downloadMetaShare'));
