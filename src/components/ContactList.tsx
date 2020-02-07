@@ -136,18 +136,25 @@ export default function ContactList(props) {
 
   function onContactSelect(index) {
     let contacts = filterContactData;
-    if (contacts[index].checked) {
-      // selectedContacts.splice(
-      //   selectedContacts.findIndex(temp => temp.id == contacts[index].id),
-      //   1
-      // );
-      selectedContacts=[];
-    } else {
-      // if (selectedContacts.length === 2) {
-      //   selectedContacts.pop();
-      // }
-      // selectedContacts.push(contacts[index]);
-      selectedContacts[0]=contacts[index];
+    if(props.isTrustedContact){
+      if (contacts[index].checked) {
+        selectedContacts=[];
+      } else {
+        selectedContacts[0]=contacts[index];
+      }
+    }
+    else{
+      if (contacts[index].checked) {
+        selectedContacts.splice(
+          selectedContacts.findIndex(temp => temp.id == contacts[index].id),
+          1
+        );
+      } else {
+        if (selectedContacts.length === 2) {
+          selectedContacts.pop();
+        }
+        selectedContacts.push(contacts[index]);
+      }
     }
     setSelectedContacts(selectedContacts);
     for (let i = 0; i < contacts.length; i++) {

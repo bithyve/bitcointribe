@@ -97,6 +97,7 @@ const TrustedContacts = props => {
         </Text>
         {props.LoadContacts ?
         <ContactList
+          isTrustedContact = {true}
           style={{}}
           onPressContinue={onPressContinue}
           onSelectContact={selectedContactsList}
