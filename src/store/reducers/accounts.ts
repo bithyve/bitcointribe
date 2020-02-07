@@ -197,21 +197,21 @@ export default (state = initialState, action) => {
           };
       }
 
-    case TRANSFER_ST2_FAILED:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          transfer: {
-            ...state[account].transfer,
-            stage2: { ...state[account].transfer.stage2, failed: true },
-          },
-          loading: {
-            ...state[account].loading,
-            transfer: false,
-          },
-        },
-      };
+    // case TRANSFER_ST2_FAILED:
+    //   return {
+    //     ...state,
+    //     [account]: {
+    //       ...state[account],
+    //       transfer: {
+    //         ...state[account].transfer,
+    //         stage2: { ...state[account].transfer.stage2, failed: true },
+    //       },
+    //       loading: {
+    //         ...state[account].loading,
+    //         transfer: false,
+    //       },
+    //     },
+    //   };
 
     case TRANSFER_ST3_EXECUTED:
       return {
