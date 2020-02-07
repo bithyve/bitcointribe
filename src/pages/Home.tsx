@@ -74,6 +74,7 @@ import {
   updateMSharesHealth,
   downloadMShare,
   initHealthCheck,
+  uploadRequestedShare,
 } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
@@ -571,9 +572,8 @@ export default function Home(props) {
 
   const getQrCodeData = qrData => {
     const scannedData = JSON.parse(qrData);
-    console.log({ scannedData });
     switch (scannedData.type) {
-      case 'secondaryDeviceQR':
+      case 'secondaryDeviceQR' || 'trustedContactQR':
         const custodyRequest = {
           requester: scannedData.requester,
           ek: scannedData.ENCRYPTED_KEY,
@@ -590,7 +590,6 @@ export default function Home(props) {
           isQR: true,
         };
         props.navigation.navigate('Home', { recoveryRequest });
-
       default:
         break;
     }
@@ -1508,10 +1507,10 @@ export default function Home(props) {
   const [overallHealth, setOverallHealth] = useState();
 
   const health = useSelector(state => state.sss.overallHealth);
-  useEffect(() => {
-    console.log({ health });
-    if (health) setOverallHealth(health);
-  }, [health]);
+  // useEffect(() => {
+  //   console.log({ health });
+  //   if (health) setOverallHealth(health);
+  // }, [health]);
 
   // const s3Service = useSelector(state => state.sss.service);
   // useEffect(() => {
@@ -1598,7 +1597,17 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }, 2);
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
+          if (recoveryRequest.isQR) {
+            uploadRequestedShare(
+              recoveryRequest.requester,
+              recoveryRequest.rk,
+              recoveryRequest.otp,
+            );
+          } else {
+            props.navigation.navigate('RecoveryRequestOTP', {
+              recoveryRequest,
+            });
+          }
         }}
         onPressReject={() => {
           setTimeout(() => {
