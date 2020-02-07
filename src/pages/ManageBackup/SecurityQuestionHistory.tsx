@@ -256,9 +256,9 @@ const SecurityQuestionHistory = props => {
         <HistoryPageComponent
           IsReshare
           data={sortedHistory(securityQuestionsHistory)}
-          reshareInfo={
-            'consectetur Lorem ipsum dolor sit amet, consectetur sit '
-          }
+          // reshareInfo={
+          //   'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+          // }
           onPressConfirm={() => {
             // ConfirmBottomSheet.current.snapTo(1);
             // alert('confirm');
