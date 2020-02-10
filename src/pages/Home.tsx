@@ -571,6 +571,7 @@ export default function Home(props) {
 
   const getQrCodeData = qrData => {
     const scannedData = JSON.parse(qrData);
+    console.log({ scannedData });
     switch (scannedData.type) {
       case 'secondaryDeviceQR' || 'trustedContactQR':
         const custodyRequest = {

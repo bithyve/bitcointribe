@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Alert,
   AsyncStorage,
-  StatusBar,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import BackupStyles from './Styles';
@@ -24,21 +23,19 @@ import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
-import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Contacts from 'react-native-contacts';
-import * as ExpoContacts from 'expo-contacts';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function CommunicationMode(props) {
   // const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  const secretSharedTrustedContact1 = props.secretSharedTrustedContact1
-    ? props.secretSharedTrustedContact1
-    : null;
-  const secretSharedTrustedContact2 = props.secretSharedTrustedContact2
-    ? props.secretSharedTrustedContact2
-    : null;
+  // const secretSharedTrustedContact1 = props.secretSharedTrustedContact1
+  //   ? props.secretSharedTrustedContact1
+  //   : null;
+  // const secretSharedTrustedContact2 = props.secretSharedTrustedContact2
+  //   ? props.secretSharedTrustedContact2
+  //   : null;
 
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
@@ -170,12 +167,12 @@ export default function CommunicationMode(props) {
     switch (selectedContactMode.type) {
       case 'number':
         textWithoutEncoding(selectedContactMode.info, deepLink);
-        if (secretSharedTrustedContact1) {
-          secretSharedTrustedContact1(true);
-        }
-        if (secretSharedTrustedContact2) {
-          secretSharedTrustedContact2(true);
-        }
+        // if (secretSharedTrustedContact1) {
+        //   secretSharedTrustedContact1(true);
+        // }
+        // if (secretSharedTrustedContact2) {
+        //   secretSharedTrustedContact2(true);
+        // }
         break;
 
       case 'email':
@@ -186,12 +183,12 @@ export default function CommunicationMode(props) {
           'Guardian request',
           deepLink,
         );
-        if (secretSharedTrustedContact1) {
-          secretSharedTrustedContact1(true);
-        }
-        if (secretSharedTrustedContact2) {
-          secretSharedTrustedContact2(true);
-        }
+        // if (secretSharedTrustedContact1) {
+        //   secretSharedTrustedContact1(true);
+        // }
+        // if (secretSharedTrustedContact2) {
+        //   secretSharedTrustedContact2(true);
+        // }
         break;
     }
     props.onPressContinue(
@@ -403,6 +400,7 @@ export default function CommunicationMode(props) {
               // console.log("contact commmunication", contact);
               return (
                 <AppBottomSheetTouchableWrapper
+                  key={index}
                   onPress={() => onContactSelect(index)}
                   style={styles.contactInfo}
                 >

@@ -3,13 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Alert,
-  ScrollView,
   Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
@@ -19,8 +16,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { useSelector } from 'react-redux';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -48,8 +44,6 @@ const TrustedContactHistory = props => {
   const [OTP, setOTP] = useState('');
   const [chosenContactIndex, setChosenContactIndex] = useState(1);
   const [chosenContact, setChosenContact] = useState({});
-  const [IsReshare, setIsReshare] = useState(false);
-  const [ContactToConfirm, setContactToConfirm] = useState({});
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
     React.createRef(),
   );
@@ -62,10 +56,9 @@ const TrustedContactHistory = props => {
     setCommunicationModeBottomSheet,
   ] = useState(React.createRef());
   const [LoadContacts, setLoadContacts] = useState(false);
-  const [contacts, setContacts] = useState([]);
   let [SelectedContacts, setSelectedContacts] = useState([]);
-  const [isSecretShared1, setIsSecretShared1] = useState(false);
-  const [isSecretShared2, setIsSecretShared2] = useState(false);
+  // const [isSecretShared1, setIsSecretShared1] = useState(false);
+  // const [isSecretShared2, setIsSecretShared2] = useState(false);
   const [
     trustedContactQrBottomSheet,
     setTrustedContactQrBottomSheet,
@@ -78,11 +71,6 @@ const TrustedContactHistory = props => {
   //     personalCopy2: false,
   //     securityAns: false,
   //   });
-  const index =
-    props.navigation.state.params &&
-    props.navigation.state.params.selectedTitle == 'Trusted Contact 1'
-      ? 1
-      : 2;
 
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
@@ -111,58 +99,82 @@ const TrustedContactHistory = props => {
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
+
+  const overallHealth = useSelector(state => state.sss.overallHealth);
+  const [shared, setShared] = useState(false);
   const [activateReshare, setActivateReshare] = useState(
     props.navigation.getParam('activateReshare'),
   );
+  const next = props.navigation.getParam('next');
+  const selectedTitle = props.navigation.getParam('selectedTitle');
+  const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
+  const updateAutoHighlightFlags = props.navigation.getParam(
+    'updateAutoHighlightFlags',
+  );
 
-  const secretSharedTrustedContact1 = isSecretShared1 => {
-    setIsSecretShared1(isSecretShared1);
-  };
+  // const secretSharedTrustedContact1 = isSecretShared1 => {
+  //   setIsSecretShared1(isSecretShared1);
+  // };
 
-  const secretSharedTrustedContact2 = isSecretShared2 => {
-    setIsSecretShared2(isSecretShared2);
-  };
+  // const secretSharedTrustedContact2 = isSecretShared2 => {
+  //   setIsSecretShared2(isSecretShared2);
+  // };
 
-  const getInfo = async () => {
+  const setContactInfo = useCallback(async () => {
     let SelectedContactsTemp = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
     );
-    setSelectedContacts(SelectedContactsTemp);
     if (SelectedContactsTemp) {
-      if (
-        props.navigation.state.params.selectedTitle == 'Trusted Contact 1' &&
-        SelectedContactsTemp[0]
-      ) {
+      setSelectedContacts(SelectedContactsTemp);
+      if (selectedTitle == 'Trusted Contact 1' && SelectedContactsTemp[0]) {
         setChosenContact(SelectedContactsTemp[0]);
-      }
-      if (
-        props.navigation.state.params.selectedTitle == 'Trusted Contact 2' &&
+      } else if (
+        selectedTitle == 'Trusted Contact 2' &&
         SelectedContactsTemp[1]
       ) {
         setChosenContact(SelectedContactsTemp[1]);
       }
-      if (props.navigation.state.params.isConfirm) {
-        ConfirmBottomSheet.current.snapTo(1);
-      }
+      // if (props.navigation.state.params.isConfirm) {
+      //   ConfirmBottomSheet.current.snapTo(1);
+      // }
     }
-    // let setupFlowFlags = JSON.parse(
-    //   await AsyncStorage.getItem('AutoHighlightFlags'),
-    // );
-    // if (setupFlowFlags) {
-    //   setAutoHighlightFlags(setupFlowFlags);
-    // }
-  };
+  }, [selectedTitle]);
 
-  useEffect(() => {
-    getInfo();
-  }, []);
+  const getContacts = useCallback(
+    async (selectedContacts, index) => {
+      console.log('Getting Contacts');
+      let contactList = SelectedContacts;
+      console.log({ contactList });
+      console.log({ selectedContacts });
+      if (!contactList) {
+        contactList = [];
+      }
+      if (index == 1) {
+        contactList[0] = selectedContacts[0];
+      }
+      if (index == 2) {
+        contactList[1] = selectedContacts[0];
+      }
 
-  function renderTrustedContactsContent() {
+      setTimeout(() => {
+        setChosenContact(
+          contactList.length == 2 && index == 2
+            ? contactList[1]
+            : contactList[0],
+        );
+      }, 2);
+      (trustedContactsBottomSheet as any).current.snapTo(0);
+      (CommunicationModeBottomSheet as any).current.snapTo(1);
+    },
+    [SelectedContacts],
+  );
+
+  const renderTrustedContactsContent = useCallback(() => {
     return (
       <TrustedContacts
         LoadContacts={LoadContacts}
         onPressBack={() => {
-          trustedContactsBottomSheet.current.snapTo(0);
+          (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={(selectedContacts, index) =>
           getContacts(selectedContacts, index)
@@ -170,9 +182,9 @@ const TrustedContactHistory = props => {
         index={index}
       />
     );
-  }
+  }, [LoadContacts, getContacts]);
 
-  function renderTrustedContactsHeader() {
+  const renderTrustedContactsHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -180,60 +192,36 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  }
+  }, []);
 
-  const getContacts = async (selectedContacts, index) => {
-    let contactList = SelectedContacts;
-    if (!contactList) {
-      contactList = [];
-    }
-    if (index == 1) {
-      contactList[0] = selectedContacts[0];
-    }
-    if (index == 2) {
-      contactList[1] = selectedContacts[0];
-    }
-
-    setTimeout(() => {
-      setContacts(selectedContacts);
-    }, 2);
-    setTimeout(() => {
-      setChosenContact(
-        contactList.length == 2 && index == 2 ? contactList[1] : contactList[0],
-      );
-    }, 2);
-    trustedContactsBottomSheet.current.snapTo(0);
-    CommunicationModeBottomSheet.current.snapTo(1);
-  };
-
-  function renderCommunicationModeModalContent() {
+  const renderCommunicationModeModalContent = useCallback(() => {
     return (
       <CommunicationMode
-        secretSharedTrustedContact1={secretSharedTrustedContact1}
-        secretSharedTrustedContact2={secretSharedTrustedContact2}
+        // secretSharedTrustedContact1={secretSharedTrustedContact1}
+        // secretSharedTrustedContact2={secretSharedTrustedContact2}
         contact={chosenContact ? chosenContact : null}
         index={index}
         onPressBack={() => {
-          CommunicationModeBottomSheet.current.snapTo(0);
+          (CommunicationModeBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={(OTP, index, selectedContactMode) => {
           if (selectedContactMode.type == 'qrcode') {
-            trustedContactQrBottomSheet.current.snapTo(1);
-            CommunicationModeBottomSheet.current.snapTo(0);
+            (trustedContactQrBottomSheet as any).current.snapTo(1);
+            (CommunicationModeBottomSheet as any).current.snapTo(0);
           } else {
             setTimeout(() => {
               setOTP(OTP);
               setChosenContactIndex(index);
             }, 10);
-            CommunicationModeBottomSheet.current.snapTo(0);
-            shareOtpWithTrustedContactBottomSheet.current.snapTo(1);
+            (CommunicationModeBottomSheet as any).current.snapTo(0);
+            (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
           }
         }}
       />
     );
-  }
+  }, [chosenContact, index]);
 
-  function renderCommunicationModeModalHeader() {
+  const renderCommunicationModeModalHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -241,32 +229,30 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  }
+  }, []);
 
-  function renderShareOtpWithTrustedContactContent() {
-    return (
-      <ShareOtpWithTrustedContact
-        onPressOk={index => onOTPShare(index)}
-        onPressBack={() => {
-          shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
-        }}
-        OTP={OTP}
-        index={chosenContactIndex}
-      />
-    );
-  }
+  const updateHistory = useCallback(
+    shareHistory => {
+      const updatedTrustedContactHistory = [...trustedContactHistory];
+      if (shareHistory[index].createdAt)
+        updatedTrustedContactHistory[0].date = shareHistory[index].createdAt;
+      if (shareHistory[index].inTransit)
+        updatedTrustedContactHistory[1].date = shareHistory[index].inTransit;
 
-  function renderShareOtpWithTrustedContactHeader() {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }
+      if (shareHistory[index].accessible)
+        updatedTrustedContactHistory[2].date = shareHistory[index].accessible;
 
-  const saveInTransitHistory = async () => {
+      if (shareHistory[index].notAccessible)
+        updatedTrustedContactHistory[3].date =
+          shareHistory[index].notAccessible;
+
+      console.log({ updatedTrustedContactHistory });
+      setTrustedContactHistory(updatedTrustedContactHistory);
+    },
+    [trustedContactHistory],
+  );
+
+  const saveInTransitHistory = useCallback(async () => {
     const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
     if (shareHistory) {
       const updatedShareHistory = [...shareHistory];
@@ -280,37 +266,63 @@ const TrustedContactHistory = props => {
         JSON.stringify(updatedShareHistory),
       );
     }
-  };
+  }, [updateHistory]);
 
-  const onOTPShare = async index => {
-    let selectedContactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
+  const onOTPShare = useCallback(
+    async index => {
+      let selectedContactList = JSON.parse(
+        await AsyncStorage.getItem('SelectedContacts'),
+      );
+      if (!selectedContactList) {
+        selectedContactList = [];
+      }
+      console.log({ chosenContact });
+      if (index == 2) {
+        selectedContactList[1] = chosenContact;
+      } else if (index == 1) {
+        selectedContactList[0] = chosenContact;
+      }
+
+      console.log({ selectedContactList });
+      await AsyncStorage.setItem(
+        'SelectedContacts',
+        JSON.stringify(selectedContactList),
+      );
+
+      updateAutoHighlightFlags();
+      saveInTransitHistory();
+      setActivateReshare(true);
+
+      (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+      (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
+    },
+    [updateAutoHighlightFlags, saveInTransitHistory, chosenContact],
+  );
+
+  const renderShareOtpWithTrustedContactContent = useCallback(() => {
+    return (
+      <ShareOtpWithTrustedContact
+        onPressOk={index => onOTPShare(index)}
+        onPressBack={() => {
+          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+        }}
+        OTP={OTP}
+        index={chosenContactIndex}
+      />
     );
-    if (!selectedContactList) {
-      selectedContactList = [];
-    }
-    console.log({ chosenContact });
-    if (index == 2) {
-      selectedContactList[1] = chosenContact;
-    } else if (index == 1) {
-      selectedContactList[0] = chosenContact;
-    }
+  }, [onOTPShare, OTP, chosenContactIndex]);
 
-    console.log({ selectedContactList });
-    await AsyncStorage.setItem(
-      'SelectedContacts',
-      JSON.stringify(selectedContactList),
+  const renderShareOtpWithTrustedContactHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
+  }, []);
 
-    updateAutoHighlightFlags();
-    saveInTransitHistory();
-    setActivateReshare(true);
-
-    shareOtpWithTrustedContactBottomSheet.current.snapTo(0);
-    trustedContactQrBottomSheet.current.snapTo(0); // closes either of them based on which was on.
-  };
-
-  const renderConfirmContent = () => {
+  const renderConfirmContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ConfirmBottomSheet}
@@ -323,7 +335,7 @@ const TrustedContactHistory = props => {
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
-          onPressConfirm();
+          (ConfirmBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
           (ConfirmBottomSheet as any).current.snapTo(0);
@@ -331,13 +343,9 @@ const TrustedContactHistory = props => {
         isBottomImage={false}
       />
     );
-  };
+  }, []);
 
-  const onPressConfirm = () => {
-    (ConfirmBottomSheet as any).current.snapTo(0);
-  };
-
-  const renderConfirmHeader = () => {
+  const renderConfirmHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -345,9 +353,24 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderReshareContent = () => {
+  const onPressReshare = useCallback(async () => {
+    let selectedContactList = JSON.parse(
+      await AsyncStorage.getItem('SelectedContacts'),
+    );
+    console.log({ selectedContactList });
+    console.log({ chosenContact });
+    if (selectedTitle == 'Trusted Contact 1') {
+      setChosenContact(selectedContactList[0]);
+    } else if (selectedTitle == 'Trusted Contact 2') {
+      setChosenContact(selectedContactList[1]);
+    }
+    (CommunicationModeBottomSheet as any).current.snapTo(1);
+    (ReshareBottomSheet as any).current.snapTo(0);
+  }, [selectedTitle]);
+
+  const renderReshareContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ReshareBottomSheet}
@@ -368,24 +391,9 @@ const TrustedContactHistory = props => {
         isBottomImage={false}
       />
     );
-  };
+  }, [onPressReshare]);
 
-  const onPressReshare = async () => {
-    let selectedContactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    if (props.navigation.state.params.selectedTitle == 'Trusted Contact 1') {
-      setChosenContact(selectedContactList[0]);
-    } else if (
-      props.navigation.state.params.selectedTitle == 'Trusted Contact 2'
-    ) {
-      setChosenContact(selectedContactList[1]);
-    }
-    CommunicationModeBottomSheet.current.snapTo(1);
-    (ReshareBottomSheet as any).current.snapTo(0);
-  };
-
-  const renderReshareHeader = () => {
+  const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -393,9 +401,9 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderChangeContent = () => {
+  const renderChangeContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
@@ -411,7 +419,7 @@ const TrustedContactHistory = props => {
           setTimeout(() => {
             setLoadContacts(true);
           }, 2);
-          trustedContactsBottomSheet.current.snapTo(1);
+          (trustedContactsBottomSheet as any).current.snapTo(1);
           (ChangeBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
@@ -420,9 +428,9 @@ const TrustedContactHistory = props => {
         isBottomImage={false}
       />
     );
-  };
+  }, []);
 
-  const renderChangeHeader = () => {
+  const renderChangeHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -430,16 +438,47 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  };
+  }, []);
 
-  const updateAutoHighlightFlags = props.navigation.getParam(
-    'updateAutoHighlightFlags',
-  );
-  const next = props.navigation.getParam('next');
-  //   const shared = props.navigation.getParam('shared');
+  const renderTrustedContactQrContents = useCallback(() => {
+    const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
+    return (
+      <TrustedContactQr
+        index={index}
+        onPressOk={() => onOTPShare(index)}
+        onPressBack={() => {
+          (trustedContactQrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [selectedTitle]);
 
-  const overallHealth = useSelector(state => state.sss.overallHealth);
-  const [shared, setShared] = useState(false);
+  const renderTrustedContactQrHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (trustedContactQrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const sortedHistory = useCallback(history => {
+    const currentHistory = history.filter(element => {
+      if (element.date) return element;
+    });
+
+    const sortedHistory = _.sortBy(currentHistory, 'date');
+    sortedHistory.forEach(element => {
+      element.date = moment(element.date)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    });
+
+    return sortedHistory;
+  }, []);
+
   useEffect(() => {
     if (overallHealth) {
       if (overallHealth.sharesInfo[2].updatedAt) {
@@ -455,72 +494,16 @@ const TrustedContactHistory = props => {
     }
   }, [next]);
 
-  const sortedHistory = history => {
-    const currentHistory = history.filter(element => {
-      if (element.date) return element;
-    });
-
-    const sortedHistory = _.sortBy(currentHistory, 'date');
-    sortedHistory.forEach(element => {
-      element.date = moment(element.date)
-        .utc()
-        .local()
-        .format('DD MMMM YYYY HH:mm');
-    });
-
-    return sortedHistory;
-  };
-
-  const updateHistory = shareHistory => {
-    const updatedTrustedContactHistory = [...trustedContactHistory];
-    if (shareHistory[index].createdAt)
-      updatedTrustedContactHistory[0].date = shareHistory[index].createdAt;
-    if (shareHistory[index].inTransit)
-      updatedTrustedContactHistory[1].date = shareHistory[index].inTransit;
-
-    if (shareHistory[index].accessible)
-      updatedTrustedContactHistory[2].date = shareHistory[index].accessible;
-
-    if (shareHistory[index].notAccessible)
-      updatedTrustedContactHistory[3].date = shareHistory[index].notAccessible;
-
-    console.log({ updatedTrustedContactHistory });
-    setTrustedContactHistory(updatedTrustedContactHistory);
-  };
-
   useEffect(() => {
     (async () => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
+      console.log({ shareHistory });
       if (shareHistory) updateHistory(shareHistory);
     })();
-  }, []);
 
-  const renderTrustedContactQrContents = useCallback(() => {
-    const index =
-      props.navigation.state.params.selectedTitle == 'Trusted Contact 1'
-        ? 1
-        : 2;
-    return (
-      <TrustedContactQr
-        index={index}
-        onPressOk={() => onOTPShare(index)}
-        onPressBack={() => {
-          trustedContactQrBottomSheet.current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  const renderTrustedContactQrHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          trustedContactQrBottomSheet.current.snapTo(0);
-        }}
-      />
-    );
+    setContactInfo();
   }, []);
 
   return (
@@ -597,7 +580,7 @@ const TrustedContactHistory = props => {
             setTimeout(() => {
               setLoadContacts(true);
             }, 2);
-            trustedContactsBottomSheet.current.snapTo(1);
+            (trustedContactsBottomSheet as any).current.snapTo(1);
           }}
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
@@ -611,40 +594,40 @@ const TrustedContactHistory = props => {
               : null
           }
           onPressChange={() => {
-            ChangeBottomSheet.current.snapTo(1);
+            (ChangeBottomSheet as any).current.snapTo(1);
           }}
           onPressConfirm={() => {
-            ConfirmBottomSheet.current.snapTo(1);
+            (ConfirmBottomSheet as any).current.snapTo(1);
           }}
           onPressReshare={() => {
-            ReshareBottomSheet.current.snapTo(1);
+            (ReshareBottomSheet as any).current.snapTo(1);
           }}
         />
       </View>
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={trustedContactsBottomSheet}
+        ref={trustedContactsBottomSheet as any}
         snapPoints={[-30, hp('90%')]}
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={CommunicationModeBottomSheet}
+        ref={CommunicationModeBottomSheet as any}
         snapPoints={[-30, hp('75%')]}
         renderContent={renderCommunicationModeModalContent}
         renderHeader={renderCommunicationModeModalHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={shareOtpWithTrustedContactBottomSheet}
+        ref={shareOtpWithTrustedContactBottomSheet as any}
         snapPoints={[-30, hp('70%')]}
         renderContent={renderShareOtpWithTrustedContactContent}
         renderHeader={renderShareOtpWithTrustedContactHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ChangeBottomSheet}
+        ref={ChangeBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
@@ -654,7 +637,7 @@ const TrustedContactHistory = props => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ReshareBottomSheet}
+        ref={ReshareBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
@@ -664,7 +647,7 @@ const TrustedContactHistory = props => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ConfirmBottomSheet}
+        ref={ConfirmBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
@@ -675,7 +658,7 @@ const TrustedContactHistory = props => {
       <BottomSheet
         onCloseStart={() => {}}
         enabledInnerScrolling={true}
-        ref={trustedContactQrBottomSheet}
+        ref={trustedContactQrBottomSheet as any}
         snapPoints={[-30, hp('90%')]}
         renderContent={renderTrustedContactQrContents}
         renderHeader={renderTrustedContactQrHeader}

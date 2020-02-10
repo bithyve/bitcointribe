@@ -26,6 +26,8 @@ import {
   CHECK_PDF_HEALTH,
   RESTORE_SHARE_FROM_QR,
   updateMSharesHealth,
+  UPDATE_SHARE_HISTORY,
+  updateShareHistory,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -463,21 +465,20 @@ function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select(state => state.sss.service);
 
-  const preInstance = JSON.stringify(s3Service);
+  // const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
-  const postInstance = JSON.stringify(s3Service);
+  // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
 
   if (res.status === 200) {
-    if (preInstance !== postInstance) {
-      const { SERVICES } = yield select(state => state.storage.database);
-      const updatedSERVICES = {
-        ...SERVICES,
-        S3_SERVICE: JSON.stringify(s3Service),
-      };
-
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    }
+    // if (preInstance !== postInstance) {
+    //   const { SERVICES } = yield select(state => state.storage.database);
+    //   const updatedSERVICES = {
+    //     ...SERVICES,
+    //     S3_SERVICE: JSON.stringify(s3Service),
+    //   };
+    //   yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    // }
   } else {
     console.log({ err: res.err });
   }
@@ -554,9 +555,11 @@ export const checkPDFHealthWatcher = createWatcher(
   CHECK_PDF_HEALTH,
 );
 
-const updateHistory = async overallHealth => {
-  console.log({ overallHealth });
-  const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+function* shareHistoryUpdateWorker({ payload }) {
+  const { overallHealth } = payload;
+  const shareHistory = JSON.parse(
+    yield call(AsyncStorage.getItem, 'shareHistory'),
+  );
 
   if (shareHistory) {
     const updatedShareHistory = [...shareHistory];
@@ -576,14 +579,15 @@ const updateHistory = async overallHealth => {
       }
     }
     console.log({ updatedShareHistory });
-    await AsyncStorage.setItem(
+    yield call(
+      AsyncStorage.setItem,
       'shareHistory',
       JSON.stringify(updatedShareHistory),
     );
   }
 
   const securityQuestionHistory = JSON.parse(
-    await AsyncStorage.getItem('securityQuestionHistory'),
+    yield call(AsyncStorage.getItem, 'securityQuestionHistory'),
   ); //TODO: use multiGet on async storage
 
   if (securityQuestionHistory) {
@@ -593,13 +597,19 @@ const updateHistory = async overallHealth => {
         unconfirmed: Date.now(),
       };
 
-      await AsyncStorage.setItem(
+      yield call(
+        AsyncStorage.setItem,
         'securityQuestionHistory',
         JSON.stringify(updatedSecurityQuestionHistory),
       );
     }
   }
-};
+}
+
+export const shareHistoryUpdateWatcher = createWatcher(
+  shareHistoryUpdateWorker,
+  UPDATE_SHARE_HISTORY,
+);
 
 function* overallHealthWorker({ payload }) {
   const service = payload.s3Service
@@ -643,7 +653,8 @@ function* overallHealthWorker({ payload }) {
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
-    yield call(updateHistory, overallHealth);
+    
+    yield put(updateShareHistory(overallHealth));
 
     yield call(
       AsyncStorage.setItem,

@@ -102,6 +102,7 @@ export const MNEMONIC_RECOVERED = 'MNEMONIC_RECOVERED';
 export const S3_LOADING = 'S3_LOADING';
 export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
 export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
+export const UPDATE_SHARE_HISTORY = 'UPDATE_SHARE_HISTORY';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -121,6 +122,10 @@ export const switchS3Loader = beingLoaded => {
 
 export const downloadedMShare = (otp, status, err?) => {
   return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
+};
+
+export const updateShareHistory = overallHealth => {
+  return { type: UPDATE_SHARE_HISTORY, payload: { overallHealth } };
 };
 
 export const overallHealthCalculated = overallHealth => {
