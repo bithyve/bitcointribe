@@ -189,163 +189,107 @@ export default function ContactList(props) {
             </View>
           )}): null}
         </View>
-        <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto', marginRight: 10, padding: 10}} onPress={() => addContact()}>
-          <Text style={{fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
+        <AppBottomSheetTouchableWrapper
+          style={{ marginLeft: 'auto', marginRight: 10, padding: 10 }}
+          onPress={() => addContact()}
+        >
+          <Text
+            style={{
+              fontSize: RFValue(13, 812),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+            onPress={() => addContact()}
+          >
+            Add contact
+          </Text>
         </AppBottomSheetTouchableWrapper>
         <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
-            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+            <EvilIcons
+              style={{ alignSelf: 'center' }}
+              name="search"
+              size={20}
+              color={Colors.textColorGrey}
+            />
           </View>
           <TextInput
-            ref={element => setSearchBox(element)}
             style={styles.searchBoxInput}
             placeholder="Search"
             placeholderTextColor={Colors.textColorGrey}
-            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+            onChangeText={nameKeyword => filterContacts(nameKeyword)}
           />
         </View>
-        <View style={{ flex: 1, flexDirection: "row", position:'relative' }}>
-            {filterContactData ? <FlatList
+        <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
+          {filterContactData ? (
+            <FlatList
+              keyExtractor={(item, index) => item.id}
               data={filterContactData}
-              extraData={radioOnOff}
+              extraData={props.onSelectContact}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
-                // let selected = false;
-                // if (
-                //   selectedContacts.findIndex(temp => temp.id == item.id) > -1
-                // ) {
-                //   selected = true;
-                //   console.log("Selected", selected);
-                // } else{
-                //   selected = false;
-                //   console.log("Selected else", selected);
-                // }
+                let selected = false;
+                if (selectedContacts.findIndex(temp => temp.id == item.id) > -1) {
+                  selected = true;
+                }
                 return (
                   <AppBottomSheetTouchableWrapper
                     onPress={() => onContactSelect(index)}
                     style={styles.contactView}
+                    key={index}
                   >
                     <RadioButton
-                    isOnModal={true}
                       size={15}
                       color={Colors.lightBlue}
                       borderColor={Colors.borderColor}
-                      isChecked={item.checked}
+                      isChecked={selected}
                       onpress={() => onContactSelect(index)}
                     />
                     <Text style={styles.contactText}>
-                      {item.name.split(" ")[0]}{" "}
+                      {item.name.split(' ')[0]}{' '}
                       <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {item.name.split(" ")[1]}
+                        {item.name.split(' ')[1]}
                       </Text>
                     </Text>
                   </AppBottomSheetTouchableWrapper>
-                </View>
-              );
-            })
-          : null}
-      </View>
-      <AppBottomSheetTouchableWrapper
-        style={{ marginLeft: 'auto', marginRight: 10, padding: 10 }}
-        onPress={() => addContact()}
-      >
-        <Text
-          style={{
-            fontSize: RFValue(13, 812),
-            fontFamily: Fonts.FiraSansRegular,
-          }}
-          onPress={() => addContact()}
-        >
-          Add contact
-        </Text>
-      </AppBottomSheetTouchableWrapper>
-      <View style={[styles.searchBoxContainer]}>
-        <View style={styles.searchBoxIcon}>
-          <EvilIcons
-            style={{ alignSelf: 'center' }}
-            name="search"
-            size={20}
-            color={Colors.textColorGrey}
-          />
-        </View>
-        <TextInput
-          style={styles.searchBoxInput}
-          placeholder="Search"
-          placeholderTextColor={Colors.textColorGrey}
-          onChangeText={nameKeyword => filterContacts(nameKeyword)}
-        />
-      </View>
-      <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
-        {filterContactData ? (
-          <FlatList
-            keyExtractor={(item, index) => item.id}
-            data={filterContactData}
-            extraData={props.onSelectContact}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              let selected = false;
-              if (selectedContacts.findIndex(temp => temp.id == item.id) > -1) {
-                selected = true;
-              }
-              return (
-                <AppBottomSheetTouchableWrapper
-                  onPress={() => onContactSelect(index)}
-                  style={styles.contactView}
-                  key={index}
-                >
-                  <RadioButton
-                    size={15}
-                    color={Colors.lightBlue}
-                    borderColor={Colors.borderColor}
-                    isChecked={selected}
-                    onpress={() => onContactSelect(index)}
-                  />
-                  <Text style={styles.contactText}>
-                    {item.name.split(' ')[0]}{' '}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {item.name.split(' ')[1]}
-                    </Text>
-                  </Text>
-                </AppBottomSheetTouchableWrapper>
-              );
-            }}
-          />
-        ) : null}
-        {/* <View style={styles.contactIndexView}>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => {
+                );
               }}
-            >
-              <Text style={styles.contactIndexText}>#</Text>
-            </AppBottomSheetTouchableWrapper>
-            {alphabetsList.map(value => (
+            />
+          ) : null}
+          {/* <View style={styles.contactIndexView}>
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
-
                 }}
               >
-                <Text style={styles.contactIndexText}>{value}</Text>
+                <Text style={styles.contactIndexText}>#</Text>
               </AppBottomSheetTouchableWrapper>
-            ))}
-          </View>*/}
-      </View>
-      {selectedContacts.length >= 1 && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            width: wp('50%'),
-            alignSelf: 'center',
-          }}
-        >
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressContinue()}
-            style={styles.bottomButtonView}
-          >
-            <Text style={styles.buttonText}>Confirm & Proceed</Text>
-          </AppBottomSheetTouchableWrapper>
+              {alphabetsList.map(value => (
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => {
+
+                  }}
+                >
+                  <Text style={styles.contactIndexText}>{value}</Text>
+                </AppBottomSheetTouchableWrapper>
+              ))}
+            </View>*/}
         </View>
-      )}
+        {selectedContacts.length >= 1 && (
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              width: wp('50%'),
+              alignSelf: 'center',
+            }}
+          >
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressContinue()}
+              style={styles.bottomButtonView}
+            >
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
+        )}
     </View>
   );
 }
