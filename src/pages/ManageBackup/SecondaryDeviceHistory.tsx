@@ -122,6 +122,9 @@ const SecondaryDeviceHistory = props => {
           updateAutoHighlightFlags();
           saveInTransitHistory();
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
+          if (next) {
+            props.navigation.goBack();
+          }
         }}
         onPressBack={() => {
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
