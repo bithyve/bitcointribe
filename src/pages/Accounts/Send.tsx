@@ -243,12 +243,11 @@ export default function Send(props) {
   const getQrCodeData = qrData => {
     setTimeout(() => {
       setQrBottomSheetsFlag(false);
-    }, 10);
-    setTimeout(() => {
+      setRecipientAddress(qrData);
+    }, 2);
+    setTimeout(()=>{
       (bottomSheet as any).current.snapTo(0);
     }, 10);
-
-    setRecipientAddress(qrData);
   };
 
   const renderContent1 = () => {
@@ -262,35 +261,16 @@ export default function Send(props) {
     );
   };
 
-  useEffect(() => {
-    if (openmodal == 'closed') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(false);
-      }, 10);
-      (bottomSheet as any).current.snapTo(0);
-    }
-    if (openmodal == 'full') {
-      setTimeout(() => {
-        setQrBottomSheetsFlag(true);
-      }, 10);
-      (bottomSheet as any).current.snapTo(1);
-    }
-  }, [openmodal]);
-
-  function openCloseModal() {
-    if (openmodal == 'closed') {
-      setOpenmodal('full');
-    }
-    if (openmodal == 'full') {
-      setOpenmodal('closed');
-    }
-  }
-
   function renderHeader() {
     return (
       <TouchableOpacity
         activeOpacity={10}
-        onPress={() => openCloseModal()}
+        onPress={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (bottomSheet as any).current.snapTo(0);
+        }}
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
@@ -937,16 +917,8 @@ export default function Send(props) {
           renderHeader={renderSendHelperHeader}
         />
         <BottomSheet
-          onOpenEnd={() => {
-            setQrBottomSheetsFlag(true);
-          }}
-          onCloseEnd={() => {
-            setQrBottomSheetsFlag(false);
-            (bottomSheet as any).current.snapTo(0);
-          }}
-          onCloseStart={() => {
-            setQrBottomSheetsFlag(false);
-          }}
+          onOpenEnd={()=>{setQrBottomSheetsFlag(true)}}
+          onCloseStart={()=>{ setQrBottomSheetsFlag(false) }}
           enabledInnerScrolling={true}
           ref={bottomSheet}
           snapPoints={[0, hp('90%')]}

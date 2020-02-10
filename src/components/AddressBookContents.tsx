@@ -73,7 +73,7 @@ export default function AddressBookContents(props) {
         </Text> */}
       </View>
      
-        {AssociatedContact.length ?  
+        {AssociatedContact && AssociatedContact.length ?  
           <View style={{ flex: 1, flexDirection: "row", marginBottom: 15,}}>
             <FlatList
               data={AssociatedContact}
@@ -111,7 +111,7 @@ export default function AddressBookContents(props) {
         </Text> */}
       </View>
       
-          {SelectedContacts ? 
+          {SelectedContacts && SelectedContacts.length? 
             <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, }}>
               <FlatList
                 data={SelectedContacts}
