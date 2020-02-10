@@ -17,15 +17,16 @@ export default function WalletBackupAndRecoveryContents(props) {
 
     return (<ScrollView style={styles.modalContainer}>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManageBackup()} style={{
+            {/* <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManageBackup()} style={{
                 width: wp('50%'), height: wp('13%'), backgroundColor: Colors.homepageButtonColor,
                 borderRadius: 10,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: hp('2%'), marginBottom: hp('2%')
-            }} >
-                <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(20) }}>Manage Backup</Text>
-            </AppBottomSheetTouchableWrapper>
+            }} > */}
+                <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(20), marginTop: hp('1%'),
+                marginBottom: hp('1%'), }}>Manage Backup</Text>
+            {/* </AppBottomSheetTouchableWrapper> */}
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image source={require("../../assets/images/icons/shieldWithRoundBorder.png")} style={{ width: wp("50%"), height: wp("50%"), resizeMode: "contain" }} />
