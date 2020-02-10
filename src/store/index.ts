@@ -53,6 +53,7 @@ import {
   generatePDFWatcher,
   checkPDFHealthWatcher,
   restoreShareFromQRWatcher,
+  shareHistoryUpdateWatcher,
 } from './sagas/sss';
 
 import {
@@ -122,6 +123,7 @@ const rootSaga = function*() {
     recoverMnemonicWatcher,
     recoverWalletWatcher,
     restoreShareFromQRWatcher,
+    shareHistoryUpdateWatcher,
 
     // manage backup
     sharePdfWatcher,

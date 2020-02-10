@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -32,6 +32,7 @@ const HistoryPageComponent = props => {
           if (SelectedOption == value.id) {
             return (
               <TouchableOpacity
+                key={value.id}
                 onPress={() => SelectOption(value.id)}
                 style={{
                   margin: wp('3%'),
@@ -79,6 +80,7 @@ const HistoryPageComponent = props => {
           }
           return (
             <TouchableOpacity
+              key={value.id}
               onPress={() => SelectOption(value.id)}
               style={{
                 margin: wp('3%'),

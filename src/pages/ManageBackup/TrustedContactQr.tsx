@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  StyleSheet,
   View,
-  SafeAreaView,
   TouchableOpacity,
-  ScrollView,
-  StatusBar,
   Text,
   Image,
-  FlatList,
-  Platform,
-  AsyncStorage,
   ActivityIndicator,
 } from 'react-native';
 import BackupStyles from '../../pages/ManageBackup/Styles';
@@ -22,10 +15,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
-import CopyThisText from '../../components/CopyThisText';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
@@ -40,12 +31,6 @@ export default function TrustedContactQr(props) {
   const WALLET_SETUP = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
-  // const { loading } = useSelector(state => state.sss);
-
-  // const deepLink = SHARES_TRANSFER_DETAILS[0]
-  //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-  //     SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
-  //   : '';
 
   useEffect(() => {
     if (SHARES_TRANSFER_DETAILS[props.index]) {
@@ -59,7 +44,7 @@ export default function TrustedContactQr(props) {
     }
   }, [SHARES_TRANSFER_DETAILS[props.index]]);
 
-  const getIconByStatus = status => {
+  const getIconByStatus = useCallback(status => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -67,7 +52,7 @@ export default function TrustedContactQr(props) {
     } else if (status == 'Good') {
       return require('../../assets/images/icons/icon_check.png');
     }
-  };
+  }, []);
 
   return (
     <View

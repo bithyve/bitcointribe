@@ -45,38 +45,8 @@ async function requestContactsPermission() {
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
-  const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactData, setContactData] = useState([]);
-  const [alphabetsList] = useState([
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-    'K',
-    'L',
-    'M',
-    'N',
-    'O',
-    'P',
-    'Q',
-    'R',
-    'S',
-    'T',
-    'U',
-    'V',
-    'W',
-    'X',
-    'Y',
-    'Z',
-  ]);
-  const [searchBox, setSearchBox] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
 
   const getContactsAsync = async () => {
@@ -110,7 +80,6 @@ export default function ContactList(props) {
     })();
     // global.isContactOpen = true;
     getContactsAsync();
-    setSearchBox('');
   }, []);
 
   const filterContacts = keyword => {
@@ -209,7 +178,6 @@ export default function ContactList(props) {
       console.log('contact', contact);
       if (contact) {
         getContactsAsync();
-        setSearchBox('');
       }
     });
   };
@@ -221,7 +189,7 @@ export default function ContactList(props) {
         {selectedContacts.length > 0
           ? selectedContacts.map(value => {
               return (
-                <View style={styles.selectedContactView}>
+                <View style={styles.selectedContactView} key={value.name}>
                   <Text style={styles.selectedContactNameText}>
                     {value.name ? value.name.split(' ')[0] : ''}{' '}
                     <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
@@ -262,7 +230,6 @@ export default function ContactList(props) {
           />
         </View>
         <TextInput
-          ref={element => setSearchBox(element)}
           style={styles.searchBoxInput}
           placeholder="Search"
           placeholderTextColor={Colors.textColorGrey}
@@ -272,6 +239,7 @@ export default function ContactList(props) {
       <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
         {filterContactData ? (
           <FlatList
+            keyExtractor={(item, index) => item.id}
             data={filterContactData}
             extraData={props.onSelectContact}
             showsVerticalScrollIndicator={false}

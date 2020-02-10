@@ -158,7 +158,7 @@ const HomeNavigator = createStackNavigator(
     TrustedContactHistory,
     PersonalCopyHistory,
     SecurityQuestionHistory,
-    SettingGetNewPin
+    SettingGetNewPin,
   },
   {
     headerLayoutPreset: 'center',
