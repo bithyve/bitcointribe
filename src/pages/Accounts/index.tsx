@@ -1230,6 +1230,7 @@ export default function Accounts(props) {
                     serviceType,
                     getServiceType: getServiceType,
                     staticFees,
+                    netBalance
                   });
                 }}
                 style={styles.bottomCardView}
