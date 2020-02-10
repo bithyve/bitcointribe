@@ -31,7 +31,7 @@ import {
   transferST2,
   fetchTransactions,
   transferST3,
-  fetchBalance
+  fetchBalance,
 } from '../../store/actions/accounts';
 import DeviceInfo from 'react-native-device-info';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
@@ -53,13 +53,31 @@ import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function Send(props) {
-  const [SendConfirmationBottomSheet, setSendConfirmationBottomSheet] = useState(React.createRef());
-  const [SendSuccessWithAddressBottomSheet, setSuccessWithAddressBottomSheet] = useState(React.createRef());
-  const [SendUnSuccessWithAddressBottomSheet, setUnSuccessWithAddressBottomSheet] = useState(React.createRef());
+  const [
+    SendConfirmationBottomSheet,
+    setSendConfirmationBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    SendSuccessWithAddressBottomSheet,
+    setSuccessWithAddressBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    SendUnSuccessWithAddressBottomSheet,
+    setUnSuccessWithAddressBottomSheet,
+  ] = useState(React.createRef());
 
-  const [SendConfirmationWithContactBottomSheet, setSendConfirmationWithContactBottomSheet] = useState(React.createRef());
-  const [SendSuccessWithContactBottomSheet, setSuccessWithContactBottomSheet] = useState(React.createRef());
-  const [SendUnSuccessWithContactBottomSheet, setUnSuccessWithContactBottomSheet] = useState(React.createRef());
+  const [
+    SendConfirmationWithContactBottomSheet,
+    setSendConfirmationWithContactBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    SendSuccessWithContactBottomSheet,
+    setSuccessWithContactBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    SendUnSuccessWithContactBottomSheet,
+    setUnSuccessWithContactBottomSheet,
+  ] = useState(React.createRef());
 
   const staticFees = props.navigation.getParam('staticFees');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
@@ -67,6 +85,7 @@ export default function Send(props) {
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
+  const netBalance = props.navigation.state.params.netBalance;
   const serviceType = props.navigation.getParam('serviceType');
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
@@ -75,6 +94,7 @@ export default function Send(props) {
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [isSendHelperDone, setIsSendHelperDone] = useState(true);
+  const [isInvalidBalance, setIsInvalidBalance] = useState(false);
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -83,14 +103,15 @@ export default function Send(props) {
   );
 
   let userInfo = {
-      to:"2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR",
-      from: "Secure Account",
-      amount:"0.00012",
-      fee:"0.0001",
-      total:0.00022,
-      estDeliveryTime:"2 hours",
-      description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a."
-    }
+    to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
+    from: 'Secure Account',
+    amount: '0.00012',
+    fee: '0.0001',
+    total: 0.00022,
+    estDeliveryTime: '2 hours',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.',
+  };
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -168,18 +189,19 @@ export default function Send(props) {
   );
 
   useEffect(() => {
-    if(transfer.stage1.failed || transfer.stage2.failed || transfer.stage3.failed){
+    if (
+      transfer.stage1.failed ||
+      transfer.stage2.failed ||
+      transfer.stage3.failed
+    ) {
       SendConfirmationBottomSheet.current.snapTo(0);
-      SendUnSuccessWithAddressBottomSheet.current.snapTo(1)
-    }
-    else if(transfer.txid){
+      SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
+    } else if (transfer.txid) {
       SendConfirmationBottomSheet.current.snapTo(0);
-      SendSuccessWithAddressBottomSheet.current.snapTo(1)
-    }
-    else if (transfer.executed === 'ST1'){
-      SendConfirmationBottomSheet.current.snapTo(1)
-    }
-    else if (!transfer.txid && transfer.executed === 'ST2'){
+      SendSuccessWithAddressBottomSheet.current.snapTo(1);
+    } else if (transfer.executed === 'ST1') {
+      SendConfirmationBottomSheet.current.snapTo(1);
+    } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
         recipientAddress,
@@ -205,7 +227,6 @@ export default function Send(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log('isSendHelperDone', isSendHelperDone);
           if (isSendHelperDone) {
             (SendHelperBottomSheet as any).current.snapTo(2);
             setTimeout(() => {
@@ -220,7 +241,6 @@ export default function Send(props) {
   };
 
   const getQrCodeData = qrData => {
-    console.log('Qrcodedata', qrData);
     setTimeout(() => {
       setQrBottomSheetsFlag(false);
     }, 10);
@@ -302,90 +322,128 @@ export default function Send(props) {
   //   );
   // }, []);
 
-  const renderSendConfirmationContents = () =>{
-    if(transfer){
+  const renderSendConfirmationContents = () => {
+    if (transfer) {
       userInfo = {
-        to:recipientAddress,
+        to: recipientAddress,
         from: getAccountFromType(),
-        amount:amount,
-        fee:transfer.stage1.fee,
-        total:parseInt(amount,10)+parseInt(transfer.stage1.fee,10),
-        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks*10),
-        description:description
-      }
+        amount: amount,
+        fee: transfer.stage1.fee,
+        total: parseInt(amount, 10) + parseInt(transfer.stage1.fee, 10),
+        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks * 10),
+        description: description,
+      };
     }
-    return <SendConfirmationContent 
-          title = {"Send Confirmation"}
-          info={"Confirm the follow details"}
-          userInfo = {userInfo}
-          isFromContact = {false}
-          okButtonText={"confirm"}
-          cancelButtonText={"Back"}
-          isCancel={true}
-          onPressOk={()=>{dispatch(transferST2(serviceType))}}
-          onPressCancel={()=>{dispatch(clearTransfer(serviceType)); SendConfirmationBottomSheet.current.snapTo(0);}}
+    return (
+      <SendConfirmationContent
+        title={'Send Confirmation'}
+        info={'Confirm the follow details'}
+        userInfo={userInfo}
+        isFromContact={false}
+        okButtonText={'confirm'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          dispatch(transferST2(serviceType));
+        }}
+        onPressCancel={() => {
+          dispatch(clearTransfer(serviceType));
+          SendConfirmationBottomSheet.current.snapTo(0);
+        }}
       />
-  }
+    );
+  };
 
-  const renderSendConfirmationHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{SendConfirmationBottomSheet.current.snapTo(0)}} />
-  }
+  const renderSendConfirmationHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          SendConfirmationBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
-  const renderSendSuccessWithAddressContents = () =>{
-    if(transfer){
+  const renderSendSuccessWithAddressContents = () => {
+    if (transfer) {
       userInfo = {
-        to:recipientAddress,
+        to: recipientAddress,
         from: getAccountFromType(),
-        amount:amount,
-        fee:transfer.stage1.fee,
-        total:parseInt(amount,10)+parseInt(transfer.stage1.fee,10),
-        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks*10),
-        description:description
-      }
+        amount: amount,
+        fee: transfer.stage1.fee,
+        total: parseInt(amount, 10) + parseInt(transfer.stage1.fee, 10),
+        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks * 10),
+        description: description,
+      };
     }
-    return <SendConfirmationContent 
-          title = {"Sent Successfully"}
-          info={"Bitcoins successfully sent to Contact"}
-          userInfo = {userInfo}
-          isFromContact = {false}
-          okButtonText={"View Account"}
-          cancelButtonText={"Back"}
-          isCancel={false}
-          onPressOk={()=>{dispatch(clearTransfer(serviceType));
-            dispatch(fetchBalance(serviceType));
-            dispatch(fetchTransactions(serviceType));
-            SendSuccessWithAddressBottomSheet.current.snapTo(0)
-            props.navigation.navigate('Accounts');}}
-          isSuccess={true}
+    return (
+      <SendConfirmationContent
+        title={'Sent Successfully'}
+        info={'Bitcoins successfully sent to Contact'}
+        userInfo={userInfo}
+        isFromContact={false}
+        okButtonText={'View Account'}
+        cancelButtonText={'Back'}
+        isCancel={false}
+        onPressOk={() => {
+          dispatch(clearTransfer(serviceType));
+          dispatch(fetchBalance(serviceType));
+          dispatch(fetchTransactions(serviceType));
+          SendSuccessWithAddressBottomSheet.current.snapTo(0);
+          props.navigation.navigate('Accounts');
+        }}
+        isSuccess={true}
       />
-  }
+    );
+  };
 
-  const renderSendSuccessWithAddressHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{dispatch(clearTransfer(serviceType));
-      dispatch(fetchBalance(serviceType));
-      dispatch(fetchTransactions(serviceType));
-      SendSuccessWithAddressBottomSheet.current.snapTo(0);
-      props.navigation.navigate('Accounts'); }} />
-  }
-
-  const renderSendUnSuccessWithAddressContents = () =>{
-    return <SendConfirmationContent 
-          title = {"Sent Unsuccessful"}
-          info={"There seems to be a problem"}
-          userInfo = {userInfo}
-          isFromContact = {false}
-          okButtonText={"Try Again"}
-          cancelButtonText={"Back"}
-          isCancel={true}
-          onPressOk={()=>{dispatch(clearTransfer(serviceType));SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}}
-          onPressCancel={()=>{dispatch(clearTransfer(serviceType));SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}}
-          isUnSuccess={true}
+  const renderSendSuccessWithAddressHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          dispatch(clearTransfer(serviceType));
+          dispatch(fetchBalance(serviceType));
+          dispatch(fetchTransactions(serviceType));
+          SendSuccessWithAddressBottomSheet.current.snapTo(0);
+          props.navigation.navigate('Accounts');
+        }}
       />
-  }
+    );
+  };
 
-  const renderSendUnSuccessWithAddressHeader = () =>{
-    return <ModalHeader onPressHeader={()=>{dispatch(clearTransfer(serviceType));SendUnSuccessWithAddressBottomSheet.current.snapTo(0)}} />
-  }
+  const renderSendUnSuccessWithAddressContents = () => {
+    return (
+      <SendConfirmationContent
+        title={'Sent Unsuccessful'}
+        info={'There seems to be a problem'}
+        userInfo={userInfo}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          dispatch(clearTransfer(serviceType));
+          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+        onPressCancel={() => {
+          dispatch(clearTransfer(serviceType));
+          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+        isUnSuccess={true}
+      />
+    );
+  };
+
+  const renderSendUnSuccessWithAddressHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          dispatch(clearTransfer(serviceType));
+          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
@@ -400,35 +458,53 @@ export default function Send(props) {
     }
   }, []);
 
-  const getAccountFromType = () =>{
-    if(serviceType=="TEST_ACCOUNT"){
-      return "Test Account";
+  const getAccountFromType = () => {
+    if (serviceType == 'TEST_ACCOUNT') {
+      return 'Test Account';
     }
-    if(serviceType=="SECURE_ACCOUNT"){
-      return "Secure Account";
+    if (serviceType == 'SECURE_ACCOUNT') {
+      return 'Secure Account';
     }
-    if(serviceType=="REGULAR_ACCOUNT"){
-      return "Regular Account";
+    if (serviceType == 'REGULAR_ACCOUNT') {
+      return 'Regular Account';
     }
-    if(serviceType=="S3_SERVICE"){
-      return "S3 Service";
+    if (serviceType == 'S3_SERVICE') {
+      return 'S3 Service';
     }
-  }
+  };
 
   function timeConvert(valueInMinutes) {
     var num = valueInMinutes;
-    var hours = Math.round((num / 60));
-    var days = Math.round(hours/24);
-    if(valueInMinutes < 60){
-      return valueInMinutes + " minutes";
-    }
-    else if(hours < 24){
-      return hours + " hours";
-    }
-    else if(days>0){
-      return days==1 ? days + " day" : days + " days";
+    var hours = Math.round(num / 60);
+    var days = Math.round(hours / 24);
+    if (valueInMinutes < 60) {
+      return valueInMinutes + ' minutes';
+    } else if (hours < 24) {
+      return hours + ' hours';
+    } else if (days > 0) {
+      return days == 1 ? days + ' day' : days + ' days';
     }
   }
+
+  const checkBalance = () => {
+    if (netBalance < Number(amount)) {
+      setIsInvalidBalance(true);
+    } else {
+      const priority =
+        sliderValueText === 'Low Fee'
+          ? 'low'
+          : sliderValueText === 'In the middle'
+          ? 'medium'
+          : 'high';
+      dispatch(
+        transferST1(serviceType, {
+          recipientAddress,
+          amount: parseInt(amount),
+          priority,
+        }),
+      );
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -441,388 +517,406 @@ export default function Send(props) {
           enabled
         >
           <ScrollView>
-          <TouchableWithoutFeedback onPress={() => {SendHelperBottomSheet.current.snapTo(0)}}>
-      
-          <View onStartShouldSetResponder={() => true}>
-            <View style={styles.modalHeaderTitleView}>
-              <View
-                style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    if (getServiceType) {
-                      getServiceType(serviceType);
-                    }
-                    props.navigation.goBack();
-                  }}
-                  style={{ height: 30, width: 30, justifyContent: 'center' }}
-                >
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.blue}
-                    size={17}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
-                {serviceType == TEST_ACCOUNT ? (
-                  <Text
-                    onPress={() => {
-                      AsyncStorage.setItem('isSendHelperDone', 'true');
-                      SendHelperBottomSheet.current.snapTo(2);
-                    }}
+            <TouchableWithoutFeedback
+              onPress={() => {
+                SendHelperBottomSheet.current.snapTo(0);
+              }}
+            >
+              <View onStartShouldSetResponder={() => true}>
+                <View style={styles.modalHeaderTitleView}>
+                  <View
                     style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      marginLeft: 'auto',
+                      flex: 1,
+                      flexDirection: 'row',
+                      alignItems: 'center',
                     }}
                   >
-                    Know more
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-              <View style={styles.textBoxView}>
-                <TextInput
-                  // ref={refs => setTextContactNameRef(refs)}
-                  style={styles.textBox}
-                  placeholder={'Address'}
-                  value={recipientAddress}
-                  onChangeText={setRecipientAddress}
-                  placeholderTextColor={Colors.borderColor}
-                  // onFocus={() => {
-                  //   props.modalRef.current.snapTo(2);
-                  // }}
-                  // onBlur={() => {
-                  //   if (
-                  //     !textAmountRef.isFocused() &&
-                  //     !descriptionRef.isFocused()
-                  //   ) {
-                  //     props.modalRef.current.snapTo(1);
-                  //   }
-                  // }}
-                />
-                <TouchableOpacity
-                  style={styles.contactNameInputImageView}
-                  onPress={() => {
-                    (bottomSheet as any).current.snapTo(1);
-                    // props.navigation.navigate('QrScanner', {
-                    //   scanedCode: getQrCodeData,
-                    // });
-                  }}
-                >
-                  <Image
-                    style={styles.textBoxImage}
-                    source={require('../../assets/images/icons/qr-code.png')}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.textBoxView}>
-                <View style={styles.amountInputImage}>
-                  <Image
-                    style={styles.textBoxImage}
-                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                  />
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (getServiceType) {
+                          getServiceType(serviceType);
+                        }
+                        props.navigation.goBack();
+                      }}
+                      style={{
+                        height: 30,
+                        width: 30,
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <FontAwesome
+                        name="long-arrow-left"
+                        color={Colors.blue}
+                        size={17}
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+                    {serviceType == TEST_ACCOUNT ? (
+                      <Text
+                        onPress={() => {
+                          AsyncStorage.setItem('isSendHelperDone', 'true');
+                          SendHelperBottomSheet.current.snapTo(2);
+                        }}
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(12),
+                          marginLeft: 'auto',
+                        }}
+                      >
+                        Know more
+                      </Text>
+                    ) : null}
+                  </View>
                 </View>
-                <TextInput
-                  // ref={refs => setTextAmountRef(refs)}
-                  style={{ ...styles.textBox, paddingLeft: 10 }}
-                  placeholder={
-                    serviceType === TEST_ACCOUNT
-                      ? 'Enter Amount in t-sats'
-                      : 'Enter Amount in sats'
-                  }
-                  value={amount}
-                  keyboardType={'numeric'}
-                  onChangeText={value => setAmount(value)}
-                  placeholderTextColor={Colors.borderColor}
-                  // onFocus={() => {
-                  //   props.modalRef.current.snapTo(2);
-                  // }}
-                  // onBlur={() => {
-                  //   if (
-                  //     !descriptionRef.isFocused() &&
-                  //     !textContactNameRef.isFocused()
-                  //   ) {
-                  //     props.modalRef.current.snapTo(1);
-                  //   }
-                  // }}
-                />
-              </View>
-              <View style={{ ...styles.textBoxView, height: 100 }}>
-                <TextInput
-                  // ref={refs => setDescriptionRef(refs)}
-                  multiline={true}
-                  numberOfLines={4}
-                  style={{
-                    ...styles.textBox,
-                    paddingRight: 20,
-                    marginTop: 10,
-                    marginBottom: 10,
-                  }}
-                  placeholder={'Description (Optional)'}
-                  value={description}
-                  onChangeText={setDescription}
-                  placeholderTextColor={Colors.borderColor}
-                  // onFocus={() => {
-                  //   props.modalRef.current.snapTo(2);
-                  // }}
-                  // onBlur={() => {
-                  //   if (
-                  //     !textAmountRef.isFocused() &&
-                  //     !textContactNameRef.isFocused()
-                  //   ) {
-                  //     props.modalRef.current.snapTo(1);
-                  //   }
-                  // }}
-                />
-              </View>
-            </View>
-            <View
-              style={{
-                height: 1,
-                backgroundColor: Colors.borderColor,
-                marginRight: 10,
-                marginLeft: 10,
-                marginTop: hp('3%'),
-                marginBottom: hp('3%'),
-              }}
-            />
-            <View style={{ paddingLeft: 20, paddingRight: 20 }}>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Transaction Priority
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Set priority for your transaction
-              </Text>
-              
-              <View
-                style={{
-                  ...styles.textBoxView,
-                  flexDirection: 'column',
-                  height: 'auto',
-                  marginTop: hp('2%'),
-                  alignItems: 'center',
-                  paddingLeft: 10,
-                  paddingRight: 10,
-                }}
-              >
-                <View style={{flexDirection: 'row'}}>
-                <Slider
-                  style={{ flex: 1, marginRight: 10 }}
-                  minimumValue={0}
-                  maximumValue={10}
-                  step={5}
-                  minimumTrackTintColor={Colors.blue}
-                  maximumTrackTintColor={Colors.borderColor}
-                  thumbStyle={{
-                    borderWidth: 5,
-                    borderColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    height: 30,
-                    width: 30,
-                    borderRadius: 15,
-                  }}
-                  trackStyle={{ height: 8, borderRadius: 10 }}
-                  thumbTouchSize={{
-                    width: 30,
-                    height: 30,
-                    backgroundColor: 'blue',
-                  }}
-                  value={sliderValue}
-                  onValueChange={value => {
-                    {
-                      value == 0
-                        ? setSliderValueText('Low Fee')
-                        : value == 5
-                        ? setSliderValueText('In the middle')
-                        : setSliderValueText('Fast Transaction');
-                    }
-                    setSliderValue(value);
-                  }}
-                />
+                <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+                  <View style={styles.textBoxView}>
+                    <TextInput
+                      // ref={refs => setTextContactNameRef(refs)}
+                      style={styles.textBox}
+                      placeholder={'Address'}
+                      value={recipientAddress}
+                      onChangeText={setRecipientAddress}
+                      placeholderTextColor={Colors.borderColor}
+                      // onFocus={() => {
+                      //   props.modalRef.current.snapTo(2);
+                      // }}
+                      // onBlur={() => {
+                      //   if (
+                      //     !textAmountRef.isFocused() &&
+                      //     !descriptionRef.isFocused()
+                      //   ) {
+                      //     props.modalRef.current.snapTo(1);
+                      //   }
+                      // }}
+                    />
+                    <TouchableOpacity
+                      style={styles.contactNameInputImageView}
+                      onPress={() => {
+                        (bottomSheet as any).current.snapTo(1);
+                        // props.navigation.navigate('QrScanner', {
+                        //   scanedCode: getQrCodeData,
+                        // });
+                      }}
+                    >
+                      <Image
+                        style={styles.textBoxImage}
+                        source={require('../../assets/images/icons/qr-code.png')}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.textBoxView}>
+                    <View style={styles.amountInputImage}>
+                      <Image
+                        style={styles.textBoxImage}
+                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                      />
+                    </View>
+                    <TextInput
+                      // ref={refs => setTextAmountRef(refs)}
+                      style={{ ...styles.textBox, paddingLeft: 10 }}
+                      placeholder={
+                        serviceType === TEST_ACCOUNT
+                          ? 'Enter Amount in t-sats'
+                          : 'Enter Amount in sats'
+                      }
+                      value={amount}
+                      keyboardType={'numeric'}
+                      onChangeText={value => setAmount(value)}
+                      placeholderTextColor={Colors.borderColor}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          setTimeout(() => {
+                            setIsInvalidBalance(false);
+                          }, 10);
+                        }
+                      }}
+                      // onFocus={() => {
+                      //   props.modalRef.current.snapTo(2);
+                      // }}
+                      // onBlur={() => {
+                      //   if (
+                      //     !descriptionRef.isFocused() &&
+                      //     !textContactNameRef.isFocused()
+                      //   ) {
+                      //     props.modalRef.current.snapTo(1);
+                      //   }
+                      // }}
+                    />
+                  </View>
+                  {isInvalidBalance ? (
+                    <View style={{ marginLeft: 'auto' }}>
+                      <Text style={styles.errorText}>Insufficient balance</Text>
+                    </View>
+                  ) : null}
+                  <View style={{ ...styles.textBoxView, height: 100 }}>
+                    <TextInput
+                      // ref={refs => setDescriptionRef(refs)}
+                      multiline={true}
+                      numberOfLines={4}
+                      style={{
+                        ...styles.textBox,
+                        paddingRight: 20,
+                        marginTop: 10,
+                        marginBottom: 10,
+                      }}
+                      placeholder={'Description (Optional)'}
+                      value={description}
+                      onChangeText={setDescription}
+                      placeholderTextColor={Colors.borderColor}
+                      // onFocus={() => {
+                      //   props.modalRef.current.snapTo(2);
+                      // }}
+                      // onBlur={() => {
+                      //   if (
+                      //     !textAmountRef.isFocused() &&
+                      //     !textContactNameRef.isFocused()
+                      //   ) {
+                      //     props.modalRef.current.snapTo(1);
+                      //   }
+                      // }}
+                    />
+                  </View>
                 </View>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    marginBottom: 10
+                    height: 1,
+                    backgroundColor: Colors.borderColor,
+                    marginRight: 10,
+                    marginLeft: 10,
+                    marginTop: hp('3%'),
+                    marginBottom: hp('3%'),
+                  }}
+                />
+                <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+                  <Text
+                    style={{
+                      color: Colors.blue,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    Transaction Priority
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    Set priority for your transaction
+                  </Text>
+
+                  <View
+                    style={{
+                      ...styles.textBoxView,
+                      flexDirection: 'column',
+                      height: 'auto',
+                      marginTop: hp('2%'),
+                      alignItems: 'center',
+                      paddingLeft: 10,
+                      paddingRight: 10,
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row' }}>
+                      <Slider
+                        style={{ flex: 1, marginRight: 10 }}
+                        minimumValue={0}
+                        maximumValue={10}
+                        step={5}
+                        minimumTrackTintColor={Colors.blue}
+                        maximumTrackTintColor={Colors.borderColor}
+                        thumbStyle={{
+                          borderWidth: 5,
+                          borderColor: Colors.white,
+                          backgroundColor: Colors.blue,
+                          height: 30,
+                          width: 30,
+                          borderRadius: 15,
+                        }}
+                        trackStyle={{ height: 8, borderRadius: 10 }}
+                        thumbTouchSize={{
+                          width: 30,
+                          height: 30,
+                          backgroundColor: 'blue',
+                        }}
+                        value={sliderValue}
+                        onValueChange={value => {
+                          {
+                            value == 0
+                              ? setSliderValueText('Low Fee')
+                              : value == 5
+                              ? setSliderValueText('In the middle')
+                              : setSliderValueText('Fast Transaction');
+                          }
+                          setSliderValue(value);
+                        }}
+                      />
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginBottom: 10,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansRegular,
+                          textAlign: 'center',
+                          flex: 1,
+                          flexWrap: 'wrap',
+                          marginRight: 5,
+                        }}
+                      >
+                        {'Low Fee\n'} (
+                        {staticFees
+                          ? staticFees[
+                              sliderValueText === 'Low Fee\n'
+                                ? 'low'
+                                : sliderValueText === 'In the middle\n'
+                                ? 'medium'
+                                : 'high'
+                            ]
+                          : ''}
+                        {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                      </Text>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansRegular,
+                          textAlign: 'center',
+                          flex: 1,
+                          flexWrap: 'wrap',
+                          marginRight: 5,
+                        }}
+                      >
+                        {'In the middle\n'} (
+                        {staticFees
+                          ? staticFees[
+                              sliderValueText === 'Low Fee\n'
+                                ? 'low'
+                                : sliderValueText === 'In the middle\n'
+                                ? 'medium'
+                                : 'high'
+                            ]
+                          : ''}
+                        {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                      </Text>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansRegular,
+                          textAlign: 'center',
+                          flex: 1,
+                          flexWrap: 'wrap',
+                        }}
+                      >
+                        {'Fast Transaction\n'} (
+                        {staticFees
+                          ? staticFees[
+                              sliderValueText === 'Low Fee'
+                                ? 'low'
+                                : sliderValueText === 'In the middle'
+                                ? 'medium'
+                                : 'high'
+                            ]
+                          : ''}
+                        {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    marginTop: hp('5%'),
                   }}
                 >
                   <Text
                     style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(10),
+                      color: Colors.blue,
+                      fontSize: RFValue(13),
                       fontFamily: Fonts.FiraSansRegular,
-                      textAlign: 'center',
-                      flex: 1, flexWrap: 'wrap',
-                      marginRight: 5
                     }}
                   >
-                    {'Low Fee\n'} (
-                    {staticFees
-                      ? staticFees[
-                          sliderValueText === 'Low Fee\n'
-                            ? 'low'
-                            : sliderValueText === 'In the middle\n'
-                            ? 'medium'
-                            : 'high'
-                        ]
-                      : ''}
-                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                    Transaction Fee
                   </Text>
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(10),
+                      fontSize: RFValue(12),
                       fontFamily: Fonts.FiraSansRegular,
-                      textAlign: 'center',
-                      flex: 1, flexWrap: 'wrap',
-                      marginRight: 5
                     }}
                   >
-                    {'In the middle\n'} (
-                    {staticFees
-                      ? staticFees[
-                          sliderValueText === 'Low Fee\n'
-                            ? 'low'
-                            : sliderValueText === 'In the middle\n'
-                            ? 'medium'
-                            : 'high'
-                        ]
-                      : ''}
-                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(10),
-                      fontFamily: Fonts.FiraSansRegular,
-                      textAlign: 'center',
-                      flex: 1, flexWrap: 'wrap'
-                    }}
-                  >
-                    {'Fast Transaction\n'} (
-                    {staticFees
-                      ? staticFees[
-                          sliderValueText === 'Low Fee'
-                            ? 'low'
-                            : sliderValueText === 'In the middle'
-                            ? 'medium'
-                            : 'high'
-                        ]
-                      : ''}
-                    {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                    Transaction fee will be calculated in the next step
+                    according to the amount of money being sent
                   </Text>
                 </View>
+                <View
+                  style={{
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    flexDirection: 'row',
+                    marginTop: hp('5%'),
+                    marginBottom: hp('5%'),
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      checkBalance();
+                    }}
+                    disabled={loading.transfer}
+                    style={{
+                      ...styles.confirmButtonView,
+                      backgroundColor: Colors.blue,
+                      elevation: 10,
+                      shadowColor: Colors.shadowBlue,
+                      shadowOpacity: 1,
+                      shadowOffset: { width: 15, height: 15 },
+                    }}
+                  >
+                    {loading.transfer && !isInvalidBalance? (
+                      <ActivityIndicator size="small" />
+                    ) : (
+                      <Text style={styles.buttonText}>Confirm</Text>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      ...styles.confirmButtonView,
+                      width: wp('30%'),
+                    }}
+                    onPress={() => {
+                      dispatch(clearTransfer(serviceType));
+                      props.navigation.goBack();
+                    }}
+                  >
+                    <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {/* {transfer.executed === 'ST1' ? stage2() : null} */}
+                <View
+                  style={{
+                    marginBottom: hp('5%'),
+                  }}
+                >
+                  <BottomInfoBox
+                    title={'Note'}
+                    infoText={
+                      'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+                    }
+                  />
                 </View>
               </View>
-            <View
-              style={{ paddingLeft: 20, paddingRight: 20, marginTop: hp('5%') }}
-            >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Transaction Fee
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Transaction fee will be calculated in the next step according to
-                the amount of money being sent
-              </Text>
-            </View>
-            <View
-              style={{
-                paddingLeft: 20,
-                paddingRight: 20,
-                flexDirection: 'row',
-                marginTop: hp('5%'),
-                marginBottom: hp('5%'),
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  const priority =
-                    sliderValueText === 'Low Fee'
-                      ? 'low'
-                      : sliderValueText === 'In the middle'
-                      ? 'medium'
-                      : 'high';
-                  dispatch(
-                    transferST1(serviceType, {
-                      recipientAddress,
-                      amount: parseInt(amount),
-                      priority,
-                    }),
-                  );
-                }}
-                disabled={loading.transfer}
-                style={{
-                  ...styles.confirmButtonView,
-                  backgroundColor: Colors.blue,
-                  elevation: 10,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 15, height: 15 },
-                }}
-              >
-                {loading.transfer ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Text style={styles.buttonText}>Confirm</Text>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.confirmButtonView,
-                  width: wp('30%'),
-                }}
-                onPress={() => {
-                  dispatch(clearTransfer(serviceType));
-                  props.navigation.goBack();
-                }}
-              >
-                <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            </View>
-            {/* {transfer.executed === 'ST1' ? stage2() : null} */}
-            <View
-          style={{
-            marginBottom: hp('5%'),
-          }}
-        >
-          <BottomInfoBox
-            title={'Note'}
-            infoText={
-              'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
-            }
-          />
-        </View>
-        </View>
-        </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
         <BottomSheet
@@ -831,11 +925,13 @@ export default function Send(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('15%')
-            : Platform.OS == 'android'
-            ? hp('16%')
-            : hp('15%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+              ? hp('15%')
+              : Platform.OS == 'android'
+              ? hp('16%')
+              : hp('15%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('75%'),
           ]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}
@@ -865,10 +961,14 @@ export default function Send(props) {
           renderHeader={renderSendConfirmationHeader}
         />
         <BottomSheet
-          onCloseStart={()=>{{dispatch(clearTransfer(serviceType));
-            dispatch(fetchBalance(serviceType));
-            dispatch(fetchTransactions(serviceType));
-            props.navigation.navigate('Accounts');}}}
+          onCloseStart={() => {
+            {
+              dispatch(clearTransfer(serviceType));
+              dispatch(fetchBalance(serviceType));
+              dispatch(fetchTransactions(serviceType));
+              props.navigation.navigate('Accounts');
+            }
+          }}
           enabledInnerScrolling={true}
           ref={SendSuccessWithAddressBottomSheet}
           snapPoints={[-50, hp('50%')]}
@@ -876,9 +976,9 @@ export default function Send(props) {
           renderHeader={renderSendSuccessWithAddressHeader}
         />
         <BottomSheet
-          onCloseStart={()=>{
+          onCloseStart={() => {
             dispatch(clearTransfer(serviceType));
-            SendUnSuccessWithAddressBottomSheet.current.snapTo(0)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
           }}
           enabledInnerScrolling={true}
           ref={SendUnSuccessWithAddressBottomSheet}
@@ -894,6 +994,12 @@ export default function Send(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11),
+    fontStyle: 'italic',
   },
   modalHeaderContainer: {
     backgroundColor: Colors.white,
