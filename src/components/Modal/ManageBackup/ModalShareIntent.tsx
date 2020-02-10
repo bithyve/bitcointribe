@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -20,12 +20,12 @@ import Icons from '../../../../src/common/Icons';
 import Singleton from '../../../common/Singleton';
 import ModalHeader from '../../ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { requestSharePdf } from '../../../store/actions/manageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function ModalShareIntent(props) {
-  console.log({ props });
+  const database = useSelector(state => state.storage.databaseSSS);
 
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [arrShareOption, setArrShareOption] = useState([
@@ -150,6 +150,16 @@ export default function ModalShareIntent(props) {
     // }
   };
 
+  const disableOrEnableOption = (item) =>{
+    if(props.selectedPersonalCopy.type == 'copy1'){
+      return database.pdfDetails.copy2.shareDetails.type == item.type ? true : false;
+    }
+    if(props.selectedPersonalCopy.type == 'copy2'){
+      return database.pdfDetails.copy1.shareDetails.type == item.type ? true : false;
+    }
+    return false;
+  }
+
   return (
     <View style={[styles.modalContainer]}>
       <View
@@ -190,7 +200,7 @@ export default function ModalShareIntent(props) {
               onPress={() => {
                 onShare(item);
               }}
-              // disabled={item.flagShare}
+              disabled={disableOrEnableOption(item)}
               style={[
                 styles.listElements,
                 item.flagShare == true
