@@ -35,6 +35,8 @@ import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import _ from 'underscore';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 const PersonalCopyHistory = props => {
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
@@ -74,6 +76,9 @@ const PersonalCopyHistory = props => {
   );
   const selectedPersonalCopy = props.navigation.getParam(
     'selectedPersonalCopy',
+  );
+  const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
+    React.createRef(),
   );
   const next = props.navigation.getParam('next');
 
@@ -209,6 +214,30 @@ const PersonalCopyHistory = props => {
     }
   }, []);
 
+  const renderSendHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={`Sending Bitcoins`}
+        helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient Pretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence of numbers and letters which is the recipients bitcoin address`}
+        continueButtonText={'Ok, got it'}
+        onPressContinue={() => {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSendHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          (SendHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -256,12 +285,15 @@ const PersonalCopyHistory = props => {
                 </Text>
               </Text>
             </View>
-            <Image
-              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
-              source={getIconByStatus(
-                props.navigation.state.params.selectedStatus,
-              )}
-            />
+            <TouchableOpacity onPress={()=>{SendHelperBottomSheet.current.snapTo(1);}} style={{  justifyContent: 'center', }}>
+              <Text style={{color: Colors.textColorGrey, fontSize: RFValue(12), marginLeft:'auto'}}>Know More</Text>
+              <Image
+                style={{ ...BackupStyles.cardIconImage, alignSelf: 'center', marginTop: 5 }}
+                source={getIconByStatus(
+                  props.navigation.state.params.selectedStatus,
+                )}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -292,6 +324,18 @@ const PersonalCopyHistory = props => {
         renderContent={renderPersonalCopyShareModalContent}
         renderHeader={renderPersonalCopyShareModalHeader}
       />
+      <BottomSheet
+          enabledInnerScrolling={true}
+          ref={SendHelperBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('75%'),
+          ]}
+          renderContent={renderSendHelperContents}
+          renderHeader={renderSendHelperHeader}
+        />
     </View>
   );
 };
