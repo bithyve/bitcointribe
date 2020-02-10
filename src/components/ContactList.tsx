@@ -45,10 +45,10 @@ async function requestContactsPermission() {
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
-  const [radioOnOff, setRadioOnOff] = useState(false);
+  const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [contactData, setContactData] = useState([]);
   const [filterContactData, setFilterContactData] = useState([]);
-
+  const [radioOnOff, setRadioOnOff] = useState(false);
   const getContactsAsync = async () => {
     if (Platform.OS === 'android') {
       if (!(await requestContactsPermission())) {
@@ -106,31 +106,20 @@ export default function ContactList(props) {
   };
 
   function onContactSelect(index) {
+    console.log("onContactSelect", index);
     let contacts = filterContactData;
-    // if (contacts[index].checked) {
-    //   // selectedContacts.splice(
-    //   //   selectedContacts.findIndex(temp => temp.id == contacts[index].id),
-    //   //   1
-    //   // );
-    //   selectedContacts=[];
-    // } else {
-    //   // if (selectedContacts.length === 2) {
-    //   //   selectedContacts.pop();
-    //   // }
-    //   // selectedContacts.push(contacts[index]);
-    //   selectedContacts[0]=contacts[index];
-    // }
-    if (props.isTrustedContact) {
+    if(props.isTrustedContact){
       if (contacts[index].checked) {
-        selectedContacts = [];
+        selectedContacts=[];
       } else {
-        selectedContacts[0] = contacts[index];
+        selectedContacts[0]=contacts[index];
       }
-    } else {
+    }
+    else{
       if (contacts[index].checked) {
         selectedContacts.splice(
           selectedContacts.findIndex(temp => temp.id == contacts[index].id),
-          1,
+          1
         );
       } else {
         if (selectedContacts.length === 2) {
@@ -149,8 +138,8 @@ export default function ContactList(props) {
         contacts[i].checked = false;
       }
     }
-    setFilterContactData(contacts);
     setRadioOnOff(!radioOnOff);
+    setFilterContactData(contacts);
     props.onSelectContact(selectedContacts);
   }
 
@@ -165,7 +154,6 @@ export default function ContactList(props) {
       1,
     );
     setSelectedContacts(selectedContacts);
-    setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
   }
 
@@ -183,23 +171,74 @@ export default function ContactList(props) {
   };
 
   return (
-    <View style={{ flex: 1, ...props.style }}>
-      <SafeAreaView style={{ flex: 0 }} />
-      <View style={styles.selectedContactContainer}>
-        {selectedContacts.length > 0
-          ? selectedContacts.map(value => {
-              return (
-                <View style={styles.selectedContactView} key={value.name}>
-                  <Text style={styles.selectedContactNameText}>
-                    {value.name ? value.name.split(' ')[0] : ''}{' '}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {value.name ? value.name.split(' ')[1] : ''}
-                    </Text>
-                  </Text>
+      <View style={{ flex: 1, ...props.style }}>
+        <SafeAreaView style={{ flex: 0 }} />
+        <View style={styles.selectedContactContainer}>
+          {selectedContacts.length > 0 ? selectedContacts.map(value => {
+            return(
+            <View style={styles.selectedContactView}>
+              <Text style={styles.selectedContactNameText}>
+                {value.name ? value.name.split(" ")[0] : ''}{" "}
+                <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                  {value.name ? value.name.split(" ")[1] : ''}
+                </Text>
+              </Text>
+              <AppBottomSheetTouchableWrapper onPress={() => onCancel(value)}>
+                <AntDesign name="close" size={17} color={Colors.white} />
+              </AppBottomSheetTouchableWrapper>
+            </View>
+          )}): null}
+        </View>
+        <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto', marginRight: 10, padding: 10}} onPress={() => addContact()}>
+          <Text style={{fontSize: RFValue(13, 812), fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
+        </AppBottomSheetTouchableWrapper>
+        <View style={[styles.searchBoxContainer]}>
+          <View style={styles.searchBoxIcon}>
+            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+          </View>
+          <TextInput
+            ref={element => setSearchBox(element)}
+            style={styles.searchBoxInput}
+            placeholder="Search"
+            placeholderTextColor={Colors.textColorGrey}
+            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+          />
+        </View>
+        <View style={{ flex: 1, flexDirection: "row", position:'relative' }}>
+            {filterContactData ? <FlatList
+              data={filterContactData}
+              extraData={radioOnOff}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item, index }) => {
+                // let selected = false;
+                // if (
+                //   selectedContacts.findIndex(temp => temp.id == item.id) > -1
+                // ) {
+                //   selected = true;
+                //   console.log("Selected", selected);
+                // } else{
+                //   selected = false;
+                //   console.log("Selected else", selected);
+                // }
+                return (
                   <AppBottomSheetTouchableWrapper
-                    onPress={() => onCancel(value)}
+                    onPress={() => onContactSelect(index)}
+                    style={styles.contactView}
                   >
-                    <AntDesign name="close" size={17} color={Colors.white} />
+                    <RadioButton
+                    isOnModal={true}
+                      size={15}
+                      color={Colors.lightBlue}
+                      borderColor={Colors.borderColor}
+                      isChecked={item.checked}
+                      onpress={() => onContactSelect(index)}
+                    />
+                    <Text style={styles.contactText}>
+                      {item.name.split(" ")[0]}{" "}
+                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                        {item.name.split(" ")[1]}
+                      </Text>
+                    </Text>
                   </AppBottomSheetTouchableWrapper>
                 </View>
               );

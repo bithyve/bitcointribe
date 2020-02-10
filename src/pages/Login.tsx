@@ -21,12 +21,26 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import AsyncStorage from '@react-native-community/async-storage';
+import BottomSheet from 'reanimated-bottom-sheet';
+import LoaderModal from '../components/LoaderModal';
+import SmallHeaderModal from '../components/SmallHeaderModal';
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../common/constants/serviceTypes';
+import {
+  getTestcoins,
+  fetchBalance,
+  fetchTransactions,
+} from '../store/actions/accounts';
+import axios from 'axios';
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const onPressNumber = useCallback(
     text => {
       let tmpPasscode = passcode;
@@ -38,35 +52,179 @@ export default function Login(props) {
       }
       if (passcode && text == 'x') {
         setPasscode(passcode.slice(0, -1));
-        setCheckAuth(false)
+        setCheckAuth(false);
       }
     },
     [passcode],
   );
 
+  const [exchangeRates, setExchangeRates] = useState();
+  const accounts = useSelector(state => state.accounts);
+  const testAccService = accounts[TEST_ACCOUNT].service;
+  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
   );
   const { dbFetched } = useSelector(state => state.storage);
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  const [transactions, setTransactions] = useState([]);
+  const [authenticating, setAuthenticating] = useState(false);
 
   useEffect(() => {
-    const custodyRequest = props.navigation.getParam('custodyRequest');
-    const recoveryRequest = props.navigation.getParam('recoveryRequest');
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+          .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
+
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+  }, [accounts]);
+
+  useEffect(() => {
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          setExchangeRates(exchangeRates);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+    // if(dbFetched){
+
+    // }
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated)
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
-          if (dbFetched)
-            props.navigation.navigate('Home', {
-              custodyRequest,
-              recoveryRequest,
-            });
+          if (dbFetched) {
+            dispatch(fetchBalance(TEST_ACCOUNT));
+            dispatch(fetchBalance(REGULAR_ACCOUNT));
+            dispatch(fetchBalance(SECURE_ACCOUNT));
+            dispatch(fetchTransactions(TEST_ACCOUNT));
+            dispatch(fetchTransactions(REGULAR_ACCOUNT));
+            dispatch(fetchTransactions(SECURE_ACCOUNT));
+          }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
   }, [isAuthenticated, dbFetched]);
 
+  const custodyRequest = props.navigation.getParam('custodyRequest');
+  const recoveryRequest = props.navigation.getParam('recoveryRequest');
+  if (
+    exchangeRates &&
+    balances.testBalance &&
+    balances.regularBalance >= 0 &&
+    balances.secureBalance >= 0 &&
+    transactions.length > 0
+  ) {
+    console.log(
+      'isInitialized && exchangeRates && testBalance && testTransactions.length',
+      exchangeRates &&
+        balances.testBalance &&
+        balances.regularBalance &&
+        balances.secureBalance &&
+        transactions.length,
+    );
+    (loaderBottomSheet as any).current.snapTo(0);
+    props.navigation.navigate('Home', {
+      custodyRequest,
+      recoveryRequest,
+      exchangeRates,
+    });
+  }
+
+  const renderLoaderModalContent = () => {
+    return (
+      <LoaderModal
+        headerText={'Loading data'}
+        messageText={'Please wait for some time'}
+      />
+    );
+  };
+  const renderLoaderModalHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {}}
+      />
+    );
+  };
+
+  const checkPasscode = () => {
+    if (checkAuth) {
+      (loaderBottomSheet as any).current.snapTo(0);
+      return (
+        <View style={{ marginLeft: 'auto' }}>
+          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+        </View>
+      );
+    }
+  };
+
   useEffect(() => {
-    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
+    console.log('authenticationFailed', authenticationFailed);
+    if (authenticationFailed) {
+      setCheckAuth(true);
+      setAuthenticating(false);
+    } else {
+      setCheckAuth(false);
+    }
   }, [authenticationFailed]);
 
   return (
@@ -80,7 +238,7 @@ export default function Login(props) {
               Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View style={{alignSelf:'baseline'}}>
+            <View style={{ alignSelf: 'baseline' }}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -205,24 +363,18 @@ export default function Login(props) {
                     )}
                   </Text>
                 </View>
-                
               </View>
-              {checkAuth ? (
-            <View style={{marginLeft: 'auto'}}>
-              <Text style={styles.errorText}>
-              Incorrect passcode, try again!
-              </Text>
+              {checkPasscode()}
             </View>
-          ) : null}
-            </View>
-            
           </View>
-          
+
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
+                  (loaderBottomSheet as any).current.snapTo(1);
+                  setAuthenticating(true);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
@@ -231,7 +383,11 @@ export default function Login(props) {
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
               >
-                <Text style={styles.proceedButtonText}>Proceed</Text>
+                {!authenticating ? (
+                  <Text style={styles.proceedButtonText}>Proceed</Text>
+                ) : (
+                  <ActivityIndicator size="small" />
+                )}
               </TouchableOpacity>
             </View>
           ) : null}
@@ -371,6 +527,15 @@ export default function Login(props) {
             </TouchableOpacity>
           </View>
         </View>
+        <BottomSheet
+          onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={loaderBottomSheet}
+          snapPoints={[-50, hp('40%')]}
+          renderContent={renderLoaderModalContent}
+          //renderHeader={renderLoaderModalHeader}
+        />
       </View>
     </SafeAreaView>
   );
@@ -447,7 +612,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
   boldItalicText: {
@@ -458,31 +623,31 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontStyle: 'italic',
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     marginLeft: 20,
     marginTop: hp('10%'),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
   },
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp('4.5%'),
     marginBottom: hp('1.5%'),
-    width: 'auto'
+    width: 'auto',
   },
 });

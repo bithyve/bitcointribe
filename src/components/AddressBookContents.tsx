@@ -19,6 +19,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function AddressBookContents(props) {
   const [contactData, setContactData] = useState([
@@ -37,6 +38,20 @@ export default function AddressBookContents(props) {
       status: ""
     },
   ]);
+
+  let [AssociatedContact, setAssociatedContact] = useState([]);
+  let [SelectedContacts, setSelectedContacts] = useState([]);
+
+  useEffect(()=>{
+    getAssociatedContact();
+  },[]);
+
+  const getAssociatedContact = async() =>{
+    let SelectedContacts = JSON.parse(await AsyncStorage.getItem("SelectedContacts"));
+    setSelectedContacts(SelectedContacts)
+    let AssociatedContact = JSON.parse(await AsyncStorage.getItem("AssociatedContacts"));
+    setAssociatedContact(AssociatedContact)
+  }
   
   return (
     <View style={styles.modalContainer}>
@@ -57,10 +72,12 @@ export default function AddressBookContents(props) {
           Lorem ipsum dolor sit amet, consectetur adipiscing
         </Text> */}
       </View>
-      <View style={{ flex: 1, flexDirection: "row", marginBottom: 15 }}>
-        <FlatList
-              data={contactData}
-              extraData={contactData}
+     
+        {AssociatedContact.length ?  
+          <View style={{ flex: 1, flexDirection: "row", marginBottom: 15,}}>
+            <FlatList
+              data={AssociatedContact}
+              extraData={AssociatedContact}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
                 return (
@@ -79,7 +96,13 @@ export default function AddressBookContents(props) {
               }
               }
             />
-      </View>
+            </View>
+            :
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center',alignItems:'center'   }}>
+              <Text style={{marginLeft: 30,color:Colors.textColorGrey, fontFamily:Fonts.FiraSansMediumItalic, fontSize:RFValue(16), }}>Nothing to show</Text>
+            </View>
+        }
+      
 
       <View>
         <Text style={styles.pageTitle}>Guardians of your Secrets</Text>
@@ -87,30 +110,37 @@ export default function AddressBookContents(props) {
           Lorem ipsum dolor sit amet, consectetur adipiscing
         </Text> */}
       </View>
-      <View style={{ flex: 1, flexDirection: "row", marginBottom: 15  }}>
-          <FlatList
-              data={contactData}
-              extraData={contactData}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => {
-                return (
-                  <View style={styles.selectedContactsView}>
-                    <Text style={styles.contactText}>
-                      {item.name.split(" ")[0]}{" "}
-                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {item.name.split(" ")[1]}
+      
+          {SelectedContacts ? 
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, }}>
+              <FlatList
+                data={SelectedContacts}
+                extraData={SelectedContacts}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => {
+                  return (
+                    <View style={styles.selectedContactsView}>
+                      <Text style={styles.contactText}>
+                        {item.name.split(" ")[0]}{" "}
+                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                          {item.name.split(" ")[1]}
+                        </Text>
                       </Text>
-                    </Text>
-                    <TouchableOpacity style={styles.shareButtonView}>
-                      <Text style={styles.shareButtonText}>Share</Text>
-                    </TouchableOpacity>
-                  </View>
-                )
-              }
-              }
-            />
-          </View>
-        </View>
+                      <TouchableOpacity style={styles.shareButtonView}>
+                        <Text style={styles.shareButtonText}>Share</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )
+                }
+                }
+              />
+            </View>
+            :
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center', alignItems:'center'  }}>
+              <Text style={{marginLeft: 30, color:Colors.textColorGrey, fontFamily:Fonts.FiraSansMediumItalic, fontSize:RFValue(16), textAlign:'center', }}>Nothing to show</Text>
+            </View>
+          }
+    </View>
   );
 }
 const styles = StyleSheet.create({

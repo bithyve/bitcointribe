@@ -42,10 +42,24 @@ import AsyncStorage from '@react-native-community/async-storage';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
+import LoaderModal from '../../components/LoaderModal';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import {
+  getTestcoins,
+  fetchBalance,
+  fetchTransactions,
+} from '../../store/actions/accounts';
+import axios from 'axios';
+
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
     React.createRef(),
   );
@@ -102,9 +116,87 @@ export default function RestoreSelectedContactsList(props) {
       setSelectedDocuments(JSON.parse(documentList));
     }
   };
+  const [exchangeRates, setExchangeRates] = useState();
+  const accounts = useSelector(state => state.accounts);
+
+  const dispatch = useDispatch();
+
+  const { dbFetched } = useSelector(state => state.storage);
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+          .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
+
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+  }, [accounts]);
 
   useEffect(() => {
     // (ErrorBottomSheet as any).current.snapTo(1);
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          setExchangeRates(exchangeRates);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
     let focusListener = props.navigation.addListener('didFocus', () => {
       getSelectedContactList();
     });
@@ -186,6 +278,24 @@ export default function RestoreSelectedContactsList(props) {
   function renderHeader() {
     return <TransparentHeaderModal onPressheader={() => closeModal()} />;
   }
+
+  const renderLoaderModalContent = () => {
+    return (
+      <LoaderModal
+        headerText={'Loading data'}
+        messageText={'Please wait for some time'}
+      />
+    );
+  };
+  const renderLoaderModalHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {}}
+      />
+    );
+  };
 
   function closeModal() {
     (successMessageBottomSheet as any).current.snapTo(0);
@@ -277,8 +387,6 @@ export default function RestoreSelectedContactsList(props) {
     );
   };
 
-  const dispatch = useDispatch();
-
   const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
     state => state.storage.database,
   );
@@ -295,10 +403,45 @@ export default function RestoreSelectedContactsList(props) {
       if (SERVICES) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
-        props.navigation.navigate('Home');
+        //props.navigation.navigate('Home');
       }
     })();
   }, [SERVICES]);
+
+  AsyncStorage.getItem('walletExists').then(exists => {
+    if (exists) {
+      if (dbFetched) {
+        dispatch(fetchBalance(TEST_ACCOUNT));
+        dispatch(fetchBalance(REGULAR_ACCOUNT));
+        dispatch(fetchBalance(SECURE_ACCOUNT));
+        dispatch(fetchTransactions(TEST_ACCOUNT));
+        dispatch(fetchTransactions(REGULAR_ACCOUNT));
+        dispatch(fetchTransactions(SECURE_ACCOUNT));
+      }
+    }
+    // } else props.navigation.replace('RestoreAndRecoverWallet');
+  });
+
+  if (
+    exchangeRates &&
+    balances.testBalance &&
+    balances.regularBalance >= 0 &&
+    balances.secureBalance >= 0 &&
+    transactions.length > 0
+  ) {
+    console.log(
+      'isInitialized && exchangeRates && testBalance && testTransactions.length',
+      exchangeRates &&
+        balances.testBalance &&
+        balances.regularBalance &&
+        balances.secureBalance &&
+        transactions.length,
+    );
+    (loaderBottomSheet as any).current.snapTo(0);
+    props.navigation.navigate('Home', {
+      exchangeRates,
+    });
+  }
 
   const downloadSecret = shareIndex => {
     const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
@@ -841,6 +984,15 @@ export default function RestoreSelectedContactsList(props) {
         snapPoints={[-30, hp('90%')]}
         renderContent={renderRestoreByCloudQrCodeContent}
         renderHeader={renderRestoreByCloudQrCodeHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[-50, hp('40%')]}
+        renderContent={renderLoaderModalContent}
+        //renderHeader={renderLoaderModalHeader}
       />
     </View>
   );

@@ -115,7 +115,10 @@ export default function Home(props) {
   );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
-  const [exchangeRates, setExchangeRates] = useState();
+  const exchangeRate = props.navigation.state.params
+    ? props.navigation.state.params.exchangeRates
+    : null;
+  const [exchangeRates, setExchangeRates] = useState(exchangeRate);
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -416,11 +419,7 @@ export default function Home(props) {
     (QrTabBarBottomSheet as any).current.snapTo(0);
     (moreTabBarBottomSheet as any).current.snapTo(0);
     AppState.addEventListener('change', handleAppStateChange);
-    // NetInfo.addEventListener(state => {
-    //   if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
-    //   else if (state.isConnected)
-    //     (NoInternetBottomSheet as any).current.snapTo(0);
-    // });
+
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
     // HC up-streaming
@@ -1519,47 +1518,47 @@ export default function Home(props) {
   //     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
   // }, [s3Service]);
 
-  const testAccService = accounts[TEST_ACCOUNT].service;
-  useEffect(() => {
-    (async () => {
-      if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-        if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-          const { balances } = testAccService.hdWallet;
-          const netBalance = testAccService
-            ? balances.balance + balances.unconfirmedBalance
-            : 0;
-          if (!netBalance) {
-            console.log('Getting Testcoins');
-            dispatch(getTestcoins(TEST_ACCOUNT));
-          }
-        }
-    })();
-  }, [testAccService]);
+  // const testAccService = accounts[TEST_ACCOUNT].service;
+  // useEffect(() => {
+  //   (async () => {
+  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
+  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
+  //         const { balances } = testAccService.hdWallet;
+  //         const netBalance = testAccService
+  //           ? balances.balance + balances.unconfirmedBalance
+  //           : 0;
+  //         if (!netBalance) {
+  //           console.log('Getting Testcoins');
+  //           dispatch(getTestcoins(TEST_ACCOUNT));
+  //         }
+  //       }
+  //   })();
+  // }, [testAccService]);
 
-  useEffect(() => {
-    (async () => {
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        if (Date.now() - exchangeRates.lastFetched < 1800000) {
-          setExchangeRates(exchangeRates);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        console.log('Failed to retrieve exchange rates', res);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+  //     if (storedExchangeRates) {
+  //       const exchangeRates = JSON.parse(storedExchangeRates);
+  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
+  //         setExchangeRates(exchangeRates);
+  //         return;
+  //       } // maintaining a half an hour difference b/w fetches
+  //     }
+  //     const res = await axios.get('https://blockchain.info/ticker');
+  //     if (res.status == 200) {
+  //       const exchangeRates = res.data;
+  //       exchangeRates.lastFetched = Date.now();
+  //       setExchangeRates(exchangeRates);
+  //       await AsyncStorage.setItem(
+  //         'exchangeRates',
+  //         JSON.stringify(exchangeRates),
+  //       );
+  //     } else {
+  //       console.log('Failed to retrieve exchange rates', res);
+  //     }
+  //   })();
+  // }, []);
 
   useEffect(() => {
     (async () => {
