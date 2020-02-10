@@ -59,9 +59,7 @@ import axios from 'axios';
 export default function RestoreSelectedContactsList(props) {
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
     React.createRef(),
   );
@@ -120,9 +118,9 @@ export default function RestoreSelectedContactsList(props) {
   };
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
- 
+
   const dispatch = useDispatch();
-  
+
   const { dbFetched } = useSelector(state => state.storage);
   const [balances, setBalances] = useState({
     testBalance: 0,
@@ -174,7 +172,6 @@ export default function RestoreSelectedContactsList(props) {
     });
     setTransactions(accumulativeTransactions);
   }, [accounts]);
-
 
   useEffect(() => {
     // (ErrorBottomSheet as any).current.snapTo(1);
@@ -285,19 +282,18 @@ export default function RestoreSelectedContactsList(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-      headerText = {'Loading data'}
-      messageText = {'Please wait for some time'}
+        headerText={'Loading data'}
+        messageText={'Please wait for some time'}
       />
     );
   };
   const renderLoaderModalHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.white}
-      backgroundColor={Colors.white}
-      onPressHeader={() => {
-      }}
-    />
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {}}
+      />
     );
   };
 
@@ -422,16 +418,30 @@ export default function RestoreSelectedContactsList(props) {
         dispatch(fetchTransactions(REGULAR_ACCOUNT));
         dispatch(fetchTransactions(SECURE_ACCOUNT));
       }
-    } else props.navigation.replace('RestoreAndRecoverWallet');
+    }
+    // } else props.navigation.replace('RestoreAndRecoverWallet');
   });
 
-  if(exchangeRates && balances.testBalance && balances.regularBalance >=0 && balances.secureBalance >=0 && transactions.length > 0) {
-      console.log("isInitialized && exchangeRates && testBalance && testTransactions.length", exchangeRates && balances.testBalance && balances.regularBalance && balances.secureBalance && transactions.length);
-      (loaderBottomSheet as any).current.snapTo(0);
-      props.navigation.navigate('Home', {
-        exchangeRates
-      });
-    }
+  if (
+    exchangeRates &&
+    balances.testBalance &&
+    balances.regularBalance >= 0 &&
+    balances.secureBalance >= 0 &&
+    transactions.length > 0
+  ) {
+    console.log(
+      'isInitialized && exchangeRates && testBalance && testTransactions.length',
+      exchangeRates &&
+        balances.testBalance &&
+        balances.regularBalance &&
+        balances.secureBalance &&
+        transactions.length,
+    );
+    (loaderBottomSheet as any).current.snapTo(0);
+    props.navigation.navigate('Home', {
+      exchangeRates,
+    });
+  }
 
   const downloadSecret = shareIndex => {
     const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
@@ -975,9 +985,9 @@ export default function RestoreSelectedContactsList(props) {
         renderContent={renderRestoreByCloudQrCodeContent}
         renderHeader={renderRestoreByCloudQrCodeHeader}
       />
-       <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction= {false}
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={loaderBottomSheet}
         snapPoints={[-50, hp('40%')]}
