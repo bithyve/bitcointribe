@@ -40,9 +40,7 @@ export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-const [loaderBottomSheet, setLoaderBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const onPressNumber = useCallback(
     text => {
       let tmpPasscode = passcode;
@@ -54,7 +52,7 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
       }
       if (passcode && text == 'x') {
         setPasscode(passcode.slice(0, -1));
-        setCheckAuth(false)
+        setCheckAuth(false);
       }
     },
     [passcode],
@@ -76,7 +74,8 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
     accumulativeBalance: 0,
   });
   const [transactions, setTransactions] = useState([]);
-  console.log("loading.authenticating", loading.authenticating);
+  const [authenticating, setAuthenticating] = useState(false);
+
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -144,14 +143,11 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
       }
     })();
     // if(dbFetched){
-      
-    // }
-    
 
+    // }
   }, []);
 
   useEffect(() => {
-    
     if (isAuthenticated)
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
@@ -167,40 +163,68 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
       });
   }, [isAuthenticated, dbFetched]);
 
-    const custodyRequest = props.navigation.getParam('custodyRequest');
-    const recoveryRequest = props.navigation.getParam('recoveryRequest');
-    if(exchangeRates && balances.testBalance && balances.regularBalance >=0 && balances.secureBalance >=0 && transactions.length > 0) {
-      console.log("isInitialized && exchangeRates && testBalance && testTransactions.length", exchangeRates && balances.testBalance && balances.regularBalance && balances.secureBalance && transactions.length);
-      (loaderBottomSheet as any).current.snapTo(0);
-      props.navigation.navigate('Home', {
-        custodyRequest,
-        recoveryRequest,
-        exchangeRates
-      });
-    }
- 
+  const custodyRequest = props.navigation.getParam('custodyRequest');
+  const recoveryRequest = props.navigation.getParam('recoveryRequest');
+  if (
+    exchangeRates &&
+    balances.testBalance &&
+    balances.regularBalance >= 0 &&
+    balances.secureBalance >= 0 &&
+    transactions.length > 0
+  ) {
+    console.log(
+      'isInitialized && exchangeRates && testBalance && testTransactions.length',
+      exchangeRates &&
+        balances.testBalance &&
+        balances.regularBalance &&
+        balances.secureBalance &&
+        transactions.length,
+    );
+    (loaderBottomSheet as any).current.snapTo(0);
+    props.navigation.navigate('Home', {
+      custodyRequest,
+      recoveryRequest,
+      exchangeRates,
+    });
+  }
 
   const renderLoaderModalContent = () => {
-      return (
-        <LoaderModal
-        headerText = {'Loading data'}
-        messageText = {'Please wait for some time'}
-        />
-      );
-    };
-    const renderLoaderModalHeader = () => {
-      return (
-        <SmallHeaderModal
+    return (
+      <LoaderModal
+        headerText={'Loading data'}
+        messageText={'Please wait for some time'}
+      />
+    );
+  };
+  const renderLoaderModalHeader = () => {
+    return (
+      <SmallHeaderModal
         borderColor={Colors.white}
         backgroundColor={Colors.white}
-        onPressHeader={() => {
-        }}
+        onPressHeader={() => {}}
       />
+    );
+  };
+
+  const checkPasscode = () => {
+    if (checkAuth) {
+      (loaderBottomSheet as any).current.snapTo(0);
+      return (
+        <View style={{ marginLeft: 'auto' }}>
+          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+        </View>
       );
-    };
+    }
+  };
 
   useEffect(() => {
-    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
+    console.log('authenticationFailed', authenticationFailed);
+    if (authenticationFailed) {
+      setCheckAuth(true);
+      setAuthenticating(false);
+    } else {
+      setCheckAuth(false);
+    }
   }, [authenticationFailed]);
 
   return (
@@ -214,7 +238,7 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
               Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View style={{alignSelf:'baseline'}}>
+            <View style={{ alignSelf: 'baseline' }}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -339,25 +363,18 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
                     )}
                   </Text>
                 </View>
-                
               </View>
-              {checkAuth ? (
-            <View style={{marginLeft: 'auto'}}>
-              <Text style={styles.errorText}>
-              Incorrect passcode, try again!
-              </Text>
+              {checkPasscode()}
             </View>
-          ) : null}
-            </View>
-            
           </View>
-          
+
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
                   (loaderBottomSheet as any).current.snapTo(1);
+                  setAuthenticating(true);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
@@ -366,12 +383,11 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
               >
-                {!loading.authenticating ? (
-          <Text style={styles.proceedButtonText}>Proceed</Text>
-        ) : (
-          <ActivityIndicator size="small" />
-        )}
-                
+                {!authenticating ? (
+                  <Text style={styles.proceedButtonText}>Proceed</Text>
+                ) : (
+                  <ActivityIndicator size="small" />
+                )}
               </TouchableOpacity>
             </View>
           ) : null}
@@ -512,14 +528,14 @@ const [loaderBottomSheet, setLoaderBottomSheet] = useState(
           </View>
         </View>
         <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction= {false}
-        enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
-        snapPoints={[-50, hp('40%')]}
-        renderContent={renderLoaderModalContent}
-        //renderHeader={renderLoaderModalHeader}
-      />
+          onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={loaderBottomSheet}
+          snapPoints={[-50, hp('40%')]}
+          renderContent={renderLoaderModalContent}
+          //renderHeader={renderLoaderModalHeader}
+        />
       </View>
     </SafeAreaView>
   );
@@ -596,7 +612,7 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
   boldItalicText: {
@@ -607,31 +623,31 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontStyle: 'italic',
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     marginLeft: 20,
     marginTop: hp('10%'),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
   },
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp('4.5%'),
     marginBottom: hp('1.5%'),
-    width: 'auto'
+    width: 'auto',
   },
 });

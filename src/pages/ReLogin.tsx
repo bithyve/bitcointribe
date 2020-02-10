@@ -474,13 +474,13 @@ const styles = StyleSheet.create({
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontStyle: 'italic',
   },
   boldItalicText: {
@@ -490,21 +490,21 @@ const styles = StyleSheet.create({
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     marginLeft: 20,
     marginTop: hp('10%'),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
   },
   passcodeTextInputView: {
     flexDirection: 'row',

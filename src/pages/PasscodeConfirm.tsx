@@ -592,13 +592,13 @@ const styles = StyleSheet.create( {
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue( 13, 812 ),
+    fontSize: RFValue( 13 ),
     textAlign: "center",
     lineHeight: 18
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue( 13, 812 ),
+    fontSize: RFValue( 13 ),
     textAlign: "center",
     lineHeight: 18
   },
@@ -609,13 +609,13 @@ const styles = StyleSheet.create( {
   keyPadElementTouchable: {
     flex: 1,
     height: hp( "8%" ),
-    fontSize: RFValue( 18, 812 ),
+    fontSize: RFValue( 18 ),
     justifyContent: "center",
     alignItems: "center"
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue( 25, 812 ),
+    fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: "normal"
   },
@@ -634,7 +634,7 @@ const styles = StyleSheet.create( {
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue( 13, 812 ),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium
   },
   boldItalicText: {
@@ -644,21 +644,21 @@ const styles = StyleSheet.create( {
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue( 25, 812 ),
+    fontSize: RFValue( 25 ),
     marginLeft: 20,
     marginTop: hp( "10%" ),
     fontFamily: Fonts.FiraSansRegular
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 12, 812 ),
+    fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: "bold",
-    fontSize: RFValue( 13, 812 )
+    fontSize: RFValue( 13 )
   },
   passcodeTextInputView: {
     flexDirection: "row",

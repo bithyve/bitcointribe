@@ -232,37 +232,23 @@ export default function NewWalletQuestion(props) {
   }, [confirmAnswer]);
 
   const setButtonVisible = () => {
-    //setAnsError('');
     return (
       <TouchableOpacity
         onPress={async () => {
+          (loaderBottomSheet as any).current.snapTo(1)
           const security = {
             question: dropdownBoxValue.question,
             answer,
           };
+          setTimeout(() => {
           setIsEditable(false);
           setIsDisabled(true);
-          (loaderBottomSheet as any).current.snapTo(1);
+        }, 2);
           dispatch(initializeSetup(walletName, security));
           await AsyncStorage.setItem(
             'SecurityAnsTimestamp',
             JSON.stringify(Date.now()),
           );
-          // await AsyncStorage.setItem(
-          //   'secondaryDeviceAutoHighlightFlags',
-          //   'false',
-          // );
-          // await AsyncStorage.setItem('contact1AutoHighlightFlags', 'false');
-          // await AsyncStorage.setItem('contact2AutoHighlightFlags', 'false');
-          // await AsyncStorage.setItem(
-          //   'personalCopy1AutoHighlightFlags',
-          //   'false',
-          // );
-          // await AsyncStorage.setItem(
-          //   'personalCopy2AutoHighlightFlags',
-          //   'false',
-          // );
-          // await AsyncStorage.setItem('securityAutoHighlightFlags', 'true');
           const current = Date.now();
           const securityQuestionHistory = {
             created: current,
