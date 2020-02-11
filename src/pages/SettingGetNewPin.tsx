@@ -121,9 +121,8 @@ export default function SettingGetNewPin(props) {
     return (
       <ErrorModalContents
         modalRef={PinChangeSuccessBottomSheet}
-        title={'Pin Changed Successfully'}
-        info={'Lorem ipsum dolor sit amet, consectetur'}
-        note={'sed do eiusmod tempor incididunt ut labore et'}
+        title={'Passcode changed successfully'}
+        note={'Please use your new passcode to login '}
         proceedButtonText={'View Settings'}
         isIgnoreButton={false}
         onPressProceed={() => {
@@ -165,7 +164,7 @@ export default function SettingGetNewPin(props) {
                   size={17}
                 />
               </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>{'Manage Pin'}</Text>
+              <Text style={styles.modalHeaderTitleText}>{'Manage Passcode'}</Text>
             </View>
           </View>
           {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
