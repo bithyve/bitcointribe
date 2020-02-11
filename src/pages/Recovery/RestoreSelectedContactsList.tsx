@@ -403,14 +403,7 @@ export default function RestoreSelectedContactsList(props) {
       if (SERVICES) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
-        //props.navigation.navigate('Home');
-      }
-    })();
-  }, [SERVICES]);
-
-  AsyncStorage.getItem('walletExists').then(exists => {
-    if (exists) {
-      if (dbFetched) {
+        // props.navigation.navigate('Home');
         dispatch(fetchBalance(TEST_ACCOUNT));
         dispatch(fetchBalance(REGULAR_ACCOUNT));
         dispatch(fetchBalance(SECURE_ACCOUNT));
@@ -418,9 +411,22 @@ export default function RestoreSelectedContactsList(props) {
         dispatch(fetchTransactions(REGULAR_ACCOUNT));
         dispatch(fetchTransactions(SECURE_ACCOUNT));
       }
-    }
-    // } else props.navigation.replace('RestoreAndRecoverWallet');
-  });
+    })();
+  }, [SERVICES]);
+
+  // AsyncStorage.getItem('walletExists').then(exists => {
+  //   if (exists) {
+  //     if (dbFetched) {
+  //       dispatch(fetchBalance(TEST_ACCOUNT));
+  //       dispatch(fetchBalance(REGULAR_ACCOUNT));
+  //       dispatch(fetchBalance(SECURE_ACCOUNT));
+  //       dispatch(fetchTransactions(TEST_ACCOUNT));
+  //       dispatch(fetchTransactions(REGULAR_ACCOUNT));
+  //       dispatch(fetchTransactions(SECURE_ACCOUNT));
+  //     }
+  //   }
+  //   // } else props.navigation.replace('RestoreAndRecoverWallet');
+  // });
 
   if (
     exchangeRates &&
