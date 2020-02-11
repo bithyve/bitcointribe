@@ -278,8 +278,8 @@ export default function NewWalletQuestion(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Loading data'}
-        messageText={'Please wait for some time'}
+        headerText={'Creating your wallet'}
+        messageText={'Make sure you try out the Test Account which has been preloaded with test bitcoins'}
       />
     );
   };
@@ -290,7 +290,7 @@ export default function NewWalletQuestion(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('60%'),
+          height: hp('65%'),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',

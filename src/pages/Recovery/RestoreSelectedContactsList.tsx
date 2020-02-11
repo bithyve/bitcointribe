@@ -281,8 +281,8 @@ export default function RestoreSelectedContactsList(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Loading data'}
-        messageText={'Please wait for some time'}
+        headerText={'Creating your wallet'}
+        messageText={'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'}
       />
     );
   };
@@ -293,7 +293,7 @@ export default function RestoreSelectedContactsList(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('60%'),
+          height: hp('65%'),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',
