@@ -152,10 +152,10 @@ export default function ModalShareIntent(props) {
 
   const disableOrEnableOption = (item) =>{
     if(props.selectedPersonalCopy.type == 'copy1'){
-      return database.pdfDetails.copy2.shareDetails.type == item.type ? true : false;
+      return database.pdfDetails && database.pdfDetails.copy2.shareDetails.type == item.type ? true : false;
     }
     if(props.selectedPersonalCopy.type == 'copy2'){
-      return database.pdfDetails.copy1.shareDetails.type == item.type ? true : false;
+      return database.pdfDetails && database.pdfDetails.copy1.shareDetails.type == item.type ? true : false;
     }
     return false;
   }

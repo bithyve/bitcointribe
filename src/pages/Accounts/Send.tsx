@@ -101,6 +101,7 @@ export default function Send(props) {
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
     React.createRef(),
   );
+  const [isEditable, setIsEditable] = useState(true);
 
   let userInfo = {
     to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
@@ -196,6 +197,7 @@ export default function Send(props) {
     ) {
       SendConfirmationBottomSheet.current.snapTo(0);
       SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
+      setIsEditable(true);
     } else if (transfer.txid) {
       SendConfirmationBottomSheet.current.snapTo(0);
       SendSuccessWithAddressBottomSheet.current.snapTo(1);
@@ -470,6 +472,7 @@ export default function Send(props) {
     if (netBalance < Number(amount)) {
       setIsInvalidBalance(true);
     } else {
+      setIsEditable(false);
       const priority =
         sliderValueText === 'Low Fee'
           ? 'low'
@@ -552,6 +555,7 @@ export default function Send(props) {
                   <View style={styles.textBoxView}>
                     <TextInput
                       // ref={refs => setTextContactNameRef(refs)}
+                      editable={isEditable}
                       style={styles.textBox}
                       placeholder={'Address'}
                       value={recipientAddress}
@@ -592,6 +596,7 @@ export default function Send(props) {
                       />
                     </View>
                     <TextInput
+                    editable={isEditable}
                       // ref={refs => setTextAmountRef(refs)}
                       style={{ ...styles.textBox, paddingLeft: 10 }}
                       placeholder={
@@ -631,6 +636,7 @@ export default function Send(props) {
                   <View style={{ ...styles.textBoxView, height: 100 }}>
                     <TextInput
                       // ref={refs => setDescriptionRef(refs)}
+                      editable={isEditable}
                       multiline={true}
                       numberOfLines={4}
                       style={{
