@@ -3,8 +3,9 @@ import {
   CREDS_AUTHENTICATED,
   SETUP_INITIALIZED,
   SETUP_LOADING,
-  RE_LOGIN
-} from "../actions/setupAndAuth";
+  RE_LOGIN,
+  AUTH_CRED_CHANGED,
+} from '../actions/setupAndAuth';
 
 const initialState: {
   isInitialized: Boolean;
@@ -17,6 +18,7 @@ const initialState: {
     storingCreds: Boolean;
     authenticating: Boolean;
   };
+  credsChanged: string;
 } = {
   isInitialized: false,
   hasCreds: false,
@@ -26,8 +28,9 @@ const initialState: {
   loading: {
     initializing: false,
     storingCreds: false,
-    authenticating: false
-  }
+    authenticating: false,
+  },
+  credsChanged: '',
 };
 
 export default (state = initialState, action) => {
@@ -38,8 +41,8 @@ export default (state = initialState, action) => {
         isInitialized: true,
         loading: {
           ...state.loading,
-          initializing: false
-        }
+          initializing: false,
+        },
       };
 
     case CREDS_STORED:
@@ -48,8 +51,8 @@ export default (state = initialState, action) => {
         hasCreds: true,
         loading: {
           ...state.loading,
-          storingCreds: false
-        }
+          storingCreds: false,
+        },
       };
 
     case CREDS_AUTHENTICATED:
@@ -59,15 +62,15 @@ export default (state = initialState, action) => {
         authenticationFailed: !action.payload.isAuthenticated,
         loading: {
           ...state.loading,
-          authenticating: false
-        }
+          authenticating: false,
+        },
       };
 
     case SETUP_LOADING:
       return {
         ...state,
         authenticationFailed:
-          action.payload.beingLoaded === "authenticating" &&
+          action.payload.beingLoaded === 'authenticating' &&
           !state.loading[action.payload.beingLoaded] === true
             ? false
             : state.authenticationFailed,
@@ -75,8 +78,8 @@ export default (state = initialState, action) => {
           ...state.loading,
           [action.payload.beingLoaded]: !state.loading[
             action.payload.beingLoaded
-          ]
-        }
+          ],
+        },
       };
 
     case RE_LOGIN:
@@ -88,8 +91,14 @@ export default (state = initialState, action) => {
           : !action.payload.loggedIn,
         loading: {
           ...state.loading,
-          authenticating: false
-        }
+          authenticating: false,
+        },
+      };
+
+    case AUTH_CRED_CHANGED:
+      return {
+        ...state,
+        credsChanged: action.payload.changed,
       };
   }
 
