@@ -185,6 +185,8 @@ export default function Login(props) {
       custodyRequest,
       recoveryRequest,
       exchangeRates,
+      balances,
+      transactions,
     });
   }
 

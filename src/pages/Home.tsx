@@ -119,14 +119,33 @@ export default function Home(props) {
     ? props.navigation.state.params.exchangeRates
     : null;
   const [exchangeRates, setExchangeRates] = useState(exchangeRate);
-  const [balances, setBalances] = useState({
-    testBalance: 0,
-    regularBalance: 0,
-    secureBalance: 0,
-    accumulativeBalance: 0,
-  });
+
+  // const [balances, setBalances] = useState({
+  //   testBalance: 0,
+  //   regularBalance: 0,
+  //   secureBalance: 0,
+  //   accumulativeBalance: 0,
+  // });
+  // const [transactions, setTransactions] = useState([]);
+
+  const balancesParam = props.navigation.getParam('balances');
+  const [balances, setBalances] = useState(
+    balancesParam
+      ? balancesParam
+      : {
+          testBalance: 0,
+          regularBalance: 0,
+          secureBalance: 0,
+          accumulativeBalance: 0,
+        },
+  );
+  const transactionsParam = props.navigation.getParam('transactions');
+  const [transactions, setTransactions] = useState(
+    transactionsParam ? transactionsParam : [],
+  );
+
   const [qrData, setqrData] = useState('');
-  const [transactions, setTransactions] = useState([]);
+
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -161,13 +180,33 @@ export default function Home(props) {
       ...secureTransactions,
     ];
 
-    setBalances({
-      testBalance,
-      regularBalance,
-      secureBalance,
-      accumulativeBalance,
-    });
-    setTransactions(accumulativeTransactions);
+    if (balancesParam) {
+      if (
+        JSON.stringify(balancesParam) !==
+        JSON.stringify({
+          testBalance,
+          regularBalance,
+          secureBalance,
+          accumulativeBalance,
+        })
+      ) {
+        setBalances({
+          testBalance,
+          regularBalance,
+          secureBalance,
+          accumulativeBalance,
+        });
+        setTransactions(accumulativeTransactions);
+      }
+    } else {
+      setBalances({
+        testBalance,
+        regularBalance,
+        secureBalance,
+        accumulativeBalance,
+      });
+      setTransactions(accumulativeTransactions);
+    }
   }, [accounts]);
 
   const [dropdownBoxValue, setDropdownBoxValue] = useState({

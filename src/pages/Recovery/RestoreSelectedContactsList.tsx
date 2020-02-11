@@ -121,7 +121,6 @@ export default function RestoreSelectedContactsList(props) {
 
   const dispatch = useDispatch();
 
-  const { dbFetched } = useSelector(state => state.storage);
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -437,15 +436,13 @@ export default function RestoreSelectedContactsList(props) {
   ) {
     console.log(
       'isInitialized && exchangeRates && testBalance && testTransactions.length',
-      exchangeRates &&
-        balances.testBalance &&
-        balances.regularBalance &&
-        balances.secureBalance &&
-        transactions.length,
+      exchangeRates && balances.testBalance && transactions.length,
     );
     (loaderBottomSheet as any).current.snapTo(0);
     props.navigation.navigate('Home', {
       exchangeRates,
+      balances,
+      transactions,
     });
   }
 
@@ -911,7 +908,10 @@ export default function RestoreSelectedContactsList(props) {
           <View>
             <TouchableOpacity
               style={{ ...styles.questionConfirmButton, margin: 20 }}
-              onPress={() => dispatch(recoverWallet())}
+              onPress={() => {
+                dispatch(recoverWallet());
+                (loaderBottomSheet as any).current.snapTo(1);
+              }}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>
             </TouchableOpacity>
