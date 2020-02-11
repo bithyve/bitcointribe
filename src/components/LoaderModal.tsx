@@ -13,105 +13,38 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal(props) {
 
-    return (<View style={{ ...styles.modalContentContainer, height: hp('40%'), }}>
-        <View style={{ height: hp('100%')}}>
-         <View style={styles.successModalHeaderView}>
-         <Image source={require('../assets/images/icons/loader.png')} style={styles.successModalImage} />
-            
-         {/* <ActivityIndicator style={{ marginBottom: wp('10%'),}} size="large" color={Colors.blue} />
-                <Text style={styles.modalTitleText}>{props.headerText}</Text>
-                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>{props.messageText}</Text> */}
+    return (<View style={{ height: hp('35%'),  backgroundColor: 'rgba(0, 0, 0, 0.3)'}}>
+        <View style={styles.modalContentContainer}>
+            <Image source={require('../assets/images/loading.gif')} style={styles.successModalImage} />
+            <View style={{marginLeft:wp('8%'), marginRight:wp('8%')}}>
+                <Text style={{color:Colors.white, fontSize:RFValue(16), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
+                <Text style={{color:Colors.white, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
             </View>
+            <View style={{marginTop:'auto'}}>
+                <Image source={require('../assets/images/icons/loaderBottomImage.png')} style={ {width: wp("28%"), height: wp("26%"), marginLeft: "auto", resizeMode: "cover"}} />
             </View>
+        </View>
     </View>
     )
 }
 
 const styles = StyleSheet.create({
     modalContentContainer: {
-        height: '100%',
-        backgroundColor: Colors.white,
+        backgroundColor:Colors.blue,
         borderTopLeftRadius: 10,
-        borderLeftColor: Colors.borderColor,
+        borderLeftColor: Colors.blue,
         borderLeftWidth: 1,
         borderTopRightRadius: 10,
-        borderRightColor: Colors.borderColor,
+        borderRightColor: Colors.blue,
         borderRightWidth: 1,
-        borderTopColor: Colors.borderColor,
+        borderTopColor: Colors.blue,
         borderTopWidth: 1,
-    },
-    successModalHeaderView: {
-        // marginRight: wp('10%'),
-        // marginLeft: wp('10%'),
-        flex: 1.7,
-        marginBottom: 'auto'
-    },
-    modalTitleText: {
-        color: Colors.blue,
-        fontSize: RFValue(18),
-        fontFamily: Fonts.FiraSansMedium,
-    },
-    modalInfoText: {
-        color: Colors.textColorGrey,
-        fontSize: RFValue(11),
-        fontFamily: Fonts.FiraSansRegular,
-    },
-    successModalAmountView: {
-        flex: 2,
-        justifyContent: 'center',
-        marginRight: wp('10%'),
-        marginLeft: wp('10%'),
-    },
-    successModalWalletNameText: {
-        color: Colors.black,
-        fontSize: RFValue(25),
-        fontFamily: Fonts.FiraSansRegular
-    },
-    successModalAmountImage: {
-        width: wp('3%'),
-        height: wp('3%'),
-        marginRight: 5,
-        marginBottom: wp('1%'),
-        resizeMode: 'contain',
-    },
-    successModalAmountText: {
-        color: Colors.black,
-        fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(21),
-        marginRight: 5
-    },
-    successModalAmountUnitText: {
-        color: Colors.borderColor,
-        fontFamily: Fonts.FiraSansRegular,
-        fontSize: RFValue(11),
-    },
-    successModalAmountInfoView: {
-        flex: 0.4,
-        marginRight: wp('10%'),
-        marginLeft: wp('10%'),
-    },
-    successModalButtonView: {
-        height: wp('13%'),
-        width: wp('35%'),
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 8,
-        elevation: 10,
-        shadowColor: Colors.shadowBlue,
-        shadowOpacity: 1,
-        shadowOffset: { width: 15, height: 15 },
-        backgroundColor: Colors.blue,
-        alignSelf: 'center',
-        marginLeft: wp('10%'),
+        height:'100%'
     },
     successModalImage: {
-        width: wp('100%'),
-        height: hp('18%'),
-        resizeMode: 'contain'
-    },
-    proceedButtonText: {
-        color: Colors.white,
-        fontSize: RFValue(13),
-        fontFamily: Fonts.FiraSansMedium
+        width: wp('80%'),
+        height: hp('8%'),
+        resizeMode: 'contain',
+        alignSelf:'center'
     },
 })
