@@ -74,7 +74,7 @@ export default function Login(props) {
     accumulativeBalance: 0,
   });
   const [transactions, setTransactions] = useState([]);
-  const [authenticating, setAuthenticating] = useState(false);
+ // const [authenticating, setAuthenticating] = useState(false);
 
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
@@ -193,17 +193,23 @@ export default function Login(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Loading data'}
+        headerText={'Loading'}
         messageText={'Please wait for some time'}
       />
     );
   };
   const renderLoaderModalHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {}}
+      <View
+        style={{
+          marginTop: 'auto',
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          height: hp('60%'),
+          zIndex: 9999,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       />
     );
   };
@@ -223,7 +229,7 @@ export default function Login(props) {
     console.log('authenticationFailed', authenticationFailed);
     if (authenticationFailed) {
       setCheckAuth(true);
-      setAuthenticating(false);
+      //setAuthenticating(false);
     } else {
       setCheckAuth(false);
     }
@@ -376,7 +382,7 @@ export default function Login(props) {
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
                   (loaderBottomSheet as any).current.snapTo(1);
-                  setAuthenticating(true);
+                  //setAuthenticating(true);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
@@ -385,11 +391,11 @@ export default function Login(props) {
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
               >
-                {!authenticating ? (
+                {/* {!authenticating ? ( */}
                   <Text style={styles.proceedButtonText}>Proceed</Text>
-                ) : (
+                {/* ) : (
                   <ActivityIndicator size="small" />
-                )}
+                )} */}
               </TouchableOpacity>
             </View>
           ) : null}
@@ -534,9 +540,9 @@ export default function Login(props) {
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
-          snapPoints={[-50, hp('40%')]}
+          snapPoints={[-50, hp('100%')]}
           renderContent={renderLoaderModalContent}
-          //renderHeader={renderLoaderModalHeader}
+          renderHeader={renderLoaderModalHeader}
         />
       </View>
     </SafeAreaView>

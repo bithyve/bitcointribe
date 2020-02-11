@@ -128,7 +128,9 @@ function AllAccountsContents(props) {
           >
             <Image style={styles.listElementsIconImage} source={value.image} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.listElementsTitle}>{value.title}</Text>
+              <Text style={styles.listElementsTitle}>
+              {value.title == 'Regular Account' ? 'Checking Account' : value.title}
+              </Text>
               <Text style={styles.listElementsInfo}>{value.info}</Text>
             </View>
             <View style={styles.listElementIcon}>

@@ -28,9 +28,7 @@ export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
-    React.createRef(),
-  );
+  
   function onPressNumber(text) {
     let tmpPasscode = passcode;
     if (passcode.length < 4) {
@@ -51,7 +49,6 @@ export default function Login(props) {
   );
 
   if (reLogin) {
-    (loaderBottomSheet as any).current.snapTo(0);
     props.navigation.pop();
     dispatch(switchReLogin(false, true));
   }
@@ -70,25 +67,6 @@ export default function Login(props) {
     return () =>
       BackHandler.removeEventListener('hardwareBackPress', hardwareBackHandler);
   }, []);
-
-  const renderLoaderModalContent = () => {
-    return (
-      <LoaderModal
-      headerText = {'Loading data'}
-      messageText = {'Please wait for some time'}
-      />
-    );
-  };
-  const renderLoaderModalHeader = () => {
-    return (
-      <SmallHeaderModal
-      borderColor={Colors.white}
-      backgroundColor={Colors.white}
-      onPressHeader={() => {
-      }}
-    />
-    );
-  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -389,15 +367,6 @@ export default function Login(props) {
             </TouchableOpacity>
           </View>
         </View>
-        <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction= {false}
-        enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
-        snapPoints={[-50, hp('40%')]}
-        renderContent={renderLoaderModalContent}
-        //renderHeader={renderLoaderModalHeader}
-      />
       </View>
     </SafeAreaView>
   );

@@ -269,7 +269,7 @@ const SecondaryDeviceHistory = props => {
         <HistoryPageComponent
           data={sortedHistory(secondaryDeviceHistory)}
           // reshareInfo={
-          //   'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+          //   'Want to send the Recovery Secret again to the same destination? '
           // }
           onPressConfirm={() => {
             // ConfirmBottomSheet.current.snapTo(1);

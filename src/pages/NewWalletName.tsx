@@ -98,8 +98,8 @@ export default function NewWalletName(props) {
           {walletName.trim() == "" ? (
             <View style={{marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0}}>
               <BottomInfoBox
-                title={"We do not store this anywhere."}
-                infoText={"Your contacts will see this to identify you"}
+                title={"We do not store this anywhere"}
+                infoText={"Only your contacts will see your wallet name when you transact with them so as to identify you"}
               />
             </View>
           ) : null}
