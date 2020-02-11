@@ -5,6 +5,7 @@ export const INIT_SETUP = 'INIT_SETUP';
 export const INIT_RECOVERY = 'INIT_RECOVERY';
 export const RE_LOGIN = 'RE_LOGIN';
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED';
+export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED';
 
 export const storeCreds = passcode => {
   return { type: STORE_CREDS, payload: { passcode } };
@@ -28,6 +29,10 @@ export const switchReLogin = (loggedIn, reset?) => {
 
 export const changeAuthCred = (oldPasscode, newPasscode) => {
   return { type: CHANGE_AUTH_CRED, payload: { oldPasscode, newPasscode } };
+};
+
+export const switchCredsChanged = () => {
+  return { type: SWITCH_CREDS_CHANGED };
 };
 
 // types and action creators (saga): dispatched by saga workers

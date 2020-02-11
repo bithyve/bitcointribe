@@ -21,7 +21,10 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
-import { changeAuthCred } from '../store/actions/setupAndAuth';
+import {
+  changeAuthCred,
+  switchCredsChanged,
+} from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ErrorModalContents from '../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
@@ -110,8 +113,7 @@ export default function SettingGetNewPin(props) {
 
   useEffect(() => {
     if (credsChanged == 'changed') {
-      PinChangeSuccessBottomSheet &&
-        (PinChangeSuccessBottomSheet as any).current.snapTo(1);
+      (PinChangeSuccessBottomSheet as any).current.snapTo(1);
     }
   }, [credsChanged]);
 
@@ -126,6 +128,8 @@ export default function SettingGetNewPin(props) {
         isIgnoreButton={false}
         onPressProceed={() => {
           (PinChangeSuccessBottomSheet as any).current.snapTo(0);
+          dispatch(switchCredsChanged());
+
           // props.navigation.state.params.managePinSuccessProceed(passcode);
           props.navigation.popToTop();
         }}

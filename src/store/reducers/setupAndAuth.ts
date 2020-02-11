@@ -5,6 +5,7 @@ import {
   SETUP_LOADING,
   RE_LOGIN,
   AUTH_CRED_CHANGED,
+  SWITCH_CREDS_CHANGED,
 } from '../actions/setupAndAuth';
 
 const initialState: {
@@ -99,6 +100,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         credsChanged: action.payload.changed,
+      };
+
+    case SWITCH_CREDS_CHANGED:
+      return {
+        ...state,
+        credsChanged: '',
       };
   }
 
