@@ -1,4 +1,4 @@
-import { call, put } from 'redux-saga/effects';
+import { call, put, select } from 'redux-saga/effects';
 import { createWatcher, serviceGenerator } from '../utils/utilities';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -14,9 +14,12 @@ import {
   switchSetupLoader,
   switchReLogin,
   INIT_RECOVERY,
+  CHANGE_AUTH_CRED,
+  credsChanged,
 } from '../actions/setupAndAuth';
 import { insertIntoDB, keyFetched, fetchFromDB } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
+import { Alert } from 'react-native';
 
 function* initSetupWorker({ payload }) {
   yield put(switchSetupLoader('initializing'));
@@ -127,4 +130,38 @@ function* credentialsAuthWorker({ payload }) {
 export const credentialsAuthWatcher = createWatcher(
   credentialsAuthWorker,
   CREDS_AUTH,
+);
+
+function* changeAuthCredWorker({ payload }) {
+  const { oldPasscode, newPasscode } = payload;
+
+  try {
+    // verify old pin
+    const oldHash = yield call(Cipher.hash, oldPasscode);
+    const oldEncryptedKey = yield call(SecureStore.fetch, oldHash);
+    const oldKey = yield call(Cipher.decrypt, oldEncryptedKey, oldHash);
+    const key = yield select(state => state.storage.key);
+    if (oldKey !== key) {
+      throw new Error('Incorrect Pin');
+    }
+
+    // setup new pin
+    const newHash = yield call(Cipher.hash, newPasscode);
+    const encryptedKey = yield call(Cipher.encrypt, key, newHash);
+
+    //store the AES key against the hash
+    if (!(yield call(SecureStore.store, newHash, encryptedKey))) {
+      throw new Error('Unable to access secure store');
+    }
+    yield put(credsChanged('changed'));
+  } catch (err) {
+    console.log({ err });
+    Alert.alert('Pin change failed!', err.message);
+    yield put(credsChanged('not-changed'));
+  }
+}
+
+export const changeAuthCredWatcher = createWatcher(
+  changeAuthCredWorker,
+  CHANGE_AUTH_CRED,
 );

@@ -24,6 +24,7 @@ import {
   initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
+  changeAuthCredWatcher,
 } from './sagas/setupAndAuth';
 import {
   fetchAddrWatcher,
@@ -94,6 +95,7 @@ const rootSaga = function*() {
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
+    changeAuthCredWatcher,
 
     // accounts watchers
     fetchAddrWatcher,
