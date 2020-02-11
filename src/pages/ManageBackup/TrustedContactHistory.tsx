@@ -112,14 +112,6 @@ const TrustedContactHistory = props => {
     'updateAutoHighlightFlags',
   );
 
-  // const secretSharedTrustedContact1 = isSecretShared1 => {
-  //   setIsSecretShared1(isSecretShared1);
-  // };
-
-  // const secretSharedTrustedContact2 = isSecretShared2 => {
-  //   setIsSecretShared2(isSecretShared2);
-  // };
-
   const setContactInfo = useCallback(async () => {
     let SelectedContactsTemp = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
@@ -134,18 +126,12 @@ const TrustedContactHistory = props => {
       ) {
         setChosenContact(SelectedContactsTemp[1]);
       }
-      // if (props.navigation.state.params.isConfirm) {
-      //   ConfirmBottomSheet.current.snapTo(1);
-      // }
     }
   }, [selectedTitle]);
 
   const getContacts = useCallback(
     async (selectedContacts, index) => {
-      console.log('Getting Contacts');
       let contactList = SelectedContacts;
-      console.log({ contactList });
-      console.log({ selectedContacts });
       if (!contactList) {
         contactList = [];
       }
@@ -157,16 +143,12 @@ const TrustedContactHistory = props => {
       }
 
       setTimeout(() => {
-        setChosenContact(
-          contactList.length == 2 && index == 2
-            ? contactList[1]
-            : contactList[0],
-        );
+        setChosenContact(selectedContacts[0]);
       }, 2);
       (trustedContactsBottomSheet as any).current.snapTo(0);
       (CommunicationModeBottomSheet as any).current.snapTo(1);
     },
-    [SelectedContacts],
+    [SelectedContacts, chosenContact],
   );
 
   const renderTrustedContactsContent = useCallback(() => {
@@ -197,8 +179,6 @@ const TrustedContactHistory = props => {
   const renderCommunicationModeModalContent = useCallback(() => {
     return (
       <CommunicationMode
-        // secretSharedTrustedContact1={secretSharedTrustedContact1}
-        // secretSharedTrustedContact2={secretSharedTrustedContact2}
         contact={chosenContact ? chosenContact : null}
         index={index}
         onPressBack={() => {
@@ -245,8 +225,6 @@ const TrustedContactHistory = props => {
       if (shareHistory[index].notAccessible)
         updatedTrustedContactHistory[3].date =
           shareHistory[index].notAccessible;
-
-      console.log({ updatedTrustedContactHistory });
       setTrustedContactHistory(updatedTrustedContactHistory);
     },
     [trustedContactHistory],
@@ -276,14 +254,11 @@ const TrustedContactHistory = props => {
       if (!selectedContactList) {
         selectedContactList = [];
       }
-      console.log({ chosenContact });
       if (index == 2) {
         selectedContactList[1] = chosenContact;
       } else if (index == 1) {
         selectedContactList[0] = chosenContact;
       }
-
-      console.log({ selectedContactList });
       await AsyncStorage.setItem(
         'SelectedContacts',
         JSON.stringify(selectedContactList),
@@ -456,7 +431,7 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  }, [selectedTitle]);
+  }, [selectedTitle, chosenContact]);
 
   const renderTrustedContactQrHeader = useCallback(() => {
     return (
