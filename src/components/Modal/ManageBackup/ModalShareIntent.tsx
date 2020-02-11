@@ -23,6 +23,7 @@ import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWra
 import { useDispatch, useSelector } from 'react-redux';
 import { requestSharePdf } from '../../../store/actions/manageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
+import BottomInfoBox from '../../../components/BottomInfoBox';
 
 export default function ModalShareIntent(props) {
   const database = useSelector(state => state.storage.databaseSSS);
@@ -35,7 +36,7 @@ export default function ModalShareIntent(props) {
       type: 'Email',
       flagShare: false,
       info:
-        'The pdf document is password protected with the answer to your secret question',
+        'Make sure you delete the message from your sent folder',
       imageIcon: Icons.manageBackup.PersonalCopy.email,
     },
     {
@@ -43,7 +44,7 @@ export default function ModalShareIntent(props) {
       title: 'Print a copy',
       type: 'Print',
       flagShare: false,
-      info: 'Keep the printed copy (6 pages) safe',
+      info: 'Keep all the pages of the printed copy safe',
       imageIcon: Icons.manageBackup.PersonalCopy.print,
     },
     {
@@ -52,7 +53,7 @@ export default function ModalShareIntent(props) {
       type: 'Other',
       flagShare: false,
       info:
-        'The pdf document is password protected with the answer to your secret question',
+        'Make sure that you delete the message from your device once it is sent',
       imageIcon: Icons.manageBackup.PersonalCopy.icloud,
     },
   ]);
@@ -229,6 +230,12 @@ export default function ModalShareIntent(props) {
           keyExtractor={(item, index) => index.toString()}
         />
       </View>
+      <BottomInfoBox
+        title={'Security question and answer'}
+        infoText={
+          'The answer your your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
+        }
+      />
     </View>
   );
 }
