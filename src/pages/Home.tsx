@@ -217,6 +217,7 @@ export default function Home(props) {
   const [selectToAdd, setSelectToAdd] = useState('Getbittr');
   const [openmodal, setOpenmodal] = useState('closed');
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
+  const [deepLinkModalOpen, setDeepLinkModalOpen] = useState(false);
   const [tabSelected, setTabSelected] = useState('sell');
   const [switchOn, setSwitchOn] = useState(true);
   const [selected, setSelected] = useState('Transactions');
@@ -1527,11 +1528,20 @@ export default function Home(props) {
 
   useEffect(() => {
     if (custodyRequest) {
+      if(tabBarZIndex==999){
+        setTimeout(() => {
+          setTabBarZIndex(0);
+          setDeepLinkModalOpen(true);
+        }, 2);
+      }
       setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
-      (CustodianRequestBottomSheet as any).current.snapTo(1);
-      (transactionTabBarBottomSheet as any).current.snapTo(1);
+        addressBookBottomSheet.current.snapTo(0);
+        AllAccountsBottomSheet.current.snapTo(0);
+        settingsBottomSheet.current.snapTo(0);
+        (CustodianRequestBottomSheet as any).current.snapTo(1);
+        (transactionTabBarBottomSheet as any).current.snapTo(1);
+      }, 30);
+      
     }
 
     if (recoveryRequest) {
@@ -2167,7 +2177,16 @@ export default function Home(props) {
       /> */}
       <BottomSheet
         onCloseEnd={() => {
-          setTabBarZIndex(999);
+          if(tabBarZIndex==0){
+            setTabBarZIndex(999);
+          }
+          setDeepLinkModalOpen(false)
+        }}
+        onOpenEnd={() => {
+          if(tabBarZIndex==999){
+            setTabBarZIndex(0);
+          }
+          setDeepLinkModalOpen(true)
         }}
         enabledInnerScrolling={true}
         ref={CustodianRequestBottomSheet}
@@ -2226,10 +2245,14 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            setTabBarZIndex(0);
+            if(!deepLinkModalOpen){
+              setTabBarZIndex(0);
+            }
           }}
           onCloseEnd={() => {
-            setTabBarZIndex(999);
+            if(!deepLinkModalOpen){
+              setTabBarZIndex(999);
+            }
           }}
           enabledInnerScrolling={true}
           ref={addressBookBottomSheet}
@@ -2246,10 +2269,14 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            setTabBarZIndex(0);
+            if(!deepLinkModalOpen){
+              setTabBarZIndex(0);
+            }
           }}
           onCloseEnd={() => {
-            setTabBarZIndex(999);
+            if(!deepLinkModalOpen){
+              setTabBarZIndex(999);
+            }
           }}
           enabledInnerScrolling={true}
           ref={AllAccountsBottomSheet}
@@ -2266,10 +2293,14 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            setTabBarZIndex(0);
+            if(!deepLinkModalOpen){
+              setTabBarZIndex(0);
+            }
           }}
           onCloseEnd={() => {
-            setTabBarZIndex(999);
+            if(!deepLinkModalOpen){
+              setTabBarZIndex(999);
+            }
           }}
           enabledInnerScrolling={true}
           ref={settingsBottomSheet}
