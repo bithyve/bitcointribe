@@ -224,7 +224,7 @@ export default function ContactList(props) {
             <FlatList
               keyExtractor={(item, index) => item.id}
               data={filterContactData}
-              extraData={props.onSelectContact}
+              extraData={radioOnOff}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
                 let selected = false;
@@ -241,7 +241,7 @@ export default function ContactList(props) {
                       size={15}
                       color={Colors.lightBlue}
                       borderColor={Colors.borderColor}
-                      isChecked={selected}
+                      isChecked={item.checked}
                       onpress={() => onContactSelect(index)}
                     />
                     <Text style={styles.contactText}>
