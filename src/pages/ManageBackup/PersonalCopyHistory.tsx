@@ -141,6 +141,9 @@ const PersonalCopyHistory = props => {
         JSON.stringify(updatedShareHistory),
       );
     }
+    if (next) {
+      props.navigation.goBack();
+    }
   };
 
   const shared = useSelector(state => state.manageBackup.shared);

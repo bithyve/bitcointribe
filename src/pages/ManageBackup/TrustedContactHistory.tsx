@@ -302,7 +302,12 @@ const TrustedContactHistory = props => {
   const renderShareOtpWithTrustedContactContent = useCallback(() => {
     return (
       <ShareOtpWithTrustedContact
-        onPressOk={index => onOTPShare(index)}
+        onPressOk={index => {
+          onOTPShare(index);
+          if (next) {
+            props.navigation.goBack();
+          }
+        }}
         onPressBack={() => {
           (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
         }}
