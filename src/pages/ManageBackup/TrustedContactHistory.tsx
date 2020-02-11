@@ -307,7 +307,6 @@ const TrustedContactHistory = props => {
       <ErrorModalContents
         modalRef={ConfirmBottomSheet}
         title={'Confirm Recovery Secret\nwith Trusted Contact'}
-        info={'Your Trusted Contact seems away from their Hexa App'}
         note={
           'You can send them a reminder to open their app to\nensure they have your Recovery Secret'
         }
