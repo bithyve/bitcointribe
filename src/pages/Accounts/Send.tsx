@@ -110,8 +110,7 @@ export default function Send(props) {
     fee: '0.0001',
     total: 0.00022,
     estDeliveryTime: '2 hours',
-    description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut faucibus pulvinar elementum integer enim neque volutpat. Leo integer malesuada nunc vel. Purus faucibus ornare suspendisse sed nisi lacus sed. Et ligula ullamcorper malesuada proin libero nunc consequat. A cras semper auctor neque vitae tempus quam pellentesque. In nisl nisi scelerisque eu ultrices vitae auctor eu augue. Sed risus ultricies tristique nulla aliquet enim tortor. Curabitur gravida arcu ac tortor dignissim convallis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Porta lorem mollis aliquam ut porttitor Leo a.',
+    description: '',
   };
 
   const checkNShowHelperModal = async () => {

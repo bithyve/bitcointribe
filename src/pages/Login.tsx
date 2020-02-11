@@ -193,8 +193,8 @@ export default function Login(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Loading'}
-        messageText={'Please wait for some time'}
+        headerText={'Getting the latest details '}
+        messageText={'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet'}
       />
     );
   };
@@ -205,7 +205,7 @@ export default function Login(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('60%'),
+          height: hp('65%'),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',
@@ -236,8 +236,9 @@ export default function Login(props) {
   }, [authenticationFailed]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <StatusBar />
+      <SafeAreaView style={{ flex: 0 }}/>
       <View style={{ flex: 1 }}>
         <View style={{}}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
@@ -545,7 +546,7 @@ export default function Login(props) {
           renderHeader={renderLoaderModalHeader}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
