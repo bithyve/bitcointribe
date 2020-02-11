@@ -36,9 +36,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import {
-  getTestcoins,
-} from '../store/actions/accounts';
+import { getTestcoins } from '../store/actions/accounts';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -77,14 +75,12 @@ export default function NewWalletQuestion(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
 
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
-  
+
   const [testBalance, setTestBalance] = useState(0);
   const [testTransactions, setTestTransactions] = useState([]);
   const [balances, setBalances] = useState({
@@ -137,7 +133,6 @@ export default function NewWalletQuestion(props) {
     setTransactions(accumulativeTransactions);
   }, [accounts]);
 
-
   useEffect(() => {
     (async () => {
       const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
@@ -179,10 +174,18 @@ export default function NewWalletQuestion(props) {
     })();
   }, [testAccService]);
 
-  if (isInitialized && exchangeRates && balances.testBalance && transactions.length > 0) {
-    console.log("isInitialized && exchangeRates && testBalance && testTransactions.length", isInitialized && exchangeRates && testBalance && testTransactions.length);
+  if (
+    isInitialized &&
+    exchangeRates &&
+    balances.testBalance &&
+    transactions.length > 0
+  ) {
+    console.log(
+      'isInitialized && exchangeRates && testBalance && testTransactions.length',
+      isInitialized && exchangeRates && testBalance && testTransactions.length,
+    );
     (loaderBottomSheet as any).current.snapTo(0);
-    props.navigation.navigate('HomeNav', exchangeRates);
+    props.navigation.navigate('HomeNav', exchangeRates, balances, transactions);
   }
 
   const setConfirm = confirmAnswer1 => {
@@ -235,15 +238,15 @@ export default function NewWalletQuestion(props) {
     return (
       <TouchableOpacity
         onPress={async () => {
-          (loaderBottomSheet as any).current.snapTo(1)
+          (loaderBottomSheet as any).current.snapTo(1);
           const security = {
             question: dropdownBoxValue.question,
             answer,
           };
           setTimeout(() => {
-          setIsEditable(false);
-          setIsDisabled(true);
-        }, 2);
+            setIsEditable(false);
+            setIsDisabled(true);
+          }, 2);
           dispatch(initializeSetup(walletName, security));
           await AsyncStorage.setItem(
             'SecurityAnsTimestamp',
@@ -272,19 +275,18 @@ export default function NewWalletQuestion(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-      headerText = {'Loading data'}
-      messageText = {'Please wait for some time'}
+        headerText={'Loading data'}
+        messageText={'Please wait for some time'}
       />
     );
   };
   const renderLoaderModalHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.white}
-      backgroundColor={Colors.white}
-      onPressHeader={() => {
-      }}
-    />
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {}}
+      />
     );
   };
 
@@ -598,14 +600,14 @@ export default function NewWalletQuestion(props) {
           </TouchableOpacity>
         </KeyboardAvoidingView>
         <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction= {false}
-        enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
-        snapPoints={[-50, hp('40%')]}
-        renderContent={renderLoaderModalContent}
-        //renderHeader={renderLoaderModalHeader}
-      />
+          onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={loaderBottomSheet}
+          snapPoints={[-50, hp('40%')]}
+          renderContent={renderLoaderModalContent}
+          //renderHeader={renderLoaderModalHeader}
+        />
       </View>
     </SafeAreaView>
   );
