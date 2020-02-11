@@ -73,7 +73,7 @@ const SecondaryDevice = props => {
       <BottomInfoBox
         title={"Note"}
         infoText={
-          "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna"
+          "Share your Recovery Secret Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR"
         }
       />
     </View>

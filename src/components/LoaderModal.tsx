@@ -13,8 +13,8 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal(props) {
 
-    return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
-        <View style={{ height: '100%'}}>
+    return (<View style={{ ...styles.modalContentContainer, height: hp('40%'), }}>
+        <View style={{ height: hp('100%')}}>
          <View style={styles.successModalHeaderView}>
          <Image source={require('../assets/images/icons/loader.png')} style={styles.successModalImage} />
             

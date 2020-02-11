@@ -49,6 +49,7 @@ import {
   downloadMShare,
   initHealthCheck,
 } from '../store/actions/sss';
+import DeviceInfo from "react-native-device-info";
 
 export default function NewWalletQuestion(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -75,8 +76,10 @@ export default function NewWalletQuestion(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
-
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [visibleButton, setVisibleButton] = useState(false);
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
@@ -194,26 +197,23 @@ export default function NewWalletQuestion(props) {
         let temp = tempAns.replace(/[^a-zA-Z ]/g, '');
         setConfirmAnswer(confirmAnswer.concat(temp));
         console.log(tempAns.replace(/[^a-zA-Z ]/g, ''));
-        console.log('in if', temp);
       } else {
         setConfirmAnswer(tempAns);
-        console.log('in else', tempAns);
+        
       }
       if (answer && confirmAnswer != answer) {
+        console.log('in if', visibleButton);
         setAnsError('Answers do not match');
-        //counter++;
-        // setCounter(counter);
-        // console.log('counter', counter);
-        // if (counter > 3) {
-        //   console.log('global.ansCounter', counter);
-        //   setHdeShowAnswer(!hideShowAnswer);
-        //   counter = 0;
-        // }
       } else {
+        console.log('in VisibleButton', visibleButton);
+        setTimeout(() => {
         setAnsError('');
+      }, 2);
       }
     } else {
-      setAnsError('');
+      setTimeout(() => {
+        setAnsError('');
+      }, 2);
     }
   };
   const setBackspace = event => {
@@ -229,8 +229,11 @@ export default function NewWalletQuestion(props) {
   };
 
   useEffect(() => {
-    if (answer.trim() == confirmAnswer.trim()) {
+    if (answer.trim() == confirmAnswer.trim() && answer && confirmAnswer) {
       setAnsError('');
+      setVisibleButton(true);
+    } else{
+      setVisibleButton(false);
     }
   }, [confirmAnswer]);
 
@@ -264,11 +267,11 @@ export default function NewWalletQuestion(props) {
         }}
         style={styles.buttonView}
       >
-        {!loading.initializing ? (
+        {/* {!loading.initializing ? ( */}
           <Text style={styles.buttonText}>Confirm</Text>
-        ) : (
+        {/* ) : (
           <ActivityIndicator size="small" />
-        )}
+        )} */}
       </TouchableOpacity>
     );
   };
@@ -282,10 +285,16 @@ export default function NewWalletQuestion(props) {
   };
   const renderLoaderModalHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {}}
+      <View
+        style={{
+          marginTop: 'auto',
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          height: hp('60%'),
+          zIndex: 9999,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       />
     );
   };
@@ -570,44 +579,40 @@ export default function NewWalletQuestion(props) {
                 </Text>
               </View>
             </ScrollView>
-
             <View style={styles.bottomButtonView}>
-              {answer.trim() == confirmAnswer.trim() &&
+            {answer.trim() == confirmAnswer.trim() &&
               confirmAnswer.trim() &&
               answer.trim() ? (
                 setButtonVisible()
-              ) : (
-                <View
-                  style={{
-                    height: wp('13%'),
-                    width: wp('30%'),
-                  }}
-                />
-              )}
-              <View style={styles.statusIndicatorView}>
-                <View style={styles.statusIndicatorInactiveView} />
-                <View style={styles.statusIndicatorActiveView} />
-              </View>
+              ) : null}
+            <View style={styles.statusIndicatorView}>
+              <View style={styles.statusIndicatorActiveView} />
+              <View style={styles.statusIndicatorInactiveView} />
             </View>
-            {dropdownBoxValue.id.trim() == '' ? (
+          </View>
+          
+          {!visibleButton ? (
+            <View style={{marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0}}>
               <BottomInfoBox
-                title={'Note'}
+                title={'Answer to the security question is something only you know and more importantly remember easily'}
                 infoText={
-                  'Secret question and answer are very important for your wallet and it’s backup'
+                  'This is not stored anywhere and will be used by the app to create backup'
                 }
-              />
-            ) : null}
+                />
+            </View>
+          ) : null}
+          
           </TouchableOpacity>
         </KeyboardAvoidingView>
         <BottomSheet
-          onCloseEnd={() => {}}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[-50, hp('40%')]}
-          renderContent={renderLoaderModalContent}
-          //renderHeader={renderLoaderModalHeader}
-        />
+        onCloseEnd={() => { }}
+        enabledGestureInteraction= {false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[-50, hp('100%')]}
+        renderContent={renderLoaderModalContent}
+        renderHeader={renderLoaderModalHeader}
+      />
       </View>
     </SafeAreaView>
   );
@@ -667,6 +672,11 @@ const styles = StyleSheet.create({
     paddingLeft: 30,
     paddingRight: 30,
     paddingBottom: 40,
+    alignItems: 'center',
+  },
+  bottomButtonView1: {
+    flexDirection: 'row',
+     marginTop: 5,
     alignItems: 'center',
   },
   statusIndicatorView: {

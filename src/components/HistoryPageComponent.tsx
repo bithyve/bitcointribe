@@ -181,7 +181,7 @@ const HistoryPageComponent = props => {
               }}
               style={{ color: Colors.blue, textDecorationLine: 'underline' }}
             >
-              Change Source
+              Change contact
             </Text>
           </Text>
         ) : null}

@@ -579,7 +579,7 @@ export default function ManageBackup(props) {
         title={'Secondary Device'}
         time={selectedTime}
         status={selectedStatus}
-        reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
+        reshareInfo={'Want to send the Recovery Secret again to the same destination? '}
         onPressConfirm={() => {
           ConfirmBottomSheet.current.snapTo(1);
         }}
@@ -612,7 +612,7 @@ export default function ManageBackup(props) {
         title={'Personal Copy'}
         time={selectedTime}
         status={selectedStatus}
-        reshareInfo={'consectetur Lorem ipsum dolor sit amet, consectetur sit '}
+        reshareInfo={'Want to send the Recovery Secret again to the same destination? '}
         onPressConfirm={() => {
           ConfirmBottomSheet.current.snapTo(1);
         }}

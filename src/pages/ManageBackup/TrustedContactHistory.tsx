@@ -565,12 +565,12 @@ const TrustedContactHistory = props => {
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
             shared || activateReshare
-              ? 'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+              ? 'Want to send the Recovery Secret again to the same destination? '
               : null
           }
           changeInfo={
             shared || activateReshare
-              ? 'Lorem ipsum dolor sit amet, consectetur sit amet '
+              ? 'Want to share the Recovery Secret with another contact? '
               : null
           }
           onPressChange={() => {

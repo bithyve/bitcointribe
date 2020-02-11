@@ -10,7 +10,7 @@ import {
   Image,
   Platform,
   TextInput,
-  KeyboardAvoidingView,
+  ActivityIndicator,
   Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -288,10 +288,16 @@ export default function RestoreSelectedContactsList(props) {
   };
   const renderLoaderModalHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {}}
+      <View
+        style={{
+          marginTop: 'auto',
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          height: hp('60%'),
+          zIndex: 9999,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       />
     );
   };
@@ -429,7 +435,7 @@ export default function RestoreSelectedContactsList(props) {
 
   if (
     exchangeRates &&
-    balances.testBalance &&
+    balances.testBalance >= 0 &&
     balances.regularBalance >= 0 &&
     balances.secureBalance >= 0 &&
     transactions.length > 0
@@ -996,9 +1002,9 @@ export default function RestoreSelectedContactsList(props) {
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={loaderBottomSheet}
-        snapPoints={[-50, hp('40%')]}
+        snapPoints={[-50, hp('100%')]}
         renderContent={renderLoaderModalContent}
-        //renderHeader={renderLoaderModalHeader}
+        renderHeader={renderLoaderModalHeader}
       />
     </View>
   );

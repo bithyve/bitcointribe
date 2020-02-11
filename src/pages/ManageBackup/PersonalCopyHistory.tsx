@@ -307,7 +307,7 @@ const PersonalCopyHistory = props => {
           data={sortedHistory(personalCopyHistory)}
           reshareInfo={
             personalCopyShared
-              ? 'consectetur Lorem ipsum dolor sit amet, consectetur sit '
+              ? 'Want to send the Recovery Secret again to the same destination? '
               : null
           }
           onPressConfirm={onConfirm}

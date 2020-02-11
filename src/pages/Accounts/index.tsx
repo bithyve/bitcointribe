@@ -282,7 +282,7 @@ export default function Accounts(props) {
                 alignSelf: 'flex-start',
               }}
             >
-              {item.accountType}
+              {item.accountType == 'Regular Account' ? 'Checking Account' : item.accountType}
             </Text>
             <Text
               style={{
@@ -721,10 +721,10 @@ export default function Accounts(props) {
       <TestAccountHelperModalContents
         topButtonText={'Savings Account'}
         boldPara={
-          'If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)'
+          'The funds in this account are secured by two factor authentication which is set up on your secondary device'
         }
         helperInfo={
-          'You can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
+          'Use this account to store most of your funds. Something you will not need on an ongoing basis\n\n\n'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -758,12 +758,12 @@ export default function Accounts(props) {
   const renderRegularAccountsHelperContents = useCallback(() => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={'Regular Account'}
+        topButtonText={'Checking Account'}
         boldPara={
-          'If you are new to Bitcoin, this account is\ndesigned for you. It comes pre-loaded\nwith some test bitcoins (not real)'
+          'These are the funds that you have easy access to for your transactional needs'
         }
         helperInfo={
-          'You can even send and receive test bitcoins\nfrom other Hexa wallet test accounts\n\nThese are not actual bitcoins and are of no\nintrinsic value. The testnet sats do not add up\nin your wallet balance\n\n\n'
+          'Transfers from this account are typically cheaper and faster\n\n\n'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {

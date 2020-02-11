@@ -524,6 +524,7 @@ export default function Home(props) {
 
   const renderTransactionsContent = () => {
     return (
+      transactions.length ? (
       <View style={styles.modalContentContainer}>
         <FlatList
           data={transactions}
@@ -604,7 +605,9 @@ export default function Home(props) {
             </AppBottomSheetTouchableWrapper>
           )}
         />
-      </View>
+      </View> ) : (<View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center',alignItems:'center'   }}>
+      <Text style={{marginLeft: 30,color:Colors.textColorGrey, fontFamily:Fonts.FiraSansMediumItalic, fontSize:RFValue(16), }}>Nothing to show</Text>
+    </View>)
     );
   };
 
@@ -1965,7 +1968,8 @@ export default function Home(props) {
                               style={{ flex: 1, justifyContent: 'flex-end' }}
                             >
                               <Text style={styles.cardTitle}>
-                                {value.title}
+                              {value.title == 'Regular Account' ? 'Checking Account' : value.title}
+                               {/* // {value.title} */}
                               </Text>
                               <Text
                                 style={{
@@ -2740,20 +2744,23 @@ const styles = StyleSheet.create({
     width: wp('3%'),
     height: wp('3%'),
     marginRight: 5,
-    marginBottom: wp('0.5%'),
     resizeMode: 'contain',
+    marginBottom: wp('0.7%'), 
   },
   cardAmountText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(17),
     marginRight: 5,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(11),
-    marginBottom: 2,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
   },
   tabBarImage: {
     width: 21,
