@@ -86,7 +86,7 @@ export default function SettingManagePin(props) {
                 size={17}
               />
             </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>{'Manage Pin'}</Text>
+            <Text style={styles.modalHeaderTitleText}>{'Manage Passcode'}</Text>
           </View>
         </View>
         <View style={{ flex: 1 }}>
@@ -94,7 +94,7 @@ export default function SettingManagePin(props) {
             <View>
               <Text style={styles.headerInfoText}>
                 Please enter your{' '}
-                <Text style={styles.boldItalicText}>existing pin</Text>
+                <Text style={styles.boldItalicText}>existing passcode</Text>
               </Text>
               <View style={styles.passcodeTextInputView}>
                 <View

@@ -43,10 +43,10 @@ export default function SettingsContents(props) {
             <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManagePIn()} style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}>
             <Image source={require('../assets/images/icons/icon_secrets.png')} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: 0, marginRight: 10 }} />
                 <View>
-                    <Text style={styles.titleText}>Manage Pin</Text>
-                    <Text style={styles.infoText}>Manage Passcode Change your passcode</Text>
+                    <Text style={styles.titleText}>Manage Passcode</Text>
+                    <Text style={styles.infoText}>Change your passcode</Text>
                 </View>
-                <View style={{width: wp('17%'), justifyContent:'center', alignItems:'center'}}>
+                <View style={{width: wp('17%'), justifyContent:'center', alignItems:'center', marginLeft: 'auto'}}>
                 <Ionicons
                     name="ios-arrow-forward"
                     color={Colors.textColorGrey}

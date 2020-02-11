@@ -28,16 +28,19 @@ export default function ShareOtpWithTrustedContact(props) {
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
-          <AppBottomSheetTouchableWrapper onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30 }} >
+          {/* <AppBottomSheetTouchableWrapper onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30 }} >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
-              Share OTP with{'\n'}trusted contact
+              Share OTP with trusted contact
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               Please provide this OTP to your trusted contact in order for them
               to send you the recovery secret
+            </Text>
+            <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
+            Please make sure you use a different to channel to send the OTP
             </Text>
           </View>
         </View>

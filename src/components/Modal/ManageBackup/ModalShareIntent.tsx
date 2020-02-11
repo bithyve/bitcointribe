@@ -24,6 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { requestSharePdf } from '../../../store/actions/manageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
 import BottomInfoBox from '../../../components/BottomInfoBox';
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function ModalShareIntent(props) {
   const database = useSelector(state => state.storage.databaseSSS);
@@ -274,13 +275,13 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: 12,
+    fontSize: RFValue(12),
     marginTop: 5,
   },
   listElements: {
@@ -296,13 +297,13 @@ const styles = StyleSheet.create({
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: 13,
+    fontSize: RFValue(13),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: 11,
+    fontSize: RFValue(11),
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,
