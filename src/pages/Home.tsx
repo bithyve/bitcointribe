@@ -1553,9 +1553,11 @@ export default function Home(props) {
         }, 2);
       }
       setTimeout(() => {
-        addressBookBottomSheet.current.snapTo(0);
-        AllAccountsBottomSheet.current.snapTo(0);
-        settingsBottomSheet.current.snapTo(0);
+        if(addressBookBottomSheet.current && AllAccountsBottomSheet.current && settingsBottomSheet.current){
+          addressBookBottomSheet.current.snapTo(0);
+          AllAccountsBottomSheet.current.snapTo(0);
+          settingsBottomSheet.current.snapTo(0);
+        }
         (CustodianRequestBottomSheet as any).current.snapTo(1);
         (transactionTabBarBottomSheet as any).current.snapTo(1);
       }, 30);
