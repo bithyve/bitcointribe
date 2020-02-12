@@ -9,7 +9,6 @@ import coinselect from 'coinselect';
 import config from '../../Config';
 import { Transactions } from '../Interface';
 
-const { BH_AXIOS, HEXA_ID } = config;
 const { TESTNET, MAINNET } = config.API_URLS;
 
 export default class Bitcoin {
@@ -494,29 +493,6 @@ export default class Bitcoin {
     const res = await this.broadcastTransaction(txHex);
     console.log('---- Transaction Broadcasted ----');
     return res;
-  };
-
-  public testnetFaucet = async (
-    recipientAddress: string,
-  ): Promise<{
-    txid: any;
-    funded: any;
-  }> => {
-    // const amount = Math.trunc(Math.random() * 1e5) / 1e8;
-    const amount = 10000 / 1e8;
-    let res: AxiosResponse;
-    try {
-      res = await BH_AXIOS.post('/testnetFaucet', {
-        HEXA_ID,
-        recipientAddress,
-        amount,
-      });
-    } catch (err) {
-      throw new Error(err.response.data.err);
-    }
-
-    const { txid, funded } = res.data;
-    return { txid, funded };
   };
 
   public generateMultiSig = (

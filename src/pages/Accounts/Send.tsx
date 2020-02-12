@@ -246,7 +246,7 @@ export default function Send(props) {
       setQrBottomSheetsFlag(false);
       setRecipientAddress(qrData);
     }, 2);
-    setTimeout(()=>{
+    setTimeout(() => {
       (bottomSheet as any).current.snapTo(0);
     }, 10);
   };
@@ -368,8 +368,12 @@ export default function Send(props) {
         isCancel={false}
         onPressOk={() => {
           dispatch(clearTransfer(serviceType));
-          dispatch(fetchBalance(serviceType));
-          dispatch(fetchTransactions(serviceType));
+          dispatch(
+            fetchBalance(serviceType, {
+              loader: true,
+              fetchTransactionsSync: true,
+            }),
+          );
           SendSuccessWithAddressBottomSheet.current.snapTo(0);
           props.navigation.navigate('Accounts');
         }}
@@ -383,8 +387,12 @@ export default function Send(props) {
       <ModalHeader
         onPressHeader={() => {
           dispatch(clearTransfer(serviceType));
-          dispatch(fetchBalance(serviceType));
-          dispatch(fetchTransactions(serviceType));
+          dispatch(
+            fetchBalance(serviceType, {
+              loader: true,
+              fetchTransactionsSync: true,
+            }),
+          );
           SendSuccessWithAddressBottomSheet.current.snapTo(0);
           props.navigation.navigate('Accounts');
         }}
@@ -595,7 +603,7 @@ export default function Send(props) {
                       />
                     </View>
                     <TextInput
-                    editable={isEditable}
+                      editable={isEditable}
                       // ref={refs => setTextAmountRef(refs)}
                       style={{ ...styles.textBox, paddingLeft: 10 }}
                       placeholder={
@@ -866,7 +874,7 @@ export default function Send(props) {
                       shadowOffset: { width: 15, height: 15 },
                     }}
                   >
-                    {loading.transfer && !isInvalidBalance? (
+                    {loading.transfer && !isInvalidBalance ? (
                       <ActivityIndicator size="small" />
                     ) : (
                       <Text style={styles.buttonText}>Confirm</Text>
@@ -922,8 +930,12 @@ export default function Send(props) {
           renderHeader={renderSendHelperHeader}
         />
         <BottomSheet
-          onOpenEnd={()=>{setQrBottomSheetsFlag(true)}}
-          onCloseStart={()=>{ setQrBottomSheetsFlag(false) }}
+          onOpenEnd={() => {
+            setQrBottomSheetsFlag(true);
+          }}
+          onCloseStart={() => {
+            setQrBottomSheetsFlag(false);
+          }}
           enabledInnerScrolling={true}
           ref={bottomSheet}
           snapPoints={[0, hp('90%')]}
@@ -941,8 +953,12 @@ export default function Send(props) {
           onCloseStart={() => {
             {
               dispatch(clearTransfer(serviceType));
-              dispatch(fetchBalance(serviceType));
-              dispatch(fetchTransactions(serviceType));
+              dispatch(
+                fetchBalance(serviceType, {
+                  loader: true,
+                  fetchTransactionsSync: true,
+                }),
+              );
               props.navigation.navigate('Accounts');
             }
           }}

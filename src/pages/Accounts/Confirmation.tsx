@@ -40,8 +40,8 @@ const Confirmation = props => {
       isSuccess={true}
       onPressViewAccount={() => {
         dispatch(clearTransfer(serviceType));
-        dispatch(fetchBalance(serviceType));
-        dispatch(fetchTransactions(serviceType));
+        dispatch(fetchBalance(serviceType, { fetchTransactionsSync: true }));
+        // dispatch(fetchTransactions(serviceType));
         props.navigation.navigate('Accounts');
       }}
       transactionId={transfer.txid}

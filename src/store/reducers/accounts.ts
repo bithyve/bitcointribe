@@ -10,6 +10,7 @@ import {
   TRANSFER_ST1_FAILED,
   TRANSFER_ST2_FAILED,
   TRANSFER_ST3_FAILED,
+  TESTCOINS_RECEIVED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -87,6 +88,15 @@ export default (state = initialState, action) => {
             ...state[account].loading,
             receivingAddress: false,
           },
+        },
+      };
+
+    case TESTCOINS_RECEIVED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          service: action.payload.service,
         },
       };
 

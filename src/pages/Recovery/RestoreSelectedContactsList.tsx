@@ -282,7 +282,9 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <LoaderModal
         headerText={'Creating your wallet'}
-        messageText={'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'}
+        messageText={
+          'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'
+        }
       />
     );
   };
@@ -409,12 +411,14 @@ export default function RestoreSelectedContactsList(props) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
         // props.navigation.navigate('Home');
-        dispatch(fetchBalance(TEST_ACCOUNT));
-        dispatch(fetchBalance(REGULAR_ACCOUNT));
-        dispatch(fetchBalance(SECURE_ACCOUNT));
-        dispatch(fetchTransactions(TEST_ACCOUNT));
-        dispatch(fetchTransactions(REGULAR_ACCOUNT));
-        dispatch(fetchTransactions(SECURE_ACCOUNT));
+        dispatch(fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }));
+        dispatch(
+          fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
+        );
+        dispatch(fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }));
+        // dispatch(fetchTransactions(TEST_ACCOUNT));
+        // dispatch(fetchTransactions(REGULAR_ACCOUNT));
+        // dispatch(fetchTransactions(SECURE_ACCOUNT));
       }
     })();
   }, [SERVICES]);

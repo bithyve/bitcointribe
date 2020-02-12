@@ -146,11 +146,15 @@ export default function Accounts(props) {
   const handleIndexChange = (index: number) => {
     //setTimeout(() => {
     setCarouselInitIndex(index);
-  //}, 2000);
+    //}, 2000);
   };
   const [isTestHelperDone, setIsTestHelperDone] = useState(true);
-  const [isRegularAccountHelperDone, setIsRegularAccountHelperDone] = useState(true);
-  const [isSecureAccountHelperDone, setIsSecureAccountHelperDone] = useState(true);
+  const [isRegularAccountHelperDone, setIsRegularAccountHelperDone] = useState(
+    true,
+  );
+  const [isSecureAccountHelperDone, setIsSecureAccountHelperDone] = useState(
+    true,
+  );
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
@@ -197,14 +201,13 @@ export default function Accounts(props) {
         TestAccountHelperBottomSheet.current.snapTo(1);
       }, 1000);
     } else {
-        setTimeout(() => {
-          setIsTestHelperDone(false);
-        }, 10);
+      setTimeout(() => {
+        setIsTestHelperDone(false);
+      }, 10);
       // props.copilotEvents.on('stepChange', handleStepChange);
       // setTimeout(()=>{
       //   props.start();
       // }, 300);
-      
     }
   };
 
@@ -217,7 +220,7 @@ export default function Accounts(props) {
     setTimeout(() => {
       setServiceType(serviceType);
     }, 10);
-    console.log("Service type in getServiceType", serviceType);
+    console.log('Service type in getServiceType', serviceType);
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
   };
 
@@ -282,7 +285,9 @@ export default function Accounts(props) {
                 alignSelf: 'flex-start',
               }}
             >
-              {item.accountType == 'Regular Account' ? 'Checking Account' : item.accountType}
+              {item.accountType == 'Regular Account'
+                ? 'Checking Account'
+                : item.accountType}
             </Text>
             <Text
               style={{
@@ -311,7 +316,7 @@ export default function Accounts(props) {
                   padding: 10,
                 }}
                 onPress={() => {
-                  console.log("item.accountType", item.accountType);
+                  console.log('item.accountType', item.accountType);
                   if (item.accountType == 'Test Account')
                     TestAccountHelperBottomSheet.current.snapTo(2);
                   else if (item.accountType == 'Savings Account')
@@ -702,13 +707,13 @@ export default function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log("isTestHelperDone",isTestHelperDone);
+          console.log('isTestHelperDone', isTestHelperDone);
           if (isTestHelperDone) {
-          (TestAccountHelperBottomSheet as any).current.snapTo(2);
-          setTimeout(() => {
-            setIsTestHelperDone(false);
-          }, 10);
-          } else{
+            (TestAccountHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsTestHelperDone(false);
+            }, 10);
+          } else {
             (TestAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -741,13 +746,13 @@ export default function Accounts(props) {
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           //(SecureAccountHelperBottomSheet as any).current.snapTo(0);
-          console.log("isSecureAccountHelperDone",isSecureAccountHelperDone);
+          console.log('isSecureAccountHelperDone', isSecureAccountHelperDone);
           if (isSecureAccountHelperDone) {
-          (SecureAccountHelperBottomSheet as any).current.snapTo(2);
-          setTimeout(() => {
-            setIsSecureAccountHelperDone(false);
-          }, 10);
-          } else{
+            (SecureAccountHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsSecureAccountHelperDone(false);
+            }, 10);
+          } else {
             (SecureAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -779,14 +784,13 @@ export default function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          
-          console.log("isRegularAccountHelperDone",isRegularAccountHelperDone);
+          console.log('isRegularAccountHelperDone', isRegularAccountHelperDone);
           if (isRegularAccountHelperDone) {
-          (RegularAccountHelperBottomSheet as any).current.snapTo(2);
-          setTimeout(() => {
-            setIsRegularAccountHelperDone(false);
-          }, 10);
-          } else{
+            (RegularAccountHelperBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsRegularAccountHelperDone(false);
+            }, 10);
+          } else {
             (RegularAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -810,8 +814,8 @@ export default function Accounts(props) {
   useEffect(() => {
     if (!netBalance) {
       // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
-      dispatch(fetchBalance(serviceType)); // TODO: do periodic auto search
-      dispatch(fetchTransactions(serviceType));
+      dispatch(fetchBalance(serviceType, { fetchTransactionsSync: true })); // TODO: do periodic auto search
+      // dispatch(fetchTransactions(serviceType));
     }
     if (serviceType === SECURE_ACCOUNT) {
       AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
@@ -824,9 +828,9 @@ export default function Accounts(props) {
             SecureAccountHelperBottomSheet.current.snapTo(1);
           }, 1000);
         } else {
-            setTimeout(() => {
-              setIsSecureAccountHelperDone(false);
-            }, 10);
+          setTimeout(() => {
+            setIsSecureAccountHelperDone(false);
+          }, 10);
         }
       });
     }
@@ -841,9 +845,9 @@ export default function Accounts(props) {
             RegularAccountHelperBottomSheet.current.snapTo(1);
           }, 1000);
         } else {
-            setTimeout(() => {
-              setIsRegularAccountHelperDone(false);
-            }, 10);
+          setTimeout(() => {
+            setIsRegularAccountHelperDone(false);
+          }, 10);
         }
       });
     }
@@ -905,7 +909,7 @@ export default function Accounts(props) {
         backgroundColor={Colors.backgroundColor}
         barStyle="dark-content"
       />
-        
+
       <View
         style={{
           ...CommonStyles.headerContainer,
@@ -959,7 +963,7 @@ export default function Accounts(props) {
           </View>
         </TouchableOpacity>
       </View>
-      
+
       <ScrollView
         contentContainerStyle={{
           backgroundColor: Colors.backgroundColor,
@@ -968,115 +972,127 @@ export default function Accounts(props) {
           <RefreshControl
             refreshing={loading.balances}
             onRefresh={() => {
-              const loader = true;
-              dispatch(fetchTransactions(serviceType));
-              dispatch(fetchBalance(serviceType, loader));
+              // dispatch(fetchTransactions(serviceType));
+              dispatch(
+                fetchBalance(serviceType, {
+                  loader: true,
+                  fetchTransactionsSync: true,
+                }),
+              );
             }}
           />
         }
       >
-        <TouchableWithoutFeedback onPress={() => {TestAccountHelperBottomSheet.current.snapTo(0)}}>
-        <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
-          <Carousel
-            ref={carousel}
-            data={carouselData}
-            firstItem={carouselInitIndex}
-            onBeforeSnapToItem={(index) => {
-              console.log('INDEX onBeforeSnapToItem', index, carouselInitIndex);
-              index === 0
-                ? getServiceType(TEST_ACCOUNT)
-                : index === 1
-                ? getServiceType(REGULAR_ACCOUNT)
-                : getServiceType(SECURE_ACCOUNT);
-              handleIndexChange(index)
-            }
-            }
-            renderItem={renderItem}
-            sliderWidth={sliderWidth}
-            itemWidth={sliderWidth * 0.95}
-            onSnapToItem={index => {
-              console.log('INDEX', index, carouselInitIndex);
-              setTimeout(() => {
-                setCarouselInitIndex(index);
-              }, 2000);
-            }}
-            style={{ activeSlideAlignment: 'center' }}
-            scrollInterpolator={scrollInterpolator}
-            slideInterpolatedStyle={slideInterpolatedStyle}
-            useScrollView={true}
-            extraData={carouselInitIndex}
-          />
-        </View>
-        
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => {TestAccountHelperBottomSheet.current.snapTo(0)}}>
-        <View>
-          <View
-            style={{
-              backgroundColor: Colors.backgroundColor,
-              flexDirection: 'row',
-              marginLeft: 20,
-              marginRight: 20,
-              marginBottom: hp('2%'),
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-                padding: 10,
+        <TouchableWithoutFeedback
+          onPress={() => {
+            TestAccountHelperBottomSheet.current.snapTo(0);
+          }}
+        >
+          <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
+            <Carousel
+              ref={carousel}
+              data={carouselData}
+              firstItem={carouselInitIndex}
+              onBeforeSnapToItem={index => {
+                console.log(
+                  'INDEX onBeforeSnapToItem',
+                  index,
+                  carouselInitIndex,
+                );
+                index === 0
+                  ? getServiceType(TEST_ACCOUNT)
+                  : index === 1
+                  ? getServiceType(REGULAR_ACCOUNT)
+                  : getServiceType(SECURE_ACCOUNT);
+                handleIndexChange(index);
               }}
-            >
-              Today
-            </Text>
-            <Text
-              onPress={() => {
-                (bottomSheet as any).current.snapTo(1);
+              renderItem={renderItem}
+              sliderWidth={sliderWidth}
+              itemWidth={sliderWidth * 0.95}
+              onSnapToItem={index => {
+                console.log('INDEX', index, carouselInitIndex);
+                setTimeout(() => {
+                  setCarouselInitIndex(index);
+                }, 2000);
               }}
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansItalic,
-                textDecorationLine: 'underline',
-                marginLeft: 'auto',
-                padding: 10,
-              }}
-            >
-              View more
-            </Text>
+              style={{ activeSlideAlignment: 'center' }}
+              scrollInterpolator={scrollInterpolator}
+              slideInterpolatedStyle={slideInterpolatedStyle}
+              useScrollView={true}
+              extraData={carouselInitIndex}
+            />
           </View>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            TestAccountHelperBottomSheet.current.snapTo(0);
+          }}
+        >
           <View>
-            <FlatList
-              data={transactions.transactionDetails.slice(0, 3)}
-              ItemSeparatorComponent={() => (
-                <View style={{ backgroundColor: Colors.backgroundColor }}>
-                  <View style={styles.separatorView} />
-                </View>
-              )}
-              renderItem={({ item, index }) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() =>
-                      props.navigation.navigate('TransactionDetails', {
-                        item,
-                        serviceType,
-                        getServiceType: getServiceType,
-                      })
-                    }
-                    style={styles.transactionModalElementView}
-                  >
-                    {index == 0 ? (
-                      // <CopilotStep
-                      //   item={item}
-                      //   active={TransactionIsActive}
-                      //   text="Here are your transactions"
-                      //   order={3}
-                      //   name="transaction"
-                      // >
-                        <View
-                          style={styles.modalElementInfoView}
-                        >
+            <View
+              style={{
+                backgroundColor: Colors.backgroundColor,
+                flexDirection: 'row',
+                marginLeft: 20,
+                marginRight: 20,
+                marginBottom: hp('2%'),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                  padding: 10,
+                }}
+              >
+                Today
+              </Text>
+              <Text
+                onPress={() => {
+                  (bottomSheet as any).current.snapTo(1);
+                }}
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansItalic,
+                  textDecorationLine: 'underline',
+                  marginLeft: 'auto',
+                  padding: 10,
+                }}
+              >
+                View more
+              </Text>
+            </View>
+            <View>
+              <FlatList
+                data={transactions.transactionDetails.slice(0, 3)}
+                ItemSeparatorComponent={() => (
+                  <View style={{ backgroundColor: Colors.backgroundColor }}>
+                    <View style={styles.separatorView} />
+                  </View>
+                )}
+                renderItem={({ item, index }) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() =>
+                        props.navigation.navigate('TransactionDetails', {
+                          item,
+                          serviceType,
+                          getServiceType: getServiceType,
+                        })
+                      }
+                      style={styles.transactionModalElementView}
+                    >
+                      {index == 0 ? (
+                        // <CopilotStep
+                        //   item={item}
+                        //   active={TransactionIsActive}
+                        //   text="Here are your transactions"
+                        //   order={3}
+                        //   name="transaction"
+                        // >
+                        <View style={styles.modalElementInfoView}>
                           <View style={{ justifyContent: 'center' }}>
                             <FontAwesome
                               name={
@@ -1111,70 +1127,74 @@ export default function Accounts(props) {
                             </Text>
                           </View>
                         </View>
-                      // </CopilotStep>
-                    ) : (
-                      <View style={styles.modalElementInfoView}>
-                        <View style={{ justifyContent: 'center' }}>
-                          <FontAwesome
-                            name={
-                              item.transactionType == 'Received'
-                                ? 'long-arrow-down'
-                                : 'long-arrow-up'
-                            }
-                            size={15}
-                            color={
-                              item.transactionType == 'Received'
-                                ? Colors.green
-                                : Colors.red
-                            }
-                          />
-                        </View>
-                        <View
-                          style={{ justifyContent: 'center', marginLeft: 10 }}
-                        >
-                          <Text style={styles.transactionModalTitleText}>
-                            {item.accountType}{' '}
-                          </Text>
-                          <Text style={styles.transactionModalDateText}>
-                            {moment(item.date)
-                              .utc()
-                              .format('DD MMMM YYYY')}{' '}
-                            {/* <Entypo
+                      ) : (
+                        // </CopilotStep>
+                        <View style={styles.modalElementInfoView}>
+                          <View style={{ justifyContent: 'center' }}>
+                            <FontAwesome
+                              name={
+                                item.transactionType == 'Received'
+                                  ? 'long-arrow-down'
+                                  : 'long-arrow-up'
+                              }
+                              size={15}
+                              color={
+                                item.transactionType == 'Received'
+                                  ? Colors.green
+                                  : Colors.red
+                              }
+                            />
+                          </View>
+                          <View
+                            style={{ justifyContent: 'center', marginLeft: 10 }}
+                          >
+                            <Text style={styles.transactionModalTitleText}>
+                              {item.accountType}{' '}
+                            </Text>
+                            <Text style={styles.transactionModalDateText}>
+                              {moment(item.date)
+                                .utc()
+                                .format('DD MMMM YYYY')}{' '}
+                              {/* <Entypo
                           size={10}
                           name={"dot-single"}
                           color={Colors.textColorGrey}
                         /> */}
-                            {/* {item.time} */}
-                          </Text>
+                              {/* {item.time} */}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    )}
-                    <View style={styles.transactionModalAmountView}>
-                      <Image
-                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                        style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                      />
-                      <Text
-                        style={{
-                          ...styles.transactionModalAmountText,
-                          color:
-                            item.transactionType == 'Received'
-                              ? Colors.green
-                              : Colors.red,
-                        }}
-                      >
-                        {UsNumberFormat(item.amount)}
-                      </Text>
-                      <Text style={styles.transactionModalAmountUnitText}>
-                        {item.confirmations < 6 ? item.confirmations : '6+'}
-                      </Text>
-                      {index == 0 ? (
-                        // <CopilotStep
-                        //   active={TransactionDetailsIsActive}
-                        //   text="You can get more details here"
-                        //   order={4}
-                        //   name="transactionDetails"
-                        // >
+                      )}
+                      <View style={styles.transactionModalAmountView}>
+                        <Image
+                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                          style={{
+                            width: 12,
+                            height: 12,
+                            resizeMode: 'contain',
+                          }}
+                        />
+                        <Text
+                          style={{
+                            ...styles.transactionModalAmountText,
+                            color:
+                              item.transactionType == 'Received'
+                                ? Colors.green
+                                : Colors.red,
+                          }}
+                        >
+                          {UsNumberFormat(item.amount)}
+                        </Text>
+                        <Text style={styles.transactionModalAmountUnitText}>
+                          {item.confirmations < 6 ? item.confirmations : '6+'}
+                        </Text>
+                        {index == 0 ? (
+                          // <CopilotStep
+                          //   active={TransactionDetailsIsActive}
+                          //   text="You can get more details here"
+                          //   order={4}
+                          //   name="transactionDetails"
+                          // >
                           <View
                             style={{
                               padding: 10,
@@ -1188,37 +1208,40 @@ export default function Accounts(props) {
                               size={12}
                             />
                           </View>
-                        // </CopilotStep>
-                      ) : (
-                        <View
-                          style={{
-                            padding: 10,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Ionicons
-                            name="ios-arrow-forward"
-                            color={Colors.textColorGrey}
-                            size={12}
-                          />
-                        </View>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
-            />
+                        ) : (
+                          // </CopilotStep>
+                          <View
+                            style={{
+                              padding: 10,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Ionicons
+                              name="ios-arrow-forward"
+                              color={Colors.textColorGrey}
+                              size={12}
+                            />
+                          </View>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
           </View>
-        </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => {TestAccountHelperBottomSheet.current.snapTo(0)}}>
-        
-        <View style={{ marginTop: hp('2%') }}>
-          <View
-            style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
-          >
-            {/* <CopilotStep
+        <TouchableWithoutFeedback
+          onPress={() => {
+            TestAccountHelperBottomSheet.current.snapTo(0);
+          }}
+        >
+          <View style={{ marginTop: hp('2%') }}>
+            <View
+              style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
+            >
+              {/* <CopilotStep
               active={SendIsActive}
               text="Try Sending"
               order={1}
@@ -1230,16 +1253,23 @@ export default function Accounts(props) {
                     serviceType,
                     getServiceType: getServiceType,
                     staticFees,
-                    netBalance
+                    netBalance,
                   });
                 }}
                 style={styles.bottomCardView}
               >
-                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
-                <Image
-                  source={require('../../assets/images/icons/icon_send.png')}
-                  style={styles.bottomCardSendReceiveImage}
-                />
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 10,
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/images/icons/icon_send.png')}
+                    style={styles.bottomCardSendReceiveImage}
+                  />
                 </View>
                 <View style={{ flex: 3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Send</Text>
@@ -1249,7 +1279,7 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </TouchableOpacity>
-            {/* </CopilotStep>
+              {/* </CopilotStep>
             <CopilotStep
               active={ReceiveIsActive}
               text="Try Receiving"
@@ -1265,13 +1295,20 @@ export default function Accounts(props) {
                 }}
                 style={styles.bottomCardView}
               >
-                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
-                <Image
-                  source={require('../../assets/images/icons/icon_recieve.png')}
-                  style={styles.bottomCardSendReceiveImage}
-                />
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 10,
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/images/icons/icon_recieve.png')}
+                    style={styles.bottomCardSendReceiveImage}
+                  />
                 </View>
-                <View style={{ flex:3, marginLeft: wp('3%') }}>
+                <View style={{ flex: 3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Receive</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Tran Fee : {staticFees['high']} (
@@ -1279,12 +1316,12 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </TouchableOpacity>
-            {/* </CopilotStep> */}
-          </View>
-          <View
-            style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
-          >
-            {/* <CopilotStep
+              {/* </CopilotStep> */}
+            </View>
+            <View
+              style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
+            >
+              {/* <CopilotStep
               active={BuyIsActive}
               text="Buy your bitcoins here"
               order={5}
@@ -1297,17 +1334,27 @@ export default function Accounts(props) {
                     getServiceType: getServiceType,
                   });
                 }}
-                style={{...styles.bottomCardView, opacity: 0.3,
-                  backgroundColor: Colors.borderColor,}}
-                  disabled={ true }
+                style={{
+                  ...styles.bottomCardView,
+                  opacity: 0.3,
+                  backgroundColor: Colors.borderColor,
+                }}
+                disabled={true}
               >
-                <View style={{flex:1, justifyContent:'center', alignItems: 'center', marginLeft: 10}}>
-                <Image
-                  source={require('../../assets/images/icons/icon_buy.png')}
-                  style={styles.bottomCardImage}
-                />
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 10,
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/images/icons/icon_buy.png')}
+                    style={styles.bottomCardImage}
+                  />
                 </View>
-                <View style={{ flex: 3,marginLeft: wp('3%') }}>
+                <View style={{ flex: 3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Buy</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
@@ -1315,7 +1362,7 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </TouchableOpacity>
-            {/* </CopilotStep>
+              {/* </CopilotStep>
             <CopilotStep
               active={SellIsActive}
               text="Sell your bitcoins here"
@@ -1323,9 +1370,12 @@ export default function Accounts(props) {
               name="Sell"
             > */}
               <TouchableOpacity
-                style={{...styles.bottomCardView, opacity: 0.3,
-                  backgroundColor: Colors.borderColor,}}
-                  disabled={ true }
+                style={{
+                  ...styles.bottomCardView,
+                  opacity: 0.3,
+                  backgroundColor: Colors.borderColor,
+                }}
+                disabled={true}
                 onPress={() => {
                   props.navigation.navigate('Sell', {
                     serviceType,
@@ -1333,13 +1383,20 @@ export default function Accounts(props) {
                   });
                 }}
               >
-                <View style={{flex:1, justifyContent:'center', alignItems: 'center',  marginLeft: 10}}>
-                <Image
-                  source={require('../../assets/images/icons/icon_sell.png')}
-                  style={styles.bottomCardImage}
-                />
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 10,
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/images/icons/icon_sell.png')}
+                    style={styles.bottomCardImage}
+                  />
                 </View>
-                <View style={{ flex:3, marginLeft: wp('3%') }}>
+                <View style={{ flex: 3, marginLeft: wp('3%') }}>
                   <Text style={styles.bottomCardTitleText}>Sell</Text>
                   <Text style={styles.bottomCardInfoText}>
                     Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
@@ -1347,12 +1404,12 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </TouchableOpacity>
-            {/* </CopilotStep> */}
+              {/* </CopilotStep> */}
+            </View>
           </View>
-        </View>
         </TouchableWithoutFeedback>
       </ScrollView>
-      
+
       <BottomSheet
         enabledInnerScrolling={true}
         ref={bottomSheet}
@@ -1453,10 +1510,10 @@ export default function Accounts(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('10%')
-          : Platform.OS == 'android'
-          ? hp('16%')
-          : hp('10%'),
+            ? hp('10%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('10%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           //Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
@@ -1469,10 +1526,10 @@ export default function Accounts(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('10%')
-          : Platform.OS == 'android'
-          ? hp('16%')
-          : hp('10%'),
+            ? hp('10%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('10%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderSecureAccountsHelperContents}
@@ -1484,16 +1541,15 @@ export default function Accounts(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('10%')
-          : Platform.OS == 'android'
-          ? hp('16%')
-          : hp('10%'),
+            ? hp('10%')
+            : Platform.OS == 'android'
+            ? hp('16%')
+            : hp('10%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderRegularAccountsHelperContents}
         renderHeader={renderRegularAccountsHelperHeader}
       />
-      
     </View>
   );
 }
@@ -1584,13 +1640,11 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     resizeMode: 'contain',
-   
   },
   bottomCardSendReceiveImage: {
     width: wp('7%'),
     height: wp('7%'),
     resizeMode: 'contain',
-   
   },
   bottomCardInfoText: {
     color: Colors.textColorGrey,

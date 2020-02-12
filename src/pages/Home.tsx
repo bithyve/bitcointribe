@@ -524,8 +524,7 @@ export default function Home(props) {
   };
 
   const renderTransactionsContent = () => {
-    return (
-      transactions.length ? (
+    return transactions.length ? (
       <View style={styles.modalContentContainer}>
         <FlatList
           data={transactions}
@@ -606,9 +605,28 @@ export default function Home(props) {
             </AppBottomSheetTouchableWrapper>
           )}
         />
-      </View> ) : (<View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center',alignItems:'center'   }}>
-      <Text style={{marginLeft: 30,color:Colors.textColorGrey, fontFamily:Fonts.FiraSansMediumItalic, fontSize:RFValue(16), }}>Nothing to show</Text>
-    </View>)
+      </View>
+    ) : (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          marginBottom: 15,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text
+          style={{
+            marginLeft: 30,
+            color: Colors.textColorGrey,
+            fontFamily: Fonts.FiraSansMediumItalic,
+            fontSize: RFValue(16),
+          }}
+        >
+          Nothing to show
+        </Text>
+      </View>
     );
   };
 
@@ -1528,7 +1546,7 @@ export default function Home(props) {
 
   useEffect(() => {
     if (custodyRequest) {
-      if(tabBarZIndex==999){
+      if (tabBarZIndex == 999) {
         setTimeout(() => {
           setTabBarZIndex(0);
           setDeepLinkModalOpen(true);
@@ -1541,7 +1559,6 @@ export default function Home(props) {
         (CustodianRequestBottomSheet as any).current.snapTo(1);
         (transactionTabBarBottomSheet as any).current.snapTo(1);
       }, 30);
-      
     }
 
     if (recoveryRequest) {
@@ -1559,10 +1576,10 @@ export default function Home(props) {
   const [overallHealth, setOverallHealth] = useState();
 
   const health = useSelector(state => state.sss.overallHealth);
-  // useEffect(() => {
-  //   console.log({ health });
-  //   if (health) setOverallHealth(health);
-  // }, [health]);
+  useEffect(() => {
+    console.log({ health });
+    if (health) setOverallHealth(health);
+  }, [health]);
 
   // const s3Service = useSelector(state => state.sss.service);
   // useEffect(() => {
@@ -1978,8 +1995,10 @@ export default function Home(props) {
                               style={{ flex: 1, justifyContent: 'flex-end' }}
                             >
                               <Text style={styles.cardTitle}>
-                              {value.title == 'Regular Account' ? 'Checking Account' : value.title}
-                               {/* // {value.title} */}
+                                {value.title == 'Regular Account'
+                                  ? 'Checking Account'
+                                  : value.title}
+                                {/* // {value.title} */}
                               </Text>
                               <Text
                                 style={{
@@ -2177,16 +2196,16 @@ export default function Home(props) {
       /> */}
       <BottomSheet
         onCloseEnd={() => {
-          if(tabBarZIndex==0){
+          if (tabBarZIndex == 0) {
             setTabBarZIndex(999);
           }
-          setDeepLinkModalOpen(false)
+          setDeepLinkModalOpen(false);
         }}
         onOpenEnd={() => {
-          if(tabBarZIndex==999){
+          if (tabBarZIndex == 999) {
             setTabBarZIndex(0);
           }
-          setDeepLinkModalOpen(true)
+          setDeepLinkModalOpen(true);
         }}
         enabledInnerScrolling={true}
         ref={CustodianRequestBottomSheet}
@@ -2245,12 +2264,12 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(0);
             }
           }}
           onCloseEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(999);
             }
           }}
@@ -2269,12 +2288,12 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(0);
             }
           }}
           onCloseEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(999);
             }
           }}
@@ -2293,12 +2312,12 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(0);
             }
           }}
           onCloseEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(999);
             }
           }}
@@ -2776,7 +2795,7 @@ const styles = StyleSheet.create({
     height: wp('3%'),
     marginRight: 5,
     resizeMode: 'contain',
-    marginBottom: wp('0.7%'), 
+    marginBottom: wp('0.7%'),
   },
   cardAmountText: {
     color: Colors.black,

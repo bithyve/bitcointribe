@@ -21,6 +21,7 @@ import {
   failedST1,
   failedST2,
   failedST3,
+  testcoinsReceived,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -55,7 +56,8 @@ function* fetchAddrWorker({ payload }) {
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {
-  if (payload.loader) yield put(switchLoader(payload.serviceType, 'balances'));
+  if (payload.options && payload.options.loader)
+    yield put(switchLoader(payload.serviceType, 'balances'));
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
@@ -72,14 +74,18 @@ function* fetchBalanceWorker({ payload }) {
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
   ) {
     yield put(balanceFetched(payload.serviceType, postFetchBalances));
-    // const { SERVICES } = yield select(state => state.storage.database);
-    // const updatedSERVICES = {
-    //   ...SERVICES,
-    //   [payload.serviceType]: JSON.stringify(service),
-    // };
-    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    if (payload.options && payload.options.fetchTransactionsSync) {
+      yield put(fetchTransactions(payload.serviceType, service));
+    } else {
+      const { SERVICES } = yield select(state => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [payload.serviceType]: JSON.stringify(service),
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    }
   } else {
-    if (payload.loader)
+    if (payload.options.loader)
       yield put(switchLoader(payload.serviceType, 'balances'));
   }
 }
@@ -212,13 +218,21 @@ function* testcoinsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service,
   );
   const res = yield call(service.getTestcoins);
-
+  console.log({ res });
   if (res.status === 200) {
     console.log('testcoins received');
-    yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
     yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
-    yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
-    yield put(fetchTransactions(payload.serviceType, service));
+    // yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
+    // yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
+    // yield put(fetchTransactions(payload.serviceType, service));
+    yield put(testcoinsReceived(payload.serviceType, service));
+
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else console.log('Failed to get testcoins');
   yield put(switchLoader(payload.serviceType, 'testcoins'));
 }

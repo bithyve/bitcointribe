@@ -49,7 +49,7 @@ import {
   downloadMShare,
   initHealthCheck,
 } from '../store/actions/sss';
-import DeviceInfo from "react-native-device-info";
+import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -76,16 +76,12 @@ export default function NewWalletQuestion(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [visibleButton, setVisibleButton] = useState(false);
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
 
-  const [testBalance, setTestBalance] = useState(0);
-  const [testTransactions, setTestTransactions] = useState([]);
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -161,35 +157,53 @@ export default function NewWalletQuestion(props) {
     })();
   }, []);
 
+  // useEffect(() => {
+  //   (async () => {
+  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
+  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
+  //         const { balances } = testAccService.hdWallet;
+  //         const netBalance = testAccService
+  //           ? balances.balance + balances.unconfirmedBalance
+  //           : 0;
+  //         if (!netBalance) {
+  //           console.log('Getting Testcoins');
+  //           dispatch(getTestcoins(TEST_ACCOUNT));
+  //         }
+  //       }
+  //   })();
+  // }, [testAccService]);
+
   useEffect(() => {
     (async () => {
-      if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-        if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-          const { balances } = testAccService.hdWallet;
-          const netBalance = testAccService
-            ? balances.balance + balances.unconfirmedBalance
-            : 0;
-          if (!netBalance) {
-            console.log('Getting Testcoins');
-            dispatch(getTestcoins(TEST_ACCOUNT));
-          }
+      if (testAccService) {
+        const { balances } = testAccService.hdWallet;
+        const netBalance = testAccService
+          ? balances.balance + balances.unconfirmedBalance
+          : 0;
+        if (!netBalance) {
+          console.log('Getting Testcoins');
+          dispatch(getTestcoins(TEST_ACCOUNT));
         }
+      }
     })();
   }, [testAccService]);
 
-  if (
-    isInitialized &&
-    exchangeRates &&
-    balances.testBalance &&
-    transactions.length > 0
-  ) {
-    console.log(
-      'isInitialized && exchangeRates && testBalance && testTransactions.length',
-      isInitialized && exchangeRates && testBalance && testTransactions.length,
-    );
-    (loaderBottomSheet as any).current.snapTo(0);
-    props.navigation.navigate('HomeNav', exchangeRates, balances, transactions);
-  }
+  useEffect(() => {
+    if (
+      isInitialized &&
+      exchangeRates &&
+      balances.testBalance &&
+      transactions.length > 0
+    ) {
+      (loaderBottomSheet as any).current.snapTo(0);
+      props.navigation.navigate(
+        'HomeNav',
+        exchangeRates,
+        balances,
+        transactions,
+      );
+    }
+  }, [isInitialized, exchangeRates, balances, transactions]);
 
   const setConfirm = confirmAnswer1 => {
     if (confirmAnswer1) {
@@ -199,7 +213,6 @@ export default function NewWalletQuestion(props) {
         console.log(tempAns.replace(/[^a-zA-Z ]/g, ''));
       } else {
         setConfirmAnswer(tempAns);
-        
       }
       if (answer && confirmAnswer != answer) {
         console.log('in if', visibleButton);
@@ -207,8 +220,8 @@ export default function NewWalletQuestion(props) {
       } else {
         console.log('in VisibleButton', visibleButton);
         setTimeout(() => {
-        setAnsError('');
-      }, 2);
+          setAnsError('');
+        }, 2);
       }
     } else {
       setTimeout(() => {
@@ -232,7 +245,7 @@ export default function NewWalletQuestion(props) {
     if (answer.trim() == confirmAnswer.trim() && answer && confirmAnswer) {
       setAnsError('');
       setVisibleButton(true);
-    } else{
+    } else {
       setVisibleButton(false);
     }
   }, [confirmAnswer]);
@@ -268,7 +281,7 @@ export default function NewWalletQuestion(props) {
         style={styles.buttonView}
       >
         {/* {!loading.initializing ? ( */}
-          <Text style={styles.buttonText}>Confirm</Text>
+        <Text style={styles.buttonText}>Confirm</Text>
         {/* ) : (
           <ActivityIndicator size="small" />
         )} */}
@@ -279,7 +292,9 @@ export default function NewWalletQuestion(props) {
     return (
       <LoaderModal
         headerText={'Creating your wallet'}
-        messageText={'Make sure you try out the Test Account which has been preloaded with test bitcoins'}
+        messageText={
+          'Make sure you try out the Test Account which has been preloaded with test bitcoins'
+        }
       />
     );
   };
@@ -302,7 +317,7 @@ export default function NewWalletQuestion(props) {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <SafeAreaView style={{ flex: 0 }}/>
+      <SafeAreaView style={{ flex: 0 }} />
       <View style={{ flex: 1 }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -581,39 +596,42 @@ export default function NewWalletQuestion(props) {
               </View>
             </ScrollView>
             <View style={styles.bottomButtonView}>
-            {answer.trim() == confirmAnswer.trim() &&
+              {answer.trim() == confirmAnswer.trim() &&
               confirmAnswer.trim() &&
-              answer.trim() ? (
-                setButtonVisible()
-              ) : null}
-            <View style={styles.statusIndicatorView}>
-              <View style={styles.statusIndicatorActiveView} />
-              <View style={styles.statusIndicatorInactiveView} />
+              answer.trim()
+                ? setButtonVisible()
+                : null}
+              <View style={styles.statusIndicatorView}>
+                <View style={styles.statusIndicatorActiveView} />
+                <View style={styles.statusIndicatorInactiveView} />
+              </View>
             </View>
-          </View>
-          
-          {!visibleButton ? (
-            <View style={{marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0}}>
-              <BottomInfoBox
-                title={'Answer to the security question is something only you know and more importantly remember easily'}
-                infoText={
-                  'This is not stored anywhere and will be used by the app to create backup'
-                }
+
+            {!visibleButton ? (
+              <View
+                style={{ marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0 }}
+              >
+                <BottomInfoBox
+                  title={
+                    'Answer to the security question is something only you know and more importantly remember easily'
+                  }
+                  infoText={
+                    'This is not stored anywhere and will be used by the app to create backup'
+                  }
                 />
-            </View>
-          ) : null}
-          
+              </View>
+            ) : null}
           </TouchableOpacity>
         </KeyboardAvoidingView>
         <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction= {false}
-        enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
-        snapPoints={[-50, hp('100%')]}
-        renderContent={renderLoaderModalContent}
-        renderHeader={renderLoaderModalHeader}
-      />
+          onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={loaderBottomSheet}
+          snapPoints={[-50, hp('100%')]}
+          renderContent={renderLoaderModalContent}
+          renderHeader={renderLoaderModalHeader}
+        />
       </View>
     </View>
   );
@@ -677,7 +695,7 @@ const styles = StyleSheet.create({
   },
   bottomButtonView1: {
     flexDirection: 'row',
-     marginTop: 5,
+    marginTop: 5,
     alignItems: 'center',
   },
   statusIndicatorView: {
