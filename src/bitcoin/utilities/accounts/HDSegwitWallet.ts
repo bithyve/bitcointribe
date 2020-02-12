@@ -6,6 +6,8 @@ import crypto from 'crypto';
 import config from '../../Config';
 import Bitcoin from './Bitcoin';
 import { Transactions } from '../Interface';
+import { AxiosResponse } from 'axios';
+const { BH_AXIOS, HEXA_ID } = config;
 
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
@@ -149,6 +151,51 @@ export default class HDSegwitWallet extends Bitcoin {
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
+  };
+
+  public testnetFaucet = async (): Promise<{
+    txid: any;
+    funded: any;
+    balances: any;
+    transactions: any;
+  }> => {
+    // const amount = Math.trunc(Math.random() * 1e5) / 1e8;
+    if (!this.isTest) {
+      throw new Error('Can only fund test account');
+    }
+    const amount = 10000 / 1e8;
+    let res: AxiosResponse;
+    const recipientAddress = this.getExternalAddressByIndex(0);
+    try {
+      res = await BH_AXIOS.post('/testnetFaucet', {
+        HEXA_ID,
+        recipientAddress,
+        amount,
+      });
+    } catch (err) {
+      throw new Error(err.response.data.err);
+    }
+
+    const { txid, funded } = res.data;
+
+    // const { balance, unconfirmedBalance } = await this.getBalanceByAddresses([
+    //   recipientAddress,
+    // ]);
+    if (txid) {
+      this.usedAddresses = [recipientAddress];
+      this.balances = { balance: 0, unconfirmedBalance: amount * 1e8 }; // assumption: we don't call testFaucet twice
+      const { transactions } = await this.fetchTransactionsByAddresses(
+        this.usedAddresses,
+        'Test Account',
+      );
+      this.transactions = transactions;
+    }
+    return {
+      txid,
+      funded,
+      balances: this.balances,
+      transactions: this.transactions,
+    };
   };
 
   public fetchBalance = async (): Promise<{

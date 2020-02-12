@@ -333,6 +333,8 @@ export default class BaseAccount {
         data: {
           txid: any;
           funded: any;
+          balances: any;
+          transactions: any;
         };
         err?: undefined;
         message?: undefined;
@@ -345,10 +347,9 @@ export default class BaseAccount {
       }
   > => {
     try {
-      const { address } = await this.hdWallet.getReceivingAddress();
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.testnetFaucet(address),
+        data: await this.hdWallet.testnetFaucet(),
       };
     } catch (err) {
       return { status: 0o5, err: err.message, message: ErrMap[0o5] };
