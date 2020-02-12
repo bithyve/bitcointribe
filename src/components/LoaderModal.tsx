@@ -17,8 +17,8 @@ export default function LoaderModal(props) {
         <View style={styles.modalContentContainer}>
             <Image source={require('../assets/images/loading.gif')} style={styles.successModalImage} />
             <View style={{marginLeft:wp('8%'), marginRight:wp('8%')}}>
-                <Text style={{color:Colors.white, fontSize:RFValue(16), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
-                <Text style={{color:Colors.white, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
+                <Text style={{color:Colors.white, fontSize:RFValue(15), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
+                <Text style={{color:Colors.white, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
             </View>
             <View style={{marginTop:'auto'}}>
                 <Image source={require('../assets/images/icons/loaderBottomImage.png')} style={ {width: wp("28%"), height: wp("26%"), marginLeft: "auto", resizeMode: "cover"}} />
