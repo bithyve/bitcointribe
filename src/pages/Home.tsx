@@ -2099,8 +2099,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
+            ? hp('19%')
+            : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
           hp('90%'),
         ]}
@@ -2121,10 +2121,10 @@ export default function Home(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('18%')
-            : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
+          ? hp('18%')
+          : Platform.OS == 'android'
+          ? hp('19%')
+          : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderAddContent}
@@ -2156,8 +2156,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
+            ? hp('19%')
+            : hp('18%'),
           hp('90%'),
         ]}
         renderContent={renderQrContent}
@@ -2179,9 +2179,9 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('63%') : hp('73%'),
+            ? hp('19%')
+            : hp('18%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -2725,7 +2725,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginTop: 'auto',
     flex: 1,
-    height: Platform.OS == 'ios' ? 47 : 42,
+    height: Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 50 : Platform.OS == "android" ? 43 : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
