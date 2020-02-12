@@ -75,26 +75,26 @@ const TrustedContactHistory = props => {
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Created',
+      title: 'Recovery Secret created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret In-Transit',
+      title: 'Recovery Secret in-transit',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret Accessible',
+      title: 'Recovery Secret accessible',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret Not Accessible',
+      title: 'Recovery Secret not accessible',
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },

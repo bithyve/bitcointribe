@@ -125,7 +125,8 @@ const styles = StyleSheet.create( {
         marginTop: 5
     },
     modalElementInfoView: {
-        padding: 10,
+        margin: 10, 
+        height: hp( '5%' ),
         flexDirection: 'row',
         justifyContent: "center",
         alignItems: 'center'
