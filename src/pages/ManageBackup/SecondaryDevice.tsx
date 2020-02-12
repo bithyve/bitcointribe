@@ -126,9 +126,9 @@ export default function SecondaryDeviceModelContents(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
-        title={'Note'}
+        title={'Share your Recovery Secret'}
         infoText={
-          'Share your Recovery Secret Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR'
+          'Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR'
         }
       />
     </View>
