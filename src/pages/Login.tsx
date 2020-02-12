@@ -74,7 +74,7 @@ export default function Login(props) {
     accumulativeBalance: 0,
   });
   const [transactions, setTransactions] = useState([]);
- // const [authenticating, setAuthenticating] = useState(false);
+  // const [authenticating, setAuthenticating] = useState(false);
 
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
@@ -152,12 +152,15 @@ export default function Login(props) {
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
           if (dbFetched) {
-            dispatch(fetchBalance(TEST_ACCOUNT));
-            dispatch(fetchBalance(REGULAR_ACCOUNT));
-            dispatch(fetchBalance(SECURE_ACCOUNT));
-            dispatch(fetchTransactions(TEST_ACCOUNT));
-            dispatch(fetchTransactions(REGULAR_ACCOUNT));
-            dispatch(fetchTransactions(SECURE_ACCOUNT));
+            dispatch(
+              fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }),
+            );
+            dispatch(
+              fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
+            );
+            dispatch(
+              fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }),
+            );
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
@@ -194,7 +197,9 @@ export default function Login(props) {
     return (
       <LoaderModal
         headerText={'Getting the latest details '}
-        messageText={'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet'}
+        messageText={
+          'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet'
+        }
       />
     );
   };
@@ -238,7 +243,7 @@ export default function Login(props) {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar />
-      <SafeAreaView style={{ flex: 0 }}/>
+      <SafeAreaView style={{ flex: 0 }} />
       <View style={{ flex: 1 }}>
         <View style={{}}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
@@ -393,7 +398,7 @@ export default function Login(props) {
                 }}
               >
                 {/* {!authenticating ? ( */}
-                  <Text style={styles.proceedButtonText}>Proceed</Text>
+                <Text style={styles.proceedButtonText}>Proceed</Text>
                 {/* ) : (
                   <ActivityIndicator size="small" />
                 )} */}

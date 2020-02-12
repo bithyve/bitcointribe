@@ -1546,7 +1546,7 @@ export default function Home(props) {
 
   useEffect(() => {
     if (custodyRequest) {
-      if(tabBarZIndex==999){
+      if (tabBarZIndex == 999) {
         setTimeout(() => {
           setTabBarZIndex(0);
           setDeepLinkModalOpen(true);
@@ -1559,7 +1559,6 @@ export default function Home(props) {
         (CustodianRequestBottomSheet as any).current.snapTo(1);
         (transactionTabBarBottomSheet as any).current.snapTo(1);
       }, 30);
-      
     }
 
     if (recoveryRequest) {
@@ -2197,16 +2196,16 @@ export default function Home(props) {
       /> */}
       <BottomSheet
         onCloseEnd={() => {
-          if(tabBarZIndex==0){
+          if (tabBarZIndex == 0) {
             setTabBarZIndex(999);
           }
-          setDeepLinkModalOpen(false)
+          setDeepLinkModalOpen(false);
         }}
         onOpenEnd={() => {
-          if(tabBarZIndex==999){
+          if (tabBarZIndex == 999) {
             setTabBarZIndex(0);
           }
-          setDeepLinkModalOpen(true)
+          setDeepLinkModalOpen(true);
         }}
         enabledInnerScrolling={true}
         ref={CustodianRequestBottomSheet}
@@ -2265,12 +2264,12 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(0);
             }
           }}
           onCloseEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(999);
             }
           }}
@@ -2289,12 +2288,12 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(0);
             }
           }}
           onCloseEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(999);
             }
           }}
@@ -2313,12 +2312,12 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(0);
             }
           }}
           onCloseEnd={() => {
-            if(!deepLinkModalOpen){
+            if (!deepLinkModalOpen) {
               setTabBarZIndex(999);
             }
           }}
