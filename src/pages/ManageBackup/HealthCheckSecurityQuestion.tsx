@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
   TextInput,
   Platform,
 } from 'react-native';
@@ -21,6 +20,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
@@ -46,7 +46,7 @@ export default function HealthCheckSecurityQuestion(props) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
         } else {
-          setAnswer(event.text);
+          setAnswer(securityAnswer);
           setErrorText('');
           return;
         }
@@ -109,7 +109,7 @@ export default function HealthCheckSecurityQuestion(props) {
               </Text>
             </View>
           </View>
-          <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
+          <ScrollView style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
             <AppBottomSheetTouchableWrapper
               activeOpacity={10}
               style={[
@@ -240,6 +240,8 @@ export default function HealthCheckSecurityQuestion(props) {
                 even your contacts don’t know this answer
               </Text>
             </View>
+          </ScrollView>
+          <View style={{paddingLeft: wp('6%'), paddingRight: wp('6%'), height:hp('15%'), justifyContent: 'center',}}>
             <AppBottomSheetTouchableWrapper
               disabled={errorText || !answer ? true : false}
               onPress={() => {
@@ -346,7 +348,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
-    marginTop: hp('6%'),
   },
   inputBox: {
     borderWidth: 0.5,
