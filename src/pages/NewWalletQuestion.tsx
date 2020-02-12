@@ -300,8 +300,9 @@ export default function NewWalletQuestion(props) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <SafeAreaView style={{ flex: 0 }}/>
       <View style={{ flex: 1 }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -614,7 +615,7 @@ export default function NewWalletQuestion(props) {
         renderHeader={renderLoaderModalHeader}
       />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
