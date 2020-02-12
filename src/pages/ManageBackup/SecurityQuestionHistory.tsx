@@ -118,9 +118,7 @@ const SecurityQuestionHistory = props => {
         onPressProceed={() => {
           (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
           dispatch(checkMSharesHealth());
-          if (next) {
-            props.navigation.goBack();
-          }
+          props.navigation.goBack();
         }}
         isBottomImage={true}
       />
