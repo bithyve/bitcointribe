@@ -198,7 +198,7 @@ export default function Accounts(props) {
         setIsTestHelperDone(true);
       }, 10);
       setTimeout(() => {
-        TestAccountHelperBottomSheet.current.snapTo(1);
+        TestAccountHelperBottomSheet.current.snapTo(2);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -688,10 +688,9 @@ export default function Accounts(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={`Test Account`}
-        boldPara={`If you are new to Bitcoin, this account is designed for you. 
-          It comes pre-loaded with some test bitcoins`}
-        helperInfo={`You can even send and receive test bitcoins from other Hexa wallet test accounts
-           \nThe testnet sats do not add up in your wallet balance\n\n`}
+        image={require('../../assets/images/icons/icon_test_white.png')}
+        boldPara={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins`}
+        helperInfo={`You can even send and receive test bitcoins from other Hexa wallet test accounts The testnet sats do not add up in your wallet balance`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
@@ -725,11 +724,12 @@ export default function Accounts(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={'Savings Account'}
+        image={require('../../assets/images/icons/secure.png')}
         boldPara={
           'The funds in this account are secured by two factor authentication which is set up on your secondary device'
         }
         helperInfo={
-          'Use this account to store most of your funds. Something you will not need on an ongoing basis\n\n\n'
+          'Use this account to store most of your funds. Something you will not need on an ongoing basis'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -764,11 +764,12 @@ export default function Accounts(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={'Checking Account'}
+        image={require('../../assets/images/icons/regular.png')}
         boldPara={
           'These are the funds that you have easy access to for your transactional needs'
         }
         helperInfo={
-          'Transfers from this account are typically cheaper and faster\n\n\n'
+          'Transfers from this account are typically cheaper and faster'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -825,7 +826,7 @@ export default function Accounts(props) {
             setIsSecureAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            SecureAccountHelperBottomSheet.current.snapTo(1);
+            SecureAccountHelperBottomSheet.current.snapTo(2);
           }, 1000);
         } else {
           setTimeout(() => {
@@ -842,7 +843,7 @@ export default function Accounts(props) {
             setIsRegularAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            RegularAccountHelperBottomSheet.current.snapTo(1);
+            RegularAccountHelperBottomSheet.current.snapTo(2);
           }, 1000);
         } else {
           setTimeout(() => {
@@ -1327,7 +1328,8 @@ export default function Accounts(props) {
               order={5}
               name="Buy"
             > */}
-              <TouchableOpacity
+            {/* TODO: Currently we removed BUY UI. */}
+              {/* <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('Buy', {
                     serviceType,
@@ -1361,21 +1363,19 @@ export default function Accounts(props) {
                     (usd)
                   </Text>
                 </View>
-              </TouchableOpacity>
-              {/* </CopilotStep>
+              </TouchableOpacity> */}
+            {/* </CopilotStep>
             <CopilotStep
               active={SellIsActive}
               text="Sell your bitcoins here"
               order={6}
               name="Sell"
             > */}
-              <TouchableOpacity
-                style={{
-                  ...styles.bottomCardView,
-                  opacity: 0.3,
-                  backgroundColor: Colors.borderColor,
-                }}
-                disabled={true}
+            {/* TODO: Currently we removed Sell UI. */}
+              {/* <TouchableOpacity
+                style={{...styles.bottomCardView, opacity: 0.3,
+                  backgroundColor: Colors.borderColor,}}
+                  disabled={ true }
                 onPress={() => {
                   props.navigation.navigate('Sell', {
                     serviceType,
@@ -1403,9 +1403,9 @@ export default function Accounts(props) {
                     (usd)
                   </Text>
                 </View>
-              </TouchableOpacity>
-              {/* </CopilotStep> */}
-            </View>
+              </TouchableOpacity> */}
+            {/* </CopilotStep> */}
+          </View>
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
@@ -1509,12 +1509,8 @@ export default function Accounts(props) {
         ref={TestAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('10%')
-            : Platform.OS == 'android'
-            ? hp('16%')
-            : hp('10%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
           //Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
         renderContent={renderTestAccountsHelperContents}
@@ -1525,12 +1521,8 @@ export default function Accounts(props) {
         ref={SecureAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('10%')
-            : Platform.OS == 'android'
-            ? hp('16%')
-            : hp('10%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderSecureAccountsHelperContents}
         renderHeader={renderSecureAccountsHelperHeader}
@@ -1540,12 +1532,8 @@ export default function Accounts(props) {
         ref={RegularAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            ? hp('10%')
-            : Platform.OS == 'android'
-            ? hp('16%')
-            : hp('10%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderRegularAccountsHelperContents}
         renderHeader={renderRegularAccountsHelperHeader}

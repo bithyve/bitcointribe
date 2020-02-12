@@ -66,7 +66,7 @@ const ReceivingAddress = props => {
         setIsReceiveHelperDone(true);
       }, 10);
       setTimeout(() => {
-        ReceiveHelperBottomSheet.current.snapTo(1);
+        ReceiveHelperBottomSheet.current.snapTo(2);
       }, 1000);
     }
     else{
@@ -92,8 +92,9 @@ const ReceivingAddress = props => {
     return (
       <TestAccountHelperModalContents
         topButtonText={'Receiving Bitcoins'}
+        image={require('../../assets/images/icons/receive.png')}
         helperInfo={
-          'For receiving bitcoins, you need to give an\naddress to the sender. Mostly in form of a QR\ncode. This is pretty much like an email address but\nyour app generates a new one for you every time\nyou want to do a transaction\n\nThe sender will scan this address or copy a long\nsequence of letters and numbers to send you the\nbitcoins or sats (a very small fraction of a\nbitcoin)\n\nNote that if you want to receive bitcoins/ sats\nfrom a “Trusted Contact”, the app does all this\nfor you and you don’t need to send a new\naddress every time.\n'
+          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from a “Trusted Contact”, the app does all this for you and you don’t need to send a new address every time'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -247,15 +248,13 @@ const ReceivingAddress = props => {
             }
           />
         </View>
-        <BottomSheet
+        
+      </View>
+      </TouchableWithoutFeedback>
+      <BottomSheet
           enabledInnerScrolling={true}
           ref={ReceiveHelperBottomSheet}
-          snapPoints={[-50,  Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('15%')
-          : Platform.OS == 'android'
-          ? hp('16%')
-          : hp('15%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),]}
+          snapPoints={[-50,  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),]}
           renderContent={renderReceiveHelperContents}
           renderHeader={renderReceiveHelperHeader}
         />
@@ -266,8 +265,6 @@ const ReceivingAddress = props => {
           renderContent={renderSecureReceiveWarningContents}
           renderHeader={renderSecureReceiveWarningHeader}
         />
-      </View>
-      </TouchableWithoutFeedback>
     </View>
   );
 };

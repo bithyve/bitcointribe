@@ -27,9 +27,9 @@ export default function SendConfirmationContent(props) {
         </View>
         { props.isUnSuccess ? 
             <View style={{ flex: 1, marginTop:hp('5%'), marginBottom:hp('2%')}}>
-                <Text style={{marginRight: wp("8%"), marginLeft: wp("8%"), color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular}}>
+                {/* <Text style={{marginRight: wp("8%"), marginLeft: wp("8%"), color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular}}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                </Text>
+                </Text> */}
             </View> : 
             <View style={{ flex: 1, marginTop:hp('2%'), marginBottom:hp('2%')}}>
                 { props.isFromContact ? 

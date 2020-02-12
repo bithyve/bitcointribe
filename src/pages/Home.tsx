@@ -2181,7 +2181,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('20%')
             : hp('19%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('63%') : hp('73%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}

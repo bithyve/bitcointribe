@@ -122,7 +122,7 @@ export default function Send(props) {
       }, 10);
 
       setTimeout(() => {
-        SendHelperBottomSheet.current.snapTo(1);
+        SendHelperBottomSheet.current.snapTo(2);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -214,7 +214,8 @@ export default function Send(props) {
     return (
       <TestAccountHelperModalContents
         topButtonText={`Sending Bitcoins`}
-        helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient Pretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence of numbers and letters which is the recipients bitcoin address`}
+        image={require('../../assets/images/icons/send.png')}
+        helperInfo={`When you want to send bitcoins or sats, you need the receipts bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           (SendHelperBottomSheet as any).current.snapTo(0);
@@ -912,19 +913,14 @@ export default function Send(props) {
             </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
-        <BottomSheet
+        
+      </View>
+      <BottomSheet
           enabledInnerScrolling={true}
           ref={SendHelperBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('15%')
-              : Platform.OS == 'android'
-              ? hp('16%')
-              : hp('15%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('75%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
           ]}
           renderContent={renderSendHelperContents}
           renderHeader={renderSendHelperHeader}
@@ -979,7 +975,6 @@ export default function Send(props) {
           renderContent={renderSendUnSuccessWithAddressContents}
           renderHeader={renderSendUnSuccessWithAddressHeader}
         />
-      </View>
     </View>
   );
 }

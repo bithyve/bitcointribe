@@ -56,7 +56,7 @@ export default function TransactionDetails(props) {
         }, 10);
   
         setTimeout(() => {
-          TransactionDetailsBottomSheet.current.snapTo(1);
+          TransactionDetailsBottomSheet.current.snapTo(2);
         }, 1000);
       } else {
         setTimeout(() => {
@@ -75,7 +75,7 @@ export default function TransactionDetails(props) {
       return (
         <TestAccountHelperModalContents
           topButtonText={`Transaction Details`}
-          helperInfo={`When you want to send bitcoins or sats (a very small fraction of a bitcoin), you have to send it to an address of the recipient \n\nPretty much like an email address but one that changes every time you send it to them \n\nFor this you can either scan a QR code from the recipient or enter a very long sequence ofnumbers and letters which is the recipientsbitcoin address`}
+          helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
           continueButtonText={'Ok, got it'}
           onPressContinue={() => {
             (TransactionDetailsBottomSheet as any).current.snapTo(0);
@@ -104,10 +104,11 @@ export default function TransactionDetails(props) {
     };
 
   return (
+    <TouchableWithoutFeedback onPress={() => {TransactionDetailsBottomSheet.current.snapTo(0)}}>
     <View style={{ flex: 1 }}>
     <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback onPress={() => {TransactionDetailsBottomSheet.current.snapTo(0)}}>
+      
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flex:1, flexDirection: 'row', alignItems: 'center'}}>
@@ -365,24 +366,20 @@ export default function TransactionDetails(props) {
             </Text>
           </View>
         </View>
-        <BottomSheet
+        
+      </View>
+      <BottomSheet
           enabledInnerScrolling={true}
           ref={TransactionDetailsBottomSheet}
           snapPoints={[
             -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('14%')
-          : Platform.OS == 'android'
-          ? hp('16%')
-          : hp('14%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
           ]}
           renderContent={renderHelperContents}
           renderHeader={renderHelperHeader}
-        />
-      </View>
-      </TouchableWithoutFeedback>
+        />   
     </View>
+    </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({
