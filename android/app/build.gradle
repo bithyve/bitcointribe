@@ -99,16 +99,17 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-   
+                              
     defaultConfig {
         applicationId "com.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1                
-        versionName "1.0.020120"        
+        versionCode 15                     
+        versionName "0.6"                   
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }              
+    }                     
+              
      signingConfigs {      
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
