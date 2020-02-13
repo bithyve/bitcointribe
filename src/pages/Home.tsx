@@ -2101,8 +2101,8 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
-          hp('90%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+          hp('80%'),
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -2125,7 +2125,7 @@ export default function Home(props) {
           : Platform.OS == 'android'
           ? hp('19%')
           : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
         ]}
         renderContent={renderAddContent}
         renderHeader={renderAddHeader}
@@ -2181,7 +2181,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -2279,9 +2279,7 @@ export default function Home(props) {
           ref={addressBookBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
@@ -2303,9 +2301,7 @@ export default function Home(props) {
           ref={AllAccountsBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
           ]}
           renderContent={renderAllAccountsContents}
           renderHeader={renderAllAccountsHeader}
@@ -2327,9 +2323,7 @@ export default function Home(props) {
           ref={settingsBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
           ]}
           renderContent={renderSettingsContents}
           renderHeader={renderSettingsHeader}

@@ -179,7 +179,6 @@ const SecondaryDeviceHistory = props => {
 
     if (shareHistory[0].notAccessible)
       updatedSecondaryHistory[3].date = shareHistory[0].notAccessible;
-    console.log({ updatedSecondaryHistory });
     setSecondaryDeviceHistory(updatedSecondaryHistory);
   };
 
@@ -189,7 +188,6 @@ const SecondaryDeviceHistory = props => {
         await AsyncStorage.getItem('shareHistory'),
       );
       if(shareHistory[0].inTransit) { setIsReshare(true); }
-      console.log({ shareHistory });
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
@@ -213,7 +211,6 @@ const SecondaryDeviceHistory = props => {
       dispatch(uploadEncMShare(0));
     }
   }, [SHARES_TRANSFER_DETAILS]);
-  console.log({ secondaryQR });
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -240,10 +237,11 @@ const SecondaryDeviceHistory = props => {
             style={{
               flex: 1,
               flexDirection: 'row',
-              marginLeft: 10,
+              // marginLeft: 10,
               marginRight: 10,
             }}
           >
+            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/icon_secondarydevice.png")} />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -262,16 +260,18 @@ const SecondaryDeviceHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
-              source={getIconByStatus(
-                props.navigation.state.params.selectedStatus,
-              )}
+              style={{ width: isReshare ? 14 : 17,
+                height: isReshare ? 16 : 17,
+                resizeMode: "contain",
+                marginLeft: "auto", alignSelf: 'center', }}
+              source={isReshare ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
             />
           </View>
         </View>
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
+          type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory(secondaryDeviceHistory)}
           onPressConfirm={() => {

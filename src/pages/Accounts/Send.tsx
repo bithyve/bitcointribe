@@ -736,14 +736,16 @@ export default function Send(props) {
                         }}
                         value={sliderValue}
                         onValueChange={value => {
-                          {
-                            value == 0
-                              ? setSliderValueText('Low Fee')
-                              : value == 5
-                              ? setSliderValueText('In the middle')
-                              : setSliderValueText('Fast Transaction');
-                          }
+                          console.log('Value', value);
                           setSliderValue(value);
+                        }}
+                        onSlidingComplete={ (value)=>{
+                          console.log('Value onSlidingComplete', value);
+                          value == 0
+                            ? setSliderValueText('Low Fee')
+                            : value == 5
+                            ? setSliderValueText('In the middle')
+                            : setSliderValueText('Fast Transaction');
                         }}
                       />
                     </View>
@@ -913,68 +915,67 @@ export default function Send(props) {
             </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
-        
       </View>
       <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SendHelperBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-          ]}
-          renderContent={renderSendHelperContents}
-          renderHeader={renderSendHelperHeader}
-        />
-        <BottomSheet
-          onOpenEnd={() => {
-            setQrBottomSheetsFlag(true);
-          }}
-          onCloseStart={() => {
-            setQrBottomSheetsFlag(false);
-          }}
-          enabledInnerScrolling={true}
-          ref={bottomSheet}
-          snapPoints={[0, hp('90%')]}
-          renderContent={renderContent1}
-          renderHeader={renderHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SendConfirmationBottomSheet}
-          snapPoints={[-50, hp('50%')]}
-          renderContent={renderSendConfirmationContents}
-          renderHeader={renderSendConfirmationHeader}
-        />
-        <BottomSheet
-          onCloseStart={() => {
-            {
-              dispatch(clearTransfer(serviceType));
-              dispatch(
-                fetchBalance(serviceType, {
-                  loader: true,
-                  fetchTransactionsSync: true,
-                }),
-              );
-              props.navigation.navigate('Accounts');
-            }
-          }}
-          enabledInnerScrolling={true}
-          ref={SendSuccessWithAddressBottomSheet}
-          snapPoints={[-50, hp('50%')]}
-          renderContent={renderSendSuccessWithAddressContents}
-          renderHeader={renderSendSuccessWithAddressHeader}
-        />
-        <BottomSheet
-          onCloseStart={() => {
+        enabledInnerScrolling={true}
+        ref={SendHelperBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderSendHelperContents}
+        renderHeader={renderSendHelperHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseStart={() => {
+          setQrBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={bottomSheet}
+        snapPoints={[0, hp('90%')]}
+        renderContent={renderContent1}
+        renderHeader={renderHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendConfirmationBottomSheet}
+        snapPoints={[-50, hp('50%')]}
+        renderContent={renderSendConfirmationContents}
+        renderHeader={renderSendConfirmationHeader}
+      />
+      <BottomSheet
+        onCloseStart={() => {
+          {
             dispatch(clearTransfer(serviceType));
-            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
-          }}
-          enabledInnerScrolling={true}
-          ref={SendUnSuccessWithAddressBottomSheet}
-          snapPoints={[-50, hp('50%')]}
-          renderContent={renderSendUnSuccessWithAddressContents}
-          renderHeader={renderSendUnSuccessWithAddressHeader}
-        />
+            dispatch(
+              fetchBalance(serviceType, {
+                loader: true,
+                fetchTransactionsSync: true,
+              }),
+            );
+            props.navigation.navigate('Accounts');
+          }
+        }}
+        enabledInnerScrolling={true}
+        ref={SendSuccessWithAddressBottomSheet}
+        snapPoints={[-50, hp('50%')]}
+        renderContent={renderSendSuccessWithAddressContents}
+        renderHeader={renderSendSuccessWithAddressHeader}
+      />
+      <BottomSheet
+        onCloseStart={() => {
+          dispatch(clearTransfer(serviceType));
+          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={SendUnSuccessWithAddressBottomSheet}
+        snapPoints={[-50, hp('50%')]}
+        renderContent={renderSendUnSuccessWithAddressContents}
+        renderHeader={renderSendUnSuccessWithAddressHeader}
+      />
     </View>
   );
 }
