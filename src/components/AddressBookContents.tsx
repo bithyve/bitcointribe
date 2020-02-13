@@ -57,7 +57,7 @@ export default function AddressBookContents(props) {
       </View>
      
         {AssociatedContact && AssociatedContact.length ?  
-          <View style={{ flex: 1, flexDirection: "row", marginBottom: 15,}}>
+          <View style={{ flex: 1, flexDirection: "row", marginBottom: 15}}>
             <FlatList
               data={AssociatedContact}
               extraData={AssociatedContact}
@@ -81,7 +81,7 @@ export default function AddressBookContents(props) {
             />
             </View>
             :
-            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center',alignItems:'center'   }}>
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center',alignItems:'center'}}>
               <Text style={{marginLeft: 30,color:Colors.textColorGrey, fontFamily:Fonts.FiraSansMediumItalic, fontSize:RFValue(16), }}>Nothing to show</Text>
             </View>
         }
@@ -95,7 +95,7 @@ export default function AddressBookContents(props) {
       </View>
       
           {SelectedContacts && SelectedContacts.length? 
-            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, }}>
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15 }}>
               <FlatList
                 data={SelectedContacts}
                 extraData={SelectedContacts}
@@ -119,7 +119,7 @@ export default function AddressBookContents(props) {
               />
             </View>
             :
-            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center', alignItems:'center'  }}>
+            <View style={{ flex: 1, flexDirection: "row", marginBottom: 15, justifyContent:'center', alignItems:'center' , }}>
               <Text style={{marginLeft: 30, color:Colors.textColorGrey, fontFamily:Fonts.FiraSansMediumItalic, fontSize:RFValue(16), textAlign:'center', }}>Nothing to show</Text>
             </View>
           }
