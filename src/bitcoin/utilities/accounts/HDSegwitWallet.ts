@@ -198,26 +198,206 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public fetchBalance = async (): Promise<{
+  private binarySearchIterationForInternalAddress = async (
+    index: number,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
+  ): Promise<number> => {
+    console.log({ index, depth });
+    if (depth >= config.BSI.DEPTH.LIMIT) {
+      return maxUsedIndex + 1;
+    } // fail
+
+    const indexAddress = this.getInternalAddressByIndex(index);
+    const adjacentAddress = this.getInternalAddressByIndex(index + 1);
+    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
+
+    if (txCounts[indexAddress] === 0) {
+      if (index === 0) {
+        return 0;
+      }
+      minUnusedIndex = Math.min(minUnusedIndex, index); // set
+      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
+    } else {
+      maxUsedIndex = Math.max(maxUsedIndex, index); // set
+      if (txCounts[adjacentAddress] === 0) {
+        return index + 1;
+      } // thats our next free address
+
+      index = Math.round((minUnusedIndex - index) / 2 + index);
+    }
+
+    return this.binarySearchIterationForInternalAddress(
+      index,
+      maxUsedIndex,
+      minUnusedIndex,
+      depth + 1,
+    );
+  };
+
+  private binarySearchIterationForExternalAddress = async (
+    index: number,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
+  ): Promise<number> => {
+    console.log({ index, depth });
+
+    if (depth >= config.BSI.DEPTH.LIMIT) {
+      return maxUsedIndex + 1;
+    } // fail
+
+    const indexAddress = this.getExternalAddressByIndex(index);
+    const adjacentAddress = this.getExternalAddressByIndex(index + 1);
+    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
+
+    if (txCounts[indexAddress] === 0) {
+      if (index === 0) {
+        return 0;
+      }
+      minUnusedIndex = Math.min(minUnusedIndex, index); // set
+      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
+    } else {
+      maxUsedIndex = Math.max(maxUsedIndex, index); // set
+      if (txCounts[adjacentAddress] === 0) {
+        return index + 1;
+      } // thats our next free address
+
+      index = Math.round((minUnusedIndex - index) / 2 + index);
+    }
+
+    return this.binarySearchIterationForExternalAddress(
+      index,
+      maxUsedIndex,
+      minUnusedIndex,
+      depth + 1,
+    );
+  };
+
+  private gapLimitCatchUp = async () => {
+    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    let tryAgain = false;
+    const externalAddress = this.getExternalAddressByIndex(
+      this.nextFreeAddressIndex + this.gapLimit - 1,
+    );
+
+    const internalAddress = this.getInternalAddressByIndex(
+      this.nextFreeChangeAddressIndex + this.gapLimit - 1,
+    );
+
+    const txCounts = await this.getTxCounts([externalAddress, internalAddress]);
+
+    if (txCounts[externalAddress] > 0) {
+      this.nextFreeAddressIndex += this.gapLimit;
+      tryAgain = true;
+    }
+
+    if (txCounts[internalAddress] > 0) {
+      this.nextFreeChangeAddressIndex += this.gapLimit - 1;
+      tryAgain = true;
+    }
+
+    if (tryAgain) {
+      return this.gapLimitCatchUp();
+    }
+  };
+
+  private isWalletEmpty = async (): Promise<boolean> => {
+    if (
+      this.nextFreeChangeAddressIndex === 0 &&
+      this.nextFreeAddressIndex === 0
+    ) {
+      // assuming that this is freshly created wallet, with no funds and default internal variables
+      let emptyWallet = false;
+      const initialExternalAddress = this.getExternalAddressByIndex(0);
+      const initialInternalAddress = this.getInternalAddressByIndex(0);
+
+      const txCounts = await this.getTxCounts([
+        initialExternalAddress,
+        initialInternalAddress,
+      ]);
+
+      if (
+        txCounts[initialExternalAddress] === 0 &&
+        txCounts[initialInternalAddress] === 0
+      ) {
+        emptyWallet = true;
+      }
+
+      return emptyWallet;
+    } else {
+      return false;
+    }
+  };
+
+  // public fetchBalance = async (): Promise<{
+  //   balance: number;
+  //   unconfirmedBalance: number;
+  // }> => {
+  //   try {
+  //     if (!(await this.isWalletEmpty())) {
+  //       console.log('Executing internal binary search');
+  //       this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
+  //         config.BSI.INIT_INDEX,
+  //       );
+  //       console.log('Executing external binary search');
+  //       this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
+  //         config.BSI.INIT_INDEX,
+  //       );
+  //     }
+
+  //     await this.gapLimitCatchUp();
+
+  //     this.usedAddresses = [];
+  //     // generating all involved addresses (TD: include gap limit?)
+  //     for (
+  //       let itr = 0;
+  //       itr < this.nextFreeAddressIndex + this.gapLimit;
+  //       itr++
+  //     ) {
+  //       this.usedAddresses.push(this.getExternalAddressByIndex(itr));
+  //     }
+  //     for (
+  //       let itr = 0;
+  //       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+  //       itr++
+  //     ) {
+  //       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
+  //     }
+
+  //     const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
+  //       this.usedAddresses,
+  //     );
+  //     return (this.balances = { balance, unconfirmedBalance });
+  //   } catch (err) {
+  //     throw new Error(`Unable to get balance: ${err.message}`);
+  //   }
+  // };
+
+  public fetchBalance = async (options?: {
+    recovery?;
+  }): Promise<{
     balance: number;
     unconfirmedBalance: number;
   }> => {
     try {
-      if (!(await this.isWalletEmpty())) {
-        console.log('Executing internal binary search');
-        this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-          config.BSI.INIT_INDEX,
-        );
-        console.log('Executing external binary search');
-        this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-          config.BSI.INIT_INDEX,
-        );
+      if (options && options.recovery) {
+        if (!(await this.isWalletEmpty())) {
+          console.log('Executing internal binary search');
+          this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
+            config.BSI.INIT_INDEX,
+          );
+          console.log('Executing external binary search');
+          this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
+            config.BSI.INIT_INDEX,
+          );
+        }
       }
 
       await this.gapLimitCatchUp();
 
       this.usedAddresses = [];
-      // generating all involved addresses (TD: include gap limit?)
       for (
         let itr = 0;
         itr < this.nextFreeAddressIndex + this.gapLimit;
@@ -233,6 +413,7 @@ export default class HDSegwitWallet extends Bitcoin {
         this.usedAddresses.push(this.getInternalAddressByIndex(itr));
       }
 
+      console.log({ usedAddresses: this.usedAddresses });
       const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
         this.usedAddresses,
       );
@@ -480,140 +661,6 @@ export default class HDSegwitWallet extends Bitcoin {
       return { address: freeAddress };
     } catch (err) {
       throw new Error(`Change address generation failed: ${err.message}`);
-    }
-  };
-
-  private binarySearchIterationForInternalAddress = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ): Promise<number> => {
-    console.log({ index, depth });
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexAddress = this.getInternalAddressByIndex(index);
-    const adjacentAddress = this.getInternalAddressByIndex(index + 1);
-    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
-
-    if (txCounts[indexAddress] === 0) {
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentAddress] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForInternalAddress(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  };
-
-  private binarySearchIterationForExternalAddress = async (
-    index: number,
-    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
-    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
-    depth: number = config.BSI.DEPTH.INIT,
-  ): Promise<number> => {
-    console.log({ index, depth });
-
-    if (depth >= config.BSI.DEPTH.LIMIT) {
-      return maxUsedIndex + 1;
-    } // fail
-
-    const indexAddress = this.getExternalAddressByIndex(index);
-    const adjacentAddress = this.getExternalAddressByIndex(index + 1);
-    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
-
-    if (txCounts[indexAddress] === 0) {
-      if (index === 0) {
-        return 0;
-      }
-      minUnusedIndex = Math.min(minUnusedIndex, index); // set
-      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
-    } else {
-      maxUsedIndex = Math.max(maxUsedIndex, index); // set
-      if (txCounts[adjacentAddress] === 0) {
-        return index + 1;
-      } // thats our next free address
-
-      index = Math.round((minUnusedIndex - index) / 2 + index);
-    }
-
-    return this.binarySearchIterationForExternalAddress(
-      index,
-      maxUsedIndex,
-      minUnusedIndex,
-      depth + 1,
-    );
-  };
-
-  private gapLimitCatchUp = async () => {
-    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
-    let tryAgain = false;
-    const externalAddress = this.getExternalAddressByIndex(
-      this.nextFreeAddressIndex + this.gapLimit - 1,
-    );
-
-    const internalAddress = this.getInternalAddressByIndex(
-      this.nextFreeChangeAddressIndex + this.gapLimit - 1,
-    );
-
-    const txCounts = await this.getTxCounts([externalAddress, internalAddress]);
-
-    if (txCounts[externalAddress] > 0) {
-      //  someone uses our wallet outside! better catch up
-      this.nextFreeAddressIndex += this.gapLimit;
-      tryAgain = true;
-    }
-
-    if (txCounts[internalAddress] > 0) {
-      this.nextFreeChangeAddressIndex += this.gapLimit - 1;
-      tryAgain = true;
-    }
-
-    if (tryAgain) {
-      return this.gapLimitCatchUp();
-    }
-  };
-
-  private isWalletEmpty = async (): Promise<boolean> => {
-    if (
-      this.nextFreeChangeAddressIndex === 0 &&
-      this.nextFreeAddressIndex === 0
-    ) {
-      // assuming that this is freshly created wallet, with no funds and default internal variables
-      let emptyWallet = false;
-      const initialExternalAddress = this.getExternalAddressByIndex(0);
-      const initialInternalAddress = this.getInternalAddressByIndex(0);
-
-      const txCounts = await this.getTxCounts([
-        initialExternalAddress,
-        initialInternalAddress,
-      ]);
-
-      if (
-        txCounts[initialExternalAddress] === 0 &&
-        txCounts[initialInternalAddress] === 0
-      ) {
-        emptyWallet = true;
-      }
-
-      return emptyWallet;
-    } else {
-      return false;
     }
   };
 

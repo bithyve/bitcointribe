@@ -232,7 +232,9 @@ export default class BaseAccount {
     }
   };
 
-  public getBalance = async (): Promise<
+  public getBalance = async (options?: {
+    recovery?;
+  }): Promise<
     | {
         status: number;
         data: {
@@ -252,7 +254,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalance(),
+        data: await this.hdWallet.fetchBalance(options),
       };
     } catch (err) {
       return { status: 0o2, err: err.message, message: ErrMap[0o2] };
