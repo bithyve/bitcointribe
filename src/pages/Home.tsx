@@ -526,6 +526,8 @@ export default function Home(props) {
   const renderTransactionsContent = () => {
     return transactions.length ? (
       <View style={styles.modalContentContainer}>
+        <View style={{ flex: 1, }}>
+        <View style={{ height:'auto' }}>
         <FlatList
           data={transactions}
           ItemSeparatorComponent={() => (
@@ -605,27 +607,24 @@ export default function Home(props) {
             </AppBottomSheetTouchableWrapper>
           )}
         />
+        </View>
+        {transactions.length <= 1 ? 
+          <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
+            <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
+              All your recent transactions across all accounts will appear here
+            </Text>
+          </View>
+        : null
+        }
+        </View>
       </View>
     ) : (
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          marginBottom: 15,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text
-          style={{
-            marginLeft: 30,
-            color: Colors.textColorGrey,
-            fontFamily: Fonts.FiraSansMediumItalic,
-            fontSize: RFValue(16),
-          }}
-        >
-          Nothing to show
-        </Text>
+      <View style={styles.modalContentContainer}>
+        <View style={{flex:1, justifyContent:'center', alignItems:'center', padding:wp('10%')}}>
+          <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
+            All your recent transactions across all accounts will appear here
+          </Text>
+        </View>
       </View>
     );
   };
