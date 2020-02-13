@@ -49,20 +49,20 @@ const SecurityQuestionHistory = props => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
       id: 1,
-      title: 'Security Questions Created',
+      title: 'Security Questions created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Security Questions Confirmed',
+      title: 'Security Questions confirmed',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Security Questions Unconfirmed',
+      title: 'Security Questions unconfirmed',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
