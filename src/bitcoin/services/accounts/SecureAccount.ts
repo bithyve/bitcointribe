@@ -373,7 +373,9 @@ export default class SecureAccount {
     }
   };
 
-  public getBalance = async (): Promise<
+  public getBalance = async (options?: {
+    restore?;
+  }): Promise<
     | {
         status: number;
         data: {
@@ -393,7 +395,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalance(),
+        data: await this.secureHDWallet.fetchBalance(options),
       };
     } catch (err) {
       return { status: 0o2, err: err.message, message: ErrMap[0o2] };
@@ -468,33 +470,33 @@ export default class SecureAccount {
     }
   };
 
-  public getTestcoins = async (): Promise<
-    | {
-        status: number;
-        data: {
-          txid: any;
-          funded: any;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      const { address } = await this.secureHDWallet.getReceivingAddress();
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.testnetFaucet(address),
-      };
-    } catch (err) {
-      return { status: 0o5, err: err.message, message: ErrMap[0o5] };
-    }
-  };
+  // public getTestcoins = async (): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         txid: any;
+  //         funded: any;
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     const { address } = await this.secureHDWallet.getReceivingAddress();
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.secureHDWallet.testnetFaucet(address),
+  //     };
+  //   } catch (err) {
+  //     return { status: 0o5, err: err.message, message: ErrMap[0o5] };
+  //   }
+  // };
 
   public transferST1 = async (
     recipientAddress: string,

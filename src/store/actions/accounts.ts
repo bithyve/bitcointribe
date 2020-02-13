@@ -53,8 +53,8 @@ export const accumulativeBalAndTx = () => {
   return { type: ACCUMULATIVE_BAL_AND_TX };
 };
 
-export const syncAccounts = () => {
-  return { type: SYNC_ACCOUNTS };
+export const syncAccounts = (restore?) => {
+  return { type: SYNC_ACCOUNTS, payload: { restore } };
 };
 
 // types and action creators (saga): dispatched by saga workers

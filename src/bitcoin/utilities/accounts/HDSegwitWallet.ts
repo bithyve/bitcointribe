@@ -376,13 +376,13 @@ export default class HDSegwitWallet extends Bitcoin {
   // };
 
   public fetchBalance = async (options?: {
-    recovery?;
+    restore?;
   }): Promise<{
     balance: number;
     unconfirmedBalance: number;
   }> => {
     try {
-      if (options && options.recovery) {
+      if (options && options.restore) {
         if (!(await this.isWalletEmpty())) {
           console.log('Executing internal binary search');
           this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
