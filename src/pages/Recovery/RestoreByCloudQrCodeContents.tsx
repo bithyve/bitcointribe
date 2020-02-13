@@ -89,12 +89,12 @@ export default function RestoreByCloudQrCodeContents(props) {
     <ScrollView style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
               Enter Recovery Secret{'\n'}from Cloud

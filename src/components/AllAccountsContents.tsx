@@ -90,13 +90,13 @@ function AllAccountsContents(props) {
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <AppBottomSheetTouchableWrapper
+        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <Text style={styles.modalHeaderTitleText}>{'All Accounts'}</Text>
         </View>
       </View>

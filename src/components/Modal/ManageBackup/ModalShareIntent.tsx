@@ -173,7 +173,7 @@ export default function ModalShareIntent(props) {
         }}
       >
         <View style={styles.headerContainer}>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             style={styles.headerLeftIconContainer}
             onPress={props.onPressBack}
           >
@@ -184,10 +184,10 @@ export default function ModalShareIntent(props) {
                 size={17}
               />
             </View>
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
         </View>
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp('1%') }}>
+          <View style={{ marginTop: hp('1%'), marginLeft: 20 }}>
             <Text style={styles.modalHeaderTitleText}>Personal Copy</Text>
             <Text style={styles.modalHeaderInfoText}>Select a source</Text>
           </View>

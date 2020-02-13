@@ -60,16 +60,16 @@ export default function SecondaryDeviceModelContents(props) {
         }}
       >
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               props.onPressBack();
             }}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <View
-            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
+            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center', marginLeft: 20 }}
           >
             <Text style={BackupStyles.modalHeaderTitleText}>
               Secondary Device
