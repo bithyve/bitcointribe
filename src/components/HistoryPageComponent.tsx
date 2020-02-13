@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image
 } from 'react-native';
 import Fonts from '../common/Fonts';
 import {
@@ -25,9 +26,23 @@ const HistoryPageComponent = props => {
     }
   };
 
+  function getImageByType(type) {
+    if (type == 'secondaryDevice') {
+      return require('../assets/images/icons/icon_secondarydevice.png');
+    } else if (type == 'contact') {
+      return require('../assets/images/icons/icon_user.png');
+    } else if (type == 'copy') {
+      return require('../assets/images/icons/note.png');
+    } else if (type == 'security') {
+      return require('../assets/images/icons/icon_securityquestion.png');
+    }
+  }
+
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView style={{ flex: 1 }}>
+      <View style={{ flex: 1, }}>
+        <View style={{ height:'auto' }}>
+        <ScrollView style={{ }}>
         {props.data.map(value => {
           if (SelectedOption == value.id) {
             return (
@@ -131,7 +146,16 @@ const HistoryPageComponent = props => {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
+        </ScrollView>
+        </View>
+        {props.data.length<=1 ? 
+          <View style={{ flex:1, opacity:0.5, justifyContent:'center', alignSelf:'center', alignItems:'center', padding:wp('10%')}}> 
+            {/* <Image blurRadius={1} source={getImageByType(props.type)} style={{width:wp('60%'), height:wp('60%'), resizeMode:'contain'}}/> */}
+            <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>The history of your Recovery Secret will appear here</Text>
+          </View>
+          : null
+        }
+      </View>
       <View
         style={{
           justifyContent: 'center',

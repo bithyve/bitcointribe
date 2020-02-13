@@ -223,10 +223,11 @@ const SecurityQuestionHistory = props => {
             style={{
               flex: 1,
               flexDirection: 'row',
-              marginLeft: 10,
+              // marginLeft: 10,
               marginRight: 10,
             }}
           >
+            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/icon_securityquestion.png")} />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -246,15 +247,14 @@ const SecurityQuestionHistory = props => {
             </View>
             <Image
               style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
-              source={getIconByStatus(
-                props.navigation.state.params.selectedStatus,
-              )}
+              source={getIconByStatus(props.navigation.state.params.selectedStatus)}
             />
           </View>
         </View>
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
+          type={'security'}
           IsReshare
           data={sortedHistory(securityQuestionsHistory)}
           // reshareInfo={

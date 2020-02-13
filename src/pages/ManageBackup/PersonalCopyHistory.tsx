@@ -240,10 +240,11 @@ const PersonalCopyHistory = props => {
             style={{
               flex: 1,
               flexDirection: 'row',
-              marginLeft: 10,
+              // marginLeft: 10,
               marginRight: 10,
             }}
           >
+            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/note.png")} />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -262,14 +263,18 @@ const PersonalCopyHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
-              source={getIconByStatus(props.navigation.state.params.selectedStatus)}
+              style={{ width: personalCopyShared ? 14 : 17,
+                height: personalCopyShared ? 16 : 17,
+                resizeMode: "contain",
+                marginLeft: "auto", alignSelf: 'center',}}
+              source={personalCopyShared ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
             />
           </View>
         </View>
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
+          type={'copy'}
           // IsReshare
           IsReshare={personalCopyShared ? true : false}
           data={sortedHistory(personalCopyHistory)}

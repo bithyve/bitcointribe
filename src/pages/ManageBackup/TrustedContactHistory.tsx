@@ -32,6 +32,7 @@ import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
 import TrustedContactQr from './TrustedContactQr';
+import { nameToInitials } from '../../common/CommonFunctions';
 
 const TrustedContactHistory = props => {
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -485,6 +486,49 @@ const TrustedContactHistory = props => {
     setContactInfo();
   }, []);
 
+  const getImageIcon = () => {
+    if (chosenContact.name) {
+        if (chosenContact.imageAvailable) {
+          return (
+            <Image
+              source={chosenContact.image}
+              style={{
+                width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8, borderRadius:wp('9%')/2
+              }}
+            />
+          );
+        } else {
+          return (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: Colors.shadowBlue,
+                width: wp('10%'), 
+                height: wp('10%'), 
+                alignSelf:'center', 
+                marginRight:8,
+                borderRadius:wp('10%')/2
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 13,
+                  lineHeight: 13, //... One for top and one for bottom alignment
+                }}
+              >
+                {chosenContact && chosenContact.name
+                  ? nameToInitials(chosenContact.name)
+                  : ''}
+              </Text>
+            </View>
+          );
+        }
+    }
+    return <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require('../../assets/images/icons/icon_user.png')} />;
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -511,13 +555,14 @@ const TrustedContactHistory = props => {
             style={{
               flex: 1,
               flexDirection: 'row',
-              marginLeft: 10,
+              // marginLeft: 10,
               marginRight: 10,
             }}
           >
+            {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {props.navigation.state.params.selectedTitle}
+                {chosenContact.name ? chosenContact.name : props.navigation.state.params.selectedTitle}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -533,10 +578,11 @@ const TrustedContactHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
-              source={getIconByStatus(
-                props.navigation.state.params.selectedStatus,
-              )}
+              style={{ width: shared || activateReshare ? 14 : 17,
+                height: shared || activateReshare ? 16 : 17,
+                resizeMode: "contain",
+                marginLeft: "auto", alignSelf: 'center', }}
+              source={shared || activateReshare ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
             />
           </View>
         </View>
@@ -553,7 +599,7 @@ const TrustedContactHistory = props => {
           //       ? true
           //       : false
           //   }
-
+          type={"contact"}
           IsReshare={shared || activateReshare}
           onPressContinue={() => {
             setTimeout(() => {
@@ -663,5 +709,10 @@ const styles = StyleSheet.create({
     paddingBottom: hp('3%'),
     marginTop: 20,
     marginBottom: 15,
+  },
+  cardImage: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
   },
 });
