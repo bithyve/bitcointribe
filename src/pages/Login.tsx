@@ -33,6 +33,7 @@ import {
   getTestcoins,
   fetchBalance,
   fetchTransactions,
+  syncAccounts,
 } from '../store/actions/accounts';
 import axios from 'axios';
 
@@ -60,8 +61,8 @@ export default function Login(props) {
 
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
-  const testAccService = accounts[TEST_ACCOUNT].service;
-  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
+  // const testAccService = accounts[TEST_ACCOUNT].service;
+  // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
@@ -152,15 +153,16 @@ export default function Login(props) {
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
           if (dbFetched) {
-            dispatch(
-              fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }),
-            );
-            dispatch(
-              fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
-            );
-            dispatch(
-              fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }),
-            );
+            // dispatch(
+            //   fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }),
+            // );
+            // dispatch(
+            //   fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
+            // );
+            // dispatch(
+            //   fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }),
+            // );
+            dispatch(syncAccounts());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
@@ -168,21 +170,40 @@ export default function Login(props) {
 
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
-  if (
-    exchangeRates &&
-    balances.testBalance &&
-    balances.regularBalance >= 0 &&
-    balances.secureBalance >= 0 &&
-    transactions.length > 0
-  ) {
-    console.log(
-      'isInitialized && exchangeRates && testBalance && testTransactions.length',
-      exchangeRates &&
-        balances.testBalance &&
-        balances.regularBalance &&
-        balances.secureBalance &&
-        transactions.length,
-    );
+  // if (
+  //   exchangeRates &&
+  //   balances.testBalance &&
+  //   balances.regularBalance >= 0 &&
+  //   balances.secureBalance >= 0 &&
+  //   transactions.length > 0
+  // ) {
+  //   console.log(
+  //     'isInitialized && exchangeRates && testBalance && testTransactions.length',
+  //     exchangeRates &&
+  //       balances.testBalance &&
+  //       balances.regularBalance &&
+  //       balances.secureBalance &&
+  //       transactions.length,
+  //   );
+  //   (loaderBottomSheet as any).current.snapTo(0);
+  //   props.navigation.navigate('Home', {
+  //     custodyRequest,
+  //     recoveryRequest,
+  //     exchangeRates,
+  //     balances,
+  //     transactions,
+  //   });
+  // }
+
+  if (exchangeRates && accounts.accountsSynched) {
+    // console.log(
+    //   'isInitialized && exchangeRates && testBalance && testTransactions.length',
+    //   exchangeRates &&
+    //     balances.testBalance &&
+    //     balances.regularBalance &&
+    //     balances.secureBalance &&
+    //     transactions.length,
+    // );
     (loaderBottomSheet as any).current.snapTo(0);
     props.navigation.navigate('Home', {
       custodyRequest,

@@ -11,6 +11,7 @@ import {
   TRANSFER_ST2_FAILED,
   TRANSFER_ST3_FAILED,
   TESTCOINS_RECEIVED,
+  ACCOUNTS_SYNCHED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -68,8 +69,15 @@ const ACCOUNT_VARS: {
   },
 };
 
-const initialState = {
+const initialState: {
+  servicesEnriched: Boolean;
+  accountsSynched: Boolean;
+  REGULAR_ACCOUNT: any;
+  TEST_ACCOUNT: any;
+  SECURE_ACCOUNT: any;
+} = {
   servicesEnriched: false,
+  accountsSynched: false,
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
@@ -286,6 +294,12 @@ export default (state = initialState, action) => {
             ],
           },
         },
+      };
+
+    case ACCOUNTS_SYNCHED:
+      return {
+        ...state,
+        accountsSynched: action.payload.synched,
       };
   }
   return state;
