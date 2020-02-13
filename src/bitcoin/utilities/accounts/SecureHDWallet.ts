@@ -197,16 +197,20 @@ export default class SecureHDWallet extends Bitcoin {
     return { isValid: res.data.isValid };
   };
 
-  public fetchBalance = async (): Promise<{
+  public fetchBalance = async (options?: {
+    recovery?;
+  }): Promise<{
     balance: number;
     unconfirmedBalance: number;
   }> => {
     try {
-      if (!(await this.isWalletEmpty())) {
-        console.log('Executing consumed binary search');
-        this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
-          config.BSI.INIT_INDEX,
-        );
+      if (options && options.recovery) {
+        if (!(await this.isWalletEmpty())) {
+          console.log('Executing consumed binary search');
+          this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
+            config.BSI.INIT_INDEX,
+          );
+        }
       }
 
       await this.gapLimitCatchUp();
