@@ -455,11 +455,12 @@ export default function Accounts(props) {
   };
 
   const renderTransactionsContent = () => {
-    return (
-      <View style={styles.modalContentContainer}>
+    return transactions.transactionDetails.length ? (<View style={styles.modalContentContainer}>
         <View style={{ marginLeft: 20, marginTop: 20 }}>
           <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
         </View>
+        <View style={{ flex: 1, }}>
+        <View style={{ height:'auto' }}>
         <FlatList
           data={transactions.transactionDetails}
           ItemSeparatorComponent={() => (
@@ -551,8 +552,26 @@ export default function Accounts(props) {
             );
           }}
         />
+        </View>
+        {transactions.transactionDetails.length <= 1 ? 
+          <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
+            <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
+              All your recent transactions across all accounts will appear here
+            </Text>
+          </View>
+        : null
+        }
+        </View>
       </View>
-    );
+    )
+    :
+    <View style={styles.modalContentContainer}>
+      <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
+        <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
+          All your recent transactions across all accounts will appear here
+        </Text>
+      </View>
+    </View>
   };
 
   const renderTransactionsHeader = () => {
