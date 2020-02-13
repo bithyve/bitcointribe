@@ -53,6 +53,7 @@ import {
   getTestcoins,
   fetchBalance,
   fetchTransactions,
+  syncAccounts,
 } from '../../store/actions/accounts';
 import axios from 'axios';
 
@@ -411,14 +412,15 @@ export default function RestoreSelectedContactsList(props) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
         // props.navigation.navigate('Home');
-        dispatch(fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }));
-        dispatch(
-          fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
-        );
-        dispatch(fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }));
-        // dispatch(fetchTransactions(TEST_ACCOUNT));
+        // dispatch(fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }));
+        // dispatch(
+        //   fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
+        // );
+        // dispatch(fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }));
+        // // dispatch(fetchTransactions(TEST_ACCOUNT));
         // dispatch(fetchTransactions(REGULAR_ACCOUNT));
         // dispatch(fetchTransactions(SECURE_ACCOUNT));
+        dispatch(syncAccounts(true));
       }
     })();
   }, [SERVICES]);
@@ -437,13 +439,7 @@ export default function RestoreSelectedContactsList(props) {
   //   // } else props.navigation.replace('RestoreAndRecoverWallet');
   // });
 
-  if (
-    exchangeRates &&
-    balances.testBalance >= 0 &&
-    balances.regularBalance >= 0 &&
-    balances.secureBalance >= 0 &&
-    transactions.length > 0
-  ) {
+  if (exchangeRates && accounts.accountsSynched) {
     console.log(
       'isInitialized && exchangeRates && testBalance && testTransactions.length',
       exchangeRates && balances.testBalance && transactions.length,

@@ -233,7 +233,7 @@ export default class BaseAccount {
   };
 
   public getBalance = async (options?: {
-    recovery?;
+    restore?;
   }): Promise<
     | {
         status: number;

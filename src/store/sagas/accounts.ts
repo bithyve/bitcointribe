@@ -68,7 +68,9 @@ function* fetchBalanceWorker({ payload }) {
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances;
-  const res = yield call(service.getBalance);
+  console.log('here');
+  const res = yield call(service.getBalance, { restore: payload.restore });
+  console.log({ res });
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
   if (
@@ -283,25 +285,25 @@ export const accumulativeTxAndBalWatcher = createWatcher(
   ACCUMULATIVE_BAL_AND_TX,
 );
 
-function* accountsSyncWorker() {
+function* accountsSyncWorker({ payload }) {
   try {
     yield all([
       fetchBalanceWorker({
         payload: {
           serviceType: TEST_ACCOUNT,
-          options: { fetchTransactionsSync: true },
+          options: { fetchTransactionsSync: true, restore: payload.restore },
         },
       }),
       fetchBalanceWorker({
         payload: {
           serviceType: REGULAR_ACCOUNT,
-          options: { fetchTransactionsSync: true },
+          options: { fetchTransactionsSync: true, restore: payload.restore },
         },
       }),
       fetchBalanceWorker({
         payload: {
           serviceType: SECURE_ACCOUNT,
-          options: { fetchTransactionsSync: true },
+          options: { fetchTransactionsSync: true, restore: payload.restore },
         },
       }),
     ]);
