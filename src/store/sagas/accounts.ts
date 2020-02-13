@@ -1,4 +1,4 @@
-import { call, put, select, delay } from 'redux-saga/effects';
+import { call, put, select, delay, all } from 'redux-saga/effects';
 import { createWatcher } from '../utils/utilities';
 import {
   FETCH_ADDR,
@@ -22,6 +22,8 @@ import {
   failedST2,
   failedST3,
   testcoinsReceived,
+  SYNC_ACCOUNTS,
+  accountsSynched,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -279,4 +281,38 @@ function* accumulativeTxAndBalWorker() {
 export const accumulativeTxAndBalWatcher = createWatcher(
   accumulativeTxAndBalWorker,
   ACCUMULATIVE_BAL_AND_TX,
+);
+
+function* accountsSyncWorker() {
+  try {
+    yield all([
+      fetchBalanceWorker({
+        payload: {
+          serviceType: TEST_ACCOUNT,
+          options: { fetchTransactionsSync: true },
+        },
+      }),
+      fetchBalanceWorker({
+        payload: {
+          serviceType: REGULAR_ACCOUNT,
+          options: { fetchTransactionsSync: true },
+        },
+      }),
+      fetchBalanceWorker({
+        payload: {
+          serviceType: SECURE_ACCOUNT,
+          options: { fetchTransactionsSync: true },
+        },
+      }),
+    ]);
+    yield put(accountsSynched(true));
+  } catch (err) {
+    console.log({ err });
+    yield put(accountsSynched(false));
+  }
+}
+
+export const accountsSyncWatcher = createWatcher(
+  accountsSyncWorker,
+  SYNC_ACCOUNTS,
 );
