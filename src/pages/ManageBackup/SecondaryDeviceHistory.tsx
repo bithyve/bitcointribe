@@ -80,6 +80,7 @@ const SecondaryDeviceHistory = props => {
     React.createRef(),
   );
   const [secondaryQR, setSecondaryQR] = useState('');
+  const [isReshare, setIsReshare] = useState(false);
   const SHARES_TRANSFER_DETAILS = useSelector(
     state =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
@@ -125,6 +126,9 @@ const SecondaryDeviceHistory = props => {
           if (next) {
             props.navigation.goBack();
           }
+          setTimeout(() => {
+            setIsReshare(true);
+          }, 2);
         }}
         onPressBack={() => {
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
@@ -184,6 +188,7 @@ const SecondaryDeviceHistory = props => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
+      if(shareHistory[0].inTransit) { setIsReshare(true); }
       console.log({ shareHistory });
       if (shareHistory) updateHistory(shareHistory);
     })();
@@ -267,17 +272,10 @@ const SecondaryDeviceHistory = props => {
       </View>
       <View style={{ flex: 1 }}>
         <HistoryPageComponent
+          IsReshare={isReshare}
           data={sortedHistory(secondaryDeviceHistory)}
-          // reshareInfo={
-          //   'Want to send the Recovery Secret again to the same destination? '
-          // }
           onPressConfirm={() => {
-            // ConfirmBottomSheet.current.snapTo(1);
-            alert('confirm');
-          }}
-          onPressReshare={() => {
-            alert('reshare');
-            // ReshareBottomSheet.current.snapTo(1);
+            (secondaryDeviceBottomSheet as any).current.snapTo(1);
           }}
           onPressContinue={() => {
             (secondaryDeviceBottomSheet as any).current.snapTo(1);
