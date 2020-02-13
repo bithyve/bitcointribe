@@ -116,8 +116,8 @@ export default function Home(props) {
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
   const exchangeRate = props.navigation.state.params
-    ? props.navigation.state.params.exchangeRates
-    : null;
+  ? props.navigation.state.params.exchangeRates
+  : null;
   const [exchangeRates, setExchangeRates] = useState(exchangeRate);
 
   // const [balances, setBalances] = useState({
@@ -1846,10 +1846,10 @@ export default function Home(props) {
                 >
                   {switchOn
                     ? UsNumberFormat(balances.accumulativeBalance)
-                    : (
+                    : exchangeRates ? (
                         (balances.accumulativeBalance / 1e8) *
                         exchangeRates['USD'].last
-                      ).toFixed(2)}
+                      ).toFixed(2) : 0}
                 </Text>
                 <Text
                   style={{
@@ -2037,15 +2037,15 @@ export default function Home(props) {
                                       : UsNumberFormat(balances.secureBalance)
                                     : value.accountType === 'test'
                                     ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular'
+                                    : value.accountType === 'regular' && exchangeRates
                                     ? (
                                         (balances.regularBalance / 1e8) *
                                         exchangeRates['USD'].last
                                       ).toFixed(2)
-                                    : (
+                                    : exchangeRates ? (
                                         (balances.secureBalance / 1e8) *
                                         exchangeRates['USD'].last
-                                      ).toFixed(2)}
+                                      ).toFixed(2) : 0}
                                 </Text>
                                 <Text style={styles.cardAmountUnitText}>
                                   {switchOn

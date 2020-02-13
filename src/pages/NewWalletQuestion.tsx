@@ -318,7 +318,15 @@ export default function NewWalletQuestion(props) {
     <View style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView style={{ flex: 0 }} />
+      <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
+          enabled
+        >
+      <ScrollView>
+      
       <View style={{ flex: 1 }}>
+      
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
@@ -336,11 +344,7 @@ export default function NewWalletQuestion(props) {
           </TouchableOpacity>
         </View>
 
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
-          enabled
-        >
+       
           <TouchableOpacity
             activeOpacity={10}
             style={{ flex: 1 }}
@@ -381,7 +385,7 @@ export default function NewWalletQuestion(props) {
                 color={Colors.textColorGrey}
               />
             </TouchableOpacity>
-            <ScrollView>
+            
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
                   {dropdownBoxList.map((value, index) => (
@@ -594,8 +598,16 @@ export default function NewWalletQuestion(props) {
                   {ansError}
                 </Text>
               </View>
-            </ScrollView>
-            <View style={styles.bottomButtonView}>
+            
+            
+            
+            
+          </TouchableOpacity>
+        
+       </View>
+       
+      </ScrollView>
+        <View style={styles.bottomButtonView}>
               {answer.trim() == confirmAnswer.trim() &&
               confirmAnswer.trim() &&
               answer.trim()
@@ -606,10 +618,9 @@ export default function NewWalletQuestion(props) {
                 <View style={styles.statusIndicatorInactiveView} />
               </View>
             </View>
-
-            {!visibleButton ? (
+        {!visibleButton ? (
               <View
-                style={{ marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0 }}
+                style={{ marginBottom: Platform.OS == "ios" && DeviceInfo.hasNotch ? hp('1%') : 0 }}
               >
                 <BottomInfoBox
                   title={
@@ -621,8 +632,6 @@ export default function NewWalletQuestion(props) {
                 />
               </View>
             ) : null}
-          </TouchableOpacity>
-        </KeyboardAvoidingView>
         <BottomSheet
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}
@@ -632,7 +641,8 @@ export default function NewWalletQuestion(props) {
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
         />
-      </View>
+        </KeyboardAvoidingView>
+      
     </View>
   );
 }

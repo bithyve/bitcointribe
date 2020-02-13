@@ -22,10 +22,10 @@ export default function SettingsContents(props) {
     const [switchOn, setSwitchOn] = useState(false);
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+                {/* <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </AppBottomSheetTouchableWrapper>
+                </AppBottomSheetTouchableWrapper> */}
                 <Text style={styles.modalHeaderTitleText}>{"Settings"}</Text>
             </View>
         </View>

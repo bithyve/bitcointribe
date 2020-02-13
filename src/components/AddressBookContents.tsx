@@ -22,23 +22,6 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export default function AddressBookContents(props) {
-  const [contactData, setContactData] = useState([
-    {
-      name: "Anant Tapadia",
-      checked: false,
-      id: 1,
-      communicationMode: [],
-      status: ""
-    },
-    {
-      name: "Mir Liyaqat Ali",
-      checked: false,
-      id: 2,
-      communicationMode: [],
-      status: ""
-    },
-  ]);
-
   let [AssociatedContact, setAssociatedContact] = useState([]);
   let [SelectedContacts, setSelectedContacts] = useState([]);
 
@@ -57,12 +40,12 @@ export default function AddressBookContents(props) {
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30, justifyContent: "center" }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text style={styles.modalHeaderTitleText}>{"Address Book"}</Text>
         </View>
       </View>
