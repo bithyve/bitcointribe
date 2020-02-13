@@ -155,6 +155,19 @@ export default function Accounts(props) {
   const [isSecureAccountHelperDone, setIsSecureAccountHelperDone] = useState(
     true,
   );
+  const service = useSelector(state => state.accounts[serviceType].service);
+  const loader = useSelector(
+    state => state.accounts[serviceType].loading.balances,
+  );
+  const wallet =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+  const [netBalance, setNetBalance] = useState(
+    wallet.balances.balance + wallet.balances.unconfirmedBalance,
+  );
+  const [transactions, setTransactions] = useState(wallet.transactions);
+  const [staticFees, setStaticFees] = useState(0);
+  const [exchangeRates, setExchangeRates] = useState();
+
   const checkNHighlight = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     let isReceiveHelperDone = await AsyncStorage.getItem('isReceiveHelperDone');
@@ -799,25 +812,29 @@ export default function Accounts(props) {
     );
   }, []);
 
-  const { loading, service } = useSelector(
-    state => state.accounts[serviceType],
-  );
-
-  const { balances, transactions } =
-    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-  const netBalance = service
-    ? balances.balance + balances.unconfirmedBalance
-    : 0;
-  const [staticFees, setStaticFees] = useState(0);
+  useEffect(() => {
+    const wallet =
+      serviceType === SECURE_ACCOUNT
+        ? service.secureHDWallet
+        : service.hdWallet;
+    if (service) {
+      const currentBalance =
+        wallet.balances.balance + wallet.balances.unconfirmedBalance;
+      if (netBalance !== currentBalance) {
+        setNetBalance(currentBalance);
+      }
+      if (transactions !== wallet.transactions)
+        setTransactions(wallet.transactions);
+    }
+  }, [service]);
 
   const dispatch = useDispatch();
-  const [exchangeRates, setExchangeRates] = useState();
   useEffect(() => {
-    if (!netBalance) {
-      // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
-      dispatch(fetchBalance(serviceType, { fetchTransactionsSync: true })); // TODO: do periodic auto search
-      // dispatch(fetchTransactions(serviceType));
-    }
+    // if (!netBalance) {
+    //   // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));
+    //   dispatch(fetchBalance(serviceType, { fetchTransactionsSync: true })); // TODO: do periodic auto search
+    //   // dispatch(fetchTransactions(serviceType));
+    // }
     if (serviceType === SECURE_ACCOUNT) {
       AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
         if (!done) {
@@ -971,7 +988,7 @@ export default function Accounts(props) {
         }}
         refreshControl={
           <RefreshControl
-            refreshing={loading.balances}
+            refreshing={loader}
             onRefresh={() => {
               // dispatch(fetchTransactions(serviceType));
               dispatch(
@@ -1328,7 +1345,7 @@ export default function Accounts(props) {
               order={5}
               name="Buy"
             > */}
-            {/* TODO: Currently we removed BUY UI. */}
+              {/* TODO: Currently we removed BUY UI. */}
               {/* <TouchableOpacity
                 onPress={() => {
                   props.navigation.navigate('Buy', {
@@ -1364,14 +1381,14 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </TouchableOpacity> */}
-            {/* </CopilotStep>
+              {/* </CopilotStep>
             <CopilotStep
               active={SellIsActive}
               text="Sell your bitcoins here"
               order={6}
               name="Sell"
             > */}
-            {/* TODO: Currently we removed Sell UI. */}
+              {/* TODO: Currently we removed Sell UI. */}
               {/* <TouchableOpacity
                 style={{...styles.bottomCardView, opacity: 0.3,
                   backgroundColor: Colors.borderColor,}}
@@ -1404,8 +1421,8 @@ export default function Accounts(props) {
                   </Text>
                 </View>
               </TouchableOpacity> */}
-            {/* </CopilotStep> */}
-          </View>
+              {/* </CopilotStep> */}
+            </View>
           </View>
         </TouchableWithoutFeedback>
       </ScrollView>
@@ -1509,7 +1526,7 @@ export default function Accounts(props) {
         ref={TestAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          
+
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
           //Platform.OS == 'android' ? hp('50%') : hp('90%'),
         ]}
@@ -1521,7 +1538,7 @@ export default function Accounts(props) {
         ref={SecureAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          
+
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderSecureAccountsHelperContents}
@@ -1532,7 +1549,7 @@ export default function Accounts(props) {
         ref={RegularAccountHelperBottomSheet}
         snapPoints={[
           -50,
-          
+
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderRegularAccountsHelperContents}

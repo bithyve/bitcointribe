@@ -73,7 +73,6 @@ function* fetchBalanceWorker({ payload }) {
     res.status === 200 &&
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
   ) {
-    yield put(balanceFetched(payload.serviceType, postFetchBalances));
     if (payload.options && payload.options.fetchTransactionsSync) {
       yield put(fetchTransactions(payload.serviceType, service));
     } else {
@@ -84,9 +83,10 @@ function* fetchBalanceWorker({ payload }) {
       };
       yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     }
-  } else {
-    if (payload.options.loader)
-      yield put(switchLoader(payload.serviceType, 'balances'));
+  }
+  if (payload.options.loader) {
+    yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
+    yield put(switchLoader(payload.serviceType, 'balances'));
   }
 }
 
