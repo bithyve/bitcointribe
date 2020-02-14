@@ -1,6 +1,6 @@
 import { call, put, select } from 'redux-saga/effects';
 import { createWatcher, serviceGenerator } from '../utils/utilities';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 
 import * as Cipher from '../../common/encryption';
 import * as SecureStore from '../../storage/secure-store';

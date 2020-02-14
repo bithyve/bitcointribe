@@ -5,11 +5,11 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
   SafeAreaView,
   StatusBar,
   Platform,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -32,7 +32,6 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function TransactionDetails(props) {
   const txDetails = props.navigation.getParam('item');
@@ -42,221 +41,182 @@ export default function TransactionDetails(props) {
   const serviceType = props.navigation.getParam('serviceType')
     ? props.navigation.getParam('serviceType')
     : null;
-  const [TransactionDetailsBottomSheet, setTransactionDetailsBottomSheet] = useState(
-      React.createRef(),
+  const [
+    TransactionDetailsBottomSheet,
+    setTransactionDetailsBottomSheet,
+  ] = useState(React.createRef());
+  const [isHelperDone, setIsHelperDone] = useState(true);
+
+  const checkNShowHelperModal = async () => {
+    let isSendHelperDone = await AsyncStorage.getItem(
+      'isTransactionHelperDone',
     );
-    const [isHelperDone, setIsHelperDone] = useState(true);
+    if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
+      await AsyncStorage.setItem('isTransactionHelperDone', 'true');
+      setTimeout(() => {
+        setIsHelperDone(true);
+      }, 10);
 
-    const checkNShowHelperModal = async () => {
-      let isSendHelperDone = await AsyncStorage.getItem('isTransactionHelperDone');
-      if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
-        await AsyncStorage.setItem('isTransactionHelperDone', 'true');
-        setTimeout(() => {
-          setIsHelperDone(true);
-        }, 10);
-  
-        setTimeout(() => {
-          TransactionDetailsBottomSheet.current.snapTo(2);
-        }, 1000);
-      } else {
-        setTimeout(() => {
-          setIsHelperDone(false);
-        }, 10);
-      }
-    };
+      setTimeout(() => {
+        TransactionDetailsBottomSheet.current.snapTo(2);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setIsHelperDone(false);
+      }, 10);
+    }
+  };
 
-    useEffect(() => {
-      console.log("txDetails", txDetails);
-  
-      checkNShowHelperModal();
-    }, []);
+  useEffect(() => {
+    console.log('txDetails', txDetails);
 
-    const renderHelperContents = () => {
-      return (
-        <TestAccountHelperModalContents
-          topButtonText={`Transaction Details`}
-          helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
-          continueButtonText={'Ok, got it'}
-          onPressContinue={() => {
+    checkNShowHelperModal();
+  }, []);
+
+  const renderHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={`Transaction Details`}
+        helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
+        continueButtonText={'Ok, got it'}
+        onPressContinue={() => {
+          (TransactionDetailsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          console.log('isHelperDone', isHelperDone);
+          if (isHelperDone) {
+            (TransactionDetailsBottomSheet as any).current.snapTo(2);
+            setTimeout(() => {
+              setIsHelperDone(false);
+            }, 10);
+          } else {
             (TransactionDetailsBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    };
-    const renderHelperHeader = () => {
-      return (
-        <SmallHeaderModal
-          borderColor={Colors.blue}
-          backgroundColor={Colors.blue}
-          onPressHeader={() => {
-            console.log('isHelperDone', isHelperDone);
-            if (isHelperDone) {
-              (TransactionDetailsBottomSheet as any).current.snapTo(2);
-              setTimeout(() => {
-                setIsHelperDone(false);
-              }, 10);
-            } else {
-              (TransactionDetailsBottomSheet as any).current.snapTo(0);
-            }
-          }}
-        />
-      );
-    };
+          }
+        }}
+      />
+    );
+  };
 
   return (
-    <TouchableWithoutFeedback onPress={() => {TransactionDetailsBottomSheet.current.snapTo(0)}}>
-    <View style={{ flex: 1 }}>
-    <SafeAreaView style={{ flex: 0 }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{ flex:1, flexDirection: 'row', alignItems: 'center'}}>
-            <TouchableOpacity
-              onPress={() => {
-                if (getServiceType && serviceType) {
-                  getServiceType(serviceType);
-                }
-                props.navigation.goBack();
-              }}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
+    <TouchableWithoutFeedback
+      onPress={() => {
+        TransactionDetailsBottomSheet.current.snapTo(0);
+      }}
+    >
+      <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 0 }} />
+        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeaderTitleView}>
+            <View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
             >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>
-              {'Transaction Details'}
-            </Text>
-            {serviceType == TEST_ACCOUNT ? (
-                  <Text
-                    onPress={() => {
-                      AsyncStorage.setItem('isTransactionHelperDone', 'true');
-                      TransactionDetailsBottomSheet.current.snapTo(2);
-                    }}
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      marginLeft: 'auto',
-                    }}
-                  >
-                    Know more
-                  </Text>
-                ) : null}
-          </View>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginLeft: hp('2%'),
-            marginRight: hp('2%'),
-            alignItems: 'center',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('2%'),
-          }}
-        >
-          <View>
-            <Image
-              source={require('../../assets/images/icons/icon_regular.png')}
-              style={{ width: wp('12%'), height: wp('12%') }}
-            />
+              <TouchableOpacity
+                onPress={() => {
+                  if (getServiceType && serviceType) {
+                    getServiceType(serviceType);
+                  }
+                  props.navigation.goBack();
+                }}
+                style={{ height: 30, width: 30, justifyContent: 'center' }}
+              >
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </TouchableOpacity>
+              <Text style={styles.modalHeaderTitleText}>
+                {'Transaction Details'}
+              </Text>
+              {serviceType == TEST_ACCOUNT ? (
+                <Text
+                  onPress={() => {
+                    AsyncStorage.setItem('isTransactionHelperDone', 'true');
+                    TransactionDetailsBottomSheet.current.snapTo(2);
+                  }}
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    marginLeft: 'auto',
+                  }}
+                >
+                  Know more
+                </Text>
+              ) : null}
+            </View>
           </View>
           <View
             style={{
-              flex: 1,
               flexDirection: 'row',
+              marginLeft: hp('2%'),
+              marginRight: hp('2%'),
               alignItems: 'center',
-              marginLeft: 10,
+              paddingTop: hp('2%'),
+              paddingBottom: hp('2%'),
             }}
           >
             <View>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(14),
-                }}
-              >
-                {txDetails.accountType}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginTop: hp('1%'),
-                }}
-              >
-                {moment(txDetails.date)
-                  .utc()
-                  .format('DD MMMM YYYY')}
-                {/* <Entypo
+              <Image
+                source={require('../../assets/images/icons/icon_regular.png')}
+                style={{ width: wp('12%'), height: wp('12%') }}
+              />
+            </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginLeft: 10,
+              }}
+            >
+              <View>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(14),
+                  }}
+                >
+                  {txDetails.accountType}
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                    marginTop: hp('1%'),
+                  }}
+                >
+                  {moment(txDetails.date)
+                    .utc()
+                    .format('DD MMMM YYYY')}
+                  {/* <Entypo
                 size={10}
                 name={"dot-single"}
                 color={Colors.textColorGrey}
               />{" "}
               11:00am */}
-              </Text>
-            </View>
-            <FontAwesome
-              style={{ marginLeft: 'auto' }}
-              name="long-arrow-down"
-              color={Colors.green}
-              size={17}
-            />
-          </View>
-        </View>
-        <View style={{ flex: 1 }}>
-          <View style={styles.infoCardView}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Amount
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp('0.5%'),
-              }}
-            >
-              <Image
-                source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                style={{
-                  width: wp('3%'),
-                  height: wp('3%'),
-                  resizeMode: 'contain',
-                }}
+                </Text>
+              </View>
+              <FontAwesome
+                style={{ marginLeft: 'auto' }}
+                name="long-arrow-down"
+                color={Colors.green}
+                size={17}
               />
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginLeft: 3,
-                }}
-              >
-                {UsNumberFormat(txDetails.amount)}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginLeft: 3,
-                }}
-              >
-                {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
-              </Text>
             </View>
           </View>
-          {txDetails.recipientAddresses ? (
+          <View style={{ flex: 1 }}>
             <View style={styles.infoCardView}>
               <Text
                 style={{
@@ -265,7 +225,102 @@ export default function TransactionDetails(props) {
                   fontSize: RFValue(12),
                 }}
               >
-                To Address
+                Amount
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: hp('0.5%'),
+                }}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                  style={{
+                    width: wp('3%'),
+                    height: wp('3%'),
+                    resizeMode: 'contain',
+                  }}
+                />
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                    marginLeft: 3,
+                  }}
+                >
+                  {UsNumberFormat(txDetails.amount)}
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                    marginLeft: 3,
+                  }}
+                >
+                  {txDetails.accountType == 'Test Account'
+                    ? ' t-sats'
+                    : ' sats'}
+                </Text>
+              </View>
+            </View>
+            {txDetails.recipientAddresses ? (
+              <View style={styles.infoCardView}>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                  }}
+                >
+                  To Address
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                    marginTop: hp('0.5%'),
+                  }}
+                >
+                  {txDetails.recipientAddresses[0]}
+                </Text>
+              </View>
+            ) : null}
+            {txDetails.senderAddresses ? (
+              <View style={styles.infoCardView}>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                  }}
+                >
+                  From Address
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(12),
+                    marginTop: hp('0.5%'),
+                  }}
+                >
+                  {txDetails.senderAddresses[0]}
+                </Text>
+              </View>
+            ) : null}
+            <View style={styles.infoCardView}>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                }}
+              >
+                Fees
               </Text>
               <Text
                 style={{
@@ -275,11 +330,9 @@ export default function TransactionDetails(props) {
                   marginTop: hp('0.5%'),
                 }}
               >
-                {txDetails.recipientAddresses[0]}
+                {UsNumberFormat(txDetails.fee)}
               </Text>
             </View>
-          ) : null}
-          {txDetails.senderAddresses ? (
             <View style={styles.infoCardView}>
               <Text
                 style={{
@@ -288,7 +341,7 @@ export default function TransactionDetails(props) {
                   fontSize: RFValue(12),
                 }}
               >
-                From Address
+                Transaction ID
               </Text>
               <Text
                 style={{
@@ -298,87 +351,45 @@ export default function TransactionDetails(props) {
                   marginTop: hp('0.5%'),
                 }}
               >
-                {txDetails.senderAddresses[0]}
+                {txDetails.txid}
               </Text>
             </View>
-          ) : null}
-          <View style={styles.infoCardView}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Fees
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {UsNumberFormat(txDetails.fee)}
-            </Text>
-          </View>
-          <View style={styles.infoCardView}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Transaction ID
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {txDetails.txid}
-            </Text>
-          </View>
-          <View style={styles.infoCardView}>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-              }}
-            >
-              Confirmations
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {txDetails.confirmations < 6 ? txDetails.confirmations : '6+'}
-            </Text>
+            <View style={styles.infoCardView}>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                }}
+              >
+                Confirmations
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginTop: hp('0.5%'),
+                }}
+              >
+                {txDetails.confirmations < 6 ? txDetails.confirmations : '6+'}
+              </Text>
+            </View>
           </View>
         </View>
-        
-      </View>
-      <BottomSheet
+        <BottomSheet
           enabledInnerScrolling={true}
           ref={TransactionDetailsBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('35%')
+              : hp('40%'),
           ]}
           renderContent={renderHelperContents}
           renderHeader={renderHelperHeader}
-        />   
-    </View>
+        />
+      </View>
     </TouchableWithoutFeedback>
   );
 }

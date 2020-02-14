@@ -9,8 +9,7 @@ import {
   Text,
   Image,
   Platform,
-  TextInput,
-  ActivityIndicator,
+  AsyncStorage,
   Alert,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -27,23 +26,18 @@ import {
 } from 'react-native-responsive-screen';
 import Feather from 'react-native-vector-icons/Feather';
 import HeaderTitle from '../../components/HeaderTitle';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import KnowMoreButton from '../../components/KnowMoreButton';
 import RequestModalContents from '../../components/RequestModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import Entypo from 'react-native-vector-icons/Entypo';
 import RecoveryQuestionModalContents from '../../components/RecoveryQuestionModalContents';
 import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents';
-import RecoveryWalletNameModalContents from '../../components/RecoveryWalletNameModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import { useDispatch, useSelector } from 'react-redux';
 import { downloadMShare, recoverWallet } from '../../store/actions/sss';
-import AsyncStorage from '@react-native-community/async-storage';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
 import LoaderModal from '../../components/LoaderModal';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,

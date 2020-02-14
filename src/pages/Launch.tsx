@@ -1,11 +1,17 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar, Linking, Alert } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  Linking,
+  Alert,
+  AsyncStorage,
+} from 'react-native';
 import { useDispatch } from 'react-redux';
 import Video from 'react-native-video';
 import Colors from '../common/Colors';
 
 import { initializeDB } from '../store/actions/storage';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Launch(props) {
   const dispatch = useDispatch();
@@ -14,28 +20,37 @@ export default function Launch(props) {
     dispatch(initializeDB());
   }, []);
 
-  Linking.getInitialURL()
-    .then(url => {
-      setTimeout(async () => {
-        if (await AsyncStorage.getItem('hasCreds'))
-          if (!url) props.navigation.replace('Login');
-          else {
-            const splits = url.split('/');
-            const requester = splits[3];
-            if (splits[4] === 'sss') {
-              if (splits[5] === 'ek') {
-                const custodyRequest = { requester, ek: splits[6] };
-                props.navigation.replace('Login', { custodyRequest });
-              } else if (splits[5] === 'rk') {
-                const recoveryRequest = { requester, rk: splits[6] };
-                props.navigation.replace('Login', { recoveryRequest });
+  useEffect(() => {
+    AsyncStorage.getAllKeys().then(console.log);
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const url = await Linking.getInitialURL();
+        setTimeout(async () => {
+          if (await AsyncStorage.getItem('hasCreds'))
+            if (!url) props.navigation.replace('Login');
+            else {
+              const splits = url.split('/');
+              const requester = splits[3];
+              if (splits[4] === 'sss') {
+                if (splits[5] === 'ek') {
+                  const custodyRequest = { requester, ek: splits[6] };
+                  props.navigation.replace('Login', { custodyRequest });
+                } else if (splits[5] === 'rk') {
+                  const recoveryRequest = { requester, rk: splits[6] };
+                  props.navigation.replace('Login', { recoveryRequest });
+                }
               }
             }
-          }
-        else props.navigation.replace('PasscodeConfirm');
-      }, 5000);
-    })
-    .catch(err => Alert.alert('An err occured', err));
+          else props.navigation.replace('PasscodeConfirm');
+        }, 3500);
+      } catch (err) {
+        Alert.alert('An err occured', err);
+      }
+    })();
+  }, []);
 
   return (
     <View style={styles.container}>

@@ -36,7 +36,6 @@ target 'HEXA' do
   pod 'PDFGenerator'
    pod 'QRCoder'
 
-  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
   pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
 

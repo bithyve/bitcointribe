@@ -3,7 +3,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { take, fork } from 'redux-saga/effects';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 
 export const serviceGenerator = async (
   securityAns: string,

@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Button, TextInput } from "react-native";
-import { useDispatch } from "react-redux";
-import { initializeSetup } from "../../store/actions/setupAndAuth";
-import AsyncStorage from "@react-native-community/async-storage";
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TextInput,
+  AsyncStorage,
+} from 'react-native';
+import { useDispatch } from 'react-redux';
+import { initializeSetup } from '../../store/actions/setupAndAuth';
 
 const SecurityQuesScreen = props => {
-  const [securityAns, setSecurityAns] = useState("");
+  const [securityAns, setSecurityAns] = useState('');
   const dispatch = useDispatch();
-  const walletName = props.navigation.getParam("walletName");
+  const walletName = props.navigation.getParam('walletName');
 
   return (
     <View style={styles.screen}>
       <Text style={{ marginBottom: 50 }}>Wallet Setup Simulator</Text>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: 'row' }}>
         <Text>Security Ans:</Text>
         <TextInput
           value={securityAns}
@@ -20,7 +26,7 @@ const SecurityQuesScreen = props => {
           style={{
             borderBottomWidth: 0.5,
             width: 150,
-            textAlign: "center"
+            textAlign: 'center',
           }}
         />
       </View>
@@ -28,8 +34,8 @@ const SecurityQuesScreen = props => {
         title="Submit"
         onPress={async () => {
           dispatch(initializeSetup(walletName, securityAns));
-          await AsyncStorage.setItem("walletExists", "true");
-          props.navigation.navigate("HomeNav");
+          await AsyncStorage.setItem('walletExists', 'true');
+          props.navigation.navigate('HomeNav');
         }}
       />
     </View>
@@ -39,9 +45,9 @@ const SecurityQuesScreen = props => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  }
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default SecurityQuesScreen;

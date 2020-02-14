@@ -7,13 +7,12 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
-  ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -32,7 +31,6 @@ import BottomInfoBox from '../components/BottomInfoBox';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
-import AsyncStorage from '@react-native-community/async-storage';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import SmallHeaderModal from '../components/SmallHeaderModal';
@@ -319,73 +317,72 @@ export default function NewWalletQuestion(props) {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView style={{ flex: 0 }} />
       <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
-          enabled
-        >
-      <ScrollView>
-      
-      <View style={{ flex: 1 }}>
-      
-        <View style={CommonStyles.headerContainer}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.navigate('RestoreAndRecoverWallet');
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
+        style={{ flex: 1 }}
+        behavior={Platform.OS == 'ios' ? 'padding' : ''}
+        enabled
+      >
+        <ScrollView>
+          <View style={{ flex: 1 }}>
+            <View style={CommonStyles.headerContainer}>
+              <TouchableOpacity
+                style={CommonStyles.headerLeftIconContainer}
+                onPress={() => {
+                  props.navigation.navigate('RestoreAndRecoverWallet');
+                }}
+              >
+                <View style={CommonStyles.headerLeftIconInnerContainer}>
+                  <FontAwesome
+                    name="long-arrow-left"
+                    color={Colors.blue}
+                    size={17}
+                  />
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        </View>
-
-       
-          <TouchableOpacity
-            activeOpacity={10}
-            style={{ flex: 1 }}
-            onPress={() => {
-              setDropdownBoxOpenClose(false);
-              Keyboard.dismiss();
-            }}
-            disabled={isDisabled}
-          >
-            <HeaderTitle
-              firstLineTitle={'New Hexa Wallet'}
-              secondLineTitle={''}
-              infoTextNormal={'Setup '}
-              infoTextBold={'secret question and answer'}
-            />
 
             <TouchableOpacity
               activeOpacity={10}
-              style={
-                dropdownBoxOpenClose
-                  ? styles.dropdownBoxOpened
-                  : styles.dropdownBox
-              }
+              style={{ flex: 1 }}
               onPress={() => {
-                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                setDropdownBoxOpenClose(false);
+                Keyboard.dismiss();
               }}
               disabled={isDisabled}
             >
-              <Text style={styles.dropdownBoxText}>
-                {dropdownBoxValue.question
-                  ? dropdownBoxValue.question
-                  : 'Select Question'}
-              </Text>
-              <Ionicons
-                style={{ marginLeft: 'auto' }}
-                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
-                size={20}
-                color={Colors.textColorGrey}
+              <HeaderTitle
+                firstLineTitle={'New Hexa Wallet'}
+                secondLineTitle={''}
+                infoTextNormal={'Setup '}
+                infoTextBold={'secret question and answer'}
               />
-            </TouchableOpacity>
-            
+
+              <TouchableOpacity
+                activeOpacity={10}
+                style={
+                  dropdownBoxOpenClose
+                    ? styles.dropdownBoxOpened
+                    : styles.dropdownBox
+                }
+                onPress={() => {
+                  setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                }}
+                disabled={isDisabled}
+              >
+                <Text style={styles.dropdownBoxText}>
+                  {dropdownBoxValue.question
+                    ? dropdownBoxValue.question
+                    : 'Select Question'}
+                </Text>
+                <Ionicons
+                  style={{ marginLeft: 'auto' }}
+                  name={
+                    dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
+                  }
+                  size={20}
+                  color={Colors.textColorGrey}
+                />
+              </TouchableOpacity>
+
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
                   {dropdownBoxList.map((value, index) => (
@@ -598,40 +595,37 @@ export default function NewWalletQuestion(props) {
                   {ansError}
                 </Text>
               </View>
-            
-            
-            
-            
-          </TouchableOpacity>
-        
-       </View>
-       
-      </ScrollView>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
         <View style={styles.bottomButtonView}>
-              {answer.trim() == confirmAnswer.trim() &&
-              confirmAnswer.trim() &&
-              answer.trim()
-                ? setButtonVisible()
-                : null}
-              <View style={styles.statusIndicatorView}>
-                <View style={styles.statusIndicatorActiveView} />
-                <View style={styles.statusIndicatorInactiveView} />
-              </View>
-            </View>
+          {answer.trim() == confirmAnswer.trim() &&
+          confirmAnswer.trim() &&
+          answer.trim()
+            ? setButtonVisible()
+            : null}
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+          </View>
+        </View>
         {!visibleButton ? (
-              <View
-                style={{ marginBottom: Platform.OS == "ios" && DeviceInfo.hasNotch ? hp('1%') : 0 }}
-              >
-                <BottomInfoBox
-                  title={
-                    'Answer to the security question is something only you know and more importantly remember easily'
-                  }
-                  infoText={
-                    'This is not stored anywhere and will be used by the app to create backup'
-                  }
-                />
-              </View>
-            ) : null}
+          <View
+            style={{
+              marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('1%') : 0,
+            }}
+          >
+            <BottomInfoBox
+              title={
+                'Answer to the security question is something only you know and more importantly remember easily'
+              }
+              infoText={
+                'This is not stored anywhere and will be used by the app to create backup'
+              }
+            />
+          </View>
+        ) : null}
         <BottomSheet
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}
@@ -641,8 +635,7 @@ export default function NewWalletQuestion(props) {
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
         />
-        </KeyboardAvoidingView>
-      
+      </KeyboardAvoidingView>
     </View>
   );
 }

@@ -7,16 +7,10 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  TextInput,
   ImageBackground,
   Platform,
-  ScrollView,
-  KeyboardAvoidingView,
+  AsyncStorage,
   Linking,
-  Alert,
-  Keyboard,
-  Dimensions,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -78,7 +72,6 @@ import {
 } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
-import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
@@ -527,102 +520,130 @@ export default function Home(props) {
   const renderTransactionsContent = () => {
     return transactions.length ? (
       <View style={styles.modalContentContainer}>
-        <View style={{ flex: 1, }}>
-        <View style={{ height:'auto' }}>
-        <FlatList
-          data={transactions}
-          ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: Colors.white }}>
-              <View style={styles.separatorView} />
-            </View>
-          )}
-          renderItem={({ item }) => (
-            <AppBottomSheetTouchableWrapper
-              onPress={() =>
-                props.navigation.navigate('TransactionDetails', { item })
-              }
-              style={{
-                ...styles.transactionModalElementView,
-                backgroundColor: Colors.white,
-              }}
-            >
-              <View style={styles.modalElementInfoView}>
-                <View style={{ justifyContent: 'center' }}>
-                  <FontAwesome
-                    name={
-                      item.transactionType == 'Received'
-                        ? 'long-arrow-down'
-                        : 'long-arrow-up'
-                    }
-                    size={15}
-                    color={
-                      item.transactionType == 'Received'
-                        ? Colors.green
-                        : Colors.red
-                    }
-                  />
+        <View style={{ flex: 1 }}>
+          <View style={{ height: 'auto' }}>
+            <FlatList
+              data={transactions}
+              ItemSeparatorComponent={() => (
+                <View style={{ backgroundColor: Colors.white }}>
+                  <View style={styles.separatorView} />
                 </View>
-                <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                  <Text style={styles.transactionModalTitleText}>
-                    {item.accountType}{' '}
-                  </Text>
-                  <Text style={styles.transactionModalDateText}>
-                    {moment(item.date)
-                      .utc()
-                      .format('DD MMMM YYYY')}{' '}
-                    {/* <Entypo
+              )}
+              renderItem={({ item }) => (
+                <AppBottomSheetTouchableWrapper
+                  onPress={() =>
+                    props.navigation.navigate('TransactionDetails', { item })
+                  }
+                  style={{
+                    ...styles.transactionModalElementView,
+                    backgroundColor: Colors.white,
+                  }}
+                >
+                  <View style={styles.modalElementInfoView}>
+                    <View style={{ justifyContent: 'center' }}>
+                      <FontAwesome
+                        name={
+                          item.transactionType == 'Received'
+                            ? 'long-arrow-down'
+                            : 'long-arrow-up'
+                        }
+                        size={15}
+                        color={
+                          item.transactionType == 'Received'
+                            ? Colors.green
+                            : Colors.red
+                        }
+                      />
+                    </View>
+                    <View style={{ justifyContent: 'center', marginLeft: 10 }}>
+                      <Text style={styles.transactionModalTitleText}>
+                        {item.accountType}{' '}
+                      </Text>
+                      <Text style={styles.transactionModalDateText}>
+                        {moment(item.date)
+                          .utc()
+                          .format('DD MMMM YYYY')}{' '}
+                        {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
                     {item.time} */}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.transactionModalAmountView}>
-                <Image
-                  source={require('../assets/images/icons/icon_bitcoin_gray.png')}
-                  style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                />
-                <Text
-                  style={{
-                    ...styles.transactionModalAmountText,
-                    color:
-                      item.transactionType == 'Received'
-                        ? Colors.green
-                        : Colors.red,
-                  }}
-                >
-                  {UsNumberFormat(item.amount)}
-                </Text>
-                <Text style={styles.transactionModalAmountUnitText}>
-                  {item.confirmations < 6 ? item.confirmations : '6+'}
-                </Text>
-                <Ionicons
-                  name="ios-arrow-forward"
-                  color={Colors.textColorGrey}
-                  size={12}
-                  style={{ marginLeft: 20, alignSelf: 'center' }}
-                />
-              </View>
-            </AppBottomSheetTouchableWrapper>
-          )}
-        />
-        </View>
-        {transactions.length <= 1 ? 
-          <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
-            <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
-              All your recent transactions across all accounts will appear here
-            </Text>
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.transactionModalAmountView}>
+                    <Image
+                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                    />
+                    <Text
+                      style={{
+                        ...styles.transactionModalAmountText,
+                        color:
+                          item.transactionType == 'Received'
+                            ? Colors.green
+                            : Colors.red,
+                      }}
+                    >
+                      {UsNumberFormat(item.amount)}
+                    </Text>
+                    <Text style={styles.transactionModalAmountUnitText}>
+                      {item.confirmations < 6 ? item.confirmations : '6+'}
+                    </Text>
+                    <Ionicons
+                      name="ios-arrow-forward"
+                      color={Colors.textColorGrey}
+                      size={12}
+                      style={{ marginLeft: 20, alignSelf: 'center' }}
+                    />
+                  </View>
+                </AppBottomSheetTouchableWrapper>
+              )}
+            />
           </View>
-        : null
-        }
+          {transactions.length <= 1 ? (
+            <View
+              style={{
+                flex: 1,
+                marginTop: hp('15%'),
+                alignItems: 'center',
+                padding: wp('10%'),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(15),
+                  textAlign: 'center',
+                }}
+              >
+                All your recent transactions across all accounts will appear
+                here
+              </Text>
+            </View>
+          ) : null}
         </View>
       </View>
     ) : (
       <View style={styles.modalContentContainer}>
-        <View style={{flex:1, justifyContent:'center', alignItems:'center', padding:wp('10%')}}>
-          <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: wp('10%'),
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(15),
+              textAlign: 'center',
+            }}
+          >
             All your recent transactions across all accounts will appear here
           </Text>
         </View>
@@ -1467,6 +1488,10 @@ export default function Home(props) {
       />
     );
   };
+
+  useEffect(() => {
+    AsyncStorage.getAllKeys().then(console.log);
+  }, []);
 
   // const submitRecoveryQuestion = () => {
   //   (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(0);

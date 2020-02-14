@@ -13,8 +13,7 @@ import {
   personalCopyShared,
 } from '../actions/manageBackup';
 import { dbUpdateSSS } from '../actions/storage';
-import { socialMediaType } from '../utils/media';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 
 function* sharePdfWorker({ payload }) {
   const { databaseSSS } = yield select(state => state.storage);

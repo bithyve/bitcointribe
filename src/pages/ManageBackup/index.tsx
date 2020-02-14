@@ -10,6 +10,7 @@ import {
   Image,
   Platform,
   RefreshControl,
+  AsyncStorage,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -39,7 +40,6 @@ import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthChec
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function ManageBackup(props) {
   const [
