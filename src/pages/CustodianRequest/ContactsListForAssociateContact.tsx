@@ -34,6 +34,7 @@ const ContactsListForAssociateContact = props => {
   return (
     <View style={{ flex: 1 }}>
         <ContactList
+            isTrustedContact ={true}
             style={{}}
             onPressContinue={continueNProceed}
             onSelectContact={selectedContactsList}

@@ -141,15 +141,6 @@ export default function CommunicationMode(props) {
     }
   };
 
-  useEffect(() => {
-    if (!selectedContactMode) {
-      let temp = [];
-      setTimeout(() => {
-        setContactInfo(temp);
-      }, 1000);
-    }
-  }, [selectedContactMode]);
-
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
   );
@@ -397,7 +388,6 @@ export default function CommunicationMode(props) {
         <View style={{ height: hp('20%') }}>
           <ScrollView>
             {contactInfo.map((item, index) => {
-              // console.log("contact commmunication", contact);
               return (
                 <AppBottomSheetTouchableWrapper
                   key={index}
