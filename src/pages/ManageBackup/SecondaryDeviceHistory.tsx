@@ -3,14 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Alert,
-  ScrollView,
-  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -24,12 +20,8 @@ import { uploadEncMShare } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
-import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -237,7 +229,6 @@ const SecondaryDeviceHistory = props => {
             style={{
               flex: 1,
               flexDirection: 'row',
-              // marginLeft: 10,
               marginRight: 10,
             }}
           >
@@ -288,7 +279,7 @@ const SecondaryDeviceHistory = props => {
         }}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet}
-        snapPoints={[-30, hp('90%')]}
+        snapPoints={[-30, hp('85%')]}
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
       />

@@ -3,14 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Alert,
-  ScrollView,
-  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -20,23 +16,17 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare, checkPDFHealth } from '../../store/actions/sss';
+import { checkPDFHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
-import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import _ from 'underscore';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 const PersonalCopyHistory = props => {
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
@@ -296,7 +286,7 @@ const PersonalCopyHistory = props => {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={PersonalCopyShareBottomSheet}
-        snapPoints={[-50, hp('95%')]}
+        snapPoints={[-50, hp('85%')]}
         renderContent={renderPersonalCopyShareModalContent}
         renderHeader={renderPersonalCopyShareModalHeader}
       />

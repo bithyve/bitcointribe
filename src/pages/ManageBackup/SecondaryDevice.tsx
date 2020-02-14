@@ -1,45 +1,22 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React from 'react';
 import {
-  StyleSheet,
   View,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  StatusBar,
   Text,
-  Image,
-  FlatList,
-  Platform,
-  AsyncStorage,
   ActivityIndicator,
 } from 'react-native';
 import BackupStyles from '../../pages/ManageBackup/Styles';
 import Colors from '../../common/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
 import QRCode from 'react-native-qrcode-svg';
-import CopyThisText from '../../components/CopyThisText';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function SecondaryDeviceModelContents(props) {
-  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  const getIconByStatus = status => {
-    if (status == 'Ugly') {
-      return require('../../assets/images/icons/icon_error_red.png');
-    } else if (status == 'Bad') {
-      return require('../../assets/images/icons/icon_error_yellow.png');
-    } else if (status == 'Good') {
-      return require('../../assets/images/icons/icon_check.png');
-    }
-  };
 
   return (
     <View
@@ -54,44 +31,12 @@ export default function SecondaryDeviceModelContents(props) {
       <View
         style={{
           ...BackupStyles.modalHeaderTitleView,
-          marginLeft: 10,
-          marginRight: 10,
-          marginTop: 5,
+          paddingTop: hp("0.5%"),
+          alignItems: 'center',
+          marginLeft: 20 
         }}
       >
-        <View style={{ flexDirection: 'row' }}>
-          {/* <TouchableOpacity
-            onPress={() => {
-              props.onPressBack();
-            }}
-            style={{ height: 30, width: 30 }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity> */}
-          <View
-            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center', marginLeft: 20 }}
-          >
-            <Text style={BackupStyles.modalHeaderTitleText}>
-              Secondary Device
-            </Text>
-            {/* <Text style={BackupStyles.modalHeaderInfoText}>
-              Last backup{' '}
-              <Text
-                style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: 'bold',
-                }}
-              >
-                {' '}
-                {'3 months ago'}
-              </Text>
-            </Text> */}
-          </View>
-        </View>
-        <Image
-          style={BackupStyles.cardIconImage}
-          source={getIconByStatus(selectedStatus)}
-        />
+        <Text style={BackupStyles.modalHeaderTitleText}>Scan the QR</Text>
       </View>
       <View style={BackupStyles.modalContentView}>
         {props.uploadMetaShare || !props.secondaryQR ? (
