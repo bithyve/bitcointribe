@@ -662,7 +662,7 @@ const TrustedContactHistory = props => {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={trustedContactsBottomSheet as any}
-        snapPoints={[-30, hp('90%')]}
+        snapPoints={[-30, hp('85%')]}
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       />

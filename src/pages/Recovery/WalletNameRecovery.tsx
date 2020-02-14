@@ -29,45 +29,38 @@ export default function WalletNameRecovery(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
     <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    <View style={commonStyle.headerContainer}>
-        <TouchableOpacity
+    <View style={{ flex: 1 }}>
+      <View style={commonStyle.headerContainer}>
+      <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
           onPress={() => {
             props.navigation.goBack();
           }}
         >
-          <View style={commonStyle.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </View>
-        </TouchableOpacity>
-      </View>
-    <KeyboardAvoidingView
-      style={styles.modalContentContainer}
-      behavior={Platform.OS == "ios" ? "padding" : ""}
-      enabled
-    >
-      <View style={{ height: "100%" }}>
-        <View style={{ display: "flex" }}>
-          <View
-            style={{
-              paddingTop: wp("2%"),
-              paddingLeft: wp("7%"),
-              paddingRight: wp("7%"),
-              paddingBottom: wp("8%")
-            }}
-          >
-            <Text
+           <View style={commonStyle.headerLeftIconInnerContainer}>
+             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+           </View>
+         </TouchableOpacity>
+       </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS == "ios" ? "padding" : ""}
+        enabled
+      >
+        <View style={{flex:1}}>
+        <Text
               style={{
                 color: Colors.blue,
                 fontSize: RFValue(18),
                 fontFamily: Fonts.FiraSansMedium,
+                marginLeft: 20, 
               }}
             >
               Type in the name{"\n"}of your wallet
             </Text>
-            <Text style={{ ...styles.modalInfoText, marginTop: 7 }}>
-              Your contacts will see this to{" "}
-              <Text
+            <Text style={{ ...styles.modalInfoText, marginTop: 7,marginLeft: 20,  }}>
+               Your contacts will see this to{" "}
+               <Text
                 style={{
                   fontFamily: Fonts.FiraSansMediumItalic,
                   fontWeight: "bold",
@@ -77,14 +70,13 @@ export default function WalletNameRecovery(props) {
                 identify you
               </Text>
             </Text>
-          </View>
+
           <TextInput
             style={{
               ...inputStyle,
-              marginTop: wp("2%"),
-              marginLeft: wp("7%"),
-              marginRight: wp("7%"),
-              marginBottom: wp("10%")
+              marginTop: hp("5%"),
+              marginLeft: 20, 
+              marginRight: 20,
             }}
             placeholder={"Enter a name for wallet"}
             placeholderTextColor={Colors.borderColor}
@@ -99,25 +91,28 @@ export default function WalletNameRecovery(props) {
               setInputStyle(styles.inputBox);
             }}
           />
-        </View>
-        <View
-          style={{
-            flexDirection: "row",
-            marginBottom:
-              Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("2%") : 0
-          }}
-        >
-          {walletName ? (
+</View>
+        
+        {walletName ? (
+          <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={() =>
                 props.navigation.navigate("QuestionRecovery", { walletName })
               }
-              style={{ ...styles.proceedButtonView }}
+              style={styles.buttonView}
             >
               <Text style={styles.proceedButtonText}>Proceed</Text>
             </TouchableOpacity>
+            </View>
           ) : (
-            <View style={{ flex: 1 }}>
+            <View style={{
+              flexDirection: "row",
+              
+              paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
+              paddingTop: 30,
+              alignItems: "center",
+              }}>
+                
               <BottomInfoBox
                 title={"Name of your existing wallet"}
                 infoText={
@@ -125,18 +120,39 @@ export default function WalletNameRecovery(props) {
                 }
               />
             </View>
+
           )}
-        </View>
-      </View>
-    </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
+        
+      </KeyboardAvoidingView>
+    </View>
+  </SafeAreaView>
+     );
 }
 
 const styles = StyleSheet.create({
   modalContentContainer: {
-    height: "100%",
+    flex: 1,
     backgroundColor: Colors.white,
+  },
+  bottomButtonView: {
+    flexDirection: "row",
+    paddingLeft: 30,
+    paddingRight: 30,
+    paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
+    paddingTop: 30,
+    alignItems: "center",
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+  },
+  buttonView: {
+    height: wp("13%"),
+    width: wp("30%"),
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: Colors.blue
   },
   modalInfoText: {
     color: Colors.textColorGrey,
@@ -185,6 +201,7 @@ const styles = StyleSheet.create({
     marginLeft: 20
   },
   proceedButtonText: {
+
     color: Colors.white,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium

@@ -4,21 +4,17 @@ import {
   View,
   Text,
   Image,
-  TouchableOpacity,
   FlatList,
 } from 'react-native';
-import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../../../src/common/Colors';
 import Fonts from '../../../../src/common/Fonts';
 import Icons from '../../../../src/common/Icons';
 import Singleton from '../../../common/Singleton';
-import ModalHeader from '../../ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestSharePdf } from '../../../store/actions/manageBackup';
@@ -170,37 +166,23 @@ export default function ModalShareIntent(props) {
     <View style={[styles.modalContainer]}>
       <View
         style={{
-          flex: 0.2,
-          flexDirection: 'row',
-          borderBottomWidth: 0.5,
+          borderBottomWidth: 1,
           borderColor: Colors.borderColor,
+          flexDirection: "row",
+          paddingRight: 10,
+          paddingBottom: hp("1.5%"),
+          marginRight: 10,
+          marginBottom: hp("1.5%"),
+          paddingTop: hp("0.5%"),
+          alignItems: 'center',
+          marginLeft: 20 
         }}
       >
-        <View style={styles.headerContainer}>
-          {/* <AppBottomSheetTouchableWrapper
-            style={styles.headerLeftIconContainer}
-            onPress={props.onPressBack}
-          >
-            <View style={styles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </AppBottomSheetTouchableWrapper> */}
-        </View>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp('1%'), marginLeft: 20 }}>
-            <Text style={styles.modalHeaderTitleText}>Personal Copy</Text>
-            <Text style={styles.modalHeaderInfoText}>Select a source</Text>
-          </View>
-        </View>
+        <Text style={{color: Colors.blue, fontSize: RFValue(18), fontFamily: Fonts.FiraSansMedium}}>Store personal copy PDF</Text>
       </View>
       <View style={{ flex: 1 }}>
         <FlatList
           data={arrShareOption}
-          // onRefresh={ onRefresh }
           renderItem={({ item, index }) => (
             <AppBottomSheetTouchableWrapper
               onPress={() => {

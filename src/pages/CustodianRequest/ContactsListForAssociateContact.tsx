@@ -35,11 +35,12 @@ const ContactsListForAssociateContact = props => {
 
   return (
     <View style={{ flex: 1 }}>
-      <ContactList
-        style={{}}
-        onPressContinue={continueNProceed}
-        onSelectContact={selectedContactsList}
-      />
+        <ContactList
+            isTrustedContact ={true}
+            style={{}}
+            onPressContinue={continueNProceed}
+            onSelectContact={selectedContactsList}
+        />
     </View>
   );
 };

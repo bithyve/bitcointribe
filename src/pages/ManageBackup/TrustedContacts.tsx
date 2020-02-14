@@ -1,18 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import ContactList from '../../components/ContactList';
-import { getIconByStatus } from './utils';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 const TrustedContacts = props => {
-  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const index = props.index;
-
   const selectedContactsList = useCallback(list => {
     if (list.length > 0) setContacts([...list]);
   }, []);
@@ -44,45 +43,16 @@ const TrustedContacts = props => {
   );
 
   return (
-    <View
-      style={{
-        height: '100%',
-        backgroundColor: Colors.white,
-        alignSelf: 'center',
-        width: '100%',
-      }}
-    >
+    <View style={{ height: '100%', backgroundColor: Colors.white, alignSelf: 'center', width: '100%' }}>
       <View
         style={{
           ...BackupStyles.modalHeaderTitleView,
-          marginLeft: 10,
-          marginRight: 10,
+          paddingTop: hp("0.5%"),
+          alignItems: 'center',
+          marginLeft: 20 
         }}
       >
-        <View style={{ flexDirection: 'row' }}>
-          {/* <TouchableOpacity
-            onPress={() => {
-              props.onPressBack();
-            }}
-            style={{ height: 30, width: 30 }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity> */}
-          <View
-            style={{ alignSelf: 'center', flex: 1, justifyContent: 'center', marginLeft: 20, }}
-          >
-            <Text style={BackupStyles.modalHeaderTitleText}>
-              Trusted Contact
-            </Text>
-            <Text style={BackupStyles.modalHeaderInfoText}>
-              Never backed up
-            </Text>
-          </View>
-        </View>
-        <Image
-          style={BackupStyles.cardIconImage}
-          source={getIconByStatus(selectedStatus)}
-        />
+        <Text style={BackupStyles.modalHeaderTitleText}>Select Contact</Text>
       </View>
       <View style={{ flex: 1 }}>
         <Text
@@ -94,7 +64,7 @@ const TrustedContacts = props => {
             marginTop: 5,
           }}
         >
-          Select two contacts to{' '}
+          Select contact to{' '}
           <Text
             style={{
               fontFamily: Fonts.FiraSansMediumItalic,
@@ -109,20 +79,5 @@ const TrustedContacts = props => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  modalHeaderContainer: {
-    paddingTop: 20,
-  },
-  modalHeaderHandle: {
-    width: 30,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 7,
-    marginBottom: 7,
-  },
-});
 
 export default TrustedContacts;

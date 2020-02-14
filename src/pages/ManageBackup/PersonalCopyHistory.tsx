@@ -17,11 +17,10 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare, checkPDFHealth } from '../../store/actions/sss';
+import { checkPDFHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
@@ -305,7 +304,7 @@ const PersonalCopyHistory = props => {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={PersonalCopyShareBottomSheet}
-        snapPoints={[-50, hp('95%')]}
+        snapPoints={[-50, hp('85%')]}
         renderContent={renderPersonalCopyShareModalContent}
         renderHeader={renderPersonalCopyShareModalHeader}
       />

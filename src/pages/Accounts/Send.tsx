@@ -214,7 +214,7 @@ export default function Send(props) {
       <TestAccountHelperModalContents
         topButtonText={`Sending Bitcoins`}
         image={require('../../assets/images/icons/send.png')}
-        helperInfo={`When you want to send bitcoins or sats, you need the receipts bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
+        helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           (SendHelperBottomSheet as any).current.snapTo(0);
@@ -825,33 +825,6 @@ export default function Send(props) {
                       </Text>
                     </View>
                   </View>
-                </View>
-                <View
-                  style={{
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    marginTop: hp('5%'),
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: Colors.blue,
-                      fontSize: RFValue(13),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    Transaction Fee
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    Transaction fee will be calculated in the next step
-                    according to the amount of money being sent
-                  </Text>
                 </View>
                 <View
                   style={{

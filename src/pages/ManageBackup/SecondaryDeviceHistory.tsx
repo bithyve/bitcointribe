@@ -21,7 +21,6 @@ import { uploadEncMShare } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
@@ -232,7 +231,6 @@ const SecondaryDeviceHistory = props => {
             style={{
               flex: 1,
               flexDirection: 'row',
-              // marginLeft: 10,
               marginRight: 10,
             }}
           >
@@ -301,7 +299,7 @@ const SecondaryDeviceHistory = props => {
         }}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet}
-        snapPoints={[-30, hp('90%')]}
+        snapPoints={[-30, hp('85%')]}
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
       />

@@ -7,7 +7,6 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
-  FlatList,
   TextInput,
   SafeAreaView,
 } from 'react-native';
@@ -24,6 +23,7 @@ import * as ExpoContacts from 'expo-contacts';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+import { FlatList } from "react-native-gesture-handler";
 
 async function requestContactsPermission() {
   try {
@@ -106,7 +106,6 @@ export default function ContactList(props) {
   };
 
   function onContactSelect(index) {
-    console.log("onContactSelect", index);
     let contacts = filterContactData;
     if(props.isTrustedContact){
       if (contacts[index].checked) {
@@ -154,6 +153,7 @@ export default function ContactList(props) {
       1,
     );
     setSelectedContacts(selectedContacts);
+    setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
   }
 
@@ -163,7 +163,6 @@ export default function ContactList(props) {
     };
     Contacts.openContactForm(newPerson, (err, contact) => {
       if (err) throw err;
-      console.log('contact', contact);
       if (contact) {
         getContactsAsync();
       }

@@ -68,7 +68,7 @@ public class MainApplication extends Application implements ShareApplication, Re
           new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(), new UdpSocketsModule(),
           new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(), new RNHTMLtoPDFPackage(),
           new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(), new RandomBytesPackage(),
-          new AsyncStoragePackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
+         new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
           new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
     }
 
