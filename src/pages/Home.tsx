@@ -1515,7 +1515,7 @@ export default function Home(props) {
       if (isNavigate) {
         props.navigation.navigate('ReLogin');
       }
-    }, 5000);
+    }, 15000);
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'

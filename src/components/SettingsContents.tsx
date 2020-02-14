@@ -73,9 +73,9 @@ export default function SettingsContents(props) {
             marginBottom: hp('6%'),
             borderRadius: 10
         }}>
-            <Text style={styles.addModalTitleText}>FAQ's</Text>
+            <Text style={styles.addModalTitleText}>FAQs</Text>
             <View style={{ height: 20, width: 1, backgroundColor: Colors.borderColor }} />
-            <Text style={styles.addModalTitleText}>Terms And Conditions</Text>
+            <Text style={styles.addModalTitleText}>Terms and conditions</Text>
             <View style={{ height: 20, width: 1, backgroundColor: Colors.borderColor }} />
             <Text style={styles.addModalTitleText}>Privacy Policy</Text>
         </View>

@@ -43,6 +43,7 @@ const TrustedContactHistory = props => {
     React.createRef(),
   );
   const [OTP, setOTP] = useState('');
+  const [renderTimer, setRenderTimer] = useState(false);
   const [chosenContactIndex, setChosenContactIndex] = useState(1);
   const [chosenContact, setChosenContact] = useState({});
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
@@ -191,8 +192,10 @@ const TrustedContactHistory = props => {
             (CommunicationModeBottomSheet as any).current.snapTo(0);
           } else {
             setTimeout(() => {
+              setRenderTimer(true);
               setOTP(OTP);
               setChosenContactIndex(index);
+              
             }, 10);
             (CommunicationModeBottomSheet as any).current.snapTo(0);
             (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
@@ -278,6 +281,7 @@ const TrustedContactHistory = props => {
   const renderShareOtpWithTrustedContactContent = useCallback(() => {
     return (
       <ShareOtpWithTrustedContact
+        renderTimer = {renderTimer}
         onPressOk={index => {
           onOTPShare(index);
           if (next) {
@@ -291,7 +295,7 @@ const TrustedContactHistory = props => {
         index={chosenContactIndex}
       />
     );
-  }, [onOTPShare, OTP, chosenContactIndex]);
+  }, [onOTPShare, OTP, chosenContactIndex,renderTimer]);
 
   const renderShareOtpWithTrustedContactHeader = useCallback(() => {
     return (

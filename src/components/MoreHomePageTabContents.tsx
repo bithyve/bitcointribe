@@ -77,13 +77,13 @@ export default function MoreHomePageTabContents( props ) {
                 marginTop: hp( '1%' )
             } }>
                 <AppBottomSheetTouchableWrapper onPress={ () => openLink("http://hexawallet.io/faq") }>
-                <Text style={ styles.addModalTitleText }>FAQ's</Text>
+                <Text style={ styles.addModalTitleText }>FAQs</Text>
                 </AppBottomSheetTouchableWrapper>
                
                 <View style={ { height: 20, width: 1, backgroundColor: Colors.borderColor } } />
                
                 <AppBottomSheetTouchableWrapper>
-                <Text style={ styles.addModalTitleText }>Terms And Conditions</Text>
+                <Text style={ styles.addModalTitleText }>Terms and conditions</Text>
                 </AppBottomSheetTouchableWrapper>
 
                 <View style={ { height: 20, width: 1, backgroundColor: Colors.borderColor } } />
