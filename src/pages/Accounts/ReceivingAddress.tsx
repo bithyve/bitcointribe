@@ -66,6 +66,7 @@ const ReceivingAddress = props => {
         setIsReceiveHelperDone(true);
       }, 10);
       setTimeout(() => {
+        if(ReceiveHelperBottomSheet.current)
         ReceiveHelperBottomSheet.current.snapTo(2);
       }, 1000);
     }
@@ -82,6 +83,7 @@ const ReceivingAddress = props => {
       if (serviceType === SECURE_ACCOUNT) {
         if (!(await AsyncStorage.getItem('savingsWarning'))) {
         // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        if(SecureReceiveWarningBottomSheet.current)
         SecureReceiveWarningBottomSheet.current.snapTo(1);
         await AsyncStorage.setItem('savingsWarning', 'true');
          }
@@ -99,6 +101,7 @@ const ReceivingAddress = props => {
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+            if(ReceiveHelperBottomSheet.current)
             (ReceiveHelperBottomSheet as any).current.snapTo(0);
             props.navigation.navigate('ReceivingAddress', {
               serviceType,
@@ -118,11 +121,13 @@ const ReceivingAddress = props => {
         onPressHeader={() => {
           console.log("isReceiveHelperDone",isReceiveHelperDone);
           if (isReceiveHelperDone) {
+            if(ReceiveHelperBottomSheet.current)
             (ReceiveHelperBottomSheet as any).current.snapTo(2);
             setTimeout(() => {
               setIsReceiveHelperDone(false);
             }, 10);
           } else{
+            if(ReceiveHelperBottomSheet.current)
             (ReceiveHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -151,8 +156,11 @@ const ReceivingAddress = props => {
             <View style={{ flexDirection: 'row' }}>
               <Button
                 title="Ok, I understand"
-                onPress={() =>
+                onPress={() =>{
+                  if(SecureReceiveWarningBottomSheet.current)
                   (SecureReceiveWarningBottomSheet as any).current.snapTo(0)
+                }
+                  
                 }
               />
               <Button
@@ -172,6 +180,7 @@ const ReceivingAddress = props => {
         borderColor={Colors.borderColor}
         backgroundColor={Colors.white}
         onPressHeader={() => {
+          if(SecureReceiveWarningBottomSheet.current)
           (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -187,7 +196,9 @@ const ReceivingAddress = props => {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback onPress={() => {ReceiveHelperBottomSheet.current.snapTo(0)}}>
+      <TouchableWithoutFeedback onPress={() => {
+        if(ReceiveHelperBottomSheet.current)
+        ReceiveHelperBottomSheet.current.snapTo(0)}}>
       <View style={BackupStyles.modalContainer}>
         <View style={BackupStyles.modalHeaderTitleView}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
@@ -213,6 +224,7 @@ const ReceivingAddress = props => {
               <Text
                 onPress={() => {
                   AsyncStorage.setItem('isReceiveHelperDone', 'true');
+                  if(ReceiveHelperBottomSheet.current)
                   ReceiveHelperBottomSheet.current.snapTo(2);
                 }}
                 style={{
