@@ -36,6 +36,7 @@ import {
   syncAccounts,
 } from '../store/actions/accounts';
 import axios from 'axios';
+import { updateMSharesHealth } from '../store/actions/sss';
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
@@ -61,6 +62,9 @@ export default function Login(props) {
 
   const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
+  const DECENTRALIZED_BACKUP = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP,
+  );
   // const testAccService = accounts[TEST_ACCOUNT].service;
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
@@ -121,6 +125,15 @@ export default function Login(props) {
   }, [accounts]);
 
   useEffect(() => {
+    // HC up-streaming
+    if (DECENTRALIZED_BACKUP) {
+      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+        dispatch(updateMSharesHealth());
+      }
+    }
+  }, [DECENTRALIZED_BACKUP]);
+
+  useEffect(() => {
     (async () => {
       const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
       if (storedExchangeRates) {
@@ -143,9 +156,6 @@ export default function Login(props) {
         console.log('Failed to retrieve exchange rates', res);
       }
     })();
-    // if(dbFetched){
-
-    // }
   }, []);
 
   useEffect(() => {
@@ -566,7 +576,7 @@ export default function Login(props) {
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
+          ref={loaderBottomSheet as any}
           snapPoints={[-50, hp('100%')]}
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
