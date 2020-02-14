@@ -66,8 +66,8 @@ import { UsNumberFormat } from '../../common/utilities';
 import { keyFetched } from '../../store/actions/storage';
 
 export default function Accounts(props) {
-  const [serviceType, setServiceType] = useState(
-    props.navigation.getParam('serviceType'),
+  const [serviceType, setServiceType] = useState(props.navigation.state.params ?
+    props.navigation.getParam('serviceType') : TEST_ACCOUNT
   );
   const sliderWidth = Dimensions.get('window').width;
   const [SendIsActive, setSendIsActive] = useState(true);
@@ -137,8 +137,8 @@ export default function Accounts(props) {
     },
   ]);
 
-  let [carouselInitIndex, setCarouselInitIndex] = useState(
-    props.navigation.getParam('index'),
+  let [carouselInitIndex, setCarouselInitIndex] = useState( props.navigation.state.params ?
+    props.navigation.getParam('index') : 1
   );
   const [switchOn, setSwitchOn] = useState(true);
   let [carousel, setCarousel] = useState(React.createRef());
@@ -203,7 +203,7 @@ export default function Accounts(props) {
       setTransactionDetailsIsActive(false);
     }
     if (
-      !isTestAccountHelperDone &&
+      !isTestAccountHelperDone && props.navigation.state.params && 
       props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
       await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
@@ -335,15 +335,18 @@ export default function Accounts(props) {
                 }}
                 onPress={() => {
                   console.log('item.accountType', item.accountType);
-                  if (item.accountType == 'Test Account')
-                  if(TestAccountHelperBottomSheet.current)
+                  if (item.accountType == 'Test Account'){
+                    if(TestAccountHelperBottomSheet.current)
                     TestAccountHelperBottomSheet.current.snapTo(2);
-                  else if (item.accountType == 'Savings Account')
-                  if(SecureAccountHelperBottomSheet.current)
+                  }
+                  else if (item.accountType == 'Savings Account'){
+                    if(SecureAccountHelperBottomSheet.current)
                     SecureAccountHelperBottomSheet.current.snapTo(2);
-                  else if (item.accountType == 'Regular Account')
+                  }
+                  else if (item.accountType == 'Regular Account'){
                   if(RegularAccountHelperBottomSheet.current)
                     RegularAccountHelperBottomSheet.current.snapTo(2);
+                  }
                 }}
               >
                 Know more
@@ -925,11 +928,19 @@ export default function Accounts(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      carousel.current.snapToItem(
-        props.navigation.getParam('index'),
-        true,
-        true,
-      );
+      if(props.navigation.state.params){
+        carousel.current.snapToItem(
+          props.navigation.getParam('index'),
+          true,
+          true,
+        );
+      } else{
+        carousel.current.snapToItem(1,
+          true,
+          true,
+        );
+      }
+      
     }, 2000);
     getServiceType(serviceType);
     (async () => {
