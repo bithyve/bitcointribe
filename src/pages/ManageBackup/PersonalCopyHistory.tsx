@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
+  AsyncStorage,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -24,7 +25,6 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import { ModalShareIntent } from '../../components/Modal/ManageBackup';
-import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import _ from 'underscore';
 
@@ -234,7 +234,16 @@ const PersonalCopyHistory = props => {
               marginRight: 10,
             }}
           >
-            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/note.png")} />
+            <Image
+              style={{
+                width: wp('9%'),
+                height: wp('9%'),
+                resizeMode: 'contain',
+                alignSelf: 'center',
+                marginRight: 8,
+              }}
+              source={require('../../assets/images/icons/note.png')}
+            />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -253,11 +262,20 @@ const PersonalCopyHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ width: personalCopyShared ? 14 : 17,
+              style={{
+                width: personalCopyShared ? 14 : 17,
                 height: personalCopyShared ? 16 : 17,
-                resizeMode: "contain",
-                marginLeft: "auto", alignSelf: 'center',}}
-              source={personalCopyShared ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
+                resizeMode: 'contain',
+                marginLeft: 'auto',
+                alignSelf: 'center',
+              }}
+              source={
+                personalCopyShared
+                  ? getIconByStatus(
+                      props.navigation.state.params.selectedStatus,
+                    )
+                  : require('../../assets/images/icons/settings.png')
+              }
             />
           </View>
         </View>

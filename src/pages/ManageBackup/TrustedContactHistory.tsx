@@ -8,6 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
+  AsyncStorage,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -27,7 +28,6 @@ import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import TrustedContacts from './TrustedContacts';
 import CommunicationMode from './CommunicationMode';
-import AsyncStorage from '@react-native-community/async-storage';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
@@ -195,7 +195,6 @@ const TrustedContactHistory = props => {
               setRenderTimer(true);
               setOTP(OTP);
               setChosenContactIndex(index);
-              
             }, 10);
             (CommunicationModeBottomSheet as any).current.snapTo(0);
             (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
@@ -281,7 +280,7 @@ const TrustedContactHistory = props => {
   const renderShareOtpWithTrustedContactContent = useCallback(() => {
     return (
       <ShareOtpWithTrustedContact
-        renderTimer = {renderTimer}
+        renderTimer={renderTimer}
         onPressOk={index => {
           onOTPShare(index);
           if (next) {
@@ -295,7 +294,7 @@ const TrustedContactHistory = props => {
         index={chosenContactIndex}
       />
     );
-  }, [onOTPShare, OTP, chosenContactIndex,renderTimer]);
+  }, [onOTPShare, OTP, chosenContactIndex, renderTimer]);
 
   const renderShareOtpWithTrustedContactHeader = useCallback(() => {
     return (
@@ -492,45 +491,61 @@ const TrustedContactHistory = props => {
 
   const getImageIcon = () => {
     if (chosenContact.name) {
-        if (chosenContact.imageAvailable) {
-          return (
-            <Image
-              source={chosenContact.image}
+      if (chosenContact.imageAvailable) {
+        return (
+          <Image
+            source={chosenContact.image}
+            style={{
+              width: wp('9%'),
+              height: wp('9%'),
+              resizeMode: 'contain',
+              alignSelf: 'center',
+              marginRight: 8,
+              borderRadius: wp('9%') / 2,
+            }}
+          />
+        );
+      } else {
+        return (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: Colors.shadowBlue,
+              width: wp('10%'),
+              height: wp('10%'),
+              alignSelf: 'center',
+              marginRight: 8,
+              borderRadius: wp('10%') / 2,
+            }}
+          >
+            <Text
               style={{
-                width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8, borderRadius:wp('9%')/2
-              }}
-            />
-          );
-        } else {
-          return (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: Colors.shadowBlue,
-                width: wp('10%'), 
-                height: wp('10%'), 
-                alignSelf:'center', 
-                marginRight:8,
-                borderRadius:wp('10%')/2
+                textAlign: 'center',
+                fontSize: 13,
+                lineHeight: 13, //... One for top and one for bottom alignment
               }}
             >
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: 13,
-                  lineHeight: 13, //... One for top and one for bottom alignment
-                }}
-              >
-                {chosenContact && chosenContact.name
-                  ? nameToInitials(chosenContact.name)
-                  : ''}
-              </Text>
-            </View>
-          );
-        }
+              {chosenContact && chosenContact.name
+                ? nameToInitials(chosenContact.name)
+                : ''}
+            </Text>
+          </View>
+        );
+      }
     }
-    return <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require('../../assets/images/icons/icon_user.png')} />;
+    return (
+      <Image
+        style={{
+          width: wp('9%'),
+          height: wp('9%'),
+          resizeMode: 'contain',
+          alignSelf: 'center',
+          marginRight: 8,
+        }}
+        source={require('../../assets/images/icons/icon_user.png')}
+      />
+    );
   };
 
   return (
@@ -566,7 +581,9 @@ const TrustedContactHistory = props => {
             {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {chosenContact.name ? chosenContact.name : props.navigation.state.params.selectedTitle}
+                {chosenContact.name
+                  ? chosenContact.name
+                  : props.navigation.state.params.selectedTitle}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -582,11 +599,20 @@ const TrustedContactHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ width: shared || activateReshare ? 14 : 17,
+              style={{
+                width: shared || activateReshare ? 14 : 17,
                 height: shared || activateReshare ? 16 : 17,
-                resizeMode: "contain",
-                marginLeft: "auto", alignSelf: 'center', }}
-              source={shared || activateReshare ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
+                resizeMode: 'contain',
+                marginLeft: 'auto',
+                alignSelf: 'center',
+              }}
+              source={
+                shared || activateReshare
+                  ? getIconByStatus(
+                      props.navigation.state.params.selectedStatus,
+                    )
+                  : require('../../assets/images/icons/settings.png')
+              }
             />
           </View>
         </View>
@@ -603,7 +629,7 @@ const TrustedContactHistory = props => {
           //       ? true
           //       : false
           //   }
-          type={"contact"}
+          type={'contact'}
           IsReshare={shared || activateReshare}
           onPressContinue={() => {
             setTimeout(() => {

@@ -18,9 +18,8 @@ import Singleton from '../../../common/Singleton';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestSharePdf } from '../../../store/actions/manageBackup';
-import AsyncStorage from '@react-native-community/async-storage';
 import BottomInfoBox from '../../../components/BottomInfoBox';
-import { RFValue } from "react-native-responsive-fontsize";
+import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function ModalShareIntent(props) {
   const database = useSelector(state => state.storage.databaseSSS);
@@ -32,8 +31,7 @@ export default function ModalShareIntent(props) {
       title: 'Send pdf on email',
       type: 'Email',
       flagShare: false,
-      info:
-        'Make sure you delete the message from your sent folder',
+      info: 'Make sure you delete the message from your sent folder',
       imageIcon: Icons.manageBackup.PersonalCopy.email,
     },
     {
@@ -148,15 +146,21 @@ export default function ModalShareIntent(props) {
     // }
   };
 
-  const disableOrEnableOption = (item) =>{
-    if(props.selectedPersonalCopy.type == 'copy1'){
-      return database.pdfDetails && database.pdfDetails.copy2.shareDetails.type == item.type ? true : false;
+  const disableOrEnableOption = item => {
+    if (props.selectedPersonalCopy.type == 'copy1') {
+      return database.pdfDetails &&
+        database.pdfDetails.copy2.shareDetails.type == item.type
+        ? true
+        : false;
     }
-    if(props.selectedPersonalCopy.type == 'copy2'){
-      return database.pdfDetails && database.pdfDetails.copy1.shareDetails.type == item.type ? true : false;
+    if (props.selectedPersonalCopy.type == 'copy2') {
+      return database.pdfDetails &&
+        database.pdfDetails.copy1.shareDetails.type == item.type
+        ? true
+        : false;
     }
     return false;
-  }
+  };
 
   return (
     <View style={[styles.modalContainer]}>

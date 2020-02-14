@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -8,20 +8,20 @@ import {
   ScrollView,
   PermissionsAndroid,
   Platform,
-  Alert
-} from "react-native";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import CommonStyles from "../../common/Styles";
+  Alert,
+  AsyncStorage,
+} from 'react-native';
+import Colors from '../../common/Colors';
+import Fonts from '../../common/Fonts';
+import CommonStyles from '../../common/Styles';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import RadioButton from "../../components/RadioButton";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import * as ExpoContacts from "expo-contacts";
-import AsyncStorage from "@react-native-community/async-storage";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import RadioButton from '../../components/RadioButton';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import * as ExpoContacts from 'expo-contacts';
 
 async function requestContactsPermission() {
   try {
@@ -33,12 +33,12 @@ async function requestContactsPermission() {
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
       {
-        title: "Contacts Permission",
-        message: "Please grant permission to read contacts on your device",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
+        title: 'Contacts Permission',
+        message: 'Please grant permission to read contacts on your device',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
     );
     return PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
@@ -52,36 +52,36 @@ export default function ContactList(props) {
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactData, setContactData] = useState([]);
   const [alphabetsList] = useState([
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z"
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
   ]);
 
   const getSelectedContactList = async () => {
-    let contactList = await AsyncStorage.getItem("selectedContacts");
+    let contactList = await AsyncStorage.getItem('selectedContacts');
     if (contactList) {
       setSelectedContacts(JSON.parse(contactList));
     }
@@ -92,14 +92,14 @@ export default function ContactList(props) {
   }, []);
 
   const getContactsAsync = async () => {
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       if (!(await requestContactsPermission())) {
-        Alert.alert("Cannot select tursted contacts; permission denied");
+        Alert.alert('Cannot select tursted contacts; permission denied');
         return;
       }
     }
     ExpoContacts.getContactsAsync().then(({ data }) => {
-      if (!data.length) Alert.alert("No contacts found!");
+      if (!data.length) Alert.alert('No contacts found!');
       //   console.log({ data });
       else {
         const contactData = data.map(contact => {
@@ -112,7 +112,7 @@ export default function ContactList(props) {
             id: contact.id,
             checked: false,
             communicationMode,
-            status: ""
+            status: '',
           };
         });
         setContactData(contactData);
@@ -129,7 +129,7 @@ export default function ContactList(props) {
     if (contacts[index].checked) {
       selectedContacts.splice(
         selectedContacts.findIndex(temp => temp.id == contacts[index].id),
-        1
+        1,
       );
     } else {
       if (selectedContacts.length === 2) {
@@ -161,7 +161,7 @@ export default function ContactList(props) {
     }
     selectedContacts.splice(
       selectedContacts.findIndex(temp => temp.id == value.id),
-      1
+      1,
     );
     setSelectedContacts(selectedContacts);
     setRadioOnOff(!radioOnOff);
@@ -174,9 +174,9 @@ export default function ContactList(props) {
         {selectedContacts.map(value => (
           <View style={styles.selectedContactView}>
             <Text style={styles.selectedContactNameText}>
-              {value.name.split(" ")[0]}{" "}
+              {value.name.split(' ')[0]}{' '}
               <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                {value.name.split(" ")[1]}
+                {value.name.split(' ')[1]}
               </Text>
             </Text>
             <TouchableOpacity onPress={() => onCancel(value)}>
@@ -185,7 +185,7 @@ export default function ContactList(props) {
           </View>
         ))}
       </View>
-      <View style={{ flex: 1, flexDirection: "row" }}>
+      <View style={{ flex: 1, flexDirection: 'row' }}>
         <View style={{ flex: 11 }}>
           <ScrollView showsVerticalScrollIndicator={false} ref={scrollViewRef}>
             {contactData.map((value, index) => {
@@ -208,9 +208,9 @@ export default function ContactList(props) {
                     onpress={() => onContactSelect(index)}
                   />
                   <Text style={styles.contactText}>
-                    {value.name.split(" ")[0]}{" "}
+                    {value.name.split(' ')[0]}{' '}
                     <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {value.name.split(" ")[1]}
+                      {value.name.split(' ')[1]}
                     </Text>
                   </Text>
                 </TouchableOpacity>
@@ -257,65 +257,65 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13)
+    fontSize: RFValue(13),
   },
   bottomButtonView: {
     height: 50,
-    width: wp("50%"),
-    position: "absolute",
+    width: wp('50%'),
+    position: 'absolute',
     backgroundColor: Colors.blue,
     bottom: 0,
-    left: wp("25%"),
+    left: wp('25%'),
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-    marginBottom: 20
+    marginBottom: 20,
   },
   selectedContactView: {
-    width: wp("42%"),
-    height: wp("12%"),
+    width: wp('42%'),
+    height: wp('12%'),
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   selectedContactContainer: {
-    height: wp("20%"),
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
+    height: wp('20%'),
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   contactView: {
     height: 50,
-    alignItems: "center",
-    flexDirection: "row",
-    marginLeft: 20
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginLeft: 20,
   },
   contactText: {
     marginLeft: 10,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   contactIndexText: {
     fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   contactIndexView: {
     flex: 0.5,
-    height: "100%",
-    justifyContent: "space-evenly"
-  }
+    height: '100%',
+    justifyContent: 'space-evenly',
+  },
 });

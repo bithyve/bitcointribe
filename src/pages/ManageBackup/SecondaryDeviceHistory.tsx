@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
+  AsyncStorage,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -24,7 +25,6 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
-import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import _ from 'underscore';
 
@@ -179,7 +179,9 @@ const SecondaryDeviceHistory = props => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if(shareHistory[0].inTransit) { setIsReshare(true); }
+      if (shareHistory[0].inTransit) {
+        setIsReshare(true);
+      }
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
@@ -232,7 +234,16 @@ const SecondaryDeviceHistory = props => {
               marginRight: 10,
             }}
           >
-            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/icon_secondarydevice.png")} />
+            <Image
+              style={{
+                width: wp('9%'),
+                height: wp('9%'),
+                resizeMode: 'contain',
+                alignSelf: 'center',
+                marginRight: 8,
+              }}
+              source={require('../../assets/images/icons/icon_secondarydevice.png')}
+            />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -251,11 +262,20 @@ const SecondaryDeviceHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ width: isReshare ? 14 : 17,
+              style={{
+                width: isReshare ? 14 : 17,
                 height: isReshare ? 16 : 17,
-                resizeMode: "contain",
-                marginLeft: "auto", alignSelf: 'center', }}
-              source={isReshare ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
+                resizeMode: 'contain',
+                marginLeft: 'auto',
+                alignSelf: 'center',
+              }}
+              source={
+                isReshare
+                  ? getIconByStatus(
+                      props.navigation.state.params.selectedStatus,
+                    )
+                  : require('../../assets/images/icons/settings.png')
+              }
             />
           </View>
         </View>

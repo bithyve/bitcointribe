@@ -1,31 +1,30 @@
-import React from "react";
+import React from 'react';
 import {
   StyleSheet,
   View,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView,
   StatusBar,
   Text,
   Image,
-  AsyncStorage
-} from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../../common/Fonts";
-import Colors from "../../common/Colors";
-import CommonStyles from "../../common/Styles";
-import { RFValue } from "react-native-responsive-fontsize";
-import HeaderTitle from "../../components/HeaderTitle";
+  AsyncStorage,
+} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Fonts from '../../common/Fonts';
+import Colors from '../../common/Colors';
+import CommonStyles from '../../common/Styles';
+import { RFValue } from 'react-native-responsive-fontsize';
+import HeaderTitle from '../../components/HeaderTitle';
 
 export default function RestoreSelectedContactsList(props) {
   const selectDocument = async type => {
-    if (type == "cloud") {
+    if (type == 'cloud') {
       await AsyncStorage.setItem(
-        "selectedDocuments",
-        JSON.stringify([{ title: "Cloud", status: "" }])
+        'selectedDocuments',
+        JSON.stringify([{ title: 'Cloud', status: '' }]),
       );
-      props.navigation.navigate("RestoreSelectedContactsList");
+      props.navigation.navigate('RestoreSelectedContactsList');
     }
   };
 
@@ -37,7 +36,7 @@ export default function RestoreSelectedContactsList(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("RestoreSelectedContactsList");
+              props.navigation.navigate('RestoreSelectedContactsList');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -51,22 +50,22 @@ export default function RestoreSelectedContactsList(props) {
         </View>
         <View style={{ flex: 2 }}>
           <HeaderTitle
-            firstLineTitle={"Restore wallet using"}
-            secondLineTitle={"Documents"}
-            infoTextNormal={"Sources where you have kept a document "}
-            infoTextBold={"copy of the Recovery Secret"}
+            firstLineTitle={'Restore wallet using'}
+            secondLineTitle={'Documents'}
+            infoTextNormal={'Sources where you have kept a document '}
+            infoTextBold={'copy of the Recovery Secret'}
           />
         </View>
         <View style={{ flex: 8 }}>
           <TouchableOpacity
-            onPress={() => selectDocument("cloud")}
+            onPress={() => selectDocument('cloud')}
             style={styles.listElements}
           >
             <Image
               style={styles.listElementsIconImage}
-              source={require("../../assets/images/icons/icon-print.png")}
+              source={require('../../assets/images/icons/icon-print.png')}
             />
-            <View style={{ justifyContent: "space-between", flex: 1 }}>
+            <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Cloud</Text>
               <Text style={styles.listElementsInfo} numberOfLines={1}>
                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
@@ -78,16 +77,16 @@ export default function RestoreSelectedContactsList(props) {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={10}
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: 'center' }}
               />
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.listElements}>
             <Image
               style={styles.listElementsIconImage}
-              source={require("../../assets/images/icons/icon-print.png")}
+              source={require('../../assets/images/icons/icon-print.png')}
             />
-            <View style={{ justifyContent: "space-between", flex: 1 }}>
+            <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Email</Text>
               <Text style={styles.listElementsInfo} numberOfLines={1}>
                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
@@ -99,16 +98,16 @@ export default function RestoreSelectedContactsList(props) {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={10}
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: 'center' }}
               />
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.listElements}>
             <Image
               style={styles.listElementsIconImage}
-              source={require("../../assets/images/icons/icon-print.png")}
+              source={require('../../assets/images/icons/icon-print.png')}
             />
-            <View style={{ justifyContent: "space-between", flex: 1 }}>
+            <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Print</Text>
               <Text style={styles.listElementsInfo} numberOfLines={1}>
                 Lorem ipsum dolor sit amet, consetetur
@@ -119,21 +118,21 @@ export default function RestoreSelectedContactsList(props) {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={10}
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: 'center' }}
               />
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.listElements}>
             <Image
               style={{
-                resizeMode: "contain",
+                resizeMode: 'contain',
                 width: 20,
                 height: 25,
-                alignSelf: "center"
+                alignSelf: 'center',
               }}
-              source={require("../../assets/images/icons/icon-usb.png")}
+              source={require('../../assets/images/icons/icon-usb.png')}
             />
-            <View style={{ justifyContent: "space-between", flex: 1 }}>
+            <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Local</Text>
               <Text style={styles.listElementsInfo}>
                 Lorem ipsum dolor sit amet,
@@ -144,7 +143,7 @@ export default function RestoreSelectedContactsList(props) {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={10}
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: 'center' }}
               />
             </View>
           </TouchableOpacity>
@@ -156,37 +155,37 @@ export default function RestoreSelectedContactsList(props) {
 
 const styles = StyleSheet.create({
   listElements: {
-    flexDirection: "row",
+    flexDirection: 'row',
     margin: 20,
     marginTop: 10,
     marginBottom: 10,
     borderBottomWidth: 0.5,
     borderColor: Colors.borderColor,
     paddingBottom: 20,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   listElementsTitle: {
     color: Colors.blue,
     fontSize: RFValue(13),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
     fontSize: RFValue(11),
     marginLeft: 13,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   listElementIcon: {
     paddingRight: 5,
     marginLeft: 25,
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listElementsIconImage: {
-    resizeMode: "contain",
+    resizeMode: 'contain',
     width: 25,
     height: 25,
-    alignSelf: "center"
-  }
+    alignSelf: 'center',
+  },
 });

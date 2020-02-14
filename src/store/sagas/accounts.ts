@@ -31,7 +31,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -76,11 +76,12 @@ function* fetchBalanceWorker({ payload }) {
     payload.options &&
     payload.options.fetchTransactionsSync
   ) {
-    yield all([
-      fetchTransactionsWorker({
-        payload: { serviceType: payload.serviceType, service },
-      }),
-    ]); // have to dispatch everytime (if selected) as the tx confirmations increments
+    yield call(fetchTransactionsWorker, {
+      payload: {
+        serviceType: payload.serviceType,
+        service,
+      },
+    }); // have to dispatch everytime (if selected) as the tx confirmations increments
   } else if (
     res.status === 200 &&
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
