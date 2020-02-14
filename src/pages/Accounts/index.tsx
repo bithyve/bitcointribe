@@ -721,8 +721,8 @@ export default function Accounts(props) {
       <TestAccountHelperModalContents
         topButtonText={`Test Account`}
         image={require('../../assets/images/icons/icon_test_white.png')}
-        boldPara={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins`}
-        helperInfo={`You can even send and receive test bitcoins from other Hexa wallet test accounts The testnet sats do not add up in your wallet balance`}
+        boldPara={``}
+        helperInfo={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins\n\nYou can even send and receive test bitcoins from other Hexa wallet test accounts`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
@@ -758,10 +758,10 @@ export default function Accounts(props) {
         topButtonText={'Savings Account'}
         image={require('../../assets/images/icons/secure.png')}
         boldPara={
-          'The funds in this account are secured by two factor authentication which is set up on your secondary device'
+          ''
         }
         helperInfo={
-          'Use this account to store most of your funds. Something you will not need on an ongoing basis'
+          'The funds in this account are secured by two factor authentication which is set up on your secondary device\n\nUse this account to store most of your funds. Something you will not need on an ongoing basis'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -798,10 +798,10 @@ export default function Accounts(props) {
         topButtonText={'Checking Account'}
         image={require('../../assets/images/icons/regular.png')}
         boldPara={
-          'These are the funds that you have easy access to for your transactional needs'
+          ''
         }
         helperInfo={
-          'Transfers from this account are typically cheaper and faster'
+          'These are the funds that you have easy access to for your transactional needs\n\nTransfers from this account are typically cheaper and faster'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {

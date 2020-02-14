@@ -354,6 +354,7 @@ export default function NewWalletQuestion(props) {
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'secret question and answer'}
+                infoTextNormal1={'(this is a very important step)'}
               />
 
               <TouchableOpacity
@@ -610,22 +611,20 @@ export default function NewWalletQuestion(props) {
           </View>
         </View>
         {!visibleButton ? (
-          <View
-            style={{
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('1%') : 0,
-            }}
-          >
-            <BottomInfoBox
-              title={
-                'Answer to the security question is something only you know and more importantly remember easily'
-              }
-              infoText={
-                'This is not stored anywhere and will be used by the app to create backup'
-              }
-            />
-          </View>
-        ) : null}
+              <View
+                style={{ marginBottom: Platform.OS == "ios" && DeviceInfo.hasNotch ? hp('1%') : 0 }}
+              >
+                <BottomInfoBox
+                  title={
+                    'The answer is used to encrypt parts of your wallet'
+                  }
+                  infoText={
+                    'Very important that this is something that only you '
+                  }
+                  italicText={'know and remember'}
+                />
+              </View>
+            ) : null}
         <BottomSheet
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}

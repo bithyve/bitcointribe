@@ -16,7 +16,16 @@ export default function BottomInfoBox(props) {
 
     return (<View style={styles.container}>
     <Text style={styles.bottomNoteText}>{props.title}</Text>
-    <Text style={styles.bottomNoteInfoText}>{props.infoText}</Text>
+    <Text style={styles.bottomNoteInfoText}>{props.infoText}
+    {props.linkText ? <Text style={{color: Colors.textColorGrey,
+        fontSize: RFValue(12),
+        fontFamily: Fonts.FiraSansRegular,textDecorationLine: 'underline'}}
+        >{props.linkText}
+        </Text> : null}
+        {props.italicText ? <Text style={{fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle:"italic", fontSize: RFValue(12),}}
+        >{props.italicText}
+        </Text> : null}
+    </Text>
 </View>
     )
 }

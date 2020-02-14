@@ -40,7 +40,7 @@ const RestoreAndRecoverWallet = props => {
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
-                Start with a new Hexa Wallet
+                Start with a new Hexa wallet
               </Text>
             </View>
             <View style={styles.arrowIconView}>
@@ -57,7 +57,7 @@ const RestoreAndRecoverWallet = props => {
         <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
           <Text style={styles.headerTitleText}>Restore Wallet</Text>
           <Text style={styles.headerInfoText}>
-            If you previously had a Hexa wallet use this method to restore your
+            If you previously had a Hexa wallet, use this method to restore your
             wallet.
           </Text>
           <TouchableOpacity
@@ -93,10 +93,11 @@ const RestoreAndRecoverWallet = props => {
         <View style={{ flex: 1 }}>
           <View style={{ marginTop: 'auto' }}>
             <BottomInfoBox
-              title={'Importing a wallet'}
+              title={"Terms of Service"}
               infoText={
-                'If you have seed words/ mnemonics from another wallet, this can be done once a Hexa wallet is created using “Import Wallet"'
+                'By proceeding to the next step, you agree to our '
               }
+              linkText={'Terms of Service'}
             />
           </View>
         </View>
