@@ -3,13 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Alert,
-  ScrollView,
+  AsyncStorage,
   Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
@@ -19,22 +17,19 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare, checkMSharesHealth } from '../../store/actions/sss';
+import { useDispatch } from 'react-redux';
+import { checkMSharesHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
 import moment from 'moment';
 import _ from 'underscore';
-import AsyncStorage from '@react-native-community/async-storage';
 
 const SecurityQuestionHistory = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
@@ -227,7 +222,16 @@ const SecurityQuestionHistory = props => {
               marginRight: 10,
             }}
           >
-            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/icon_securityquestion.png")} />
+            <Image
+              style={{
+                width: wp('9%'),
+                height: wp('9%'),
+                resizeMode: 'contain',
+                alignSelf: 'center',
+                marginRight: 8,
+              }}
+              source={require('../../assets/images/icons/icon_securityquestion.png')}
+            />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -247,7 +251,9 @@ const SecurityQuestionHistory = props => {
             </View>
             <Image
               style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
-              source={getIconByStatus(props.navigation.state.params.selectedStatus)}
+              source={getIconByStatus(
+                props.navigation.state.params.selectedStatus,
+              )}
             />
           </View>
         </View>

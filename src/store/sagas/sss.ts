@@ -41,7 +41,7 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage } from 'react-native';
 import { Alert } from 'react-native';
 
 function* generateMetaSharesWorker() {
@@ -653,7 +653,7 @@ function* overallHealthWorker({ payload }) {
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
-    
+
     yield put(updateShareHistory(overallHealth));
 
     yield call(

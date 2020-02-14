@@ -6,8 +6,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  Alert,
-  ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -20,7 +19,6 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
-import AsyncStorage from '@react-native-community/async-storage';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import SmallHeaderModal from '../components/SmallHeaderModal';
@@ -159,23 +157,17 @@ export default function Login(props) {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated)
+    if (isAuthenticated) {
       AsyncStorage.getItem('walletExists').then(exists => {
+        console.log({ exists });
+        AsyncStorage.getAllKeys().then(console.log);
         if (exists) {
           if (dbFetched) {
-            // dispatch(
-            //   fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }),
-            // );
-            // dispatch(
-            //   fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
-            // );
-            // dispatch(
-            //   fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }),
-            // );
             dispatch(syncAccounts());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
+    }
   }, [isAuthenticated, dbFetched]);
 
   const custodyRequest = props.navigation.getParam('custodyRequest');

@@ -9,6 +9,7 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import QuestionList from '../../common/QuestionList';
@@ -24,7 +25,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { initializeRecovery } from '../../store/actions/setupAndAuth';
 import commonStyle from '../../common/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-community/async-storage';
 
 export default function RecoveryQuestionModalContents(props) {
   const walletName = props.navigation.getParam('walletName');
@@ -165,7 +165,7 @@ export default function RecoveryQuestionModalContents(props) {
                 textContentType="none"
                 autoCompleteType="off"
                 autoCorrect={false}
-                autoCapitalize = 'none'
+                autoCapitalize="none"
                 placeholder={'Enter Security Answer'}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}

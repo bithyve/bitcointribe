@@ -3,14 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Alert,
-  ScrollView,
-  Platform,
+  AsyncStorage,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -24,15 +21,11 @@ import { uploadEncMShare } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
-import ErrorModalContents from '../../components/ErrorModalContents';
+
 import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
-import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import _ from 'underscore';
 
@@ -187,7 +180,9 @@ const SecondaryDeviceHistory = props => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if(shareHistory[0].inTransit) { setIsReshare(true); }
+      if (shareHistory[0].inTransit) {
+        setIsReshare(true);
+      }
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
@@ -241,7 +236,16 @@ const SecondaryDeviceHistory = props => {
               marginRight: 10,
             }}
           >
-            <Image style={{width: wp('9%'), height: wp('9%'), resizeMode: 'contain', alignSelf:'center', marginRight:8}} source={require("../../assets/images/icons/icon_secondarydevice.png")} />
+            <Image
+              style={{
+                width: wp('9%'),
+                height: wp('9%'),
+                resizeMode: 'contain',
+                alignSelf: 'center',
+                marginRight: 8,
+              }}
+              source={require('../../assets/images/icons/icon_secondarydevice.png')}
+            />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 {props.navigation.state.params.selectedTitle}
@@ -260,11 +264,20 @@ const SecondaryDeviceHistory = props => {
               </Text>
             </View>
             <Image
-              style={{ width: isReshare ? 14 : 17,
+              style={{
+                width: isReshare ? 14 : 17,
                 height: isReshare ? 16 : 17,
-                resizeMode: "contain",
-                marginLeft: "auto", alignSelf: 'center', }}
-              source={isReshare ? getIconByStatus(props.navigation.state.params.selectedStatus) : require('../../assets/images/icons/settings.png')}
+                resizeMode: 'contain',
+                marginLeft: 'auto',
+                alignSelf: 'center',
+              }}
+              source={
+                isReshare
+                  ? getIconByStatus(
+                      props.navigation.state.params.selectedStatus,
+                    )
+                  : require('../../assets/images/icons/settings.png')
+              }
             />
           </View>
         </View>

@@ -1,35 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  Text,
-  Image,
   KeyboardAvoidingView,
   Platform,
-  TextInput,
-  ScrollView,
-  FlatList
-} from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../../common/Fonts";
-import Colors from "../../common/Colors";
-import CommonStyles from "../../common/Styles";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import BottomSheet from "reanimated-bottom-sheet";
-import HeaderTitle from "../../components/HeaderTitle";
-import ContactList from "../../components/ContactList";
-import DeviceInfo from "react-native-device-info";
-import RadioButton from "../../components/RadioButton";
-import CommunicationModeModalContents from "../../components/CommunicationModeModalContents";
-import AsyncStorage from "@react-native-community/async-storage";
+  AsyncStorage,
+} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Colors from '../../common/Colors';
+import CommonStyles from '../../common/Styles';
+import HeaderTitle from '../../components/HeaderTitle';
+import ContactList from '../../components/ContactList';
 
 export default function RestoreWalletByContacts(props) {
   //   const [contacts, setContacts] = useState([]);
@@ -45,21 +30,21 @@ export default function RestoreWalletByContacts(props) {
   //   }
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
-  function selectedContactsList( list ) {
-    if ( list.length > 0 ) setContacts( [ ...list ] );
+  function selectedContactsList(list) {
+    if (list.length > 0) setContacts([...list]);
   }
 
-  const onPressContinue = async() =>{
-    await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+  const onPressContinue = async () => {
+    await AsyncStorage.setItem('selectedContacts', JSON.stringify(contacts));
     console.log({ contacts });
-    props.navigation.navigate("RestoreSelectedContactsList");
-  }
+    props.navigation.navigate('RestoreSelectedContactsList');
+  };
 
   const continueNProceed = async contacts => {
     // communicationModeBottomSheet.current.snapTo(1);
-    await AsyncStorage.setItem("selectedContacts", JSON.stringify(contacts));
+    await AsyncStorage.setItem('selectedContacts', JSON.stringify(contacts));
     console.log({ contacts });
-    props.navigation.navigate("RestoreSelectedContactsList");
+    props.navigation.navigate('RestoreSelectedContactsList');
   };
 
   //   const saveCommunicationMode = async selectedContactMode => {
@@ -116,7 +101,7 @@ export default function RestoreWalletByContacts(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("RestoreSelectedContactsList");
+              props.navigation.navigate('RestoreSelectedContactsList');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -128,7 +113,7 @@ export default function RestoreWalletByContacts(props) {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ height: 54, marginLeft: "auto" }}
+            style={{ height: 54, marginLeft: 'auto' }}
             onPress={() => {}}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -138,22 +123,22 @@ export default function RestoreWalletByContacts(props) {
         </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == "ios" ? "padding" : ""}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <HeaderTitle
             isKnowMoreButton={true}
             onPressKnowMore={() => {}}
-            firstLineTitle={"Restore wallet using"}
-            secondLineTitle={"Contacts"}
-            infoTextNormal={"Select contacts to "}
-            infoTextBold={"send recovery request"}
+            firstLineTitle={'Restore wallet using'}
+            secondLineTitle={'Contacts'}
+            infoTextNormal={'Select contacts to '}
+            infoTextBold={'send recovery request'}
           />
           <ContactList
-          style={{}}
-          onPressContinue={onPressContinue}
-          onSelectContact={selectedContactsList}
-        />
+            style={{}}
+            onPressContinue={onPressContinue}
+            onSelectContact={selectedContactsList}
+          />
           {/* <ContactList style={{}} continueNProceed={continueNProceed} /> */}
         </KeyboardAvoidingView>
         {/* <BottomSheet
@@ -175,15 +160,15 @@ export default function RestoreWalletByContacts(props) {
 
 const styles = StyleSheet.create({
   modalHeaderContainer: {
-    paddingTop: 20
+    paddingTop: 20,
   },
   modalHeaderHandle: {
     width: 30,
     height: 5,
     backgroundColor: Colors.borderColor,
     borderRadius: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginTop: 7,
-    marginBottom: 7
-  }
+    marginBottom: 7,
+  },
 });

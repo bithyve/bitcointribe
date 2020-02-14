@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,13 +8,13 @@ import {
   TextInput,
   Platform,
   Linking,
-  Alert
-} from "react-native";
+  Alert,
+  AsyncStorage,
+} from 'react-native';
 
-import AsyncStorage from "@react-native-community/async-storage";
-import { useDispatch, useSelector } from "react-redux";
-import { initializeDB } from "../store/actions/storage";
-import { credsAuth, storeCreds } from "../store/actions/setupAndAuth";
+import { useDispatch, useSelector } from 'react-redux';
+import { initializeDB } from '../store/actions/storage';
+import { credsAuth, storeCreds } from '../store/actions/setupAndAuth';
 
 const StartupScreen = props => {
   // const initialize = useCallback(async () => {
@@ -42,8 +42,8 @@ const StartupScreen = props => {
   const { isAuthenticated } = useSelector(state => state.setupAndAuth);
 
   const pinExists = async () => {
-    if (await AsyncStorage.getItem("hasCreds")) {
-      if (await AsyncStorage.getItem("walletExists")) {
+    if (await AsyncStorage.getItem('hasCreds')) {
+      if (await AsyncStorage.getItem('walletExists')) {
         setWalletExists(true);
       }
       setHasPin(true);
@@ -51,19 +51,19 @@ const StartupScreen = props => {
   };
 
   const handleDeepLink = event => {
-    Alert.alert("DeepLink Detected", event.url);
+    Alert.alert('DeepLink Detected', event.url);
   };
 
   useEffect(() => {
     Linking.getInitialURL()
       .then(url => {
         if (url) {
-          Alert.alert("Initializer URL", url);
+          Alert.alert('Initializer URL', url);
         }
       })
-      .catch(err => Alert.alert("An err occured", err));
+      .catch(err => Alert.alert('An err occured', err));
 
-    Linking.addEventListener("url", handleDeepLink);
+    Linking.addEventListener('url', handleDeepLink);
     // return Linking.removeEventListener("url", handleDeepLink);
   }, []);
 
@@ -75,8 +75,8 @@ const StartupScreen = props => {
     pinExists().then(() => {
       if (isAuthenticated)
         walletExists
-          ? props.navigation.navigate("HomeNav")
-          : props.navigation.navigate("WalletSetup");
+          ? props.navigation.navigate('HomeNav')
+          : props.navigation.navigate('WalletSetup');
     });
   }, [isAuthenticated]);
 
@@ -92,7 +92,7 @@ const StartupScreen = props => {
             style={{
               borderBottomWidth: 0.5,
               width: 150,
-              textAlign: "center"
+              textAlign: 'center',
             }}
             keyboardType="numeric"
           />
@@ -112,7 +112,7 @@ const StartupScreen = props => {
             style={{
               borderBottomWidth: 0.5,
               width: 150,
-              textAlign: "center"
+              textAlign: 'center',
             }}
             keyboardType="numeric"
           />
@@ -137,9 +137,9 @@ const StartupScreen = props => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center"
-  }
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default StartupScreen;

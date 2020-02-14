@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
-  Keyboard,
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -47,7 +47,6 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 // import HealthCheckGoogleAuthModalContents from '../../components/HealthCheckGoogleAuthModalContents';
-import AsyncStorage from '@react-native-community/async-storage';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
@@ -739,7 +738,7 @@ export default function Send(props) {
                           console.log('Value', value);
                           setSliderValue(value);
                         }}
-                        onSlidingComplete={ (value)=>{
+                        onSlidingComplete={value => {
                           console.log('Value onSlidingComplete', value);
                           value == 0
                             ? setSliderValueText('Low Fee')

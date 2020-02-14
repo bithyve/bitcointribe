@@ -20,7 +20,6 @@ import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.bitgo.randombytes.RandomBytesPackage;
-import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;

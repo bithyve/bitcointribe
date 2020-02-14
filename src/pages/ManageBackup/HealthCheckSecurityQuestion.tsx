@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Image,
-  TouchableOpacity,
   Text,
+  AsyncStorage,
   StyleSheet,
   TextInput,
   Platform,
@@ -18,8 +17,7 @@ import {
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { useDispatch, useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
+import { useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function HealthCheckSecurityQuestion(props) {
@@ -241,7 +239,14 @@ export default function HealthCheckSecurityQuestion(props) {
               </Text>
             </View>
           </ScrollView>
-          <View style={{paddingLeft: wp('6%'), paddingRight: wp('6%'), height:hp('15%'), justifyContent: 'center',}}>
+          <View
+            style={{
+              paddingLeft: wp('6%'),
+              paddingRight: wp('6%'),
+              height: hp('15%'),
+              justifyContent: 'center',
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               disabled={errorText || !answer ? true : false}
               onPress={() => {
