@@ -210,9 +210,11 @@ export default function Accounts(props) {
       setTimeout(() => {
         setIsTestHelperDone(true);
       }, 10);
+      if(TestAccountHelperBottomSheet.current){
       setTimeout(() => {
         TestAccountHelperBottomSheet.current.snapTo(2);
       }, 1000);
+    }
     } else {
       setTimeout(() => {
         setIsTestHelperDone(false);
@@ -241,10 +243,13 @@ export default function Accounts(props) {
     return (
       <SendModalContents
         onPressBack={() => {
+          if(SendBottomSheet.current)
           (SendBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
+          if(SendBottomSheet.current)
           (SendBottomSheet as any).current.snapTo(0);
+          if(CustodianRequestOtpBottomSheet.current)
           (CustodianRequestOtpBottomSheet as any).current.snapTo(1);
         }}
         modalRef={SendBottomSheet}
@@ -331,10 +336,13 @@ export default function Accounts(props) {
                 onPress={() => {
                   console.log('item.accountType', item.accountType);
                   if (item.accountType == 'Test Account')
+                  if(TestAccountHelperBottomSheet.current)
                     TestAccountHelperBottomSheet.current.snapTo(2);
                   else if (item.accountType == 'Savings Account')
+                  if(SecureAccountHelperBottomSheet.current)
                     SecureAccountHelperBottomSheet.current.snapTo(2);
                   else if (item.accountType == 'Regular Account')
+                  if(RegularAccountHelperBottomSheet.current)
                     RegularAccountHelperBottomSheet.current.snapTo(2);
                 }}
               >
@@ -580,6 +588,7 @@ export default function Accounts(props) {
         borderColor={Colors.white}
         backgroundColor={Colors.white}
         onPressHeader={() => {
+          if(bottomSheet.current)
           (bottomSheet as any).current.snapTo(0);
         }}
       />
@@ -594,6 +603,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
+          if(SendBottomSheet.current)
           (SendBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -613,7 +623,9 @@ export default function Accounts(props) {
         subInfo2ndLine={'sed do eiusmod tempor incididunt ut labore et dolore'}
         modalRef={CustodianRequestOtpBottomSheet}
         onPressConfirm={() => {
+          if(CustodianRequestOtpBottomSheet.current)
           (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+          if(SendSuccessBottomSheet.current)
           (SendSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
@@ -623,6 +635,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
+          if(CustodianRequestOtpBottomSheet.current)
           (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -640,6 +653,7 @@ export default function Accounts(props) {
         modalRef={SendSuccessBottomSheet}
         isSuccess={true}
         onPressViewAccount={() => {
+          if(SendSuccessBottomSheet.current)
           (SendSuccessBottomSheet as any).current.snapTo(0);
         }}
         transactionId={'38123819421304'}
@@ -651,6 +665,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
+          if(SendSuccessBottomSheet.current)
           (SendSuccessBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -672,9 +687,11 @@ export default function Accounts(props) {
         modalRef={SendErrorBottomSheet}
         isSuccess={false}
         onPressTryAgain={() => {
+          if(SendErrorBottomSheet.current)
           (SendErrorBottomSheet as any).current.snapTo(0);
         }}
         onPressSkip={() => {
+          if(SendErrorBottomSheet.current)
           (SendErrorBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -684,6 +701,7 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
+          if(SendErrorBottomSheet.current)
           (SendErrorBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -725,6 +743,7 @@ export default function Accounts(props) {
         helperInfo={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins\n\nYou can even send and receive test bitcoins from other Hexa wallet test accounts`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
+          if(TestAccountHelperBottomSheet.current)
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
           // props.copilotEvents.on('stepChange', handleStepChange);
           // props.start();
@@ -740,11 +759,13 @@ export default function Accounts(props) {
         onPressHeader={() => {
           console.log('isTestHelperDone', isTestHelperDone);
           if (isTestHelperDone) {
+            if(TestAccountHelperBottomSheet.current)
             (TestAccountHelperBottomSheet as any).current.snapTo(2);
             setTimeout(() => {
               setIsTestHelperDone(false);
             }, 10);
           } else {
+            if(TestAccountHelperBottomSheet.current)
             (TestAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -765,6 +786,7 @@ export default function Accounts(props) {
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
+          if(SecureAccountHelperBottomSheet.current)
           (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -780,11 +802,13 @@ export default function Accounts(props) {
           //(SecureAccountHelperBottomSheet as any).current.snapTo(0);
           console.log('isSecureAccountHelperDone', isSecureAccountHelperDone);
           if (isSecureAccountHelperDone) {
+            if(SecureAccountHelperBottomSheet.current)
             (SecureAccountHelperBottomSheet as any).current.snapTo(2);
             setTimeout(() => {
               setIsSecureAccountHelperDone(false);
             }, 10);
           } else {
+            if(SecureAccountHelperBottomSheet.current)
             (SecureAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -805,6 +829,7 @@ export default function Accounts(props) {
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
+          if(RegularAccountHelperBottomSheet.current)
           (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -819,11 +844,13 @@ export default function Accounts(props) {
         onPressHeader={() => {
           console.log('isRegularAccountHelperDone', isRegularAccountHelperDone);
           if (isRegularAccountHelperDone) {
+            if(RegularAccountHelperBottomSheet.current)
             (RegularAccountHelperBottomSheet as any).current.snapTo(2);
             setTimeout(() => {
               setIsRegularAccountHelperDone(false);
             }, 10);
           } else {
+            if(RegularAccountHelperBottomSheet.current)
             (RegularAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
@@ -861,9 +888,11 @@ export default function Accounts(props) {
           setTimeout(() => {
             setIsSecureAccountHelperDone(true);
           }, 10);
+          if(SecureAccountHelperBottomSheet.current){
           setTimeout(() => {
             SecureAccountHelperBottomSheet.current.snapTo(2);
           }, 1000);
+        }
         } else {
           setTimeout(() => {
             setIsSecureAccountHelperDone(false);
@@ -878,9 +907,12 @@ export default function Accounts(props) {
           setTimeout(() => {
             setIsRegularAccountHelperDone(true);
           }, 10);
-          setTimeout(() => {
-            RegularAccountHelperBottomSheet.current.snapTo(2);
-          }, 1000);
+          if(RegularAccountHelperBottomSheet.current){
+            setTimeout(() => {
+              (RegularAccountHelperBottomSheet as any).current.snapTo(2);
+            }, 1000)
+          }
+           
         } else {
           setTimeout(() => {
             setIsRegularAccountHelperDone(false);
@@ -1022,6 +1054,7 @@ export default function Accounts(props) {
       >
         <TouchableWithoutFeedback
           onPress={() => {
+            if(TestAccountHelperBottomSheet.current)
             TestAccountHelperBottomSheet.current.snapTo(0);
           }}
         >
@@ -1062,6 +1095,7 @@ export default function Accounts(props) {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
           onPress={() => {
+            if(TestAccountHelperBottomSheet.current)
             TestAccountHelperBottomSheet.current.snapTo(0);
           }}
         >
@@ -1087,6 +1121,7 @@ export default function Accounts(props) {
               </Text>
               <Text
                 onPress={() => {
+                  if(bottomSheet.current)
                   (bottomSheet as any).current.snapTo(1);
                 }}
                 style={{
@@ -1271,6 +1306,7 @@ export default function Accounts(props) {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
           onPress={() => {
+            if(TestAccountHelperBottomSheet.current)
             TestAccountHelperBottomSheet.current.snapTo(0);
           }}
         >
