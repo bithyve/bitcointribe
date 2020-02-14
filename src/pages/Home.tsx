@@ -110,14 +110,14 @@ export default function Home(props) {
   const WALLET_SETUP = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
-  const DECENTRALIZED_BACKUP = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+  // const DECENTRALIZED_BACKUP = useSelector(
+  //   state => state.storage.database.DECENTRALIZED_BACKUP,
+  // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
   const exchangeRate = props.navigation.state.params
-  ? props.navigation.state.params.exchangeRates
-  : null;
+    ? props.navigation.state.params.exchangeRates
+    : null;
   const [exchangeRates, setExchangeRates] = useState(exchangeRate);
 
   // const [balances, setBalances] = useState({
@@ -462,12 +462,13 @@ export default function Home(props) {
 
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
+
     // HC up-streaming
-    if (DECENTRALIZED_BACKUP) {
-      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-        dispatch(updateMSharesHealth());
-      }
-    }
+    // if (DECENTRALIZED_BACKUP) {
+    //   if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+    //     dispatch(updateMSharesHealth());
+    //   }
+    // }
 
     (async () => {
       if (!overallHealth) {
@@ -1553,7 +1554,11 @@ export default function Home(props) {
         }, 2);
       }
       setTimeout(() => {
-        if(addressBookBottomSheet.current && AllAccountsBottomSheet.current && settingsBottomSheet.current){
+        if (
+          addressBookBottomSheet.current &&
+          AllAccountsBottomSheet.current &&
+          settingsBottomSheet.current
+        ) {
           addressBookBottomSheet.current.snapTo(0);
           AllAccountsBottomSheet.current.snapTo(0);
           settingsBottomSheet.current.snapTo(0);
@@ -1846,10 +1851,12 @@ export default function Home(props) {
                 >
                   {switchOn
                     ? UsNumberFormat(balances.accumulativeBalance)
-                    : exchangeRates ? (
+                    : exchangeRates
+                    ? (
                         (balances.accumulativeBalance / 1e8) *
                         exchangeRates['USD'].last
-                      ).toFixed(2) : 0}
+                      ).toFixed(2)
+                    : 0}
                 </Text>
                 <Text
                   style={{
@@ -2037,15 +2044,18 @@ export default function Home(props) {
                                       : UsNumberFormat(balances.secureBalance)
                                     : value.accountType === 'test'
                                     ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular' && exchangeRates
+                                    : value.accountType === 'regular' &&
+                                      exchangeRates
                                     ? (
                                         (balances.regularBalance / 1e8) *
                                         exchangeRates['USD'].last
                                       ).toFixed(2)
-                                    : exchangeRates ? (
+                                    : exchangeRates
+                                    ? (
                                         (balances.secureBalance / 1e8) *
                                         exchangeRates['USD'].last
-                                      ).toFixed(2) : 0}
+                                      ).toFixed(2)
+                                    : 0}
                                 </Text>
                                 <Text style={styles.cardAmountUnitText}>
                                   {switchOn
@@ -2121,10 +2131,10 @@ export default function Home(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
-          : Platform.OS == 'android'
-          ? hp('19%')
-          : hp('18%'),
+            ? hp('18%')
+            : Platform.OS == 'android'
+            ? hp('19%')
+            : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
         ]}
         renderContent={renderAddContent}
@@ -2181,7 +2191,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -2279,7 +2289,9 @@ export default function Home(props) {
           ref={addressBookBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('70%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
@@ -2301,7 +2313,9 @@ export default function Home(props) {
           ref={AllAccountsBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('70%'),
           ]}
           renderContent={renderAllAccountsContents}
           renderHeader={renderAllAccountsHeader}
@@ -2323,7 +2337,9 @@ export default function Home(props) {
           ref={settingsBottomSheet}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('70%'),
           ]}
           renderContent={renderSettingsContents}
           renderHeader={renderSettingsHeader}
@@ -2719,7 +2735,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginTop: 'auto',
     flex: 1,
-    height: Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 50 : Platform.OS == "android" ? 43 : 40,
+    height:
+      Platform.OS == 'ios' && DeviceInfo.hasNotch()
+        ? 50
+        : Platform.OS == 'android'
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

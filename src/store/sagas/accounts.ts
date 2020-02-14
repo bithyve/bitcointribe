@@ -68,28 +68,33 @@ function* fetchBalanceWorker({ payload }) {
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances;
-  console.log('here');
   const res = yield call(service.getBalance, { restore: payload.restore });
-  console.log({ res });
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
   if (
     res.status === 200 &&
+    payload.options &&
+    payload.options.fetchTransactionsSync
+  ) {
+    yield all([
+      fetchTransactionsWorker({
+        payload: { serviceType: payload.serviceType, service },
+      }),
+    ]); // have to dispatch everytime (if selected) as the tx confirmations increments
+  } else if (
+    res.status === 200 &&
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
   ) {
-    if (payload.options && payload.options.fetchTransactionsSync) {
-      yield put(fetchTransactions(payload.serviceType, service));
-    } else {
-      const { SERVICES } = yield select(state => state.storage.database);
-      const updatedSERVICES = {
-        ...SERVICES,
-        [payload.serviceType]: JSON.stringify(service),
-      };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    }
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   }
+
   if (payload.options.loader) {
-    yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
+    // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
     yield put(switchLoader(payload.serviceType, 'balances'));
   }
 }
