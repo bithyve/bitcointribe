@@ -928,19 +928,20 @@ export default function Accounts(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      if(props.navigation.state.params){
-        carousel.current.snapToItem(
-          props.navigation.getParam('index'),
-          true,
-          true,
-        );
-      } else{
-        carousel.current.snapToItem(1,
-          true,
-          true,
-        );
+      if(carousel.current){
+        if(props.navigation.state.params){
+          carousel.current.snapToItem(
+            props.navigation.getParam('index'),
+            true,
+            true,
+          );
+        } else{
+          carousel.current.snapToItem(1,
+            true,
+            true,
+          );
+        }  
       }
-      
     }, 2000);
     getServiceType(serviceType);
     (async () => {

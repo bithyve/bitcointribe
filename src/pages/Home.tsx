@@ -2628,7 +2628,7 @@ export default function Home(props) {
             </View>
           )}
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => selectTab('Add')}
           style={styles.tabBarTabView}
         >
@@ -2648,7 +2648,7 @@ export default function Home(props) {
               />
             </View>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => selectTab('QR')}
           style={styles.tabBarTabView}
