@@ -230,6 +230,7 @@ export default function ContactList(props) {
                 if (selectedContacts.findIndex(temp => temp.id == item.id) > -1) {
                   selected = true;
                 }
+                if(item.phoneNumbers || item.emails){
                 return (
                   <AppBottomSheetTouchableWrapper
                     onPress={() => onContactSelect(index)}
@@ -244,13 +245,17 @@ export default function ContactList(props) {
                       onpress={() => onContactSelect(index)}
                     />
                     <Text style={styles.contactText}>
-                      {item.name.split(' ')[0]}{' '}
+                      {item.name && item.name.split(' ')[0] ? item.name.split(' ')[0] : ""}{' '}
                       <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {item.name.split(' ')[1]}
+                        {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                       </Text>
                     </Text>
                   </AppBottomSheetTouchableWrapper>
                 );
+                }
+                else{
+                  return null;
+                }
               }}
             />
           ) : null}

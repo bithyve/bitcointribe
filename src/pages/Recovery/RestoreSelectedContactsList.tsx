@@ -634,9 +634,9 @@ export default function RestoreSelectedContactsList(props) {
                   >
                     <View>
                       <Text style={styles.selectedContactName}>
-                        {contact.name.split(' ')[0]}{' '}
+                        {contact.name && contact.name.split(' ')[0] ? contact.name.split(' ')[0] : ""}{' '}
                         <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {contact.name.split(' ')[1]}
+                          {contact.name && contact.name.split(' ')[0] ? contact.name.split(' ')[1] : ""}
                         </Text>
                       </Text>
                       {contact &&
