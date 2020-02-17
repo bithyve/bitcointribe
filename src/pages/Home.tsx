@@ -931,9 +931,9 @@ export default function Home(props) {
         onPressAcceptSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
+            setDeepLinkModalOpen(false)
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
-          console.log('custodyRequest', custodyRequest);
           if (custodyRequest.isQR) {
             dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
           } else {
@@ -1049,6 +1049,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
+            setDeepLinkModalOpen(false)
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
         }}
@@ -2004,7 +2005,7 @@ export default function Home(props) {
                               {value.accountType == 'secure' ? (
                                 <TouchableOpacity
                                   onPress={() => {
-                                    alert('2FA');
+                                    // alert('2FA');
                                   }}
                                   style={{
                                     marginLeft: 'auto',
@@ -2232,10 +2233,9 @@ export default function Home(props) {
       /> */}
       <BottomSheet
         onCloseEnd={() => {
-          if (tabBarZIndex == 0) {
+          if (tabBarZIndex == 0 && !deepLinkModalOpen) {
             setTabBarZIndex(999);
           }
-          setDeepLinkModalOpen(false);
         }}
         onOpenEnd={() => {
           if (tabBarZIndex == 999) {
@@ -2250,11 +2250,11 @@ export default function Home(props) {
         renderHeader={renderCustodianRequestModalHeader}
       />
       <BottomSheet
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
         onCloseEnd={() => {
           setTabBarZIndex(999);
+        }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
         }}
         enabledInnerScrolling={true}
         ref={RecoverySecretRequestBottomSheet}
@@ -2288,8 +2288,11 @@ export default function Home(props) {
         renderHeader={renderCustodianRequestOtpModalHeader}
       /> */}
       <BottomSheet
-        onCloseEnd={() => {
+        onCloseStart={() => {
           setTabBarZIndex(999);
+        }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
         }}
         enabledInnerScrolling={true}
         ref={CustodianRequestRejectedBottomSheet}
