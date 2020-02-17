@@ -74,7 +74,7 @@ const ReceivingAddress = props => {
       }, 10);
       setTimeout(() => {
         if (ReceiveHelperBottomSheet.current)
-          ReceiveHelperBottomSheet.current.snapTo(2);
+          ReceiveHelperBottomSheet.current.snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -128,7 +128,7 @@ const ReceivingAddress = props => {
           console.log('isReceiveHelperDone', isReceiveHelperDone);
           if (isReceiveHelperDone) {
             if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(2);
+              (ReceiveHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsReceiveHelperDone(false);
             }, 10);
@@ -288,7 +288,7 @@ const ReceivingAddress = props => {
                   onPress={() => {
                     AsyncStorage.setItem('isReceiveHelperDone', 'true');
                     if (ReceiveHelperBottomSheet.current)
-                      ReceiveHelperBottomSheet.current.snapTo(2);
+                      ReceiveHelperBottomSheet.current.snapTo(1);
                   }}
                   style={{
                     color: Colors.textColorGrey,
