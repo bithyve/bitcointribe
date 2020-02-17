@@ -639,18 +639,15 @@ export default function RestoreSelectedContactsList(props) {
                           {contact.name.split(' ')[1]}
                         </Text>
                       </Text>
-                      <Text
+                      {contact &&
+                        contact.communicationMode &&
+                        contact.communicationMode.length ? <Text
                         style={{
                           ...styles.selectedContactName,
                           fontSize: RFValue(11),
                         }}
-                      >
-                        {contact &&
-                        contact.communicationMode &&
-                        contact.communicationMode.length
-                          ? contact.communicationMode[0].info
-                          : ''}
-                      </Text>
+                      >{contact.communicationMode[0].info}</Text>
+                      : null}
                     </View>
                     {contact.status == 'received' ? (
                       <View
