@@ -24,6 +24,7 @@ import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import commonStyle from '../../common/Styles';
 import { requestShare } from '../../store/actions/sss';
+import { nameToInitials } from '../../common/CommonFunctions';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
@@ -166,10 +167,33 @@ export default function RecoveryCommunication(props) {
                   alignItems: 'center',
                 }}
               >
+                {contact.imageAvailable ? (
                 <Image
-                  source={require('../../assets/images/icons/pexels-photo.png')}
+                  source={contact.image}
                   style={{ ...styles.contactProfileImage }}
                 />
+              ) : (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.shadowBlue,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                  }}
+                >
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: 13,
+                      lineHeight: 13, //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {contact.name ? nameToInitials(contact.name) : ''}
+                  </Text>
+                </View>
+              )}
               </View>
             </View>
           </View>
