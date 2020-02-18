@@ -27,7 +27,6 @@ export default function RestoreByCloudQrCodeContents(props) {
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
     let shareCode = qrData.substring(0, 2);
-
     if (shareCode !== 'e0' && shareCode !== 'c0') {
       Alert.alert('Invalid QR', 'Please try again');
       return;
@@ -81,6 +80,7 @@ export default function RestoreByCloudQrCodeContents(props) {
       setCounter(1);
       setQrData('');
       setStartNumberCounter(1);
+      props.onScanCompleted(shareCode);
       props.onPressBack();
     }
   };

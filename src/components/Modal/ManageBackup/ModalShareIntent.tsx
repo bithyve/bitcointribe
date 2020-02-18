@@ -184,6 +184,7 @@ export default function ModalShareIntent(props) {
         <FlatList
           data={arrShareOption}
           renderItem={({ item, index }) => (
+            <View>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
                 onShare(item);
@@ -191,9 +192,9 @@ export default function ModalShareIntent(props) {
               disabled={disableOrEnableOption(item)}
               style={[
                 styles.listElements,
-                item.flagShare == true
-                  ? { backgroundColor: '#ccc', borderRadius: 5 }
-                  : null,
+                disableOrEnableOption(item) ? 
+                { backgroundColor: Colors.borderColor }
+                : null,
               ]}
             >
               <Image
@@ -213,6 +214,9 @@ export default function ModalShareIntent(props) {
                 />
               </View>
             </AppBottomSheetTouchableWrapper>
+            <View style={{ marginLeft:20, marginRight:20, marginTop:2, marginBottom:2, height: 1,
+              backgroundColor: Colors.borderColor,}} />
+              </View>
           )}
           keyExtractor={(item, index) => index.toString()}
         />
@@ -272,13 +276,11 @@ const styles = StyleSheet.create({
   },
   listElements: {
     flexDirection: 'row',
-    marginLeft: 20,
-    marginRight: 20,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
+    paddingLeft: 20,
+    paddingRight: 20,
     paddingTop: 25,
     paddingBottom: 25,
-    paddingLeft: 10,
+    // paddingLeft: 10,
     alignItems: 'center',
   },
   listElementsTitle: {

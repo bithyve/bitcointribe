@@ -511,9 +511,31 @@ export default function RestoreSelectedContactsList(props) {
     }
   }
 
+  const onScanCompleted = async(shareCode) =>{
+    let selectedDocsTemp = JSON.parse(await AsyncStorage.getItem("selectedDocuments"));
+    if(!selectedDocsTemp){
+      selectedDocsTemp = [];
+    }
+    let obj = null;
+    if(shareCode == 'e0')
+    {
+      obj = { title: 'Personal Copy 1', status: 'received' };
+      selectedDocsTemp[0]=obj;
+    }
+    else if(shareCode == 'c0')
+    {
+      obj = { title: 'Personal Copy 2', status: 'received' };
+      selectedDocsTemp[1]=obj;
+    }
+    await AsyncStorage.setItem('selectedDocuments', JSON.stringify(selectedDocsTemp));
+    selectedDocsTemp = JSON.parse(await AsyncStorage.getItem("selectedDocuments"));
+    setSelectedDocuments(selectedDocsTemp);
+  }
+
   function renderRestoreByCloudQrCodeContent() {
     return (
       <RestoreByCloudQrCodeContents
+        onScanCompleted = {(shareCode)=>onScanCompleted(shareCode)}
         modalRef={RestoreByCloudQrCodeContents}
         isOpenedFlag={QrBottomSheetsFlag}
         onPressBack={() => {
@@ -804,6 +826,7 @@ export default function RestoreSelectedContactsList(props) {
           {selectedDocuments.length > 0 && (
             <View style={{}}>
               {selectedDocuments.map(value => {
+                if(value){
                 return (
                   <TouchableOpacity
                     activeOpacity={value.status != 'received' ? 0 : 10}
@@ -897,6 +920,10 @@ export default function RestoreSelectedContactsList(props) {
                     )}
                   </TouchableOpacity>
                 );
+                }
+                else{
+                  null;
+                }
               })}
             </View>
           )}
