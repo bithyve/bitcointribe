@@ -159,8 +159,6 @@ export default function Login(props) {
   useEffect(() => {
     if (isAuthenticated) {
       AsyncStorage.getItem('walletExists').then(exists => {
-        console.log({ exists });
-        AsyncStorage.getAllKeys().then(console.log);
         if (exists) {
           if (dbFetched) {
             dispatch(syncAccounts());
