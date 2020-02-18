@@ -221,22 +221,22 @@ export default function Home(props) {
   //   ShareRecoverySecretBottomSheet,
   //   setShareRecoverySecretBottomSheet,
   // ] = useState(React.createRef());
-  const [
-    ShareRecoverySecretOtpBottomSheet,
-    setShareRecoverySecretOtpBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckGoogleAuthBottomSheet,
-    setHealthCheckGoogleAuthBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSecurityQuestionBottomSheet,
-    setHealthCheckSecurityQuestionBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   ShareRecoverySecretOtpBottomSheet,
+  //   setShareRecoverySecretOtpBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckSuccessBottomSheet,
+  //   setHealthCheckSuccessBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckGoogleAuthBottomSheet,
+  //   setHealthCheckGoogleAuthBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckSecurityQuestionBottomSheet,
+  //   setHealthCheckSecurityQuestionBottomSheet,
+  // ] = useState(React.createRef());
   const [
     ContactSelectedFromAddressBookQrCodeBottomSheet,
     setContactSelectedFromAddressBookQrCodeBottomSheet,
@@ -264,9 +264,7 @@ export default function Home(props) {
   const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
     React.createRef(),
   );
-  const [MoreTabBottomSheet, setMoreTabBottomSheet] = useState(
-    React.createRef(),
-  );
+  
   // const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -471,7 +469,6 @@ export default function Home(props) {
         }
       }
     })();
-    console.log('overallHealthoverallHealth', overallHealth);
   }, []);
 
   const messageAsPerHealth = health => {
@@ -1993,7 +1990,7 @@ export default function Home(props) {
                                   : value.accountType === 'regular'
                                   ? 1
                                   : 2,
-                            });
+                              });
                           }}
                         >
                           <CardView cornerRadius={10} style={styles.card}>
