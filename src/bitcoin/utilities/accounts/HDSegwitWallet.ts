@@ -294,7 +294,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     if (txCounts[internalAddress] > 0) {
-      this.nextFreeChangeAddressIndex += this.gapLimit - 1;
+      this.nextFreeChangeAddressIndex += this.gapLimit;
       tryAgain = true;
     }
 
