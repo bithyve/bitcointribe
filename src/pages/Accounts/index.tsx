@@ -210,11 +210,12 @@ export default function Accounts(props) {
       setTimeout(() => {
         setIsTestHelperDone(true);
       }, 10);
-      if(TestAccountHelperBottomSheet.current){
+      
       setTimeout(() => {
-        TestAccountHelperBottomSheet.current.snapTo(1);
+        if(TestAccountHelperBottomSheet.current){
+          TestAccountHelperBottomSheet.current.snapTo(1);
+        }
       }, 1000);
-    }
     } else {
       setTimeout(() => {
         setIsTestHelperDone(false);
@@ -891,11 +892,11 @@ export default function Accounts(props) {
           setTimeout(() => {
             setIsSecureAccountHelperDone(true);
           }, 10);
-          if(SecureAccountHelperBottomSheet.current){
           setTimeout(() => {
-            SecureAccountHelperBottomSheet.current.snapTo(1);
+            if(SecureAccountHelperBottomSheet.current){
+              SecureAccountHelperBottomSheet.current.snapTo(1);
+            }
           }, 1000);
-        }
         } else {
           setTimeout(() => {
             setIsSecureAccountHelperDone(false);
@@ -910,12 +911,11 @@ export default function Accounts(props) {
           setTimeout(() => {
             setIsRegularAccountHelperDone(true);
           }, 10);
-          if(RegularAccountHelperBottomSheet.current){
-            setTimeout(() => {
+          setTimeout(() => {
+            if(RegularAccountHelperBottomSheet.current){
               (RegularAccountHelperBottomSheet as any).current.snapTo(1);
-            }, 1000)
-          }
-           
+            }
+          }, 1000);
         } else {
           setTimeout(() => {
             setIsRegularAccountHelperDone(false);
