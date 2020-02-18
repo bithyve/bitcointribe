@@ -606,6 +606,7 @@ export default function Home(props) {
                 marginTop: hp('15%'),
                 alignItems: 'center',
                 padding: wp('10%'),
+                opacity:0.5
               }}
             >
               <Text
@@ -616,7 +617,7 @@ export default function Home(props) {
                   textAlign: 'center',
                 }}
               >
-                All your recent transactions across all accounts will appear
+                Recent transactions across all accounts will appear
                 here
               </Text>
             </View>
@@ -628,9 +629,10 @@ export default function Home(props) {
         <View
           style={{
             flex: 1,
-            justifyContent: 'center',
+            marginTop: hp('15%'),
             alignItems: 'center',
             padding: wp('10%'),
+            opacity:0.5
           }}
         >
           <Text
@@ -641,7 +643,7 @@ export default function Home(props) {
               textAlign: 'center',
             }}
           >
-            All your recent transactions across all accounts will appear here
+            Recent transactions across all accounts will appear here
           </Text>
         </View>
       </View>
@@ -2134,7 +2136,7 @@ export default function Home(props) {
             ? hp('19%')
             : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
-          hp('80%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%')
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -2190,7 +2192,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          hp('90%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
