@@ -103,7 +103,10 @@ const MODAL_ROUTES = [
 
 const HomeNavigator = createStackNavigator(
   {
-    Home,
+    Home: {
+      screen: Home,
+      path: 'Home'
+    },
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {
@@ -185,5 +188,6 @@ const Navigator = createSwitchNavigator({
   SetupNav: SetupNavigator,
   HomeNav: HomeNavigator,
 });
+
 
 export default createAppContainer(Navigator);

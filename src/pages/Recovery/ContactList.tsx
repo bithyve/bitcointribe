@@ -174,9 +174,9 @@ export default function ContactList(props) {
         {selectedContacts.map(value => (
           <View style={styles.selectedContactView}>
             <Text style={styles.selectedContactNameText}>
-              {value.name.split(' ')[0]}{' '}
+              {value.name && value.name.split(' ')[0] ? value.name.split(' ')[0] : ""}{' '}
               <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                {value.name.split(' ')[1]}
+                {value.name && value.name.split(' ')[0] ? value.name.split(' ')[1] : ""}
               </Text>
             </Text>
             <TouchableOpacity onPress={() => onCancel(value)}>
@@ -208,9 +208,9 @@ export default function ContactList(props) {
                     onpress={() => onContactSelect(index)}
                   />
                   <Text style={styles.contactText}>
-                    {value.name.split(' ')[0]}{' '}
+                    {value.name && value.name.split(' ')[0] ? value.name.split(' ')[0] : ""}{' '}
                     <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {value.name.split(' ')[1]}
+                      {value.name && value.name.split(' ')[0] ? value.name.split(' ')[1] : ""}
                     </Text>
                   </Text>
                 </TouchableOpacity>

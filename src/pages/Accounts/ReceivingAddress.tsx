@@ -11,7 +11,7 @@ import {
   Button,
   ScrollView,
   Platform,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -36,6 +36,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { RFValue } from 'react-native-responsive-fontsize';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 const ReceivingAddress = props => {
   const getServiceType = props.navigation.state.params.getServiceType
@@ -55,22 +56,27 @@ const ReceivingAddress = props => {
   );
   const { receivingAddress } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-    const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
+  const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
 
   const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone1 = await AsyncStorage.getItem('isReceiveHelperDone');
-    console.log("isReceiveHelperDone1", isReceiveHelperDone,isReceiveHelperDone1)
+    let isReceiveHelperDone1 = await AsyncStorage.getItem(
+      'isReceiveHelperDone',
+    );
+    console.log(
+      'isReceiveHelperDone1',
+      isReceiveHelperDone,
+      isReceiveHelperDone1,
+    );
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
       }, 10);
       setTimeout(() => {
-        if(ReceiveHelperBottomSheet.current)
-        ReceiveHelperBottomSheet.current.snapTo(2);
+        if (ReceiveHelperBottomSheet.current)
+          ReceiveHelperBottomSheet.current.snapTo(1);
       }, 1000);
-    }
-    else{
+    } else {
       setTimeout(() => {
         setIsReceiveHelperDone(false);
       }, 10);
@@ -81,12 +87,12 @@ const ReceivingAddress = props => {
     checkNShowHelperModal();
     (async () => {
       if (serviceType === SECURE_ACCOUNT) {
-        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+         if (!(await AsyncStorage.getItem('savingsWarning'))) {
         // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-        if(SecureReceiveWarningBottomSheet.current)
-        SecureReceiveWarningBottomSheet.current.snapTo(1);
+        if (SecureReceiveWarningBottomSheet.current)
+          SecureReceiveWarningBottomSheet.current.snapTo(1);
         await AsyncStorage.setItem('savingsWarning', 'true');
-         }
+        }
       }
     })();
   }, []);
@@ -101,8 +107,8 @@ const ReceivingAddress = props => {
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-            if(ReceiveHelperBottomSheet.current)
-            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+            if (ReceiveHelperBottomSheet.current)
+              (ReceiveHelperBottomSheet as any).current.snapTo(0);
             props.navigation.navigate('ReceivingAddress', {
               serviceType,
               getServiceType,
@@ -119,21 +125,21 @@ const ReceivingAddress = props => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log("isReceiveHelperDone",isReceiveHelperDone);
+          console.log('isReceiveHelperDone', isReceiveHelperDone);
           if (isReceiveHelperDone) {
-            if(ReceiveHelperBottomSheet.current)
-            (ReceiveHelperBottomSheet as any).current.snapTo(2);
+            if (ReceiveHelperBottomSheet.current)
+              (ReceiveHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsReceiveHelperDone(false);
             }, 10);
-          } else{
-            if(ReceiveHelperBottomSheet.current)
-            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+          } else {
+            if (ReceiveHelperBottomSheet.current)
+              (ReceiveHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
     );
-  }
+  };
 
   const renderSecureReceiveWarningContents = useCallback(() => {
     return (
@@ -144,7 +150,7 @@ const ReceivingAddress = props => {
               height: '100%',
               justifyContent: 'center',
               alignItems: 'center',
-              marginTop: hp('2%')
+              marginTop: hp('2%'),
             }}
           >
             <BottomInfoBox
@@ -153,7 +159,59 @@ const ReceivingAddress = props => {
                 "Please ensure that you have 2FA setted up (preferably on your secondary device), you'll require the 2FA token in order to send bitcoins from the savings account."
               }
             />
-            <View style={{ flexDirection: 'row' }}>
+
+            <View
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+                flexDirection: 'row',
+                marginTop: hp('1%'),
+                marginBottom: hp('1%'),
+              }}
+            >
+              <AppBottomSheetTouchableWrapper
+                onPress={() => {
+                  if (SecureReceiveWarningBottomSheet.current)
+                    (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+                }}
+                style={{
+                  ...styles.confirmButtonView,
+                  backgroundColor: Colors.blue,
+                  elevation: 10,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 15, height: 15 },
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Ok, I understand
+                </Text>
+              </AppBottomSheetTouchableWrapper>
+              <AppBottomSheetTouchableWrapper
+                onPress={() => props.navigation.replace('ManageBackup')}
+                style={{
+                  ...styles.confirmButtonView,
+                  width: wp('30%'),
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Manage Backup
+                </Text>
+              </AppBottomSheetTouchableWrapper>
+            </View>
+            {/* <View style={{ flexDirection: 'row' }}>
               <Button
                 title="Ok, I understand"
                 onPress={() =>{
@@ -167,7 +225,7 @@ const ReceivingAddress = props => {
                 title="Manage Backup"
                 onPress={() => props.navigation.replace('ManageBackup')}
               />
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       </View>
@@ -180,8 +238,8 @@ const ReceivingAddress = props => {
         borderColor={Colors.borderColor}
         backgroundColor={Colors.white}
         onPressHeader={() => {
-          if(SecureReceiveWarningBottomSheet.current)
-          (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+          if (SecureReceiveWarningBottomSheet.current)
+            (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -196,87 +254,97 @@ const ReceivingAddress = props => {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <TouchableWithoutFeedback onPress={() => {
-        if(ReceiveHelperBottomSheet.current)
-        ReceiveHelperBottomSheet.current.snapTo(0)}}>
-      <View style={BackupStyles.modalContainer}>
-        <View style={BackupStyles.modalHeaderTitleView}>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity
-              onPress={() => {
-                if (getServiceType) {
-                  getServiceType(serviceType);
-                }
-                props.navigation.goBack();
-              }}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (ReceiveHelperBottomSheet.current)
+            ReceiveHelperBottomSheet.current.snapTo(0);
+        }}
+      >
+        <View style={BackupStyles.modalContainer}>
+          <View style={BackupStyles.modalHeaderTitleView}>
+            <View
+              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
             >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <Text style={BackupStyles.modalHeaderTitleText}>
-              Receiving Address
-            </Text>
-            {serviceType == TEST_ACCOUNT ? (
-              <Text
+              <TouchableOpacity
                 onPress={() => {
-                  AsyncStorage.setItem('isReceiveHelperDone', 'true');
-                  if(ReceiveHelperBottomSheet.current)
-                  ReceiveHelperBottomSheet.current.snapTo(2);
+                  if (getServiceType) {
+                    getServiceType(serviceType);
+                  }
+                  props.navigation.goBack();
                 }}
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  marginLeft: 'auto',
-                }}
+                style={{ height: 30, width: 30, justifyContent: 'center' }}
               >
-                Know more
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </TouchableOpacity>
+              <Text style={BackupStyles.modalHeaderTitleText}>
+                Receiving Address
               </Text>
-            ) : null}
+              {serviceType == TEST_ACCOUNT ? (
+                <Text
+                  onPress={() => {
+                    AsyncStorage.setItem('isReceiveHelperDone', 'true');
+                    if (ReceiveHelperBottomSheet.current)
+                      ReceiveHelperBottomSheet.current.snapTo(1);
+                  }}
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    marginLeft: 'auto',
+                  }}
+                >
+                  Know more
+                </Text>
+              ) : null}
+            </View>
+          </View>
+          <View style={BackupStyles.modalContentView}>
+            {!receivingAddress ? (
+              <View style={styles.loader}>
+                <ActivityIndicator size="large" />
+              </View>
+            ) : (
+              <QRCode value={receivingAddress} size={hp('27%')} />
+            )}
+            {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
+          </View>
+          <View
+            style={{
+              marginBottom: hp('5%'),
+            }}
+          >
+            <BottomInfoBox
+              title={'Note'}
+              infoText={
+                'The QR code is your bitcoin address. The payer will scan it to send bitcoins. Alternatively copy the address displayed below it and send it to the payer'
+              }
+            />
           </View>
         </View>
-        <View style={BackupStyles.modalContentView}>
-          {!receivingAddress ? (
-            <View style={styles.loader}>
-              <ActivityIndicator size="large" />
-            </View>
-          ) : (
-            <QRCode value={receivingAddress} size={hp('27%')} />
-          )}
-          {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
-        </View>
-        <View
-          style={{
-            marginBottom: hp('5%'),
-          }}
-        >
-          <BottomInfoBox
-            title={'Note'}
-            infoText={
-              'The QR code is your bitcoin address. The payer will scan it to send bitcoins. Alternatively copy the address displayed below it and send it to the payer'
-            }
-          />
-        </View>
-        
-      </View>
       </TouchableWithoutFeedback>
       <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ReceiveHelperBottomSheet}
-          snapPoints={[-50,  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),]}
-          renderContent={renderReceiveHelperContents}
-          renderHeader={renderReceiveHelperHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SecureReceiveWarningBottomSheet}
-          snapPoints={[-50, hp('95%')]}
-          renderContent={renderSecureReceiveWarningContents}
-          renderHeader={renderSecureReceiveWarningHeader}
-        />
+        enabledInnerScrolling={true}
+        ref={ReceiveHelperBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),
+        ]}
+        renderContent={renderReceiveHelperContents}
+        renderHeader={renderReceiveHelperHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SecureReceiveWarningBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderSecureReceiveWarningContents}
+        renderHeader={renderSecureReceiveWarningHeader}
+      />
     </View>
   );
 };
@@ -288,10 +356,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
+    paddingBottom: hp('2%'),
     elevation: 10,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
+  },
+  confirmButtonView: {
+    width: wp('40%'),
+    height: wp('13%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
   },
 });
 

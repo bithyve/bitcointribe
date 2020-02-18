@@ -70,9 +70,9 @@ export default function AddressBookContents(props) {
               return (
                 <View style={styles.selectedContactsView}>
                   <Text style={styles.contactText}>
-                    {item.name.split(' ')[0]}{' '}
+                    {item.name && item.name.split(' ')[0] ?  item.name.split(' ')[0] : ""}{' '}
                     <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {item.name.split(' ')[1]}
+                      {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                     </Text>
                   </Text>
                   <TouchableOpacity style={styles.shareButtonView}>
@@ -123,9 +123,9 @@ export default function AddressBookContents(props) {
               return (
                 <View style={styles.selectedContactsView}>
                   <Text style={styles.contactText}>
-                    {item.name.split(' ')[0]}{' '}
+                    {item.name && item.name.split(' ')[0] ? item.name.split(' ')[0]: ""}{' '}
                     <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {item.name.split(' ')[1]}
+                      {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                     </Text>
                   </Text>
                   <TouchableOpacity style={styles.shareButtonView}>

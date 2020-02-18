@@ -58,7 +58,7 @@ export default function TransactionDetails(props) {
       }, 10);
 
       setTimeout(() => {
-        TransactionDetailsBottomSheet.current.snapTo(2);
+        TransactionDetailsBottomSheet.current.snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -93,7 +93,7 @@ export default function TransactionDetails(props) {
         onPressHeader={() => {
           console.log('isHelperDone', isHelperDone);
           if (isHelperDone) {
-            (TransactionDetailsBottomSheet as any).current.snapTo(2);
+            (TransactionDetailsBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsHelperDone(false);
             }, 10);
@@ -142,7 +142,7 @@ export default function TransactionDetails(props) {
                 <Text
                   onPress={() => {
                     AsyncStorage.setItem('isTransactionHelperDone', 'true');
-                    TransactionDetailsBottomSheet.current.snapTo(2);
+                    TransactionDetailsBottomSheet.current.snapTo(1);
                   }}
                   style={{
                     color: Colors.textColorGrey,

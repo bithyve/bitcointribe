@@ -122,7 +122,7 @@ export default function Send(props) {
 
       setTimeout(() => {
         if(SendHelperBottomSheet.current)
-        SendHelperBottomSheet.current.snapTo(2);
+        SendHelperBottomSheet.current.snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -237,7 +237,7 @@ export default function Send(props) {
         onPressHeader={() => {
           if (isSendHelperDone) {
             if(SendHelperBottomSheet.current)
-            (SendHelperBottomSheet as any).current.snapTo(2);
+            (SendHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsSendHelperDone(false);
             }, 10);
@@ -565,7 +565,7 @@ export default function Send(props) {
                         onPress={() => {
                           AsyncStorage.setItem('isSendHelperDone', 'true');
                           if(SendHelperBottomSheet.current)
-                          SendHelperBottomSheet.current.snapTo(2);
+                          SendHelperBottomSheet.current.snapTo(1);
                         }}
                         style={{
                           color: Colors.textColorGrey,

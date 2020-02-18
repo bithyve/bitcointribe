@@ -87,7 +87,7 @@ const TestLink = props => {
         return (
           <TouchableOpacity onPress={() => setSelectedContact(value)}>
             <Text>
-              {value.name.split(' ')[0]} <Text>{value.name.split(' ')[1]}</Text>
+              {value.name && value.name.split(' ')[0] ? value.name.split(' ')[0] : ""} <Text>{value.name && value.name.split(' ')[0] ? value.name.split(' ')[1] : ""}</Text>
             </Text>
           </TouchableOpacity>
         );
