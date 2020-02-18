@@ -11,6 +11,7 @@ import {
   Platform,
   RefreshControl,
   AsyncStorage,
+  InteractionManager
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -187,6 +188,7 @@ export default function ManageBackup(props) {
   const healthLoading = useSelector(
     state => state.sss.loading.checkMSharesHealth,
   );
+  const [is_initiated, setIs_initiated] = useState(false);
 
   function getImageByType(item) {
     let type = item.type;
@@ -785,6 +787,9 @@ export default function ManageBackup(props) {
   };
 
   useEffect(() => {
+    InteractionManager.runAfterInteractions(() => {
+      setIs_initiated(true);
+  });
     let focusListener = props.navigation.addListener('didFocus', () => {
       setContactsFromAsync();
       // setAutoHighlightFlagsFromAsync();
@@ -1307,6 +1312,8 @@ export default function ManageBackup(props) {
             />
           </TouchableOpacity>
         </View>
+        { is_initiated ?
+        <View style={{flex:1}}>
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -1608,6 +1615,18 @@ export default function ManageBackup(props) {
           </Text>
         </TouchableOpacity>
       </View>
+       
+       : <ScrollView
+           contentContainerStyle={{
+             backgroundColor: Colors.backgroundColor,
+           }}
+           refreshControl={
+             <RefreshControl
+               refreshing={!is_initiated}
+             />
+           }
+         /> }
+    </View>
     </View>
   );
 }
