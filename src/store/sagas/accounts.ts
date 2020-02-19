@@ -69,7 +69,9 @@ function* fetchBalanceWorker({ payload }) {
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances;
-  const res = yield call(service.getBalance, { restore: payload.restore });
+  const res = yield call(service.getBalance, {
+    restore: payload.options.restore,
+  });
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
   if (
@@ -159,7 +161,7 @@ function* fetchBalanceTxWorker({ payload }) {
       : service.hdWallet.transactions;
 
   const res = yield call(service.getBalanceTransactions, {
-    restore: payload.restore,
+    restore: payload.options.restore,
   });
 
   const postFetchBalances =
