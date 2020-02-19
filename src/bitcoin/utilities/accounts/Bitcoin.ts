@@ -242,6 +242,91 @@ export default class Bitcoin {
     }
   };
 
+  public fetchBalanceTransactionsByAddresses = async (
+    addresses: string[],
+    accountType: string,
+  ): Promise<{
+    balances: { balance: number; unconfirmedBalance: number };
+    transactions: Transactions;
+  }> => {
+    let res: AxiosResponse;
+    try {
+      if (this.network === bitcoinJS.networks.testnet) {
+        res = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCETXN,
+          {
+            addresses,
+          },
+        );
+      } else {
+        res = await axios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCETXN,
+          {
+            addresses,
+          },
+        );
+      }
+
+      const { Balance, Transactions } = res.data;
+
+      const balances = {
+        balance: Balance.Balance,
+        unconfirmedBalance: Balance.UnconfirmedBalance,
+      };
+
+      const transactions: Transactions = {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [],
+      };
+
+      const addressesInfo = Transactions[0]; // returned data has an array inside an array (to be fixed later)
+      const txMap = new Map();
+      for (const addressInfo of addressesInfo) {
+        console.log(
+          `Appending transactions corresponding to ${addressInfo.Address}`,
+        );
+        if (addressInfo.TotalTransactions === 0) {
+          continue;
+        }
+        transactions.totalTransactions += addressInfo.TotalTransactions;
+        transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
+        transactions.unconfirmedTransactions +=
+          addressInfo.UnconfirmedTransactions;
+
+        addressInfo.Transactions.forEach(tx => {
+          if (!txMap.has(tx.txid)) {
+            // check for duplicate tx (fetched against sending and  then again for change address)
+            txMap.set(tx.txid, true);
+            this.categorizeTx(tx, addresses, accountType);
+            transactions.transactionDetails.push({
+              txid: tx.txid,
+              confirmations: tx.NumberofConfirmations,
+              status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
+              fee: tx.fee,
+              date: tx.Status.block_time
+                ? new Date(tx.Status.block_time * 1000).toUTCString()
+                : new Date(Date.now()).toUTCString(),
+              transactionType: tx.transactionType,
+              amount: tx.amount,
+              accountType: tx.accountType,
+              recipientAddresses: tx.recipientAddresses,
+              senderAddresses: tx.senderAddresses,
+            });
+          }
+        });
+      }
+
+      return { balances, transactions };
+    } catch (err) {
+      console.log(
+        `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+      );
+      throw new Error('Fetching balance-txn by addresses failed');
+    }
+  };
+
   public fetchTransactionsByAddress = async (
     address: string,
   ): Promise<

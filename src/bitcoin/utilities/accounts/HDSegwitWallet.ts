@@ -423,6 +423,54 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public fetchBalanceTransaction = async (options?: {
+    restore?;
+  }): Promise<{
+    balances: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions: Transactions;
+  }> => {
+    if (options && options.restore) {
+      if (!(await this.isWalletEmpty())) {
+        console.log('Executing internal binary search');
+        this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
+          config.BSI.INIT_INDEX,
+        );
+        console.log('Executing external binary search');
+        this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
+          config.BSI.INIT_INDEX,
+        );
+      }
+    }
+
+    await this.gapLimitCatchUp();
+
+    this.usedAddresses = [];
+    for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
+      this.usedAddresses.push(this.getExternalAddressByIndex(itr));
+    }
+    for (
+      let itr = 0;
+      itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+      itr++
+    ) {
+      this.usedAddresses.push(this.getInternalAddressByIndex(itr));
+    }
+
+    const {
+      balances,
+      transactions,
+    } = await this.fetchBalanceTransactionsByAddresses(
+      this.usedAddresses,
+      this.isTest ? 'Test Account' : 'Regular Account',
+    );
+    this.balances = balances;
+    this.transactions = transactions;
+    return { balances, transactions };
+  };
+
   public fetchTransactions = async (): Promise<{
     transactions: Transactions;
   }> => {
