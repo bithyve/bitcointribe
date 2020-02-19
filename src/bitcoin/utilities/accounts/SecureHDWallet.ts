@@ -264,6 +264,45 @@ export default class SecureHDWallet extends Bitcoin {
     return { transactions };
   };
 
+  public fetchBalanceTransaction = async (options?: {
+    restore?;
+  }): Promise<{
+    balances: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions: Transactions;
+  }> => {
+    if (options && options.restore) {
+      if (!(await this.isWalletEmpty())) {
+        console.log('Executing consumed binary search');
+        this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
+          config.BSI.INIT_INDEX,
+        );
+      }
+    }
+
+    await this.gapLimitCatchUp();
+
+    this.consumedAddresses = [];
+    // generating all consumed addresses:
+    for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
+      const multiSig = this.createSecureMultiSig(itr);
+      this.consumedAddresses.push(multiSig.address);
+    }
+
+    const {
+      balances,
+      transactions,
+    } = await this.fetchBalanceTransactionsByAddresses(
+      this.consumedAddresses,
+      'Savings Account',
+    );
+    this.balances = balances;
+    this.transactions = transactions;
+    return { balances, transactions };
+  };
+
   public getReceivingAddress = async (): Promise<{ address: string }> => {
     try {
       // looking for free external address

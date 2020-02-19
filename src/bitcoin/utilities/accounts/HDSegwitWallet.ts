@@ -423,6 +423,22 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public fetchTransactions = async (): Promise<{
+    transactions: Transactions;
+  }> => {
+    if (this.usedAddresses.length === 0) {
+      // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
+      await this.fetchBalance();
+    }
+
+    const { transactions } = await this.fetchTransactionsByAddresses(
+      this.usedAddresses,
+      this.isTest ? 'Test Account' : 'Regular Account',
+    );
+    this.transactions = transactions;
+    return { transactions };
+  };
+
   public fetchBalanceTransaction = async (options?: {
     restore?;
   }): Promise<{
@@ -469,22 +485,6 @@ export default class HDSegwitWallet extends Bitcoin {
     this.balances = balances;
     this.transactions = transactions;
     return { balances, transactions };
-  };
-
-  public fetchTransactions = async (): Promise<{
-    transactions: Transactions;
-  }> => {
-    if (this.usedAddresses.length === 0) {
-      // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-      await this.fetchBalance();
-    }
-
-    const { transactions } = await this.fetchTransactionsByAddresses(
-      this.usedAddresses,
-      this.isTest ? 'Test Account' : 'Regular Account',
-    );
-    this.transactions = transactions;
-    return { transactions };
   };
 
   public createHDTransaction = async (
