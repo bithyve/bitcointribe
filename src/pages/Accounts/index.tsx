@@ -42,6 +42,7 @@ import {
   fetchBalance,
   fetchTransactions,
   getTestcoins,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -123,7 +124,7 @@ export default function Accounts(props) {
   );
   const service = useSelector(state => state.accounts[serviceType].service);
   const loader = useSelector(
-    state => state.accounts[serviceType].loading.balances,
+    state => state.accounts[serviceType].loading.balanceTx,
   );
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
@@ -889,9 +890,8 @@ export default function Accounts(props) {
                 onRefresh={() => {
                   // dispatch(fetchTransactions(serviceType));
                   dispatch(
-                    fetchBalance(serviceType, {
+                    fetchBalanceTx(serviceType, {
                       loader: true,
-                      fetchTransactionsSync: true,
                     }),
                   );
                 }}

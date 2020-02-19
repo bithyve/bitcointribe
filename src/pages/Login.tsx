@@ -32,9 +32,10 @@ import {
   fetchBalance,
   fetchTransactions,
   syncAccounts,
+  calculateExchangeRate,
 } from '../store/actions/accounts';
 import axios from 'axios';
-import { updateMSharesHealth } from '../store/actions/sss';
+import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
@@ -59,8 +60,6 @@ export default function Login(props) {
     [passcode],
   );
 
-  const [exchangeRates, setExchangeRates] = useState();
-  const accounts = useSelector(state => state.accounts);
   const DECENTRALIZED_BACKUP = useSelector(
     state => state.storage.database.DECENTRALIZED_BACKUP,
   );
@@ -71,149 +70,145 @@ export default function Login(props) {
     state => state.setupAndAuth,
   );
   const { dbFetched } = useSelector(state => state.storage);
-  const [balances, setBalances] = useState({
-    testBalance: 0,
-    regularBalance: 0,
-    secureBalance: 0,
-    accumulativeBalance: 0,
-  });
-  const [transactions, setTransactions] = useState([]);
+  // const [balances, setBalances] = useState({
+  //   testBalance: 0,
+  //   regularBalance: 0,
+  //   secureBalance: 0,
+  //   accumulativeBalance: 0,
+  // });
+  // const [transactions, setTransactions] = useState([]);
   // const [authenticating, setAuthenticating] = useState(false);
 
-  useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
-      : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
+  // useEffect(() => {
+  //   const testBalance = accounts[TEST_ACCOUNT].service
+  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+  //       accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //     : 0;
+  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
+  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+  //       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //     : 0;
+  //   const secureBalance = accounts[SECURE_ACCOUNT].service
+  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+  //       accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+  //         .unconfirmedBalance
+  //     : 0;
+  //   const accumulativeBalance = regularBalance + secureBalance;
 
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : [];
-    const regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
-      : [];
+  //   const testTransactions = accounts[TEST_ACCOUNT].service
+  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+  //     : [];
+  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
+  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+  //         .transactionDetails
+  //     : [];
 
-    const secureTransactions = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
-      : [];
-    const accumulativeTransactions = [
-      ...testTransactions,
-      ...regularTransactions,
-      ...secureTransactions,
-    ];
+  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
+  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+  //         .transactionDetails
+  //     : [];
+  //   const accumulativeTransactions = [
+  //     ...testTransactions,
+  //     ...regularTransactions,
+  //     ...secureTransactions,
+  //   ];
 
-    setBalances({
-      testBalance,
-      regularBalance,
-      secureBalance,
-      accumulativeBalance,
-    });
-    setTransactions(accumulativeTransactions);
-  }, [accounts]);
+  //   setBalances({
+  //     testBalance,
+  //     regularBalance,
+  //     secureBalance,
+  //     accumulativeBalance,
+  //   });
+  //   setTransactions(accumulativeTransactions);
+  // }, [accounts]);
 
-  useEffect(() => {
-    // HC up-streaming
-    if (DECENTRALIZED_BACKUP) {
-      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-        dispatch(updateMSharesHealth());
-      }
-    }
-  }, [DECENTRALIZED_BACKUP]);
+  const s3Service = useSelector(state => state.sss.service);
+  // useEffect(() => {
+  //   // HC init and down-streaming
+  //   if (s3Service) {
+  //     const { healthCheckInitialized } = s3Service.sss;
+  //     if (healthCheckInitialized) {
+  //       dispatch(checkMSharesHealth());
+  //     }
+  //   }
+  // }, [s3Service]);
 
-  useEffect(() => {
-    (async () => {
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        if (Date.now() - exchangeRates.lastFetched < 1800000) {
-          setExchangeRates(exchangeRates);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        console.log('Failed to retrieve exchange rates', res);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   // HC up-streaming
+  //   if (DECENTRALIZED_BACKUP) {
+  //     if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+  //       dispatch(updateMSharesHealth());
+  //     }
+  //   }
+  // }, [DECENTRALIZED_BACKUP]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+  //     if (storedExchangeRates) {
+  //       const exchangeRates = JSON.parse(storedExchangeRates);
+  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
+  //         setExchangeRates(exchangeRates);
+  //         return;
+  //       } // maintaining an hour difference b/w fetches
+  //     }
+  //     const res = await axios.get('https://blockchain.info/ticker');
+  //     if (res.status == 200) {
+  //       const exchangeRates = res.data;
+  //       exchangeRates.lastFetched = Date.now();
+  //       setExchangeRates(exchangeRates);
+  //       await AsyncStorage.setItem(
+  //         'exchangeRates',
+  //         JSON.stringify(exchangeRates),
+  //       );
+  //     } else {
+  //       console.log('Failed to retrieve exchange rates', res);
+  //     }
+  //   })();
+  // }, []);
+
+  const custodyRequest = props.navigation.getParam('custodyRequest');
+  const recoveryRequest = props.navigation.getParam('recoveryRequest');
 
   useEffect(() => {
     if (isAuthenticated) {
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
           if (dbFetched) {
+            (loaderBottomSheet as any).current.snapTo(1);
+
+            // calculate the exchangeRate
+            dispatch(calculateExchangeRate());
+
+            // HC down-streaming
+            if (s3Service) {
+              const { healthCheckInitialized } = s3Service.sss;
+              if (healthCheckInitialized) {
+                dispatch(checkMSharesHealth());
+              }
+            }
+
+            // HC up-streaming
+            if (DECENTRALIZED_BACKUP) {
+              if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+                dispatch(updateMSharesHealth());
+              }
+            }
+
+            setTimeout(() => {
+              (loaderBottomSheet as any).current.snapTo(0);
+              props.navigation.navigate('Home', {
+                custodyRequest,
+                recoveryRequest,
+              });
+            }, 2500);
+
             dispatch(syncAccounts());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
     }
   }, [isAuthenticated, dbFetched]);
-
-  const custodyRequest = props.navigation.getParam('custodyRequest');
-  const recoveryRequest = props.navigation.getParam('recoveryRequest');
-  // if (
-  //   exchangeRates &&
-  //   balances.testBalance &&
-  //   balances.regularBalance >= 0 &&
-  //   balances.secureBalance >= 0 &&
-  //   transactions.length > 0
-  // ) {
-  //   console.log(
-  //     'isInitialized && exchangeRates && testBalance && testTransactions.length',
-  //     exchangeRates &&
-  //       balances.testBalance &&
-  //       balances.regularBalance &&
-  //       balances.secureBalance &&
-  //       transactions.length,
-  //   );
-  //   (loaderBottomSheet as any).current.snapTo(0);
-  //   props.navigation.navigate('Home', {
-  //     custodyRequest,
-  //     recoveryRequest,
-  //     exchangeRates,
-  //     balances,
-  //     transactions,
-  //   });
-  // }
-
-  if (exchangeRates && accounts.accountsSynched) {
-    // console.log(
-    //   'isInitialized && exchangeRates && testBalance && testTransactions.length',
-    //   exchangeRates &&
-    //     balances.testBalance &&
-    //     balances.regularBalance &&
-    //     balances.secureBalance &&
-    //     transactions.length,
-    // );
-    (loaderBottomSheet as any).current.snapTo(0);
-    props.navigation.navigate('Home', {
-      custodyRequest,
-      recoveryRequest,
-      exchangeRates,
-      balances,
-      transactions,
-    });
-  }
 
   const renderLoaderModalContent = () => {
     return (
@@ -410,7 +405,6 @@ export default function Login(props) {
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
                   setElevation(0);
-                  (loaderBottomSheet as any).current.snapTo(1);
                   //setAuthenticating(true);
                   dispatch(credsAuth(passcode));
                 }}
