@@ -112,7 +112,7 @@ export default function Home(props) {
   //   ? props.navigation.state.params.exchangeRates
   //   : null;
 
-  const [exchangeRates, setExchangeRates] = useState(null);
+  const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
@@ -2059,7 +2059,13 @@ export default function Home(props) {
                                     source={require('../assets/images/icons/icon_dollar_dark.png')}
                                   />
                                 )}
-                                <Text style={styles.cardAmountText}>
+                                <Text
+                                  style={
+                                    accounts.accountsSynched
+                                      ? styles.cardAmountText
+                                      : styles.cardAmountTextGrey
+                                  }
+                                >
                                   {switchOn
                                     ? value.accountType === 'test'
                                       ? UsNumberFormat(balances.testBalance)
@@ -2842,6 +2848,14 @@ const styles = StyleSheet.create({
   },
   cardAmountText: {
     color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(17),
+    marginRight: 5,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
+  },
+  cardAmountTextGrey: {
+    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(17),
     marginRight: 5,

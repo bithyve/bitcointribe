@@ -123,24 +123,24 @@ export default function Login(props) {
   // }, [accounts]);
 
   const s3Service = useSelector(state => state.sss.service);
-  // useEffect(() => {
-  //   // HC init and down-streaming
-  //   if (s3Service) {
-  //     const { healthCheckInitialized } = s3Service.sss;
-  //     if (healthCheckInitialized) {
-  //       dispatch(checkMSharesHealth());
-  //     }
-  //   }
-  // }, [s3Service]);
+  useEffect(() => {
+    // HC init and down-streaming
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+      if (healthCheckInitialized) {
+        dispatch(checkMSharesHealth());
+      }
+    }
+  }, [s3Service]);
 
-  // useEffect(() => {
-  //   // HC up-streaming
-  //   if (DECENTRALIZED_BACKUP) {
-  //     if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-  //       dispatch(updateMSharesHealth());
-  //     }
-  //   }
-  // }, [DECENTRALIZED_BACKUP]);
+  useEffect(() => {
+    // HC up-streaming
+    if (DECENTRALIZED_BACKUP) {
+      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+        dispatch(updateMSharesHealth());
+      }
+    }
+  }, [DECENTRALIZED_BACKUP]);
 
   // useEffect(() => {
   //   (async () => {
@@ -179,21 +179,6 @@ export default function Login(props) {
 
             // calculate the exchangeRate
             dispatch(calculateExchangeRate());
-
-            // HC down-streaming
-            if (s3Service) {
-              const { healthCheckInitialized } = s3Service.sss;
-              if (healthCheckInitialized) {
-                dispatch(checkMSharesHealth());
-              }
-            }
-
-            // HC up-streaming
-            if (DECENTRALIZED_BACKUP) {
-              if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-                dispatch(updateMSharesHealth());
-              }
-            }
 
             setTimeout(() => {
               (loaderBottomSheet as any).current.snapTo(0);
