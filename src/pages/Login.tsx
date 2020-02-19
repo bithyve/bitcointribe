@@ -38,6 +38,7 @@ import { updateMSharesHealth } from '../store/actions/sss';
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
+  const [Elevation, setElevation] = useState(10);
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
@@ -410,12 +411,14 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
+                  setElevation(0);
                   (loaderBottomSheet as any).current.snapTo(1);
                   //setAuthenticating(true);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
                   ...styles.proceedButtonView,
+                  elevation: Elevation,
                   backgroundColor:
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
@@ -642,7 +645,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },

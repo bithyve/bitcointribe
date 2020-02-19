@@ -50,6 +50,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
+  const [Elevation, setElevation] = useState(10);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
@@ -252,6 +253,7 @@ export default function NewWalletQuestion(props) {
     return (
       <TouchableOpacity
         onPress={async () => {
+          setElevation(0);
           (loaderBottomSheet as any).current.snapTo(1);
           const security = {
             question: dropdownBoxValue.question,
@@ -276,7 +278,7 @@ export default function NewWalletQuestion(props) {
             JSON.stringify(securityQuestionHistory),
           );
         }}
-        style={styles.buttonView}
+        style={{...styles.buttonView, elevation: Elevation,}}
       >
         {/* {!loading.initializing ? ( */}
         <Text style={styles.buttonText}>Confirm</Text>
@@ -448,6 +450,7 @@ export default function NewWalletQuestion(props) {
                       editable={isEditable}
                       autoCapitalize="none"
                       onChangeText={text => {
+                        text = text.toLowerCase();
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -525,6 +528,7 @@ export default function NewWalletQuestion(props) {
                         // ) {
                         //   Keyboard.dismiss();
                         // }
+                        text = text.toLowerCase();
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
@@ -677,7 +681,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },

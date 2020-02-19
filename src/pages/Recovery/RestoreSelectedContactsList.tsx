@@ -52,6 +52,7 @@ import {
 import axios from 'axios';
 
 export default function RestoreSelectedContactsList(props) {
+  const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
@@ -931,8 +932,9 @@ export default function RestoreSelectedContactsList(props) {
         {metaShares.length >= 3 ? (
           <View>
             <TouchableOpacity
-              style={{ ...styles.questionConfirmButton, margin: 20 }}
+              style={{ ...styles.questionConfirmButton, margin: 20, elevation: Elevation, }}
               onPress={() => {
+                setElevation(0);
                 dispatch(recoverWallet());
                 (loaderBottomSheet as any).current.snapTo(1);
               }}
@@ -1123,7 +1125,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
