@@ -21,10 +21,6 @@ export default function Launch(props) {
   }, []);
 
   useEffect(() => {
-    AsyncStorage.getAllKeys().then(console.log);
-  }, []);
-
-  useEffect(() => {
     (async () => {
       try {
         const url = await Linking.getInitialURL();

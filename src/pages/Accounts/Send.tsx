@@ -32,6 +32,7 @@ import {
   fetchTransactions,
   transferST3,
   fetchBalance,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import DeviceInfo from 'react-native-device-info';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
@@ -121,8 +122,8 @@ export default function Send(props) {
       }, 10);
 
       setTimeout(() => {
-        if(SendHelperBottomSheet.current)
-        SendHelperBottomSheet.current.snapTo(1);
+        if (SendHelperBottomSheet.current)
+          SendHelperBottomSheet.current.snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -194,19 +195,19 @@ export default function Send(props) {
       transfer.stage2.failed ||
       transfer.stage3.failed
     ) {
-      if(SendConfirmationBottomSheet.current)
-      SendConfirmationBottomSheet.current.snapTo(0);
-      if(SendUnSuccessWithAddressBottomSheet.current)
-      SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
+      if (SendConfirmationBottomSheet.current)
+        SendConfirmationBottomSheet.current.snapTo(0);
+      if (SendUnSuccessWithAddressBottomSheet.current)
+        SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
       setIsEditable(true);
     } else if (transfer.txid) {
-      if(SendConfirmationBottomSheet.current)
-      SendConfirmationBottomSheet.current.snapTo(0);
-      if(SendSuccessWithAddressBottomSheet.current)
-      SendSuccessWithAddressBottomSheet.current.snapTo(1);
+      if (SendConfirmationBottomSheet.current)
+        SendConfirmationBottomSheet.current.snapTo(0);
+      if (SendSuccessWithAddressBottomSheet.current)
+        SendSuccessWithAddressBottomSheet.current.snapTo(1);
     } else if (transfer.executed === 'ST1') {
-      if(SendConfirmationBottomSheet.current)
-      SendConfirmationBottomSheet.current.snapTo(1);
+      if (SendConfirmationBottomSheet.current)
+        SendConfirmationBottomSheet.current.snapTo(1);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
@@ -223,8 +224,8 @@ export default function Send(props) {
         helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if(SendHelperBottomSheet.current)
-          (SendHelperBottomSheet as any).current.snapTo(0);
+          if (SendHelperBottomSheet.current)
+            (SendHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -236,14 +237,14 @@ export default function Send(props) {
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           if (isSendHelperDone) {
-            if(SendHelperBottomSheet.current)
-            (SendHelperBottomSheet as any).current.snapTo(1);
+            if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsSendHelperDone(false);
             }, 10);
           } else {
-            if(SendHelperBottomSheet.current)
-            (SendHelperBottomSheet as any).current.snapTo(0);
+            if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -256,8 +257,7 @@ export default function Send(props) {
       setRecipientAddress(qrData);
     }, 2);
     setTimeout(() => {
-      if(bottomSheet.current)
-      (bottomSheet as any).current.snapTo(0);
+      if (bottomSheet.current) (bottomSheet as any).current.snapTo(0);
     }, 10);
   };
 
@@ -280,8 +280,7 @@ export default function Send(props) {
           setTimeout(() => {
             setQrBottomSheetsFlag(false);
           }, 2);
-          if(bottomSheet.current)
-          (bottomSheet as any).current.snapTo(0);
+          if (bottomSheet.current) (bottomSheet as any).current.snapTo(0);
         }}
         style={styles.modalHeaderContainer}
       >
@@ -340,8 +339,8 @@ export default function Send(props) {
         }}
         onPressCancel={() => {
           dispatch(clearTransfer(serviceType));
-          if(SendConfirmationBottomSheet.current)
-          SendConfirmationBottomSheet.current.snapTo(0);
+          if (SendConfirmationBottomSheet.current)
+            SendConfirmationBottomSheet.current.snapTo(0);
         }}
       />
     );
@@ -351,8 +350,8 @@ export default function Send(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          if(SendConfirmationBottomSheet.current)
-          SendConfirmationBottomSheet.current.snapTo(0);
+          if (SendConfirmationBottomSheet.current)
+            SendConfirmationBottomSheet.current.snapTo(0);
         }}
       />
     );
@@ -382,13 +381,12 @@ export default function Send(props) {
         onPressOk={() => {
           dispatch(clearTransfer(serviceType));
           dispatch(
-            fetchBalance(serviceType, {
+            fetchBalanceTx(serviceType, {
               loader: true,
-              fetchTransactionsSync: true,
             }),
           );
-          if(SendSuccessWithAddressBottomSheet.current)
-          SendSuccessWithAddressBottomSheet.current.snapTo(0);
+          if (SendSuccessWithAddressBottomSheet.current)
+            SendSuccessWithAddressBottomSheet.current.snapTo(0);
           props.navigation.navigate('Accounts');
         }}
         isSuccess={true}
@@ -402,13 +400,12 @@ export default function Send(props) {
         onPressHeader={() => {
           dispatch(clearTransfer(serviceType));
           dispatch(
-            fetchBalance(serviceType, {
+            fetchBalanceTx(serviceType, {
               loader: true,
-              fetchTransactionsSync: true,
             }),
           );
-          if(SendSuccessWithAddressBottomSheet.current)
-          SendSuccessWithAddressBottomSheet.current.snapTo(0);
+          if (SendSuccessWithAddressBottomSheet.current)
+            SendSuccessWithAddressBottomSheet.current.snapTo(0);
           props.navigation.navigate('Accounts');
         }}
       />
@@ -427,13 +424,13 @@ export default function Send(props) {
         isCancel={true}
         onPressOk={() => {
           dispatch(clearTransfer(serviceType));
-          if(SendUnSuccessWithAddressBottomSheet.current)
-          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+          if (SendUnSuccessWithAddressBottomSheet.current)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
           dispatch(clearTransfer(serviceType));
-          if(SendUnSuccessWithAddressBottomSheet.current)
-          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+          if (SendUnSuccessWithAddressBottomSheet.current)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
         }}
         isUnSuccess={true}
       />
@@ -445,8 +442,8 @@ export default function Send(props) {
       <ModalHeader
         onPressHeader={() => {
           dispatch(clearTransfer(serviceType));
-          if(SendUnSuccessWithAddressBottomSheet.current)
-          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+          if (SendUnSuccessWithAddressBottomSheet.current)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
         }}
       />
     );
@@ -527,8 +524,8 @@ export default function Send(props) {
           <ScrollView>
             <TouchableWithoutFeedback
               onPress={() => {
-                if(SendHelperBottomSheet.current)
-                SendHelperBottomSheet.current.snapTo(0);
+                if (SendHelperBottomSheet.current)
+                  SendHelperBottomSheet.current.snapTo(0);
               }}
             >
               <View onStartShouldSetResponder={() => true}>
@@ -564,8 +561,8 @@ export default function Send(props) {
                       <Text
                         onPress={() => {
                           AsyncStorage.setItem('isSendHelperDone', 'true');
-                          if(SendHelperBottomSheet.current)
-                          SendHelperBottomSheet.current.snapTo(1);
+                          if (SendHelperBottomSheet.current)
+                            SendHelperBottomSheet.current.snapTo(1);
                         }}
                         style={{
                           color: Colors.textColorGrey,
@@ -603,8 +600,8 @@ export default function Send(props) {
                     <TouchableOpacity
                       style={styles.contactNameInputImageView}
                       onPress={() => {
-                        if(bottomSheet.current)
-                        (bottomSheet as any).current.snapTo(1);
+                        if (bottomSheet.current)
+                          (bottomSheet as any).current.snapTo(1);
                         // props.navigation.navigate('QrScanner', {
                         //   scanedCode: getQrCodeData,
                         // });
@@ -944,9 +941,8 @@ export default function Send(props) {
           {
             dispatch(clearTransfer(serviceType));
             dispatch(
-              fetchBalance(serviceType, {
+              fetchBalanceTx(serviceType, {
                 loader: true,
-                fetchTransactionsSync: true,
               }),
             );
             props.navigation.navigate('Accounts');

@@ -24,6 +24,7 @@ import {
   testcoinsReceived,
   SYNC_ACCOUNTS,
   accountsSynched,
+  FETCH_BALANCE_TX,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -68,7 +69,9 @@ function* fetchBalanceWorker({ payload }) {
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances;
-  const res = yield call(service.getBalance, { restore: payload.restore });
+  const res = yield call(service.getBalance, {
+    restore: payload.options.restore,
+  });
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
   if (
@@ -139,6 +142,58 @@ function* fetchTransactionsWorker({ payload }) {
 export const fetchTransactionsWatcher = createWatcher(
   fetchTransactionsWorker,
   FETCH_TRANSACTIONS,
+);
+
+function* fetchBalanceTxWorker({ payload }) {
+  if (payload.options && payload.options.loader)
+    yield put(switchLoader(payload.serviceType, 'balanceTx'));
+  const service =
+    payload.options && payload.options.service
+      ? payload.options.service
+      : yield select(state => state.accounts[payload.serviceType].service);
+
+  const preFetchBalances =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.balances
+      : service.hdWallet.balances;
+  const preFetchTransactions =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.transactions
+      : service.hdWallet.transactions;
+
+  const res = yield call(service.getBalanceTransactions, {
+    restore: payload.options.restore,
+  });
+
+  const postFetchBalances =
+    res.status === 200 ? res.data.balances : preFetchBalances;
+  const postFetchTransactions =
+    res.status === 200 ? res.data.transactions : preFetchTransactions;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
+  ) {
+    if (!payload.options.shouldNotInsert) {
+      const { SERVICES } = yield select(state => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [payload.serviceType]: JSON.stringify(service),
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    }
+  }
+
+  if (payload.options.loader) {
+    // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
+    yield put(switchLoader(payload.serviceType, 'balanceTx'));
+  }
+}
+
+export const fetchBalanceTxWatcher = createWatcher(
+  fetchBalanceTxWorker,
+  FETCH_BALANCE_TX,
 );
 
 function* transferST1Worker({ payload }) {
@@ -293,26 +348,54 @@ export const accumulativeTxAndBalWatcher = createWatcher(
 
 function* accountsSyncWorker({ payload }) {
   try {
+    const accounts = yield select(state => state.accounts);
+
+    const testService = accounts[TEST_ACCOUNT].service;
+    const regularService = accounts[REGULAR_ACCOUNT].service;
+    const secureService = accounts[SECURE_ACCOUNT].service;
+
     yield all([
-      fetchBalanceWorker({
+      fetchBalanceTxWorker({
         payload: {
           serviceType: TEST_ACCOUNT,
-          options: { fetchTransactionsSync: true, restore: payload.restore },
+          options: {
+            service: testService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
         },
       }),
-      fetchBalanceWorker({
+      fetchBalanceTxWorker({
         payload: {
           serviceType: REGULAR_ACCOUNT,
-          options: { fetchTransactionsSync: true, restore: payload.restore },
+          options: {
+            service: regularService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
         },
       }),
-      fetchBalanceWorker({
+      fetchBalanceTxWorker({
         payload: {
           serviceType: SECURE_ACCOUNT,
-          options: { fetchTransactionsSync: true, restore: payload.restore },
+          options: {
+            service: secureService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
         },
       }),
     ]);
+
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [TEST_ACCOUNT]: JSON.stringify(testService),
+      [REGULAR_ACCOUNT]: JSON.stringify(regularService),
+      [SECURE_ACCOUNT]: JSON.stringify(secureService),
+    };
+
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     yield put(accountsSynched(true));
   } catch (err) {
     console.log({ err });

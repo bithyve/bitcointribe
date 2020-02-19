@@ -42,6 +42,7 @@ const ACCOUNT_VARS: {
     receivingAddress: Boolean;
     balances: Boolean;
     transactions: Boolean;
+    balanceTx: Boolean;
     transfer: Boolean;
     testcoins: Boolean;
   };
@@ -64,6 +65,7 @@ const ACCOUNT_VARS: {
     receivingAddress: false,
     balances: false,
     transactions: false,
+    balanceTx: false,
     transfer: false,
     testcoins: false,
   },

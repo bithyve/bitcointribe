@@ -11,6 +11,7 @@ import {
   transferST2,
   fetchTransactions,
   fetchBalance,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import { useDispatch, useSelector } from 'react-redux';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
@@ -40,7 +41,7 @@ const Confirmation = props => {
       isSuccess={true}
       onPressViewAccount={() => {
         dispatch(clearTransfer(serviceType));
-        dispatch(fetchBalance(serviceType, { fetchTransactionsSync: true }));
+        dispatch(fetchBalanceTx(serviceType));
         // dispatch(fetchTransactions(serviceType));
         props.navigation.navigate('Accounts');
       }}
