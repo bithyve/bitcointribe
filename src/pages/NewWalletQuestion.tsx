@@ -388,6 +388,7 @@ export default function NewWalletQuestion(props) {
 
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
+                  <ScrollView style={{height: hp('40%')}}>
                   {dropdownBoxList.map((value, index) => (
                     <TouchableOpacity
                       onPress={() => {
@@ -426,6 +427,7 @@ export default function NewWalletQuestion(props) {
                       </Text>
                     </TouchableOpacity>
                   ))}
+                  </ScrollView>
                 </View>
               ) : null}
               {dropdownBoxValue.id ? (
@@ -603,7 +605,7 @@ export default function NewWalletQuestion(props) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        <View style={styles.bottomButtonView}>
+        <View style={{...styles.bottomButtonView,}}>
           {answer.trim() == confirmAnswer.trim() &&
           confirmAnswer.trim() &&
           answer.trim()
