@@ -10,6 +10,7 @@ export const GET_TESTCOINS = 'GET_TESTCOINS';
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
+export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 
 export const fetchAddress = serviceType => {
   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -63,6 +64,10 @@ export const syncAccounts = (restore?) => {
   return { type: SYNC_ACCOUNTS, payload: { restore } };
 };
 
+export const calculateExchangeRate = () => {
+  return { type: EXCHANGE_RATE };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
@@ -76,6 +81,7 @@ export const TRANSFER_ST3_EXECUTED = 'TRANSFER_SECURE_ST3_EXECUTED';
 export const TRANSFER_ST3_FAILED = 'TRANSFER_ST3_FAILED';
 export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING';
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED';
+export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED';
 
 export const testcoinsReceived = (serviceType, service) => {
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
@@ -124,4 +130,8 @@ export const switchLoader = (serviceType, beingLoaded) => {
 
 export const accountsSynched = synched => {
   return { type: ACCOUNTS_SYNCHED, payload: { synched } };
+};
+
+export const exchangeRatesCalculated = exchangeRates => {
+  return { type: EXCHANGE_RATE_CALCULATED, payload: { exchangeRates } };
 };
