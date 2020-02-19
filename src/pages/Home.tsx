@@ -1489,10 +1489,6 @@ export default function Home(props) {
     );
   };
 
-  useEffect(() => {
-    AsyncStorage.getAllKeys().then(console.log);
-  }, []);
-
   // const submitRecoveryQuestion = () => {
   //   (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(0);
   //   (HealthCheckGoogleAuthBottomSheet as any).current.snapTo(1);

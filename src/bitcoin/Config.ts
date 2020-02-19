@@ -1,6 +1,6 @@
-import axios, { AxiosInstance } from "axios";
-import Client from "bitcoin-core";
-import * as bitcoinJS from "bitcoinjs-lib";
+import axios, { AxiosInstance } from 'axios';
+import Client from 'bitcoin-core';
+import * as bitcoinJS from 'bitcoinjs-lib';
 import {
   BIT_ENVIRONMENT,
   BIT_GAP_LIMIT,
@@ -28,12 +28,14 @@ import {
   BIT_ESPLORA_TESTNET_MULTIBALANCE,
   BIT_ESPLORA_TESTNET_MULTIUTXO,
   BIT_ESPLORA_TESTNET_MULTITXN,
+  BIT_ESPLORA_TESTNET_MULTIBALANCETXN,
   BIT_ESPLORA_TESTNET_TXNFEE,
   BIT_ESPLORA_TESTNET_TXNDETAILS,
   BIT_ESPLORA_TESTNET_BROADCAST_TX,
   BIT_ESPLORA_MAINNET_MULTIBALANCE,
   BIT_ESPLORA_MAINNET_MULTIUTXO,
   BIT_ESPLORA_MAINNET_MULTITXN,
+  BIT_ESPLORA_MAINNET_MULTIBALANCETXN,
   BIT_ESPLORA_MAINNET_TXNFEE,
   BIT_ESPLORA_MAINNET_TXNDETAILS,
   BIT_ESPLORA_MAINNET_BROADCAST_TX,
@@ -73,8 +75,8 @@ import {
   BIT_ENTITY_HEALTH_STAGE3,
   BIT_SHARE_HEALTH_TIME_SLOT1,
   BIT_SHARE_HEALTH_TIME_SLOT2,
-  BIT_MNEMONIC_HEALTH_TIME_SLOT
-} from "react-native-dotenv";
+  BIT_MNEMONIC_HEALTH_TIME_SLOT,
+} from 'react-native-dotenv';
 
 class Config {
   public ENVIRONMENT: string;
@@ -95,11 +97,11 @@ class Config {
     algorithm: BIT_CIPHER_ALGORITHM,
     salt: BIT_CIPHER_SALT,
     keyLength: parseInt(BIT_CIPHER_KEYLENGTH, 10),
-    iv: Buffer.alloc(16, 0)
+    iv: Buffer.alloc(16, 0),
   };
   public BH_SERVER = {
     DEV: BIT_API_URLS_BH_SERVER_DEV,
-    PROD: BIT_API_URLS_BH_SERVER_PROD
+    PROD: BIT_API_URLS_BH_SERVER_PROD,
   };
   public BSI = {
     INIT_INDEX: parseInt(BIT_BSI_INIT_INDEX, 10),
@@ -107,8 +109,8 @@ class Config {
     MINUNUSEDINDEX: parseInt(BIT_BSI_MINUNUSEDINDEX, 10),
     DEPTH: {
       INIT: parseInt(BIT_BSI_DEPTH_INIT, 10),
-      LIMIT: parseInt(BIT_BSI_DEPTH_LIMIT, 10)
-    }
+      LIMIT: parseInt(BIT_BSI_DEPTH_LIMIT, 10),
+    },
   };
   public SSS_TOTAL: number = parseInt(BIT_SSS_TOTAL, 10);
   public SSS_THRESHOLD: number = parseInt(BIT_SSS_THRESHOLD, 10);
@@ -120,12 +122,12 @@ class Config {
   public SSS_METASHARE_SPLITS: number = parseInt(BIT_SSS_METASHARE_SPLITS, 10);
   public STATUS = {
     SUCCESS: parseInt(BIT_SUCCESS_STATUS_CODE, 10),
-    ERROR: parseInt(BIT_ERROR_STATUS_CODE, 10)
+    ERROR: parseInt(BIT_ERROR_STATUS_CODE, 10),
   };
   public STANDARD = {
     BIP44: parseInt(BIT_STANDARD_BIP44, 10),
     BIP49: parseInt(BIT_STANDARD_BIP49, 10),
-    BIP84: parseInt(BIT_STANDARD_BIP84, 10)
+    BIP84: parseInt(BIT_STANDARD_BIP84, 10),
   };
 
   public HEALTH_STATUS = {
@@ -134,20 +136,20 @@ class Config {
       STAGE2: BIT_HEXA_HEALTH_STAGE2,
       STAGE3: BIT_HEXA_HEALTH_STAGE3,
       STAGE4: BIT_HEXA_HEALTH_STAGE4,
-      STAGE5: BIT_HEXA_HEALTH_STAGE5
+      STAGE5: BIT_HEXA_HEALTH_STAGE5,
     },
 
     ENTITY_HEALTH: {
       STAGE1: BIT_ENTITY_HEALTH_STAGE1,
       STAGE2: BIT_ENTITY_HEALTH_STAGE2,
-      STAGE3: BIT_ENTITY_HEALTH_STAGE3
+      STAGE3: BIT_ENTITY_HEALTH_STAGE3,
     },
 
     TIME_SLOTS: {
       SHARE_SLOT1: parseInt(BIT_SHARE_HEALTH_TIME_SLOT1, 10),
       SHARE_SLOT2: parseInt(BIT_SHARE_HEALTH_TIME_SLOT2, 10),
-      MNEMONIC_SLOT: parseInt(BIT_MNEMONIC_HEALTH_TIME_SLOT, 10)
-    }
+      MNEMONIC_SLOT: parseInt(BIT_MNEMONIC_HEALTH_TIME_SLOT, 10),
+    },
   };
 
   public ESPLORA_API_ENDPOINTS = {
@@ -155,18 +157,20 @@ class Config {
       MULTIBALANCE: BIT_ESPLORA_TESTNET_MULTIBALANCE,
       MULTIUTXO: BIT_ESPLORA_TESTNET_MULTIUTXO,
       MULTITXN: BIT_ESPLORA_TESTNET_MULTITXN,
+      MULTIBALANCETXN: BIT_ESPLORA_TESTNET_MULTIBALANCETXN,
       TXN_FEE: BIT_ESPLORA_TESTNET_TXNFEE,
       TXNDETAILS: BIT_ESPLORA_TESTNET_TXNDETAILS,
-      BROADCAST_TX: BIT_ESPLORA_TESTNET_BROADCAST_TX
+      BROADCAST_TX: BIT_ESPLORA_TESTNET_BROADCAST_TX,
     },
     MAINNET: {
       MULTIBALANCE: BIT_ESPLORA_MAINNET_MULTIBALANCE,
       MULTIUTXO: BIT_ESPLORA_MAINNET_MULTIUTXO,
       MULTITXN: BIT_ESPLORA_MAINNET_MULTITXN,
+      MULTIBALANCETXN: BIT_ESPLORA_MAINNET_MULTIBALANCETXN,
       TXN_FEE: BIT_ESPLORA_MAINNET_TXNFEE,
       TXNDETAILS: BIT_ESPLORA_MAINNET_TXNDETAILS,
-      BROADCAST_TX: BIT_ESPLORA_MAINNET_BROADCAST_TX
-    }
+      BROADCAST_TX: BIT_ESPLORA_MAINNET_BROADCAST_TX,
+    },
   };
 
   public SERVER: string = this.BH_SERVER.PROD;
@@ -181,11 +185,11 @@ class Config {
       TX_DECODE: BIT_API_URLS_TESTNET_TX_DECODE,
       TX_FETCH: {
         URL: BIT_API_URLS_TESTNET_TX_FETCH_URL,
-        LIMIT: BIT_API_URLS_TESTNET_TX_LIMIT
+        LIMIT: BIT_API_URLS_TESTNET_TX_LIMIT,
       },
       FUND: {
-        URL: BIT_API_URLS_TESTNET_FUND_URL
-      }
+        URL: BIT_API_URLS_TESTNET_FUND_URL,
+      },
     },
     MAINNET: {
       BASE: BIT_API_URLS_MAINNET_BASE,
@@ -196,9 +200,9 @@ class Config {
       TX_DECODE: BIT_API_URLS_MAINNET_TX_DECODE,
       TX_FETCH: {
         URL: BIT_API_URLS_MAINNET_TX_FETCH_URL,
-        LIMIT: BIT_API_URLS_MAINNET_TX_LIMIT
-      }
-    }
+        LIMIT: BIT_API_URLS_MAINNET_TX_LIMIT,
+      },
+    },
   };
 
   constructor(env: string) {
@@ -206,24 +210,24 @@ class Config {
     this.setNetwork();
     this.BITCOIN_NODE = new Client({
       network:
-        this.NETWORK === bitcoinJS.networks.bitcoin ? "mainnet" : "testnet",
+        this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
       timeout: 10000,
       username: BIT_RPC_USERNAME,
       password: BIT_RPC_PASSWORD,
-      host: BIT_HOST_IP
+      host: BIT_HOST_IP,
     });
     this.BH_AXIOS = axios.create({
-      baseURL: this.SERVER
+      baseURL: this.SERVER,
     });
   }
 
   public setNetwork = (): void => {
-    if (this.ENVIRONMENT === "MAIN") {
+    if (this.ENVIRONMENT === 'MAIN') {
       this.NETWORK = bitcoinJS.networks.bitcoin;
-    } else if (this.ENVIRONMENT === "TEST") {
+    } else if (this.ENVIRONMENT === 'TEST') {
       this.NETWORK = bitcoinJS.networks.testnet;
     } else {
-      throw new Error("Please specify an apt environment(MAIN||TEST)");
+      throw new Error('Please specify an apt environment(MAIN||TEST)');
     }
   };
 }

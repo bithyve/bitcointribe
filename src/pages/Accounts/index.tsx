@@ -42,6 +42,7 @@ import {
   fetchBalance,
   fetchTransactions,
   getTestcoins,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -56,8 +57,10 @@ import { UsNumberFormat } from '../../common/utilities';
 import { keyFetched } from '../../store/actions/storage';
 
 export default function Accounts(props) {
-  const [serviceType, setServiceType] = useState(props.navigation.state.params ?
-    props.navigation.getParam('serviceType') : TEST_ACCOUNT
+  const [serviceType, setServiceType] = useState(
+    props.navigation.state.params
+      ? props.navigation.getParam('serviceType')
+      : TEST_ACCOUNT,
   );
   const sliderWidth = Dimensions.get('window').width;
   
@@ -102,8 +105,8 @@ export default function Accounts(props) {
     },
   ]);
 
-  let [carouselInitIndex, setCarouselInitIndex] = useState( props.navigation.state.params ?
-    props.navigation.getParam('index') : 1
+  let [carouselInitIndex, setCarouselInitIndex] = useState(
+    props.navigation.state.params ? props.navigation.getParam('index') : 1,
   );
   const [switchOn, setSwitchOn] = useState(true);
   const [is_initiated, setIs_initiated] = useState(false);
@@ -122,7 +125,7 @@ export default function Accounts(props) {
   );
   const service = useSelector(state => state.accounts[serviceType].service);
   const loader = useSelector(
-    state => state.accounts[serviceType].loading.balances,
+    state => state.accounts[serviceType].loading.balanceTx,
   );
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
@@ -150,16 +153,17 @@ export default function Accounts(props) {
     // }
    
     if (
-      !isTestAccountHelperDone && props.navigation.state.params && 
+      !isTestAccountHelperDone &&
+      props.navigation.state.params &&
       props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
       await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
       setTimeout(() => {
         setIsTestHelperDone(true);
       }, 10);
-      
+
       setTimeout(() => {
-        if(TestAccountHelperBottomSheet.current){
+        if (TestAccountHelperBottomSheet.current) {
           TestAccountHelperBottomSheet.current.snapTo(1);
         }
       }, 1000);
@@ -240,6 +244,26 @@ export default function Accounts(props) {
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
   }, [serviceType]);
 
+<<<<<<< HEAD
+=======
+  const renderSendContents = () => {
+    return (
+      <SendModalContents
+        onPressBack={() => {
+          if (SendBottomSheet.current)
+            (SendBottomSheet as any).current.snapTo(0);
+        }}
+        onPressContinue={() => {
+          if (SendBottomSheet.current)
+            (SendBottomSheet as any).current.snapTo(0);
+          if (CustodianRequestOtpBottomSheet.current)
+            (CustodianRequestOtpBottomSheet as any).current.snapTo(1);
+        }}
+        modalRef={SendBottomSheet}
+      />
+    );
+  };
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
 
   const renderItem = ({ item, index }) => {
     return (
@@ -318,6 +342,7 @@ export default function Accounts(props) {
                   padding: 10,
                 }}
                 onPress={() => {
+<<<<<<< HEAD
                   //console.log('item.accountType', item.accountType);
                   if (item.accountType == 'Test Account'){
                     if(TestAccountHelperBottomSheet.current)
@@ -330,6 +355,18 @@ export default function Accounts(props) {
                   else if (item.accountType == 'Regular Account'){
                   if(RegularAccountHelperBottomSheet.current)
                     RegularAccountHelperBottomSheet.current.snapTo(1);
+=======
+                  console.log('item.accountType', item.accountType);
+                  if (item.accountType == 'Test Account') {
+                    if (TestAccountHelperBottomSheet.current)
+                      TestAccountHelperBottomSheet.current.snapTo(1);
+                  } else if (item.accountType == 'Savings Account') {
+                    if (SecureAccountHelperBottomSheet.current)
+                      SecureAccountHelperBottomSheet.current.snapTo(1);
+                  } else if (item.accountType == 'Regular Account') {
+                    if (RegularAccountHelperBottomSheet.current)
+                      RegularAccountHelperBottomSheet.current.snapTo(1);
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
                   }
                 }}
               >
@@ -450,87 +487,91 @@ export default function Accounts(props) {
   };
 
   const renderTransactionsContent = () => {
-    return transactions.transactionDetails.length ? (<View style={styles.modalContentContainer}>
+    return transactions.transactionDetails.length ? (
+      <View style={styles.modalContentContainer}>
         <View style={{ marginLeft: 20, marginTop: 20 }}>
           <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
         </View>
-        <View style={{ flex: 1, }}>
-        <View style={{ height:'auto' }}>
-        <FlatList
-          data={transactions.transactionDetails}
-          ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: Colors.white }}>
-              <View style={styles.separatorView} />
-            </View>
-          )}
-          renderItem={({ item }) => {
-            return (
-              <AppBottomSheetTouchableWrapper
-                onPress={() =>
-                  props.navigation.navigate('TransactionDetails', {
-                    item,
-                    serviceType,
-                    getServiceType: getServiceType,
-                  })
-                }
-                style={{
-                  ...styles.transactionModalElementView,
-                  backgroundColor: Colors.white,
-                }}
-              >
-                <View style={styles.modalElementInfoView}>
-                  <View style={{ justifyContent: 'center' }}>
-                    <FontAwesome
-                      name={
-                        item.transactionType == 'Received'
-                          ? 'long-arrow-down'
-                          : 'long-arrow-up'
-                      }
-                      size={15}
-                      color={
-                        item.transactionType == 'Received'
-                          ? Colors.green
-                          : Colors.red
-                      }
-                    />
-                  </View>
-                  <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                    <Text style={styles.transactionModalTitleText}>
-                      {item.accountType}{' '}
-                    </Text>
-                    <Text style={styles.transactionModalDateText}>
-                      {moment(item.date)
-                        .utc()
-                        .format('DD MMMM YYYY')}{' '}
-                      {/* <Entypo
+        <View style={{ flex: 1 }}>
+          <View style={{ height: 'auto' }}>
+            <FlatList
+              data={transactions.transactionDetails}
+              ItemSeparatorComponent={() => (
+                <View style={{ backgroundColor: Colors.white }}>
+                  <View style={styles.separatorView} />
+                </View>
+              )}
+              renderItem={({ item }) => {
+                return (
+                  <AppBottomSheetTouchableWrapper
+                    onPress={() =>
+                      props.navigation.navigate('TransactionDetails', {
+                        item,
+                        serviceType,
+                        getServiceType: getServiceType,
+                      })
+                    }
+                    style={{
+                      ...styles.transactionModalElementView,
+                      backgroundColor: Colors.white,
+                    }}
+                  >
+                    <View style={styles.modalElementInfoView}>
+                      <View style={{ justifyContent: 'center' }}>
+                        <FontAwesome
+                          name={
+                            item.transactionType == 'Received'
+                              ? 'long-arrow-down'
+                              : 'long-arrow-up'
+                          }
+                          size={15}
+                          color={
+                            item.transactionType == 'Received'
+                              ? Colors.green
+                              : Colors.red
+                          }
+                        />
+                      </View>
+                      <View
+                        style={{ justifyContent: 'center', marginLeft: 10 }}
+                      >
+                        <Text style={styles.transactionModalTitleText}>
+                          {item.accountType}{' '}
+                        </Text>
+                        <Text style={styles.transactionModalDateText}>
+                          {moment(item.date)
+                            .utc()
+                            .format('DD MMMM YYYY')}{' '}
+                          {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
                     {item.time} */}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.transactionModalAmountView}>
-                  <Image
-                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                    style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                  />
-                  <Text
-                    style={{
-                      ...styles.transactionModalAmountText,
-                      color:
-                        item.transactionType == 'Received'
-                          ? Colors.green
-                          : Colors.red,
-                    }}
-                  >
-                    {/* {switchOn
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.transactionModalAmountView}>
+                      <Image
+                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                      />
+                      <Text
+                        style={{
+                          ...styles.transactionModalAmountText,
+                          color:
+                            item.transactionType == 'Received'
+                              ? Colors.green
+                              : Colors.red,
+                        }}
+                      >
+                        {/* {switchOn
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
                           exchangeRates['USD'].last
                         ).toFixed(2)} */}
+<<<<<<< HEAD
                     {item.amount}
                   </Text>
                   <Text style={styles.transactionModalAmountUnitText}>
@@ -553,11 +594,50 @@ export default function Accounts(props) {
             <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
               Recent transactions will appear here
             </Text>
+=======
+                        {item.amount}
+                      </Text>
+                      <Text style={styles.transactionModalAmountUnitText}>
+                        {item.confirmations < 6 ? item.confirmations : '6+'}
+                      </Text>
+                      <Ionicons
+                        name="ios-arrow-forward"
+                        color={Colors.textColorGrey}
+                        size={12}
+                        style={{ marginLeft: 20, alignSelf: 'center' }}
+                      />
+                    </View>
+                  </AppBottomSheetTouchableWrapper>
+                );
+              }}
+            />
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
           </View>
-        : null
-        }
+          {transactions.transactionDetails.length <= 1 ? (
+            <View
+              style={{
+                flex: 1,
+                marginTop: hp('15%'),
+                alignItems: 'center',
+                padding: wp('10%'),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(15),
+                  textAlign: 'center',
+                }}
+              >
+                All your recent transactions across all accounts will appear
+                here
+              </Text>
+            </View>
+          ) : null}
         </View>
       </View>
+<<<<<<< HEAD
     )
     :
     <View style={styles.modalContentContainer}>
@@ -565,8 +645,31 @@ export default function Accounts(props) {
         <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
           Recent transactions will appear here
         </Text>
+=======
+    ) : (
+      <View style={styles.modalContentContainer}>
+        <View
+          style={{
+            flex: 1,
+            marginTop: hp('15%'),
+            alignItems: 'center',
+            padding: wp('10%'),
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(15),
+              textAlign: 'center',
+            }}
+          >
+            All your recent transactions across all accounts will appear here
+          </Text>
+        </View>
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
       </View>
-    </View>
+    );
   };
 
   const renderTransactionsHeader = () => {
@@ -575,10 +678,151 @@ export default function Accounts(props) {
         borderColor={Colors.white}
         backgroundColor={Colors.white}
         onPressHeader={() => {
-          if(bottomSheet.current)
-          (bottomSheet as any).current.snapTo(0);
+          if (bottomSheet.current) (bottomSheet as any).current.snapTo(0);
         }}
       />
+<<<<<<< HEAD
+=======
+      // <TransparentHeaderModal
+      //   onPressheader={() => {
+      //     (bottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+    );
+  };
+  const renderSendModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          if (SendBottomSheet.current)
+            (SendBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSendOtpModalContents = () => {
+    return (
+      <CustodianRequestOtpModalContents
+        title1stLine={'Enter OTP to'}
+        title2ndLine={'authenticate'}
+        info1stLine={'Lorem ipsum dolor sit amet, consectetur'}
+        info2ndLine={'adipiscing elit, sed do eiusmod tempor'}
+        subInfo1stLine={
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'
+        }
+        subInfo2ndLine={'sed do eiusmod tempor incididunt ut labore et dolore'}
+        modalRef={CustodianRequestOtpBottomSheet}
+        onPressConfirm={() => {
+          if (CustodianRequestOtpBottomSheet.current)
+            (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+          if (SendSuccessBottomSheet.current)
+            (SendSuccessBottomSheet as any).current.snapTo(1);
+        }}
+      />
+    );
+  };
+  const renderSendOTPModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          if (CustodianRequestOtpBottomSheet.current)
+            (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSuccessStatusContents = () => {
+    return (
+      <SendStatusModalContents
+        title1stLine={'Sent Successfully'}
+        title2ndLine={'to Contact'}
+        info1stLine={'Bitcoins successfully sent to Contact'}
+        info2ndLine={''}
+        userName={'Arpan Jain'}
+        modalRef={SendSuccessBottomSheet}
+        isSuccess={true}
+        onPressViewAccount={() => {
+          if (SendSuccessBottomSheet.current)
+            (SendSuccessBottomSheet as any).current.snapTo(0);
+        }}
+        transactionId={'38123819421304'}
+        transactionDateTime={'11:00am, 19 June 2019'}
+      />
+    );
+  };
+  const renderSendSuccessHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          if (SendSuccessBottomSheet.current)
+            (SendSuccessBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSendErrorContents = () => {
+    return (
+      <SendStatusModalContents
+        title1stLine={'Could not Send '}
+        title2ndLine={'Amount to Contact'}
+        info1stLine={'There seems to be a problem'}
+        info2ndLine={''}
+        subInfo1stLine={
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit'
+        }
+        subInfo2ndLine={'sed do eiusmod tempor incididunt ut labore et dolore'}
+        userName={'Arpan Jain'}
+        modalRef={SendErrorBottomSheet}
+        isSuccess={false}
+        onPressTryAgain={() => {
+          if (SendErrorBottomSheet.current)
+            (SendErrorBottomSheet as any).current.snapTo(0);
+        }}
+        onPressSkip={() => {
+          if (SendErrorBottomSheet.current)
+            (SendErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderSendErrorHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          if (SendErrorBottomSheet.current)
+            (SendErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderBuyHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={'Buying Bitcoins from the Test Account'}
+        helperInfo={
+          'Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod\ntempor invidunt ut labore et dolore magna\n\n'
+        }
+        continueButtonText={'Ok, got it'}
+        onPressContinue={() => {
+          (BuyHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderBuyHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          (BuyHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
     );
   };
  
@@ -617,8 +861,15 @@ export default function Accounts(props) {
         helperInfo={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins\n\nYou can even send and receive test bitcoins from other Hexa wallet test accounts`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
+<<<<<<< HEAD
           if(TestAccountHelperBottomSheet.current)
           (TestAccountHelperBottomSheet as any).current.snapTo(0);
+=======
+          if (TestAccountHelperBottomSheet.current)
+            (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          // props.copilotEvents.on('stepChange', handleStepChange);
+          // props.start();
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
         }}
       />
     );
@@ -631,14 +882,14 @@ export default function Accounts(props) {
         onPressHeader={() => {
           //console.log('isTestHelperDone', isTestHelperDone);
           if (isTestHelperDone) {
-            if(TestAccountHelperBottomSheet.current)
-            (TestAccountHelperBottomSheet as any).current.snapTo(1);
+            if (TestAccountHelperBottomSheet.current)
+              (TestAccountHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsTestHelperDone(false);
             }, 10);
           } else {
-            if(TestAccountHelperBottomSheet.current)
-            (TestAccountHelperBottomSheet as any).current.snapTo(0);
+            if (TestAccountHelperBottomSheet.current)
+              (TestAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -650,16 +901,14 @@ export default function Accounts(props) {
       <TestAccountHelperModalContents
         topButtonText={'Savings Account'}
         image={require('../../assets/images/icons/secure.png')}
-        boldPara={
-          ''
-        }
+        boldPara={''}
         helperInfo={
           'The funds in this account are secured by two factor authentication which is set up on your secondary device\n\nUse this account to store most of your funds. Something you will not need on an ongoing basis'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if(SecureAccountHelperBottomSheet.current)
-          (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+          if (SecureAccountHelperBottomSheet.current)
+            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -672,14 +921,14 @@ export default function Accounts(props) {
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           if (isSecureAccountHelperDone) {
-            if(SecureAccountHelperBottomSheet.current)
-            (SecureAccountHelperBottomSheet as any).current.snapTo(1);
+            if (SecureAccountHelperBottomSheet.current)
+              (SecureAccountHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsSecureAccountHelperDone(false);
             }, 10);
           } else {
-            if(SecureAccountHelperBottomSheet.current)
-            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+            if (SecureAccountHelperBottomSheet.current)
+              (SecureAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -691,16 +940,14 @@ export default function Accounts(props) {
       <TestAccountHelperModalContents
         topButtonText={'Checking Account'}
         image={require('../../assets/images/icons/regular.png')}
-        boldPara={
-          ''
-        }
+        boldPara={''}
         helperInfo={
           'These are the funds that you have easy access to for your transactional needs\n\nTransfers from this account are typically cheaper and faster'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if(RegularAccountHelperBottomSheet.current)
-          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+          if (RegularAccountHelperBottomSheet.current)
+            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -714,14 +961,14 @@ export default function Accounts(props) {
         onPressHeader={() => {
           //console.log('isRegularAccountHelperDone', isRegularAccountHelperDone);
           if (isRegularAccountHelperDone) {
-            if(RegularAccountHelperBottomSheet.current)
-            (RegularAccountHelperBottomSheet as any).current.snapTo(1);
+            if (RegularAccountHelperBottomSheet.current)
+              (RegularAccountHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsRegularAccountHelperDone(false);
             }, 10);
           } else {
-            if(RegularAccountHelperBottomSheet.current)
-            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+            if (RegularAccountHelperBottomSheet.current)
+              (RegularAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -759,7 +1006,7 @@ export default function Accounts(props) {
             setIsSecureAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            if(SecureAccountHelperBottomSheet.current){
+            if (SecureAccountHelperBottomSheet.current) {
               SecureAccountHelperBottomSheet.current.snapTo(1);
             }
           }, 1000);
@@ -778,7 +1025,7 @@ export default function Accounts(props) {
             setIsRegularAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            if(RegularAccountHelperBottomSheet.current){
+            if (RegularAccountHelperBottomSheet.current) {
               (RegularAccountHelperBottomSheet as any).current.snapTo(1);
             }
           }, 1000);
@@ -792,6 +1039,7 @@ export default function Accounts(props) {
     //console.log('IN useEffect1');
   }, [serviceType]);
 
+<<<<<<< HEAD
  
   
     return (
@@ -803,6 +1051,89 @@ export default function Accounts(props) {
         />
   
         <View
+=======
+  useEffect(() => {
+    setTimeout(() => {
+      if (carousel.current) {
+        if (props.navigation.state.params) {
+          carousel.current.snapToItem(
+            props.navigation.getParam('index'),
+            true,
+            true,
+          );
+        } else {
+          carousel.current.snapToItem(1, true, true);
+        }
+      }
+    }, 2000);
+    getServiceType(serviceType);
+    (async () => {
+      const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
+      if (storedStaticFees) {
+        const { staticFees, lastFetched } = JSON.parse(storedStaticFees);
+        if (Date.now() - lastFetched < 1800000) {
+          setStaticFees(staticFees);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+
+      const instance = service.hdWallet || service.secureHDWallet;
+      const staticFees = await instance.getStaticFee();
+      setStaticFees(staticFees);
+      await AsyncStorage.setItem(
+        'storedStaticFees',
+        JSON.stringify({ staticFees, lastFetched: Date.now() }),
+      );
+
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        setExchangeRates(exchangeRates);
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      console.log({ res });
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+  }, []);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
+      <SafeAreaView style={{ flex: 0 }} />
+      <StatusBar
+        backgroundColor={Colors.backgroundColor}
+        barStyle="dark-content"
+      />
+
+      <View
+        style={{
+          ...CommonStyles.headerContainer,
+          justifyContent: 'space-between',
+          backgroundColor: Colors.backgroundColor,
+          borderBottomWidth: 0,
+        }}
+      >
+        <TouchableOpacity
+          style={{ ...CommonStyles.headerLeftIconContainer }}
+          onPress={() => {
+            props.navigation.navigate('Home');
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </View>
+        </TouchableOpacity>
+        <Text
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
           style={{
             ...CommonStyles.headerContainer,
             justifyContent: 'space-between',
@@ -839,6 +1170,7 @@ export default function Accounts(props) {
                 ...CommonStyles.headerLeftIconInnerContainer,
                 paddingRight: 30,
               }}
+<<<<<<< HEAD
             >
               <ToggleSwitch
                 activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
@@ -860,6 +1192,36 @@ export default function Accounts(props) {
         <ScrollView
           contentContainerStyle={{
             backgroundColor: Colors.backgroundColor,
+=======
+              toggle={switchOn}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{
+          backgroundColor: Colors.backgroundColor,
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={loader}
+            onRefresh={() => {
+              // dispatch(fetchTransactions(serviceType));
+              dispatch(
+                fetchBalanceTx(serviceType, {
+                  loader: true,
+                }),
+              );
+            }}
+          />
+        }
+      >
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (TestAccountHelperBottomSheet.current)
+              TestAccountHelperBottomSheet.current.snapTo(0);
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
           }}
           refreshControl={
             <RefreshControl
@@ -874,7 +1236,17 @@ export default function Accounts(props) {
                 );
               }}
             />
+<<<<<<< HEAD
           }
+=======
+          </View>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (TestAccountHelperBottomSheet.current)
+              TestAccountHelperBottomSheet.current.snapTo(0);
+          }}
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
         >
           <TouchableWithoutFeedback
             onPress={() => {
@@ -895,6 +1267,7 @@ export default function Accounts(props) {
                     : getServiceType(SECURE_ACCOUNT);
                   handleIndexChange(index);
                 }}
+<<<<<<< HEAD
                 renderItem={renderItem}
                 sliderWidth={sliderWidth}
                 itemWidth={sliderWidth * 0.95}
@@ -903,6 +1276,15 @@ export default function Accounts(props) {
                   setTimeout(() => {
                     setCarouselInitIndex(index);
                   }, 2000);
+=======
+              >
+                Today
+              </Text>
+              <Text
+                onPress={() => {
+                  if (bottomSheet.current)
+                    (bottomSheet as any).current.snapTo(1);
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
                 }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}
@@ -1107,6 +1489,7 @@ export default function Accounts(props) {
                 />
               </View>
             </View>
+<<<<<<< HEAD
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => {
@@ -1117,6 +1500,36 @@ export default function Accounts(props) {
             <View style={{ marginTop: hp('2%') }}>
               <View
                 style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
+=======
+          </View>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (TestAccountHelperBottomSheet.current)
+              TestAccountHelperBottomSheet.current.snapTo(0);
+          }}
+        >
+          <View style={{ marginTop: hp('2%') }}>
+            <View
+              style={{ flexDirection: 'row', marginLeft: 10, marginRight: 10 }}
+            >
+              {/* <CopilotStep
+              active={SendIsActive}
+              text="Try Sending"
+              order={1}
+              name="sendTransaction"
+              > */}
+              <TouchableOpacity
+                onPress={() => {
+                  props.navigation.navigate('Send', {
+                    serviceType,
+                    getServiceType: getServiceType,
+                    staticFees,
+                    netBalance,
+                  });
+                }}
+                style={styles.bottomCardView}
+>>>>>>> 26ed294c5d77c5409a43c6809592e881c8068e36
               >
                <TouchableOpacity
                   onPress={() => {

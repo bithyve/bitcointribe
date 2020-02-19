@@ -444,6 +444,54 @@ export default class SecureAccount {
     }
   };
 
+  public getBalanceTransactions = async (options?: {
+    restore?;
+  }): Promise<
+    | {
+        status: number;
+        data: {
+          balances: {
+            balance: number;
+            unconfirmedBalance: number;
+          };
+          transactions: {
+            totalTransactions: number;
+            confirmedTransactions: number;
+            unconfirmedTransactions: number;
+            transactionDetails: Array<{
+              txid: string;
+              status: string;
+              confirmations: number;
+              fee: string;
+              date: string;
+              transactionType: string;
+              amount: number;
+              accountType: string;
+              recipientAddresses?: string[];
+              senderAddresses?: string[];
+            }>;
+          };
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.fetchBalanceTransaction(options),
+      };
+    } catch (err) {
+      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
+    }
+  };
+
   public getTransactionDetails = async (
     txHash: string,
   ): Promise<

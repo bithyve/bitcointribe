@@ -1,9 +1,8 @@
-import { TransactionBuilder } from 'bitcoinjs-lib';
-
 // types and action creators: dispatched by components and sagas
 export const FETCH_ADDR = 'FETCH_ADDR';
 export const FETCH_BALANCE = 'FETCH_BALANCE';
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
+export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
 export const TRANSFER_ST1 = 'TRANSFER_ST1';
 export const TRANSFER_ST2 = 'TRANSFER_ST2';
 export const TRANSFER_ST3 = 'TRANSFER_ST3';
@@ -18,13 +17,20 @@ export const fetchAddress = serviceType => {
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync? },
+  options?: { loader?; fetchTransactionsSync?; restore? },
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
 
 export const fetchTransactions = (serviceType, service?) => {
   return { type: FETCH_TRANSACTIONS, payload: { serviceType, service } };
+};
+
+export const fetchBalanceTx = (
+  serviceType,
+  options?: { service?; loader?; restore?; shouldNotInsert? },
+) => {
+  return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
 
 export const transferST1 = (serviceType, transferInfo) => {
