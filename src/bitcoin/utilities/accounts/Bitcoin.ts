@@ -281,7 +281,7 @@ export default class Bitcoin {
         transactionDetails: [],
       };
 
-      const addressesInfo = Transactions[0]; // returned data has an array inside an array (to be fixed later)
+      const addressesInfo = Transactions;
       const txMap = new Map();
       for (const addressInfo of addressesInfo) {
         console.log(

@@ -47,6 +47,7 @@ import {
   fetchBalance,
   fetchTransactions,
   getTestcoins,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -66,8 +67,10 @@ import { UsNumberFormat } from '../../common/utilities';
 import { keyFetched } from '../../store/actions/storage';
 
 export default function Accounts(props) {
-  const [serviceType, setServiceType] = useState(props.navigation.state.params ?
-    props.navigation.getParam('serviceType') : TEST_ACCOUNT
+  const [serviceType, setServiceType] = useState(
+    props.navigation.state.params
+      ? props.navigation.getParam('serviceType')
+      : TEST_ACCOUNT,
   );
   const sliderWidth = Dimensions.get('window').width;
   const [SendIsActive, setSendIsActive] = useState(true);
@@ -137,8 +140,8 @@ export default function Accounts(props) {
     },
   ]);
 
-  let [carouselInitIndex, setCarouselInitIndex] = useState( props.navigation.state.params ?
-    props.navigation.getParam('index') : 1
+  let [carouselInitIndex, setCarouselInitIndex] = useState(
+    props.navigation.state.params ? props.navigation.getParam('index') : 1,
   );
   const [switchOn, setSwitchOn] = useState(true);
   let [carousel, setCarousel] = useState(React.createRef());
@@ -203,16 +206,17 @@ export default function Accounts(props) {
       setTransactionDetailsIsActive(false);
     }
     if (
-      !isTestAccountHelperDone && props.navigation.state.params && 
+      !isTestAccountHelperDone &&
+      props.navigation.state.params &&
       props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
       await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
       setTimeout(() => {
         setIsTestHelperDone(true);
       }, 10);
-      
+
       setTimeout(() => {
-        if(TestAccountHelperBottomSheet.current){
+        if (TestAccountHelperBottomSheet.current) {
           TestAccountHelperBottomSheet.current.snapTo(1);
         }
       }, 1000);
@@ -244,14 +248,14 @@ export default function Accounts(props) {
     return (
       <SendModalContents
         onPressBack={() => {
-          if(SendBottomSheet.current)
-          (SendBottomSheet as any).current.snapTo(0);
+          if (SendBottomSheet.current)
+            (SendBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
-          if(SendBottomSheet.current)
-          (SendBottomSheet as any).current.snapTo(0);
-          if(CustodianRequestOtpBottomSheet.current)
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(1);
+          if (SendBottomSheet.current)
+            (SendBottomSheet as any).current.snapTo(0);
+          if (CustodianRequestOtpBottomSheet.current)
+            (CustodianRequestOtpBottomSheet as any).current.snapTo(1);
         }}
         modalRef={SendBottomSheet}
       />
@@ -336,17 +340,15 @@ export default function Accounts(props) {
                 }}
                 onPress={() => {
                   console.log('item.accountType', item.accountType);
-                  if (item.accountType == 'Test Account'){
-                    if(TestAccountHelperBottomSheet.current)
-                    TestAccountHelperBottomSheet.current.snapTo(1);
-                  }
-                  else if (item.accountType == 'Savings Account'){
-                    if(SecureAccountHelperBottomSheet.current)
-                    SecureAccountHelperBottomSheet.current.snapTo(1);
-                  }
-                  else if (item.accountType == 'Regular Account'){
-                  if(RegularAccountHelperBottomSheet.current)
-                    RegularAccountHelperBottomSheet.current.snapTo(1);
+                  if (item.accountType == 'Test Account') {
+                    if (TestAccountHelperBottomSheet.current)
+                      TestAccountHelperBottomSheet.current.snapTo(1);
+                  } else if (item.accountType == 'Savings Account') {
+                    if (SecureAccountHelperBottomSheet.current)
+                      SecureAccountHelperBottomSheet.current.snapTo(1);
+                  } else if (item.accountType == 'Regular Account') {
+                    if (RegularAccountHelperBottomSheet.current)
+                      RegularAccountHelperBottomSheet.current.snapTo(1);
                   }
                 }}
               >
@@ -467,123 +469,154 @@ export default function Accounts(props) {
   };
 
   const renderTransactionsContent = () => {
-    return transactions.transactionDetails.length ? (<View style={styles.modalContentContainer}>
+    return transactions.transactionDetails.length ? (
+      <View style={styles.modalContentContainer}>
         <View style={{ marginLeft: 20, marginTop: 20 }}>
           <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
         </View>
-        <View style={{ flex: 1, }}>
-        <View style={{ height:'auto' }}>
-        <FlatList
-          data={transactions.transactionDetails}
-          ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: Colors.white }}>
-              <View style={styles.separatorView} />
-            </View>
-          )}
-          renderItem={({ item }) => {
-            return (
-              <AppBottomSheetTouchableWrapper
-                onPress={() =>
-                  props.navigation.navigate('TransactionDetails', {
-                    item,
-                    serviceType,
-                    getServiceType: getServiceType,
-                  })
-                }
-                style={{
-                  ...styles.transactionModalElementView,
-                  backgroundColor: Colors.white,
-                }}
-              >
-                <View style={styles.modalElementInfoView}>
-                  <View style={{ justifyContent: 'center' }}>
-                    <FontAwesome
-                      name={
-                        item.transactionType == 'Received'
-                          ? 'long-arrow-down'
-                          : 'long-arrow-up'
-                      }
-                      size={15}
-                      color={
-                        item.transactionType == 'Received'
-                          ? Colors.green
-                          : Colors.red
-                      }
-                    />
-                  </View>
-                  <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                    <Text style={styles.transactionModalTitleText}>
-                      {item.accountType}{' '}
-                    </Text>
-                    <Text style={styles.transactionModalDateText}>
-                      {moment(item.date)
-                        .utc()
-                        .format('DD MMMM YYYY')}{' '}
-                      {/* <Entypo
+        <View style={{ flex: 1 }}>
+          <View style={{ height: 'auto' }}>
+            <FlatList
+              data={transactions.transactionDetails}
+              ItemSeparatorComponent={() => (
+                <View style={{ backgroundColor: Colors.white }}>
+                  <View style={styles.separatorView} />
+                </View>
+              )}
+              renderItem={({ item }) => {
+                return (
+                  <AppBottomSheetTouchableWrapper
+                    onPress={() =>
+                      props.navigation.navigate('TransactionDetails', {
+                        item,
+                        serviceType,
+                        getServiceType: getServiceType,
+                      })
+                    }
+                    style={{
+                      ...styles.transactionModalElementView,
+                      backgroundColor: Colors.white,
+                    }}
+                  >
+                    <View style={styles.modalElementInfoView}>
+                      <View style={{ justifyContent: 'center' }}>
+                        <FontAwesome
+                          name={
+                            item.transactionType == 'Received'
+                              ? 'long-arrow-down'
+                              : 'long-arrow-up'
+                          }
+                          size={15}
+                          color={
+                            item.transactionType == 'Received'
+                              ? Colors.green
+                              : Colors.red
+                          }
+                        />
+                      </View>
+                      <View
+                        style={{ justifyContent: 'center', marginLeft: 10 }}
+                      >
+                        <Text style={styles.transactionModalTitleText}>
+                          {item.accountType}{' '}
+                        </Text>
+                        <Text style={styles.transactionModalDateText}>
+                          {moment(item.date)
+                            .utc()
+                            .format('DD MMMM YYYY')}{' '}
+                          {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
                     {item.time} */}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.transactionModalAmountView}>
-                  <Image
-                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                    style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                  />
-                  <Text
-                    style={{
-                      ...styles.transactionModalAmountText,
-                      color:
-                        item.transactionType == 'Received'
-                          ? Colors.green
-                          : Colors.red,
-                    }}
-                  >
-                    {/* {switchOn
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.transactionModalAmountView}>
+                      <Image
+                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                      />
+                      <Text
+                        style={{
+                          ...styles.transactionModalAmountText,
+                          color:
+                            item.transactionType == 'Received'
+                              ? Colors.green
+                              : Colors.red,
+                        }}
+                      >
+                        {/* {switchOn
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
                           exchangeRates['USD'].last
                         ).toFixed(2)} */}
-                    {item.amount}
-                  </Text>
-                  <Text style={styles.transactionModalAmountUnitText}>
-                    {item.confirmations < 6 ? item.confirmations : '6+'}
-                  </Text>
-                  <Ionicons
-                    name="ios-arrow-forward"
-                    color={Colors.textColorGrey}
-                    size={12}
-                    style={{ marginLeft: 20, alignSelf: 'center' }}
-                  />
-                </View>
-              </AppBottomSheetTouchableWrapper>
-            );
-          }}
-        />
-        </View>
-        {transactions.transactionDetails.length <= 1 ? 
-          <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
-            <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
-              All your recent transactions across all accounts will appear here
-            </Text>
+                        {item.amount}
+                      </Text>
+                      <Text style={styles.transactionModalAmountUnitText}>
+                        {item.confirmations < 6 ? item.confirmations : '6+'}
+                      </Text>
+                      <Ionicons
+                        name="ios-arrow-forward"
+                        color={Colors.textColorGrey}
+                        size={12}
+                        style={{ marginLeft: 20, alignSelf: 'center' }}
+                      />
+                    </View>
+                  </AppBottomSheetTouchableWrapper>
+                );
+              }}
+            />
           </View>
-        : null
-        }
+          {transactions.transactionDetails.length <= 1 ? (
+            <View
+              style={{
+                flex: 1,
+                marginTop: hp('15%'),
+                alignItems: 'center',
+                padding: wp('10%'),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(15),
+                  textAlign: 'center',
+                }}
+              >
+                All your recent transactions across all accounts will appear
+                here
+              </Text>
+            </View>
+          ) : null}
         </View>
       </View>
-    )
-    :
-    <View style={styles.modalContentContainer}>
-      <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
-        <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
-          All your recent transactions across all accounts will appear here
-        </Text>
+    ) : (
+      <View style={styles.modalContentContainer}>
+        <View
+          style={{
+            flex: 1,
+            marginTop: hp('15%'),
+            alignItems: 'center',
+            padding: wp('10%'),
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(15),
+              textAlign: 'center',
+            }}
+          >
+            All your recent transactions across all accounts will appear here
+          </Text>
+        </View>
       </View>
-    </View>
+    );
   };
 
   const renderTransactionsHeader = () => {
@@ -592,8 +625,7 @@ export default function Accounts(props) {
         borderColor={Colors.white}
         backgroundColor={Colors.white}
         onPressHeader={() => {
-          if(bottomSheet.current)
-          (bottomSheet as any).current.snapTo(0);
+          if (bottomSheet.current) (bottomSheet as any).current.snapTo(0);
         }}
       />
       // <TransparentHeaderModal
@@ -607,8 +639,8 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          if(SendBottomSheet.current)
-          (SendBottomSheet as any).current.snapTo(0);
+          if (SendBottomSheet.current)
+            (SendBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -627,10 +659,10 @@ export default function Accounts(props) {
         subInfo2ndLine={'sed do eiusmod tempor incididunt ut labore et dolore'}
         modalRef={CustodianRequestOtpBottomSheet}
         onPressConfirm={() => {
-          if(CustodianRequestOtpBottomSheet.current)
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
-          if(SendSuccessBottomSheet.current)
-          (SendSuccessBottomSheet as any).current.snapTo(1);
+          if (CustodianRequestOtpBottomSheet.current)
+            (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+          if (SendSuccessBottomSheet.current)
+            (SendSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -639,8 +671,8 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          if(CustodianRequestOtpBottomSheet.current)
-          (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
+          if (CustodianRequestOtpBottomSheet.current)
+            (CustodianRequestOtpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -657,8 +689,8 @@ export default function Accounts(props) {
         modalRef={SendSuccessBottomSheet}
         isSuccess={true}
         onPressViewAccount={() => {
-          if(SendSuccessBottomSheet.current)
-          (SendSuccessBottomSheet as any).current.snapTo(0);
+          if (SendSuccessBottomSheet.current)
+            (SendSuccessBottomSheet as any).current.snapTo(0);
         }}
         transactionId={'38123819421304'}
         transactionDateTime={'11:00am, 19 June 2019'}
@@ -669,8 +701,8 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          if(SendSuccessBottomSheet.current)
-          (SendSuccessBottomSheet as any).current.snapTo(0);
+          if (SendSuccessBottomSheet.current)
+            (SendSuccessBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -691,12 +723,12 @@ export default function Accounts(props) {
         modalRef={SendErrorBottomSheet}
         isSuccess={false}
         onPressTryAgain={() => {
-          if(SendErrorBottomSheet.current)
-          (SendErrorBottomSheet as any).current.snapTo(0);
+          if (SendErrorBottomSheet.current)
+            (SendErrorBottomSheet as any).current.snapTo(0);
         }}
         onPressSkip={() => {
-          if(SendErrorBottomSheet.current)
-          (SendErrorBottomSheet as any).current.snapTo(0);
+          if (SendErrorBottomSheet.current)
+            (SendErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -705,8 +737,8 @@ export default function Accounts(props) {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
-          if(SendErrorBottomSheet.current)
-          (SendErrorBottomSheet as any).current.snapTo(0);
+          if (SendErrorBottomSheet.current)
+            (SendErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -747,8 +779,8 @@ export default function Accounts(props) {
         helperInfo={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins\n\nYou can even send and receive test bitcoins from other Hexa wallet test accounts`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if(TestAccountHelperBottomSheet.current)
-          (TestAccountHelperBottomSheet as any).current.snapTo(0);
+          if (TestAccountHelperBottomSheet.current)
+            (TestAccountHelperBottomSheet as any).current.snapTo(0);
           // props.copilotEvents.on('stepChange', handleStepChange);
           // props.start();
         }}
@@ -763,14 +795,14 @@ export default function Accounts(props) {
         onPressHeader={() => {
           console.log('isTestHelperDone', isTestHelperDone);
           if (isTestHelperDone) {
-            if(TestAccountHelperBottomSheet.current)
-            (TestAccountHelperBottomSheet as any).current.snapTo(1);
+            if (TestAccountHelperBottomSheet.current)
+              (TestAccountHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsTestHelperDone(false);
             }, 10);
           } else {
-            if(TestAccountHelperBottomSheet.current)
-            (TestAccountHelperBottomSheet as any).current.snapTo(0);
+            if (TestAccountHelperBottomSheet.current)
+              (TestAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -782,16 +814,14 @@ export default function Accounts(props) {
       <TestAccountHelperModalContents
         topButtonText={'Savings Account'}
         image={require('../../assets/images/icons/secure.png')}
-        boldPara={
-          ''
-        }
+        boldPara={''}
         helperInfo={
           'The funds in this account are secured by two factor authentication which is set up on your secondary device\n\nUse this account to store most of your funds. Something you will not need on an ongoing basis'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if(SecureAccountHelperBottomSheet.current)
-          (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+          if (SecureAccountHelperBottomSheet.current)
+            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -806,14 +836,14 @@ export default function Accounts(props) {
           //(SecureAccountHelperBottomSheet as any).current.snapTo(0);
           console.log('isSecureAccountHelperDone', isSecureAccountHelperDone);
           if (isSecureAccountHelperDone) {
-            if(SecureAccountHelperBottomSheet.current)
-            (SecureAccountHelperBottomSheet as any).current.snapTo(1);
+            if (SecureAccountHelperBottomSheet.current)
+              (SecureAccountHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsSecureAccountHelperDone(false);
             }, 10);
           } else {
-            if(SecureAccountHelperBottomSheet.current)
-            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+            if (SecureAccountHelperBottomSheet.current)
+              (SecureAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -825,16 +855,14 @@ export default function Accounts(props) {
       <TestAccountHelperModalContents
         topButtonText={'Checking Account'}
         image={require('../../assets/images/icons/regular.png')}
-        boldPara={
-          ''
-        }
+        boldPara={''}
         helperInfo={
           'These are the funds that you have easy access to for your transactional needs\n\nTransfers from this account are typically cheaper and faster'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          if(RegularAccountHelperBottomSheet.current)
-          (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+          if (RegularAccountHelperBottomSheet.current)
+            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -848,14 +876,14 @@ export default function Accounts(props) {
         onPressHeader={() => {
           console.log('isRegularAccountHelperDone', isRegularAccountHelperDone);
           if (isRegularAccountHelperDone) {
-            if(RegularAccountHelperBottomSheet.current)
-            (RegularAccountHelperBottomSheet as any).current.snapTo(1);
+            if (RegularAccountHelperBottomSheet.current)
+              (RegularAccountHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
               setIsRegularAccountHelperDone(false);
             }, 10);
           } else {
-            if(RegularAccountHelperBottomSheet.current)
-            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+            if (RegularAccountHelperBottomSheet.current)
+              (RegularAccountHelperBottomSheet as any).current.snapTo(0);
           }
         }}
       />
@@ -893,7 +921,7 @@ export default function Accounts(props) {
             setIsSecureAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            if(SecureAccountHelperBottomSheet.current){
+            if (SecureAccountHelperBottomSheet.current) {
               SecureAccountHelperBottomSheet.current.snapTo(1);
             }
           }, 1000);
@@ -912,7 +940,7 @@ export default function Accounts(props) {
             setIsRegularAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            if(RegularAccountHelperBottomSheet.current){
+            if (RegularAccountHelperBottomSheet.current) {
               (RegularAccountHelperBottomSheet as any).current.snapTo(1);
             }
           }, 1000);
@@ -928,19 +956,16 @@ export default function Accounts(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      if(carousel.current){
-        if(props.navigation.state.params){
+      if (carousel.current) {
+        if (props.navigation.state.params) {
           carousel.current.snapToItem(
             props.navigation.getParam('index'),
             true,
             true,
           );
-        } else{
-          carousel.current.snapToItem(1,
-            true,
-            true,
-          );
-        }  
+        } else {
+          carousel.current.snapToItem(1, true, true);
+        }
       }
     }, 2000);
     getServiceType(serviceType);
@@ -1055,9 +1080,8 @@ export default function Accounts(props) {
             onRefresh={() => {
               // dispatch(fetchTransactions(serviceType));
               dispatch(
-                fetchBalance(serviceType, {
+                fetchBalanceTx(serviceType, {
                   loader: true,
-                  fetchTransactionsSync: true,
                 }),
               );
             }}
@@ -1066,8 +1090,8 @@ export default function Accounts(props) {
       >
         <TouchableWithoutFeedback
           onPress={() => {
-            if(TestAccountHelperBottomSheet.current)
-            TestAccountHelperBottomSheet.current.snapTo(0);
+            if (TestAccountHelperBottomSheet.current)
+              TestAccountHelperBottomSheet.current.snapTo(0);
           }}
         >
           <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
@@ -1107,8 +1131,8 @@ export default function Accounts(props) {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
           onPress={() => {
-            if(TestAccountHelperBottomSheet.current)
-            TestAccountHelperBottomSheet.current.snapTo(0);
+            if (TestAccountHelperBottomSheet.current)
+              TestAccountHelperBottomSheet.current.snapTo(0);
           }}
         >
           <View>
@@ -1133,8 +1157,8 @@ export default function Accounts(props) {
               </Text>
               <Text
                 onPress={() => {
-                  if(bottomSheet.current)
-                  (bottomSheet as any).current.snapTo(1);
+                  if (bottomSheet.current)
+                    (bottomSheet as any).current.snapTo(1);
                 }}
                 style={{
                   color: Colors.textColorGrey,
@@ -1318,8 +1342,8 @@ export default function Accounts(props) {
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback
           onPress={() => {
-            if(TestAccountHelperBottomSheet.current)
-            TestAccountHelperBottomSheet.current.snapTo(0);
+            if (TestAccountHelperBottomSheet.current)
+              TestAccountHelperBottomSheet.current.snapTo(0);
           }}
         >
           <View style={{ marginTop: hp('2%') }}>

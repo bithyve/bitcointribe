@@ -414,7 +414,7 @@ export default function RestoreSelectedContactsList(props) {
         // // dispatch(fetchTransactions(TEST_ACCOUNT));
         // dispatch(fetchTransactions(REGULAR_ACCOUNT));
         // dispatch(fetchTransactions(SECURE_ACCOUNT));
-        dispatch(syncAccounts(true));
+        dispatch(syncAccounts(true)); // restore: true
       }
     })();
   }, [SERVICES]);
@@ -511,31 +511,35 @@ export default function RestoreSelectedContactsList(props) {
     }
   }
 
-  const onScanCompleted = async(shareCode) =>{
-    let selectedDocsTemp = JSON.parse(await AsyncStorage.getItem("selectedDocuments"));
-    if(!selectedDocsTemp){
+  const onScanCompleted = async shareCode => {
+    let selectedDocsTemp = JSON.parse(
+      await AsyncStorage.getItem('selectedDocuments'),
+    );
+    if (!selectedDocsTemp) {
       selectedDocsTemp = [];
     }
     let obj = null;
-    if(shareCode == 'e0')
-    {
+    if (shareCode == 'e0') {
       obj = { title: 'Personal Copy 1', status: 'received' };
-      selectedDocsTemp[0]=obj;
-    }
-    else if(shareCode == 'c0')
-    {
+      selectedDocsTemp[0] = obj;
+    } else if (shareCode == 'c0') {
       obj = { title: 'Personal Copy 2', status: 'received' };
-      selectedDocsTemp[1]=obj;
+      selectedDocsTemp[1] = obj;
     }
-    await AsyncStorage.setItem('selectedDocuments', JSON.stringify(selectedDocsTemp));
-    selectedDocsTemp = JSON.parse(await AsyncStorage.getItem("selectedDocuments"));
+    await AsyncStorage.setItem(
+      'selectedDocuments',
+      JSON.stringify(selectedDocsTemp),
+    );
+    selectedDocsTemp = JSON.parse(
+      await AsyncStorage.getItem('selectedDocuments'),
+    );
     setSelectedDocuments(selectedDocsTemp);
-  }
+  };
 
   function renderRestoreByCloudQrCodeContent() {
     return (
       <RestoreByCloudQrCodeContents
-        onScanCompleted = {(shareCode)=>onScanCompleted(shareCode)}
+        onScanCompleted={shareCode => onScanCompleted(shareCode)}
         modalRef={RestoreByCloudQrCodeContents}
         isOpenedFlag={QrBottomSheetsFlag}
         onPressBack={() => {
@@ -656,20 +660,27 @@ export default function RestoreSelectedContactsList(props) {
                   >
                     <View>
                       <Text style={styles.selectedContactName}>
-                        {contact.name && contact.name.split(' ')[0] ? contact.name.split(' ')[0] : ""}{' '}
+                        {contact.name && contact.name.split(' ')[0]
+                          ? contact.name.split(' ')[0]
+                          : ''}{' '}
                         <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {contact.name && contact.name.split(' ')[0] ? contact.name.split(' ')[1] : ""}
+                          {contact.name && contact.name.split(' ')[0]
+                            ? contact.name.split(' ')[1]
+                            : ''}
                         </Text>
                       </Text>
                       {contact &&
-                        contact.communicationMode &&
-                        contact.communicationMode.length ? <Text
-                        style={{
-                          ...styles.selectedContactName,
-                          fontSize: RFValue(11),
-                        }}
-                      >{contact.communicationMode[0].info}</Text>
-                      : null}
+                      contact.communicationMode &&
+                      contact.communicationMode.length ? (
+                        <Text
+                          style={{
+                            ...styles.selectedContactName,
+                            fontSize: RFValue(11),
+                          }}
+                        >
+                          {contact.communicationMode[0].info}
+                        </Text>
+                      ) : null}
                     </View>
                     {contact.status == 'received' ? (
                       <View
@@ -826,102 +837,104 @@ export default function RestoreSelectedContactsList(props) {
           {selectedDocuments.length > 0 && (
             <View style={{}}>
               {selectedDocuments.map(value => {
-                if(value){
-                return (
-                  <TouchableOpacity
-                    activeOpacity={value.status != 'received' ? 0 : 10}
-                    onPress={() =>
-                      value.status != 'received' ? handleDocuments() : {}
-                    }
-                    style={{ ...styles.selectedContactView, marginBottom: 15 }}
-                  >
-                    <View>
-                      <Text style={styles.selectedContactName}>
-                        {value.title}
-                      </Text>
-                    </View>
-                    {value.status == 'received' ? (
-                      <View
-                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                      >
+                if (value) {
+                  return (
+                    <TouchableOpacity
+                      activeOpacity={value.status != 'received' ? 0 : 10}
+                      onPress={() =>
+                        value.status != 'received' ? handleDocuments() : {}
+                      }
+                      style={{
+                        ...styles.selectedContactView,
+                        marginBottom: 15,
+                      }}
+                    >
+                      <View>
+                        <Text style={styles.selectedContactName}>
+                          {value.title}
+                        </Text>
+                      </View>
+                      {value.status == 'received' ? (
                         <View
-                          style={{
-                            ...styles.secretReceivedView,
-                            backgroundColor: Colors.green,
-                          }}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
                         >
-                          <Text
+                          <View
                             style={{
-                              ...styles.secretReceivedText,
-                              color: Colors.darkGreen,
+                              ...styles.secretReceivedView,
+                              backgroundColor: Colors.green,
                             }}
                           >
-                            Secret Entered
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            ...styles.secretReceivedCheckSignView,
-                            backgroundColor: Colors.green,
-                          }}
-                        >
-                          <Feather
-                            name={'check'}
-                            size={12}
-                            color={Colors.darkGreen}
-                          />
-                        </View>
-                      </View>
-                    ) : value.status == 'rejected' ? (
-                      <View
-                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                      >
-                        <View
-                          style={{
-                            ...styles.secretReceivedView,
-                            backgroundColor: Colors.lightRed,
-                          }}
-                        >
-                          <Text
+                            <Text
+                              style={{
+                                ...styles.secretReceivedText,
+                                color: Colors.darkGreen,
+                              }}
+                            >
+                              Secret Entered
+                            </Text>
+                          </View>
+                          <View
                             style={{
-                              ...styles.secretReceivedText,
-                              color: Colors.red,
+                              ...styles.secretReceivedCheckSignView,
+                              backgroundColor: Colors.green,
                             }}
                           >
-                            Secret Invalid
-                          </Text>
+                            <Feather
+                              name={'check'}
+                              size={12}
+                              color={Colors.darkGreen}
+                            />
+                          </View>
                         </View>
+                      ) : value.status == 'rejected' ? (
                         <View
-                          style={{
-                            height: 25,
-                            width: 25,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginLeft: 5,
-                          }}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
                         >
-                          <Entypo
-                            name={'dots-three-horizontal'}
-                            size={15}
-                            color={Colors.borderColor}
-                          />
+                          <View
+                            style={{
+                              ...styles.secretReceivedView,
+                              backgroundColor: Colors.lightRed,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                ...styles.secretReceivedText,
+                                color: Colors.red,
+                              }}
+                            >
+                              Secret Invalid
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              height: 25,
+                              width: 25,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginLeft: 5,
+                            }}
+                          >
+                            <Entypo
+                              name={'dots-three-horizontal'}
+                              size={15}
+                              color={Colors.borderColor}
+                            />
+                          </View>
                         </View>
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        onPress={() => handleDocuments()}
-                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                      >
-                        <Text>{value.status}</Text>
-                        <View style={styles.dotsView} />
-                        <View style={styles.dotsView} />
-                        <View style={styles.dotsView} />
-                      </TouchableOpacity>
-                    )}
-                  </TouchableOpacity>
-                );
-                }
-                else{
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => handleDocuments()}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                        >
+                          <Text>{value.status}</Text>
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                        </TouchableOpacity>
+                      )}
+                    </TouchableOpacity>
+                  );
+                } else {
                   null;
                 }
               })}

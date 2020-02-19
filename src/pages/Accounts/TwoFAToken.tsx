@@ -24,6 +24,7 @@ import {
   transferST3,
   clearTransfer,
   fetchTransactions,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -53,7 +54,8 @@ export default function TwoFAToken(props) {
       isSuccess={true}
       onPressViewAccount={() => {
         dispatch(clearTransfer(serviceType));
-        dispatch(fetchTransactions(serviceType));
+        // dispatch(fetchTransactions(serviceType));
+        dispatch(fetchBalanceTx(serviceType));
         props.navigation.navigate('Accounts');
       }}
       transactionId={transfer.txid}
@@ -98,7 +100,9 @@ export default function TwoFAToken(props) {
               {'Enter OTP to authenticate'}
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              {'Please enter the OTP from the authenticator that you have set up'}
+              {
+                'Please enter the OTP from the authenticator that you have set up'
+              }
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>
@@ -254,7 +258,9 @@ export default function TwoFAToken(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              {'If you have not set up the authenticator yet, please see our FAQ section to see how to do it'}
+              {
+                'If you have not set up the authenticator yet, please see our FAQ section to see how to do it'
+              }
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
