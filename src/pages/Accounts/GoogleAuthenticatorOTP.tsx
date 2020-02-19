@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -22,15 +22,19 @@ import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 const GoogleAuthenticatorOTP = props => {
+  const [textInput1Value, setTextInput1Value] = useState('');
+  const [textInput2Value, setTextInput2Value] = useState('');
+  const [textInput3Value, setTextInput3Value] = useState('');
+  const [textInput4Value, setTextInput4Value] = useState('');
+  const [textInput5Value, setTextInput5Value] = useState('');
+  const [textInput6Value, setTextInput6Value] = useState('');
   const [passcode, setPasscode] = useState([]);
   const correctPasscode = 'AAAAAA';
 
   function onPressNumber(text, i) {
-    if(!text) return;
     let tempPasscode = passcode;
     tempPasscode[i] = text;
     setPasscode(tempPasscode);
-
     if (passcode.join('').length == 6 && passcode.join('') == correctPasscode) {
       props.navigation.navigate('WalletCreationSuccess');
     }
@@ -113,7 +117,7 @@ const GoogleAuthenticatorOTP = props => {
                     ) : null}
                   </View>
                   <View style={styles.passcodeTextInputView}>
-                    <TextInput
+                  <TextInput
                       maxLength={1}
                       keyboardType="email-address"
                       selectTextOnFocus={true}
@@ -129,7 +133,9 @@ const GoogleAuthenticatorOTP = props => {
                           : styles.textBoxStyles,
                       ]}
                       onChangeText={value => {
-                        value = value.replace(/\s/g, '')
+                        value = value.replace(/\s/g, '');
+                        setTextInput1Value(value);
+                        // console.log("value", "###"+value+"###", value.length)
                         if (value.length >= 1) {
                           onPressNumber(value, 0);
                           this.textInput2.focus();
@@ -141,64 +147,68 @@ const GoogleAuthenticatorOTP = props => {
                           onPressNumber('', 0);
                         }
                       }}
+                      value={passcode[0] && passcode[0].length ? passcode[0] : ""}
+                    />
+                    <TextInput
+                      maxLength={1}
+                      keyboardType="email-address"
+                      selectTextOnFocus={true}
+                      contextMenuHidden={true}
+                      autoCorrect={false}
+                      ref={input => {
+                        this.textInput2 = input;
+                      }}
+                      style={[
+                        this.textInput2 && this.textInput2.isFocused()
+                          ? styles.textBoxActive
+                          : styles.textBoxStyles,
+                      ]}
+                      onChangeText={value => {
+                        value = value.replace(/\s/g, '');
+                        setTextInput2Value(value);
+                        if (value.length >= 1) {
+                          onPressNumber(value, 1);
+                          this.textInput3.focus();
+                        }
+                      }}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          this.textInput.focus();
+                          onPressNumber('', 1);
+                        }
+                      }}
+                      value={passcode[1] && passcode[1].length ? passcode[1] : ""}
                     />
 
                     <TextInput
                       maxLength={1}
                       keyboardType="email-address"
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput2 = input;
-                }}
-                style={[
-                  this.textInput2 && this.textInput2.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  value = value.replace(/\s/g, '')
-                  if (value.length >= 1) {
-                    onPressNumber(value, 1);
-                    this.textInput3.focus();}
-                }}
-                
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput.focus();
-                    onPressNumber('', 1);
-                  }
-                }}
-                    />
-
-                    <TextInput
-                      maxLength={1}
-                      keyboardType="email-address"
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput3 = input;
-                }}
-                style={[
-                  this.textInput3 && this.textInput3.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  value = value.replace(/\s/g, '')
-                  if (value.length >= 1) {
-                    onPressNumber(value, 2);
-                    this.textInput4.focus();
-                  }
-                }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput2.focus();
-                    onPressNumber('', 2);
-                  }
-                }}
+                      selectTextOnFocus={true}
+                      contextMenuHidden={true}
+                      autoCorrect={false}
+                      ref={input => {
+                        this.textInput3 = input;
+                      }}
+                      style={[
+                        this.textInput3 && this.textInput3.isFocused()
+                          ? styles.textBoxActive
+                          : styles.textBoxStyles,
+                      ]}
+                      onChangeText={value => {
+                        value = value.replace(/\s/g, '');
+                        setTextInput3Value(value);
+                        if (value.length >= 1) {
+                          onPressNumber(value, 2);
+                          this.textInput4.focus();
+                        }
+                      }}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          this.textInput2.focus();
+                          onPressNumber('', 2);
+                        }
+                      }}
+                      value={passcode[2] && passcode[2].length ? passcode[2] : ""}
                     />
 
                     <TextInput
@@ -216,11 +226,11 @@ const GoogleAuthenticatorOTP = props => {
                           : styles.textBoxStyles,
                       ]}
                       onChangeText={value => {
-                        value = value.replace(/\s/g, '')
+                        value = value.replace(/\s/g, '');
+                        setTextInput4Value(value);
                         if (value.length >= 1) {
                           onPressNumber(value, 3);
                           this.textInput5.focus();}
-                        
                       }}
                       onKeyPress={e => {
                         if (e.nativeEvent.key === 'Backspace') {
@@ -228,63 +238,66 @@ const GoogleAuthenticatorOTP = props => {
                           onPressNumber('', 3);
                         }
                       }}
+                      value={passcode[3] && passcode[3].length ? passcode[3] : ""}
                     />
 
                     <TextInput
                       maxLength={1}
                       keyboardType="email-address"
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput5 = input;
-                }}
-                style={[
-                  this.textInput5 && this.textInput5.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  value = value.replace(/\s/g, '')
-                  if (value.length >= 1) {
-                    onPressNumber(value,4);
-                    this.textInput6.focus();}
-                  
-                }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput4.focus();
-                    onPressNumber('',4);
-                  }
-                }}
+                      selectTextOnFocus={true}
+                      contextMenuHidden={true}
+                      autoCorrect={false}
+                      ref={input => {
+                        this.textInput5 = input;
+                      }}
+                      style={[
+                        this.textInput5 && this.textInput5.isFocused()
+                          ? styles.textBoxActive
+                          : styles.textBoxStyles,
+                      ]}
+                      onChangeText={value => {
+                        value = value.replace(/\s/g, '');
+                        setTextInput5Value(value);
+                        if (value.length >= 1) {
+                          onPressNumber(value,4);
+                          this.textInput6.focus();}
+                      }}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          this.textInput4.focus();
+                          onPressNumber('',4);
+                        }
+                      }}
+                      value={passcode[4] && passcode[4].length ? passcode[4] : ""}
                     />
                     <TextInput
                       maxLength={1}
                       keyboardType="email-address"
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput6 = input;
-                }}
-                style={[
-                  this.textInput6 && this.textInput6.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  value = value.replace(/\s/g, '')
-                  
-                  if (value.length >= 1) {
-                    onPressNumber(value,5);
-                    this.textInput6.focus();}
-                  }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput5.focus();
-                    onPressNumber('',5);
-                  }
-                }}
+                      selectTextOnFocus={true}
+                      contextMenuHidden={true}
+                      autoCorrect={false}
+                      ref={input => {
+                        this.textInput6 = input;
+                      }}
+                      style={[
+                        this.textInput6 && this.textInput6.isFocused()
+                          ? styles.textBoxActive
+                          : styles.textBoxStyles,
+                      ]}
+                      onChangeText={value => {
+                        value = value.replace(/\s/g, '');
+                        setTextInput6Value(value);
+                        if (value.length >= 1) {
+                          onPressNumber(value,5);
+                          this.textInput6.focus();}
+                      }}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          this.textInput5.focus();
+                          onPressNumber('',5);
+                        }
+                      }}
+                      value={passcode[5] && passcode[5].length ? passcode[5] : ""}
                     />
                   </View>
                 </View>
