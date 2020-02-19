@@ -34,7 +34,11 @@ import { initializeSetup } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import { getTestcoins, calculateExchangeRate } from '../store/actions/accounts';
+import {
+  getTestcoins,
+  calculateExchangeRate,
+  accountsSynched,
+} from '../store/actions/accounts';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -201,6 +205,7 @@ export default function NewWalletQuestion(props) {
       transactions.length > 0
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
+      dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
       props.navigation.navigate('HomeNav');
     }
   }, [isInitialized, exchangeRates, balances, transactions]);
