@@ -28,7 +28,7 @@ export const fetchTransactions = (serviceType, service?) => {
 
 export const fetchBalanceTx = (
   serviceType,
-  options?: { loader?; restore? },
+  options?: { service?; loader?; restore?; shouldNotInsert? },
 ) => {
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
