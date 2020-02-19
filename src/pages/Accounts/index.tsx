@@ -160,7 +160,7 @@ export default function Accounts(props) {
   );
   const service = useSelector(state => state.accounts[serviceType].service);
   const loader = useSelector(
-    state => state.accounts[serviceType].loading.balances,
+    state => state.accounts[serviceType].loading.balanceTx,
   );
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;

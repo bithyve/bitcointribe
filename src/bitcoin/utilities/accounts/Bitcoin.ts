@@ -267,8 +267,7 @@ export default class Bitcoin {
         );
       }
 
-      const { Balance, Transactions } = res.data;
-
+      const { Balance, Txs } = res.data;
       const balances = {
         balance: Balance.Balance,
         unconfirmedBalance: Balance.UnconfirmedBalance,
@@ -281,7 +280,7 @@ export default class Bitcoin {
         transactionDetails: [],
       };
 
-      const addressesInfo = Transactions;
+      const addressesInfo = Txs;
       const txMap = new Map();
       for (const addressInfo of addressesInfo) {
         console.log(
