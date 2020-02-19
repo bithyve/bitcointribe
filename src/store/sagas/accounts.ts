@@ -24,6 +24,7 @@ import {
   testcoinsReceived,
   SYNC_ACCOUNTS,
   accountsSynched,
+  FETCH_BALANCE_TX,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -139,6 +140,55 @@ function* fetchTransactionsWorker({ payload }) {
 export const fetchTransactionsWatcher = createWatcher(
   fetchTransactionsWorker,
   FETCH_TRANSACTIONS,
+);
+
+function* fetchBalanceTxWorker({ payload }) {
+  if (payload.options && payload.options.loader)
+    yield put(switchLoader(payload.serviceType, 'balanceTx'));
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service,
+  );
+
+  const preFetchBalances =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.balances
+      : service.hdWallet.balances;
+  const preFetchTransactions =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.transactions
+      : service.hdWallet.transactions;
+
+  const res = yield call(service.getBalanceTransactions, {
+    restore: payload.restore,
+  });
+
+  const postFetchBalances =
+    res.status === 200 ? res.data.balances : preFetchBalances;
+  const postFetchTransactions =
+    res.status === 200 ? res.data.transactions : preFetchTransactions;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
+  ) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  }
+
+  if (payload.options.loader) {
+    // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
+    yield put(switchLoader(payload.serviceType, 'balanceTx'));
+  }
+}
+
+export const fetchBalanceTxWatcher = createWatcher(
+  fetchBalanceTxWorker,
+  FETCH_BALANCE_TX,
 );
 
 function* transferST1Worker({ payload }) {
