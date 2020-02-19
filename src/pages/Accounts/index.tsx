@@ -549,9 +549,9 @@ export default function Accounts(props) {
         />
         </View>
         {transactions.transactionDetails.length <= 1 ? 
-          <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
+          <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%'), opacity: 0.5}}>
             <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
-              All your recent transactions across all accounts will appear here
+              Recent transactions will appear here
             </Text>
           </View>
         : null
@@ -561,9 +561,9 @@ export default function Accounts(props) {
     )
     :
     <View style={styles.modalContentContainer}>
-      <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%')}}>
+      <View style={{flex:1, marginTop:hp('15%'), alignItems:'center', padding:wp('10%'), opacity: 0.5}}>
         <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>
-          All your recent transactions across all accounts will appear here
+          Recent transactions will appear here
         </Text>
       </View>
     </View>

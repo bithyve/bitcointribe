@@ -97,11 +97,10 @@ export default function RestoreByCloudQrCodeContents(props) {
           </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
-              Enter Recovery Secret{'\n'}from Cloud
+              Enter Recovery Secret
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              {props.pageInfo}These are the 8 QR codes saved in the{'\n'}PDF you
-              stored in your cloud service
+              {props.pageInfo}There are 8 QR codes in the {'\n'}PDF you have stored
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
