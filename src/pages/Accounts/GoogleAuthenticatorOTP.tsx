@@ -26,6 +26,7 @@ const GoogleAuthenticatorOTP = props => {
   const correctPasscode = 'AAAAAA';
 
   function onPressNumber(text, i) {
+    if(!text) return;
     let tempPasscode = passcode;
     tempPasscode[i] = text;
     setPasscode(tempPasscode);
@@ -128,8 +129,9 @@ const GoogleAuthenticatorOTP = props => {
                           : styles.textBoxStyles,
                       ]}
                       onChangeText={value => {
-                        onPressNumber(value, 0);
+                        value = value.replace(/\s/g, '')
                         if (value.length >= 1) {
+                          onPressNumber(value, 0);
                           this.textInput2.focus();
                         }
                       }}
@@ -156,8 +158,10 @@ const GoogleAuthenticatorOTP = props => {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value, 1);
-                  if (value.length >= 1) this.textInput3.focus();
+                  value = value.replace(/\s/g, '')
+                  if (value.length >= 1) {
+                    onPressNumber(value, 1);
+                    this.textInput3.focus();}
                 }}
                 
                 onKeyPress={e => {
@@ -183,9 +187,11 @@ const GoogleAuthenticatorOTP = props => {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value, 2);
-                  if (value.length >= 1) this.textInput4.focus();
-                  
+                  value = value.replace(/\s/g, '')
+                  if (value.length >= 1) {
+                    onPressNumber(value, 2);
+                    this.textInput4.focus();
+                  }
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -210,8 +216,10 @@ const GoogleAuthenticatorOTP = props => {
                           : styles.textBoxStyles,
                       ]}
                       onChangeText={value => {
-                        onPressNumber(value, 3);
-                        if (value.length >= 1) this.textInput5.focus();
+                        value = value.replace(/\s/g, '')
+                        if (value.length >= 1) {
+                          onPressNumber(value, 3);
+                          this.textInput5.focus();}
                         
                       }}
                       onKeyPress={e => {
@@ -237,8 +245,10 @@ const GoogleAuthenticatorOTP = props => {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,4);
-                  if (value.length >= 1) this.textInput6.focus();
+                  value = value.replace(/\s/g, '')
+                  if (value.length >= 1) {
+                    onPressNumber(value,4);
+                    this.textInput6.focus();}
                   
                 }}
                 onKeyPress={e => {
@@ -263,10 +273,12 @@ const GoogleAuthenticatorOTP = props => {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,5);
-                  if (value.length >= 1) this.textInput6.focus();
+                  value = value.replace(/\s/g, '')
                   
-                }}
+                  if (value.length >= 1) {
+                    onPressNumber(value,5);
+                    this.textInput6.focus();}
+                  }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
