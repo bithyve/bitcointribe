@@ -34,7 +34,11 @@ import { initializeSetup } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import { getTestcoins } from '../store/actions/accounts';
+import {
+  getTestcoins,
+  calculateExchangeRate,
+  accountsSynched,
+} from '../store/actions/accounts';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -77,7 +81,6 @@ export default function NewWalletQuestion(props) {
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [visibleButton, setVisibleButton] = useState(false);
-  const [exchangeRates, setExchangeRates] = useState();
   const accounts = useSelector(state => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
 
@@ -131,30 +134,30 @@ export default function NewWalletQuestion(props) {
     setTransactions(accumulativeTransactions);
   }, [accounts]);
 
-  useEffect(() => {
-    (async () => {
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        if (Date.now() - exchangeRates.lastFetched < 1800000) {
-          setExchangeRates(exchangeRates);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        console.log('Failed to retrieve exchange rates', res);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+  //     if (storedExchangeRates) {
+  //       const exchangeRates = JSON.parse(storedExchangeRates);
+  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
+  //         setExchangeRates(exchangeRates);
+  //         return;
+  //       } // maintaining a half an hour difference b/w fetches
+  //     }
+  //     const res = await axios.get('https://blockchain.info/ticker');
+  //     if (res.status == 200) {
+  //       const exchangeRates = res.data;
+  //       exchangeRates.lastFetched = Date.now();
+  //       setExchangeRates(exchangeRates);
+  //       await AsyncStorage.setItem(
+  //         'exchangeRates',
+  //         JSON.stringify(exchangeRates),
+  //       );
+  //     } else {
+  //       console.log('Failed to retrieve exchange rates', res);
+  //     }
+  //   })();
+  // }, []);
 
   // useEffect(() => {
   //   (async () => {
@@ -187,6 +190,13 @@ export default function NewWalletQuestion(props) {
     })();
   }, [testAccService]);
 
+  const exchangeRates = useSelector(state => state.accounts.exchangeRates);
+  useEffect(() => {
+    if (!exchangeRates) {
+      dispatch(calculateExchangeRate());
+    }
+  }, []);
+
   useEffect(() => {
     if (
       isInitialized &&
@@ -195,12 +205,8 @@ export default function NewWalletQuestion(props) {
       transactions.length > 0
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
-      props.navigation.navigate(
-        'HomeNav',
-        exchangeRates,
-        balances,
-        transactions,
-      );
+      dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
+      props.navigation.navigate('HomeNav');
     }
   }, [isInitialized, exchangeRates, balances, transactions]);
 
@@ -278,7 +284,7 @@ export default function NewWalletQuestion(props) {
             JSON.stringify(securityQuestionHistory),
           );
         }}
-        style={{...styles.buttonView, elevation: Elevation,}}
+        style={{ ...styles.buttonView, elevation: Elevation }}
       >
         {/* {!loading.initializing ? ( */}
         <Text style={styles.buttonText}>Confirm</Text>
@@ -388,45 +394,45 @@ export default function NewWalletQuestion(props) {
 
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
-                  <ScrollView style={{height: hp('40%')}}>
-                  {dropdownBoxList.map((value, index) => (
-                    <TouchableOpacity
-                      onPress={() => {
-                        setTimeout(() => {
-                          setDropdownBoxValue(value);
-                          setDropdownBoxOpenClose(false);
-                        }, 70);
-                      }}
-                      style={{
-                        ...styles.dropdownBoxModalElementView,
-                        borderTopLeftRadius: index == 0 ? 10 : 0,
-                        borderTopRightRadius: index == 0 ? 10 : 0,
-                        borderBottomLeftRadius:
-                          index == dropdownBoxList.length - 1 ? 10 : 0,
-                        borderBottomRightRadius:
-                          index == dropdownBoxList.length - 1 ? 10 : 0,
-                        paddingTop: index == 0 ? 5 : 0,
-                        backgroundColor: dropdownBoxValue
-                          ? dropdownBoxValue.id == value.id
-                            ? Colors.lightBlue
-                            : Colors.white
-                          : Colors.white,
-                      }}
-                    >
-                      <Text
+                  <ScrollView style={{ height: hp('40%') }}>
+                    {dropdownBoxList.map((value, index) => (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setTimeout(() => {
+                            setDropdownBoxValue(value);
+                            setDropdownBoxOpenClose(false);
+                          }, 70);
+                        }}
                         style={{
-                          color:
-                            dropdownBoxValue.id == value.id
-                              ? Colors.blue
-                              : Colors.black,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(12),
+                          ...styles.dropdownBoxModalElementView,
+                          borderTopLeftRadius: index == 0 ? 10 : 0,
+                          borderTopRightRadius: index == 0 ? 10 : 0,
+                          borderBottomLeftRadius:
+                            index == dropdownBoxList.length - 1 ? 10 : 0,
+                          borderBottomRightRadius:
+                            index == dropdownBoxList.length - 1 ? 10 : 0,
+                          paddingTop: index == 0 ? 5 : 0,
+                          backgroundColor: dropdownBoxValue
+                            ? dropdownBoxValue.id == value.id
+                              ? Colors.lightBlue
+                              : Colors.white
+                            : Colors.white,
                         }}
                       >
-                        {value.question}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text
+                          style={{
+                            color:
+                              dropdownBoxValue.id == value.id
+                                ? Colors.blue
+                                : Colors.black,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(12),
+                          }}
+                        >
+                          {value.question}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </ScrollView>
                 </View>
               ) : null}
@@ -605,7 +611,7 @@ export default function NewWalletQuestion(props) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        <View style={{...styles.bottomButtonView,}}>
+        <View style={{ ...styles.bottomButtonView }}>
           {answer.trim() == confirmAnswer.trim() &&
           confirmAnswer.trim() &&
           answer.trim()
@@ -617,20 +623,19 @@ export default function NewWalletQuestion(props) {
           </View>
         </View>
         {!visibleButton ? (
-              <View
-                style={{ marginBottom: Platform.OS == "ios" && DeviceInfo.hasNotch ? hp('1%') : 0 }}
-              >
-                <BottomInfoBox
-                  title={
-                    'The answer is used to encrypt parts of your wallet'
-                  }
-                  infoText={
-                    'Very important that this is something that only you '
-                  }
-                  italicText={'know and remember'}
-                />
-              </View>
-            ) : null}
+          <View
+            style={{
+              marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('1%') : 0,
+            }}
+          >
+            <BottomInfoBox
+              title={'The answer is used to encrypt parts of your wallet'}
+              infoText={'Very important that this is something that only you '}
+              italicText={'know and remember'}
+            />
+          </View>
+        ) : null}
         <BottomSheet
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}

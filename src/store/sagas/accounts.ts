@@ -25,6 +25,8 @@ import {
   SYNC_ACCOUNTS,
   accountsSynched,
   FETCH_BALANCE_TX,
+  EXCHANGE_RATE,
+  exchangeRatesCalculated,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -33,6 +35,7 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage } from 'react-native';
+import axios from 'axios';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -406,4 +409,41 @@ function* accountsSyncWorker({ payload }) {
 export const accountsSyncWatcher = createWatcher(
   accountsSyncWorker,
   SYNC_ACCOUNTS,
+);
+
+function* exchangeRateWorker() {
+  try {
+    const storedExchangeRates = yield call(
+      AsyncStorage.getItem,
+      'exchangeRates',
+    );
+
+    if (storedExchangeRates) {
+      const exchangeRates = JSON.parse(storedExchangeRates);
+      if (Date.now() - exchangeRates.lastFetched < 1800000) {
+        yield put(exchangeRatesCalculated(exchangeRates));
+        return;
+      } // maintaining half an hour difference b/w fetches
+    }
+    const res = yield call(axios.get, 'https://blockchain.info/ticker');
+    if (res.status == 200) {
+      const exchangeRates = res.data;
+      exchangeRates.lastFetched = Date.now();
+      yield put(exchangeRatesCalculated(exchangeRates));
+      yield call(
+        AsyncStorage.setItem,
+        'exchangeRates',
+        JSON.stringify(exchangeRates),
+      );
+    } else {
+      console.log('Failed to retrieve exchange rates', res);
+    }
+  } catch (err) {
+    console.log({ err });
+  }
+}
+
+export const exchangeRateWatcher = createWatcher(
+  exchangeRateWorker,
+  EXCHANGE_RATE,
 );

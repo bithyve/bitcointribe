@@ -108,11 +108,14 @@ export default function Home(props) {
   // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
-  const exchangeRate = props.navigation.state.params
-    ? props.navigation.state.params.exchangeRates
-    : null;
-  const [exchangeRates, setExchangeRates] = useState(exchangeRate);
+  // const exchangeRate = props.navigation.state.params
+  //   ? props.navigation.state.params.exchangeRates
+  //   : null;
 
+  const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
+  useEffect(() => {
+    if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
+  }, [accounts.exchangeRates]);
   // const [balances, setBalances] = useState({
   //   testBalance: 0,
   //   regularBalance: 0,
@@ -121,21 +124,15 @@ export default function Home(props) {
   // });
   // const [transactions, setTransactions] = useState([]);
 
-  const balancesParam = props.navigation.getParam('balances');
-  const [balances, setBalances] = useState(
-    balancesParam
-      ? balancesParam
-      : {
-          testBalance: 0,
-          regularBalance: 0,
-          secureBalance: 0,
-          accumulativeBalance: 0,
-        },
-  );
-  const transactionsParam = props.navigation.getParam('transactions');
-  const [transactions, setTransactions] = useState(
-    transactionsParam ? transactionsParam : [],
-  );
+  // const balancesParam = props.navigation.getParam('balances');
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  // const transactionsParam = props.navigation.getParam('transactions');
+  const [transactions, setTransactions] = useState([]);
 
   const [qrData, setqrData] = useState('');
 
@@ -173,33 +170,41 @@ export default function Home(props) {
       ...secureTransactions,
     ];
 
-    if (balancesParam) {
-      if (
-        JSON.stringify(balancesParam) !==
-        JSON.stringify({
-          testBalance,
-          regularBalance,
-          secureBalance,
-          accumulativeBalance,
-        })
-      ) {
-        setBalances({
-          testBalance,
-          regularBalance,
-          secureBalance,
-          accumulativeBalance,
-        });
-        setTransactions(accumulativeTransactions);
-      }
-    } else {
-      setBalances({
-        testBalance,
-        regularBalance,
-        secureBalance,
-        accumulativeBalance,
-      });
-      setTransactions(accumulativeTransactions);
-    }
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+
+    // if (balancesParam) {
+    //   if (
+    //     JSON.stringify(balancesParam) !==
+    //     JSON.stringify({
+    //       testBalance,
+    //       regularBalance,
+    //       secureBalance,
+    //       accumulativeBalance,
+    //     })
+    //   ) {
+    //     setBalances({
+    //       testBalance,
+    //       regularBalance,
+    //       secureBalance,
+    //       accumulativeBalance,
+    //     });
+    //     setTransactions(accumulativeTransactions);
+    //   }
+    // } else {
+    //   setBalances({
+    //     testBalance,
+    //     regularBalance,
+    //     secureBalance,
+    //     accumulativeBalance,
+    //   });
+    //   setTransactions(accumulativeTransactions);
+    // }
   }, [accounts]);
 
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
@@ -264,7 +269,7 @@ export default function Home(props) {
   const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
     React.createRef(),
   );
-  
+
   // const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -606,7 +611,7 @@ export default function Home(props) {
                 marginTop: hp('15%'),
                 alignItems: 'center',
                 padding: wp('10%'),
-                opacity:0.5
+                opacity: 0.5,
               }}
             >
               <Text
@@ -617,8 +622,7 @@ export default function Home(props) {
                   textAlign: 'center',
                 }}
               >
-                Recent transactions across all accounts will appear
-                here
+                Recent transactions across all accounts will appear here
               </Text>
             </View>
           ) : null}
@@ -632,7 +636,7 @@ export default function Home(props) {
             marginTop: hp('15%'),
             alignItems: 'center',
             padding: wp('10%'),
-            opacity:0.5
+            opacity: 0.5,
           }}
         >
           <Text
@@ -930,7 +934,7 @@ export default function Home(props) {
         onPressAcceptSecret={() => {
           setTimeout(() => {
             setTabBarZIndex(0);
-            setDeepLinkModalOpen(false)
+            setDeepLinkModalOpen(false);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
           if (custodyRequest.isQR) {
@@ -1048,7 +1052,7 @@ export default function Home(props) {
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
-            setDeepLinkModalOpen(false)
+            setDeepLinkModalOpen(false);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
         }}
@@ -1988,7 +1992,7 @@ export default function Home(props) {
                                   : value.accountType === 'regular'
                                   ? 1
                                   : 2,
-                              });
+                            });
                           }}
                         >
                           <CardView cornerRadius={10} style={styles.card}>
@@ -2055,7 +2059,13 @@ export default function Home(props) {
                                     source={require('../assets/images/icons/icon_dollar_dark.png')}
                                   />
                                 )}
-                                <Text style={styles.cardAmountText}>
+                                <Text
+                                  style={
+                                    accounts.accountsSynched
+                                      ? styles.cardAmountText
+                                      : styles.cardAmountTextGrey
+                                  }
+                                >
                                   {switchOn
                                     ? value.accountType === 'test'
                                       ? UsNumberFormat(balances.testBalance)
@@ -2132,7 +2142,7 @@ export default function Home(props) {
             ? hp('19%')
             : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%')
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%'),
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -2188,7 +2198,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
@@ -2838,6 +2848,14 @@ const styles = StyleSheet.create({
   },
   cardAmountText: {
     color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(17),
+    marginRight: 5,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
+  },
+  cardAmountTextGrey: {
+    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(17),
     marginRight: 5,

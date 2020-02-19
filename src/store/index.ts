@@ -37,6 +37,7 @@ import {
   accumulativeTxAndBalWatcher,
   accountsSyncWatcher,
   fetchBalanceTxWatcher,
+  exchangeRateWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -110,6 +111,7 @@ const rootSaga = function*() {
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     accountsSyncWatcher,
+    exchangeRateWatcher,
 
     // sss watchers
     initHCWatcher,
