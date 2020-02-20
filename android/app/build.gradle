@@ -96,20 +96,20 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
     
-android {
+android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-                              
+                                                
     defaultConfig {
         applicationId "com.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15                     
-        versionName "0.6"                   
+        versionCode 19                    
+        versionName "0.7"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }                     
-              
+    }                         
+                                 
      signingConfigs {      
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
