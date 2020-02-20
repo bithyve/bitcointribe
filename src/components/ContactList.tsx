@@ -73,12 +73,17 @@ export default function ContactList(props) {
 
   useEffect(() => {
     (async () => {
-      let isContactOpen = await AsyncStorage.getItem('isContactOpen');
+      let isContactOpen=false;
+      AsyncStorage.getItem('isContactOpen', (err, value) => {
+      if (err) console.log(err)
+       else {
+        isContactOpen = JSON.parse(value)
+      }
+  });
       if (!isContactOpen) {
-        await AsyncStorage.setItem('isContactOpen', 'true');
+        await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
       }
     })();
-    // global.isContactOpen = true;
     getContactsAsync();
   }, []);
 
