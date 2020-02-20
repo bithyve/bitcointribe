@@ -717,4 +717,46 @@ export default class SecureAccount {
       return { status: 311, err: err.message, message: ErrMap[311] };
     }
   };
+
+  public alternateTransferST2 = async (
+    inputs: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+    }>,
+    txb: TransactionBuilder,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          txid: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      const { signedTxb } = this.secureHDWallet.dualSignHDTransaction(
+        inputs,
+        txb,
+      );
+      console.log('---- Transaction Signed ----');
+
+      const txHex = signedTxb.build().toHex();
+      console.log({ txHex });
+      const { txid } = await this.secureHDWallet.broadcastTransaction(txHex);
+      console.log('---- Transaction Broadcasted ----');
+
+      return { status: config.STATUS.SUCCESS, data: { txid } };
+    } catch (err) {
+      return { status: 107, err: err.message, message: ErrMap[107] };
+    }
+  };
 }

@@ -673,54 +673,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  public broadcastTransaction = async (
-    txHex: string,
-  ): Promise<{
-    txid: string;
-  }> => {
-    try {
-      let res: AxiosResponse;
-      if (this.network === bitcoinJS.networks.testnet) {
-        res = await axios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
-          txHex,
-          {
-            headers: { 'Content-Type': 'text/plain' },
-          },
-        );
-      } else {
-        res = await axios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
-          txHex,
-          {
-            headers: { 'Content-Type': 'text/plain' },
-          },
-        );
-      }
-      return { txid: res.data };
-    } catch (err) {
-      console.log(
-        `An error occured while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
-      );
-      try {
-        let res: AxiosResponse;
-        if (this.network === bitcoinJS.networks.testnet) {
-          res = await axios.post(TESTNET.BROADCAST, { hex: txHex });
-        } else {
-          res = await axios.post(MAINNET.BROADCAST, { hex: txHex });
-        }
-
-        const { txid } = res.data;
-        return {
-          txid,
-        };
-      } catch (err) {
-        console.log(err.message);
-        throw new Error('Transaction broadcasting failed');
-      }
-    }
-  };
-
   public prepareSecureAccount = (
     bhXpub: string,
     secondaryXpub?: string,
