@@ -27,6 +27,7 @@ import {
   FETCH_BALANCE_TX,
   EXCHANGE_RATE,
   exchangeRatesCalculated,
+  ALTERNATE_TRANSFER_ST2,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -249,6 +250,34 @@ function* transferST2Worker({ payload }) {
 export const transferST2Watcher = createWatcher(
   transferST2Worker,
   TRANSFER_ST2,
+);
+
+function* alternateTransferST2Worker({ payload }) {
+  if (payload.serviceType !== SECURE_ACCOUNT) return;
+
+  yield put(switchLoader(payload.serviceType, 'transfer'));
+  const { service, transfer } = yield select(
+    state => state.accounts[payload.serviceType],
+  );
+
+  const { inputs, txb } = transfer.stage1;
+  if (!inputs && !txb) {
+    console.log('Transaction object missing');
+    return;
+  }
+  const res = yield call(service.alternateTransferST2, inputs, txb);
+  console.log({ res });
+  if (res.status === 200) {
+    yield put(executedST2(payload.serviceType, res.data.txid));
+  } else {
+    yield put(failedST2(payload.serviceType));
+    yield put(switchLoader(payload.serviceType, 'transfer'));
+  }
+}
+
+export const alternateTransferST2Watcher = createWatcher(
+  alternateTransferST2Worker,
+  ALTERNATE_TRANSFER_ST2,
 );
 
 function* transferST3Worker({ payload }) {

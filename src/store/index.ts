@@ -38,6 +38,7 @@ import {
   accountsSyncWatcher,
   fetchBalanceTxWatcher,
   exchangeRateWatcher,
+  alternateTransferST2Watcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -107,6 +108,7 @@ const rootSaga = function*() {
     fetchBalanceTxWatcher,
     transferST1Watcher,
     transferST2Watcher,
+    alternateTransferST2Watcher,
     transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
