@@ -5,6 +5,7 @@ export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
 export const TRANSFER_ST1 = 'TRANSFER_ST1';
 export const TRANSFER_ST2 = 'TRANSFER_ST2';
+export const ALTERNATE_TRANSFER_ST2 = 'ALTERNATE_TRANSFER_ST2';
 export const TRANSFER_ST3 = 'TRANSFER_ST3';
 export const GET_TESTCOINS = 'GET_TESTCOINS';
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
@@ -40,6 +41,10 @@ export const transferST1 = (serviceType, transferInfo) => {
 
 export const transferST2 = serviceType => {
   return { type: TRANSFER_ST2, payload: { serviceType } };
+};
+
+export const alternateTransferST2 = serviceType => {
+  return { type: ALTERNATE_TRANSFER_ST2, payload: { serviceType } };
 };
 
 export const transferST3 = (serviceType, token) => {

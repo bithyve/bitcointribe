@@ -7,8 +7,10 @@ import crypto from 'crypto';
 import config from '../../Config';
 import { Transactions } from '../Interface';
 import Bitcoin from './Bitcoin';
+import axios from 'axios';
 
-const { BH_AXIOS, HEXA_ID } = config;
+const { BH_AXIOS, HEXA_ID, API_URLS } = config;
+const { TESTNET, MAINNET } = API_URLS;
 
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
@@ -38,6 +40,7 @@ export default class SecureHDWallet extends Bitcoin {
   private consumedAddresses: string[];
   private nextFreeChildIndex: number;
   private primaryXpriv: string;
+  private secondaryXpriv: string;
   private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
@@ -551,6 +554,7 @@ export default class SecureHDWallet extends Bitcoin {
       };
     }>;
   } => {
+    // single signature (via primary mnemonic), to be followed by server signing
     try {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
@@ -622,6 +626,53 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public dualSignHDTransaction = (
+    inputs: any,
+    txb: bitcoinJS.TransactionBuilder,
+  ): {
+    signedTxb: bitcoinJS.TransactionBuilder;
+  } => {
+    // dual signing (via primary and secondary mnemonic), generates a fully-signed broadcastable transaction
+    try {
+      console.log('------ Transaction Signing ----------');
+      let vin = 0;
+      inputs.forEach(input => {
+        console.log('Signing Input:', input);
+        const {
+          multiSig,
+          primaryPriv,
+          secondaryPriv,
+        } = this.getSigningEssentials(input.address);
+
+        txb.sign(
+          vin,
+          bip32.fromBase58(primaryPriv, this.network),
+          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          null,
+          input.value,
+          Buffer.from(multiSig.scripts.witness, 'hex'),
+        );
+
+        if (!secondaryPriv) {
+          throw new Error('Private key from secondary mnemonic is missing');
+        }
+        txb.sign(
+          vin,
+          bip32.fromBase58(secondaryPriv, this.network),
+          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          null,
+          input.value,
+          Buffer.from(multiSig.scripts.witness, 'hex'),
+        );
+        vin += 1;
+      });
+
+      return { signedTxb: txb };
+    } catch (err) {
+      throw new Error(`Transaction signing failed: ${err.message}`);
+    }
+  };
+
   public prepareSecureAccount = (
     bhXpub: string,
     secondaryXpub?: string,
@@ -656,6 +707,15 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public generateSecondaryXpriv = (secondaryMnemonic: string) => {
+    const path = this.derivePath(this.xpubs.bh);
+    this.secondaryXpriv = this.getRecoverableXKey(
+      secondaryMnemonic,
+      path,
+      true,
+    );
+  };
+
   private getSigningEssentials = (address: string) => {
     if (this.signingEssentialsCache[address]) {
       return this.signingEssentialsCache[address];
@@ -668,6 +728,9 @@ export default class SecureHDWallet extends Bitcoin {
         return (this.signingEssentialsCache[address] = {
           multiSig,
           primaryPriv: this.deriveChildXKey(this.primaryXpriv, itr),
+          secondaryPriv: this.secondaryXpriv
+            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            : null,
           childIndex: itr,
         });
       }
