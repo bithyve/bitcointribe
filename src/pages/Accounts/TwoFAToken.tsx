@@ -55,7 +55,11 @@ export default function TwoFAToken(props) {
       onPressViewAccount={() => {
         dispatch(clearTransfer(serviceType));
         // dispatch(fetchTransactions(serviceType));
-        dispatch(fetchBalanceTx(serviceType));
+        dispatch(
+          fetchBalanceTx(serviceType, {
+            loader: true,
+          }),
+        );
         props.navigation.navigate('Accounts');
       }}
       transactionId={transfer.txid}
