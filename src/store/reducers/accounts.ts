@@ -13,6 +13,8 @@ import {
   TESTCOINS_RECEIVED,
   ACCOUNTS_SYNCHED,
   EXCHANGE_RATE_CALCULATED,
+  SECONDARY_XPRIV_GENERATED,
+  ALTERNATE_TRANSFER_ST2_EXECUTED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -79,6 +81,11 @@ const initialState: {
   REGULAR_ACCOUNT: any;
   TEST_ACCOUNT: any;
   SECURE_ACCOUNT: any;
+  additional?: {
+    regular?: any;
+    test?: any;
+    secure?: any;
+  };
 } = {
   servicesEnriched: false,
   accountsSynched: false,
@@ -220,6 +227,23 @@ export default (state = initialState, action) => {
           };
       }
 
+    case ALTERNATE_TRANSFER_ST2_EXECUTED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            txid: action.payload.result,
+            executed: 'ST2',
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
     // case TRANSFER_ST2_FAILED:
     //   return {
     //     ...state,
@@ -311,6 +335,16 @@ export default (state = initialState, action) => {
       return {
         ...state,
         exchangeRates: action.payload.exchangeRates,
+      };
+
+    case SECONDARY_XPRIV_GENERATED:
+      return {
+        ...state,
+        additional: {
+          secure: {
+            xprivGenerated: action.payload.generated,
+          },
+        },
       };
   }
   return state;

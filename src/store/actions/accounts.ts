@@ -12,6 +12,7 @@ export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
+export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 
 export const fetchAddress = serviceType => {
   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -73,6 +74,13 @@ export const calculateExchangeRate = () => {
   return { type: EXCHANGE_RATE };
 };
 
+export const generateSecondaryXpriv = (serviceType, secondaryMnemonic) => {
+  return {
+    type: GENERATE_SECONDARY_XPRIV,
+    payload: { serviceType, secondaryMnemonic },
+  };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
@@ -87,6 +95,9 @@ export const TRANSFER_ST3_FAILED = 'TRANSFER_ST3_FAILED';
 export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING';
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED';
 export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED';
+export const ALTERNATE_TRANSFER_ST2_EXECUTED =
+  'ALTERNATE_TRANSFER_ST2_EXECUTED';
+export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 
 export const testcoinsReceived = (serviceType, service) => {
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
@@ -139,4 +150,15 @@ export const accountsSynched = synched => {
 
 export const exchangeRatesCalculated = exchangeRates => {
   return { type: EXCHANGE_RATE_CALCULATED, payload: { exchangeRates } };
+};
+
+export const alternateTransferST2Executed = (serviceType, result) => {
+  return {
+    type: ALTERNATE_TRANSFER_ST2_EXECUTED,
+    payload: { serviceType, result },
+  };
+};
+
+export const secondaryXprivGenerated = generated => {
+  return { type: SECONDARY_XPRIV_GENERATED, payload: { generated } };
 };

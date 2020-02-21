@@ -15,6 +15,7 @@ export default class SecureAccount {
       multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
+      secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
@@ -29,6 +30,7 @@ export default class SecureAccount {
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -51,6 +53,7 @@ export default class SecureAccount {
       multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
+      secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
@@ -71,6 +74,7 @@ export default class SecureAccount {
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -545,6 +549,20 @@ export default class SecureAccount {
   //     return { status: 0o5, err: err.message, message: ErrMap[0o5] };
   //   }
   // };
+
+  public generateSecondaryXpriv = (
+    secondaryMnemonic: string,
+  ): { generated: Boolean } => {
+    try {
+      const generated = this.secureHDWallet.generateSecondaryXpriv(
+        secondaryMnemonic,
+      );
+      return { generated };
+    } catch (err) {
+      console.log({ err });
+      return { generated: false };
+    }
+  };
 
   public transferST1 = async (
     recipientAddress: string,

@@ -33,6 +33,7 @@ import {
   transferST3,
   fetchBalance,
   fetchBalanceTx,
+  alternateTransferST2,
 } from '../../store/actions/accounts';
 import DeviceInfo from 'react-native-device-info';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
@@ -66,27 +67,34 @@ export default function Send(props) {
     setUnSuccessWithAddressBottomSheet,
   ] = useState(React.createRef());
 
-  const [
-    SendConfirmationWithContactBottomSheet,
-    setSendConfirmationWithContactBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SendSuccessWithContactBottomSheet,
-    setSuccessWithContactBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SendUnSuccessWithContactBottomSheet,
-    setUnSuccessWithContactBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   SendConfirmationWithContactBottomSheet,
+  //   setSendConfirmationWithContactBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   SendSuccessWithContactBottomSheet,
+  //   setSuccessWithContactBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   SendUnSuccessWithContactBottomSheet,
+  //   setUnSuccessWithContactBottomSheet,
+  // ] = useState(React.createRef());
 
-  const staticFees = props.navigation.getParam('staticFees');
+  const [staticFees, setStaticFees] = useState(
+    props.navigation.getParam('staticFees'),
+  );
+  const serviceType = props.navigation.getParam('serviceType');
+  const sweepSecure = props.navigation.getParam('sweepSecure');
+  let netBalance = props.navigation.getParam('netBalance');
+  const { transfer, loading, service } = useSelector(
+    state => state.accounts[serviceType],
+  );
+
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
-  const netBalance = props.navigation.state.params.netBalance;
-  const serviceType = props.navigation.getParam('serviceType');
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState('');
@@ -136,6 +144,49 @@ export default function Send(props) {
     checkNShowHelperModal();
   }, []);
 
+  useEffect(() => {
+    if (!staticFees) {
+      (async () => {
+        const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
+        if (storedStaticFees) {
+          const { staticFees, lastFetched } = JSON.parse(storedStaticFees);
+          if (Date.now() - lastFetched < 1800000) {
+            setStaticFees(staticFees);
+            return;
+          } // maintaining a half an hour difference b/w fetches
+        }
+
+        const instance = service.hdWallet || service.secureHDWallet;
+        const staticFees = await instance.getStaticFee();
+        setStaticFees(staticFees);
+        await AsyncStorage.setItem(
+          'storedStaticFees',
+          JSON.stringify({ staticFees, lastFetched: Date.now() }),
+        );
+      })();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (sweepSecure)
+      if (netBalance === 0) {
+        setAmount(`0`);
+      } else {
+        setAmount(
+          `${netBalance -
+            Number(
+              staticFees[
+                sliderValueText === 'Low Fee'
+                  ? 'low'
+                  : sliderValueText === 'In the middle'
+                  ? 'medium'
+                  : 'high'
+              ],
+            )}`,
+        );
+      }
+  }, [sweepSecure, sliderValueText]);
+
   // const stage2 = () => (
   //   <View style={{ margin: 40 }}>
   //     <Text style={{ marginVertical: 5 }}>Sending to: {recipientAddress}</Text>
@@ -184,10 +235,6 @@ export default function Send(props) {
   // );
 
   const dispatch = useDispatch();
-
-  const { transfer, loading, service } = useSelector(
-    state => state.accounts[serviceType],
-  );
 
   useEffect(() => {
     if (
@@ -331,11 +378,15 @@ export default function Send(props) {
         info={'Confirm the follow details'}
         userInfo={userInfo}
         isFromContact={false}
-        okButtonText={'confirm'}
+        okButtonText={'Confirm'}
         cancelButtonText={'Back'}
         isCancel={true}
         onPressOk={() => {
-          dispatch(transferST2(serviceType));
+          if (sweepSecure) {
+            dispatch(alternateTransferST2(serviceType));
+          } else {
+            dispatch(transferST2(serviceType));
+          }
         }}
         onPressCancel={() => {
           dispatch(clearTransfer(serviceType));
@@ -350,8 +401,10 @@ export default function Send(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          if (SendConfirmationBottomSheet.current)
+          if (SendConfirmationBottomSheet.current) {
+            dispatch(clearTransfer(serviceType));
             SendConfirmationBottomSheet.current.snapTo(0);
+          }
         }}
       />
     );
@@ -491,7 +544,19 @@ export default function Send(props) {
   }
 
   const checkBalance = () => {
-    if (netBalance < Number(amount)) {
+    if (
+      netBalance <
+      Number(amount) +
+        Number(
+          staticFees[
+            sliderValueText === 'Low Fee'
+              ? 'low'
+              : sliderValueText === 'In the middle'
+              ? 'medium'
+              : 'high'
+          ],
+        )
+    ) {
       setIsInvalidBalance(true);
     } else {
       setIsEditable(false);
@@ -621,7 +686,7 @@ export default function Send(props) {
                       />
                     </View>
                     <TextInput
-                      editable={isEditable}
+                      editable={sweepSecure ? false : isEditable}
                       // ref={refs => setTextAmountRef(refs)}
                       style={{ ...styles.textBox, paddingLeft: 10 }}
                       placeholder={
@@ -901,6 +966,22 @@ export default function Send(props) {
                     }
                   />
                 </View>
+                {serviceType === SECURE_ACCOUNT ? (
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      marginBottom: 200,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        props.navigation.navigate('LostTwoFA');
+                      }}
+                    >
+                      <Text>Forget 2FA?</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : null}
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
