@@ -1526,15 +1526,27 @@ export default function Home(props) {
   // };
 
   let isNavigate = false;
+  let isContactOpen = false;
+  let isCameraOpen = false;
   const handleAppStateChange = async nextAppState => {
-    let isContactOpen = await AsyncStorage.getItem('isContactOpen');
-    let isCameraOpen = await AsyncStorage.getItem('isCameraOpen');
-    if (isCameraOpen) {
-      await AsyncStorage.setItem('isCameraOpen', 'false');
+    AsyncStorage.getItem('isContactOpen', (err, value) => {
+      if (err) console.log(err)
+       else {
+        isContactOpen = JSON.parse(value)
+      }
+  });
+    AsyncStorage.getItem('isCameraOpen', (err, value) => {
+      if (err) console.log(err)
+      else {
+        isCameraOpen = JSON.parse(value)
+      }
+  });
+  if (isCameraOpen) {
+      await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
       return;
     }
     if (isContactOpen) {
-      await AsyncStorage.setItem('isContactOpen', 'false');
+      await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
       return;
     }
     var blockApp = setTimeout(() => {
@@ -2141,8 +2153,8 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -2165,7 +2177,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderAddContent}
         renderHeader={renderAddHeader}
@@ -2198,7 +2210,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('74%') : hp('73%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}

@@ -3,10 +3,10 @@ import {
 	View,
 	Text,
 	StyleSheet,
-	ScrollView,
 	KeyboardAvoidingView,
 	TextInput,
 	Platform,
+	AsyncStorage,
 	ImageBackground
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -17,6 +17,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../components/BottomInfoBox';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function QrCodeModalContents(props) {
 	const [openCameraFlag, setOpenCameraFlag] = useState(false)
@@ -27,6 +28,22 @@ export default function QrCodeModalContents(props) {
 			props.onQrScan(getFormattedString(barcodes.data));
 		}
 	};
+
+	useEffect(() => {
+		(async () => {
+		let isCameraOpen;
+		AsyncStorage.getItem('isCameraOpen', (err, value) => {
+		  if (err) {
+			  console.log(err)
+		  } else {
+			isCameraOpen = JSON.parse(value) // boolean false
+		  }
+		});
+		if (!isCameraOpen) {
+		  await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
+		}
+	  })();
+	  }, []);
 
 	const getFormattedString = ( qrString: string ) => {
 		qrString = qrString.split( 'Dquote' ).join( '"' );
