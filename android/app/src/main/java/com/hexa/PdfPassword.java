@@ -270,11 +270,17 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Secondary Mnemonic:",
                 catFont));
         document.add(preface);
+        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), 250, 250, null);
+        codeQrImage = barcodeQRCode.getImage();
+        codeQrImage.scaleAbsolute(250, 250);
+        document.add(codeQrImage);
         preface = new Paragraph();
         preface.add(new Paragraph(
                 jsonObj.getString("secondaryMnemonic"),
                 smallBold));
         document.add(preface);
+
+
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "BitHyve Xpub:",
@@ -283,23 +289,6 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         preface = new Paragraph();
         preface.add(new Paragraph(
                 jsonObj.getString("bhXpub"),
-                smallBold));
-        document.add(preface);
-
-
-        document.newPage();
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                "2FA Secret:",
-                catFont));
-        document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("twoFAQR"), 250, 250, null);
-        codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
-        document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                jsonObj.getString("twoFASecret"),
                 smallBold));
         document.add(preface);
         preface = new Paragraph();
