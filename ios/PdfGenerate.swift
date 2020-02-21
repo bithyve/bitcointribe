@@ -343,16 +343,22 @@ import QRCoder
     txtTitle.textAlignment = .left
     txtTitle.sizeToFit()
     v5.addSubview(txtTitle)
+    qrCodeImage = UIImageView();
+    generator = QRCodeGenerator();
+    qrCodeImage.image = generator.createImage(value: secondaryMnemonic as String,size: CGSize(width: 80, height: 70))
+    qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height) , width: 80, height: 80)
+     v5.addSubview(qrCodeImage)
+    
     txtQrCodeString = UILabel();
     txtQrCodeString.text = secondaryMnemonic as? String;
     txtQrCodeString.lineBreakMode = .byWordWrapping
     txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:10,y: ( txtTitle.frame.origin.y + txtTitle.frame.height),width:v5.bounds.size.width - 20, height:v5.bounds.size.height)
+    txtQrCodeString.frame = CGRect(x:10,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v5.bounds.size.width - 20, height:v5.bounds.size.height)
     txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
     txtQrCodeString.textAlignment = .center
     txtQrCodeString.sizeToFit();
     v5.addSubview(txtQrCodeString);
-       
+         
     txtTitle = UILabel();
     txtTitle.text = "BitHyve Xpub:"
     txtTitle.lineBreakMode = .byWordWrapping
@@ -373,51 +379,24 @@ import QRCoder
     v5.addSubview(txtQrCodeString);
        
      
-    //page 6
-    let v6 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
-    txtTitle = UILabel();
-    txtTitle.text = "2FA Secret:"
-    txtTitle.lineBreakMode = .byWordWrapping
-    txtTitle.numberOfLines = 0
-    txtTitle.frame = CGRect(x:5,y:5,width:v6.bounds.size.width - 5, height:v6.bounds.size.height)
-    txtTitle.font =  UIFont.systemFont(ofSize: 10.0)
-    txtTitle.textAlignment = .left
-    txtTitle.sizeToFit()
-    v6.addSubview(txtTitle)
-    qrCodeImage = UIImageView();
-    generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: twoFAQR as String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height) , width: 80, height: 80)
-    v6.addSubview(qrCodeImage)
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = twoFASecret as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:10,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v6.bounds.size.width - 10, height:v6.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit();
-    v6.addSubview(txtQrCodeString);
-      
     txtMessage = UILabel();
     txtMessage.text = "Following assets can be used to recover your funds using the open - sourced ga - recovery tool.";
     txtMessage.lineBreakMode = .byWordWrapping
     txtMessage.numberOfLines = 0
-    txtMessage.frame = CGRect(x:5,y: ( txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v6.bounds.size.width - 10, height:v6.bounds.size.height)
+    txtMessage.frame = CGRect(x:5,y: ( txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v5.bounds.size.width - 10, height:v5.bounds.size.height)
     txtMessage.font =  UIFont.systemFont(ofSize: 6.0)
     txtMessage.textAlignment = .left
     txtMessage.sizeToFit();
-    v6.addSubview(txtMessage);
+    v5.addSubview(txtMessage);
        
-          
     let page1 = PDFPage.view(v1);
     let page2 = PDFPage.view(v2);
     let page3 = PDFPage.view(v3);
     let page4 = PDFPage.view(v4);
     let page5 = PDFPage.view(v5);
-    let page6 = PDFPage.view(v6);
+   
       
-    let pages = [page1, page2,page3,page4,page5,page6]
+    let pages = [page1, page2,page3,page4,page5]
     let dst = NSTemporaryDirectory().appending(pdfPath as String)
     do {
       //  try PDFGenerator.generate(pages, to: dst, password: password )
