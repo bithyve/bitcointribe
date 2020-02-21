@@ -63,6 +63,7 @@ import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHisto
 import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
 import LostTwoFA from '../pages/Accounts/LostTwoFA';
+import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -163,6 +164,12 @@ const HomeNavigator = createStackNavigator(
     SettingGetNewPin,
     ContactsListForAssociateContact,
     LostTwoFA,
+    PasscodeChangeSuccessPage: {
+      screen: PasscodeChangeSuccessPage,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
   },
   {
     headerLayoutPreset: 'center',
