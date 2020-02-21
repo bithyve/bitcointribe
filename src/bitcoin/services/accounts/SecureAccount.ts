@@ -248,7 +248,7 @@ export default class SecureAccount {
   };
 
   public resetTwoFA = async (
-    token: number,
+    secondaryMnemonic: number,
   ): Promise<
     | {
         status: number;
@@ -269,7 +269,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.resetTwoFA(token),
+        data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
       };
     } catch (err) {
       return { status: 306, err: err.message, message: ErrMap[306] };

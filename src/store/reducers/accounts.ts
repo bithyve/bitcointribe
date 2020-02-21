@@ -15,6 +15,7 @@ import {
   EXCHANGE_RATE_CALCULATED,
   SECONDARY_XPRIV_GENERATED,
   ALTERNATE_TRANSFER_ST2_EXECUTED,
+  TWO_FA_RESETTED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -343,6 +344,16 @@ export default (state = initialState, action) => {
         additional: {
           secure: {
             xprivGenerated: action.payload.generated,
+          },
+        },
+      };
+
+    case TWO_FA_RESETTED:
+      return {
+        ...state,
+        additional: {
+          secure: {
+            twoFAResetted: action.payload.resetted,
           },
         },
       };

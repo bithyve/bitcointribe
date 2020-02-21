@@ -3,25 +3,24 @@ import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import { useSelector, useDispatch } from 'react-redux';
-import { generateSecondaryXpriv } from '../../store/actions/accounts';
+import {
+  generateSecondaryXpriv,
+  resetTwoFA,
+} from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
   const additional = useSelector(state => state.accounts.additional);
-  let generated;
+  let generatedSecureXPriv;
+  let twoFAResetted;
   if (additional && additional.secure) {
-    generated = additional.secure.xprivGenerated;
+    generatedSecureXPriv = additional.secure.xprivGenerated;
+    twoFAResetted = additional.secure.twoFAResetted;
   }
   const dispatch = useDispatch();
   const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
 
   useEffect(() => {
-    if (generated) {
-      // if (mode === 'reset')
-      //   props.navigation.navigate('Send', {
-      //     serviceType: SECURE_ACCOUNT,
-      //     sweepSecure: true,
-      //   });
-
+    if (generatedSecureXPriv) {
       props.navigation.navigate('Send', {
         serviceType: SECURE_ACCOUNT,
         netBalance:
@@ -29,10 +28,23 @@ const LostTwoFA = props => {
           service.secureHDWallet.balances.unconfirmedBalance,
         sweepSecure: true,
       });
-    } else if (generated === false) {
+    } else if (generatedSecureXPriv === false) {
       Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
     }
-  }, [generated]);
+  }, [generatedSecureXPriv]);
+
+  useEffect(() => {
+    if (twoFAResetted) {
+      props.navigation.navigate('TwoFASetup', {
+        twoFASetup: service.secureHDWallet.twoFASetup,
+      });
+    } else if (twoFAResetted === false) {
+      Alert.alert(
+        'Failed to reset 2FA',
+        'Invalid Secondary Mnemonic, please try again.',
+      );
+    }
+  }, [twoFAResetted]);
 
   return (
     <View style={styles.screen}>
@@ -44,12 +56,13 @@ const LostTwoFA = props => {
       >
         <TouchableOpacity
           onPress={() => {
-            props.navigation.navigate('QrScanner', {
-              title: 'Scan Secondary Mnemonic',
-              scanedCode: qrData => {
-                // dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
-              },
-            });
+            // props.navigation.navigate('QrScanner', {
+            //   title: 'Scan Secondary Mnemonic',
+            //   scanedCode: qrData => {
+            //     dispatch(resetTwoFA(qrData));
+            //   },
+            // });
+            dispatch(resetTwoFA('qrData'));
           }}
         >
           <Text>Reset 2FA</Text>
