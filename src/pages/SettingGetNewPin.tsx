@@ -25,16 +25,8 @@ import {
   changeAuthCred,
   switchCredsChanged,
 } from '../store/actions/setupAndAuth';
-import BottomSheet from 'reanimated-bottom-sheet';
-import ErrorModalContents from '../components/ErrorModalContents';
-import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../components/ModalHeader';
 
 export default function SettingGetNewPin(props) {
-  const [
-    PinChangeSuccessBottomSheet,
-    setPinChangeSuccessBottomSheet,
-  ] = useState(React.createRef());
   const [passcode, setPasscode] = useState('');
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
@@ -113,39 +105,9 @@ export default function SettingGetNewPin(props) {
 
   useEffect(() => {
     if (credsChanged == 'changed') {
-      (PinChangeSuccessBottomSheet as any).current.snapTo(1);
+    props.navigation.navigate("PasscodeChangeSuccessPage");
     }
   }, [credsChanged]);
-
-  const renderPinChangeSuccessModalContent = () => {
-    return (
-      <ErrorModalContents
-        modalRef={PinChangeSuccessBottomSheet}
-        title={'Passcode changed successfully'}
-        note={'Please use your new passcode to login '}
-        proceedButtonText={'View Settings'}
-        isIgnoreButton={false}
-        onPressProceed={() => {
-          (PinChangeSuccessBottomSheet as any).current.snapTo(0);
-          dispatch(switchCredsChanged());
-
-          // props.navigation.state.params.managePinSuccessProceed(passcode);
-          props.navigation.popToTop();
-        }}
-        isBottomImage={true}
-      />
-    );
-  };
-
-  const renderPinChangeSuccessModalHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (PinChangeSuccessBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -636,18 +598,6 @@ export default function SettingGetNewPin(props) {
             </TouchableOpacity>
           </View>
         </View>
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={PinChangeSuccessBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('37%')
-              : hp('45%'),
-          ]}
-          renderContent={renderPinChangeSuccessModalContent}
-          renderHeader={renderPinChangeSuccessModalHeader}
-        />
       </View>
     </SafeAreaView>
   );
