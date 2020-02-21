@@ -515,7 +515,7 @@ function* resetTwoFAWorker({ payload }) {
   const res = yield call(service.resetTwoFA, payload.secondaryMnemonic);
 
   if (res.status == 200) {
-    yield put(twoFAResetted(res.data));
+    yield put(twoFAResetted(true));
   } else {
     console.log('Failed to reset twoFA', res.err);
     yield put(twoFAResetted(false));

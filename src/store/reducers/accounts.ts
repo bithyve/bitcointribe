@@ -353,7 +353,7 @@ export default (state = initialState, action) => {
         ...state,
         additional: {
           secure: {
-            twoFAResetted: action.payload.resettedValues,
+            twoFAResetted: action.payload.resetted,
           },
         },
       };

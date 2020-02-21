@@ -172,6 +172,6 @@ export const secondaryXprivGenerated = generated => {
   return { type: SECONDARY_XPRIV_GENERATED, payload: { generated } };
 };
 
-export const twoFAResetted = resettedValues => {
-  return { type: TWO_FA_RESETTED, payload: { resettedValues } };
+export const twoFAResetted = resetted => {
+  return { type: TWO_FA_RESETTED, payload: { resetted } };
 };

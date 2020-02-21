@@ -368,11 +368,13 @@ export default class SecureHDWallet extends Bitcoin {
     };
   }> => {
     let res: AxiosResponse;
+    const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
+
     try {
       res = await BH_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
-        secondaryID: this.getSecondaryID(this.secondaryMnemonic),
+        secondaryID,
       });
     } catch (err) {
       throw new Error(err.response.data.err);
@@ -420,17 +422,19 @@ export default class SecureHDWallet extends Bitcoin {
     secret: any;
   }> => {
     let res: AxiosResponse;
+    const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
     try {
       res = await BH_AXIOS.post('resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
-        secondaryID: this.getSecondaryID(secondaryMnemonic),
+        secondaryID,
       });
     } catch (err) {
       throw new Error(err.response.data.err);
     }
     const { qrData, secret } = res.data;
-    return { qrData, secret };
+    this.twoFASetup = { qrData, secret };
+    return this.twoFASetup;
   };
 
   public isActive = async (): Promise<{ isActive: boolean }> => {

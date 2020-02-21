@@ -40,6 +40,7 @@ import {
   exchangeRateWatcher,
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
+  resetTwoFAWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -116,6 +117,7 @@ const rootSaga = function*() {
     accountsSyncWatcher,
     exchangeRateWatcher,
     generateSecondaryXprivWatcher,
+    resetTwoFAWatcher,
 
     // sss watchers
     initHCWatcher,
