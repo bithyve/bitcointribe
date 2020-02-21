@@ -7,10 +7,8 @@ import crypto from 'crypto';
 import config from '../../Config';
 import { Transactions } from '../Interface';
 import Bitcoin from './Bitcoin';
-import axios from 'axios';
 
 const { BH_AXIOS, HEXA_ID, API_URLS } = config;
-const { TESTNET, MAINNET } = API_URLS;
 
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
@@ -60,6 +58,7 @@ export default class SecureHDWallet extends Bitcoin {
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -92,6 +91,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
 
     this.primaryXpriv = stateVars ? stateVars.primaryXpriv : undefined;
+    this.secondaryXpriv = stateVars ? stateVars.secondaryXpriv : undefined;
     this.xpubs = stateVars ? stateVars.xpubs : undefined;
     this.cipherSpec = {
       algorithm: 'aes-192-cbc',
@@ -707,13 +707,19 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  public generateSecondaryXpriv = (secondaryMnemonic: string) => {
+  public generateSecondaryXpriv = (secondaryMnemonic: string): Boolean => {
     const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      throw new Error('Invaild secondary mnemonic');
+    }
+
     this.secondaryXpriv = this.getRecoverableXKey(
       secondaryMnemonic,
       path,
       true,
     );
+    return true;
   };
 
   private getSigningEssentials = (address: string) => {

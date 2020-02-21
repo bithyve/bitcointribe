@@ -62,6 +62,7 @@ import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
 import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
+import LostTwoFA from '../pages/Accounts/LostTwoFA';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -105,7 +106,7 @@ const HomeNavigator = createStackNavigator(
   {
     Home: {
       screen: Home,
-      path: 'Home'
+      path: 'Home',
     },
     ReLogin: {
       screen: ReLogin,
@@ -160,7 +161,8 @@ const HomeNavigator = createStackNavigator(
     PersonalCopyHistory,
     SecurityQuestionHistory,
     SettingGetNewPin,
-    ContactsListForAssociateContact
+    ContactsListForAssociateContact,
+    LostTwoFA,
   },
   {
     headerLayoutPreset: 'center',
@@ -188,6 +190,5 @@ const Navigator = createSwitchNavigator({
   SetupNav: SetupNavigator,
   HomeNav: HomeNavigator,
 });
-
 
 export default createAppContainer(Navigator);

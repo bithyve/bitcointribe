@@ -28,6 +28,9 @@ import {
   EXCHANGE_RATE,
   exchangeRatesCalculated,
   ALTERNATE_TRANSFER_ST2,
+  secondaryXprivGenerated,
+  GENERATE_SECONDARY_XPRIV,
+  alternateTransferST2Executed,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -215,7 +218,7 @@ function* transferST1Worker({ payload }) {
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     yield put(failedST1(payload.serviceType));
-    yield put(switchLoader(payload.serviceType, 'transfer'));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
 
@@ -243,13 +246,40 @@ function* transferST2Worker({ payload }) {
     } else yield put(executedST2(payload.serviceType, res.data.txid));
   } else {
     yield put(failedST2(payload.serviceType));
-    yield put(switchLoader(payload.serviceType, 'transfer'));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
 
 export const transferST2Watcher = createWatcher(
   transferST2Worker,
   TRANSFER_ST2,
+);
+
+function* generateSecondaryXprivWorker({ payload }) {
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service,
+  );
+
+  const { generated } = service.generateSecondaryXpriv(
+    payload.secondaryMnemonic,
+  );
+
+  if (generated) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield put(secondaryXprivGenerated(true));
+  } else {
+    yield put(secondaryXprivGenerated(false));
+  }
+}
+
+export const generateSecondaryXprivWatcher = createWatcher(
+  generateSecondaryXprivWorker,
+  GENERATE_SECONDARY_XPRIV,
 );
 
 function* alternateTransferST2Worker({ payload }) {
@@ -268,10 +298,10 @@ function* alternateTransferST2Worker({ payload }) {
   const res = yield call(service.alternateTransferST2, inputs, txb);
   console.log({ res });
   if (res.status === 200) {
-    yield put(executedST2(payload.serviceType, res.data.txid));
+    yield put(alternateTransferST2Executed(payload.serviceType, res.data.txid));
   } else {
     yield put(failedST2(payload.serviceType));
-    yield put(switchLoader(payload.serviceType, 'transfer'));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
 
@@ -299,7 +329,7 @@ function* transferST3Worker({ payload }) {
     yield put(executedST3(payload.serviceType, res.data.txid));
   } else {
     yield put(failedST3(payload.serviceType));
-    yield put(switchLoader(payload.serviceType, 'transfer'));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
 

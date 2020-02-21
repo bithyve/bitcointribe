@@ -18,6 +18,7 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function QrScanner(props) {
+  const title = props.navigation.getParam('title');
   const [cameraRef, setcameraRef] = useState(React.createRef());
   const barcodeRecognized = async barcodes => {
     if (barcodes.data) {
@@ -87,7 +88,7 @@ export default function QrScanner(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Scan QR code
+            {title ? title : 'Scan QR code'}
           </Text>
         </View>
       </View>
