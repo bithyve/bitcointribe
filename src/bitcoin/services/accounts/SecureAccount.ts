@@ -248,7 +248,7 @@ export default class SecureAccount {
   };
 
   public resetTwoFA = async (
-    secondaryMnemonic: number,
+    secondaryMnemonic: string,
   ): Promise<
     | {
         status: number;

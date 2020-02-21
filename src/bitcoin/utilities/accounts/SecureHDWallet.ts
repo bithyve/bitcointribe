@@ -416,13 +416,19 @@ export default class SecureHDWallet extends Bitcoin {
   // };
 
   public resetTwoFA = async (
-    secondaryMnemonic: number,
+    secondaryMnemonic: string,
   ): Promise<{
     qrData: any;
     secret: any;
   }> => {
+    const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      throw new Error('Invaild secondary mnemonic');
+    }
+
     let res: AxiosResponse;
-    const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
+    const { secondaryID } = this.getSecondaryID(secondaryMnemonic);
     try {
       res = await BH_AXIOS.post('resetTwoFA', {
         HEXA_ID,
