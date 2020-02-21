@@ -14,6 +14,7 @@ import {
   ACCOUNTS_SYNCHED,
   EXCHANGE_RATE_CALCULATED,
   SECONDARY_XPRIV_GENERATED,
+  ALTERNATE_TRANSFER_ST2_EXECUTED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -225,6 +226,23 @@ export default (state = initialState, action) => {
             },
           };
       }
+
+    case ALTERNATE_TRANSFER_ST2_EXECUTED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            txid: action.payload.result,
+            executed: 'ST2',
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
 
     // case TRANSFER_ST2_FAILED:
     //   return {

@@ -6,24 +6,29 @@ import { useSelector, useDispatch } from 'react-redux';
 import { generateSecondaryXpriv } from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
-  const generated = useSelector(
-    state => state.accounts.additional.secure.xprivGenerated,
-  );
-  const [mode, setMode] = useState();
+  const additional = useSelector(state => state.accounts.additional);
+  let generated;
+  if (additional && additional.secure) {
+    generated = additional.secure.xprivGenerated;
+  }
   const dispatch = useDispatch();
+  const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
 
   useEffect(() => {
     if (generated) {
-      if (mode === 'reset')
-        props.navigation.navigate('Send', {
-          serviceType: SECURE_ACCOUNT,
-          sweepSecure: true,
-        });
-      else if (mode === 'sweep')
-        props.navigation.navigate('Send', {
-          serviceType: SECURE_ACCOUNT,
-          sweepSecure: true,
-        });
+      // if (mode === 'reset')
+      //   props.navigation.navigate('Send', {
+      //     serviceType: SECURE_ACCOUNT,
+      //     sweepSecure: true,
+      //   });
+
+      props.navigation.navigate('Send', {
+        serviceType: SECURE_ACCOUNT,
+        netBalance:
+          service.secureHDWallet.balances.balance +
+          service.secureHDWallet.balances.unconfirmedBalance,
+        sweepSecure: true,
+      });
     } else if (generated === false) {
       Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
     }
@@ -42,8 +47,7 @@ const LostTwoFA = props => {
             props.navigation.navigate('QrScanner', {
               title: 'Scan Secondary Mnemonic',
               scanedCode: qrData => {
-                setMode('reset');
-                dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
+                // dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
               },
             });
           }}
@@ -62,7 +66,6 @@ const LostTwoFA = props => {
             props.navigation.navigate('QrScanner', {
               title: 'Scan Secondary Mnemonic',
               scanedCode: qrData => {
-                setMode('sweep');
                 dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
               },
             });

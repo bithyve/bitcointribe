@@ -77,7 +77,7 @@ export const calculateExchangeRate = () => {
 export const generateSecondaryXpriv = (serviceType, secondaryMnemonic) => {
   return {
     type: GENERATE_SECONDARY_XPRIV,
-    paylaod: { serviceType, secondaryMnemonic },
+    payload: { serviceType, secondaryMnemonic },
   };
 };
 
@@ -95,6 +95,8 @@ export const TRANSFER_ST3_FAILED = 'TRANSFER_ST3_FAILED';
 export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING';
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED';
 export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED';
+export const ALTERNATE_TRANSFER_ST2_EXECUTED =
+  'ALTERNATE_TRANSFER_ST2_EXECUTED';
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 
 export const testcoinsReceived = (serviceType, service) => {
@@ -148,6 +150,13 @@ export const accountsSynched = synched => {
 
 export const exchangeRatesCalculated = exchangeRates => {
   return { type: EXCHANGE_RATE_CALCULATED, payload: { exchangeRates } };
+};
+
+export const alternateTransferST2Executed = (serviceType, result) => {
+  return {
+    type: ALTERNATE_TRANSFER_ST2_EXECUTED,
+    payload: { serviceType, result },
+  };
 };
 
 export const secondaryXprivGenerated = generated => {

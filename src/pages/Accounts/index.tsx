@@ -53,7 +53,6 @@ import moment from 'moment';
 import axios from 'axios';
 
 import { UsNumberFormat } from '../../common/utilities';
-import { keyFetched } from '../../store/actions/storage';
 
 export default function Accounts(props) {
   const [serviceType, setServiceType] = useState(
