@@ -137,6 +137,18 @@ export default class SecureHDWallet extends Bitcoin {
     return { walletId: hash.digest('hex') };
   };
 
+  public getSecondaryID = (): { secondaryID: string } => {
+    if (!this.secondaryMnemonic) {
+      throw new Error(
+        'SecondaryID generation failed; missing secondary mnemonic',
+      );
+    }
+    const hash = crypto.createHash('sha256');
+    const seed = bip39.mnemonicToSeedSync(this.secondaryMnemonic);
+    hash.update(seed);
+    return { secondaryID: hash.digest('hex') };
+  };
+
   public getSecondaryMnemonic = (): { secondaryMnemonic: string } => {
     return { secondaryMnemonic: this.secondaryMnemonic };
   };
@@ -360,6 +372,7 @@ export default class SecureHDWallet extends Bitcoin {
       res = await BH_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
+        secondaryID: this.getSecondaryID(),
       });
     } catch (err) {
       throw new Error(err.response.data.err);
@@ -380,8 +393,28 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  // public resetTwoFA = async (
+  //   token: number,
+  // ): Promise<{
+  //   qrData: any;
+  //   secret: any;
+  // }> => {
+  //   let res: AxiosResponse;
+  //   try {
+  //     res = await BH_AXIOS.post('resetTwoFA', {
+  //       HEXA_ID,
+  //       walletID: this.walletID,
+  //       token,
+  //     });
+  //   } catch (err) {
+  //     throw new Error(err.response.data.err);
+  //   }
+  //   const { qrData, secret } = res.data;
+  //   return { qrData, secret };
+  // };
+
   public resetTwoFA = async (
-    token: number,
+    secondaryID: number,
   ): Promise<{
     qrData: any;
     secret: any;
@@ -391,7 +424,7 @@ export default class SecureHDWallet extends Bitcoin {
       res = await BH_AXIOS.post('resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
-        token,
+        secondaryID,
       });
     } catch (err) {
       throw new Error(err.response.data.err);

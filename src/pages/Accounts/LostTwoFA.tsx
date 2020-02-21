@@ -7,21 +7,15 @@ import { generateSecondaryXpriv } from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
   const additional = useSelector(state => state.accounts.additional);
-  let generated;
+  let generatedSecureXPriv;
   if (additional && additional.secure) {
-    generated = additional.secure.xprivGenerated;
+    generatedSecureXPriv = additional.secure.xprivGenerated;
   }
   const dispatch = useDispatch();
   const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
 
   useEffect(() => {
-    if (generated) {
-      // if (mode === 'reset')
-      //   props.navigation.navigate('Send', {
-      //     serviceType: SECURE_ACCOUNT,
-      //     sweepSecure: true,
-      //   });
-
+    if (generatedSecureXPriv) {
       props.navigation.navigate('Send', {
         serviceType: SECURE_ACCOUNT,
         netBalance:
@@ -29,10 +23,12 @@ const LostTwoFA = props => {
           service.secureHDWallet.balances.unconfirmedBalance,
         sweepSecure: true,
       });
-    } else if (generated === false) {
+    } else if (generatedSecureXPriv === false) {
       Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
     }
-  }, [generated]);
+  }, [generatedSecureXPriv]);
+
+  // useEffect(() => {}, []);
 
   return (
     <View style={styles.screen}>
