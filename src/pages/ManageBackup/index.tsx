@@ -1508,8 +1508,8 @@ export default function ManageBackup(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+              ? hp('89%')
+              : hp('89%'),
           ]}
           renderContent={renderWalletBackupAndRecoveryContents}
           renderHeader={renderWalletBackupAndRecoveryHeader}

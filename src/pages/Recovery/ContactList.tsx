@@ -37,13 +37,6 @@ async function requestContactsPermission() {
     }
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      {
-        title: 'Contacts Permission',
-        message: 'Please grant permission to read contacts on your device',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
     );
     return PermissionsAndroid.RESULTS.GRANTED;
   } catch (err) {
