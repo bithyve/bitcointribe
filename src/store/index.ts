@@ -39,6 +39,7 @@ import {
   fetchBalanceTxWatcher,
   exchangeRateWatcher,
   alternateTransferST2Watcher,
+  generateSecondaryXprivWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -114,6 +115,7 @@ const rootSaga = function*() {
     accumulativeTxAndBalWatcher,
     accountsSyncWatcher,
     exchangeRateWatcher,
+    generateSecondaryXprivWatcher,
 
     // sss watchers
     initHCWatcher,

@@ -1,27 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { generateSecondaryXpriv } from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
-  const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
-  const verifySecondaryMnemonic = (secondaryMnemonic, reset?) => {
-    // following instance of the secure account isn't stringified and saved to database (as we don't want to persist the secondary mnemonic/xpriv in the app), hence, we need to pass this instance around as the instance in database doesn't hold the secondaryXPriv
-    const { generated } = service.generateSecondaryXpriv(secondaryMnemonic);
+  const generated = useSelector(
+    state => state.accounts.additional.secure.xprivGenerated,
+  );
+  const [mode, setMode] = useState();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
     if (generated) {
-      if (reset) {
-      } else {
+      if (mode === 'reset')
         props.navigation.navigate('Send', {
           serviceType: SECURE_ACCOUNT,
-          secondaryService: service,
           sweepSecure: true,
         });
-      }
-    } else {
+      else if (mode === 'sweep')
+        props.navigation.navigate('Send', {
+          serviceType: SECURE_ACCOUNT,
+          sweepSecure: true,
+        });
+    } else if (generated === false) {
       Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
     }
-  };
+  }, [generated]);
 
   return (
     <View style={styles.screen}>
@@ -35,7 +41,10 @@ const LostTwoFA = props => {
           onPress={() => {
             props.navigation.navigate('QrScanner', {
               title: 'Scan Secondary Mnemonic',
-              scanedCode: qrData => verifySecondaryMnemonic(qrData, true),
+              scanedCode: qrData => {
+                setMode('reset');
+                dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
+              },
             });
           }}
         >
@@ -52,7 +61,10 @@ const LostTwoFA = props => {
           onPress={() => {
             props.navigation.navigate('QrScanner', {
               title: 'Scan Secondary Mnemonic',
-              scanedCode: qrData => verifySecondaryMnemonic(qrData),
+              scanedCode: qrData => {
+                setMode('sweep');
+                dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
+              },
             });
           }}
         >

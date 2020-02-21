@@ -28,6 +28,8 @@ import {
   EXCHANGE_RATE,
   exchangeRatesCalculated,
   ALTERNATE_TRANSFER_ST2,
+  secondaryXprivGenerated,
+  GENERATE_SECONDARY_XPRIV,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -250,6 +252,33 @@ function* transferST2Worker({ payload }) {
 export const transferST2Watcher = createWatcher(
   transferST2Worker,
   TRANSFER_ST2,
+);
+
+function* generateSecondaryXprivWorker({ payload }) {
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service,
+  );
+
+  const { generated } = service.generateSecondaryXpriv(
+    payload.secondaryMnemonic,
+  );
+
+  if (generated) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield put(secondaryXprivGenerated(true));
+  } else {
+    yield put(secondaryXprivGenerated(false));
+  }
+}
+
+export const generateSecondaryXprivWatcher = createWatcher(
+  generateSecondaryXprivWorker,
+  GENERATE_SECONDARY_XPRIV,
 );
 
 function* alternateTransferST2Worker({ payload }) {

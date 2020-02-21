@@ -67,22 +67,25 @@ export default function Send(props) {
     setUnSuccessWithAddressBottomSheet,
   ] = useState(React.createRef());
 
-  const [
-    SendConfirmationWithContactBottomSheet,
-    setSendConfirmationWithContactBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SendSuccessWithContactBottomSheet,
-    setSuccessWithContactBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    SendUnSuccessWithContactBottomSheet,
-    setUnSuccessWithContactBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   SendConfirmationWithContactBottomSheet,
+  //   setSendConfirmationWithContactBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   SendSuccessWithContactBottomSheet,
+  //   setSuccessWithContactBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   SendUnSuccessWithContactBottomSheet,
+  //   setUnSuccessWithContactBottomSheet,
+  // ] = useState(React.createRef());
 
   const [staticFees, setStaticFees] = useState(
     props.navigation.getParam('staticFees'),
   );
+  const sweepSecure = props.navigation.getParam('sweepSecure');
+  const secureService = props.navigation.getParam('secureService');
+
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
