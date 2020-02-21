@@ -6,15 +6,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   generateSecondaryXpriv,
   resetTwoFA,
+  twoFAResetted,
+  secondaryXprivGenerated,
 } from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
   const additional = useSelector(state => state.accounts.additional);
   let generatedSecureXPriv;
-  let twoFAResetted;
+  let resettedTwoFA;
   if (additional && additional.secure) {
     generatedSecureXPriv = additional.secure.xprivGenerated;
-    twoFAResetted = additional.secure.twoFAResetted;
+    resettedTwoFA = additional.secure.twoFAResetted;
   }
   const dispatch = useDispatch();
   const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
@@ -28,23 +30,27 @@ const LostTwoFA = props => {
           service.secureHDWallet.balances.unconfirmedBalance,
         sweepSecure: true,
       });
+      dispatch(secondaryXprivGenerated(null));
     } else if (generatedSecureXPriv === false) {
       Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
+      dispatch(secondaryXprivGenerated(null));
     }
   }, [generatedSecureXPriv]);
 
   useEffect(() => {
-    if (twoFAResetted) {
+    if (resettedTwoFA) {
       props.navigation.navigate('TwoFASetup', {
         twoFASetup: service.secureHDWallet.twoFASetup,
       });
-    } else if (twoFAResetted === false) {
+      dispatch(twoFAResetted(null)); //resetting to monitor consecutive change
+    } else if (resettedTwoFA === false) {
       Alert.alert(
         'Failed to reset 2FA',
         'Invalid Secondary Mnemonic, please try again.',
       );
+      dispatch(twoFAResetted(null));
     }
-  }, [twoFAResetted]);
+  }, [resettedTwoFA]);
 
   return (
     <View style={styles.screen}>
@@ -56,13 +62,12 @@ const LostTwoFA = props => {
       >
         <TouchableOpacity
           onPress={() => {
-            // props.navigation.navigate('QrScanner', {
-            //   title: 'Scan Secondary Mnemonic',
-            //   scanedCode: qrData => {
-            //     dispatch(resetTwoFA(qrData));
-            //   },
-            // });
-            dispatch(resetTwoFA('qrData'));
+            props.navigation.navigate('QrScanner', {
+              title: 'Scan Secondary Mnemonic',
+              scanedCode: qrData => {
+                dispatch(resetTwoFA(qrData));
+              },
+            });
           }}
         >
           <Text>Reset 2FA</Text>
