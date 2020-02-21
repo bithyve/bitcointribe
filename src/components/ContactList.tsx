@@ -24,24 +24,8 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { FlatList } from "react-native-gesture-handler";
+import * as Permissions from 'expo-permissions';
 
-async function requestContactsPermission() {
-  try {
-    await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      {
-        title: 'Contacts Permission',
-        message: 'Please grant permission to read contacts on your device',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    );
-    return PermissionsAndroid.RESULTS.GRANTED;
-  } catch (err) {
-    console.warn(err);
-  }
-}
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
@@ -49,14 +33,40 @@ export default function ContactList(props) {
   const [contactData, setContactData] = useState([]);
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
-  const getContactsAsync = async () => {
-    if (Platform.OS === 'android') {
-      if (!(await requestContactsPermission())) {
-        Alert.alert('Cannot select trusted contacts; permission denied');
-        return;
-      }
-    }
+  const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
+  const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
 
+  const requestContactsPermission = async () => {
+    try {
+      let isContactOpen=false;
+      AsyncStorage.getItem('isContactOpen', (err, value) => {
+        if (err) console.log(err)
+         else {
+          isContactOpen = JSON.parse(value)
+        }
+        });
+        if (!isContactOpen) {
+          await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
+        }
+        const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
+        return result;
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+  
+  const checkPermission = async () => {
+    const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
+    if (status !== 'granted') {
+      setContactPermissionIOS(false)
+      Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+      return;
+    }else{
+      setContactPermissionIOS(true)
+    }
+  }
+
+  const getContact = () => {
     ExpoContacts.getContactsAsync().then(({ data }) => {
       if (!data.length) Alert.alert('No contacts found!');
       setContactData(data);
@@ -69,16 +79,39 @@ export default function ContactList(props) {
       });
       setFilterContactData(contactList);
     });
+  }
+  
+  const getContactsAsync = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await requestContactsPermission();
+        console.log("GRANTED", granted);
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setContactPermissionAndroid(false);
+          return;
+        } else {
+          getContact();
+    }
+  } else {
+    getContact();
+  }
+
+    
   };
 
   useEffect(() => {
     (async () => {
-      let isContactOpen = await AsyncStorage.getItem('isContactOpen');
+      let isContactOpen=false;
+      AsyncStorage.getItem('isContactOpen', (err, value) => {
+      if (err) console.log(err)
+       else {
+        isContactOpen = JSON.parse(value)
+      }
+  });
       if (!isContactOpen) {
-        await AsyncStorage.setItem('isContactOpen', 'true');
+        await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
       }
     })();
-    // global.isContactOpen = true;
     getContactsAsync();
   }, []);
 
@@ -157,17 +190,42 @@ export default function ContactList(props) {
     props.onSelectContact(selectedContacts);
   }
 
-  const addContact = async () => {
-    var newPerson = {
-      displayName: '',
-    };
-    Contacts.openContactForm(newPerson, (err, contact) => {
-      if (err) throw err;
-      if (contact) {
-        getContactsAsync();
-      }
-    });
-  };
+  const addContact = async() => {
+      if (Platform.OS === 'android') {
+        const granted = await requestContactsPermission();
+        console.log("GRANTED", granted);
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setContactPermissionAndroid(false);
+          return;
+        } else {
+          var newPerson = {
+            displayName: '',
+          };
+          console.log('contact permission granted');
+          Contacts.openContactForm(newPerson, (err, contact) => {
+            if (err) return;
+            if (contact) {
+              console.log("contact",contact);
+              getContactsAsync();
+            }
+          });
+        }
+       
+      } else {
+        var newPerson = {
+          displayName: '',
+        };
+        //if(contactPermissionAndroid){
+          Contacts.openContactForm(newPerson, (err, contact) => {
+            if (err) return;
+            if (contact) {
+              console.log("contact",contact);
+              getContactsAsync();
+            }
+          });
+       // }
+      }}
 
   return (
       <View style={{ flex: 1, ...props.style }}>

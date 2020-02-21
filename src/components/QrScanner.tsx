@@ -20,7 +20,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 export default function QrScanner(props) {
   const title = props.navigation.getParam('title');
   const [cameraRef, setcameraRef] = useState(React.createRef());
-  //global.isCameraOpen = true;
   const barcodeRecognized = async barcodes => {
     if (barcodes.data) {
       props.navigation.state.params.scanedCode(
@@ -32,12 +31,19 @@ export default function QrScanner(props) {
 
   useEffect(() => {
     (async () => {
-      let isCameraOpen = await AsyncStorage.getItem('isCameraOpen');
-      if (!isCameraOpen) {
-        await AsyncStorage.setItem('isCameraOpen', 'true');
+    let isCameraOpen;
+    AsyncStorage.getItem('isCameraOpen', (err, value) => {
+      if (err) {
+          console.log(err)
+      } else {
+        isCameraOpen = JSON.parse(value) // boolean false
       }
-    })();
-    // global.isContactOpen = true;
+    });
+    console.log("isCameraOpen in QR Scanner", isCameraOpen)
+    if (!isCameraOpen) {
+      await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
+    }
+  })();
   }, []);
 
   const getFormattedString = (qrString: string) => {

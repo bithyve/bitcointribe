@@ -15,10 +15,15 @@ import { text, email } from 'react-native-communications';
 
 async function requestContactsPermission() {
   try {
-    //global.isContactOpen = true;
-    let isContactOpen = await AsyncStorage.getItem('isContactOpen');
+    let isContactOpen=false;
+      AsyncStorage.getItem('isContactOpen', (err, value) => {
+      if (err) console.log(err)
+       else {
+        isContactOpen = JSON.parse(value)
+      }
+  });
     if (!isContactOpen) {
-      await AsyncStorage.setItem('isContactOpen', 'true');
+      await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
     }
     await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
