@@ -3,13 +3,18 @@ import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import { useSelector, useDispatch } from 'react-redux';
-import { generateSecondaryXpriv } from '../../store/actions/accounts';
+import {
+  generateSecondaryXpriv,
+  resetTwoFA,
+} from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
   const additional = useSelector(state => state.accounts.additional);
   let generatedSecureXPriv;
+  let resettedValues;
   if (additional && additional.secure) {
     generatedSecureXPriv = additional.secure.xprivGenerated;
+    resettedValues = additional.secure.resettedValues;
   }
   const dispatch = useDispatch();
   const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
@@ -28,7 +33,15 @@ const LostTwoFA = props => {
     }
   }, [generatedSecureXPriv]);
 
-  // useEffect(() => {}, []);
+  useEffect(() => {
+    if (resettedValues) {
+    } else if (resettedValues === false) {
+      Alert.alert(
+        'Failed to reset 2FA',
+        'Invalid Secondary Mnemonic, please try again.',
+      );
+    }
+  }, [resettedValues]);
 
   return (
     <View style={styles.screen}>
@@ -43,7 +56,7 @@ const LostTwoFA = props => {
             props.navigation.navigate('QrScanner', {
               title: 'Scan Secondary Mnemonic',
               scanedCode: qrData => {
-                // dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
+                dispatch(resetTwoFA(qrData));
               },
             });
           }}

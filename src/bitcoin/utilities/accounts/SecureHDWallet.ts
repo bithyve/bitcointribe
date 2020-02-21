@@ -137,14 +137,14 @@ export default class SecureHDWallet extends Bitcoin {
     return { walletId: hash.digest('hex') };
   };
 
-  public getSecondaryID = (): { secondaryID: string } => {
+  public getSecondaryID = (secondaryMnemonic): { secondaryID: string } => {
     if (!this.secondaryMnemonic) {
       throw new Error(
         'SecondaryID generation failed; missing secondary mnemonic',
       );
     }
     const hash = crypto.createHash('sha256');
-    const seed = bip39.mnemonicToSeedSync(this.secondaryMnemonic);
+    const seed = bip39.mnemonicToSeedSync(secondaryMnemonic);
     hash.update(seed);
     return { secondaryID: hash.digest('hex') };
   };
@@ -372,7 +372,7 @@ export default class SecureHDWallet extends Bitcoin {
       res = await BH_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
-        secondaryID: this.getSecondaryID(),
+        secondaryID: this.getSecondaryID(this.secondaryMnemonic),
       });
     } catch (err) {
       throw new Error(err.response.data.err);
@@ -414,7 +414,7 @@ export default class SecureHDWallet extends Bitcoin {
   // };
 
   public resetTwoFA = async (
-    secondaryID: number,
+    secondaryMnemonic: number,
   ): Promise<{
     qrData: any;
     secret: any;
@@ -424,7 +424,7 @@ export default class SecureHDWallet extends Bitcoin {
       res = await BH_AXIOS.post('resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
-        secondaryID,
+        secondaryID: this.getSecondaryID(secondaryMnemonic),
       });
     } catch (err) {
       throw new Error(err.response.data.err);

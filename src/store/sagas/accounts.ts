@@ -31,6 +31,8 @@ import {
   secondaryXprivGenerated,
   GENERATE_SECONDARY_XPRIV,
   alternateTransferST2Executed,
+  RESET_TWO_FA,
+  twoFAResetted,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -506,3 +508,18 @@ export const exchangeRateWatcher = createWatcher(
   exchangeRateWorker,
   EXCHANGE_RATE,
 );
+
+function* resetTwoFAWorker({ payload }) {
+  const service = yield select(state => state.accounts[SECURE_ACCOUNT].service);
+
+  const res = yield call(service.resetTwoFA, payload.secondaryMnemonic);
+
+  if (res.status == 200) {
+    yield put(twoFAResetted(res.data));
+  } else {
+    console.log('Failed to reset twoFA', res.err);
+    yield put(twoFAResetted(false));
+  }
+}
+
+export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
