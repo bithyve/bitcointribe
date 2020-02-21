@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  View, Image, TouchableOpacity, Text, StyleSheet, SafeAreaView,
+  View, Image, Text, StyleSheet, SafeAreaView,
   StatusBar, Platform
 } from "react-native";
 import Colors from "../../common/Colors";
@@ -11,7 +11,8 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import commonStyle from "../../common/Styles";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+
 import DeviceInfo from 'react-native-device-info';
 
 export default function SendConfirmationContent(props) {
@@ -142,16 +143,16 @@ export default function SendConfirmationContent(props) {
                 marginBottom: Platform.OS=="ios" && DeviceInfo.hasNotch ? hp('1%'): 0
                 }}
             >
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                 onPress={() => props.onPressOk()}
                 style={{ ...styles.successModalButtonView }}
                 >
                 <Text style={styles.proceedButtonText}>
                     {props.okButtonText}
                 </Text>
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 {props.isCancel && (
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressCancel()}
                     style={{
                     height: wp("13%"),
@@ -163,7 +164,7 @@ export default function SendConfirmationContent(props) {
                     <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
                     {props.cancelButtonText}
                 </Text>
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
                 )}
                 {(props.isSuccess || props.isUnSuccess) && 
                     <Image
