@@ -901,6 +901,19 @@ export default class SSS {
     return { metaShares: this.metaShares };
   };
 
+  public restoreMetaShares = (
+    metaShares: MetaShare[],
+  ): {
+    restored: Boolean;
+  } => {
+    if (metaShares.length !== 3) {
+      throw new Error('Restoration requires a minimum of 3 metaShares');
+    }
+
+    this.metaShares = [...metaShares];
+    return { restored: true };
+  };
+
   public createQR = (index: number): { qrData: string[] } => {
     const splits: number = config.SSS_METASHARE_SPLITS;
     const metaString = JSON.stringify(this.metaShares[index]);

@@ -803,7 +803,7 @@ export default function RestoreSelectedContactsList(props) {
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={
-            () => RestoreByCloudQrCode.current.snapTo(1)
+            () => (RestoreByCloudQrCode as any).current.snapTo(1)
             // props.navigation.navigate('RestoreWalletUsingDocuments')
           }
         >
@@ -975,7 +975,7 @@ export default function RestoreSelectedContactsList(props) {
       /> */}
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={successMessageBottomSheet}
+        ref={successMessageBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
           hp('60%'),
@@ -996,7 +996,7 @@ export default function RestoreSelectedContactsList(props) {
       /> */}
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={requestBottomSheet}
+        ref={requestBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('75%'),
@@ -1008,7 +1008,7 @@ export default function RestoreSelectedContactsList(props) {
         onOpenEnd={() => {}}
         onCloseEnd={() => {}}
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
@@ -1029,7 +1029,7 @@ export default function RestoreSelectedContactsList(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={RestoreByCloudQrCode}
+        ref={RestoreByCloudQrCode as any}
         snapPoints={[-30, hp('90%')]}
         renderContent={renderRestoreByCloudQrCodeContent}
         renderHeader={renderRestoreByCloudQrCodeHeader}
@@ -1038,7 +1038,7 @@ export default function RestoreSelectedContactsList(props) {
         onCloseEnd={() => {}}
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
+        ref={loaderBottomSheet as any}
         snapPoints={[-50, hp('100%')]}
         renderContent={renderLoaderModalContent}
         renderHeader={renderLoaderModalHeader}

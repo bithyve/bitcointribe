@@ -707,6 +707,31 @@ export default class S3Service {
     }
   };
 
+  public restoreMetaShares = (
+    metaShares: MetaShare[],
+  ):
+    | {
+        status: number;
+        data: {
+          restored: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const { restored } = this.sss.restoreMetaShares(metaShares);
+      return { status: config.STATUS.SUCCESS, data: { restored } };
+    } catch (err) {
+      return { status: 510, err: err.message, message: ErrMap[510] };
+    }
+  };
+
   public createQR = (
     index: number,
   ):

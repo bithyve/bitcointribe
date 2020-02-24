@@ -27,10 +27,15 @@ export const serviceGenerator = async (
   const testAcc = new TestAccount(primaryMnemonic);
   console.log({ testAcc });
 
-  // Share generation
+  // Share generation/restoration
   const s3Service = new S3Service(primaryMnemonic);
-  res = s3Service.generateShares(securityAns); // TODO: Generates new shares, swap with a mech that re-stores the shares used for wallet restoration
-  if (res.status !== 200) throw new Error('Share generation failed');
+  if (metaShares) {
+    res = s3Service.restoreMetaShares(metaShares);
+    if (res.status !== 200) throw new Error('Share restoration failed');
+  } else {
+    res = s3Service.generateShares(securityAns);
+    if (res.status !== 200) throw new Error('Share generation failed');
+  }
 
   // share history initialization
   const createdAt = Date.now();
