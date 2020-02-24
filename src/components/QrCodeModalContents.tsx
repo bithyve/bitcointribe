@@ -59,7 +59,6 @@ export default function QrCodeModalContents(props) {
 
 	return (<View style={styles.modalContentContainer}>
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : undefined} enabled keyboardVerticalOffset={150}>
-			
 			<ScrollView style={styles.qrModalScrollView}>
 				<View style={styles.qrModalImageNTextInputView}>
 					{props.isOpenedFlag && openCameraFlag ?
@@ -68,7 +67,6 @@ export default function QrCodeModalContents(props) {
 							height: wp('100%'),
 							overflow: "hidden",
 							borderRadius: 20,
-							marginTop: hp('2%')
 						}}>
 							<RNCamera
 								ref={(ref) => { this.cameraRef = ref; }}
@@ -95,7 +93,6 @@ export default function QrCodeModalContents(props) {
 									height: wp('100%'),
 									overflow: "hidden",
 									borderRadius: 20,
-									marginTop: hp('3%')
 								}} >
 									<View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
 										<View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
@@ -149,6 +146,7 @@ const styles = StyleSheet.create({
 	qrModalScrollView: {
 		display: 'flex',
 		backgroundColor: Colors.white,
+		marginTop:hp('3%')
 	},
 	qrModalImageNTextInputView: {
 		marginBottom: 10,
