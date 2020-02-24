@@ -466,15 +466,24 @@ export default function Home(props) {
     //   }
     // }
 
-    (async () => {
-      if (!overallHealth) {
-        const storedHealth = await AsyncStorage.getItem('overallHealth');
-        if (storedHealth) {
-          setOverallHealth(JSON.parse(storedHealth));
-        }
-      }
-    })();
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      getOverAllHealthFromAsync();
+    });
+    return () => {
+      focusListener.remove();
+    };
+
+    
   }, []);
+
+  const getOverAllHealthFromAsync = async() =>{
+    if (!overallHealth) {
+      const storedHealth = await AsyncStorage.getItem('overallHealth');
+      if (storedHealth) {
+        setOverallHealth(JSON.parse(storedHealth));
+      }
+    }
+  }
 
   const messageAsPerHealth = health => {
     if (health == 0) {

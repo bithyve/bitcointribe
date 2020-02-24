@@ -678,6 +678,15 @@ export default function Send(props) {
                       />
                     </TouchableOpacity>
                   </View>
+                  {serviceType == TEST_ACCOUNT ? 
+                    <Text 
+                      onPress={()=>{setRecipientAddress("2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8")}} 
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(10),
+                        marginLeft: 'auto', fontFamily:Fonts.FiraSansItalic}}>Send it to a sample address</Text>
+                          : null
+                  }
                   <View style={styles.textBoxView}>
                     <View style={styles.amountInputImage}>
                       <Image
