@@ -415,7 +415,7 @@ export default function RestoreSelectedContactsList(props) {
         // // dispatch(fetchTransactions(TEST_ACCOUNT));
         // dispatch(fetchTransactions(REGULAR_ACCOUNT));
         // dispatch(fetchTransactions(SECURE_ACCOUNT));
-        dispatch(syncAccounts(true)); // restore: true
+        dispatch(syncAccounts()); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)
       }
     })();
   }, [SERVICES]);
@@ -945,7 +945,11 @@ export default function RestoreSelectedContactsList(props) {
         {metaShares.length >= 3 ? (
           <View>
             <TouchableOpacity
-              style={{ ...styles.questionConfirmButton, margin: 20, elevation: Elevation, }}
+              style={{
+                ...styles.questionConfirmButton,
+                margin: 20,
+                elevation: Elevation,
+              }}
               onPress={() => {
                 setElevation(0);
                 dispatch(recoverWallet());
