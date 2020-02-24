@@ -684,7 +684,7 @@ export default function Send(props) {
                       style={{
                         color: Colors.textColorGrey,
                         fontSize: RFValue(10),
-                        marginLeft: 'auto', fontFamily:Fonts.FiraSansItalic}}>use a sample address</Text>
+                        marginLeft: 'auto', fontFamily:Fonts.FiraSansItalic}}>Send it to a sample address</Text>
                           : null
                   }
                   <View style={styles.textBoxView}>
