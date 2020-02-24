@@ -466,24 +466,22 @@ export default function Home(props) {
     //   }
     // }
 
-    let focusListener = props.navigation.addListener('didFocus', () => {
-      getOverAllHealthFromAsync();
-    });
-    return () => {
-      focusListener.remove();
-    };
-
-    
+    // let focusListener = props.navigation.addListener('didFocus', () => {
+    //   getOverAllHealthFromAsync();
+    // });
+    // return () => {
+    //   focusListener.remove();
+    // };
   }, []);
 
-  const getOverAllHealthFromAsync = async() =>{
-    if (!overallHealth) {
-      const storedHealth = await AsyncStorage.getItem('overallHealth');
-      if (storedHealth) {
-        setOverallHealth(JSON.parse(storedHealth));
-      }
-    }
-  }
+  // const getOverAllHealthFromAsync = async () => {
+  //   if (!overallHealth) {
+  //     const storedHealth = await AsyncStorage.getItem('overallHealth');
+  //     if (storedHealth) {
+  //       setOverallHealth(JSON.parse(storedHealth));
+  //     }
+  //   }
+  // };
 
   const messageAsPerHealth = health => {
     if (health == 0) {
@@ -1539,18 +1537,18 @@ export default function Home(props) {
   let isCameraOpen = false;
   const handleAppStateChange = async nextAppState => {
     AsyncStorage.getItem('isContactOpen', (err, value) => {
-      if (err) console.log(err)
-       else {
-        isContactOpen = JSON.parse(value)
-      }
-  });
-    AsyncStorage.getItem('isCameraOpen', (err, value) => {
-      if (err) console.log(err)
+      if (err) console.log(err);
       else {
-        isCameraOpen = JSON.parse(value)
+        isContactOpen = JSON.parse(value);
       }
-  });
-  if (isCameraOpen) {
+    });
+    AsyncStorage.getItem('isCameraOpen', (err, value) => {
+      if (err) console.log(err);
+      else {
+        isCameraOpen = JSON.parse(value);
+      }
+    });
+    if (isCameraOpen) {
       await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
       return;
     }
@@ -2186,7 +2184,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderAddContent}
         renderHeader={renderAddHeader}
@@ -2219,7 +2217,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}

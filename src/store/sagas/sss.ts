@@ -267,7 +267,6 @@ function* downloadMetaShareWorker({ payload }) {
       existingShares,
     );
   } else {
-    console.log('HERE');
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
     console.log({ res });
   }
@@ -836,21 +835,21 @@ function* recoverWalletWorker({ payload }) {
     const { security } = WALLET_SETUP;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
-    const metaShares = [];
+    const metaShares = Array(5);
     Object.keys(RECOVERY_SHARES).forEach(key => {
       const { META_SHARE } = RECOVERY_SHARES[key];
-      if (META_SHARE) metaShares.push(META_SHARE);
+      if (META_SHARE) metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
     });
 
-    if (metaShares.length !== 3) {
+    if (Object.keys(metaShares).length !== 3) {
       throw new Error(
         `Insufficient number of shares to recover the wallet, ${3 -
           metaShares.length} more required`,
       );
     }
 
-    const encryptedSecrets: string[] = metaShares.map(
-      metaShare => metaShare.encryptedSecret,
+    const encryptedSecrets: string[] = Object.keys(metaShares).map(
+      key => metaShares[key].encryptedSecret,
     );
 
     const res = yield call(
@@ -875,6 +874,16 @@ function* recoverWalletWorker({ payload }) {
         S3_SERVICE: JSON.stringify(s3Service),
       };
       yield put(insertIntoDB({ SERVICES }));
+
+      const current = Date.now();
+      AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
+      const securityQuestionHistory = {
+        confirmed: current,
+      };
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify(securityQuestionHistory),
+      );
     } else {
       throw new Error(res.err);
     }

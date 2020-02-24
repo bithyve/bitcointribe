@@ -708,7 +708,7 @@ export default class S3Service {
   };
 
   public restoreMetaShares = (
-    metaShares: MetaShare[],
+    metaShares: any[],
   ):
     | {
         status: number;

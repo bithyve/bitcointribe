@@ -902,15 +902,15 @@ export default class SSS {
   };
 
   public restoreMetaShares = (
-    metaShares: MetaShare[],
+    metaShares: any[],
   ): {
     restored: Boolean;
   } => {
-    if (metaShares.length !== 3) {
+    if (Object.keys(metaShares).length !== 3) {
       throw new Error('Restoration requires a minimum of 3 metaShares');
     }
 
-    this.metaShares = [...metaShares];
+    this.metaShares = metaShares;
     return { restored: true };
   };
 

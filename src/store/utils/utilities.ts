@@ -61,7 +61,9 @@ export const serviceGenerator = async (
   let secondaryXpub = '';
   let bhXpub = '';
   if (metaShares) {
-    res = s3Service.decryptStaticNonPMDD(metaShares[0].encryptedStaticNonPMDD);
+    res = s3Service.decryptStaticNonPMDD(
+      metaShares[Object.keys(metaShares)[0]].encryptedStaticNonPMDD,
+    );
     if (res.status !== 200) throw new Error('Failed to decrypt StaticNPMDD');
     secondaryXpub = res.data.decryptedStaticNonPMDD.secondaryXpub;
     bhXpub = res.data.decryptedStaticNonPMDD.bhXpub;

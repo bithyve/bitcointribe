@@ -270,11 +270,12 @@ export default function NewWalletQuestion(props) {
             setIsDisabled(true);
           }, 2);
           dispatch(initializeSetup(walletName, security));
+
+          const current = Date.now();
           await AsyncStorage.setItem(
             'SecurityAnsTimestamp',
-            JSON.stringify(Date.now()),
+            JSON.stringify(current),
           );
-          const current = Date.now();
           const securityQuestionHistory = {
             created: current,
             confirmed: current,
