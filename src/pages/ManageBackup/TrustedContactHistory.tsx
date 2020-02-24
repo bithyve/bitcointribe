@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Platform,
   AsyncStorage,
+  Alert
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -33,8 +34,13 @@ import moment from 'moment';
 import _ from 'underscore';
 import TrustedContactQr from './TrustedContactQr';
 import { nameToInitials } from '../../common/CommonFunctions';
+import { textWithoutEncoding, email } from 'react-native-communications';
+import { uploadEncMShare } from '../../store/actions/sss';
+import { useDispatch } from 'react-redux';
 
 const TrustedContactHistory = props => {
+  const dispatch = useDispatch();
+  const [selectedContactMode, setSelectedContactMode] = useState(null);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
     React.createRef(),
@@ -73,6 +79,10 @@ const TrustedContactHistory = props => {
   //     personalCopy2: false,
   //     securityAns: false,
   //   });
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+    state => state.storage.database,
+  );
+  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
@@ -186,7 +196,19 @@ const TrustedContactHistory = props => {
         onPressBack={() => {
           (CommunicationModeBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={(OTP, index, selectedContactMode) => {
+        onPressContinue={ async(OTP, index, selectedContactMode) => {
+          let selectedContactModeTemp = JSON.parse(await AsyncStorage.getItem("selectedContactMode"));
+          if(!selectedContactModeTemp){
+            selectedContactModeTemp = []
+          }
+          if(index == 1){
+            selectedContactModeTemp[0] = selectedContactMode;
+          }
+          if(index == 2){
+            selectedContactModeTemp[1] = selectedContactMode;
+          }
+          await AsyncStorage.setItem("selectedContactMode", JSON.stringify(selectedContactModeTemp));
+          setSelectedContactMode(selectedContactModeTemp);
           if (selectedContactMode.type == 'qrcode') {
             (trustedContactQrBottomSheet as any).current.snapTo(1);
             (CommunicationModeBottomSheet as any).current.snapTo(0);
@@ -202,7 +224,7 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  }, [chosenContact, index]);
+  }, [chosenContact, index, selectedContactMode]);
 
   const renderCommunicationModeModalHeader = useCallback(() => {
     return (
@@ -282,6 +304,7 @@ const TrustedContactHistory = props => {
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
         onPressOk={index => {
+          setRenderTimer(false);
           onOTPShare(index);
           if (next) {
             props.navigation.goBack();
@@ -294,7 +317,7 @@ const TrustedContactHistory = props => {
         index={chosenContactIndex}
       />
     );
-  }, [onOTPShare, OTP, chosenContactIndex, renderTimer]);
+  }, [onOTPShare, OTP, chosenContactIndex, renderTimer, selectedContactMode]);
 
   const renderShareOtpWithTrustedContactHeader = useCallback(() => {
     return (
@@ -318,6 +341,7 @@ const TrustedContactHistory = props => {
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
+          communicate();
           (ConfirmBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
@@ -326,7 +350,7 @@ const TrustedContactHistory = props => {
         isBottomImage={false}
       />
     );
-  }, []);
+  }, [selectedContactMode]);
 
   const renderConfirmHeader = useCallback(() => {
     return (
@@ -336,7 +360,58 @@ const TrustedContactHistory = props => {
         }}
       />
     );
-  }, []);
+  }, [selectedContactMode]);
+
+  const communicate = async() => {
+    let selectedContactModeTmp = index == 1 ? selectedContactMode[0] :selectedContactMode[1];
+    if (!SHARES_TRANSFER_DETAILS[index]) {
+      Alert.alert('Failed to share');
+      return;
+    }
+    const deepLink =
+      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
+
+    switch (selectedContactModeTmp.type) {
+      case 'number':
+        textWithoutEncoding(selectedContactModeTmp.info, deepLink);
+        break;
+
+      case 'email':
+        email(
+          [selectedContactModeTmp.info],
+          null,
+          null,
+          'Guardian request',
+          deepLink,
+        );
+        break;
+      case 'qrcode':
+        (trustedContactQrBottomSheet as any).current.snapTo(1);
+        break;
+    }
+    if(selectedContactModeTmp.type != "qrcode"){
+      let otpTemp = SHARES_TRANSFER_DETAILS[index].OTP ? SHARES_TRANSFER_DETAILS[index].OTP : null
+      setTimeout(() => {
+        setRenderTimer(true);
+        setOTP(otpTemp);
+        setChosenContactIndex(index);
+      }, 10);
+      (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      !SHARES_TRANSFER_DETAILS[index] ||
+      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+    )
+      dispatch(uploadEncMShare(index));
+    else {
+      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
+      console.log(SHARES_TRANSFER_DETAILS[index]);
+    }
+  }, [SHARES_TRANSFER_DETAILS[index]]);
 
   const onPressReshare = useCallback(async () => {
     let selectedContactList = JSON.parse(
@@ -479,13 +554,14 @@ const TrustedContactHistory = props => {
 
   useEffect(() => {
     (async () => {
+      let selectedContactModeTemp = await AsyncStorage.getItem("selectedContactMode");
+      setSelectedContactMode(JSON.parse(selectedContactModeTemp));
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
       console.log({ shareHistory });
       if (shareHistory) updateHistory(shareHistory);
     })();
-
     setContactInfo();
   }, []);
 
