@@ -78,7 +78,8 @@ export default function RestoreWalletBySecondaryDevice(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate('RestoreSelectedContactsList');
+              props.navigation.goBack();
+              // props.navigation.navigate('RestoreSelectedContactsList');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>

@@ -80,6 +80,7 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletUsingDocuments,
     RestoreWalletByContacts,
     RecoveryCommunication,
+    ShareRecoveryOTP,
   },
   {
     initialRouteName: 'Launch',
@@ -151,12 +152,6 @@ const HomeNavigator = createStackNavigator(
     GoogleAuthenticatorOTP,
     Confirmation,
     TwoFASetup,
-    ShareRecoveryOTP: {
-      screen: ShareRecoveryOTP,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
     SecondaryDeviceHistory,
     TrustedContactHistory,
     PersonalCopyHistory,

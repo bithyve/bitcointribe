@@ -37,15 +37,17 @@ export default function RestoreWalletByContacts(props) {
   const onPressContinue = async () => {
     await AsyncStorage.setItem('selectedContacts', JSON.stringify(contacts));
     console.log({ contacts });
-    props.navigation.navigate('RestoreSelectedContactsList');
+    props.navigation.goBack();
+
+    // props.navigation.navigate('RestoreSelectedContactsList');
   };
 
-  const continueNProceed = async contacts => {
-    // communicationModeBottomSheet.current.snapTo(1);
-    await AsyncStorage.setItem('selectedContacts', JSON.stringify(contacts));
-    console.log({ contacts });
-    props.navigation.navigate('RestoreSelectedContactsList');
-  };
+  // const continueNProceed = async contacts => {
+  //   // communicationModeBottomSheet.current.snapTo(1);
+  //   await AsyncStorage.setItem('selectedContacts', JSON.stringify(contacts));
+  //   console.log({ contacts });
+  //   props.navigation.navigate('RestoreSelectedContactsList');
+  // };
 
   //   const saveCommunicationMode = async selectedContactMode => {
   //     if (contacts.length > 0) {
@@ -101,7 +103,8 @@ export default function RestoreWalletByContacts(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate('RestoreSelectedContactsList');
+              props.navigation.goBack();
+              // props.navigation.navigate('RestoreSelectedContactsList');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
