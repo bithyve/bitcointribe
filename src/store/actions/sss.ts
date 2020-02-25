@@ -103,6 +103,7 @@ export const S3_LOADING = 'S3_LOADING';
 export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
 export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 export const UPDATE_SHARE_HISTORY = 'UPDATE_SHARE_HISTORY';
+export const CHECKED_PDF_HEALTH = 'CHECKED_PDF_HEALTH';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -134,4 +135,8 @@ export const overallHealthCalculated = overallHealth => {
 
 export const restoreShareFromQR = qrArray => {
   return { type: RESTORE_SHARE_FROM_QR, payload: { qrArray } };
+};
+
+export const pdfHealthChecked = (pdfHealthChecked) => {
+  return { type: CHECKED_PDF_HEALTH, payload: { pdfHealthChecked } };
 };
