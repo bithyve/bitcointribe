@@ -66,6 +66,7 @@ export default function NewWalletName(props) {
               placeholder={"Enter a name for your wallet"}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
+              maxLength={20}
               onChangeText={text => setWalletName(text)}
               onFocus={() => {
                 setInputStyle(styles.inputBoxFocused);

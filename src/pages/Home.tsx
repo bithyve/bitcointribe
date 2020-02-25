@@ -1873,8 +1873,8 @@ export default function Home(props) {
             <View style={styles.headerTitleViewContainer}>
               <Text
                 style={styles.headerTitleText}
-              >{`${walletName}’s Wallet`}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+             >{`${walletName}’s Wallet`}</Text> 
+             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                 {switchOn ? (
                   <Image
                     style={CommonStyles.homepageAmountImage}
@@ -2817,7 +2817,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   headerViewContainer: {
-    marginTop: hp('3%'),
+    marginTop: hp('2%'),
     marginLeft: 20,
     marginRight: 20,
   },
@@ -2842,7 +2842,7 @@ const styles = StyleSheet.create({
   headerInfoText: {
     fontSize: RFValue(12),
     color: Colors.white,
-    marginBottom: hp('4%'),
+    marginBottom: hp('3%'),
   },
   headerButton: {
     backgroundColor: Colors.homepageButtonColor,

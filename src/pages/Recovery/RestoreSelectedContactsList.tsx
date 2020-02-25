@@ -83,6 +83,8 @@ export default function RestoreSelectedContactsList(props) {
   );
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
+
+  
   // function openCloseModal() {
   //   if (!walletName) {
   //     walletNameBottomSheet.current.snapTo(0);
@@ -395,6 +397,11 @@ export default function RestoreSelectedContactsList(props) {
   );
 
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+
+  const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[0]
+    ? RECOVERY_SHARES[0]
+    : { REQUEST_DETAILS: null, META_SHARE: null };
+
   const metaShares = [];
   Object.keys(RECOVERY_SHARES).forEach(key => {
     const { META_SHARE } = RECOVERY_SHARES[key];
@@ -587,7 +594,7 @@ export default function RestoreSelectedContactsList(props) {
           infoTextBold={'You need three of them restore your wallet'}
         />
         <TouchableOpacity
-          style={{ ...styles.listElements, marginTop: 60 }}
+          style={{ ...styles.listElements, marginTop: 60, marginBottom: META_SHARE ? 0 : 10, }}
           onPress={() =>
             props.navigation.navigate('RestoreWalletBySecondaryDevice')
           }
@@ -610,7 +617,71 @@ export default function RestoreSelectedContactsList(props) {
               style={{ alignSelf: 'center' }}
             />
           </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+          {META_SHARE && (
+            <View style={{}}>
+              <TouchableOpacity
+                      style={{
+                        ...styles.selectedContactView,
+                        marginBottom: 15,
+                      }}
+                    >
+                      <View>
+                        <Text style={styles.selectedContactName}>
+                          {META_SHARE ? 'Downloaded' : 'Download'}
+                        </Text>
+                      </View>
+                      {META_SHARE ? (
+                        <View
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                        >
+                          <View
+                            style={{
+                              ...styles.secretReceivedCheckSignView,
+                              backgroundColor: Colors.green,
+                            }}
+                          >
+                            <Feather
+                              name={'check'}
+                              size={12}
+                              color={Colors.darkGreen}
+                            />
+                          </View>
+                        </View>
+                      ) : !META_SHARE ? (
+                        <View
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                        >
+                          <View
+                            style={{
+                              height: 25,
+                              width: 25,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginLeft: 5,
+                            }}
+                          >
+                            <Entypo
+                              name={'dots-three-horizontal'}
+                              size={15}
+                              color={Colors.borderColor}
+                            />
+                          </View>
+                        </View>
+                      ) : (
+                        <View
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                        >
+                          <Text>{META_SHARE ? 'Downloaded' : 'Download'}</Text>
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                        </View>
+                      )}
+                      
+                    </TouchableOpacity>
+              </View>
+          )}
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={() =>
