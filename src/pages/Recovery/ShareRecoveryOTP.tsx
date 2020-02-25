@@ -33,8 +33,9 @@ export default function ShareRecoveryOTP(props) {
           <View style={{ flexDirection: 'row', flex: 1 }}>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
-                //   props.onPressBack();
-                props.navigation.navigate('RestoreSelectedContactsList');
+                // props.onPressBack();
+                // props.navigation.navigate('RestoreSelectedContactsList');
+                props.navigation.goBack();
               }}
               style={{ height: 30, width: 30 }}
             >
@@ -97,7 +98,6 @@ export default function ShareRecoveryOTP(props) {
             </View>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
-                //props.onPressOk(index);
                 props.navigation.navigate('RestoreSelectedContactsList');
               }}
               style={{
