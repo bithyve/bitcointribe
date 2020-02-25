@@ -31,6 +31,7 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestShare, downloadMShare } from '../../store/actions/sss';
 import QRCode from 'react-native-qrcode-svg';
+import Toast from '../../components/Toast';
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -66,6 +67,9 @@ export default function RestoreWalletBySecondaryDevice(props) {
     if (!REQUEST_DETAILS) dispatch(requestShare(0));
   }, []);
 
+  if(META_SHARE) {
+    Toast("Downloaded")
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -115,8 +119,41 @@ export default function RestoreWalletBySecondaryDevice(props) {
           </View>
 
           {REQUEST_DETAILS ? (
-            <View>
-              <Button
+            <View style={{justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: hp('3%'),
+            marginBottom: hp('3%'),}}>
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(
+                      downloadMShare(
+                        REQUEST_DETAILS.OTP,
+                        REQUEST_DETAILS.ENCRYPTED_KEY,
+                        'recovery',
+                      ),
+                    );
+                }}
+                disabled={!!META_SHARE}
+                style={{
+                  backgroundColor: Colors.blue,
+                  borderRadius: 10,
+                  width: wp('50%'),
+                  height: wp('13%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansMedium,
+                  }}
+                >
+                  Yes, I have shared
+                </Text>
+              </TouchableOpacity>
+              {/* <Button
                 title={META_SHARE ? 'Downloaded' : 'Download'}
                 disabled={!!META_SHARE}
                 onPress={() =>
@@ -128,12 +165,18 @@ export default function RestoreWalletBySecondaryDevice(props) {
                     ),
                   )
                 }
-              />
+              /> */}
             </View>
           ) : null}
 
           <View style={{ flex: 2, justifyContent: 'flex-end' }}></View>
         </KeyboardAvoidingView>
+        <BottomInfoBox
+          title={'Note'}
+          infoText={
+            'Once you have scanned and accepted the request, press continue button'
+          }
+        />
       </View>
     </SafeAreaView>
   );

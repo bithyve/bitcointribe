@@ -78,6 +78,7 @@ export default function WalletNameRecovery(props) {
               marginLeft: 20, 
               marginRight: 20,
             }}
+            maxLength={20}
             placeholder={"Enter a name for wallet"}
             placeholderTextColor={Colors.borderColor}
             value={walletName}
