@@ -48,13 +48,14 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-
+import {getCurrencyImageByRegion } from "../../common/CommonFunctions/index";
 import moment from 'moment';
 import axios from 'axios';
 
 import { UsNumberFormat } from '../../common/utilities';
 
 export default function Accounts(props) {
+  const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
       ? props.navigation.getParam('serviceType')
@@ -173,6 +174,7 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
+    setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
     });
@@ -228,6 +230,13 @@ export default function Accounts(props) {
       }
     })();
   }, []);
+
+  const setCurrencyCodeFromAsync = async() =>{
+    let currencyToggleValueTmp = await AsyncStorage.getItem("currencyToggleValue");
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+    let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
+    setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : "USD");
+  }
 
   const getServiceType = useCallback(
     serviceType => {
@@ -863,14 +872,17 @@ export default function Accounts(props) {
             }}
           >
             <ToggleSwitch
+              currencyCodeValue={CurrencyCode}
               activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
               inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-              activeOffImage={require('../../assets/images/icons/icon_dollar_white.png')}
-              inactiveOffImage={require('../../assets/images/icons/icon_dollar_dark.png')}
+              activeOffImage={getCurrencyImageByRegion(CurrencyCode, "light")}
+              inactiveOffImage={getCurrencyImageByRegion(CurrencyCode, "dark")}
               toggleColor={Colors.lightBlue}
               toggleCircleColor={Colors.blue}
-              onpress={() => {
+              onpress={async() => {
                 setSwitchOn(!switchOn);
+                let temp = !switchOn ? 'true' : '';
+                await AsyncStorage.setItem("currencyToggleValue", temp)
               }}
               toggle={switchOn}
             />

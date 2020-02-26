@@ -11,6 +11,7 @@ import {
   Platform,
   AsyncStorage,
   Linking,
+  NativeModules
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -90,6 +91,7 @@ import { UsNumberFormat } from '../common/utilities';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
     false,
@@ -449,6 +451,9 @@ export default function Home(props) {
   }
 
   useEffect(function() {
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      setCurrencyCodeFromAsync();
+    });
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
@@ -465,14 +470,28 @@ export default function Home(props) {
     //     dispatch(updateMSharesHealth());
     //   }
     // }
-
-    // let focusListener = props.navigation.addListener('didFocus', () => {
-    //   getOverAllHealthFromAsync();
-    // });
-    // return () => {
-    //   focusListener.remove();
-    // };
+    return () => {
+      focusListener.remove();
+    };
   }, []);
+
+  const setCurrencyCodeFromAsync = async() =>{
+    let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
+    if(!currencyCodeTmp){
+      const identifiers = [
+        'io.hexawallet.hexa',
+      ];
+      NativeModules.InAppUtils.loadProducts(identifiers, async(error, products) => {
+        await AsyncStorage.setItem("currencyCode", products && products.length ? products[0].currencyCode : "USD")
+        setCurrencyCode(products && products.length ? products[0].currencyCode : "USD");
+      });
+    }
+    else{
+      setCurrencyCode(currencyCodeTmp);
+    }
+    let currencyToggleValueTmp = await AsyncStorage.getItem("currencyToggleValue");
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+  }
 
   // const getOverAllHealthFromAsync = async () => {
   //   if (!overallHealth) {
@@ -1109,14 +1128,22 @@ export default function Home(props) {
     (settingsBottomSheet as any).current.snapTo(0);
   };
 
+  const onPressSettingsElements = async(type, currencycode) =>{ 
+    if(type == 'ManagePin'){
+      return props.navigation.navigate('SettingManagePin', {
+        managePinSuccessProceed: pin => managePinSuccessProceed(pin),
+      });
+    }
+    else if(type == 'ManageCurrency'){
+      setCurrencyCode(currencycode);
+    }
+  }
+
   const renderSettingsContents = () => {
     return (
       <SettingsContents
-        onPressManagePIn={() => {
-          return props.navigation.navigate('SettingManagePin', {
-            managePinSuccessProceed: pin => managePinSuccessProceed(pin),
-          });
-        }}
+        currencyCode={CurrencyCode}
+        onPressManagePin={(type, currencycode) => onPressSettingsElements(type, currencycode)}
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1913,8 +1940,11 @@ export default function Home(props) {
             </View>
             <View style={styles.headerToggleSwitchContainer}>
               <ToggleSwitch
+                currencyCodeValue={CurrencyCode}
                 onpress={async () => {
                   setSwitchOn(!switchOn);
+                  let temp = !switchOn ? 'true' : '';
+                  await AsyncStorage.setItem("currencyToggleValue", temp)
                 }}
                 toggle={switchOn}
               />
