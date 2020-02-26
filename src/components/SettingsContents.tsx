@@ -32,7 +32,7 @@ export default function SettingsContents(props) {
             symbol:'€'
         },
         {
-            code:'EGP',
+            code:'GBP',
             symbol:'£'
         },
         {

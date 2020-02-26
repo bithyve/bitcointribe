@@ -397,7 +397,7 @@ export default function Accounts(props) {
             ) : (
               <Image
                 style={styles.cardBitCoinImage}
-                source={require('../../assets/images/icons/icon_dollar_white.png')}
+                source={getCurrencyImageByRegion(CurrencyCode, "light")}
               />
             )}
             <Text style={styles.cardAmountText}>
@@ -406,7 +406,7 @@ export default function Accounts(props) {
                 : switchOn
                 ? UsNumberFormat(netBalance)
                 : exchangeRates
-                ? ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)
+                ? ((netBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
                 : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
@@ -414,7 +414,7 @@ export default function Accounts(props) {
                 ? 't-sats'
                 : switchOn
                 ? 'sats'
-                : 'usd'}
+                : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -538,7 +538,7 @@ export default function Accounts(props) {
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
-                          exchangeRates['USD'].last
+                          exchangeRates[CurrencyCode].last
                         ).toFixed(2)} */}
                         {item.amount}
                       </Text>
@@ -1264,7 +1264,7 @@ export default function Accounts(props) {
                   <View style={{ flex: 3, marginLeft: wp('3%') }}>
                     <Text style={styles.bottomCardTitleText}>Buy</Text>
                     <Text style={styles.bottomCardInfoText}>
-                      Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
+                      Ex Rate : {exchangeRates ? exchangeRates[CurrencyCode].last : 0}{' '}
                       (usd)
                     </Text>
                   </View>
@@ -1298,7 +1298,7 @@ export default function Accounts(props) {
                   <View style={{ flex: 3, marginLeft: wp('3%') }}>
                     <Text style={styles.bottomCardTitleText}>Sell</Text>
                     <Text style={styles.bottomCardInfoText}>
-                      Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
+                      Ex Rate : {exchangeRates ? exchangeRates[CurrencyCode].last : 0}{' '}
                       (usd)
                     </Text>
                   </View>

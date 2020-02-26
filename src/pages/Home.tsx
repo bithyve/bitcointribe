@@ -82,6 +82,7 @@ import {
 } from '../store/actions/accounts';
 import axios from 'axios';
 import { UsNumberFormat } from '../common/utilities';
+import {getCurrencyImageByRegion } from "../common/CommonFunctions/index";
 
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
@@ -454,6 +455,7 @@ export default function Home(props) {
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
     });
+    setCurrencyCodeFromAsync();
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
@@ -1904,13 +1906,13 @@ export default function Home(props) {
              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                 {switchOn ? (
                   <Image
-                    style={CommonStyles.homepageAmountImage}
+                    style={{...CommonStyles.homepageAmountImage, marginBottom: wp('1.5%')}}
                     source={require('../assets/images/icons/icon_bitcoin_light.png')}
                   />
                 ) : (
                   <Image
-                    style={styles.cardBitCoinImage}
-                    source={require('../assets/images/icons/icon_dollar_white.png')}
+                    style={{...styles.cardBitCoinImage, marginBottom: wp('1.5%')}}
+                    source={getCurrencyImageByRegion(CurrencyCode, "light")}
                   />
                 )}
                 <Text
@@ -1924,7 +1926,7 @@ export default function Home(props) {
                     : exchangeRates
                     ? (
                         (balances.accumulativeBalance / 1e8) *
-                        exchangeRates['USD'].last
+                        exchangeRates[CurrencyCode].last
                       ).toFixed(2)
                     : 0}
                 </Text>
@@ -1934,7 +1936,7 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  {switchOn ? 'sats' : 'usd'}
+                  {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
             </View>
@@ -2105,7 +2107,7 @@ export default function Home(props) {
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}
-                                    source={require('../assets/images/icons/icon_dollar_dark.png')}
+                                    source={getCurrencyImageByRegion(CurrencyCode, "dark")}
                                   />
                                 )}
                                 <Text
@@ -2127,12 +2129,12 @@ export default function Home(props) {
                                       exchangeRates
                                     ? (
                                         (balances.regularBalance / 1e8) *
-                                        exchangeRates['USD'].last
+                                        exchangeRates[CurrencyCode].last
                                       ).toFixed(2)
                                     : exchangeRates
                                     ? (
                                         (balances.secureBalance / 1e8) *
-                                        exchangeRates['USD'].last
+                                        exchangeRates[CurrencyCode].last
                                       ).toFixed(2)
                                     : 0}
                                 </Text>
@@ -2141,7 +2143,7 @@ export default function Home(props) {
                                     ? value.unit
                                     : value.accountType === 'test'
                                     ? value.unit
-                                    : 'usd'}
+                                    : CurrencyCode.toLocaleLowerCase()}
                                 </Text>
                               </View>
                             </View>
