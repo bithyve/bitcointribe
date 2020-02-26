@@ -173,6 +173,7 @@ function* fetchBalanceTxWorker({ payload }) {
   const res = yield call(service.getBalanceTransactions, {
     restore: payload.options.restore,
   });
+  console.log({ res });
 
   const postFetchBalances =
     res.status === 200 ? res.data.balances : preFetchBalances;
