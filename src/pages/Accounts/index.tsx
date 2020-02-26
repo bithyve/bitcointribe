@@ -133,7 +133,9 @@ export default function Accounts(props) {
   );
   const [transactions, setTransactions] = useState(wallet.transactions);
   const [staticFees, setStaticFees] = useState(0);
-  const [exchangeRates, setExchangeRates] = useState();
+
+  const accounts = useSelector(state => state.accounts);
+  const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
 
   const checkNHighlight = async () => {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
@@ -209,25 +211,6 @@ export default function Accounts(props) {
         'storedStaticFees',
         JSON.stringify({ staticFees, lastFetched: Date.now() }),
       );
-
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        setExchangeRates(exchangeRates);
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      //console.log({ res });
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        //console.log('Failed to retrieve exchange rates', res);
-      }
     })();
   }, []);
 
@@ -237,6 +220,9 @@ export default function Accounts(props) {
     let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
     setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : "USD");
   }
+  useEffect(() => {
+    if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
+  }, [accounts.exchangeRates]);
 
   const getServiceType = useCallback(
     serviceType => {
@@ -1190,7 +1176,7 @@ export default function Accounts(props) {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
-                        Tran Fee : {staticFees['high']} (
+                        Tran Fee : {staticFees['low']} (
                         {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                       </Text>
                     </View>
@@ -1219,10 +1205,10 @@ export default function Accounts(props) {
                     </View>
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Receive</Text>
-                      <Text style={styles.bottomCardInfoText}>
+                      {/* <Text style={styles.bottomCardInfoText}>
                         Tran Fee : {staticFees['high']} (
                         {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
-                      </Text>
+                      </Text> */}
                     </View>
                   </TouchableOpacity>
                 </View>
