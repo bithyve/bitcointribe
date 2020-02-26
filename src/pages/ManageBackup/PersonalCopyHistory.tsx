@@ -17,7 +17,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkPDFHealth } from '../../store/actions/sss';
+import { checkPDFHealth, pdfHealthChecked } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -27,6 +27,7 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import moment from 'moment';
 import _ from 'underscore';
+import Toast from "../../components/Toast";
 
 const PersonalCopyHistory = props => {
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
@@ -68,7 +69,7 @@ const PersonalCopyHistory = props => {
     'selectedPersonalCopy',
   );
   const next = props.navigation.getParam('next');
-
+  const { loading } = useSelector(state => state.sss);
   const dispatch = useDispatch();
 
   const onConfirm = useCallback(() => {
@@ -81,6 +82,14 @@ const PersonalCopyHistory = props => {
       },
     });
   }, [selectedPersonalCopy]);
+
+    useEffect(() => {
+      if(loading.pdfHealthChecked){
+        console.log("loading.pdfHealthChecked && personalCopyIndex", loading.pdfHealthChecked)
+      Toast("PDF scanned Successfully");
+      dispatch(pdfHealthChecked(''));
+    } 
+    }, [loading.pdfHealthChecked]);
 
   const renderPersonalCopyShareModalContent = useCallback(() => {
     return (

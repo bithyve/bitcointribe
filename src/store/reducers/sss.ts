@@ -6,6 +6,7 @@ import {
   RESET_REQUESTED_SHARE_UPLOADS,
   DOWNLOADED_MSHARE,
   OVERALL_HEALTH_CALCULATED,
+  CHECKED_PDF_HEALTH
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -26,8 +27,10 @@ const initialState: {
     downloadDynamicNonPMDD: Boolean;
     restoreDynamicNonPMDD: Boolean;
     restoreWallet: Boolean;
+    pdfHealthChecked: Boolean;
   };
   mnemonic: String;
+  personalCopyIndex: Number;
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
@@ -54,8 +57,10 @@ const initialState: {
     downloadDynamicNonPMDD: false,
     restoreDynamicNonPMDD: false,
     restoreWallet: false,
+    pdfHealthChecked: false
   },
   mnemonic: '',
+  personalCopyIndex: 0,
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
@@ -130,6 +135,15 @@ export default (state = initialState, action) => {
             action.payload.beingLoaded
           ],
         },
+      };
+      case CHECKED_PDF_HEALTH:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          pdfHealthChecked: action.payload.pdfHealthChecked,
+        },
+        //personalCopyIndex: action.payload.index
       };
   }
   return state;
