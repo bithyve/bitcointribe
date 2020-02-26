@@ -11,6 +11,7 @@ import {
   Platform,
   AsyncStorage,
   Linking,
+  NativeModules
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -81,6 +82,7 @@ import {
 } from '../store/actions/accounts';
 import axios from 'axios';
 import { UsNumberFormat } from '../common/utilities';
+import {getCurrencyImageByRegion } from "../common/CommonFunctions/index";
 
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
@@ -90,6 +92,7 @@ import { UsNumberFormat } from '../common/utilities';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
     false,
@@ -449,6 +452,10 @@ export default function Home(props) {
   }
 
   useEffect(function() {
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      setCurrencyCodeFromAsync();
+    });
+    setCurrencyCodeFromAsync();
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
@@ -465,14 +472,28 @@ export default function Home(props) {
     //     dispatch(updateMSharesHealth());
     //   }
     // }
-
-    // let focusListener = props.navigation.addListener('didFocus', () => {
-    //   getOverAllHealthFromAsync();
-    // });
-    // return () => {
-    //   focusListener.remove();
-    // };
+    return () => {
+      focusListener.remove();
+    };
   }, []);
+
+  const setCurrencyCodeFromAsync = async() =>{
+    let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
+    if(!currencyCodeTmp){
+      const identifiers = [
+        'io.hexawallet.hexa',
+      ];
+      NativeModules.InAppUtils.loadProducts(identifiers, async(error, products) => {
+        await AsyncStorage.setItem("currencyCode", products && products.length ? products[0].currencyCode : "USD")
+        setCurrencyCode(products && products.length ? products[0].currencyCode : "USD");
+      });
+    }
+    else{
+      setCurrencyCode(currencyCodeTmp);
+    }
+    let currencyToggleValueTmp = await AsyncStorage.getItem("currencyToggleValue");
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+  }
 
   // const getOverAllHealthFromAsync = async () => {
   //   if (!overallHealth) {
@@ -1109,14 +1130,22 @@ export default function Home(props) {
     (settingsBottomSheet as any).current.snapTo(0);
   };
 
+  const onPressSettingsElements = async(type, currencycode) =>{ 
+    if(type == 'ManagePin'){
+      return props.navigation.navigate('SettingManagePin', {
+        managePinSuccessProceed: pin => managePinSuccessProceed(pin),
+      });
+    }
+    else if(type == 'ManageCurrency'){
+      setCurrencyCode(currencycode);
+    }
+  }
+
   const renderSettingsContents = () => {
     return (
       <SettingsContents
-        onPressManagePIn={() => {
-          return props.navigation.navigate('SettingManagePin', {
-            managePinSuccessProceed: pin => managePinSuccessProceed(pin),
-          });
-        }}
+        currencyCode={CurrencyCode}
+        onPressManagePin={(type, currencycode) => onPressSettingsElements(type, currencycode)}
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1877,13 +1906,13 @@ export default function Home(props) {
              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                 {switchOn ? (
                   <Image
-                    style={CommonStyles.homepageAmountImage}
+                    style={{...CommonStyles.homepageAmountImage, marginBottom: wp('1.5%')}}
                     source={require('../assets/images/icons/icon_bitcoin_light.png')}
                   />
                 ) : (
                   <Image
-                    style={styles.cardBitCoinImage}
-                    source={require('../assets/images/icons/icon_dollar_white.png')}
+                    style={{...styles.cardBitCoinImage, marginBottom: wp('1.5%')}}
+                    source={getCurrencyImageByRegion(CurrencyCode, "light")}
                   />
                 )}
                 <Text
@@ -1897,7 +1926,7 @@ export default function Home(props) {
                     : exchangeRates
                     ? (
                         (balances.accumulativeBalance / 1e8) *
-                        exchangeRates['USD'].last
+                        exchangeRates[CurrencyCode].last
                       ).toFixed(2)
                     : 0}
                 </Text>
@@ -1907,14 +1936,17 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  {switchOn ? 'sats' : 'usd'}
+                  {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
             </View>
             <View style={styles.headerToggleSwitchContainer}>
               <ToggleSwitch
+                currencyCodeValue={CurrencyCode}
                 onpress={async () => {
                   setSwitchOn(!switchOn);
+                  let temp = !switchOn ? 'true' : '';
+                  await AsyncStorage.setItem("currencyToggleValue", temp)
                 }}
                 toggle={switchOn}
               />
@@ -2075,7 +2107,7 @@ export default function Home(props) {
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}
-                                    source={require('../assets/images/icons/icon_dollar_dark.png')}
+                                    source={getCurrencyImageByRegion(CurrencyCode, "dark")}
                                   />
                                 )}
                                 <Text
@@ -2097,12 +2129,12 @@ export default function Home(props) {
                                       exchangeRates
                                     ? (
                                         (balances.regularBalance / 1e8) *
-                                        exchangeRates['USD'].last
+                                        exchangeRates[CurrencyCode].last
                                       ).toFixed(2)
                                     : exchangeRates
                                     ? (
                                         (balances.secureBalance / 1e8) *
-                                        exchangeRates['USD'].last
+                                        exchangeRates[CurrencyCode].last
                                       ).toFixed(2)
                                     : 0}
                                 </Text>
@@ -2111,7 +2143,7 @@ export default function Home(props) {
                                     ? value.unit
                                     : value.accountType === 'test'
                                     ? value.unit
-                                    : 'usd'}
+                                    : CurrencyCode.toLocaleLowerCase()}
                                 </Text>
                               </View>
                             </View>

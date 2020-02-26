@@ -48,13 +48,14 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-
+import {getCurrencyImageByRegion } from "../../common/CommonFunctions/index";
 import moment from 'moment';
 import axios from 'axios';
 
 import { UsNumberFormat } from '../../common/utilities';
 
 export default function Accounts(props) {
+  const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
       ? props.navigation.getParam('serviceType')
@@ -175,6 +176,7 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
+    setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
     });
@@ -212,6 +214,12 @@ export default function Accounts(props) {
     })();
   }, []);
 
+  const setCurrencyCodeFromAsync = async() =>{
+    let currencyToggleValueTmp = await AsyncStorage.getItem("currencyToggleValue");
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+    let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
+    setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : "USD");
+  }
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
@@ -375,7 +383,7 @@ export default function Accounts(props) {
             ) : (
               <Image
                 style={styles.cardBitCoinImage}
-                source={require('../../assets/images/icons/icon_dollar_white.png')}
+                source={getCurrencyImageByRegion(CurrencyCode, "light")}
               />
             )}
             <Text style={styles.cardAmountText}>
@@ -384,7 +392,7 @@ export default function Accounts(props) {
                 : switchOn
                 ? UsNumberFormat(netBalance)
                 : exchangeRates
-                ? ((netBalance / 1e8) * exchangeRates['USD'].last).toFixed(2)
+                ? ((netBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
                 : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
@@ -392,7 +400,7 @@ export default function Accounts(props) {
                 ? 't-sats'
                 : switchOn
                 ? 'sats'
-                : 'usd'}
+                : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -516,7 +524,7 @@ export default function Accounts(props) {
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
-                          exchangeRates['USD'].last
+                          exchangeRates[CurrencyCode].last
                         ).toFixed(2)} */}
                         {item.amount}
                       </Text>
@@ -850,14 +858,17 @@ export default function Accounts(props) {
             }}
           >
             <ToggleSwitch
+              currencyCodeValue={CurrencyCode}
               activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
               inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-              activeOffImage={require('../../assets/images/icons/icon_dollar_white.png')}
-              inactiveOffImage={require('../../assets/images/icons/icon_dollar_dark.png')}
+              activeOffImage={getCurrencyImageByRegion(CurrencyCode, "light")}
+              inactiveOffImage={getCurrencyImageByRegion(CurrencyCode, "dark")}
               toggleColor={Colors.lightBlue}
               toggleCircleColor={Colors.blue}
-              onpress={() => {
+              onpress={async() => {
                 setSwitchOn(!switchOn);
+                let temp = !switchOn ? 'true' : '';
+                await AsyncStorage.setItem("currencyToggleValue", temp)
               }}
               toggle={switchOn}
             />
@@ -1239,7 +1250,7 @@ export default function Accounts(props) {
                   <View style={{ flex: 3, marginLeft: wp('3%') }}>
                     <Text style={styles.bottomCardTitleText}>Buy</Text>
                     <Text style={styles.bottomCardInfoText}>
-                      Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
+                      Ex Rate : {exchangeRates ? exchangeRates[CurrencyCode].last : 0}{' '}
                       (usd)
                     </Text>
                   </View>
@@ -1273,7 +1284,7 @@ export default function Accounts(props) {
                   <View style={{ flex: 3, marginLeft: wp('3%') }}>
                     <Text style={styles.bottomCardTitleText}>Sell</Text>
                     <Text style={styles.bottomCardInfoText}>
-                      Ex Rate : {exchangeRates ? exchangeRates['USD'].last : 0}{' '}
+                      Ex Rate : {exchangeRates ? exchangeRates[CurrencyCode].last : 0}{' '}
                       (usd)
                     </Text>
                   </View>

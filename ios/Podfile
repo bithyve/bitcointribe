@@ -60,4 +60,6 @@ target 'HEXA' do
 
   pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
 
+  pod 'react-native-in-app-utils', :path => '../node_modules/react-native-in-app-utils'
+
 end
