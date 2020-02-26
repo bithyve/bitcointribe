@@ -224,7 +224,7 @@ export default function CommunicationMode(props) {
     };
 
     Contacts.openExistingContact(newPerson, async (err, contact) => {
-      if (err) throw err;
+      if (err) return;
       // console.log('contact editContact', contact);
       if (contact) {
         let contactListArray = [];

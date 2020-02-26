@@ -521,6 +521,8 @@ export default function NewWalletQuestion(props) {
                           ? tempAns
                           : confirmAnswer
                       }
+                      returnKeyType='done'
+                      returnKeyLabel='Done'
                       textContentType="none"
                       autoCompleteType="off"
                       autoCorrect={false}

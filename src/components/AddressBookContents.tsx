@@ -75,9 +75,9 @@ export default function AddressBookContents(props) {
                       {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                     </Text>
                   </Text>
-                  <TouchableOpacity style={styles.shareButtonView}>
+                  {/* <TouchableOpacity style={styles.shareButtonView}>
                     <Text style={styles.shareButtonText}>Share</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               );
             }}
@@ -128,9 +128,9 @@ export default function AddressBookContents(props) {
                       {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                     </Text>
                   </Text>
-                  <TouchableOpacity style={styles.shareButtonView}>
+                  {/* <TouchableOpacity style={styles.shareButtonView}>
                     <Text style={styles.shareButtonText}>Share</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </View>
               );
             }}

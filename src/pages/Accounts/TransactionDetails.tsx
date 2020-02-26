@@ -28,99 +28,23 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function TransactionDetails(props) {
-  const txDetails = props.navigation.getParam('item');
-  const getServiceType = props.navigation.state.params.getServiceType
-    ? props.navigation.state.params.getServiceType
+  const txDetails = props.item;
+  const getServiceType = props.getServiceType
+    ? props.getServiceType
     : null;
-  const serviceType = props.navigation.getParam('serviceType')
-    ? props.navigation.getParam('serviceType')
+  const serviceType = props.serviceType
+    ? props.serviceType
     : null;
-  const [
-    TransactionDetailsBottomSheet,
-    setTransactionDetailsBottomSheet,
-  ] = useState(React.createRef());
-  const [isHelperDone, setIsHelperDone] = useState(true);
-
-  const checkNShowHelperModal = async () => {
-    let isSendHelperDone = await AsyncStorage.getItem(
-      'isTransactionHelperDone',
-    );
-    if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isTransactionHelperDone', 'true');
-      setTimeout(() => {
-        setIsHelperDone(true);
-      }, 10);
-
-      setTimeout(() => {
-        TransactionDetailsBottomSheet.current.snapTo(1);
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        setIsHelperDone(false);
-      }, 10);
-    }
-  };
-
-  useEffect(() => {
-    console.log('txDetails', txDetails);
-
-    checkNShowHelperModal();
-  }, []);
-
-  const renderHelperContents = () => {
-    return (
-      <TestAccountHelperModalContents
-        topButtonText={`Transaction Details`}
-        helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          (TransactionDetailsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-  const renderHelperHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          console.log('isHelperDone', isHelperDone);
-          if (isHelperDone) {
-            (TransactionDetailsBottomSheet as any).current.snapTo(1);
-            setTimeout(() => {
-              setIsHelperDone(false);
-            }, 10);
-          } else {
-            (TransactionDetailsBottomSheet as any).current.snapTo(0);
-          }
-        }}
-      />
-    );
-  };
-
+console.log("txDetails", txDetails, getServiceType, serviceType);
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        TransactionDetailsBottomSheet.current.snapTo(0);
-      }}
-    >
-      <View style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 0 }} />
-        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-
-        <View style={styles.modalContainer}>
+          <View style={styles.modalContainer}>
           <View style={styles.modalHeaderTitleView}>
             <View
               style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
             >
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   if (getServiceType && serviceType) {
                     getServiceType(serviceType);
@@ -134,16 +58,13 @@ export default function TransactionDetails(props) {
                   color={Colors.blue}
                   size={17}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <Text style={styles.modalHeaderTitleText}>
                 {'Transaction Details'}
               </Text>
-              {serviceType == TEST_ACCOUNT ? (
+              {serviceType && serviceType == TEST_ACCOUNT ? (
                 <Text
-                  onPress={() => {
-                    AsyncStorage.setItem('isTransactionHelperDone', 'true');
-                    TransactionDetailsBottomSheet.current.snapTo(1);
-                  }}
+                  onPress={() => props.onPressKnowMore()}
                   style={{
                     color: Colors.textColorGrey,
                     fontSize: RFValue(12),
@@ -377,26 +298,14 @@ export default function TransactionDetails(props) {
             </View>
           </View>
         </View>
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={TransactionDetailsBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('35%')
-              : hp('40%'),
-          ]}
-          renderContent={renderHelperContents}
-          renderHeader={renderHelperHeader}
-        />
-      </View>
-    </TouchableWithoutFeedback>
   );
 }
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
-    width: '100%',
+    backgroundColor: Colors.white,
+        alignSelf: 'center',
+        width: '100%'
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

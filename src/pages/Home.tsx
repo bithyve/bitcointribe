@@ -81,9 +81,11 @@ import {
   fetchTransactions,
 } from '../store/actions/accounts';
 import axios from 'axios';
+import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
 import {getCurrencyImageByRegion } from "../common/CommonFunctions/index";
 
+import TransactionDetails from './Accounts/TransactionDetails';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -301,10 +303,6 @@ export default function Home(props) {
   //   CustodianRequestAcceptBottomSheet,
   //   setCustodianRequestAcceptBottomSheet,
   // ] = useState(React.createRef());
-  const [
-    transactionDetailsBottomSheet,
-    setTransactionDetailsBottomSheet,
-  ] = useState(React.createRef());
   const [settingsBottomSheet, setSettingsBottomSheet] = useState(
     React.createRef(),
   );
@@ -436,6 +434,16 @@ export default function Home(props) {
     },
   ]);
   const [modaldata, setModaldata] = useState(transactionData);
+  const [
+    TransactionDetailsBottomSheet,
+    setTransactionDetailsBottomSheet,
+  ] = useState(React.createRef());
+   const [transactionItem, setTransactionItem] = useState({});
+  const [
+    TransactionDetailsHelperBottomSheet,
+    setTransactionDetailsHelperBottomSheet,
+  ] = useState(React.createRef());
+  const [isHelperDone, setIsHelperDone] = useState(true);
 
   function getIconByAccountType(type) {
     if (type == 'saving') {
@@ -562,7 +570,14 @@ export default function Home(props) {
               renderItem={({ item }) => (
                 <AppBottomSheetTouchableWrapper
                   onPress={() =>
-                    props.navigation.navigate('TransactionDetails', { item })
+                    {
+                      (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                      setTimeout(() => {
+                        setTransactionItem(item);
+                      }, 10);
+                      
+                    }
+                    //props.navigation.navigate('TransactionDetails', { item })
                   }
                   style={{
                     ...styles.transactionModalElementView,
@@ -724,6 +739,31 @@ export default function Home(props) {
       </TouchableOpacity>
     );
   }
+
+  const renderTransactionDetailsContents = useCallback(() => {
+    return (
+      <TransactionDetails
+        item={transactionItem}
+        onPressKnowMore={() => {
+          TransactionDetailsHelperBottomSheet.current.snapTo(1);
+        }}
+      />
+    );
+  }, [transactionItem]);
+
+  const renderTransactionDetailsHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {
+          if (TransactionDetailsBottomSheet.current)
+            (TransactionDetailsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [transactionItem]);
+
 
   function renderAddContent() {
     return (
@@ -1115,12 +1155,13 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-    } else if (item.title == 'All accounts and funds') {
-      (AllAccountsBottomSheet as any).current.snapTo(1);
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
-    }
+    } 
+    // else if (item.title == 'All accounts and funds') {
+    //   (AllAccountsBottomSheet as any).current.snapTo(1);
+    //   setTimeout(() => {
+    //     setTabBarZIndex(0);
+    //   }, 10);
+    // }
   };
 
   const managePinSuccessProceed = pin => {
@@ -1222,33 +1263,6 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 2);
           (addressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderTransactionDetailsContents = () => {
-    return (
-      <TransactionDetailsContents
-        onPressBack={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (transactionDetailsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderTransactionDetailsHeader = () => {
-    return (
-      <SmallHeaderModal
-        headerColor={Colors.backgroundColor}
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -2272,7 +2286,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -2374,7 +2388,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('70%'),
+              : hp('64%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
@@ -2398,7 +2412,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('70%'),
+              : hp('64%'),
           ]}
           renderContent={renderAllAccountsContents}
           renderHeader={renderAllAccountsHeader}
@@ -2422,7 +2436,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('70%'),
+              : hp('64%'),
           ]}
           renderContent={renderSettingsContents}
           renderHeader={renderSettingsHeader}
@@ -2451,7 +2465,7 @@ export default function Home(props) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       /> */}
-      <BottomSheet
+      {/* <BottomSheet
         onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
@@ -2464,7 +2478,22 @@ export default function Home(props) {
         ]}
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
-      />
+      /> */}
+
+          <BottomSheet
+            enabledInnerScrolling={true}
+            onCloseEnd={() => {
+              setTabBarZIndex(999);
+            }}
+            ref={TransactionDetailsBottomSheet}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+            ]}
+            renderContent={renderTransactionDetailsContents}
+            renderHeader={renderTransactionDetailsHeader}
+          />
+
       {addBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {

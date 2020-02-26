@@ -48,11 +48,12 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import {getCurrencyImageByRegion } from "../../common/CommonFunctions/index";
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import moment from 'moment';
 import axios from 'axios';
 
 import { UsNumberFormat } from '../../common/utilities';
+import TransactionDetails from './TransactionDetails';
 
 export default function Accounts(props) {
   const [CurrencyCode, setCurrencyCode] = useState('USD');
@@ -81,6 +82,11 @@ export default function Accounts(props) {
   const [
     RegularAccountHelperBottomSheet,
     setRegularAccountHelperBottomSheet,
+  ] = useState(React.createRef());
+
+  const [
+    TransactionDetailsBottomSheet,
+    setTransactionDetailsBottomSheet,
   ] = useState(React.createRef());
 
   const [carouselData, setCarouselData] = useState([
@@ -136,7 +142,12 @@ export default function Accounts(props) {
 
   const accounts = useSelector(state => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
-
+  const [transactionItem, setTransactionItem] = useState({});
+  const [
+    TransactionDetailsHelperBottomSheet,
+    setTransactionDetailsHelperBottomSheet,
+  ] = useState(React.createRef());
+  const [isHelperDone, setIsHelperDone] = useState(true);
   const checkNHighlight = async () => {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
@@ -214,8 +225,10 @@ export default function Accounts(props) {
     })();
   }, []);
 
-  const setCurrencyCodeFromAsync = async() =>{
-    let currencyToggleValueTmp = await AsyncStorage.getItem("currencyToggleValue");
+  const setCurrencyCodeFromAsync = async () => {
+    let currencyToggleValueTmp = await AsyncStorage.getItem(
+      'currencyToggleValue',
+    );
     setSwitchOn(currencyToggleValueTmp ? true : false);
     let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
     setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : "USD");
@@ -459,12 +472,19 @@ export default function Accounts(props) {
               renderItem={({ item }) => {
                 return (
                   <AppBottomSheetTouchableWrapper
-                    onPress={() =>
-                      props.navigation.navigate('TransactionDetails', {
-                        item,
-                        serviceType,
-                        getServiceType: getServiceType,
-                      })
+                    onPress={
+                      () => {
+                        (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                        checkNShowHelperModal();
+                        setTimeout(() => {
+                          setTransactionItem(item);
+                        }, 10);
+                      }
+                      // props.navigation.navigate('TransactionDetails', {
+                      //   item,
+                      //   serviceType,
+                      //   getServiceType: getServiceType,
+                      // })
                     }
                     style={{
                       ...styles.transactionModalElementView,
@@ -725,6 +745,86 @@ export default function Accounts(props) {
     );
   }, []);
 
+  const checkNShowHelperModal = async () => {
+    let isSendHelperDone = await AsyncStorage.getItem(
+      'isTransactionHelperDone',
+    );
+    if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
+      await AsyncStorage.setItem('isTransactionHelperDone', 'true');
+      setTimeout(() => {
+        setIsHelperDone(true);
+      }, 10);
+
+      setTimeout(() => {
+        TransactionDetailsHelperBottomSheet.current.snapTo(1);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setIsHelperDone(false);
+      }, 10);
+    }
+  };
+
+  const renderTransactionDetailsContents = useCallback(() => {
+    return (
+      <TransactionDetails
+        item={transactionItem}
+        serviceType={serviceType}
+        getServiceType={getServiceType}
+        onPressKnowMore={() => {
+          AsyncStorage.setItem('isTransactionHelperDone', 'true');
+          TransactionDetailsHelperBottomSheet.current.snapTo(1);
+        }}
+      />
+    );
+  }, [transactionItem]);
+
+  const renderTransactionDetailsHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {
+          if (TransactionDetailsBottomSheet.current)
+            (TransactionDetailsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [transactionItem]);
+
+  const renderHelperContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={`Transaction Details`}
+        helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
+        continueButtonText={'Ok, got it'}
+        onPressContinue={() => {
+          (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+  const renderHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          console.log('isHelperDone', isHelperDone);
+          if (isHelperDone) {
+            (TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
+            setTimeout(() => {
+              setIsHelperDone(false);
+            }, 10);
+          } else {
+            (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
+          }
+        }}
+      />
+    );
+  };
+
+
   const renderRegularAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
@@ -861,14 +961,14 @@ export default function Accounts(props) {
               currencyCodeValue={CurrencyCode}
               activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
               inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-              activeOffImage={getCurrencyImageByRegion(CurrencyCode, "light")}
-              inactiveOffImage={getCurrencyImageByRegion(CurrencyCode, "dark")}
+              activeOffImage={getCurrencyImageByRegion(CurrencyCode, 'light')}
+              inactiveOffImage={getCurrencyImageByRegion(CurrencyCode, 'dark')}
               toggleColor={Colors.lightBlue}
               toggleCircleColor={Colors.blue}
-              onpress={async() => {
+              onpress={async () => {
                 setSwitchOn(!switchOn);
                 let temp = !switchOn ? 'true' : '';
-                await AsyncStorage.setItem("currencyToggleValue", temp)
+                await AsyncStorage.setItem('currencyToggleValue', temp);
               }}
               toggle={switchOn}
             />
@@ -895,46 +995,43 @@ export default function Accounts(props) {
               />
             }
           >
+            <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
+              <Carousel
+                ref={carousel}
+                data={carouselData}
+                firstItem={carouselInitIndex}
+                onBeforeSnapToItem={index => {
+                  index === 0
+                    ? getServiceType(TEST_ACCOUNT)
+                    : index === 1
+                    ? getServiceType(REGULAR_ACCOUNT)
+                    : getServiceType(SECURE_ACCOUNT);
+                  handleIndexChange(index);
+                }}
+                renderItem={renderItem}
+                sliderWidth={sliderWidth}
+                itemWidth={sliderWidth * 0.95}
+                onSnapToItem={index => {
+                  //console.log('INDEX', index, carouselInitIndex);
+                  setTimeout(() => {
+                    setCarouselInitIndex(index);
+                  }, 2000);
+                }}
+                style={{ activeSlideAlignment: 'center' }}
+                scrollInterpolator={scrollInterpolator}
+                slideInterpolatedStyle={slideInterpolatedStyle}
+                useScrollView={true}
+                extraData={carouselInitIndex}
+              />
+            </View>
             <TouchableWithoutFeedback
               onPress={() => {
                 if (TestAccountHelperBottomSheet.current)
                   TestAccountHelperBottomSheet.current.snapTo(0);
-              }}
-            >
-              <View style={{ paddingTop: hp('3%'), paddingBottom: hp('3%') }}>
-                <Carousel
-                  ref={carousel}
-                  data={carouselData}
-                  firstItem={carouselInitIndex}
-                  onBeforeSnapToItem={index => {
-                    index === 0
-                      ? getServiceType(TEST_ACCOUNT)
-                      : index === 1
-                      ? getServiceType(REGULAR_ACCOUNT)
-                      : getServiceType(SECURE_ACCOUNT);
-                    handleIndexChange(index);
-                  }}
-                  renderItem={renderItem}
-                  sliderWidth={sliderWidth}
-                  itemWidth={sliderWidth * 0.95}
-                  onSnapToItem={index => {
-                    //console.log('INDEX', index, carouselInitIndex);
-                    setTimeout(() => {
-                      setCarouselInitIndex(index);
-                    }, 2000);
-                  }}
-                  style={{ activeSlideAlignment: 'center' }}
-                  scrollInterpolator={scrollInterpolator}
-                  slideInterpolatedStyle={slideInterpolatedStyle}
-                  useScrollView={true}
-                  extraData={carouselInitIndex}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                if (TestAccountHelperBottomSheet.current)
-                  TestAccountHelperBottomSheet.current.snapTo(0);
+                if (RegularAccountHelperBottomSheet.current)
+                  RegularAccountHelperBottomSheet.current.snapTo(0);
+                if (SecureAccountHelperBottomSheet.current)
+                  SecureAccountHelperBottomSheet.current.snapTo(0);
               }}
             >
               <View>
@@ -985,12 +1082,19 @@ export default function Accounts(props) {
                     renderItem={({ item, index }) => {
                       return (
                         <TouchableOpacity
-                          onPress={() =>
-                            props.navigation.navigate('TransactionDetails', {
-                              item,
-                              serviceType,
-                              getServiceType: getServiceType,
-                            })
+                          onPress={() => {
+                              (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                              checkNShowHelperModal();
+                              setTimeout(() => {
+                                setTransactionItem(item);
+                              }, 10);
+                              
+                            }
+                            // props.navigation.navigate('TransactionDetails', {
+                            //   item,
+                            //   serviceType,
+                            //   getServiceType: getServiceType,
+                            // })
                           }
                           style={styles.transactionModalElementView}
                         >
@@ -1139,6 +1243,10 @@ export default function Accounts(props) {
               onPress={() => {
                 if (TestAccountHelperBottomSheet.current)
                   TestAccountHelperBottomSheet.current.snapTo(0);
+                if (RegularAccountHelperBottomSheet.current)
+                  RegularAccountHelperBottomSheet.current.snapTo(0);
+                if (SecureAccountHelperBottomSheet.current)
+                  SecureAccountHelperBottomSheet.current.snapTo(0);
               }}
             >
               <View style={{ marginTop: hp('2%') }}>
@@ -1362,6 +1470,31 @@ export default function Accounts(props) {
             ]}
             renderContent={renderRegularAccountsHelperContents}
             renderHeader={renderRegularAccountsHelperHeader}
+          />
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={TransactionDetailsBottomSheet}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('88%')
+                : hp('88%'),
+            ]}
+            renderContent={renderTransactionDetailsContents}
+            renderHeader={renderTransactionDetailsHeader}
+          />
+
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={TransactionDetailsHelperBottomSheet}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('35%')
+                : hp('40%'),
+            ]}
+            renderContent={renderHelperContents}
+            renderHeader={renderHelperHeader}
           />
         </View>
       ) : (
