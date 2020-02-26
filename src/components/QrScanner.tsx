@@ -20,10 +20,12 @@ import { RFValue } from 'react-native-responsive-fontsize';
 export default function QrScanner(props) {
   const title = props.navigation.getParam('title');
   const [cameraRef, setcameraRef] = useState(React.createRef());
+  const [openCameraFlag, setOpenCameraFlag] = useState(true)
   const [scanQRFlag, setScanQRFlag] = useState([RNCamera.Constants.BarCodeType.qr])
   const barcodeRecognized = async barcodes => {
     if (barcodes.data) {
       setScanQRFlag([]);
+      setOpenCameraFlag(false);
       props.navigation.state.params.scanedCode(
         getFormattedString(barcodes.data),
       );
@@ -103,6 +105,7 @@ export default function QrScanner(props) {
           marginTop: hp('3%'),
         }}
       >
+        { openCameraFlag ?
         <RNCamera
           ref={ref => {
             this.cameraRef = ref;
@@ -114,7 +117,7 @@ export default function QrScanner(props) {
           }}
           onBarCodeRead={barcode => barcodeRecognized(barcode)}
           captureAudio={false}
-        >
+        > 
           <View
             style={{
               flexDirection: 'row',
@@ -178,7 +181,7 @@ export default function QrScanner(props) {
               }}
             />
           </View>
-        </RNCamera>
+        </RNCamera> :  null }
       </View>
     </SafeAreaView>
   );
