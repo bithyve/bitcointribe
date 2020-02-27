@@ -330,7 +330,7 @@ export default function Home(props) {
       amount: '400,000',
       account: `Learn Bitcoin`,
       accountType: 'test',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
     {
       id: 2,
@@ -339,7 +339,7 @@ export default function Home(props) {
       amount: '60,000',
       account: 'Multi-factor security',
       accountType: 'secure',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
     {
       id: 3,
@@ -348,7 +348,7 @@ export default function Home(props) {
       amount: '5,000',
       account: 'Fast and easy',
       accountType: 'regular',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
     {
       id: 4,
@@ -2121,7 +2121,7 @@ export default function Home(props) {
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}
-                                    source={getCurrencyImageByRegion(CurrencyCode, "dark")}
+                                    source={getCurrencyImageByRegion(CurrencyCode, "light_blue")}
                                   />
                                 )}
                                 <Text
