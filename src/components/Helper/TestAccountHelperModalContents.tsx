@@ -10,10 +10,8 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 export default function TestAccountHelperModalContents(props) {
-  return (
-    <View style={styles.modalContainer}>
-      <ScrollView>
-        <View
+  const mainView = () =>{
+    return (<View
           style={{
             height: '100%',
             marginLeft: wp('8%'),
@@ -72,7 +70,19 @@ export default function TestAccountHelperModalContents(props) {
             </Text>
           </View>
         </View>
-      </ScrollView>
+    )
+  }
+  return (
+    <View style={styles.modalContainer}>
+      {
+        props.topButtonText == 'Receiving Bitcoins'?
+        (<ScrollView>
+          {mainView()}
+        </ScrollView>) : 
+        (<View>
+        {mainView()}
+        </View>)
+      }
       {/* <View
         style={{
           flexDirection: 'row',

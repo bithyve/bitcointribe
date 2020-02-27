@@ -28,7 +28,7 @@ import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
 import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-import TransactionDetails from '../pages/Accounts/TransactionDetails';
+//import TransactionDetails from '../pages/Accounts/TransactionDetails';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
@@ -102,6 +102,7 @@ const MODAL_ROUTES = [
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
   'Confirmation',
+  'TransactionDetails',
 ];
 
 const HomeNavigator = createStackNavigator(
@@ -125,8 +126,12 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    TransactionDetails,
-    Send,
+    Send: {
+      screen: Send,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     TwoFAToken,
     RecoveryRequestOTP,
     SettingManagePin,

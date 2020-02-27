@@ -25,9 +25,9 @@ export default function MoreHomePageTabContents( props ) {
         {
             title: 'Settings', image: require( '../assets/images/icons/settings.png' ), info: `Wallet settings and preferences`,
         },
-        {
-            title: `All accounts and funds`, image: require( '../assets/images/icons/accounts.png' ), info: `View and manage all accounts and funds`,
-        },
+        // {
+        //     title: `All accounts and funds`, image: require( '../assets/images/icons/accounts.png' ), info: `View and manage all accounts and funds`,
+        // },
     ] )
 
     const openLink = (url) =>{
@@ -41,8 +41,7 @@ export default function MoreHomePageTabContents( props ) {
     }
 
     return ( <View style={ { ...styles.modalContentContainer, height: '100%', } }>
-        <View style={ { height: '100%', paddingBottom: hp( '10%' ) } }>
-            <View>
+        <View>
                 <FlatList
                     data={ addData }
                     ItemSeparatorComponent={ () => <View style={ { backgroundColor: Colors.white } }><View style={ styles.separatorView } /></View> }
@@ -74,7 +73,8 @@ export default function MoreHomePageTabContents( props ) {
                 marginRight: 10,
                 paddingLeft: 10,
                 paddingRight: 10,
-                marginTop: hp( '1%' )
+                marginTop: 'auto',
+                marginBottom: hp('14%')
             } }>
                 <AppBottomSheetTouchableWrapper onPress={ () => openLink("http://hexawallet.io/faq") }>
                 <Text style={ styles.addModalTitleText }>FAQs</Text>
@@ -93,7 +93,6 @@ export default function MoreHomePageTabContents( props ) {
                 </AppBottomSheetTouchableWrapper>
             </View>
         </View>
-    </View>
     )
 }
 
