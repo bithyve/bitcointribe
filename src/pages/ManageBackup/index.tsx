@@ -1259,8 +1259,8 @@ export default function ManageBackup(props) {
                   lineHeight: 13, //... One for top and one for bottom alignment
                 }}
               >
-                {item.personalInfo && item.personalInfo.name
-                  ? nameToInitials(item.personalInfo.name)
+                {item.personalInfo 
+                  ? nameToInitials(item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.firstName+' '+item.personalInfo.lastName : item.personalInfo.firstName && !item.personalInfo.lastName ? item.personalInfo.firstName : !item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.lastName : "")
                   : ''}
               </Text>
             </View>
@@ -1480,10 +1480,10 @@ export default function ManageBackup(props) {
                       {getImageIcon(item)}
                       <View style={{ marginLeft: 15 }}>
                         <Text style={styles.cardTitleText}>
-                          {item.personalInfo &&
-                          (item.type == 'contact1' || item.type == 'contact2')
-                            ? item.personalInfo.name
-                            : item.title}
+                        {item.personalInfo &&
+                      (item.type == 'contact1' || item.type == 'contact2')
+                        ? item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.firstName+' '+item.personalInfo.lastName : item.personalInfo.firstName && !item.personalInfo.lastName ? item.personalInfo.firstName : !item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.lastName : ""
+                        : item.title}
                         </Text>
                         <Text style={styles.cardTimeText}>
                           Last backup{' '}

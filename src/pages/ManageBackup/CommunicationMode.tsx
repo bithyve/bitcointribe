@@ -29,14 +29,6 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function CommunicationMode(props) {
-  // const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  // const secretSharedTrustedContact1 = props.secretSharedTrustedContact1
-  //   ? props.secretSharedTrustedContact1
-  //   : null;
-  // const secretSharedTrustedContact2 = props.secretSharedTrustedContact2
-  //   ? props.secretSharedTrustedContact2
-  //   : null;
-
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
@@ -47,65 +39,13 @@ export default function CommunicationMode(props) {
   if (contact.emails) communicationInfo.push(...contact.emails);
   const [Contact, setContact] = useState({});
   const [selectedContactMode, setSelectedContactMode] = useState();
-  const [contactInfo, setContactInfo] = useState(
-    communicationInfo.map(({ number, email }, index) => {
-      if (number || email) {
-        return {
-          id: index,
-          info: number || email,
-          isSelected: false,
-          type: number ? 'number' : 'email',
-        };
-      }
-    }),
-  );
+  const [contactInfo, setContactInfo] = useState([]);
+  
+
 
   useEffect(() => {
     setContact(contact);
-  });
-
-  useEffect(() => {
-    updateNewContactInfo();
-  }, [Contact]);
-
-  const updateNewContactInfo = () => {
-    let communicationInfo = [];
-    if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
-    if (contact.emails) communicationInfo.push(...contact.emails);
-
-    if (
-      contactInfo.length == 0 ||
-      (contactInfo.length > 0 &&
-        communicationInfo.findIndex(
-          value =>
-            value.email == contactInfo[0].info ||
-            value.number == contactInfo[0].info,
-        ) == -1)
-    ) {
-      let contactInfoTemp = communicationInfo.map(
-        ({ number, email }, index) => {
-          if (number || email) {
-            return {
-              id: index,
-              info: number || email,
-              isSelected: false,
-              type: number ? 'number' : 'email',
-            };
-          }
-        },
-      );
-      contactInfoTemp.push({
-        id: contactInfoTemp.length,
-        info: 'Qr code',
-        isSelected: false,
-        type: 'qrcode',
-      });
-
-      setTimeout(() => {
-        setContactInfo(contactInfoTemp);
-      }, 2);
-    }
-  };
+  }, [contact]);
 
   const getIconByStatus = status => {
     if (status == 'Ugly') {
@@ -133,7 +73,6 @@ export default function CommunicationMode(props) {
         }
       }),
     ]);
-    // contactInfo[index].isSelected would become true during the next render cycle (batched state updates)
     if (!contactInfo[index].isSelected) {
       setSelectedContactMode({ ...contactInfo[index], isSelected: true });
     } else {
@@ -158,12 +97,6 @@ export default function CommunicationMode(props) {
     switch (selectedContactMode.type) {
       case 'number':
         textWithoutEncoding(selectedContactMode.info, deepLink);
-        // if (secretSharedTrustedContact1) {
-        //   secretSharedTrustedContact1(true);
-        // }
-        // if (secretSharedTrustedContact2) {
-        //   secretSharedTrustedContact2(true);
-        // }
         break;
 
       case 'email':
@@ -174,12 +107,6 @@ export default function CommunicationMode(props) {
           'Guardian request',
           deepLink,
         );
-        // if (secretSharedTrustedContact1) {
-        //   secretSharedTrustedContact1(true);
-        // }
-        // if (secretSharedTrustedContact2) {
-        //   secretSharedTrustedContact2(true);
-        // }
         break;
     }
     props.onPressContinue(
@@ -189,10 +116,6 @@ export default function CommunicationMode(props) {
       index,
       selectedContactMode,
     );
-    // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
-    //   OTP:'123456'
-    //   // OTP: SHARES_TRANSFER_DETAILS[index].OTP,
-    // });
   };
 
   const { loading } = useSelector(state => state.sss);
@@ -204,73 +127,74 @@ export default function CommunicationMode(props) {
     )
       dispatch(uploadEncMShare(index));
     else {
-      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      console.log(SHARES_TRANSFER_DETAILS[index]);
     }
   }, [SHARES_TRANSFER_DETAILS[index]]);
 
   const editContact = () => {
-    let contactId = contact.id;
-    // ExpoContacts.presentFormAsync(contactId).then(() => {
-    //       console.log("DATA");
-    // })
     var newPerson = {
-      recordID: contact.id ? contact.id : '',
-      emailAddresses: contact.emails ? contact.emails : [],
-      familyName: contact.lastName ? contact.lastName : '',
-      givenName: contact.firstName ? contact.firstName : '',
-      middleName: contact.middleName ? contact.middleName : '',
-      phoneNumbers: contact.phoneNumbers ? contact.phoneNumbers : [],
+      recordID: Contact.id ? Contact.id : '',
+      emailAddresses: Contact.emails ? Contact.emails : [],
+      familyName: Contact.lastName ? Contact.lastName : '',
+      givenName: Contact.firstName ? Contact.firstName : '',
+      middleName: Contact.middleName ? Contact.middleName : '',
+      phoneNumbers: Contact.phoneNumbers ? Contact.phoneNumbers : [],
     };
 
-    Contacts.openExistingContact(newPerson, async (err, contact) => {
+    Contacts.openExistingContact(newPerson, async(err, contact) => {
       if (err) return;
-      // console.log('contact editContact', contact);
-      if (contact) {
-        let contactListArray = [];
-        const contactList = JSON.parse(
-          await AsyncStorage.getItem('SelectedContacts'),
-        );
-        if (contactList) {
-          contactListArray = contactList;
-          for (let i = 0; i < contactListArray.length; i++) {
-            if (contact.recordID == contactListArray[i].id) {
-              (contactListArray[i].id = contact.recordID
-                ? contact.recordID
-                : ''),
-                (contactListArray[i].emails = contact.emailAddresses
-                  ? contact.emailAddresses
-                  : ''),
-                (contactListArray[i].lastName = contact.familyName
-                  ? contact.familyName
-                  : ''),
-                (contactListArray[i].firstName = contact.givenName
-                  ? contact.givenName
-                  : ''),
-                (contactListArray[i].middleName = contact.middleName
-                  ? contact.middleName
-                  : ''),
-                (contactListArray[i].phoneNumbers = contact.phoneNumbers
-                  ? contact.phoneNumbers
-                  : ''),
-                (contactListArray[i].imageAvailable = contact.hasThumbnail
-                  ? contact.hasThumbnail
-                  : ''),
-                (contactListArray[i].image = contact.thumbnailPath
-                  ? contact.thumbnailPath
-                  : ''),
-                (contactListArray[i].name = contact.givenName
-                  ? contact.givenName
-                  : '' + contact.familyName
-                  ? contact.familyName
-                  : ''),
-                setContact(contactListArray[i]);
-              //await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray[i]));
-            }
+      if (Contact.id && contact) {
+        let ContactTemp = Contact; 
+        ContactTemp.emails = contact.emailAddresses ? contact.emailAddresses : [];
+        ContactTemp.lastName = contact.familyName ? contact.familyName : '';
+        ContactTemp.firstName = contact.givenName ? contact.givenName : '';
+        ContactTemp.middleName = contact.middleName ? contact.middleName : '';
+        ContactTemp.phoneNumbers = contact.phoneNumbers ? contact.phoneNumbers : [];
+        ContactTemp.imageAvailable = contact.hasThumbnail ? contact.hasThumbnail : '';
+        ContactTemp.image = contact.thumbnailPath ? contact.thumbnailPath : '';
+        setContact(ContactTemp);
+        updateNewContactInfo();
+        let selectedContactsAsync = JSON.parse(await AsyncStorage.getItem("SelectedContacts"));
+        if(selectedContactsAsync){
+          if(index == 1){
+            selectedContactsAsync[0] = ContactTemp;
           }
+          else if(index == 2){
+            selectedContactsAsync[1] = ContactTemp;
+          }
+          await AsyncStorage.setItem("SelectedContacts", JSON.stringify(selectedContactsAsync));
         }
+        props.onContactUpdate(ContactTemp);
       }
     });
+  };
+
+  useEffect(() => {
+    updateNewContactInfo();
+  }, [Contact]);
+
+  const updateNewContactInfo = () => {
+    let communicationInfo = [];
+    if (Contact.phoneNumbers) communicationInfo.push(...Contact.phoneNumbers);
+    if (Contact.emails) communicationInfo.push(...Contact.emails);
+    let contactInfoTemp = communicationInfo.map(
+      ({ number, email }, index) => {
+        if (number || email) {
+          return {
+            id: index,
+            info: number || email,
+            isSelected: false,
+            type: number ? 'number' : 'email',
+          };
+        }
+      },
+    );
+    contactInfoTemp.push({
+      id: contactInfoTemp.length,
+      info: 'Qr code',
+      isSelected: false,
+      type: 'qrcode',
+    });
+    setContactInfo(contactInfoTemp);
   };
 
   return (
@@ -342,7 +266,7 @@ export default function CommunicationMode(props) {
                 borderRadius: 10,
               }}
             >
-              <Text style={styles.contactNameText}>{contact.name}</Text>
+              <Text style={styles.contactNameText}>{Contact.firstName && Contact.lastName ? Contact.firstName+' '+Contact.lastName : Contact.firstName && !Contact.lastName ? Contact.firstName : !Contact.firstName && Contact.lastName ? Contact.lastName : "" }</Text>
             </View>
             <View
               style={{
@@ -374,11 +298,11 @@ export default function CommunicationMode(props) {
                   <Text
                     style={{
                       textAlign: 'center',
-                      fontSize: 13,
-                      lineHeight: 13, //... One for top and one for bottom alignment
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
                     }}
                   >
-                    {contact.name ? nameToInitials(contact.name) : ''}
+                    {nameToInitials(Contact.firstName && Contact.lastName ? Contact.firstName+' '+Contact.lastName : Contact.firstName && !Contact.lastName ? Contact.firstName : !Contact.firstName && Contact.lastName ? Contact.lastName : "")}
                   </Text>
                 </View>
               )}
