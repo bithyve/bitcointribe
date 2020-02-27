@@ -31,20 +31,13 @@ import {
 
 export default function TransactionDetails(props) {
   const txDetails = props.item;
-  const getServiceType = props.getServiceType
-    ? props.getServiceType
-    : null;
-  const serviceType = props.serviceType
-    ? props.serviceType
-    : null;
-console.log("txDetails", txDetails, getServiceType, serviceType);
+  const getServiceType = props.getServiceType ? props.getServiceType : null;
+  const serviceType = props.serviceType ? props.serviceType : null;
   return (
-          <View style={styles.modalContainer}>
-          <View style={styles.modalHeaderTitleView}>
-            <View
-              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-            >
-              {/* <TouchableOpacity
+    <View style={styles.modalContainer}>
+      <View style={styles.modalHeaderTitleView}>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+          {/* <TouchableOpacity
                 onPress={() => {
                   if (getServiceType && serviceType) {
                     getServiceType(serviceType);
@@ -59,253 +52,260 @@ console.log("txDetails", txDetails, getServiceType, serviceType);
                   size={17}
                 />
               </TouchableOpacity> */}
-              <Text style={styles.modalHeaderTitleText}>
-                {'Transaction Details'}
-              </Text>
-              {serviceType && serviceType == TEST_ACCOUNT ? (
-                <Text
-                  onPress={() => props.onPressKnowMore()}
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12),
-                    marginLeft: 'auto',
-                  }}
-                >
-                  Know more
-                </Text>
-              ) : null}
-            </View>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: hp('2%'),
-              marginRight: hp('2%'),
-              alignItems: 'center',
-              paddingTop: hp('2%'),
-              paddingBottom: hp('2%'),
-            }}
-          >
-            <View>
-              <Image
-                source={require('../../assets/images/icons/icon_regular.png')}
-                style={{ width: wp('12%'), height: wp('12%') }}
-              />
-            </View>
-            <View
+          <Text style={styles.modalHeaderTitleText}>
+            {'Transaction Details'}
+          </Text>
+          {serviceType && serviceType == TEST_ACCOUNT ? (
+            <Text
+              onPress={() => props.onPressKnowMore()}
               style={{
-                flex: 1,
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginLeft: 10,
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                marginLeft: 'auto',
               }}
             >
-              <View>
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(14),
-                  }}
-                >
-                  {txDetails.accountType}
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                    marginTop: hp('1%'),
-                  }}
-                >
-                  {moment(txDetails.date)
-                    .utc()
-                    .format('DD MMMM YYYY')}
-                  {/* <Entypo
+              Know more
+            </Text>
+          ) : null}
+        </View>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginLeft: hp('2%'),
+          marginRight: hp('2%'),
+          alignItems: 'center',
+          paddingTop: hp('2%'),
+          paddingBottom: hp('2%'),
+        }}
+      >
+        <View>
+          <Image
+            source={require('../../assets/images/icons/icon_regular.png')}
+            style={{ width: wp('12%'), height: wp('12%') }}
+          />
+        </View>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 10,
+          }}
+        >
+          <View>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(14),
+              }}
+            >
+              {txDetails.accountType}
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginTop: hp('1%'),
+              }}
+            >
+              {moment(txDetails.date)
+                .utc()
+                .format('DD MMMM YYYY')}
+              {/* <Entypo
                 size={10}
                 name={"dot-single"}
                 color={Colors.textColorGrey}
               />{" "}
               11:00am */}
-                </Text>
-              </View>
-              <FontAwesome
-                style={{ marginLeft: 'auto' }}
-                name="long-arrow-down"
-                color={Colors.green}
-                size={17}
-              />
-            </View>
+            </Text>
           </View>
-          <View style={{ flex: 1 }}>
-            <View style={styles.infoCardView}>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                }}
-              >
-                Amount
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: hp('0.5%'),
-                }}
-              >
-                <Image
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                  style={{
-                    width: wp('3%'),
-                    height: wp('3%'),
-                    resizeMode: 'contain',
-                  }}
-                />
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                    marginLeft: 3,
-                  }}
-                >
-                  {UsNumberFormat(txDetails.amount)}
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                    marginLeft: 3,
-                  }}
-                >
-                  {txDetails.accountType == 'Test Account'
-                    ? ' t-sats'
-                    : ' sats'}
-                </Text>
-              </View>
-            </View>
-            {txDetails.recipientAddresses ? (
-              <View style={styles.infoCardView}>
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                  }}
-                >
-                  To Address
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                    marginTop: hp('0.5%'),
-                  }}
-                >
-                  {txDetails.recipientAddresses[0]}
-                </Text>
-              </View>
-            ) : null}
-            {txDetails.senderAddresses ? (
-              <View style={styles.infoCardView}>
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                  }}
-                >
-                  From Address
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(12),
-                    marginTop: hp('0.5%'),
-                  }}
-                >
-                  {txDetails.senderAddresses[0]}
-                </Text>
-              </View>
-            ) : null}
-            <View style={styles.infoCardView}>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                }}
-              >
-                Fees
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginTop: hp('0.5%'),
-                }}
-              >
-                {UsNumberFormat(txDetails.fee)}
-              </Text>
-            </View>
-            <View style={styles.infoCardView}>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                }}
-              >
-                Transaction ID
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginTop: hp('0.5%'),
-                }}
-              >
-                {txDetails.txid}
-              </Text>
-            </View>
-            <View style={styles.infoCardView}>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                }}
-              >
-                Confirmations
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginTop: hp('0.5%'),
-                }}
-              >
-                {txDetails.confirmations < 6 ? txDetails.confirmations : '6+'}
-              </Text>
-            </View>
+          <FontAwesome
+            style={{ marginLeft: 'auto' }}
+            name={
+              txDetails.transactionType == 'Received'
+                ? 'long-arrow-down'
+                : 'long-arrow-up'
+            }
+            color={
+              txDetails.transactionType == 'Received'
+                ? Colors.green
+                : Colors.red
+            }
+            size={17}
+          />
+        </View>
+      </View>
+      <View style={{ flex: 1 }}>
+        <View style={styles.infoCardView}>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+            }}
+          >
+            Amount
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: hp('0.5%'),
+            }}
+          >
+            <Image
+              source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+              style={{
+                width: wp('3%'),
+                height: wp('3%'),
+                resizeMode: 'contain',
+              }}
+            />
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginLeft: 3,
+              }}
+            >
+              {UsNumberFormat(txDetails.amount)}
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginLeft: 3,
+              }}
+            >
+              {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
+            </Text>
           </View>
         </View>
+        {txDetails.recipientAddresses ? (
+          <View style={styles.infoCardView}>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              To Address
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginTop: hp('0.5%'),
+              }}
+            >
+              {txDetails.recipientAddresses[0]}
+            </Text>
+          </View>
+        ) : null}
+        {txDetails.senderAddresses ? (
+          <View style={styles.infoCardView}>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              From Address
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginTop: hp('0.5%'),
+              }}
+            >
+              {txDetails.senderAddresses[0]}
+            </Text>
+          </View>
+        ) : null}
+        <View style={styles.infoCardView}>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+            }}
+          >
+            Fees
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+              marginTop: hp('0.5%'),
+            }}
+          >
+            {UsNumberFormat(txDetails.fee)}{' '}
+            {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
+          </Text>
+        </View>
+        <View style={styles.infoCardView}>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+            }}
+          >
+            Transaction ID
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+              marginTop: hp('0.5%'),
+            }}
+          >
+            {txDetails.txid}
+          </Text>
+        </View>
+        <View style={styles.infoCardView}>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+            }}
+          >
+            Confirmations
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(12),
+              marginTop: hp('0.5%'),
+            }}
+          >
+            {txDetails.confirmations < 6 ? txDetails.confirmations : '6+'}
+          </Text>
+        </View>
+      </View>
+    </View>
   );
 }
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
-        alignSelf: 'center',
-        width: '100%'
+    alignSelf: 'center',
+    width: '100%',
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
