@@ -1375,10 +1375,7 @@ export default function ManageBackup(props) {
               {pageData.map((item, index) => {
                 return (
                   <View
-                    style={{
-                      opacity:
-                        !selectedType || item.type == selectedType ? 1 : 0.5,
-                    }}
+                    style={{}}
                   >
                     <TouchableOpacity
                       onPress={() => {
@@ -1619,7 +1616,8 @@ export default function ManageBackup(props) {
                   fontSize: RFValue(12),
                 }}
               >
-                Next Step
+                {(autoHighlightFlags.secondaryDevice && autoHighlightFlags.trustedContact1 && autoHighlightFlags.trustedContact2 && autoHighlightFlags.personalCopy1 &&autoHighlightFlags.personalCopy2 && autoHighlightFlags.securityAns) ? 'Confirm Shares'
+            :'Complete Setup' }
               </Text>
             </TouchableOpacity>
           </View>
