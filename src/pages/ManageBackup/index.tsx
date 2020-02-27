@@ -11,7 +11,7 @@ import {
   Platform,
   RefreshControl,
   AsyncStorage,
-  InteractionManager
+  InteractionManager,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Fonts from '../../common/Fonts';
@@ -789,7 +789,7 @@ export default function ManageBackup(props) {
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
-  });
+    });
     let focusListener = props.navigation.addListener('didFocus', () => {
       setContactsFromAsync();
       // setAutoHighlightFlagsFromAsync();
@@ -1312,321 +1312,326 @@ export default function ManageBackup(props) {
             />
           </TouchableOpacity>
         </View>
-        { is_initiated ?
-        <View style={{flex:1}}>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={healthLoading}
-              onRefresh={() => {
-                dispatch(checkMSharesHealth());
-              }}
-            />
-          }
-        >
-          <View style={{ flexDirection: 'row', marginTop: 10 }}>
-            <View style={{ flex: 2 }}>
-              <Text style={{ ...CommonStyles.headerTitles, marginLeft: 25 }}>
-                Manage Backup
-              </Text>
-              <Text
-                style={{ ...CommonStyles.headerTitlesInfoText, marginLeft: 25 }}
-              >
-                The wallet backup is not secured. Please complete the setup to
-                safeguard against loss of funds
-              </Text>
-              <KnowMoreButton
-                onpress={() => {
-                  (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(1);
-                }}
-                containerStyle={{ marginTop: 10, marginLeft: 25 }}
-                textStyle={{}}
-              />
-            </View>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              {overallHealth ? (
-                <HomePageShield
-                  circleShadowColor={Colors.borderColor}
-                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                  shieldStatus={overallHealth.overallStatus}
-                />
-              ) : (
-                <HomePageShield
-                  circleShadowColor={Colors.borderColor}
-                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                  shieldStatus={0}
-                />
-              )}
-            </View>
-          </View>
-          {pageData.map((item, index) => {
-            return (
-              <View
-                style={{
-                  opacity: !selectedType || item.type == selectedType ? 1 : 0.5,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    if (item.type == 'secondaryDevice') {
-                      props.navigation.navigate('SecondaryDeviceHistory', {
-                        selectedStatus: item.status,
-                        selectedTime: getTime(item.time),
-                        selectedTitle: item.title,
-                        updateAutoHighlightFlags: () =>
-                          setAutoHighlightFlags({
-                            ...autoHighlightFlags,
-                            secondaryDevice: true,
-                          }),
-                      });
-                    } else if (item.type == 'contact1') {
-                      props.navigation.navigate('TrustedContactHistory', {
-                        selectedStatus: item.status,
-                        selectedTime: getTime(item.time),
-                        selectedTitle: item.title,
-                        updateAutoHighlightFlags: () =>
-                          setAutoHighlightFlags({
-                            ...autoHighlightFlags,
-                            trustedContact1: true,
-                          }),
-                        activateReshare: autoHighlightFlags.trustedContact1,
-                      });
-                    } else if (item.type == 'contact2') {
-                      props.navigation.navigate('TrustedContactHistory', {
-                        selectedStatus: item.status,
-                        selectedTime: getTime(item.time),
-                        selectedTitle: item.title,
-                        updateAutoHighlightFlags: () =>
-                          setAutoHighlightFlags({
-                            ...autoHighlightFlags,
-                            trustedContact2: true,
-                          }),
-                        activateReshare: autoHighlightFlags.trustedContact2,
-                      });
-                    } else if (item.type === 'copy1') {
-                      props.navigation.navigate('PersonalCopyHistory', {
-                        selectedStatus: item.status,
-                        selectedTime: getTime(item.time),
-                        selectedTitle: item.title,
-                        selectedPersonalCopy: item,
-                        updateAutoHighlightFlags: () =>
-                          setAutoHighlightFlags({
-                            ...autoHighlightFlags,
-                            personalCopy1: true,
-                          }),
-                      });
-                    } else if (item.type == 'copy2') {
-                      props.navigation.navigate('PersonalCopyHistory', {
-                        selectedStatus: item.status,
-                        selectedTime: getTime(item.time),
-                        selectedTitle: item.title,
-                        selectedPersonalCopy: item,
-                        updateAutoHighlightFlags: () =>
-                          setAutoHighlightFlags({
-                            ...autoHighlightFlags,
-                            personalCopy2: true,
-                          }),
-                      });
-                    } else if (item.type == 'security') {
-                      props.navigation.navigate('SecurityQuestionHistory', {
-                        selectedStatus: item.status,
-                        selectedTime: getTime(item.time),
-                        selectedTitle: item.title,
-                        updateAutoHighlightFlags: () =>
-                          setAutoHighlightFlags({
-                            ...autoHighlightFlags,
-                            securityAns: true,
-                          }),
-                      });
-                    }
+        {is_initiated ? (
+          <View style={{ flex: 1 }}>
+            <ScrollView
+              refreshControl={
+                <RefreshControl
+                  refreshing={healthLoading}
+                  onRefresh={() => {
+                    dispatch(checkMSharesHealth());
                   }}
+                />
+              }
+            >
+              <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                <View style={{ flex: 2 }}>
+                  <Text
+                    style={{ ...CommonStyles.headerTitles, marginLeft: 25 }}
+                  >
+                    Manage Backup
+                  </Text>
+                  <Text
+                    style={{
+                      ...CommonStyles.headerTitlesInfoText,
+                      marginLeft: 25,
+                    }}
+                  >
+                    The wallet backup is not secured. Please complete the setup
+                    to safeguard against loss of funds
+                  </Text>
+                  <KnowMoreButton
+                    onpress={() => {
+                      (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(
+                        1,
+                      );
+                    }}
+                    containerStyle={{ marginTop: 10, marginLeft: 25 }}
+                    textStyle={{}}
+                  />
+                </View>
+                <View
                   style={{
-                    ...styles.manageBackupCard,
-                    borderColor:
-                      item.status == 'Ugly'
-                        ? Colors.red
-                        : item.status == 'Bad'
-                        ? Colors.yellow
-                        : item.status == 'Good'
-                        ? Colors.green
-                        : Colors.blue,
-                    elevation:
-                      selectedType && item.type == selectedType ? 10 : 0,
-                    shadowColor:
-                      selectedType && item.type == selectedType
-                        ? Colors.borderColor
-                        : Colors.white,
-                    shadowOpacity:
-                      selectedType && item.type == selectedType ? 10 : 0,
-                    shadowOffset:
-                      selectedType && item.type == selectedType
-                        ? { width: 0, height: 10 }
-                        : { width: 0, height: 0 },
-                    shadowRadius:
-                      selectedType && item.type == selectedType ? 10 : 0,
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
                 >
-                  {getImageIcon(item)}
-                  <View style={{ marginLeft: 15 }}>
-                    <Text style={styles.cardTitleText}>
-                      {item.personalInfo &&
-                      (item.type == 'contact1' || item.type == 'contact2')
-                        ? item.personalInfo.name
-                        : item.title}
-                    </Text>
-                    <Text style={styles.cardTimeText}>
-                      Last backup{' '}
-                      <Text
-                        style={{
-                          fontFamily: Fonts.FiraSansMediumItalic,
-                          fontWeight: 'bold',
-                          fontStyle: 'italic',
-                        }}
-                      >
-                        {getTime(item.time)}
-                      </Text>
-                    </Text>
-                  </View>
-                  <Image
-                    style={styles.cardIconImage}
-                    source={getStatusIcon(item)}
-                  />
-                </TouchableOpacity>
+                  {overallHealth ? (
+                    <HomePageShield
+                      circleShadowColor={Colors.borderColor}
+                      shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                      shieldStatus={overallHealth.overallStatus}
+                    />
+                  ) : (
+                    <HomePageShield
+                      circleShadowColor={Colors.borderColor}
+                      shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                      shieldStatus={0}
+                    />
+                  )}
+                </View>
               </View>
-            );
-          })}
-        </ScrollView>
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={WalletBackupAndRecoveryBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('89%')
-              : hp('89%'),
-          ]}
-          renderContent={renderWalletBackupAndRecoveryContents}
-          renderHeader={renderWalletBackupAndRecoveryHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={RegenerateShareHelperBottomSheet as any}
-          snapPoints={[-50, hp('95%')]}
-          renderContent={renderRegenerateShareHelperContents}
-          renderHeader={renderRegenerateShareHelperHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={PersonalCopyQRScannerBottomSheet as any}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderPersonalCopyConfirmModalContent}
-          renderHeader={renderPersonalCopyConfirmModalHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SecondaryDeviceHistoryBottomSheet as any}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderSecondaryDeviceHistoryContent}
-          renderHeader={renderSecondaryDeviceHistoryHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={PersonalCopyHistoryBottomSheet as any}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderPersonalCopyHistoryContent}
-          renderHeader={renderPersonalCopyHistoryHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SecurityQuestionHistoryBottomSheet as any}
-          snapPoints={[-30, hp('90%')]}
-          renderContent={renderSecurityQuestionHistoryContent}
-          renderHeader={renderSecurityQuestionHistoryHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ChangeBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('37%')
-              : hp('45%'),
-          ]}
-          renderContent={renderChangeContent}
-          renderHeader={renderChangeHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ReshareBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('37%')
-              : hp('45%'),
-          ]}
-          renderContent={renderReshareContent}
-          renderHeader={renderReshareHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ConfirmBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('37%')
-              : hp('45%'),
-          ]}
-          renderContent={renderConfirmContent}
-          renderHeader={renderConfirmHeader}
-        />
-        <TouchableOpacity
-          disabled={isNextStepDisable}
-          onPress={() => nextStep()}
-          style={{
-            height: wp('10%'),
-            width: wp('30%'),
-            backgroundColor: Colors.blue,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 5,
-            marginLeft: 'auto',
-            margin: 15,
-            position: 'absolute',
-            bottom: 0,
-            marginBottom: 20,
-            left: wp('65%'),
-            marginRight: 20,
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.white,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(12),
+              {pageData.map((item, index) => {
+                return (
+                  <View
+                    style={{
+                      opacity:
+                        !selectedType || item.type == selectedType ? 1 : 0.5,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        if (item.type == 'secondaryDevice') {
+                          props.navigation.navigate('SecondaryDeviceHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime(item.time),
+                            selectedTitle: item.title,
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags({
+                                ...autoHighlightFlags,
+                                secondaryDevice: true,
+                              }),
+                          });
+                        } else if (item.type == 'contact1') {
+                          props.navigation.navigate('TrustedContactHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime(item.time),
+                            selectedTitle: item.title,
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags({
+                                ...autoHighlightFlags,
+                                trustedContact1: true,
+                              }),
+                            activateReshare: autoHighlightFlags.trustedContact1,
+                          });
+                        } else if (item.type == 'contact2') {
+                          props.navigation.navigate('TrustedContactHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime(item.time),
+                            selectedTitle: item.title,
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags({
+                                ...autoHighlightFlags,
+                                trustedContact2: true,
+                              }),
+                            activateReshare: autoHighlightFlags.trustedContact2,
+                          });
+                        } else if (item.type === 'copy1') {
+                          props.navigation.navigate('PersonalCopyHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime(item.time),
+                            selectedTitle: item.title,
+                            selectedPersonalCopy: item,
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags({
+                                ...autoHighlightFlags,
+                                personalCopy1: true,
+                              }),
+                          });
+                        } else if (item.type == 'copy2') {
+                          props.navigation.navigate('PersonalCopyHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime(item.time),
+                            selectedTitle: item.title,
+                            selectedPersonalCopy: item,
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags({
+                                ...autoHighlightFlags,
+                                personalCopy2: true,
+                              }),
+                          });
+                        } else if (item.type == 'security') {
+                          props.navigation.navigate('SecurityQuestionHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime(item.time),
+                            selectedTitle: item.title,
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags({
+                                ...autoHighlightFlags,
+                                securityAns: true,
+                              }),
+                          });
+                        }
+                      }}
+                      style={{
+                        ...styles.manageBackupCard,
+                        borderColor:
+                          item.status == 'Ugly'
+                            ? Colors.red
+                            : item.status == 'Bad'
+                            ? Colors.yellow
+                            : item.status == 'Good'
+                            ? Colors.green
+                            : Colors.blue,
+                        elevation:
+                          selectedType && item.type == selectedType ? 10 : 0,
+                        shadowColor:
+                          selectedType && item.type == selectedType
+                            ? Colors.borderColor
+                            : Colors.white,
+                        shadowOpacity:
+                          selectedType && item.type == selectedType ? 10 : 0,
+                        shadowOffset:
+                          selectedType && item.type == selectedType
+                            ? { width: 0, height: 10 }
+                            : { width: 0, height: 0 },
+                        shadowRadius:
+                          selectedType && item.type == selectedType ? 10 : 0,
+                      }}
+                    >
+                      {getImageIcon(item)}
+                      <View style={{ marginLeft: 15 }}>
+                        <Text style={styles.cardTitleText}>
+                          {item.personalInfo &&
+                          (item.type == 'contact1' || item.type == 'contact2')
+                            ? item.personalInfo.name
+                            : item.title}
+                        </Text>
+                        <Text style={styles.cardTimeText}>
+                          Last backup{' '}
+                          <Text
+                            style={{
+                              fontFamily: Fonts.FiraSansMediumItalic,
+                              fontWeight: 'bold',
+                              fontStyle: 'italic',
+                            }}
+                          >
+                            {getTime(item.time)}
+                          </Text>
+                        </Text>
+                      </View>
+                      <Image
+                        style={styles.cardIconImage}
+                        source={getStatusIcon(item)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={WalletBackupAndRecoveryBottomSheet as any}
+              snapPoints={[
+                -50,
+                Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                  ? hp('89%')
+                  : hp('89%'),
+              ]}
+              renderContent={renderWalletBackupAndRecoveryContents}
+              renderHeader={renderWalletBackupAndRecoveryHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={RegenerateShareHelperBottomSheet as any}
+              snapPoints={[-50, hp('95%')]}
+              renderContent={renderRegenerateShareHelperContents}
+              renderHeader={renderRegenerateShareHelperHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={PersonalCopyQRScannerBottomSheet as any}
+              snapPoints={[-30, hp('90%')]}
+              renderContent={renderPersonalCopyConfirmModalContent}
+              renderHeader={renderPersonalCopyConfirmModalHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={SecondaryDeviceHistoryBottomSheet as any}
+              snapPoints={[-30, hp('90%')]}
+              renderContent={renderSecondaryDeviceHistoryContent}
+              renderHeader={renderSecondaryDeviceHistoryHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={PersonalCopyHistoryBottomSheet as any}
+              snapPoints={[-30, hp('90%')]}
+              renderContent={renderPersonalCopyHistoryContent}
+              renderHeader={renderPersonalCopyHistoryHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={SecurityQuestionHistoryBottomSheet as any}
+              snapPoints={[-30, hp('90%')]}
+              renderContent={renderSecurityQuestionHistoryContent}
+              renderHeader={renderSecurityQuestionHistoryHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={ChangeBottomSheet as any}
+              snapPoints={[
+                -50,
+                Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                  ? hp('37%')
+                  : hp('45%'),
+              ]}
+              renderContent={renderChangeContent}
+              renderHeader={renderChangeHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={ReshareBottomSheet as any}
+              snapPoints={[
+                -50,
+                Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                  ? hp('37%')
+                  : hp('45%'),
+              ]}
+              renderContent={renderReshareContent}
+              renderHeader={renderReshareHeader}
+            />
+            <BottomSheet
+              enabledInnerScrolling={true}
+              ref={ConfirmBottomSheet as any}
+              snapPoints={[
+                -50,
+                Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                  ? hp('37%')
+                  : hp('45%'),
+              ]}
+              renderContent={renderConfirmContent}
+              renderHeader={renderConfirmHeader}
+            />
+            <TouchableOpacity
+              disabled={isNextStepDisable}
+              onPress={() => nextStep()}
+              style={{
+                height: wp('10%'),
+                width: wp('30%'),
+                backgroundColor: Colors.blue,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 5,
+                marginLeft: 'auto',
+                margin: 15,
+                position: 'absolute',
+                bottom: 0,
+                marginBottom: 20,
+                left: wp('65%'),
+                marginRight: 20,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                }}
+              >
+                Next Step
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
             }}
-          >
-            Next Step
-          </Text>
-        </TouchableOpacity>
+            refreshControl={<RefreshControl refreshing={!is_initiated} />}
+          />
+        )}
       </View>
-       
-       : <ScrollView
-           contentContainerStyle={{
-             backgroundColor: Colors.backgroundColor,
-           }}
-           refreshControl={
-             <RefreshControl
-               refreshing={!is_initiated}
-             />
-           }
-         /> }
-    </View>
     </View>
   );
 }
