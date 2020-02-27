@@ -183,7 +183,6 @@ export default function NewWalletQuestion(props) {
           ? balances.balance + balances.unconfirmedBalance
           : 0;
         if (!netBalance) {
-          console.log('Getting Testcoins');
           dispatch(getTestcoins(TEST_ACCOUNT));
         }
       }
@@ -212,18 +211,10 @@ export default function NewWalletQuestion(props) {
 
   const setConfirm = confirmAnswer1 => {
     if (confirmAnswer1) {
-      if (tempAns.indexOf('*') > -1) {
-        let temp = tempAns.replace(/[^a-zA-Z ]/g, '');
-        setConfirmAnswer(confirmAnswer.concat(temp));
-        console.log(tempAns.replace(/[^a-zA-Z ]/g, ''));
-      } else {
-        setConfirmAnswer(tempAns);
-      }
-      if (answer && confirmAnswer != answer) {
-        console.log('in if', visibleButton);
+      setConfirmAnswer(tempAns);
+      if (answer && confirmAnswer && confirmAnswer != answer) {
         setAnsError('Answers do not match');
       } else {
-        console.log('in VisibleButton', visibleButton);
         setTimeout(() => {
           setAnsError('');
         }, 2);
@@ -235,8 +226,6 @@ export default function NewWalletQuestion(props) {
     }
   };
   const setBackspace = event => {
-    console.log('event,key', event.nativeEvent.key);
-
     if (event.nativeEvent.key == 'Backspace') {
       setTimeout(() => {
         setAnsError('');
@@ -256,6 +245,9 @@ export default function NewWalletQuestion(props) {
   }, [confirmAnswer]);
 
   const setButtonVisible = () => {
+    setTimeout(() => {
+      setAnsError('');
+    }, 2);
     return (
       <TouchableOpacity
         onPress={async () => {
@@ -466,6 +458,10 @@ export default function NewWalletQuestion(props) {
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setAnswerInputStyle(styles.inputBoxFocused);
+                        if(answer.length > 0) {
+                          setAnswer('');
+                          setAnswerMasked('');
+                        }
                       }}
                       onBlur={() => {
                         setAnswerInputStyle(styles.inputBox);
@@ -474,8 +470,15 @@ export default function NewWalletQuestion(props) {
                         for (let i = 0; i < answer.length; i++) {
                           temp += '*';
                         }
-                        console.log('temp', temp, answer);
                         setAnswerMasked(temp);
+
+                        if (answer && confirmAnswer && confirmAnswer != answer) {
+                          setAnsError('Answers do not match');
+                        }else {
+                          setTimeout(() => {
+                            setAnsError('');
+                          }, 2);
+                        }
                       }}
                       onKeyPress={e => {
                         if (e.nativeEvent.key === 'Backspace') {
@@ -515,11 +518,7 @@ export default function NewWalletQuestion(props) {
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
                       value={
-                        hideShowConfirmAnswer
-                          ? confirmAnswerMasked
-                          : !confirmAnswer
-                          ? tempAns
-                          : confirmAnswer
+                        hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
                       }
                       returnKeyType='done'
                       returnKeyLabel='Done'
@@ -532,13 +531,6 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={text => {
-                        // if (
-                        //   answer.trim() == text.trim() &&
-                        //   text.trim() &&
-                        //   answer.trim()
-                        // ) {
-                        //   Keyboard.dismiss();
-                        // }
                         text = text.toLowerCase();
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
@@ -547,32 +539,23 @@ export default function NewWalletQuestion(props) {
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
+                        if(tempAns.length > 0) {
+                          setTempAns('');
+                          setAnsError('');
+                          setConfirmAnswer('');
+                          setConfirmAnswerMasked('');
+                        }
                       }}
                       onBlur={() => {
-                        //  if(!confirmAnswer){
-                        //   setConfirmAnswer(tempAns);
-                        //   console.log('in else', tempAns);
-                        //   let temp = '';
-                        //   for (let i = 0; i < tempAns.length; i++) {
-                        //     temp += '*';
-                        //   }
-                        //   console.log('temp', temp, tempAns);
-                        //   setConfirmAnswerMasked(temp);
-                        //   console.log('confirmAnswerMasked', confirmAnswerMasked);
-                        //   setConfirm(tempAns)
-                        // } else {
+                        setConfirmAnswerInputStyle(styles.inputBox);
+                        setDropdownBoxOpenClose(false);
+                        
                         let temp = '';
                         for (let i = 0; i < tempAns.length; i++) {
                           temp += '*';
                         }
-                        console.log('temp', temp, confirmAnswer, tempAns);
                         setConfirmAnswerMasked(temp);
-                        console.log('confirmAnswerMasked', confirmAnswerMasked);
-                        // }
-
-                        setConfirmAnswerInputStyle(styles.inputBox);
-                        setDropdownBoxOpenClose(false);
-                        //setConfirm(tempAns)
+                        setConfirm(tempAns)
                       }}
                     />
                     <TouchableWithoutFeedback

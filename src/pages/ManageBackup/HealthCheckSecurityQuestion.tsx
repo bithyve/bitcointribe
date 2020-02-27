@@ -37,9 +37,8 @@ export default function HealthCheckSecurityQuestion(props) {
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
 
-  const setConfirm = event => {
-    if (event.text) {
-      if (event.text.length > 0 && event.text != securityAnswer) {
+  const setConfirm = () => {
+    if (answer.length > 0 && answer != securityAnswer) {
         if (AnswerCounter < 2) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
@@ -52,10 +51,7 @@ export default function HealthCheckSecurityQuestion(props) {
       } else {
         setErrorText('');
       }
-    } else {
-      setErrorText('');
-    }
-  };
+  }
 
   const setBackspace = event => {
     if (event.nativeEvent.key == 'Backspace') {
@@ -207,7 +203,7 @@ export default function HealthCheckSecurityQuestion(props) {
                 onChangeText={text => {
                   setAnswer(text);
                 }}
-                onSubmitEditing={event => setConfirm(event.nativeEvent)}
+                onSubmitEditing={event => setConfirm()}
                 onFocus={() => {
                   if (Platform.OS == 'ios') {
                     props.bottomSheetRef.current.snapTo(2);
@@ -239,7 +235,9 @@ export default function HealthCheckSecurityQuestion(props) {
               </Text>
             </View>
           </ScrollView>
-          <View
+          
+        </View>
+        <View
             style={{
               paddingLeft: wp('6%'),
               paddingRight: wp('6%'),
@@ -250,6 +248,7 @@ export default function HealthCheckSecurityQuestion(props) {
             <AppBottomSheetTouchableWrapper
               disabled={errorText || !answer ? true : false}
               onPress={() => {
+                setConfirm();
                 if (answer.trim() == securityAnswer.trim()) {
                   AsyncStorage.setItem(
                     'SecurityAnsTimestamp',
@@ -268,7 +267,6 @@ export default function HealthCheckSecurityQuestion(props) {
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
-        </View>
       </View>
     </View>
   );
@@ -285,7 +283,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
   },
   modalInfoText: {
-    marginTop: hp('6%'),
+    marginTop: hp('3%'),
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
