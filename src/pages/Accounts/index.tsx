@@ -187,6 +187,12 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
+    if(wallet.transactions.transactionDetails.length){
+      wallet.transactions.transactionDetails.sort(function (left, right) {
+        return moment.utc(right.date).diff(moment.utc(left.date))
+    });
+    }
+    
     setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
@@ -858,8 +864,13 @@ export default function Accounts(props) {
       if (netBalance !== currentBalance) {
         setNetBalance(currentBalance);
       }
-      if (transactions !== wallet.transactions)
-        setTransactions(wallet.transactions);
+      if (transactions !== wallet.transactions){
+        wallet.transactions.transactionDetails.sort(function (left, right) {
+          return moment.utc(right.date).diff(moment.utc(left.date))
+      });
+      setTransactions(wallet.transactions);
+      }
+        
     }
   }, [service]);
 
