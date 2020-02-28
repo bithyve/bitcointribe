@@ -174,7 +174,11 @@ export default function Home(props) {
       ...regularTransactions,
       ...secureTransactions,
     ];
-
+    if(accumulativeTransactions.length){
+      accumulativeTransactions.sort(function (left, right) {
+        return moment.utc(right.date).diff(moment.utc(left.date))
+      });
+    }
     setBalances({
       testBalance,
       regularBalance,
@@ -559,7 +563,8 @@ export default function Home(props) {
     return transactions.length ? (
       <View style={styles.modalContentContainer}>
         <View style={{ flex: 1 }}>
-          <View style={{ height: 'auto' }}>
+          <View style={{ height: 'auto', marginTop: 10,
+        marginBottom: hp('13%') }}>
             <FlatList
               data={transactions}
               ItemSeparatorComponent={() => (
@@ -3007,5 +3012,6 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
+    
   },
 });
