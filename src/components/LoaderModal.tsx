@@ -20,8 +20,8 @@ export default function LoaderModal(props) {
                 <Text style={{color:Colors.white, fontSize:RFValue(15), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
                 <Text style={{color:Colors.white, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
             </View>
-            <View style={{marginTop:'auto'}}>
-                <Image source={require('../assets/images/icons/loaderBottomImage.png')} style={ {width: wp("28%"), height: wp("26%"), marginLeft: "auto", resizeMode: "cover"}} />
+            <View style={{marginTop:'auto', marginRight:-5}}>
+                <Image source={require('../assets/images/icons/errorImage.png')} style={ { width: wp('25%'), height: wp('25%'), marginLeft: 'auto', resizeMode: "cover",}} />
             </View>
         </View>
     </View>
