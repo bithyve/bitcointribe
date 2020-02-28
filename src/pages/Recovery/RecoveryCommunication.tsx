@@ -154,7 +154,7 @@ export default function RecoveryCommunication(props) {
                   borderRadius: 10,
                 }}
               >
-                <Text style={styles.contactNameText}>{contact.name}</Text>
+                <Text style={styles.contactNameText}>{contact.firstName && contact.lastName ? contact.firstName+' '+contact.lastName : contact.firstName && !contact.lastName ? contact.firstName : !contact.firstName && contact.lastName ? contact.lastName : ""}</Text>
               </View>
               <View
                 style={{
@@ -190,7 +190,7 @@ export default function RecoveryCommunication(props) {
                       lineHeight: 13, //... One for top and one for bottom alignment
                     }}
                   >
-                    {contact.name ? nameToInitials(contact.name) : ''}
+                    {nameToInitials(contact.firstName && contact.lastName ? contact.firstName+' '+contact.lastName : contact.firstName && !contact.lastName ? contact.firstName : !contact.firstName && contact.lastName ? contact.lastName : "")}
                   </Text>
                 </View>
               )}

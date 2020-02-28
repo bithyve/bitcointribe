@@ -71,6 +71,7 @@ const TrustedContactHistory = props => {
     trustedContactQrBottomSheet,
     setTrustedContactQrBottomSheet,
   ] = useState(React.createRef());
+  const [Temp, setTemp] = useState(false);
   //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
   //     secondaryDevice: false,
   //     trustedContact1: false,
@@ -153,7 +154,6 @@ const TrustedContactHistory = props => {
       if (index == 2) {
         contactList[1] = selectedContacts[0];
       }
-
       setTimeout(() => {
         setChosenContact(selectedContacts[0]);
       }, 2);
@@ -191,6 +191,11 @@ const TrustedContactHistory = props => {
   const renderCommunicationModeModalContent = useCallback(() => {
     return (
       <CommunicationMode
+        onContactUpdate = {(contact)=>{ setTimeout(() => {
+            setChosenContact(contact);
+            setTemp(!Temp);
+          }, 2);  
+        }}
         contact={chosenContact ? chosenContact : null}
         index={index}
         onPressBack={() => {
@@ -426,7 +431,7 @@ const TrustedContactHistory = props => {
     }
     (CommunicationModeBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);
-  }, [selectedTitle]);
+  }, [selectedTitle, chosenContact]);
 
   const renderReshareContent = useCallback(() => {
     return (
@@ -434,9 +439,7 @@ const TrustedContactHistory = props => {
         modalRef={ReshareBottomSheet}
         title={'Reshare Recovery Secret\nwith Trusted Contact'}
         info={'Did your contact not receive the Recovery Secret?'}
-        note={
-          'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'
-        }
+        note={'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'}
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -467,9 +470,7 @@ const TrustedContactHistory = props => {
         modalRef={ChangeBottomSheet}
         title={'Change your\nTrusted Contact'}
         info={'Having problems with your Trusted Contact'}
-        note={
-          'You can change the Trusted Contact you selected to share your Recovery Secret'
-        }
+        note={'You can change the Trusted Contact you selected to share your Recovery Secret'}
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -603,7 +604,7 @@ const TrustedContactHistory = props => {
               }}
             >
               {chosenContact && chosenContact.name
-                ? nameToInitials(chosenContact.name)
+                ? nameToInitials(chosenContact.firstName && chosenContact.lastName ? chosenContact.firstName+' '+chosenContact.lastName : chosenContact.firstName && !chosenContact.lastName ? chosenContact.firstName : !chosenContact.firstName && chosenContact.lastName ? chosenContact.lastName : "")
                 : ''}
             </Text>
           </View>
@@ -657,9 +658,7 @@ const TrustedContactHistory = props => {
             {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {chosenContact.name
-                  ? chosenContact.name
-                  : props.navigation.state.params.selectedTitle}
+                {chosenContact.firstName && chosenContact.lastName ? chosenContact.firstName+' '+chosenContact.lastName : chosenContact.firstName && !chosenContact.lastName ? chosenContact.firstName : !chosenContact.firstName && chosenContact.lastName ? chosenContact.lastName : props.navigation.state.params.selectedTitle}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}

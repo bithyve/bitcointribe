@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef } from 'react';
 import {
   View,
   Image,
@@ -140,6 +140,25 @@ export default function Send(props) {
     }
   };
   const [openmodal, setOpenmodal] = useState('closed');
+  const viewRef = useRef(null);
+  const tapSliderHandler = (evt) => {
+    if (viewRef.current) {
+     
+      viewRef.current.measure((fx, fy, width, height, px) => {
+        const location = ((evt.nativeEvent.locationX - px) / width);
+        console.log("LOCATION", location, evt.nativeEvent.locationX, px, width);
+        if(location >= -0.1 && location <= 0.2){
+          setSliderValue(0);
+        } else if(location >= 0.3 && location <= 0.6){
+          setSliderValue(5);
+        } else if(location >= 0.7 && location <= 1){
+          setSliderValue(10);
+        }
+        
+      });
+    }
+  };
+
   useEffect(() => {
     checkNShowHelperModal();
   }, []);
@@ -814,9 +833,10 @@ export default function Send(props) {
                       paddingRight: 10,
                     }}
                   >
-                    <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flexDirection: 'row'}} ref={ viewRef } collapsable={ false }>
+                      <TouchableWithoutFeedback onPressIn={ tapSliderHandler }>
                       <Slider
-                        style={{ flex: 1, marginRight: 10 }}
+                        style={{ flex: 1 }}
                         minimumValue={0}
                         maximumValue={10}
                         step={5}
@@ -850,6 +870,7 @@ export default function Send(props) {
                             : setSliderValueText('Fast Transaction');
                         }}
                       />
+                      </TouchableWithoutFeedback>
                     </View>
                     <View
                       style={{
