@@ -232,6 +232,9 @@ export default class BaseAccount {
     }
   };
 
+  public isValidAddress = (recipientAddress: string): Boolean =>
+    this.hdWallet.isValidAddress(recipientAddress);
+
   public getBalance = async (options?: {
     restore?;
   }): Promise<

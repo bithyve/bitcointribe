@@ -377,6 +377,9 @@ export default class SecureAccount {
     }
   };
 
+  public isValidAddress = (recipientAddress: string): Boolean =>
+    this.secureHDWallet.isValidAddress(recipientAddress);
+
   public getBalance = async (options?: {
     restore?;
   }): Promise<
