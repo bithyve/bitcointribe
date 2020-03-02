@@ -28,7 +28,7 @@ import {
   updateMSharesHealth,
   UPDATE_SHARE_HISTORY,
   updateShareHistory,
-  pdfHealthChecked
+  pdfHealthChecked,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -504,7 +504,6 @@ function* checkPDFHealthWorker({ payload }) {
   const s3Service: S3Service = yield select(state => state.sss.service);
   const { pdfHealth } = s3Service.sss;
   const { scannedQR, index } = payload;
-  console.log("scannedQR, index", { scannedQR, index });
 
   if (scannedQR === pdfHealth[index].qrData) {
     let storedPDFHealth = JSON.parse(
@@ -537,7 +536,6 @@ function* checkPDFHealthWorker({ payload }) {
       'PDF Health',
       JSON.stringify(updatedPDFHealth),
     );
-    console.log("scannedQR, index  sdfsdfsfs", { scannedQR, index });
     yield put(pdfHealthChecked('pdfHealthChecked'));
   } else {
     console.log({ pdfHealth, payload });

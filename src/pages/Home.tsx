@@ -11,7 +11,8 @@ import {
   Platform,
   AsyncStorage,
   Linking,
-  NativeModules
+  NativeModules,
+  Alert,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -83,7 +84,7 @@ import {
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
-import {getCurrencyImageByRegion } from "../common/CommonFunctions/index";
+import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 
 import TransactionDetails from './Accounts/TransactionDetails';
 // const { Value, abs, sub, min } = Animated
@@ -174,9 +175,9 @@ export default function Home(props) {
       ...regularTransactions,
       ...secureTransactions,
     ];
-    if(accumulativeTransactions.length){
-      accumulativeTransactions.sort(function (left, right) {
-        return moment.utc(right.date).diff(moment.utc(left.date))
+    if (accumulativeTransactions.length) {
+      accumulativeTransactions.sort(function(left, right) {
+        return moment.utc(right.date).diff(moment.utc(left.date));
       });
     }
     setBalances({
@@ -442,7 +443,7 @@ export default function Home(props) {
     TransactionDetailsBottomSheet,
     setTransactionDetailsBottomSheet,
   ] = useState(React.createRef());
-   const [transactionItem, setTransactionItem] = useState({});
+  const [transactionItem, setTransactionItem] = useState({});
   const [
     TransactionDetailsHelperBottomSheet,
     setTransactionDetailsHelperBottomSheet,
@@ -489,23 +490,30 @@ export default function Home(props) {
     };
   }, []);
 
-  const setCurrencyCodeFromAsync = async() =>{
-    let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
-    if(!currencyCodeTmp){
-      const identifiers = [
-        'io.hexawallet.hexa',
-      ];
-      NativeModules.InAppUtils.loadProducts(identifiers, async(error, products) => {
-        await AsyncStorage.setItem("currencyCode", products && products.length ? products[0].currencyCode : "USD")
-        setCurrencyCode(products && products.length ? products[0].currencyCode : "USD");
-      });
-    }
-    else{
+  const setCurrencyCodeFromAsync = async () => {
+    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    if (!currencyCodeTmp) {
+      const identifiers = ['io.hexawallet.hexa'];
+      NativeModules.InAppUtils.loadProducts(
+        identifiers,
+        async (error, products) => {
+          await AsyncStorage.setItem(
+            'currencyCode',
+            products && products.length ? products[0].currencyCode : 'USD',
+          );
+          setCurrencyCode(
+            products && products.length ? products[0].currencyCode : 'USD',
+          );
+        },
+      );
+    } else {
       setCurrencyCode(currencyCodeTmp);
     }
-    let currencyToggleValueTmp = await AsyncStorage.getItem("currencyToggleValue");
+    let currencyToggleValueTmp = await AsyncStorage.getItem(
+      'currencyToggleValue',
+    );
     setSwitchOn(currencyToggleValueTmp ? true : false);
-  }
+  };
 
   // const getOverAllHealthFromAsync = async () => {
   //   if (!overallHealth) {
@@ -563,8 +571,9 @@ export default function Home(props) {
     return transactions.length ? (
       <View style={styles.modalContentContainer}>
         <View style={{ flex: 1 }}>
-          <View style={{ height: 'auto', marginTop: 10,
-        marginBottom: hp('13%') }}>
+          <View
+            style={{ height: 'auto', marginTop: 10, marginBottom: hp('13%') }}
+          >
             <FlatList
               data={transactions}
               ItemSeparatorComponent={() => (
@@ -574,13 +583,12 @@ export default function Home(props) {
               )}
               renderItem={({ item }) => (
                 <AppBottomSheetTouchableWrapper
-                  onPress={() =>
-                    {
+                  onPress={
+                    () => {
                       (TransactionDetailsBottomSheet as any).current.snapTo(1);
                       setTimeout(() => {
                         setTransactionItem(item);
                       }, 10);
-                      
                     }
                     //props.navigation.navigate('TransactionDetails', { item })
                   }
@@ -768,7 +776,6 @@ export default function Home(props) {
       />
     );
   }, [transactionItem]);
-
 
   function renderAddContent() {
     return (
@@ -999,8 +1006,12 @@ export default function Home(props) {
   //   );
   // };
 
+  const { UNDER_CUSTODY } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP,
+  );
   const renderCustodianRequestModalContent = useCallback(() => {
-    if (!custodyRequest) return <View></View>;
+    if (!custodyRequest) return;
+
     return (
       <CustodianRequestModalContents
         userName={custodyRequest.requester}
@@ -1010,12 +1021,20 @@ export default function Home(props) {
             setDeepLinkModalOpen(false);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
-          if (custodyRequest.isQR) {
-            dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+
+          if (UNDER_CUSTODY[custodyRequest.requester]) {
+            Alert.alert(
+              'Failed to store',
+              'You cannot custody multiple shares of the same user.',
+            );
           } else {
-            props.navigation.navigate('CustodianRequestOTP', {
-              custodyRequest,
-            });
+            if (custodyRequest.isQR) {
+              dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+            } else {
+              props.navigation.navigate('CustodianRequestOTP', {
+                custodyRequest,
+              });
+            }
           }
         }}
         onPressRejectSecret={() => {
@@ -1160,7 +1179,7 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-    } 
+    }
     // else if (item.title == 'All accounts and funds') {
     //   (AllAccountsBottomSheet as any).current.snapTo(1);
     //   setTimeout(() => {
@@ -1176,22 +1195,23 @@ export default function Home(props) {
     (settingsBottomSheet as any).current.snapTo(0);
   };
 
-  const onPressSettingsElements = async(type, currencycode) =>{ 
-    if(type == 'ManagePin'){
+  const onPressSettingsElements = async (type, currencycode) => {
+    if (type == 'ManagePin') {
       return props.navigation.navigate('SettingManagePin', {
         managePinSuccessProceed: pin => managePinSuccessProceed(pin),
       });
-    }
-    else if(type == 'ManageCurrency'){
+    } else if (type == 'ManageCurrency') {
       setCurrencyCode(currencycode);
     }
-  }
+  };
 
   const renderSettingsContents = () => {
     return (
       <SettingsContents
         currencyCode={CurrencyCode}
-        onPressManagePin={(type, currencycode) => onPressSettingsElements(type, currencycode)}
+        onPressManagePin={(type, currencycode) =>
+          onPressSettingsElements(type, currencycode)
+        }
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1921,17 +1941,23 @@ export default function Home(props) {
             <View style={styles.headerTitleViewContainer}>
               <Text
                 style={styles.headerTitleText}
-             >{`${walletName}’s Wallet`}</Text> 
-             <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+              >{`${walletName}’s Wallet`}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                 {switchOn ? (
                   <Image
-                    style={{...CommonStyles.homepageAmountImage, marginBottom: wp('1.5%')}}
+                    style={{
+                      ...CommonStyles.homepageAmountImage,
+                      marginBottom: wp('1.5%'),
+                    }}
                     source={require('../assets/images/icons/icon_bitcoin_light.png')}
                   />
                 ) : (
                   <Image
-                    style={{...styles.cardBitCoinImage, marginBottom: wp('1.5%')}}
-                    source={getCurrencyImageByRegion(CurrencyCode, "light")}
+                    style={{
+                      ...styles.cardBitCoinImage,
+                      marginBottom: wp('1.5%'),
+                    }}
+                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
                   />
                 )}
                 <Text
@@ -1965,7 +1991,7 @@ export default function Home(props) {
                 onpress={async () => {
                   setSwitchOn(!switchOn);
                   let temp = !switchOn ? 'true' : '';
-                  await AsyncStorage.setItem("currencyToggleValue", temp)
+                  await AsyncStorage.setItem('currencyToggleValue', temp);
                 }}
                 toggle={switchOn}
               />
@@ -2126,7 +2152,10 @@ export default function Home(props) {
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}
-                                    source={getCurrencyImageByRegion(CurrencyCode, "light_blue")}
+                                    source={getCurrencyImageByRegion(
+                                      CurrencyCode,
+                                      'light_blue',
+                                    )}
                                   />
                                 )}
                                 <Text
@@ -2291,7 +2320,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -2485,19 +2514,19 @@ export default function Home(props) {
         renderHeader={renderTransactionDetailsHeader}
       /> */}
 
-          <BottomSheet
-            enabledInnerScrolling={true}
-            onCloseEnd={() => {
-              setTabBarZIndex(999);
-            }}
-            ref={TransactionDetailsBottomSheet}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
-            ]}
-            renderContent={renderTransactionDetailsContents}
-            renderHeader={renderTransactionDetailsHeader}
-          />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        ref={TransactionDetailsBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+        ]}
+        renderContent={renderTransactionDetailsContents}
+        renderHeader={renderTransactionDetailsHeader}
+      />
 
       {addBottomSheetsFlag ? (
         <BottomSheet
@@ -3012,6 +3041,5 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
-    
   },
 });
