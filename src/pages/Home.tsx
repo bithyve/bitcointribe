@@ -588,6 +588,7 @@ export default function Home(props) {
                       (TransactionDetailsBottomSheet as any).current.snapTo(1);
                       setTimeout(() => {
                         setTransactionItem(item);
+                        setTabBarZIndex(0);
                       }, 10);
                     }
                     //props.navigation.navigate('TransactionDetails', { item })
@@ -2518,6 +2519,12 @@ export default function Home(props) {
         enabledInnerScrolling={true}
         onCloseEnd={() => {
           setTabBarZIndex(999);
+        }}
+        onCloseStart={() => {
+          setTabBarZIndex(999);
+        }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
         }}
         ref={TransactionDetailsBottomSheet}
         snapPoints={[
