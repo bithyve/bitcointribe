@@ -340,13 +340,11 @@ const TrustedContactHistory = props => {
         modalRef={ConfirmBottomSheet}
         title={'Confirm Recovery Secret\nwith Trusted Contact'}
         note={
-          'You can send them a reminder to open their app to\nensure they have your Recovery Secret'
+          'Your Recovery Secrets with contacts get confirmed automatically when the contact opens their app.\nSimply remind them to open their Hexa app and login to confirm your Recovery Secret'
         }
-        proceedButtonText={'Confirm'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
+        proceedButtonText={'Ok, got it'}
         onPressProceed={() => {
-          communicate();
+          //communicate();
           (ConfirmBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
@@ -517,6 +515,33 @@ const TrustedContactHistory = props => {
       <ModalHeader
         onPressHeader={() => {
           (trustedContactQrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSecondaryDeviceMessageContents = () => {
+    return (
+      <TestAccountHelperModalContents
+        topButtonText={`Secondary Device`}
+        image={require('../../assets/images/icons/icon_secondarydevice.png')}
+        helperInfo={`Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit`}
+        continueButtonText={'Ok, got it'}
+        onPressContinue={() => {
+          if (secondaryDeviceMessageBottomSheet.current)
+          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderSecondaryDeviceMessageHeader = useCallback(() => {
+    return (
+      <ModalHeader
+      borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -780,7 +805,7 @@ const TrustedContactHistory = props => {
         ref={ConfirmBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderConfirmContent}
         renderHeader={renderConfirmHeader}

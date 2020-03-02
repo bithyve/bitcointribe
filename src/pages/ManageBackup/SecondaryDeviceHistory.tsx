@@ -8,6 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
   AsyncStorage,
+  Platform
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -27,6 +28,9 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
 import moment from 'moment';
 import _ from 'underscore';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import DeviceInfo from 'react-native-device-info';
 
 const SecondaryDeviceHistory = props => {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
@@ -69,6 +73,9 @@ const SecondaryDeviceHistory = props => {
     // },
   ]);
   const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [secondaryDeviceMessageBottomSheet, setSecondaryDeviceMessageBottomSheet] = useState(
     React.createRef(),
   );
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -134,6 +141,37 @@ const SecondaryDeviceHistory = props => {
       <ModalHeader
         onPressHeader={() => {
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+  const renderSecondaryDeviceMessageContents = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={secondaryDeviceMessageBottomSheet}
+        title={`Secondary Device`}
+        note={
+          'For confirming your Recovery Secret on the Secondary Device, simply open the app on that device and log in'
+        }
+        proceedButtonText={'Ok, got it'}
+        onPressProceed={() => {
+          if (secondaryDeviceMessageBottomSheet.current)
+          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          if (secondaryDeviceMessageBottomSheet.current)
+          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  }, []);
+
+  const renderSecondaryDeviceMessageHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -286,7 +324,7 @@ const SecondaryDeviceHistory = props => {
           IsReshare={isReshare}
           data={sortedHistory(secondaryDeviceHistory)}
           onPressConfirm={() => {
-            (secondaryDeviceBottomSheet as any).current.snapTo(1);
+            (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
           }}
           onPressContinue={() => {
             (secondaryDeviceBottomSheet as any).current.snapTo(1);
@@ -302,6 +340,17 @@ const SecondaryDeviceHistory = props => {
         snapPoints={[-30, hp('85%')]}
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
+      />
+      <BottomSheet
+        onCloseStart={() => {
+          secondaryDeviceMessageBottomSheet.current.snapTo(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={secondaryDeviceMessageBottomSheet}
+        snapPoints={[-50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),]}
+        renderContent={renderSecondaryDeviceMessageContents}
+        renderHeader={renderSecondaryDeviceMessageHeader}
       />
     </View>
   );
