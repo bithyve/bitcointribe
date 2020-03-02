@@ -201,8 +201,10 @@ export default function HealthCheckSecurityQuestion(props) {
                   setBackspace(event);
                 }}
                 onChangeText={text => {
+                  text = text.replace(/[^a-z]/g, '')
                   setAnswer(text);
                 }}
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 onSubmitEditing={event => setConfirm()}
                 onFocus={() => {
                   if (Platform.OS == 'ios') {

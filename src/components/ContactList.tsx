@@ -271,6 +271,7 @@ export default function ContactList(props) {
           </View>
           <TextInput
             style={styles.searchBoxInput}
+            keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
             placeholder="Search"
             placeholderTextColor={Colors.textColorGrey}
             onChangeText={nameKeyword => filterContacts(nameKeyword)}

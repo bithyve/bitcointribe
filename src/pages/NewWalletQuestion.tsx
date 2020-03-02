@@ -450,8 +450,9 @@ export default function NewWalletQuestion(props) {
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
+                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                       onChangeText={text => {
-                        text = text.toLowerCase();
+                        text = text.replace(/[^a-z]/g, '')
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
@@ -520,6 +521,7 @@ export default function NewWalletQuestion(props) {
                       value={
                         hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
                       }
+                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                       returnKeyType='done'
                       returnKeyLabel='Done'
                       textContentType="none"
@@ -531,7 +533,7 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={text => {
-                        text = text.toLowerCase();
+                        text = text.replace(/[^a-z]/g, '')
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}

@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   AsyncStorage,
+  Platform
 } from 'react-native';
 import Colors from '../../common/Colors';
 import QuestionList from '../../common/QuestionList';
@@ -162,6 +163,7 @@ export default function RecoveryQuestionModalContents(props) {
                   marginTop: 15,
                   marginBottom: hp('6%'),
                 }}
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 textContentType="none"
                 autoCompleteType="off"
                 autoCorrect={false}
@@ -170,6 +172,7 @@ export default function RecoveryQuestionModalContents(props) {
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 onChangeText={text => {
+                  text = text.replace(/[^a-z]/g, '')
                   setAnswer(text);
                 }}
                 onFocus={() => {

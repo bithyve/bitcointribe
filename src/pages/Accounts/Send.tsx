@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
+  Keyboard,
   AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -669,6 +670,7 @@ export default function Send(props) {
                       editable={isEditable}
                       style={styles.textBox}
                       placeholder={'Address'}
+                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                       value={recipientAddress}
                       onChangeText={setRecipientAddress}
                       placeholderTextColor={Colors.borderColor}
@@ -734,6 +736,8 @@ export default function Send(props) {
                           : 'Enter Amount in sats'
                       }
                       value={amount}
+                      returnKeyLabel='Done' 
+                      returnKeyType='done' 
                       keyboardType={'numeric'}
                       onChangeText={value => setAmount(value)}
                       placeholderTextColor={Colors.borderColor}
@@ -774,6 +778,10 @@ export default function Send(props) {
                         marginTop: 10,
                         marginBottom: 10,
                       }}
+                      returnKeyLabel='Done' 
+                      returnKeyType='done' 
+                      onSubmitEditing={Keyboard.dismiss}
+                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                       placeholder={'Description (Optional)'}
                       value={description}
                       onChangeText={setDescription}

@@ -66,8 +66,11 @@ export default function NewWalletName(props) {
               placeholder={"Enter a name for your wallet"}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
+              keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
               maxLength={20}
-              onChangeText={text => setWalletName(text)}
+              onChangeText={text => {
+                text = text.replace(/[^A-Za-z]/g, '')
+                setWalletName(text)}}
               onFocus={() => {
                 setInputStyle(styles.inputBoxFocused);
               }}
