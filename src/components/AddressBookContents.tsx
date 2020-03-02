@@ -91,17 +91,19 @@ export default function AddressBookContents(props) {
             marginBottom: 15,
             justifyContent: 'center',
             alignItems: 'center',
+            opacity: 0.5,
           }}
         >
           <Text
             style={{
-              marginLeft: 30,
+              marginLeft: 15,
+              marginRight: 15,
               color: Colors.textColorGrey,
               fontFamily: Fonts.FiraSansMediumItalic,
-              fontSize: RFValue(16),
+              fontSize: RFValue(15),
+              textAlign: 'center',
             }}
-          >
-            Nothing to show
+          >{"Contacts or devices for whom you are guarding\nthe Recovery Secret will appear here"}
           </Text>
         </View>
       )}
@@ -144,18 +146,19 @@ export default function AddressBookContents(props) {
             marginBottom: 15,
             justifyContent: 'center',
             alignItems: 'center',
+            opacity: 0.5,
           }}
         >
           <Text
             style={{
-              marginLeft: 30,
+              marginLeft: 15,
+              marginRight: 15,
               color: Colors.textColorGrey,
               fontFamily: Fonts.FiraSansMediumItalic,
-              fontSize: RFValue(16),
+              fontSize: RFValue(15),
               textAlign: 'center',
             }}
-          >
-            Nothing to show
+          >{"Contacts or devices who are guarding your\nRecovery Secret will appear here"}
           </Text>
         </View>
       )}

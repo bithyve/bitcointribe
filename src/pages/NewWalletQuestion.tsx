@@ -300,7 +300,7 @@ export default function NewWalletQuestion(props) {
       <LoaderModal
         headerText={'Creating your wallet'}
         messageText={
-          'Make sure you try out the Test Account which has been preloaded with test bitcoins'
+          'Make sure you try out the Test Account which has been preloaded with test bitcoins\nPerfect way to learn Bitcoin'
         }
       />
     );
