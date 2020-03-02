@@ -64,7 +64,7 @@ export default function CustodianRequestModalContents(props) {
               Message from the Sender
             </Text>
             <Text style={{ ...styles.modalInfoText }}>
-              Please accept my secret, this will help me recover{"\n"}my wallet
+              Please accept my request, this will help me recover{"\n"}my wallet
               later
             </Text>
           </View>

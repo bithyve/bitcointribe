@@ -107,7 +107,7 @@ export default function AddressBookContents(props) {
       )}
 
       <View>
-        <Text style={styles.pageTitle}>Guardians of your Secrets</Text>
+        <Text style={styles.pageTitle}>Guardians of your Recovery Secret</Text>
         {/* <Text style={styles.pageInfoText}>
           Lorem ipsum dolor sit amet, consectetur adipiscing
         </Text> */}
