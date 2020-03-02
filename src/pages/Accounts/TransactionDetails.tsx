@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -33,6 +33,24 @@ export default function TransactionDetails(props) {
   const txDetails = props.item;
   const getServiceType = props.getServiceType ? props.getServiceType : null;
   const serviceType = props.serviceType ? props.serviceType : null;
+  const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const descriptionHistory = JSON.parse(
+        await AsyncStorage.getItem('descriptionHistory'),
+      );
+      if (descriptionHistory) {
+        const descrip = descriptionHistory[txDetails.txid];
+        if (descrip) {
+          setDescription(descrip);
+        } else {
+          setDescription('');
+        }
+      }
+    })();
+  }, [txDetails]);
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -254,6 +272,29 @@ export default function TransactionDetails(props) {
             {txDetails.accountType == 'Test Account' ? ' t-sats' : ' sats'}
           </Text>
         </View>
+        {description ? (
+          <View style={styles.infoCardView}>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              Description
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginTop: hp('0.5%'),
+              }}
+            >
+              {description}
+            </Text>
+          </View>
+        ) : null}
         <View style={styles.infoCardView}>
           <Text
             style={{

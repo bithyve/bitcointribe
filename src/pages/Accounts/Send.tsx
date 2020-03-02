@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback,useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Image,
@@ -143,20 +143,18 @@ export default function Send(props) {
   };
   const [openmodal, setOpenmodal] = useState('closed');
   const viewRef = useRef(null);
-  const tapSliderHandler = (evt) => {
+  const tapSliderHandler = evt => {
     if (viewRef.current) {
-     
       viewRef.current.measure((fx, fy, width, height, px) => {
-        const location = ((evt.nativeEvent.locationX - px) / width);
-        console.log("LOCATION", location, evt.nativeEvent.locationX, px, width);
-        if(location >= -0.1 && location <= 0.2){
+        const location = (evt.nativeEvent.locationX - px) / width;
+        console.log('LOCATION', location, evt.nativeEvent.locationX, px, width);
+        if (location >= -0.1 && location <= 0.2) {
           setSliderValue(0);
-        } else if(location >= 0.3 && location <= 0.6){
+        } else if (location >= 0.3 && location <= 0.6) {
           setSliderValue(5);
-        } else if(location >= 0.7 && location <= 1){
+        } else if (location >= 0.7 && location <= 1) {
           setSliderValue(10);
         }
-        
       });
     }
   };
@@ -255,6 +253,20 @@ export default function Send(props) {
   //   />
   // );
 
+  const updateDescription = useCallback(async (txid, description) => {
+    let descriptionHistory = {};
+    const storedHistory = JSON.parse(
+      await AsyncStorage.getItem('descriptionHistory'),
+    );
+    if (storedHistory) descriptionHistory = storedHistory;
+    descriptionHistory[txid] = description;
+
+    await AsyncStorage.setItem(
+      'descriptionHistory',
+      JSON.stringify(descriptionHistory),
+    );
+  }, []);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -269,6 +281,9 @@ export default function Send(props) {
         SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
       setIsEditable(true);
     } else if (transfer.txid) {
+      if (description) {
+        updateDescription(transfer.txid, description);
+      }
       if (SendConfirmationBottomSheet.current)
         SendConfirmationBottomSheet.current.snapTo(0);
       if (SendSuccessWithAddressBottomSheet.current)
@@ -671,7 +686,11 @@ export default function Send(props) {
                       editable={isEditable}
                       style={styles.textBox}
                       placeholder={'Address'}
-                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
+                      }
                       value={recipientAddress}
                       onChangeText={setRecipientAddress}
                       placeholderTextColor={Colors.borderColor}
@@ -683,9 +702,12 @@ export default function Send(props) {
                         }
                       }}
                       onBlur={() => {
-                        const instance = service.hdWallet || service.secureHDWallet;
-                        let isAddressValid = instance.isValidAddress(recipientAddress);
-                        console.log("isAddressValid",isAddressValid)
+                        const instance =
+                          service.hdWallet || service.secureHDWallet;
+                        let isAddressValid = instance.isValidAddress(
+                          recipientAddress,
+                        );
+                        console.log('isAddressValid', isAddressValid);
                         setIsInvalidAddress(isAddressValid);
                       }}
                     />
@@ -707,7 +729,9 @@ export default function Send(props) {
                   </View>
                   {!isInvalidAddress ? (
                     <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>Enter correct address</Text>
+                      <Text style={styles.errorText}>
+                        Enter correct address
+                      </Text>
                     </View>
                   ) : null}
                   {serviceType == TEST_ACCOUNT ? (
@@ -744,8 +768,8 @@ export default function Send(props) {
                           : 'Enter Amount in sats'
                       }
                       value={amount}
-                      returnKeyLabel='Done' 
-                      returnKeyType='done' 
+                      returnKeyLabel="Done"
+                      returnKeyType="done"
                       keyboardType={'numeric'}
                       onChangeText={value => setAmount(value)}
                       placeholderTextColor={Colors.borderColor}
@@ -786,10 +810,14 @@ export default function Send(props) {
                         marginTop: 10,
                         marginBottom: 10,
                       }}
-                      returnKeyLabel='Done' 
-                      returnKeyType='done' 
+                      returnKeyLabel="Done"
+                      returnKeyType="done"
                       onSubmitEditing={Keyboard.dismiss}
-                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
+                      }
                       placeholder={'Description (Optional)'}
                       value={description}
                       onChangeText={setDescription}
@@ -849,43 +877,47 @@ export default function Send(props) {
                       paddingRight: 10,
                     }}
                   >
-                    <View style={{ flexDirection: 'row'}} ref={ viewRef } collapsable={ false }>
-                      <TouchableWithoutFeedback onPressIn={ tapSliderHandler }>
-                      <Slider
-                        style={{ flex: 1 }}
-                        minimumValue={0}
-                        maximumValue={10}
-                        step={5}
-                        minimumTrackTintColor={Colors.blue}
-                        maximumTrackTintColor={Colors.borderColor}
-                        thumbStyle={{
-                          borderWidth: 5,
-                          borderColor: Colors.white,
-                          backgroundColor: Colors.blue,
-                          height: 30,
-                          width: 30,
-                          borderRadius: 15,
-                        }}
-                        trackStyle={{ height: 8, borderRadius: 10 }}
-                        thumbTouchSize={{
-                          width: 30,
-                          height: 30,
-                          backgroundColor: 'blue',
-                        }}
-                        value={sliderValue}
-                        onValueChange={value => {
-                          console.log('Value', value);
-                          setSliderValue(value);
-                        }}
-                        onSlidingComplete={value => {
-                          console.log('Value onSlidingComplete', value);
-                          value == 0
-                            ? setSliderValueText('Low Fee')
-                            : value == 5
-                            ? setSliderValueText('In the middle')
-                            : setSliderValueText('Fast Transaction');
-                        }}
-                      />
+                    <View
+                      style={{ flexDirection: 'row' }}
+                      ref={viewRef}
+                      collapsable={false}
+                    >
+                      <TouchableWithoutFeedback onPressIn={tapSliderHandler}>
+                        <Slider
+                          style={{ flex: 1 }}
+                          minimumValue={0}
+                          maximumValue={10}
+                          step={5}
+                          minimumTrackTintColor={Colors.blue}
+                          maximumTrackTintColor={Colors.borderColor}
+                          thumbStyle={{
+                            borderWidth: 5,
+                            borderColor: Colors.white,
+                            backgroundColor: Colors.blue,
+                            height: 30,
+                            width: 30,
+                            borderRadius: 15,
+                          }}
+                          trackStyle={{ height: 8, borderRadius: 10 }}
+                          thumbTouchSize={{
+                            width: 30,
+                            height: 30,
+                            backgroundColor: 'blue',
+                          }}
+                          value={sliderValue}
+                          onValueChange={value => {
+                            console.log('Value', value);
+                            setSliderValue(value);
+                          }}
+                          onSlidingComplete={value => {
+                            console.log('Value onSlidingComplete', value);
+                            value == 0
+                              ? setSliderValueText('Low Fee')
+                              : value == 5
+                              ? setSliderValueText('In the middle')
+                              : setSliderValueText('Fast Transaction');
+                          }}
+                        />
                       </TouchableWithoutFeedback>
                     </View>
                     <View
