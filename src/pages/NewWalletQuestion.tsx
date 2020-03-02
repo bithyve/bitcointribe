@@ -55,6 +55,7 @@ import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
   const [Elevation, setElevation] = useState(10);
+  const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
@@ -197,6 +198,31 @@ export default function NewWalletQuestion(props) {
   }, []);
 
   useEffect(() => {
+    (async () => {
+    if (isLoaderStart) {
+      const security = {
+        question: dropdownBoxValue.question,
+        answer,
+      };
+      dispatch(initializeSetup(walletName, security));
+      const current = Date.now();
+      await AsyncStorage.setItem(
+        'SecurityAnsTimestamp',
+        JSON.stringify(current),
+      );
+      const securityQuestionHistory = {
+        created: current,
+        confirmed: current,
+      };
+      await AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify(securityQuestionHistory),
+      );
+    }
+    })();
+    }, [isLoaderStart]);
+
+  useEffect(() => {
     if (
       isInitialized &&
       exchangeRates &&
@@ -251,31 +277,13 @@ export default function NewWalletQuestion(props) {
     return (
       <TouchableOpacity
         onPress={async () => {
-          setElevation(0);
           (loaderBottomSheet as any).current.snapTo(1);
-          const security = {
-            question: dropdownBoxValue.question,
-            answer,
-          };
           setTimeout(() => {
+            setIsLoaderStart(true);
+            setElevation(0);
             setIsEditable(false);
             setIsDisabled(true);
           }, 2);
-          dispatch(initializeSetup(walletName, security));
-
-          const current = Date.now();
-          await AsyncStorage.setItem(
-            'SecurityAnsTimestamp',
-            JSON.stringify(current),
-          );
-          const securityQuestionHistory = {
-            created: current,
-            confirmed: current,
-          };
-          await AsyncStorage.setItem(
-            'securityQuestionHistory',
-            JSON.stringify(securityQuestionHistory),
-          );
         }}
         style={{ ...styles.buttonView, elevation: Elevation }}
       >
@@ -450,16 +458,20 @@ export default function NewWalletQuestion(props) {
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
-                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
+                      }
                       onChangeText={text => {
-                        text = text.replace(/[^a-z]/g, '')
+                        text = text.replace(/[^a-z]/g, '');
                         setAnswer(text);
                         setAnswerMasked(text);
                       }}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setAnswerInputStyle(styles.inputBoxFocused);
-                        if(answer.length > 0) {
+                        if (answer.length > 0) {
                           setAnswer('');
                           setAnswerMasked('');
                         }
@@ -473,9 +485,13 @@ export default function NewWalletQuestion(props) {
                         }
                         setAnswerMasked(temp);
 
-                        if (answer && confirmAnswer && confirmAnswer != answer) {
+                        if (
+                          answer &&
+                          confirmAnswer &&
+                          confirmAnswer != answer
+                        ) {
                           setAnsError('Answers do not match');
-                        }else {
+                        } else {
                           setTimeout(() => {
                             setAnsError('');
                           }, 2);
@@ -521,9 +537,13 @@ export default function NewWalletQuestion(props) {
                       value={
                         hideShowConfirmAnswer ? confirmAnswerMasked : tempAns
                       }
-                      keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-                      returnKeyType='done'
-                      returnKeyLabel='Done'
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
+                      }
+                      returnKeyType="done"
+                      returnKeyLabel="Done"
                       textContentType="none"
                       autoCompleteType="off"
                       autoCorrect={false}
@@ -533,7 +553,7 @@ export default function NewWalletQuestion(props) {
                         setBackspace(event);
                       }}
                       onChangeText={text => {
-                        text = text.replace(/[^a-z]/g, '')
+                        text = text.replace(/[^a-z]/g, '');
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
@@ -541,7 +561,7 @@ export default function NewWalletQuestion(props) {
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
-                        if(tempAns.length > 0) {
+                        if (tempAns.length > 0) {
                           setTempAns('');
                           setAnsError('');
                           setConfirmAnswer('');
@@ -551,13 +571,13 @@ export default function NewWalletQuestion(props) {
                       onBlur={() => {
                         setConfirmAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
-                        
+
                         let temp = '';
                         for (let i = 0; i < tempAns.length; i++) {
                           temp += '*';
                         }
                         setConfirmAnswerMasked(temp);
-                        setConfirm(tempAns)
+                        setConfirm(tempAns);
                       }}
                     />
                     <TouchableWithoutFeedback
