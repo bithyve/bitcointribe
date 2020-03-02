@@ -104,6 +104,7 @@ export default function Send(props) {
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [isSendHelperDone, setIsSendHelperDone] = useState(true);
   const [isInvalidBalance, setIsInvalidBalance] = useState(false);
+  const [isInvalidAddress, setIsInvalidAddress] = useState(true);
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -674,17 +675,19 @@ export default function Send(props) {
                       value={recipientAddress}
                       onChangeText={setRecipientAddress}
                       placeholderTextColor={Colors.borderColor}
-                      // onFocus={() => {
-                      //   props.modalRef.current.snapTo(2);
-                      // }}
-                      // onBlur={() => {
-                      //   if (
-                      //     !textAmountRef.isFocused() &&
-                      //     !descriptionRef.isFocused()
-                      //   ) {
-                      //     props.modalRef.current.snapTo(1);
-                      //   }
-                      // }}
+                      onKeyPress={e => {
+                        if (e.nativeEvent.key === 'Backspace') {
+                          setTimeout(() => {
+                            setIsInvalidAddress(true);
+                          }, 10);
+                        }
+                      }}
+                      onBlur={() => {
+                        const instance = service.hdWallet || service.secureHDWallet;
+                        let isAddressValid = instance.isValidAddress(recipientAddress);
+                        console.log("isAddressValid",isAddressValid)
+                        setIsInvalidAddress(isAddressValid);
+                      }}
                     />
                     <TouchableOpacity
                       style={styles.contactNameInputImageView}
@@ -702,6 +705,11 @@ export default function Send(props) {
                       />
                     </TouchableOpacity>
                   </View>
+                  {!isInvalidAddress ? (
+                    <View style={{ marginLeft: 'auto' }}>
+                      <Text style={styles.errorText}>Enter correct address</Text>
+                    </View>
+                  ) : null}
                   {serviceType == TEST_ACCOUNT ? (
                     <Text
                       onPress={() => {
