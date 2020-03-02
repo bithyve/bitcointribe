@@ -43,7 +43,7 @@ export default function CustodianRequestOTP(props) {
     tempPasscode[i] = text;
     setPasscode(tempPasscode);
     console.log("passcode.join('').length", passcode.join('').length);
-    if(passcode.join('').length == 6){
+    if (passcode.join('').length == 6) {
       Keyboard.dismiss();
     }
   }
@@ -65,14 +65,23 @@ export default function CustodianRequestOTP(props) {
     state => state.storage.database.DECENTRALIZED_BACKUP,
   );
 
+  // useEffect(() => {
+  //   if (UNDER_CUSTODY[requester]) {
+  //     Alert.alert(
+  //       'Failed to store',
+  //       'You cannot custody multiple shares of the same user.',
+  //     );
+  //   } else {
+  //     if (passcode.join('').length === 6 || otp)
+  //       props.navigation.navigate('CustodianRequestAccepted', { requester });
+  //   }
+  // }, [UNDER_CUSTODY]);
+
   useEffect(() => {
+    // check for whether the share from the same wallet is under custody is done prior to landing on this page
     if (UNDER_CUSTODY[requester]) {
-      passcode.join('').length === 6 || otp
-        ? props.navigation.navigate('CustodianRequestAccepted', { requester })
-        : Alert.alert(
-            'Failed to store',
-            'You cannot custody multiple shares of the same user.',
-          );
+      if (passcode.join('').length === 6 || otp)
+        props.navigation.navigate('CustodianRequestAccepted', { requester });
     }
   }, [UNDER_CUSTODY]);
 
@@ -115,7 +124,7 @@ export default function CustodianRequestOTP(props) {
                 keyboardType="email-address"
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
-                autoFocus = {true}
+                autoFocus={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;
@@ -126,7 +135,7 @@ export default function CustodianRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,0);
+                  onPressNumber(value, 0);
                   if (value.length >= 1) {
                     this.textInput2.focus();
                   }
@@ -134,7 +143,7 @@ export default function CustodianRequestOTP(props) {
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
-                    onPressNumber('',0);
+                    onPressNumber('', 0);
                   }
                 }}
               />
@@ -158,7 +167,6 @@ export default function CustodianRequestOTP(props) {
                   onPressNumber(value, 1);
                   if (value.length >= 1) this.textInput3.focus();
                 }}
-                
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
@@ -185,7 +193,6 @@ export default function CustodianRequestOTP(props) {
                 onChangeText={value => {
                   onPressNumber(value, 2);
                   if (value.length >= 1) this.textInput4.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -213,7 +220,6 @@ export default function CustodianRequestOTP(props) {
                 onChangeText={value => {
                   onPressNumber(value, 3);
                   if (value.length >= 1) this.textInput5.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -221,7 +227,6 @@ export default function CustodianRequestOTP(props) {
                     onPressNumber('', 3);
                   }
                 }}
-                
               />
 
               <TextInput
@@ -240,17 +245,15 @@ export default function CustodianRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,4);
+                  onPressNumber(value, 4);
                   if (value.length >= 1) this.textInput6.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
-                    onPressNumber('',4);
+                    onPressNumber('', 4);
                   }
                 }}
-                
               />
               <TextInput
                 maxLength={1}
@@ -268,14 +271,13 @@ export default function CustodianRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,5);
+                  onPressNumber(value, 5);
                   if (value.length >= 1) this.textInput6.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
-                    onPressNumber('',5);
+                    onPressNumber('', 5);
                   }
                 }}
               />
