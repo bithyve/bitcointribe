@@ -214,7 +214,7 @@ const ShareRecoverySecretOtp = props => {
                     <View style={styles.passcodeTextInputView}>
                       <TextInput
                         maxLength={1}
-                        keyboardType="email-address"
+                        keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                         selectTextOnFocus={true}
                         contextMenuHidden={true}
                         autoFocus={true}
@@ -243,7 +243,7 @@ const ShareRecoverySecretOtp = props => {
 
                       <TextInput
                         maxLength={1}
-                        keyboardType="email-address"
+                        keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                         selectTextOnFocus={true}
                         contextMenuHidden={true}
                         autoCorrect={false}
@@ -269,7 +269,7 @@ const ShareRecoverySecretOtp = props => {
 
                       <TextInput
                         maxLength={1}
-                        keyboardType="email-address"
+                        keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                         selectTextOnFocus={true}
                         contextMenuHidden={true}
                         autoCorrect={false}
@@ -295,7 +295,7 @@ const ShareRecoverySecretOtp = props => {
 
                       <TextInput
                         maxLength={1}
-                        keyboardType="email-address"
+                        keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                         selectTextOnFocus={true}
                         contextMenuHidden={true}
                         autoCorrect={false}
@@ -321,7 +321,7 @@ const ShareRecoverySecretOtp = props => {
 
                       <TextInput
                         maxLength={1}
-                        keyboardType="email-address"
+                        keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                         selectTextOnFocus={true}
                         contextMenuHidden={true}
                         autoCorrect={false}
@@ -346,7 +346,7 @@ const ShareRecoverySecretOtp = props => {
                       />
                       <TextInput
                         maxLength={1}
-                        keyboardType="email-address"
+                        keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                         selectTextOnFocus={true}
                         contextMenuHidden={true}
                         autoCorrect={false}

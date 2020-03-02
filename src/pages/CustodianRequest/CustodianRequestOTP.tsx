@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   StatusBar,
   Keyboard,
+  Platform
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -121,7 +122,7 @@ export default function CustodianRequestOTP(props) {
               <TextInput
                 maxLength={1}
                 value={otp ? otp[0] : null}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoFocus={true}
@@ -151,7 +152,7 @@ export default function CustodianRequestOTP(props) {
               <TextInput
                 maxLength={1}
                 value={otp ? otp[1] : null}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
@@ -178,7 +179,7 @@ export default function CustodianRequestOTP(props) {
               <TextInput
                 maxLength={1}
                 value={otp ? otp[2] : null}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
@@ -205,7 +206,7 @@ export default function CustodianRequestOTP(props) {
               <TextInput
                 maxLength={1}
                 value={otp ? otp[3] : null}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
@@ -232,7 +233,7 @@ export default function CustodianRequestOTP(props) {
               <TextInput
                 maxLength={1}
                 value={otp ? otp[4] : null}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
@@ -258,7 +259,7 @@ export default function CustodianRequestOTP(props) {
               <TextInput
                 maxLength={1}
                 value={otp ? otp[5] : null}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}

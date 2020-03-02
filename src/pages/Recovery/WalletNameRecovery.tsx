@@ -78,13 +78,14 @@ export default function WalletNameRecovery(props) {
               marginLeft: 20, 
               marginRight: 20,
             }}
+            keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
             maxLength={20}
             placeholder={"Enter a name for wallet"}
             placeholderTextColor={Colors.borderColor}
             value={walletName}
             onChangeText={text => {
-              setWalletName(text);
-            }}
+              text = text.replace(/[^A-Za-z]/g, '')
+              setWalletName(text)}}
             onFocus={() => {
               setInputStyle(styles.inputBoxFocused);
             }}

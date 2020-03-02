@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   StatusBar,
   Keyboard,
+  Platform
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -112,7 +113,7 @@ export default function RecoveryRequestOTP(props) {
             <View style={styles.passcodeTextInputView}>
               <TextInput
                 maxLength={1}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 value={otp ? otp[0] : null}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
@@ -146,7 +147,7 @@ export default function RecoveryRequestOTP(props) {
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput2 = input;
                 }}
@@ -173,7 +174,7 @@ export default function RecoveryRequestOTP(props) {
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput3 = input;
                 }}
@@ -200,7 +201,7 @@ export default function RecoveryRequestOTP(props) {
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput4 = input;
                 }}
@@ -227,7 +228,7 @@ export default function RecoveryRequestOTP(props) {
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput5 = input;
                 }}
@@ -253,7 +254,7 @@ export default function RecoveryRequestOTP(props) {
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput6 = input;
                 }}
