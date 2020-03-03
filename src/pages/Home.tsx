@@ -87,7 +87,7 @@ import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 
 import TransactionDetails from './Accounts/TransactionDetails';
-import Toast from "../components/Toast";
+import Toast from '../components/Toast';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -288,9 +288,9 @@ export default function Home(props) {
     React.createRef(),
   );
 
-  // const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-  //   React.createRef(),
-  // );
+  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
+    React.createRef(),
+  );
   // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   // const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
   //   React.createRef(),
@@ -720,24 +720,37 @@ export default function Home(props) {
       </View>
     );
   };
-  
-  const setSecondaryDeviceAddresses = async() =>{
-    let secondaryDeviceOtpTemp = JSON.parse(await AsyncStorage.getItem("secondaryDeviceAddress"));
-    if(!secondaryDeviceOtpTemp){
+
+  const setSecondaryDeviceAddresses = async () => {
+    let secondaryDeviceOtpTemp = JSON.parse(
+      await AsyncStorage.getItem('secondaryDeviceAddress'),
+    );
+    if (!secondaryDeviceOtpTemp) {
       secondaryDeviceOtpTemp = [];
     }
-    if(secondaryDeviceOtpTemp.findIndex((value)=>value.otp == secondaryDeviceOtp.otp)== -1){
+    if (
+      secondaryDeviceOtpTemp.findIndex(
+        value => value.otp == (secondaryDeviceOtp as any).otp,
+      ) == -1
+    ) {
       secondaryDeviceOtpTemp.push(secondaryDeviceOtp);
-      await AsyncStorage.setItem("secondaryDeviceAddress", JSON.stringify(secondaryDeviceOtpTemp));
+      await AsyncStorage.setItem(
+        'secondaryDeviceAddress',
+        JSON.stringify(secondaryDeviceOtpTemp),
+      );
     }
-  }
+  };
 
-  useEffect(() =>{
-    if(secondaryDeviceOtp.otp && SecondaryDeviceStatus[secondaryDeviceOtp.otp] && SecondaryDeviceStatus[secondaryDeviceOtp.otp].status){
-      Toast("Shares downloaded successfully!");
+  useEffect(() => {
+    if (
+      (secondaryDeviceOtp as any).otp &&
+      SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp] &&
+      SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp].status
+    ) {
+      Toast('Shares downloaded successfully!');
       setSecondaryDeviceAddresses();
     }
-  }, [SecondaryDeviceStatus])
+  }, [SecondaryDeviceStatus]);
 
   const getQrCodeData = qrData => {
     const scannedData = JSON.parse(qrData);
@@ -787,7 +800,7 @@ export default function Home(props) {
       <TransactionDetails
         item={transactionItem}
         onPressKnowMore={() => {
-          TransactionDetailsHelperBottomSheet.current.snapTo(1);
+          (TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -954,20 +967,20 @@ export default function Home(props) {
         setSelected(tabTitle);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(0);
-      addTabBarBottomSheet.current.snapTo(0);
-      QrTabBarBottomSheet.current.snapTo(0);
-      moreTabBarBottomSheet.current.snapTo(2);
+      (transactionTabBarBottomSheet as any).current.snapTo(0);
+      (addTabBarBottomSheet.current as any).snapTo(0);
+      (QrTabBarBottomSheet.current as any).snapTo(0);
+      (moreTabBarBottomSheet.current as any).snapTo(2);
     }
     if (tabTitle == 'Transactions') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(2);
-      addTabBarBottomSheet.current.snapTo(0);
-      QrTabBarBottomSheet.current.snapTo(0);
-      moreTabBarBottomSheet.current.snapTo(0);
+      (transactionTabBarBottomSheet as any).current.snapTo(2);
+      (addTabBarBottomSheet.current as any).snapTo(0);
+      (QrTabBarBottomSheet.current as any).snapTo(0);
+      (moreTabBarBottomSheet.current as any).snapTo(0);
     }
     if (tabTitle == 'Add') {
       setTimeout(() => {
@@ -975,31 +988,46 @@ export default function Home(props) {
         setModaldata([]);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(0);
-      addTabBarBottomSheet.current.snapTo(2);
-      QrTabBarBottomSheet.current.snapTo(0);
-      moreTabBarBottomSheet.current.snapTo(0);
+      (transactionTabBarBottomSheet as any).current.snapTo(0);
+      (addTabBarBottomSheet.current as any).snapTo(2);
+      (QrTabBarBottomSheet.current as any).snapTo(0);
+      (moreTabBarBottomSheet.current as any).snapTo(0);
     }
     if (tabTitle == 'QR') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(0);
-      addTabBarBottomSheet.current.snapTo(0);
-      QrTabBarBottomSheet.current.snapTo(2);
-      moreTabBarBottomSheet.current.snapTo(0);
+      (transactionTabBarBottomSheet as any).current.snapTo(0);
+      (addTabBarBottomSheet.current as any).snapTo(0);
+      (QrTabBarBottomSheet.current as any).snapTo(2);
+      (moreTabBarBottomSheet.current as any).snapTo(0);
     }
   }
 
-  // const renderNoInternetModalContent = () => {
-  //   return (
-  //     <NoInternetModalContents
-  //       onPressTryAgain={() => {}}
-  //       onPressIgnore={() => {}}
-  //     />
-  //   );
-  // };
+  const renderNoInternetModalContent = () => {
+    return (
+      <NoInternetModalContents
+        onPressTryAgain={() => {}}
+        onPressIgnore={() => {
+          (NoInternetBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderNoInternetModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+          (NoInternetBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   // const renderErrorModalContent = () => {
   //   return (
@@ -1154,19 +1182,6 @@ export default function Home(props) {
   //   );
   // };
 
-  // const renderNoInternetModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //         (NoInternetBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
   const renderCustodianRequestModalHeader = useCallback(() => {
     return (
       <TransparentHeaderModal
@@ -1312,9 +1327,9 @@ export default function Home(props) {
   const renderAddressBookContents = () => {
     return (
       <AddressBookContents
-        SecondaryDeviceAddress = {SecondaryDeviceAddress}
-        AssociatedContact = {AssociatedContact}
-        SelectedContacts = {SelectedContacts}
+        SecondaryDeviceAddress={SecondaryDeviceAddress}
+        AssociatedContact={AssociatedContact}
+        SelectedContacts={SelectedContacts}
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1717,9 +1732,9 @@ export default function Home(props) {
           AllAccountsBottomSheet.current &&
           settingsBottomSheet.current
         ) {
-          addressBookBottomSheet.current.snapTo(0);
-          AllAccountsBottomSheet.current.snapTo(0);
-          settingsBottomSheet.current.snapTo(0);
+          (addressBookBottomSheet as any).current.snapTo(0);
+          (AllAccountsBottomSheet as any).current.snapTo(0);
+          (settingsBottomSheet.current as any).snapTo(0);
         }
         (CustodianRequestBottomSheet as any).current.snapTo(1);
         (transactionTabBarBottomSheet as any).current.snapTo(1);
@@ -1745,6 +1760,21 @@ export default function Home(props) {
     console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
+
+  // useEffect(() => {
+  //   const unsubscribe = NetInfo.addEventListener(state => {
+  //     console.log('Connection type', state.type);
+  //     console.log('Is connected?', state.isConnected);
+  //
+  //     if (!state.isConnected) {
+  //       (NoInternetBottomSheet as any).current.snapTo(1);
+  //     } else {
+  //       (NoInternetBottomSheet as any).current.snapTo(0);
+  //     }
+  //   });
+
+  //   // return unsubscribe; // unsubscribing
+  // }, []);
 
   // const s3Service = useSelector(state => state.sss.service);
   // useEffect(() => {
@@ -2279,7 +2309,7 @@ export default function Home(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={transactionTabBarBottomSheet}
+        ref={transactionTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2303,7 +2333,7 @@ export default function Home(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={addTabBarBottomSheet}
+        ref={addTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2336,7 +2366,7 @@ export default function Home(props) {
         // snapPoints={ snapPoints }
         // callbackNode={ position }
         // ref={bottomSheet}
-        ref={QrTabBarBottomSheet}
+        ref={QrTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2359,7 +2389,7 @@ export default function Home(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={moreTabBarBottomSheet}
+        ref={moreTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2372,16 +2402,16 @@ export default function Home(props) {
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
       />
-      {/* <BottomSheet
+      <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
         enabledInnerScrolling={true}
-        ref={NoInternetBottomSheet}
+        ref={NoInternetBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderNoInternetModalContent}
         renderHeader={renderNoInternetModalHeader}
-      /> */}
+      />
       <BottomSheet
         onCloseEnd={() => {
           if (tabBarZIndex == 0 && !deepLinkModalOpen) {
@@ -2395,7 +2425,7 @@ export default function Home(props) {
           setDeepLinkModalOpen(true);
         }}
         enabledInnerScrolling={true}
-        ref={CustodianRequestBottomSheet}
+        ref={CustodianRequestBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
@@ -2408,7 +2438,7 @@ export default function Home(props) {
           setTabBarZIndex(0);
         }}
         enabledInnerScrolling={true}
-        ref={RecoverySecretRequestBottomSheet}
+        ref={RecoverySecretRequestBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
@@ -2446,7 +2476,7 @@ export default function Home(props) {
           setTabBarZIndex(0);
         }}
         enabledInnerScrolling={true}
-        ref={CustodianRequestRejectedBottomSheet}
+        ref={CustodianRequestRejectedBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestRejectedModalContent}
         renderHeader={renderCustodianRequestRejectedModalHeader}
@@ -2464,7 +2494,7 @@ export default function Home(props) {
             }
           }}
           enabledInnerScrolling={true}
-          ref={addressBookBottomSheet}
+          ref={addressBookBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2488,7 +2518,7 @@ export default function Home(props) {
             }
           }}
           enabledInnerScrolling={true}
-          ref={AllAccountsBottomSheet}
+          ref={AllAccountsBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2512,7 +2542,7 @@ export default function Home(props) {
             }
           }}
           enabledInnerScrolling={true}
-          ref={settingsBottomSheet}
+          ref={settingsBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2572,7 +2602,7 @@ export default function Home(props) {
         onOpenEnd={() => {
           setTabBarZIndex(0);
         }}
-        ref={TransactionDetailsBottomSheet}
+        ref={TransactionDetailsBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
@@ -2591,7 +2621,7 @@ export default function Home(props) {
             setAddSubBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
-          ref={AddBottomSheet}
+          ref={AddBottomSheet as any}
           snapPoints={[-50, hp('63%')]}
           renderContent={renderAddModalContents}
           renderHeader={renderAddModalHeader}
@@ -2603,7 +2633,7 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }}
           enabledInnerScrolling={true}
-          ref={fastBitcoinRedeemCalculationBottomSheet}
+          ref={fastBitcoinRedeemCalculationBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2621,7 +2651,7 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }}
           enabledInnerScrolling={true}
-          ref={fastBitcoinSellCalculationBottomSheet}
+          ref={fastBitcoinSellCalculationBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2644,7 +2674,7 @@ export default function Home(props) {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
-          ref={FamilyAndFriendAddressBookBottomSheet}
+          ref={FamilyAndFriendAddressBookBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2659,7 +2689,7 @@ export default function Home(props) {
         <BottomSheet
           onOpenEnd={() => {}}
           enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookBottomSheet}
+          ref={ContactSelectedFromAddressBookBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2674,7 +2704,7 @@ export default function Home(props) {
         <BottomSheet
           onOpenEnd={() => {}}
           enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookQrCodeBottomSheet}
+          ref={ContactSelectedFromAddressBookQrCodeBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
