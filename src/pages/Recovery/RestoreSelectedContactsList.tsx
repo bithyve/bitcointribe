@@ -48,6 +48,7 @@ import {
   fetchBalance,
   fetchTransactions,
   syncAccounts,
+  calculateExchangeRate,
 } from '../../store/actions/accounts';
 import axios from 'axios';
 
@@ -84,7 +85,6 @@ export default function RestoreSelectedContactsList(props) {
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
 
-  
   // function openCloseModal() {
   //   if (!walletName) {
   //     walletNameBottomSheet.current.snapTo(0);
@@ -422,30 +422,21 @@ export default function RestoreSelectedContactsList(props) {
         // // dispatch(fetchTransactions(TEST_ACCOUNT));
         // dispatch(fetchTransactions(REGULAR_ACCOUNT));
         // dispatch(fetchTransactions(SECURE_ACCOUNT));
-        dispatch(syncAccounts()); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)
+        // dispatch(syncAccounts(true)); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)
+
+        dispatch(calculateExchangeRate());
+
+        // setTimeout(() => {
+        //   (loaderBottomSheet as any).current.snapTo(0);
+        //   props.navigation.navigate('Home');
+        // }, 4000);
+
+        dispatch(syncAccounts());
       }
     })();
   }, [SERVICES]);
 
-  // AsyncStorage.getItem('walletExists').then(exists => {
-  //   if (exists) {
-  //     if (dbFetched) {
-  //       dispatch(fetchBalance(TEST_ACCOUNT));
-  //       dispatch(fetchBalance(REGULAR_ACCOUNT));
-  //       dispatch(fetchBalance(SECURE_ACCOUNT));
-  //       dispatch(fetchTransactions(TEST_ACCOUNT));
-  //       dispatch(fetchTransactions(REGULAR_ACCOUNT));
-  //       dispatch(fetchTransactions(SECURE_ACCOUNT));
-  //     }
-  //   }
-  //   // } else props.navigation.replace('RestoreAndRecoverWallet');
-  // });
-
-  if (exchangeRates && accounts.accountsSynched) {
-    console.log(
-      'isInitialized && exchangeRates && testBalance && testTransactions.length',
-      exchangeRates && balances.testBalance && transactions.length,
-    );
+  if (accounts.accountsSynched) {
     (loaderBottomSheet as any).current.snapTo(0);
     props.navigation.navigate('Home', {
       exchangeRates,
@@ -594,7 +585,11 @@ export default function RestoreSelectedContactsList(props) {
           infoTextBold={'You need three of them restore your wallet'}
         />
         <TouchableOpacity
-          style={{ ...styles.listElements, marginTop: 60, marginBottom: META_SHARE ? 0 : 10, }}
+          style={{
+            ...styles.listElements,
+            marginTop: 60,
+            marginBottom: META_SHARE ? 0 : 10,
+          }}
           onPress={() =>
             props.navigation.navigate('RestoreWalletBySecondaryDevice')
           }
@@ -617,71 +612,64 @@ export default function RestoreSelectedContactsList(props) {
               style={{ alignSelf: 'center' }}
             />
           </View>
-          </TouchableOpacity>
-          {META_SHARE && (
-            <View style={{}}>
-              <TouchableOpacity
-                      style={{
-                        ...styles.selectedContactView,
-                        marginBottom: 15,
-                      }}
-                    >
-                      <View>
-                        <Text style={styles.selectedContactName}>
-                          {META_SHARE ? 'Downloaded' : 'Download'}
-                        </Text>
-                      </View>
-                      {META_SHARE ? (
-                        <View
-                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                        >
-                          <View
-                            style={{
-                              ...styles.secretReceivedCheckSignView,
-                              backgroundColor: Colors.green,
-                            }}
-                          >
-                            <Feather
-                              name={'check'}
-                              size={12}
-                              color={Colors.darkGreen}
-                            />
-                          </View>
-                        </View>
-                      ) : !META_SHARE ? (
-                        <View
-                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                        >
-                          <View
-                            style={{
-                              height: 25,
-                              width: 25,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              marginLeft: 5,
-                            }}
-                          >
-                            <Entypo
-                              name={'dots-three-horizontal'}
-                              size={15}
-                              color={Colors.borderColor}
-                            />
-                          </View>
-                        </View>
-                      ) : (
-                        <View
-                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                        >
-                          <Text>{META_SHARE ? 'Downloaded' : 'Download'}</Text>
-                          <View style={styles.dotsView} />
-                          <View style={styles.dotsView} />
-                          <View style={styles.dotsView} />
-                        </View>
-                      )}
-                      
-                    </TouchableOpacity>
+        </TouchableOpacity>
+        {META_SHARE && (
+          <View style={{}}>
+            <TouchableOpacity
+              style={{
+                ...styles.selectedContactView,
+                marginBottom: 15,
+              }}
+            >
+              <View>
+                <Text style={styles.selectedContactName}>
+                  {META_SHARE ? 'Downloaded' : 'Download'}
+                </Text>
               </View>
-          )}
+              {META_SHARE ? (
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <View
+                    style={{
+                      ...styles.secretReceivedCheckSignView,
+                      backgroundColor: Colors.green,
+                    }}
+                  >
+                    <Feather
+                      name={'check'}
+                      size={12}
+                      color={Colors.darkGreen}
+                    />
+                  </View>
+                </View>
+              ) : !META_SHARE ? (
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <View
+                    style={{
+                      height: 25,
+                      width: 25,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginLeft: 5,
+                    }}
+                  >
+                    <Entypo
+                      name={'dots-three-horizontal'}
+                      size={15}
+                      color={Colors.borderColor}
+                    />
+                  </View>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <Text>{META_SHARE ? 'Downloaded' : 'Download'}</Text>
+                  <View style={styles.dotsView} />
+                  <View style={styles.dotsView} />
+                  <View style={styles.dotsView} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={() =>
