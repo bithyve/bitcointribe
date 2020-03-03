@@ -21,8 +21,8 @@ export default () => {
   const renderNoInternetModalContent = () => {
     return (
       <NoInternetModalContents
-        onPressTryAgain={() => { }}
-        onPressIgnore={() => { }}
+        onPressTryAgain={() => { (NoInternetBottomSheet as any).current.snapTo(0)}}
+        onPressIgnore={() => { (NoInternetBottomSheet as any).current.snapTo(0)}}
       />
     );
   };
