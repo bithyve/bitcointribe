@@ -40,8 +40,6 @@ export default function CommunicationMode(props) {
   const [Contact, setContact] = useState({});
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState([]);
-  
-
 
   useEffect(() => {
     setContact(contact);
@@ -92,7 +90,8 @@ export default function CommunicationMode(props) {
     }
     const deepLink =
       `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
+      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
+      `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
 
     switch (selectedContactMode.type) {
       case 'number':
@@ -140,28 +139,38 @@ export default function CommunicationMode(props) {
       phoneNumbers: Contact.phoneNumbers ? Contact.phoneNumbers : [],
     };
 
-    Contacts.openExistingContact(newPerson, async(err, contact) => {
+    Contacts.openExistingContact(newPerson, async (err, contact) => {
       if (err) return;
       if (Contact.id && contact) {
-        let ContactTemp = Contact; 
-        ContactTemp.emails = contact.emailAddresses ? contact.emailAddresses : [];
+        let ContactTemp = Contact;
+        ContactTemp.emails = contact.emailAddresses
+          ? contact.emailAddresses
+          : [];
         ContactTemp.lastName = contact.familyName ? contact.familyName : '';
         ContactTemp.firstName = contact.givenName ? contact.givenName : '';
         ContactTemp.middleName = contact.middleName ? contact.middleName : '';
-        ContactTemp.phoneNumbers = contact.phoneNumbers ? contact.phoneNumbers : [];
-        ContactTemp.imageAvailable = contact.hasThumbnail ? contact.hasThumbnail : '';
+        ContactTemp.phoneNumbers = contact.phoneNumbers
+          ? contact.phoneNumbers
+          : [];
+        ContactTemp.imageAvailable = contact.hasThumbnail
+          ? contact.hasThumbnail
+          : '';
         ContactTemp.image = contact.thumbnailPath ? contact.thumbnailPath : '';
         setContact(ContactTemp);
         updateNewContactInfo();
-        let selectedContactsAsync = JSON.parse(await AsyncStorage.getItem("SelectedContacts"));
-        if(selectedContactsAsync){
-          if(index == 1){
+        let selectedContactsAsync = JSON.parse(
+          await AsyncStorage.getItem('SelectedContacts'),
+        );
+        if (selectedContactsAsync) {
+          if (index == 1) {
             selectedContactsAsync[0] = ContactTemp;
-          }
-          else if(index == 2){
+          } else if (index == 2) {
             selectedContactsAsync[1] = ContactTemp;
           }
-          await AsyncStorage.setItem("SelectedContacts", JSON.stringify(selectedContactsAsync));
+          await AsyncStorage.setItem(
+            'SelectedContacts',
+            JSON.stringify(selectedContactsAsync),
+          );
         }
         props.onContactUpdate(ContactTemp);
       }
@@ -176,18 +185,16 @@ export default function CommunicationMode(props) {
     let communicationInfo = [];
     if (Contact.phoneNumbers) communicationInfo.push(...Contact.phoneNumbers);
     if (Contact.emails) communicationInfo.push(...Contact.emails);
-    let contactInfoTemp = communicationInfo.map(
-      ({ number, email }, index) => {
-        if (number || email) {
-          return {
-            id: index,
-            info: number || email,
-            isSelected: false,
-            type: number ? 'number' : 'email',
-          };
-        }
-      },
-    );
+    let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
+      if (number || email) {
+        return {
+          id: index,
+          info: number || email,
+          isSelected: false,
+          type: number ? 'number' : 'email',
+        };
+      }
+    });
     contactInfoTemp.push({
       id: contactInfoTemp.length,
       info: 'QR code',
@@ -266,7 +273,15 @@ export default function CommunicationMode(props) {
                 borderRadius: 10,
               }}
             >
-              <Text style={styles.contactNameText}>{Contact.firstName && Contact.lastName ? Contact.firstName+' '+Contact.lastName : Contact.firstName && !Contact.lastName ? Contact.firstName : !Contact.firstName && Contact.lastName ? Contact.lastName : "" }</Text>
+              <Text style={styles.contactNameText}>
+                {Contact.firstName && Contact.lastName
+                  ? Contact.firstName + ' ' + Contact.lastName
+                  : Contact.firstName && !Contact.lastName
+                  ? Contact.firstName
+                  : !Contact.firstName && Contact.lastName
+                  ? Contact.lastName
+                  : ''}
+              </Text>
             </View>
             <View
               style={{
@@ -302,7 +317,15 @@ export default function CommunicationMode(props) {
                       lineHeight: RFValue(20), //... One for top and one for bottom alignment
                     }}
                   >
-                    {nameToInitials(Contact.firstName && Contact.lastName ? Contact.firstName+' '+Contact.lastName : Contact.firstName && !Contact.lastName ? Contact.firstName : !Contact.firstName && Contact.lastName ? Contact.lastName : "")}
+                    {nameToInitials(
+                      Contact.firstName && Contact.lastName
+                        ? Contact.firstName + ' ' + Contact.lastName
+                        : Contact.firstName && !Contact.lastName
+                        ? Contact.firstName
+                        : !Contact.firstName && Contact.lastName
+                        ? Contact.lastName
+                        : '',
+                    )}
                   </Text>
                 </View>
               )}
