@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   View,
-  Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
   FlatList,
-  TextInput,
-  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,31 +11,9 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import CommonStyles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ContactList from '../components/ContactList';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import EvilIcons from 'react-native-vector-icons/EvilIcons';
 
 export default function AddressBookContents(props) {
-  let [AssociatedContact, setAssociatedContact] = useState([]);
-  let [SelectedContacts, setSelectedContacts] = useState([]);
-
-  useEffect(() => {
-    getAssociatedContact();
-  }, []);
-
-  const getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setSelectedContacts(SelectedContacts);
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
-    setAssociatedContact(AssociatedContact);
-  };
-
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -60,11 +34,11 @@ export default function AddressBookContents(props) {
         </Text> */}
       </View>
 
-      {AssociatedContact && AssociatedContact.length ? (
+      {props.AssociatedContact && props.AssociatedContact.length ? (
         <View style={{ flex: 1, flexDirection: 'row', marginBottom: 15 }}>
           <FlatList
-            data={AssociatedContact}
-            extraData={AssociatedContact}
+            data={props.AssociatedContact}
+            extraData={props.AssociatedContact}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
               return (
@@ -115,11 +89,11 @@ export default function AddressBookContents(props) {
         </Text> */}
       </View>
 
-      {SelectedContacts && SelectedContacts.length ? (
+      {props.SelectedContacts && props.SelectedContacts.length ? (
         <View style={{ flex: 1, flexDirection: 'row', marginBottom: 15 }}>
           <FlatList
-            data={SelectedContacts}
-            extraData={SelectedContacts}
+            data={props.SelectedContacts}
+            extraData={props.SelectedContacts}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
               return (
@@ -162,6 +136,58 @@ export default function AddressBookContents(props) {
           </Text>
         </View>
       )}
+      <View>
+        <Text style={styles.pageTitle}>Secondary Device for</Text>
+        {/* <Text style={styles.pageInfoText}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing
+        </Text> */}
+      </View>
+
+      {props.SecondaryDeviceAddress && props.SecondaryDeviceAddress.length ? (
+        <View style={{ flex: 1, flexDirection: 'row', marginBottom: 15 }}>
+          <FlatList
+            data={props.SecondaryDeviceAddress}
+            extraData={props.SecondaryDeviceAddress}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => {
+              return (
+                <View style={styles.selectedContactsView}>
+                  <Text style={styles.contactText}>
+                    {item.requester}
+                  </Text>
+                  {/* <TouchableOpacity style={styles.shareButtonView}>
+                    <Text style={styles.shareButtonText}>Share</Text>
+                  </TouchableOpacity> */}
+                </View>
+              );
+            }}
+          />
+        </View>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            marginBottom: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+            opacity: 0.5,
+          }}
+        >
+          <Text
+            style={{
+              marginLeft: 15,
+              marginRight: 15,
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansMediumItalic,
+              fontSize: RFValue(15),
+              textAlign: 'center',
+            }}
+          >{"Contacts or devices for whom you are guarding\nthe Recovery Secret will appear here"}
+          </Text>
+        </View>
+      )}
+
     </View>
   );
 }
@@ -188,31 +214,10 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
   },
-  modalContentView: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  contactView: {
-    height: 50,
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginLeft: 20,
-  },
   contactText: {
     marginLeft: 10,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
-  },
-  contactIndexText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  contactIndexView: {
-    flex: 0.5,
-    height: '100%',
-    justifyContent: 'space-evenly',
   },
   selectedContactsView: {
     marginLeft: 30,
@@ -220,10 +225,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 20,
     marginTop: 15,
-  },
-  contactsNameText: {
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
   },
   shareButtonView: {
     height: wp('8%'),
@@ -252,26 +253,5 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
-  },
-  searchBoxContainer: {
-    flexDirection: 'row',
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 0.5,
-    marginLeft: 10,
-    marginRight: 10,
-    height: 40,
-    justifyContent: 'center',
-  },
-  searchBoxIcon: {
-    justifyContent: 'center',
-    marginBottom: -10,
-  },
-  searchBoxInput: {
-    flex: 1,
-    fontSize: 13,
-    color: Colors.blacl,
-    borderBottomColor: Colors.borderColor,
-    alignSelf: 'center',
-    marginBottom: -10,
   },
 });

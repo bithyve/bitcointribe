@@ -87,6 +87,7 @@ import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 
 import TransactionDetails from './Accounts/TransactionDetails';
+import Toast from "../components/Toast";
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -95,6 +96,11 @@ import TransactionDetails from './Accounts/TransactionDetails';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  let [AssociatedContact, setAssociatedContact] = useState([]);
+  let [SelectedContacts, setSelectedContacts] = useState([]);
+  let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
+  let SecondaryDeviceStatus = useSelector(state => state.sss.downloadedMShare);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
@@ -109,6 +115,8 @@ export default function Home(props) {
   const WALLET_SETUP = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
+  const { status } = useSelector(state => state.sss);
+  // alert(status);
   // const DECENTRALIZED_BACKUP = useSelector(
   //   state => state.storage.database.DECENTRALIZED_BACKUP,
   // );
@@ -467,7 +475,9 @@ export default function Home(props) {
   useEffect(function() {
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
+      getAssociatedContact();
     });
+    getAssociatedContact();
     setCurrencyCodeFromAsync();
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
@@ -588,6 +598,7 @@ export default function Home(props) {
                       (TransactionDetailsBottomSheet as any).current.snapTo(1);
                       setTimeout(() => {
                         setTransactionItem(item);
+                        setTabBarZIndex(0);
                       }, 10);
                     }
                     //props.navigation.navigate('TransactionDetails', { item })
@@ -709,10 +720,27 @@ export default function Home(props) {
       </View>
     );
   };
+  
+  const setSecondaryDeviceAddresses = async() =>{
+    let secondaryDeviceOtpTemp = JSON.parse(await AsyncStorage.getItem("secondaryDeviceAddress"));
+    if(!secondaryDeviceOtpTemp){
+      secondaryDeviceOtpTemp = [];
+    }
+    if(secondaryDeviceOtpTemp.findIndex((value)=>value.otp == secondaryDeviceOtp.otp)== -1){
+      secondaryDeviceOtpTemp.push(secondaryDeviceOtp);
+      await AsyncStorage.setItem("secondaryDeviceAddress", JSON.stringify(secondaryDeviceOtpTemp));
+    }
+  }
+
+  useEffect(() =>{
+    if(secondaryDeviceOtp.otp && SecondaryDeviceStatus[secondaryDeviceOtp.otp] && SecondaryDeviceStatus[secondaryDeviceOtp.otp].status){
+      Toast("Shares downloaded successfully!");
+      setSecondaryDeviceAddresses();
+    }
+  }, [SecondaryDeviceStatus])
 
   const getQrCodeData = qrData => {
     const scannedData = JSON.parse(qrData);
-    console.log({ scannedData });
     switch (scannedData.type) {
       case 'secondaryDeviceQR' || 'trustedContactQR':
         const custodyRequest = {
@@ -721,6 +749,7 @@ export default function Home(props) {
           otp: scannedData.OTP,
           isQR: true,
         };
+        setSecondaryDeviceOtp(custodyRequest);
         props.navigation.navigate('Home', { custodyRequest });
         break;
       case 'secondaryDeviceQRRecovery':
@@ -1265,9 +1294,27 @@ export default function Home(props) {
     );
   };
 
+  const getAssociatedContact = async () => {
+    let SelectedContacts = JSON.parse(
+      await AsyncStorage.getItem('SelectedContacts'),
+    );
+    setSelectedContacts(SelectedContacts);
+    let AssociatedContact = JSON.parse(
+      await AsyncStorage.getItem('AssociatedContacts'),
+    );
+    setAssociatedContact(AssociatedContact);
+    let SecondaryDeviceAddress = JSON.parse(
+      await AsyncStorage.getItem('secondaryDeviceAddress'),
+    );
+    setSecondaryDeviceAddress(SecondaryDeviceAddress);
+  };
+
   const renderAddressBookContents = () => {
     return (
       <AddressBookContents
+        SecondaryDeviceAddress = {SecondaryDeviceAddress}
+        AssociatedContact = {AssociatedContact}
+        SelectedContacts = {SelectedContacts}
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -2421,8 +2468,8 @@ export default function Home(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
+              ? hp('84%')
+              : hp('83%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
@@ -2518,6 +2565,12 @@ export default function Home(props) {
         enabledInnerScrolling={true}
         onCloseEnd={() => {
           setTabBarZIndex(999);
+        }}
+        onCloseStart={() => {
+          setTabBarZIndex(999);
+        }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
         }}
         ref={TransactionDetailsBottomSheet}
         snapPoints={[
