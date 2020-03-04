@@ -18,6 +18,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import Toast from '../../components/Toast';
+import CountDown from 'react-native-countdown-component';
 
 export default function ShareRecoveryOTP(props) {
   const OTP = props.navigation.getParam('OTP');
@@ -94,7 +95,23 @@ export default function ShareRecoveryOTP(props) {
           <View style={styles.bottomView}>
             <View style={styles.bottomInnerView}>
               <Ionicons color={Colors.blue} size={17} name={'md-time'} />
-              <Text style={styles.timerText}>09 : 12</Text>
+            <CountDown
+              size={15}
+              until={600}
+              digitStyle={{
+                backgroundColor: '#FFF',
+                borderWidth: 0,
+                borderColor: '#FFF',
+                margin: -10,
+                
+              }}
+              digitTxtStyle={{ color: Colors.blue,fontSize: RFValue(19),
+                fontFamily: Fonts.FiraSansRegular, }}
+              separatorStyle={{ color: Colors.blue, }}
+              timeToShow={['M', 'S']}
+              timeLabels={{ m: null, s: null }}
+              showSeparator
+            />
             </View>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
