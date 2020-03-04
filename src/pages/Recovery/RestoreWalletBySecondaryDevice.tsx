@@ -50,7 +50,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
         JSON.stringify({
           ...REQUEST_DETAILS,
           requester: WALLET_SETUP.walletName,
-          type: 'secondaryDeviceQRRecovery',
+          type: 'recoveryQR',
         }),
       )
     : null;
@@ -67,8 +67,8 @@ export default function RestoreWalletBySecondaryDevice(props) {
     if (!REQUEST_DETAILS) dispatch(requestShare(0));
   }, []);
 
-  if(META_SHARE) {
-    Toast("Downloaded")
+  if (META_SHARE) {
+    Toast('Downloaded');
   }
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -120,19 +120,23 @@ export default function RestoreWalletBySecondaryDevice(props) {
           </View>
 
           {REQUEST_DETAILS ? (
-            <View style={{justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: hp('3%'),
-            marginBottom: hp('3%'),}}>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('3%'),
+                marginBottom: hp('3%'),
+              }}
+            >
               <TouchableOpacity
                 onPress={() => {
                   dispatch(
-                      downloadMShare(
-                        REQUEST_DETAILS.OTP,
-                        REQUEST_DETAILS.ENCRYPTED_KEY,
-                        'recovery',
-                      ),
-                    );
+                    downloadMShare(
+                      REQUEST_DETAILS.OTP,
+                      REQUEST_DETAILS.ENCRYPTED_KEY,
+                      'recovery',
+                    ),
+                  );
                 }}
                 disabled={!!META_SHARE}
                 style={{

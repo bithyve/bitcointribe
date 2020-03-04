@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -26,8 +26,8 @@ import commonStyle from '../../common/Styles';
 import { requestShare } from '../../store/actions/sss';
 import { nameToInitials } from '../../common/CommonFunctions';
 import BottomSheet from 'reanimated-bottom-sheet';
-import TrustedContactQr from '../ManageBackup/TrustedContactQr';
 import ModalHeader from '../../components/ModalHeader';
+import RecoveryTrustedQR from './RecoveryTrustedQR';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
@@ -42,7 +42,8 @@ export default function RecoveryCommunication(props) {
 
   const [selectedContactMode, setSelectedContactMode] = useState();
   const [contactInfo, setContactInfo] = useState([]);
-  
+  const [trustedQR, setTrustedQR] = useState('');
+
   const onContactSelect = index => {
     setContactInfo([
       ...contactInfo.map(item => {
@@ -79,7 +80,7 @@ export default function RecoveryCommunication(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     if (!REQUEST_DETAILS) dispatch(requestShare(index));
-    
+
     let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
       if (number || email) {
         return {
@@ -89,7 +90,7 @@ export default function RecoveryCommunication(props) {
           type: number ? 'number' : 'email',
         };
       }
-    })
+    });
     contactInfoTemp.push({
       id: contactInfoTemp.length,
       info: 'QR code',
@@ -100,6 +101,15 @@ export default function RecoveryCommunication(props) {
   }, []);
 
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
+  REQUEST_DETAILS && !trustedQR
+    ? setTrustedQR(
+        JSON.stringify({
+          ...REQUEST_DETAILS,
+          requester: WALLET_SETUP.walletName,
+          type: 'recoveryQR',
+        }),
+      )
+    : null;
 
   const communicate = async selectedContactMode => {
     const deepLink =
@@ -126,16 +136,16 @@ export default function RecoveryCommunication(props) {
           OTP: REQUEST_DETAILS.OTP,
         });
         break;
-        case 'qrcode': 
+      case 'qrcode':
         (trustedContactQrBottomSheet as any).current.snapTo(1);
         break;
     }
-};
+  };
 
   const renderTrustedContactQrContents = () => {
     return (
-      <TrustedContactQr
-        index={index}
+      <RecoveryTrustedQR
+        trustedQR={trustedQR}
         onPressOk={() => (trustedContactQrBottomSheet as any).current.snapTo(0)}
         onPressBack={() => {
           (trustedContactQrBottomSheet as any).current.snapTo(0);
@@ -152,7 +162,7 @@ export default function RecoveryCommunication(props) {
         }}
       />
     );
-  }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -193,7 +203,15 @@ export default function RecoveryCommunication(props) {
                   borderRadius: 10,
                 }}
               >
-                <Text style={styles.contactNameText}>{contact.firstName && contact.lastName ? contact.firstName+' '+contact.lastName : contact.firstName && !contact.lastName ? contact.firstName : !contact.firstName && contact.lastName ? contact.lastName : ""}</Text>
+                <Text style={styles.contactNameText}>
+                  {contact.firstName && contact.lastName
+                    ? contact.firstName + ' ' + contact.lastName
+                    : contact.firstName && !contact.lastName
+                    ? contact.firstName
+                    : !contact.firstName && contact.lastName
+                    ? contact.lastName
+                    : ''}
+                </Text>
               </View>
               <View
                 style={{
@@ -207,54 +225,63 @@ export default function RecoveryCommunication(props) {
                 }}
               >
                 {contact.imageAvailable ? (
-                <Image
-                  source={contact.image}
-                  style={{ ...styles.contactProfileImage }}
-                />
-              ) : (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: Colors.shadowBlue,
-                    width: 70,
-                    height: 70,
-                    borderRadius: 70 / 2,
-                  }}
-                >
-                  <Text
+                  <Image
+                    source={contact.image}
+                    style={{ ...styles.contactProfileImage }}
+                  />
+                ) : (
+                  <View
                     style={{
-                      textAlign: 'center',
-                      fontSize: 13,
-                      lineHeight: 13, //... One for top and one for bottom alignment
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: Colors.shadowBlue,
+                      width: 70,
+                      height: 70,
+                      borderRadius: 70 / 2,
                     }}
                   >
-                    {nameToInitials(contact.firstName && contact.lastName ? contact.firstName+' '+contact.lastName : contact.firstName && !contact.lastName ? contact.firstName : !contact.firstName && contact.lastName ? contact.lastName : "")}
-                  </Text>
-                </View>
-              )}
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: 13,
+                        lineHeight: 13, //... One for top and one for bottom alignment
+                      }}
+                    >
+                      {nameToInitials(
+                        contact.firstName && contact.lastName
+                          ? contact.firstName + ' ' + contact.lastName
+                          : contact.firstName && !contact.lastName
+                          ? contact.firstName
+                          : !contact.firstName && contact.lastName
+                          ? contact.lastName
+                          : '',
+                      )}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
           <View>
             <ScrollView>
-              {contactInfo && contactInfo.map((item, index) => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => onContactSelect(index)}
-                    style={styles.contactInfo}
-                  >
-                    <RadioButton
-                      size={15}
-                      color={Colors.lightBlue}
-                      borderColor={Colors.borderColor}
-                      isChecked={item.isSelected}
-                      onpress={() => onContactSelect(index)}
-                    />
-                    <Text style={styles.contactInfoText}>{item.info}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+              {contactInfo &&
+                contactInfo.map((item, index) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => onContactSelect(index)}
+                      style={styles.contactInfo}
+                    >
+                      <RadioButton
+                        size={15}
+                        color={Colors.lightBlue}
+                        borderColor={Colors.borderColor}
+                        isChecked={item.isSelected}
+                        onpress={() => onContactSelect(index)}
+                      />
+                      <Text style={styles.contactInfoText}>{item.info}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
             </ScrollView>
           </View>
           {selectedContactMode ? (
