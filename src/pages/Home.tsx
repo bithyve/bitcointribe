@@ -759,9 +759,11 @@ export default function Home(props) {
         const custodyRequest = {
           requester: scannedData.requester,
           ek: scannedData.ENCRYPTED_KEY,
+          uploadedAt: scannedData.UPLOADED_AT,
           otp: scannedData.OTP,
           isQR: true,
         };
+
         setSecondaryDeviceOtp(custodyRequest);
         props.navigation.navigate('Home', { custodyRequest });
         break;
@@ -1079,18 +1081,25 @@ export default function Home(props) {
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
 
-          if (UNDER_CUSTODY[custodyRequest.requester]) {
+          if (Date.now() - custodyRequest.uploadedAt > 600000) {
             Alert.alert(
-              'Failed to store',
-              'You cannot custody multiple shares of the same user.',
+              'Request expired!',
+              'Please ask the sender to initiate a new request',
             );
           } else {
-            if (custodyRequest.isQR) {
-              dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+            if (UNDER_CUSTODY[custodyRequest.requester]) {
+              Alert.alert(
+                'Failed to store',
+                'You cannot custody multiple shares of the same user.',
+              );
             } else {
-              props.navigation.navigate('CustodianRequestOTP', {
-                custodyRequest,
-              });
+              if (custodyRequest.isQR) {
+                dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+              } else {
+                props.navigation.navigate('CustodianRequestOTP', {
+                  custodyRequest,
+                });
+              }
             }
           }
         }}
@@ -1709,7 +1718,11 @@ export default function Home(props) {
 
     if (splits[4] === 'sss') {
       if (splits[5] === 'ek') {
-        const custodyRequest = { requester, ek: splits[6] };
+        const custodyRequest = {
+          requester,
+          ek: splits[6],
+          uploadedAt: splits[7],
+        };
         props.navigation.navigate('Home', { custodyRequest });
       } else if (splits[5] === 'rk') {
         const recoveryRequest = { requester, rk: splits[6] };
