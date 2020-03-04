@@ -190,7 +190,7 @@ export default function CommunicationMode(props) {
     );
     contactInfoTemp.push({
       id: contactInfoTemp.length,
-      info: 'Qr code',
+      info: 'QR code',
       isSelected: false,
       type: 'qrcode',
     });
