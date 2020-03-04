@@ -747,26 +747,44 @@ export default function Home(props) {
       SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp] &&
       SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp].status
     ) {
-      Toast('Shares downloaded successfully!');
-      setSecondaryDeviceAddresses();
+      if((secondaryDeviceOtp as any).type == 'trustedContactQR'){
+        props.navigation.navigate('CustodianRequestAccepted', { requester:(secondaryDeviceOtp as any).requester });
+      }
+      if((secondaryDeviceOtp as any).type == 'secondaryDeviceQR'){
+        Toast('Shares downloaded successfully!');
+        setSecondaryDeviceAddresses();
+      }
+      getAssociatedContact();
     }
   }, [SecondaryDeviceStatus]);
 
   const getQrCodeData = qrData => {
     const scannedData = JSON.parse(qrData);
+    console.log("scannedData", scannedData)
     switch (scannedData.type) {
-      case 'secondaryDeviceQR' || 'trustedContactQR':
-        const custodyRequest = {
+      case 'trustedContactQR':
+        const custodyRequest1 = {
           requester: scannedData.requester,
           ek: scannedData.ENCRYPTED_KEY,
           uploadedAt: scannedData.UPLOADED_AT,
           otp: scannedData.OTP,
           isQR: true,
-        };
-
-        setSecondaryDeviceOtp(custodyRequest);
-        props.navigation.navigate('Home', { custodyRequest });
+          type: scannedData.type
+        }; 
+        setSecondaryDeviceOtp(custodyRequest1);
+        props.navigation.navigate('Home', { custodyRequest :custodyRequest1 });
         break;
+      case 'secondaryDeviceQR' :
+          const custodyRequest2 = {
+            requester: scannedData.requester,
+            ek: scannedData.ENCRYPTED_KEY,
+            otp: scannedData.OTP,
+            isQR: true,
+            type: scannedData.type
+          }; //trustedContactQR
+          setSecondaryDeviceOtp(custodyRequest2);
+          props.navigation.navigate('Home', { custodyRequest :custodyRequest2 });
+          break;
       case 'secondaryDeviceQRRecovery':
         const recoveryRequest = {
           requester: scannedData.requester,
