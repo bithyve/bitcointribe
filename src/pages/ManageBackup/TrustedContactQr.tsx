@@ -85,7 +85,7 @@ export default function TrustedContactQr(props) {
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
             <Text style={BackupStyles.modalHeaderTitleText}>
-              Trusted contact Qr code
+              Trusted contact QR code
             </Text>
             {/* <Text style={BackupStyles.modalHeaderInfoText}>
               Last backup{' '}
@@ -139,9 +139,9 @@ export default function TrustedContactQr(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
-        title={'Note'}
+        title={'Share your Recovery Secret'}
         infoText={
-          'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna'
+          'Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR'
         }
       />
     </View>
