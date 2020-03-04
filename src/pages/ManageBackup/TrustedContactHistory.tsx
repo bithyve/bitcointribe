@@ -814,7 +814,7 @@ const TrustedContactHistory = props => {
         onCloseStart={() => {}}
         enabledInnerScrolling={true}
         ref={trustedContactQrBottomSheet as any}
-        snapPoints={[-30, hp('90%')]}
+        snapPoints={[-30, hp('85%')]}
         renderContent={renderTrustedContactQrContents}
         renderHeader={renderTrustedContactQrHeader}
       />

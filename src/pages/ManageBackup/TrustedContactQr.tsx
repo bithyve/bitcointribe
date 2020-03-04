@@ -21,7 +21,6 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function TrustedContactQr(props) {
-  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [trustedContactQR, setTrustedContactQR] = useState('');
 
   const SHARES_TRANSFER_DETAILS = useSelector(
@@ -73,38 +72,14 @@ export default function TrustedContactQr(props) {
         }}
       >
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity
-            onPress={() => {
-              props.onPressBack();
-            }}
-            style={{ height: 30, width: 30 }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
           <View
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
             <Text style={BackupStyles.modalHeaderTitleText}>
               Trusted contact QR code
             </Text>
-            {/* <Text style={BackupStyles.modalHeaderInfoText}>
-              Last backup{' '}
-              <Text
-                style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: 'bold',
-                }}
-              >
-                {' '}
-                {'3 months ago'}
-              </Text>
-            </Text> */}
           </View>
         </View>
-        <Image
-          style={BackupStyles.cardIconImage}
-          source={getIconByStatus(selectedStatus)}
-        />
       </View>
       <View style={BackupStyles.modalContentView}>
         {!trustedContactQR ? (
