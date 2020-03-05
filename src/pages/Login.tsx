@@ -21,20 +21,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import SmallHeaderModal from '../components/SmallHeaderModal';
 import {
-  TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../common/constants/serviceTypes';
-import {
-  getTestcoins,
-  fetchBalance,
-  fetchTransactions,
   syncAccounts,
   calculateExchangeRate,
 } from '../store/actions/accounts';
-import axios from 'axios';
 import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
 
 export default function Login(props) {
@@ -77,7 +67,6 @@ export default function Login(props) {
   //   accumulativeBalance: 0,
   // });
   // const [transactions, setTransactions] = useState([]);
-  // const [authenticating, setAuthenticating] = useState(false);
 
   // useEffect(() => {
   //   const testBalance = accounts[TEST_ACCOUNT].service
@@ -175,11 +164,8 @@ export default function Login(props) {
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
           if (dbFetched) {
-            (loaderBottomSheet as any).current.snapTo(1);
-
             // calculate the exchangeRate
             dispatch(calculateExchangeRate());
-
             setTimeout(() => {
               (loaderBottomSheet as any).current.snapTo(0);
               props.navigation.navigate('Home', {
@@ -187,7 +173,6 @@ export default function Login(props) {
                 recoveryRequest,
               });
             }, 2500);
-
             dispatch(syncAccounts());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
@@ -233,10 +218,8 @@ export default function Login(props) {
   };
 
   useEffect(() => {
-    console.log('authenticationFailed', authenticationFailed);
     if (authenticationFailed) {
       setCheckAuth(true);
-      //setAuthenticating(false);
     } else {
       setCheckAuth(false);
     }
@@ -389,8 +372,10 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
-                  setElevation(0);
-                  //setAuthenticating(true);
+                  (loaderBottomSheet as any).current.snapTo(1);
+                  setTimeout(() => {
+                    setElevation(0);
+                  }, 2);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
@@ -400,11 +385,7 @@ export default function Login(props) {
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
               >
-                {/* {!authenticating ? ( */}
                 <Text style={styles.proceedButtonText}>Proceed</Text>
-                {/* ) : (
-                  <ActivityIndicator size="small" />
-                )} */}
               </TouchableOpacity>
             </View>
           ) : null}

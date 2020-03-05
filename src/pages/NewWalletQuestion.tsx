@@ -276,11 +276,13 @@ export default function NewWalletQuestion(props) {
     }, 2);
     return (
       <TouchableOpacity
-        onPress={async () => {
+        onPress={() => {
           (loaderBottomSheet as any).current.snapTo(1);
           setTimeout(() => {
-            setIsLoaderStart(true);
             setElevation(0);
+          }, 0.2);
+          setTimeout(() => {
+            setIsLoaderStart(true);
             setIsEditable(false);
             setIsDisabled(true);
           }, 2);
