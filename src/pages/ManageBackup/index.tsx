@@ -663,7 +663,7 @@ export default function ManageBackup(props) {
     trustedContact2: false,
     personalCopy1: false,
     personalCopy2: false,
-    securityAns: false,
+    securityAns: true,
   });
 
   const autoHighlight = async () => {
@@ -769,20 +769,6 @@ export default function ManageBackup(props) {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
     if (highlightFlags) {
       setAutoHighlightFlags(JSON.parse(highlightFlags));
-    } else {
-      const autoHighlightFlags = {
-        secondaryDevice: false,
-        trustedContact1: false,
-        trustedContact2: false,
-        personalCopy1: false,
-        personalCopy2: false,
-        securityAns: true, // due to auto-health (during initialization)
-      };
-      setAutoHighlightFlags(autoHighlightFlags);
-      await AsyncStorage.setItem(
-        'AutoHighlightFlags',
-        JSON.stringify(autoHighlightFlags),
-      );
     }
   };
 
@@ -804,15 +790,57 @@ export default function ManageBackup(props) {
     setAutoHighlightFlagsFromAsync();
   }, []);
 
+  // useEffect(() => {
+  //   if (autoHighlightFlags) {
+  //     autoHighlight();
+  //     AsyncStorage.setItem(
+  //       'AutoHighlightFlags',
+  //       JSON.stringify(autoHighlightFlags),
+  //     );
+  //   }
+  // }, [autoHighlightFlags, overallHealth]);
+
   useEffect(() => {
-    if (autoHighlightFlags) {
-      autoHighlight();
-      AsyncStorage.setItem(
-        'AutoHighlightFlags',
-        JSON.stringify(autoHighlightFlags),
-      );
+    if (overallHealth) {
+      // update acc to overall health (aids post wallet recovery)
+
+      const updatedAutoHighlightFlags = { ...autoHighlightFlags };
+      if (overallHealth.sharesInfo[0].updatedAt) {
+        updatedAutoHighlightFlags.secondaryDevice = true;
+      }
+      if (overallHealth.sharesInfo[1].updatedAt) {
+        updatedAutoHighlightFlags.trustedContact1 = true;
+      }
+      if (overallHealth.sharesInfo[2].updatedAt) {
+        updatedAutoHighlightFlags.trustedContact2 = true;
+      }
+      if (overallHealth.sharesInfo[3].updatedAt) {
+        updatedAutoHighlightFlags.personalCopy1 = true;
+      }
+      if (overallHealth.sharesInfo[4].updatedAt) {
+        updatedAutoHighlightFlags.personalCopy2 = true;
+      }
+      if (overallHealth.qaStatus.updatedAt) {
+        updatedAutoHighlightFlags.securityAns = true;
+      }
+
+      if (
+        JSON.stringify(updatedAutoHighlightFlags) !==
+        JSON.stringify(autoHighlightFlags)
+      ) {
+        setAutoHighlightFlags(updatedAutoHighlightFlags);
+
+        AsyncStorage.setItem(
+          'AutoHighlightFlags',
+          JSON.stringify(autoHighlightFlags),
+        );
+      }
     }
-  }, [autoHighlightFlags, , overallHealth]);
+  }, [overallHealth]);
+
+  useEffect(() => {
+    autoHighlight();
+  }, [autoHighlightFlags]);
 
   useEffect(() => {
     dispatch(fetchSSSFromDB());
@@ -1204,6 +1232,7 @@ export default function ManageBackup(props) {
   }, [s3Service]);
 
   const getStatusIcon = item => {
+    console.log({ autoHighlightFlags });
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
       return getIconByStatus(item.status);
     }
@@ -1259,8 +1288,20 @@ export default function ManageBackup(props) {
                   lineHeight: 13, //... One for top and one for bottom alignment
                 }}
               >
-                {item.personalInfo 
-                  ? nameToInitials(item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.firstName+' '+item.personalInfo.lastName : item.personalInfo.firstName && !item.personalInfo.lastName ? item.personalInfo.firstName : !item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.lastName : "")
+                {item.personalInfo
+                  ? nameToInitials(
+                      item.personalInfo.firstName && item.personalInfo.lastName
+                        ? item.personalInfo.firstName +
+                            ' ' +
+                            item.personalInfo.lastName
+                        : item.personalInfo.firstName &&
+                          !item.personalInfo.lastName
+                        ? item.personalInfo.firstName
+                        : !item.personalInfo.firstName &&
+                          item.personalInfo.lastName
+                        ? item.personalInfo.lastName
+                        : '',
+                    )
                   : ''}
               </Text>
             </View>
@@ -1374,9 +1415,7 @@ export default function ManageBackup(props) {
               </View>
               {pageData.map((item, index) => {
                 return (
-                  <View
-                    style={{}}
-                  >
+                  <View style={{}}>
                     <TouchableOpacity
                       onPress={() => {
                         if (item.type == 'secondaryDevice') {
@@ -1480,10 +1519,21 @@ export default function ManageBackup(props) {
                       {getImageIcon(item)}
                       <View style={{ marginLeft: 15 }}>
                         <Text style={styles.cardTitleText}>
-                        {item.personalInfo &&
-                      (item.type == 'contact1' || item.type == 'contact2')
-                        ? item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.firstName+' '+item.personalInfo.lastName : item.personalInfo.firstName && !item.personalInfo.lastName ? item.personalInfo.firstName : !item.personalInfo.firstName && item.personalInfo.lastName ? item.personalInfo.lastName : ""
-                        : item.title}
+                          {item.personalInfo &&
+                          (item.type == 'contact1' || item.type == 'contact2')
+                            ? item.personalInfo.firstName &&
+                              item.personalInfo.lastName
+                              ? item.personalInfo.firstName +
+                                ' ' +
+                                item.personalInfo.lastName
+                              : item.personalInfo.firstName &&
+                                !item.personalInfo.lastName
+                              ? item.personalInfo.firstName
+                              : !item.personalInfo.firstName &&
+                                item.personalInfo.lastName
+                              ? item.personalInfo.lastName
+                              : ''
+                            : item.title}
                         </Text>
                         <Text style={styles.cardTimeText}>
                           Last backup{' '}
@@ -1616,8 +1666,14 @@ export default function ManageBackup(props) {
                   fontSize: RFValue(12),
                 }}
               >
-                {(autoHighlightFlags.secondaryDevice && autoHighlightFlags.trustedContact1 && autoHighlightFlags.trustedContact2 && autoHighlightFlags.personalCopy1 &&autoHighlightFlags.personalCopy2 && autoHighlightFlags.securityAns) ? 'Confirm Shares'
-            :'Complete Setup' }
+                {autoHighlightFlags.secondaryDevice &&
+                autoHighlightFlags.trustedContact1 &&
+                autoHighlightFlags.trustedContact2 &&
+                autoHighlightFlags.personalCopy1 &&
+                autoHighlightFlags.personalCopy2 &&
+                autoHighlightFlags.securityAns
+                  ? 'Confirm Shares'
+                  : 'Complete Setup'}
               </Text>
             </TouchableOpacity>
           </View>
