@@ -185,7 +185,8 @@ export default function Home(props) {
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function(left, right) {
-        return moment.utc(right.date).diff(moment.utc(left.date));
+        console.log("moment.utc(right.date),moment.utc(left.date)", moment.utc(right.date).unix(), moment.utc(left.date).unix(), moment.utc(right.date).unix() - moment.utc(left.date).unix());
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix()
       });
     }
     setBalances({
