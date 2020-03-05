@@ -1010,9 +1010,11 @@ export default function RestoreSelectedContactsList(props) {
                 elevation: Elevation,
               }}
               onPress={() => {
-                setElevation(0);
-                dispatch(recoverWallet());
                 (loaderBottomSheet as any).current.snapTo(1);
+                setTimeout(() => {
+                  setElevation(0);
+                }, 2);
+                dispatch(recoverWallet());
               }}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>
