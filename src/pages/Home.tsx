@@ -1776,9 +1776,12 @@ export default function Home(props) {
     }
 
     if (recoveryRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
+      if (tabBarZIndex == 999) {
+        setTimeout(() => {
+          setTabBarZIndex(0);
+          setDeepLinkModalOpen(true);
+        }, 2);
+      }
       (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
       (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
@@ -1925,7 +1928,7 @@ export default function Home(props) {
         onPressheader={() => {
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
-            setTabBarZIndex(999);
+            setTabBarZIndex(0);
           }, 2);
         }}
       />
@@ -2466,10 +2469,14 @@ export default function Home(props) {
       />
       <BottomSheet
         onCloseEnd={() => {
-          setTabBarZIndex(999);
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
         }}
         onOpenEnd={() => {
-          setTabBarZIndex(0);
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
         }}
         enabledInnerScrolling={true}
         ref={RecoverySecretRequestBottomSheet as any}
@@ -2531,9 +2538,7 @@ export default function Home(props) {
           ref={addressBookBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('84%')
-              : hp('83%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
