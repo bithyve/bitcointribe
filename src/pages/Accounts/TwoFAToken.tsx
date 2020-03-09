@@ -282,6 +282,21 @@ export default function TwoFAToken(props) {
             </TouchableOpacity>
           </View>
         </View>
+        <View
+          style={{
+            alignItems: 'center',
+            marginBottom: 200,
+            marginTop: 200,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.navigate('LostTwoFA');
+            }}
+          >
+            <Text>I am having problems with my 2FA</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

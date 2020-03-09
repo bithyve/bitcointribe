@@ -8,6 +8,7 @@ import {
   resetTwoFA,
   twoFAResetted,
   secondaryXprivGenerated,
+  clearTransfer,
 } from '../../store/actions/accounts';
 
 const LostTwoFA = props => {
@@ -23,14 +24,18 @@ const LostTwoFA = props => {
 
   useEffect(() => {
     if (generatedSecureXPriv) {
-      props.navigation.navigate('Send', {
-        serviceType: SECURE_ACCOUNT,
-        netBalance:
-          service.secureHDWallet.balances.balance +
-          service.secureHDWallet.balances.unconfirmedBalance,
-        sweepSecure: true,
-      });
-      dispatch(secondaryXprivGenerated(null));
+      dispatch(clearTransfer(SECURE_ACCOUNT));
+
+      setTimeout(() => {
+        props.navigation.navigate('Send', {
+          serviceType: SECURE_ACCOUNT,
+          netBalance:
+            service.secureHDWallet.balances.balance +
+            service.secureHDWallet.balances.unconfirmedBalance,
+          sweepSecure: true,
+        });
+        dispatch(secondaryXprivGenerated(null));
+      }, 1500);
     } else if (generatedSecureXPriv === false) {
       Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
       dispatch(secondaryXprivGenerated(null));
@@ -41,6 +46,13 @@ const LostTwoFA = props => {
     if (resettedTwoFA) {
       props.navigation.navigate('TwoFASetup', {
         twoFASetup: service.secureHDWallet.twoFASetup,
+        onPressBack: () => {
+          dispatch(clearTransfer(SECURE_ACCOUNT));
+          props.navigation.navigate('Accounts', {
+            serviceType: SECURE_ACCOUNT,
+            index: 2,
+          });
+        },
       });
       dispatch(twoFAResetted(null)); //resetting to monitor consecutive change
     } else if (resettedTwoFA === false) {

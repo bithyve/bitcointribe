@@ -25,6 +25,7 @@ import { uploadEncMShare } from '../../store/actions/sss';
 
 const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam('twoFASetup');
+  const onPressBack = props.navigation.getParam('onPressBack');
   const { qrData, secret } = twoFASetup;
 
   return (
@@ -33,9 +34,13 @@ const TwoFASetup = props => {
       <View style={BackupStyles.headerContainer}>
         <TouchableOpacity
           style={BackupStyles.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack();
-          }}
+          onPress={
+            onPressBack
+              ? onPressBack
+              : () => {
+                  props.navigation.goBack();
+                }
+          }
         >
           <View style={BackupStyles.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -48,11 +53,12 @@ const TwoFASetup = props => {
             Setup Two Factor Authentication
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-          Please scan the following QR on your authenticator app like Google Authenticator{'\n'}in order
-            to setup the 2FA
+            Please scan the following QR on your authenticator app like Google
+            Authenticator{'\n'}in order to setup the 2FA
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-          The authenticator app should be{'\n'}installed on another device like your Secondary Device
+            The authenticator app should be{'\n'}installed on another device
+            like your Secondary Device
           </Text>
         </View>
       </View>
@@ -63,10 +69,14 @@ const TwoFASetup = props => {
       <View style={{ margin: 20 }}>
         <View style={{ flexDirection: 'row', marginTop: 20, marginBottom: 20 }}>
           <TouchableOpacity
-            onPress={() => {
-              // props.navigation.navigate('GoogleAuthenticatorOTP');
-              props.navigation.goBack();
-            }}
+            onPress={
+              onPressBack
+                ? onPressBack
+                : () => {
+                    // props.navigation.navigate('GoogleAuthenticatorOTP');
+                    props.navigation.goBack();
+                  }
+            }
             style={{
               height: wp('13%'),
               width: wp('40%'),
@@ -75,9 +85,9 @@ const TwoFASetup = props => {
               alignItems: 'center',
               borderRadius: 10,
               elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+              shadowColor: Colors.shadowBlue,
+              shadowOpacity: 1,
+              shadowOffset: { width: 15, height: 15 },
             }}
           >
             <Text
@@ -91,9 +101,13 @@ const TwoFASetup = props => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => {
-              props.navigation.goBack();
-            }}
+            onPress={
+              onPressBack
+                ? onPressBack
+                : () => {
+                    props.navigation.goBack();
+                  }
+            }
             style={{
               height: wp('13%'),
               width: wp('30%'),
