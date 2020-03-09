@@ -187,7 +187,8 @@ export default function Send(props) {
   }, []);
 
   useEffect(() => {
-    if (sweepSecure)
+    if (sweepSecure) {
+      SendConfirmationBottomSheet.current.snapTo(0);
       if (netBalance === 0) {
         setAmount(`0`);
       } else {
@@ -204,6 +205,7 @@ export default function Send(props) {
             )}`,
         );
       }
+    }
   }, [sweepSecure, sliderValueText]);
 
   // const stage2 = () => (
@@ -1055,22 +1057,6 @@ export default function Send(props) {
                     }
                   />
                 </View>
-                {serviceType === SECURE_ACCOUNT ? (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      marginBottom: 200,
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        props.navigation.navigate('LostTwoFA');
-                      }}
-                    >
-                      <Text>Forget 2FA?</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : null}
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
