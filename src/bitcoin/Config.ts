@@ -3,6 +3,7 @@ import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import {
   BIT_ENVIRONMENT,
+  BIT_SERVER_MODE,
   BIT_GAP_LIMIT,
   BIT_DPATH_PURPOSE,
   BIT_STANDARD_BIP44,
@@ -180,6 +181,7 @@ class Config {
     },
   };
 
+  public SERVER_MODE: string = BIT_SERVER_MODE;
   public RELAY: string;
   public SIGNING_SERVER: string;
 
@@ -215,6 +217,13 @@ class Config {
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
+    if (this.SERVER_MODE === 'PROD') {
+      this.RELAY = this.BH_SERVERS.PROD.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
+    } else {
+      this.RELAY = this.BH_SERVERS.DEV.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
+    }
     this.setNetwork();
     this.BITCOIN_NODE = new Client({
       network:
