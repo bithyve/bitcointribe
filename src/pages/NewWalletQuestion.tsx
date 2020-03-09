@@ -397,7 +397,7 @@ export default function NewWalletQuestion(props) {
 
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
-                  <ScrollView style={{ height: hp('40%') }}>
+                  <ScrollView nestedScrollEnabled={true} style={{ height: hp('40%') }}>
                     {dropdownBoxList.map((value, index) => (
                       <TouchableOpacity
                         onPress={() => {
