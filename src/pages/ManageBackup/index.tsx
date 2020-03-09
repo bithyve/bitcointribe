@@ -1413,6 +1413,7 @@ export default function ManageBackup(props) {
                   )}
                 </View>
               </View>
+              <View style={{marginBottom: 10}}>
               {pageData.map((item, index) => {
                 return (
                   <View style={{}}>
@@ -1556,6 +1557,7 @@ export default function ManageBackup(props) {
                   </View>
                 );
               })}
+              </View>
             </ScrollView>
             <BottomSheet
               enabledInnerScrolling={true}

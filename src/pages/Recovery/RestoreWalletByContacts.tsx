@@ -29,17 +29,72 @@ export default function RestoreWalletByContacts(props) {
   //     setContacts(list);
   //   }
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
+  const [selectedContacts, setSelectedContacts] = useState([]);
+  const [test, setTest] = useState(false);
   const [contacts, setContacts] = useState([]);
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
   }
 
-  const onPressContinue = async () => {
-    await AsyncStorage.setItem('selectedContacts', JSON.stringify(contacts));
-    console.log({ contacts });
-    props.navigation.goBack();
+  useEffect(()=>{
+    (async()=>{
+      let selectedContactsTemp = JSON.parse(await AsyncStorage.getItem('selectedContacts'));
+      setTimeout(() => {
+        setSelectedContacts(selectedContactsTemp);
+        setTest(!test);
+      }, 2);
+    })();
+  },[])
 
-    // props.navigation.navigate('RestoreSelectedContactsList');
+  const onPressContinue = async () => {
+    let selectedContactList = JSON.parse(await AsyncStorage.getItem('selectedContacts'));
+    if(!selectedContactList){
+      selectedContactList = []
+    }
+    if(selectedContactList.length>1 && contacts.length>1){
+      if(selectedContactList[0].id!=contacts[0].id && selectedContactList[1].id!=contacts[1].id){
+        selectedContactList[0] = contacts[0];
+        selectedContactList[1] = contacts[1];
+      }
+    }
+    else if(selectedContactList.length==1 && contacts.length ==1){
+      selectedContactList[1] = contacts[0];
+    }
+    else if(selectedContactList.length>1 && contacts.length ==1){
+      selectedContactList[1] = contacts[0];
+    }
+    else if(selectedContactList.length==1 && contacts.length >1){
+      if(selectedContactList[0].id!=contacts[0].id){
+        selectedContactList[0] = contacts[0];
+      }
+      selectedContactList[1] = contacts[1];
+    }
+    else if(selectedContactList.length==0 && contacts.length >1){
+      selectedContactList[0] = contacts[0];
+      selectedContactList[1] = contacts[1];
+    }
+    else {
+      selectedContactList[0] = contacts[0];
+    }
+    await AsyncStorage.setItem('selectedContacts', JSON.stringify(selectedContactList));
+    if(!selectedContactList[0].status && contacts.length>0){
+      props.navigation.navigate('RecoveryCommunication', {
+        contact:contacts[0],
+        index: 1,
+      });
+    }
+    else if(!selectedContactList[1].status && contacts.length>1){
+      props.navigation.navigate('RecoveryCommunication', {
+        contact:contacts[1],
+        index: 2,
+      });
+    }
+    else{
+      props.navigation.navigate('RecoveryCommunication', {
+        contact:contacts[0],
+        index: 1,
+      });
+    }
   };
 
   // const continueNProceed = async contacts => {
@@ -139,6 +194,8 @@ export default function RestoreWalletByContacts(props) {
           />
           <ContactList
             style={{}}
+            isTrustedContact={false}
+            selectedContacts={selectedContacts}
             onPressContinue={onPressContinue}
             onSelectContact={selectedContactsList}
           />

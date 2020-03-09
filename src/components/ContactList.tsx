@@ -35,6 +35,24 @@ export default function ContactList(props) {
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
   const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
+  const selectectcontactlist = props.selectedContacts ? props.selectedContacts : [];
+  useEffect(() => {
+    if(props.selectedContacts){
+      setSelectedContacts(selectectcontactlist);
+      for (let i = 0; i < filterContactData.length; i++) {
+        if (
+          props.selectedContacts.findIndex(value => value.id == filterContactData[i].id) > -1
+        ) {
+          filterContactData[i].checked = true;
+        } else {
+          filterContactData[i].checked = false;
+        }
+      }
+      setRadioOnOff(!radioOnOff);
+      setFilterContactData(filterContactData);
+      props.onSelectContact(selectectcontactlist);
+    }
+  },[selectectcontactlist, filterContactData]);
 
   const requestContactsPermission = async () => {
     try {
@@ -139,6 +157,10 @@ export default function ContactList(props) {
   };
 
   function onContactSelect(index) {
+    if(selectedContacts.length==2 && !props.isTrustedContact){
+      Alert.alert("","Please remove one or more selected contacts to select a new one.");
+      return;
+    }
     let contacts = filterContactData;
     if(props.isTrustedContact){
       if (contacts[index].checked) {
