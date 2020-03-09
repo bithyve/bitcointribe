@@ -187,13 +187,18 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
-    if(wallet.transactions.transactionDetails.length){
-      wallet.transactions.transactionDetails.sort(function (left, right) {
-        console.log("moment.utc(right.date),moment.utc(left.date)", moment.utc(right.date).unix(), moment.utc(left.date).unix(), moment.utc(right.date).unix() - moment.utc(left.date).unix());
-        return moment.utc(right.date).unix() - moment.utc(left.date).unix()
-    });
+    if (wallet.transactions.transactionDetails.length) {
+      wallet.transactions.transactionDetails.sort(function(left, right) {
+        console.log(
+          'moment.utc(right.date),moment.utc(left.date)',
+          moment.utc(right.date).unix(),
+          moment.utc(left.date).unix(),
+          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
+        );
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
     }
-    
+
     setCurrencyCodeFromAsync();
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
@@ -237,9 +242,9 @@ export default function Accounts(props) {
       'currencyToggleValue',
     );
     setSwitchOn(currencyToggleValueTmp ? true : false);
-    let currencyCodeTmp = await AsyncStorage.getItem("currencyCode");
-    setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : "USD");
-  }
+    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
+  };
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
@@ -384,9 +389,8 @@ export default function Accounts(props) {
                   alignSelf: 'center',
                 }}
                 onPress={() => {
-                  props.navigation.navigate('SecureScan', {
-                    serviceType,
-                    getServiceType: getServiceType,
+                  props.navigation.navigate('TwoFASetup', {
+                    twoFASetup: service.secureHDWallet.twoFASetup,
                   });
                 }}
               >
@@ -403,7 +407,7 @@ export default function Accounts(props) {
             ) : (
               <Image
                 style={styles.cardBitCoinImage}
-                source={getCurrencyImageByRegion(CurrencyCode, "light")}
+                source={getCurrencyImageByRegion(CurrencyCode, 'light')}
               />
             )}
             <Text style={styles.cardAmountText}>
@@ -412,7 +416,10 @@ export default function Accounts(props) {
                 : switchOn
                 ? UsNumberFormat(netBalance)
                 : exchangeRates
-                ? ((netBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+                ? (
+                    (netBalance / 1e8) *
+                    exchangeRates[CurrencyCode].last
+                  ).toFixed(2)
                 : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
@@ -481,7 +488,9 @@ export default function Accounts(props) {
                   <AppBottomSheetTouchableWrapper
                     onPress={
                       () => {
-                        (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                        (TransactionDetailsBottomSheet as any).current.snapTo(
+                          1,
+                        );
                         checkNShowHelperModal();
                         setTimeout(() => {
                           setTransactionItem(item);
@@ -831,7 +840,6 @@ export default function Accounts(props) {
     );
   };
 
-
   const renderRegularAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
@@ -865,14 +873,18 @@ export default function Accounts(props) {
       if (netBalance !== currentBalance) {
         setNetBalance(currentBalance);
       }
-      if (transactions !== wallet.transactions){
-        wallet.transactions.transactionDetails.sort(function (left, right) {
-          console.log("moment.utc(right.date),moment.utc(left.date)", moment.utc(right.date).unix(), moment.utc(left.date).unix(), moment.utc(right.date).unix() - moment.utc(left.date).unix());
-        return moment.utc(right.date).unix() - moment.utc(left.date).unix()
-      });
-      setTransactions(wallet.transactions);
+      if (transactions !== wallet.transactions) {
+        wallet.transactions.transactionDetails.sort(function(left, right) {
+          console.log(
+            'moment.utc(right.date),moment.utc(left.date)',
+            moment.utc(right.date).unix(),
+            moment.utc(left.date).unix(),
+            moment.utc(right.date).unix() - moment.utc(left.date).unix(),
+          );
+          return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+        });
+        setTransactions(wallet.transactions);
       }
-        
     }
   }, [service]);
 
@@ -1095,13 +1107,15 @@ export default function Accounts(props) {
                     renderItem={({ item, index }) => {
                       return (
                         <TouchableOpacity
-                          onPress={() => {
-                              (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                          onPress={
+                            () => {
+                              (TransactionDetailsBottomSheet as any).current.snapTo(
+                                1,
+                              );
                               checkNShowHelperModal();
                               setTimeout(() => {
                                 setTransactionItem(item);
                               }, 10);
-                              
                             }
                             // props.navigation.navigate('TransactionDetails', {
                             //   item,
