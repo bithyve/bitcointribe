@@ -181,9 +181,8 @@ class Config {
     },
   };
 
-  public SERVER_MODE: string = BIT_SERVER_MODE;
-  public RELAY: string;
-  public SIGNING_SERVER: string;
+  public RELAY: string = this.BH_SERVERS.PROD.RELAY;
+  public SIGNING_SERVER: string = this.BH_SERVERS.PROD.SIGNING_SERVER;
 
   public API_URLS = {
     TESTNET: {
@@ -217,7 +216,7 @@ class Config {
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
-    if (this.SERVER_MODE === 'PROD') {
+    if (BIT_SERVER_MODE === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;
       this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
     } else {
@@ -238,12 +237,8 @@ class Config {
   public setNetwork = (): void => {
     if (this.ENVIRONMENT === 'MAIN') {
       this.NETWORK = bitcoinJS.networks.bitcoin;
-      this.RELAY = this.BH_SERVERS.PROD.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
     } else if (this.ENVIRONMENT === 'TEST') {
       this.NETWORK = bitcoinJS.networks.testnet;
-      this.RELAY = this.BH_SERVERS.DEV.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
     } else {
       throw new Error('Please specify an apt environment(MAIN||TEST)');
     }
