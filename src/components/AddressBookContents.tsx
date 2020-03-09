@@ -34,28 +34,52 @@ export default function AddressBookContents(props) {
         </Text> */}
       </View>
 
-      {props.AssociatedContact && props.AssociatedContact.length ? (
-        <View style={{ flex: 1, flexDirection: 'row', marginBottom: 15 }}>
-          <FlatList
-            data={props.AssociatedContact}
-            extraData={props.AssociatedContact}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              return (
-                <View style={styles.selectedContactsView}>
-                  <Text style={styles.contactText}>
-                    {item.name && item.name.split(' ')[0] ?  item.name.split(' ')[0] : ""}{' '}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                      {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
-                    </Text>
-                  </Text>
-                  {/* <TouchableOpacity style={styles.shareButtonView}>
-                    <Text style={styles.shareButtonText}>Share</Text>
-                  </TouchableOpacity> */}
-                </View>
-              );
-            }}
-          />
+      {(props.AssociatedContact) || (props.SecondaryDeviceAddress) ? (
+        <View style={{ flex: 1,  marginBottom: 15 }}>
+          {props.AssociatedContact && props.AssociatedContact.length ? 
+            <View style={{height:'auto'}}>
+              <FlatList
+                data={props.AssociatedContact}
+                extraData={props.AssociatedContact}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => {
+                  return (
+                    <View style={styles.selectedContactsView}>
+                      <Text style={styles.contactText}>
+                        {item.name && item.name.split(' ')[0] ?  item.name.split(' ')[0] : ""}{' '}
+                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                          {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
+                        </Text>
+                      </Text>
+                      {/* <TouchableOpacity style={styles.shareButtonView}>
+                        <Text style={styles.shareButtonText}>Share</Text>
+                      </TouchableOpacity> */}
+                    </View>
+                  );
+                }}
+              />
+            </View>
+            : null
+          }
+          {props.SecondaryDeviceAddress && props.SecondaryDeviceAddress.length ?
+            <View style={{height:'auto'}}> 
+              <FlatList
+                data={props.SecondaryDeviceAddress}
+                extraData={props.SecondaryDeviceAddress}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => {
+                  return (
+                    <View style={styles.selectedContactsView}>
+                      <Text style={styles.contactText}>
+                        {item.requester}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />
+            </View>
+            : null
+          }
         </View>
       ) : (
         <View
@@ -136,58 +160,6 @@ export default function AddressBookContents(props) {
           </Text>
         </View>
       )}
-      <View>
-        <Text style={styles.pageTitle}>Secondary Device for</Text>
-        {/* <Text style={styles.pageInfoText}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing
-        </Text> */}
-      </View>
-
-      {props.SecondaryDeviceAddress && props.SecondaryDeviceAddress.length ? (
-        <View style={{ flex: 1, flexDirection: 'row', marginBottom: 15 }}>
-          <FlatList
-            data={props.SecondaryDeviceAddress}
-            extraData={props.SecondaryDeviceAddress}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => {
-              return (
-                <View style={styles.selectedContactsView}>
-                  <Text style={styles.contactText}>
-                    {item.requester}
-                  </Text>
-                  {/* <TouchableOpacity style={styles.shareButtonView}>
-                    <Text style={styles.shareButtonText}>Share</Text>
-                  </TouchableOpacity> */}
-                </View>
-              );
-            }}
-          />
-        </View>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            marginBottom: 15,
-            justifyContent: 'center',
-            alignItems: 'center',
-            opacity: 0.5,
-          }}
-        >
-          <Text
-            style={{
-              marginLeft: 15,
-              marginRight: 15,
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansMediumItalic,
-              fontSize: RFValue(15),
-              textAlign: 'center',
-            }}
-          >{"Contacts or devices for whom you are guarding\nthe Recovery Secret will appear here"}
-          </Text>
-        </View>
-      )}
-
     </View>
   );
 }
