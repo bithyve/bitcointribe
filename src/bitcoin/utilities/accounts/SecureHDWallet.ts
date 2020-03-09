@@ -1,4 +1,4 @@
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
 import * as bitcoinJS from 'bitcoinjs-lib';
@@ -8,7 +8,11 @@ import config from '../../Config';
 import { Transactions } from '../Interface';
 import Bitcoin from './Bitcoin';
 
-const { BH_AXIOS, HEXA_ID, API_URLS } = config;
+const { SIGNING_SERVER, HEXA_ID } = config;
+
+const BH_AXIOS: AxiosInstance = axios.create({
+  baseURL: SIGNING_SERVER,
+});
 
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {

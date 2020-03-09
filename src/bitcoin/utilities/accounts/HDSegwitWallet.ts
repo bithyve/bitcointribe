@@ -6,9 +6,12 @@ import crypto from 'crypto';
 import config from '../../Config';
 import Bitcoin from './Bitcoin';
 import { Transactions } from '../Interface';
-import { AxiosResponse } from 'axios';
-const { BH_AXIOS, HEXA_ID } = config;
+import axios, { AxiosResponse, AxiosInstance } from 'axios';
+const { RELAY, HEXA_ID } = config;
 
+const BH_AXIOS: AxiosInstance = axios.create({
+  baseURL: RELAY,
+});
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
   private passphrase: string;
