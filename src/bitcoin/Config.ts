@@ -3,6 +3,7 @@ import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import {
   BIT_ENVIRONMENT,
+  BIT_SERVER_MODE,
   BIT_GAP_LIMIT,
   BIT_DPATH_PURPOSE,
   BIT_STANDARD_BIP44,
@@ -16,8 +17,10 @@ import {
   BIT_BSI_MINUNUSEDINDEX,
   BIT_BSI_DEPTH_INIT,
   BIT_BSI_DEPTH_LIMIT,
-  BIT_API_URLS_BH_SERVER_DEV,
-  BIT_API_URLS_BH_SERVER_PROD,
+  BIT_API_URLS_RELAY_DEV,
+  BIT_API_URLS_SIGNING_SERVER_DEV,
+  BIT_API_URLS_RELAY_PROD,
+  BIT_API_URLS_SIGNING_SERVER_PROD,
   BIT_HEXA_ID,
   BIT_BLOCKCYPHER_API_URLS_TOKEN,
   BIT_SUCCESS_STATUS_CODE,
@@ -82,7 +85,6 @@ class Config {
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public BITCOIN_NODE: Client;
-  public BH_AXIOS: AxiosInstance;
   public SECURE_WALLET_XPUB_PATH: string = BIT_SECURE_WALLET_XPUB_PATH;
   public SECURE_DERIVATION_BRANCH: string = BIT_SECURE_DERIVATION_BRANCH;
   public TOKEN: string = BIT_BLOCKCYPHER_API_URLS_TOKEN;
@@ -99,9 +101,15 @@ class Config {
     keyLength: parseInt(BIT_CIPHER_KEYLENGTH, 10),
     iv: Buffer.alloc(16, 0),
   };
-  public BH_SERVER = {
-    DEV: BIT_API_URLS_BH_SERVER_DEV,
-    PROD: BIT_API_URLS_BH_SERVER_PROD,
+  public BH_SERVERS = {
+    DEV: {
+      RELAY: BIT_API_URLS_RELAY_DEV,
+      SIGNING_SERVER: BIT_API_URLS_SIGNING_SERVER_DEV,
+    },
+    PROD: {
+      RELAY: BIT_API_URLS_RELAY_PROD,
+      SIGNING_SERVER: BIT_API_URLS_SIGNING_SERVER_PROD,
+    },
   };
   public BSI = {
     INIT_INDEX: parseInt(BIT_BSI_INIT_INDEX, 10),
@@ -173,7 +181,9 @@ class Config {
     },
   };
 
-  public SERVER: string = this.BH_SERVER.PROD;
+  public SERVER_MODE: string = BIT_SERVER_MODE;
+  public RELAY: string;
+  public SIGNING_SERVER: string;
 
   public API_URLS = {
     TESTNET: {
@@ -207,6 +217,13 @@ class Config {
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
+    if (this.SERVER_MODE === 'PROD') {
+      this.RELAY = this.BH_SERVERS.PROD.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
+    } else {
+      this.RELAY = this.BH_SERVERS.DEV.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
+    }
     this.setNetwork();
     this.BITCOIN_NODE = new Client({
       network:
@@ -216,16 +233,17 @@ class Config {
       password: BIT_RPC_PASSWORD,
       host: BIT_HOST_IP,
     });
-    this.BH_AXIOS = axios.create({
-      baseURL: this.SERVER,
-    });
   }
 
   public setNetwork = (): void => {
     if (this.ENVIRONMENT === 'MAIN') {
       this.NETWORK = bitcoinJS.networks.bitcoin;
+      this.RELAY = this.BH_SERVERS.PROD.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
     } else if (this.ENVIRONMENT === 'TEST') {
       this.NETWORK = bitcoinJS.networks.testnet;
+      this.RELAY = this.BH_SERVERS.DEV.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
     } else {
       throw new Error('Please specify an apt environment(MAIN||TEST)');
     }

@@ -1,15 +1,20 @@
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosInstance } from 'axios';
 import * as bip39 from 'bip39';
 import crypto from 'crypto';
 import secrets from 'secrets.js-grempe';
 import config from '../../Config';
+import axios from 'axios';
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD,
 } from '../Interface';
-const { BH_AXIOS, HEXA_ID } = config;
+const { RELAY, HEXA_ID } = config;
+
+const BH_AXIOS: AxiosInstance = axios.create({
+  baseURL: RELAY,
+});
 
 export default class SSS {
   public static cipherSpec: {
