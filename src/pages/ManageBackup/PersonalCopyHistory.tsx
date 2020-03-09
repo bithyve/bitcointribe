@@ -27,7 +27,7 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import moment from 'moment';
 import _ from 'underscore';
-import Toast from "../../components/Toast";
+import Toast from '../../components/Toast';
 
 const PersonalCopyHistory = props => {
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
@@ -80,16 +80,20 @@ const PersonalCopyHistory = props => {
       scanedCode: qrData => {
         dispatch(checkPDFHealth(qrData, index));
       },
+      title: 'Confirm your Recovery Secret',
     });
   }, [selectedPersonalCopy]);
 
-    useEffect(() => {
-      if(loading.pdfHealthChecked){
-        console.log("loading.pdfHealthChecked && personalCopyIndex", loading.pdfHealthChecked)
-      Toast("PDF scanned Successfully");
+  useEffect(() => {
+    if (loading.pdfHealthChecked) {
+      console.log(
+        'loading.pdfHealthChecked && personalCopyIndex',
+        loading.pdfHealthChecked,
+      );
+      Toast('PDF scanned Successfully');
       dispatch(pdfHealthChecked(''));
-    } 
-    }, [loading.pdfHealthChecked]);
+    }
+  }, [loading.pdfHealthChecked]);
 
   const renderPersonalCopyShareModalContent = useCallback(() => {
     return (
