@@ -413,10 +413,21 @@ export default class Bitcoin {
         if (addressInfo.TotalTransactions === 0) {
           continue;
         }
-        transactions.totalTransactions += addressInfo.TotalTransactions;
         transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
         transactions.unconfirmedTransactions +=
           addressInfo.UnconfirmedTransactions;
+
+        if (
+          addressInfo.ConfirmedTransactions +
+            addressInfo.UnconfirmedTransactions >
+          addressInfo.totalTransactions
+        ) {
+          transactions.totalTransactions +=
+            addressInfo.ConfirmedTransactions +
+            addressInfo.UnconfirmedTransactions;
+        } else {
+          transactions.totalTransactions += addressInfo.TotalTransactions;
+        }
 
         addressInfo.Transactions.forEach(tx => {
           if (!txMap.has(tx.txid)) {

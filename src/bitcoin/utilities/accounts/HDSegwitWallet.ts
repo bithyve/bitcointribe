@@ -175,7 +175,10 @@ export default class HDSegwitWallet extends Bitcoin {
         recipientAddress,
         amount,
       });
+      console.log({ res });
     } catch (err) {
+      console.log({ res });
+
       throw new Error(err.response.data.err);
     }
 
@@ -477,6 +480,8 @@ export default class HDSegwitWallet extends Bitcoin {
     ) {
       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
     }
+
+    console.log({ usedAddresses: this.usedAddresses });
 
     const {
       balances,

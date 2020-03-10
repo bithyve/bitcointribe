@@ -216,13 +216,6 @@ class Config {
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
-    if (BIT_SERVER_MODE === 'PROD') {
-      this.RELAY = this.BH_SERVERS.PROD.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
-    } else {
-      this.RELAY = this.BH_SERVERS.DEV.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
-    }
     this.setNetwork();
     this.BITCOIN_NODE = new Client({
       network:
