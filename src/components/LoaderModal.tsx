@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
@@ -12,17 +12,16 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 export default function LoaderModal(props) {
-
-    return (<View style={{ height: hp('35%'),  backgroundColor: 'rgba(0, 0, 0, 0.3)'}}>
+    return (<View style={{ height: hp('25%'),  backgroundColor: 'rgba(0, 0, 0, 0.3)'}}>
         <View style={styles.modalContentContainer}>
-            <Image source={require('../assets/images/loading.gif')} style={styles.successModalImage} />
-            <View style={{marginLeft:wp('8%'), marginRight:wp('8%')}}>
-                <Text style={{color:Colors.white, fontSize:RFValue(15), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
-                <Text style={{color:Colors.white, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
+            <View style={{marginTop:'auto', right:0, bottom:0, marginRight:-5, position:'absolute'}}>
+                <Image source={require('../assets/images/loader.gif')} style={ { width: wp('30%'), height: wp('35%'), marginLeft: 'auto', resizeMode: "stretch",}} />
             </View>
-            <View style={{marginTop:'auto', marginRight:-5}}>
-                <Image source={require('../assets/images/icons/errorImage.png')} style={ { width: wp('25%'), height: wp('25%'), marginLeft: 'auto', resizeMode: "cover",}} />
+            <View style={{marginLeft:wp('8%'), marginRight:wp('8%'), marginTop:wp('8%')}}>
+                <Text style={{color:Colors.blue, fontSize:RFValue(18), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
+                <Text style={{color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
             </View>
+            
         </View>
     </View>
     )
@@ -30,16 +29,17 @@ export default function LoaderModal(props) {
 
 const styles = StyleSheet.create({
     modalContentContainer: {
-        backgroundColor:Colors.blue,
+        backgroundColor:Colors.white,
         borderTopLeftRadius: 10,
-        borderLeftColor: Colors.blue,
+        borderLeftColor: Colors.white,
         borderLeftWidth: 1,
         borderTopRightRadius: 10,
-        borderRightColor: Colors.blue,
+        borderRightColor: Colors.white,
         borderRightWidth: 1,
-        borderTopColor: Colors.blue,
+        borderTopColor: Colors.white,
         borderTopWidth: 1,
-        height:'100%'
+        height:'100%',
+        position:'relative'
     },
     successModalImage: {
         width: wp('80%'),
