@@ -14,7 +14,6 @@ const BH_AXIOS: AxiosInstance = axios.create({
   baseURL: SIGNING_SERVER,
 });
 
-console.log({ SIGNING_SERVER });
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
     qrData: string;
