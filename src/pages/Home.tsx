@@ -96,6 +96,7 @@ import Toast from '../components/Toast';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  let [loading, setLoading] = useState(false);
   let [AssociatedContact, setAssociatedContact] = useState([]);
   let [SelectedContacts, setSelectedContacts] = useState([]);
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
@@ -773,6 +774,7 @@ export default function Home(props) {
           isQR: true,
           type: scannedData.type,
         };
+        setLoading(false);
         setSecondaryDeviceOtp(custodyRequest1);
         props.navigation.navigate('Home', { custodyRequest: custodyRequest1 });
         break;
@@ -785,6 +787,7 @@ export default function Home(props) {
           isQR: true,
           type: scannedData.type,
         }; //trustedContactQR
+        setLoading(false);
         setSecondaryDeviceOtp(custodyRequest2);
         props.navigation.navigate('Home', { custodyRequest: custodyRequest2 });
         break;
@@ -795,6 +798,7 @@ export default function Home(props) {
           otp: scannedData.OTP,
           isQR: true,
         };
+        setLoading(false);
         props.navigation.navigate('Home', { recoveryRequest });
       default:
         break;
@@ -1094,8 +1098,10 @@ export default function Home(props) {
 
     return (
       <CustodianRequestModalContents
+        loading={loading}
         userName={custodyRequest.requester}
         onPressAcceptSecret={() => {
+          setLoading(true);
           setTimeout(() => {
             setTabBarZIndex(0);
             setDeepLinkModalOpen(false);
@@ -1107,19 +1113,23 @@ export default function Home(props) {
               'Request expired!',
               'Please ask the sender to initiate a new request',
             );
+            setLoading(false);
           } else {
             if (UNDER_CUSTODY[custodyRequest.requester]) {
               Alert.alert(
                 'Failed to store',
                 'You cannot custody multiple shares of the same user.',
               );
+              setLoading(false);
             } else {
               if (custodyRequest.isQR) {
                 dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+                setLoading(false);
               } else {
                 props.navigation.navigate('CustodianRequestOTP', {
                   custodyRequest,
                 });
+                setLoading(false);
               }
             }
           }
@@ -1133,7 +1143,7 @@ export default function Home(props) {
         }}
       />
     );
-  }, [custodyRequest]);
+  }, [custodyRequest, loading]);
 
   // const renderRecoveryRequestModalContent = useCallback(() => {
   //   if (!recoveryRequest) return <View></View>;
