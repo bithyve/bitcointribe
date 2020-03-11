@@ -73,16 +73,6 @@ export default function ContactList(props) {
     }
   }
   
-  const checkPermission = async () => {
-    const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
-    if (status !== 'granted') {
-      setContactPermissionIOS(false)
-      Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
-      return;
-    }else{
-      setContactPermissionIOS(true)
-    }
-  }
 
   const getContact = () => {
     ExpoContacts.getContactsAsync().then(({ data }) => {
@@ -110,11 +100,16 @@ export default function ContactList(props) {
         } else {
           getContact();
     }
-  } else {
-    getContact();
+  } else if(Platform.OS === 'ios'){
+    const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
+    if (status !== 'granted') {
+      setContactPermissionIOS(false)
+      Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+      return;
+    } else {
+      getContact();
+    }
   }
-
-    
   };
 
   useEffect(() => {
@@ -233,21 +228,26 @@ export default function ContactList(props) {
             }
           });
         }
-       
-      } else {
-        var newPerson = {
-          displayName: '',
-        };
-        //if(contactPermissionAndroid){
+      } else if(Platform.OS === 'ios'){
+        const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
+        if (status !== 'granted') {
+          setContactPermissionIOS(false)
+          Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          return;
+        } else {
+          var newPerson = {
+            displayName: '',
+          };
           Contacts.openContactForm(newPerson, (err, contact) => {
-            if (err) return;
-            if (contact) {
-              console.log("contact",contact);
-              getContactsAsync();
-            }
-          });
-       // }
-      }}
+              if (err) return;
+              if (contact) {
+                console.log("contact",contact);
+                getContactsAsync();
+              }
+            });
+        }
+      }
+    }
 
   return (
       <View style={{ flex: 1, ...props.style }}>
