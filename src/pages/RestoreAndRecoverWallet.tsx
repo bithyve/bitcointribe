@@ -8,6 +8,7 @@ import {
   StatusBar,
   Text,
   AsyncStorage,
+  Linking
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -20,6 +21,15 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import BottomInfoBox from '../components/BottomInfoBox';
 
 const RestoreAndRecoverWallet = props => {
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -98,6 +108,7 @@ const RestoreAndRecoverWallet = props => {
                 'By proceeding to the next step, you agree to our '
               }
               linkText={'Terms of Service'}
+              onPress={()=>openLink("https://hexawallet.io/terms-of-service/")}
             />
           </View>
         </View>
