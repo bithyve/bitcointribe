@@ -60,6 +60,10 @@ const TrustedContactHistory = props => {
     setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef());
   const [
+    ErrorBottomSheet,
+    setErrorBottomSheet,
+  ] = useState(React.createRef());
+  const [
     CommunicationModeBottomSheet,
     setCommunicationModeBottomSheet,
   ] = useState(React.createRef());
@@ -365,10 +369,37 @@ const TrustedContactHistory = props => {
     );
   }, [selectedContactMode]);
 
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={'Failed to share'}
+        info={'There was some error while sharing the Recovery Secret, please try again'}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, []);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   const communicate = async() => {
     let selectedContactModeTmp = index == 1 ? selectedContactMode[0] :selectedContactMode[1];
     if (!SHARES_TRANSFER_DETAILS[index]) {
-      Alert.alert('Failed to share');
+      (ErrorBottomSheet as any).current.snapTo(1);
+      //Alert.alert('Failed to share');
       return;
     }
     const deepLink =
@@ -817,6 +848,16 @@ const TrustedContactHistory = props => {
         snapPoints={[-30, hp('85%')]}
         renderContent={renderTrustedContactQrContents}
         renderHeader={renderTrustedContactQrHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
       />
     </View>
   );

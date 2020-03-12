@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect,useCallback } from 'react';
 import {
   View,
   Image,
@@ -24,6 +24,10 @@ import { downloadMShare } from '../../store/actions/sss';
 import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommonStyle from '../../common/Styles';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function CustodianRequestOTP(props) {
   const custodyRequest = props.navigation.getParam('custodyRequest');
@@ -37,6 +41,10 @@ export default function CustodianRequestOTP(props) {
   const [
     CustodianRequestAcceptBottomSheet,
     setCustodianRequestAcceptBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    ErrorBottomSheet,
+    setErrorBottomSheet,
   ] = useState(React.createRef());
 
   function onPressNumber(text, i) {
@@ -68,10 +76,7 @@ export default function CustodianRequestOTP(props) {
 
   // useEffect(() => {
   //   if (UNDER_CUSTODY[requester]) {
-  //     Alert.alert(
-  //       'Failed to store',
-  //       'You cannot custody multiple shares of the same user.',
-  //     );
+  //     (ErrorBottomSheet as any).current.snapTo(1);
   //   } else {
   //     if (passcode.join('').length === 6 || otp)
   //       props.navigation.navigate('CustodianRequestAccepted', { requester });
@@ -85,6 +90,32 @@ export default function CustodianRequestOTP(props) {
         props.navigation.navigate('CustodianRequestAccepted', { requester });
     }
   }, [UNDER_CUSTODY]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={'Failed to store Recovery Secret'}
+        info={'You cannot be the Guardian of multiple shares from the same user'}
+        proceedButtonText={'Ok'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, []);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -310,6 +341,16 @@ export default function CustodianRequestOTP(props) {
           </View>
         </View>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </SafeAreaView>
   );
 }

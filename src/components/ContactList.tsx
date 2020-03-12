@@ -429,7 +429,7 @@ export default function ContactList(props) {
         ref={contactListErrorBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('32%') : hp('40%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderContactListErrorModalContent}
         renderHeader={renderContactListErrorModalHeader}
