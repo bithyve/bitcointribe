@@ -786,7 +786,6 @@ export default function ManageBackup(props) {
   }, []);
 
   useEffect(() => {
-    // setContactsFromAsync();
     setAutoHighlightFlagsFromAsync();
   }, []);
 
@@ -803,7 +802,6 @@ export default function ManageBackup(props) {
   useEffect(() => {
     if (overallHealth) {
       // update acc to overall health (aids post wallet recovery)
-
       const updatedAutoHighlightFlags = { ...autoHighlightFlags };
       if (overallHealth.sharesInfo[0].updatedAt) {
         updatedAutoHighlightFlags.secondaryDevice = true;
@@ -848,17 +846,20 @@ export default function ManageBackup(props) {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const storedHealth = await AsyncStorage.getItem('overallHealth');
-      if (storedHealth) {
-        setOverallHealth(JSON.parse(storedHealth));
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
     if (health) setOverallHealth(health);
+    else {
+      (async () => {
+        const storedHealth = await AsyncStorage.getItem('overallHealth');
+        if (storedHealth) {
+          setOverallHealth(JSON.parse(storedHealth));
+        }
+      })();
+    }
   }, [health]);
+
+  // useEffect(() => {
+  //   if (health) setOverallHealth(health);
+  // }, [health]);
 
   useEffect(() => {
     if (overallHealth) {
@@ -1232,7 +1233,6 @@ export default function ManageBackup(props) {
   }, [s3Service]);
 
   const getStatusIcon = item => {
-    console.log({ autoHighlightFlags });
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
       return getIconByStatus(item.status);
     }
@@ -1413,150 +1413,158 @@ export default function ManageBackup(props) {
                   )}
                 </View>
               </View>
-              <View style={{marginBottom: 10}}>
-              {pageData.map((item, index) => {
-                return (
-                  <View style={{}}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (item.type == 'secondaryDevice') {
-                          props.navigation.navigate('SecondaryDeviceHistory', {
-                            selectedStatus: item.status,
-                            selectedTime: getTime(item.time),
-                            selectedTitle: item.title,
-                            updateAutoHighlightFlags: () =>
-                              setAutoHighlightFlags({
-                                ...autoHighlightFlags,
-                                secondaryDevice: true,
-                              }),
-                          });
-                        } else if (item.type == 'contact1') {
-                          props.navigation.navigate('TrustedContactHistory', {
-                            selectedStatus: item.status,
-                            selectedTime: getTime(item.time),
-                            selectedTitle: item.title,
-                            updateAutoHighlightFlags: () =>
-                              setAutoHighlightFlags({
-                                ...autoHighlightFlags,
-                                trustedContact1: true,
-                              }),
-                            activateReshare: autoHighlightFlags.trustedContact1,
-                          });
-                        } else if (item.type == 'contact2') {
-                          props.navigation.navigate('TrustedContactHistory', {
-                            selectedStatus: item.status,
-                            selectedTime: getTime(item.time),
-                            selectedTitle: item.title,
-                            updateAutoHighlightFlags: () =>
-                              setAutoHighlightFlags({
-                                ...autoHighlightFlags,
-                                trustedContact2: true,
-                              }),
-                            activateReshare: autoHighlightFlags.trustedContact2,
-                          });
-                        } else if (item.type === 'copy1') {
-                          props.navigation.navigate('PersonalCopyHistory', {
-                            selectedStatus: item.status,
-                            selectedTime: getTime(item.time),
-                            selectedTitle: item.title,
-                            selectedPersonalCopy: item,
-                            updateAutoHighlightFlags: () =>
-                              setAutoHighlightFlags({
-                                ...autoHighlightFlags,
-                                personalCopy1: true,
-                              }),
-                          });
-                        } else if (item.type == 'copy2') {
-                          props.navigation.navigate('PersonalCopyHistory', {
-                            selectedStatus: item.status,
-                            selectedTime: getTime(item.time),
-                            selectedTitle: item.title,
-                            selectedPersonalCopy: item,
-                            updateAutoHighlightFlags: () =>
-                              setAutoHighlightFlags({
-                                ...autoHighlightFlags,
-                                personalCopy2: true,
-                              }),
-                          });
-                        } else if (item.type == 'security') {
-                          props.navigation.navigate('SecurityQuestionHistory', {
-                            selectedStatus: item.status,
-                            selectedTime: getTime(item.time),
-                            selectedTitle: item.title,
-                            updateAutoHighlightFlags: () =>
-                              setAutoHighlightFlags({
-                                ...autoHighlightFlags,
-                                securityAns: true,
-                              }),
-                          });
-                        }
-                      }}
-                      style={{
-                        ...styles.manageBackupCard,
-                        borderColor:
-                          item.status == 'Ugly'
-                            ? Colors.red
-                            : item.status == 'Bad'
-                            ? Colors.yellow
-                            : item.status == 'Good'
-                            ? Colors.green
-                            : Colors.blue,
-                        elevation:
-                          selectedType && item.type == selectedType ? 10 : 0,
-                        shadowColor:
-                          selectedType && item.type == selectedType
-                            ? Colors.borderColor
-                            : Colors.white,
-                        shadowOpacity:
-                          selectedType && item.type == selectedType ? 10 : 0,
-                        shadowOffset:
-                          selectedType && item.type == selectedType
-                            ? { width: 0, height: 10 }
-                            : { width: 0, height: 0 },
-                        shadowRadius:
-                          selectedType && item.type == selectedType ? 10 : 0,
-                      }}
-                    >
-                      {getImageIcon(item)}
-                      <View style={{ marginLeft: 15 }}>
-                        <Text style={styles.cardTitleText}>
-                          {item.personalInfo &&
-                          (item.type == 'contact1' || item.type == 'contact2')
-                            ? item.personalInfo.firstName &&
-                              item.personalInfo.lastName
-                              ? item.personalInfo.firstName +
-                                ' ' +
+              <View style={{ marginBottom: 10 }}>
+                {pageData.map((item, index) => {
+                  return (
+                    <View style={{}}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          if (item.type == 'secondaryDevice') {
+                            props.navigation.navigate(
+                              'SecondaryDeviceHistory',
+                              {
+                                selectedStatus: item.status,
+                                selectedTime: getTime(item.time),
+                                selectedTitle: item.title,
+                                updateAutoHighlightFlags: () =>
+                                  setAutoHighlightFlags({
+                                    ...autoHighlightFlags,
+                                    secondaryDevice: true,
+                                  }),
+                              },
+                            );
+                          } else if (item.type == 'contact1') {
+                            props.navigation.navigate('TrustedContactHistory', {
+                              selectedStatus: item.status,
+                              selectedTime: getTime(item.time),
+                              selectedTitle: item.title,
+                              updateAutoHighlightFlags: () =>
+                                setAutoHighlightFlags({
+                                  ...autoHighlightFlags,
+                                  trustedContact1: true,
+                                }),
+                              activateReshare:
+                                autoHighlightFlags.trustedContact1,
+                            });
+                          } else if (item.type == 'contact2') {
+                            props.navigation.navigate('TrustedContactHistory', {
+                              selectedStatus: item.status,
+                              selectedTime: getTime(item.time),
+                              selectedTitle: item.title,
+                              updateAutoHighlightFlags: () =>
+                                setAutoHighlightFlags({
+                                  ...autoHighlightFlags,
+                                  trustedContact2: true,
+                                }),
+                              activateReshare:
+                                autoHighlightFlags.trustedContact2,
+                            });
+                          } else if (item.type === 'copy1') {
+                            props.navigation.navigate('PersonalCopyHistory', {
+                              selectedStatus: item.status,
+                              selectedTime: getTime(item.time),
+                              selectedTitle: item.title,
+                              selectedPersonalCopy: item,
+                              updateAutoHighlightFlags: () =>
+                                setAutoHighlightFlags({
+                                  ...autoHighlightFlags,
+                                  personalCopy1: true,
+                                }),
+                            });
+                          } else if (item.type == 'copy2') {
+                            props.navigation.navigate('PersonalCopyHistory', {
+                              selectedStatus: item.status,
+                              selectedTime: getTime(item.time),
+                              selectedTitle: item.title,
+                              selectedPersonalCopy: item,
+                              updateAutoHighlightFlags: () =>
+                                setAutoHighlightFlags({
+                                  ...autoHighlightFlags,
+                                  personalCopy2: true,
+                                }),
+                            });
+                          } else if (item.type == 'security') {
+                            props.navigation.navigate(
+                              'SecurityQuestionHistory',
+                              {
+                                selectedStatus: item.status,
+                                selectedTime: getTime(item.time),
+                                selectedTitle: item.title,
+                                updateAutoHighlightFlags: () =>
+                                  setAutoHighlightFlags({
+                                    ...autoHighlightFlags,
+                                    securityAns: true,
+                                  }),
+                              },
+                            );
+                          }
+                        }}
+                        style={{
+                          ...styles.manageBackupCard,
+                          borderColor:
+                            item.status == 'Ugly'
+                              ? Colors.red
+                              : item.status == 'Bad'
+                              ? Colors.yellow
+                              : item.status == 'Good'
+                              ? Colors.green
+                              : Colors.blue,
+                          elevation:
+                            selectedType && item.type == selectedType ? 10 : 0,
+                          shadowColor:
+                            selectedType && item.type == selectedType
+                              ? Colors.borderColor
+                              : Colors.white,
+                          shadowOpacity:
+                            selectedType && item.type == selectedType ? 10 : 0,
+                          shadowOffset:
+                            selectedType && item.type == selectedType
+                              ? { width: 0, height: 10 }
+                              : { width: 0, height: 0 },
+                          shadowRadius:
+                            selectedType && item.type == selectedType ? 10 : 0,
+                        }}
+                      >
+                        {getImageIcon(item)}
+                        <View style={{ marginLeft: 15 }}>
+                          <Text style={styles.cardTitleText}>
+                            {item.personalInfo &&
+                            (item.type == 'contact1' || item.type == 'contact2')
+                              ? item.personalInfo.firstName &&
                                 item.personalInfo.lastName
-                              : item.personalInfo.firstName &&
-                                !item.personalInfo.lastName
-                              ? item.personalInfo.firstName
-                              : !item.personalInfo.firstName &&
-                                item.personalInfo.lastName
-                              ? item.personalInfo.lastName
-                              : ''
-                            : item.title}
-                        </Text>
-                        <Text style={styles.cardTimeText}>
-                          Last backup{' '}
-                          <Text
-                            style={{
-                              fontFamily: Fonts.FiraSansMediumItalic,
-                              fontWeight: 'bold',
-                              fontStyle: 'italic',
-                            }}
-                          >
-                            {getTime(item.time)}
+                                ? item.personalInfo.firstName +
+                                  ' ' +
+                                  item.personalInfo.lastName
+                                : item.personalInfo.firstName &&
+                                  !item.personalInfo.lastName
+                                ? item.personalInfo.firstName
+                                : !item.personalInfo.firstName &&
+                                  item.personalInfo.lastName
+                                ? item.personalInfo.lastName
+                                : ''
+                              : item.title}
                           </Text>
-                        </Text>
-                      </View>
-                      <Image
-                        style={styles.cardIconImage}
-                        source={getStatusIcon(item)}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
+                          <Text style={styles.cardTimeText}>
+                            Last backup{' '}
+                            <Text
+                              style={{
+                                fontFamily: Fonts.FiraSansMediumItalic,
+                                fontWeight: 'bold',
+                                fontStyle: 'italic',
+                              }}
+                            >
+                              {getTime(item.time)}
+                            </Text>
+                          </Text>
+                        </View>
+                        <Image
+                          style={styles.cardIconImage}
+                          source={getStatusIcon(item)}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
               </View>
             </ScrollView>
             <BottomSheet

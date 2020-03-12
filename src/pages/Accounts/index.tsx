@@ -203,6 +203,7 @@ export default function Accounts(props) {
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
     });
+
     setTimeout(() => {
       if (carousel.current) {
         if (props.navigation.state.params) {
@@ -216,26 +217,47 @@ export default function Accounts(props) {
         }
       }
     }, 2000);
-    getServiceType(serviceType);
-    (async () => {
-      const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
-      if (storedStaticFees) {
-        const { staticFees, lastFetched } = JSON.parse(storedStaticFees);
-        if (Date.now() - lastFetched < 1800000) {
-          setStaticFees(staticFees);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
 
-      const instance = service.hdWallet || service.secureHDWallet;
-      const staticFees = await instance.getStaticFee();
-      setStaticFees(staticFees);
-      await AsyncStorage.setItem(
-        'storedStaticFees',
-        JSON.stringify({ staticFees, lastFetched: Date.now() }),
-      );
-    })();
+    getServiceType(serviceType);
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const storedStaticFees = JSON.parse(
+        await AsyncStorage.getItem('storedStaticFees'),
+      );
+      console.log({ storedStaticFees });
+      if (storedStaticFees && storedStaticFees[serviceType]) {
+        const { staticFees, lastFetched } = storedStaticFees[serviceType];
+        if (Date.now() - lastFetched < 1800000) {
+          // maintaining a half an hour difference b/w fetches
+          setStaticFees(staticFees);
+        } else {
+          const instance = service.hdWallet || service.secureHDWallet;
+          const staticFees = await instance.getStaticFee();
+          setStaticFees(staticFees);
+          await AsyncStorage.setItem(
+            'storedStaticFees',
+            JSON.stringify({
+              ...storedStaticFees,
+              serviceType: { staticFees, lastFetched: Date.now() },
+            }),
+          );
+        }
+      } else {
+        const instance = service.hdWallet || service.secureHDWallet;
+        const staticFees = await instance.getStaticFee();
+        console.log({ staticFees });
+        setStaticFees(staticFees);
+        await AsyncStorage.setItem(
+          'storedStaticFees',
+          JSON.stringify({
+            serviceType: { staticFees, lastFetched: Date.now() },
+          }),
+        );
+      }
+    })();
+  }, [serviceType]);
 
   const setCurrencyCodeFromAsync = async () => {
     let currencyToggleValueTmp = await AsyncStorage.getItem(

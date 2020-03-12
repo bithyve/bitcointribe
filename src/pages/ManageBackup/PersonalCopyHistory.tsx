@@ -17,7 +17,11 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkPDFHealth, pdfHealthChecked } from '../../store/actions/sss';
+import {
+  checkPDFHealth,
+  pdfHealthChecked,
+  checkMSharesHealth,
+} from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -91,6 +95,7 @@ const PersonalCopyHistory = props => {
         loading.pdfHealthChecked,
       );
       Toast('PDF scanned Successfully');
+      dispatch(checkMSharesHealth());
       dispatch(pdfHealthChecked(''));
     }
   }, [loading.pdfHealthChecked]);
