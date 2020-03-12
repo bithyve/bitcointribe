@@ -87,10 +87,7 @@ const styles = StyleSheet.create({
         marginLeft: wp('8%'),
     },
     successModalImage: {
-        width: wp('25%'),
-        height: hp('18%'),
-        marginLeft: 'auto',
-        resizeMode: "cover"
+        width: wp('30%'), height: wp('35%'), marginLeft: 'auto', resizeMode: "stretch" , marginRight: -5
     },
     proceedButtonText: {
         color: Colors.white,

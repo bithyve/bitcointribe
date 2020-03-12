@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import {
   View,
   Image,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Platform,
   AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -27,13 +28,21 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
+
 
 export default function CommunicationMode(props) {
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
-
+  const [
+    ErrorBottomSheet,
+    setErrorBottomSheet,
+  ] = useState(React.createRef());
   const communicationInfo = [];
   if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
   if (contact.emails) communicationInfo.push(...contact.emails);
@@ -54,7 +63,31 @@ export default function CommunicationMode(props) {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={'Failed to share'}
+        info={'There was some error while sharing the Recovery Secret, please try again'}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, []);
 
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
   const onContactSelect = index => {
     setContactInfo([
       ...contactInfo.map(item => {
@@ -85,7 +118,7 @@ export default function CommunicationMode(props) {
 
   const communicate = async selectedContactMode => {
     if (!SHARES_TRANSFER_DETAILS[index]) {
-      Alert.alert('Failed to share');
+      (ErrorBottomSheet as any).current.snapTo(1);
       return;
     }
     const deepLink =
@@ -374,6 +407,16 @@ export default function CommunicationMode(props) {
           </AppBottomSheetTouchableWrapper>
         ) : null}
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, Platform, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,6 +10,14 @@ import {
   secondaryXprivGenerated,
   clearTransfer,
 } from '../../store/actions/accounts';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 
 const LostTwoFA = props => {
   const additional = useSelector(state => state.accounts.additional);
@@ -21,6 +29,9 @@ const LostTwoFA = props => {
   }
   const dispatch = useDispatch();
   const service = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
 
   useEffect(() => {
     if (generatedSecureXPriv) {
@@ -37,10 +48,40 @@ const LostTwoFA = props => {
         dispatch(secondaryXprivGenerated(null));
       }, 1500);
     } else if (generatedSecureXPriv === false) {
-      Alert.alert('Invalid Secondary Mnemonic', 'Please try again');
+      setTimeout(() => {
+        setErrorMessageHeader('Invalid Secondary Mnemonic');
+        setErrorMessage('Invalid Secondary Mnemonic, please try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(secondaryXprivGenerated(null));
     }
   }, [generatedSecureXPriv]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   useEffect(() => {
     if (resettedTwoFA) {
@@ -56,10 +97,13 @@ const LostTwoFA = props => {
       });
       dispatch(twoFAResetted(null)); //resetting to monitor consecutive change
     } else if (resettedTwoFA === false) {
-      Alert.alert(
-        'Failed to reset 2FA',
-        'Invalid Secondary Mnemonic, please try again.',
-      );
+      setTimeout(() => {
+        setErrorMessageHeader('Failed to reset 2FA');
+        setErrorMessage(
+          'The QR you have scanned seems to be invalid, pls try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(twoFAResetted(null));
     }
   }, [resettedTwoFA]);
@@ -104,6 +148,16 @@ const LostTwoFA = props => {
           <Text>Sweep Savings</Text>
         </TouchableOpacity>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 };

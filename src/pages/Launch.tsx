@@ -119,7 +119,7 @@ export default function Launch(props) {
         ref={ErrorBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('32%') : hp('40%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}

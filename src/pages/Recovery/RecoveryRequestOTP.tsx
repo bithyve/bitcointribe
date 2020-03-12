@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect,useCallback } from 'react';
 import {
   View,
   Image,
@@ -28,6 +28,10 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommonStyle from '../../common/Styles';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function RecoveryRequestOTP(props) {
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
@@ -42,7 +46,10 @@ export default function RecoveryRequestOTP(props) {
     RecoveryRequestAcceptBottomSheet,
     setRecoveryRequestAcceptBottomSheet,
   ] = useState(React.createRef());
-
+  const [
+    ErrorBottomSheet,
+    setErrorBottomSheet,
+  ] = useState(React.createRef());
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
     tempPasscode[i] = text;
@@ -70,14 +77,43 @@ export default function RecoveryRequestOTP(props) {
   useEffect(() => {
     if (requestedShareUpload[requester]) {
       if (!requestedShareUpload[requester].status) {
-        Alert.alert('Upload failed', requestedShareUpload[requester].err);
+        (ErrorBottomSheet as any).current.snapTo(1);
+        //Alert.alert('Upload failed', requestedShareUpload[requester].err);
       } else {
         dispatch(resetRequestedShareUpload());
         props.navigation.goBack();
       }
     }
   }, [requestedShareUpload]);
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={'Error sending Recovery Secret'}
+        info={'There was an error while sending your Recovery Secret, please try again in a little while'}
+        proceedButtonText={'Try again'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, []);
 
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -302,6 +338,16 @@ export default function RecoveryRequestOTP(props) {
           </View>
         </View>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </SafeAreaView>
   );
 }
