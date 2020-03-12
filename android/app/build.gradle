@@ -104,7 +104,7 @@ android {
         applicationId "com.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 28                  
+        versionCode 30           
         versionName "0.7"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true

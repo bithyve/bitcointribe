@@ -8,6 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
   AsyncStorage,
+  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -21,6 +22,7 @@ import {
   checkPDFHealth,
   pdfHealthChecked,
   checkMSharesHealth,
+  QRChecked
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -32,8 +34,15 @@ import { ModalShareIntent } from '../../components/Modal/ManageBackup';
 import moment from 'moment';
 import _ from 'underscore';
 import Toast from '../../components/Toast';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
 
 const PersonalCopyHistory = props => {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isQRChecked = useSelector(state => state.sss.qrChecked);
+  console.log("isQRChecked", isQRChecked);
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -99,6 +108,43 @@ const PersonalCopyHistory = props => {
       dispatch(pdfHealthChecked(''));
     }
   }, [loading.pdfHealthChecked]);
+
+  if(isQRChecked){
+    setTimeout(() => {
+      setErrorMessageHeader('Invalid QR!');
+      setErrorMessage(
+        'The scanned QR is wrong, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(QRChecked(null));
+  }
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   const renderPersonalCopyShareModalContent = useCallback(() => {
     return (
@@ -325,6 +371,16 @@ const PersonalCopyHistory = props => {
         snapPoints={[-50, hp('85%')]}
         renderContent={renderPersonalCopyShareModalContent}
         renderHeader={renderPersonalCopyShareModalHeader}
+      />
+       <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
       />
     </View>
   );

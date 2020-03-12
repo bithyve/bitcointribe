@@ -6,6 +6,7 @@ import {
   RE_LOGIN,
   AUTH_CRED_CHANGED,
   SWITCH_CREDS_CHANGED,
+  PIN_CHANGED_FAILED
 } from '../actions/setupAndAuth';
 
 const initialState: {
@@ -20,6 +21,7 @@ const initialState: {
     authenticating: Boolean;
   };
   credsChanged: string;
+  pinChangedFailed: Boolean;
 } = {
   isInitialized: false,
   hasCreds: false,
@@ -32,6 +34,7 @@ const initialState: {
     authenticating: false,
   },
   credsChanged: '',
+  pinChangedFailed: false
 };
 
 export default (state = initialState, action) => {
@@ -106,6 +109,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         credsChanged: '',
+      };
+
+      case PIN_CHANGED_FAILED:
+      return {
+        ...state,
+        pinChangedFailed: action.payload.isFailed,
       };
   }
 

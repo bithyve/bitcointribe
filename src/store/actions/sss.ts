@@ -104,6 +104,9 @@ export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
 export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 export const UPDATE_SHARE_HISTORY = 'UPDATE_SHARE_HISTORY';
 export const CHECKED_PDF_HEALTH = 'CHECKED_PDF_HEALTH';
+export const QR_CHECKED = 'QR_CHECKED';
+export const UNABLE_RECOVER_SHARE_FROM_QR = 'UNABLE_RECOVER_SHARE_FROM_QR';
+export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -139,4 +142,16 @@ export const restoreShareFromQR = qrArray => {
 
 export const pdfHealthChecked = (pdfHealthChecked) => {
   return { type: CHECKED_PDF_HEALTH, payload: { pdfHealthChecked } };
+};
+
+export const QRChecked = isFailed => {
+  return { type: QR_CHECKED, payload: { isFailed } };
+};
+
+export const UnableRecoverShareFromQR = isFailed => {
+  return { type: UNABLE_RECOVER_SHARE_FROM_QR, payload: { isFailed } };
+};
+
+export const walletRecoveryFailed = isFailed => {
+  return { type: WALLET_RECOVERY_FAILED, payload: { isFailed } };
 };

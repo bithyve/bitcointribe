@@ -29,6 +29,9 @@ import {
   UPDATE_SHARE_HISTORY,
   updateShareHistory,
   pdfHealthChecked,
+  QRChecked,
+  UnableRecoverShareFromQR,
+  walletRecoveryFailed
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -539,7 +542,8 @@ function* checkPDFHealthWorker({ payload }) {
     yield put(pdfHealthChecked('pdfHealthChecked'));
   } else {
     console.log({ pdfHealth, payload });
-    Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
+    yield put( QRChecked(true) );
+    //Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
   }
 
   // if (res.status === 200) {
@@ -815,7 +819,8 @@ function* restoreShareFromQRWorker({ payload }) {
     console.log({ updatedBackup });
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
-    Alert.alert('Unable to recover share from QR', res.err);
+    yield put( UnableRecoverShareFromQR(true) );
+    //Alert.alert('Unable to recover share from QR', res.err);
     console.log({ err: res.err });
   }
 }
@@ -890,7 +895,8 @@ function* recoverWalletWorker({ payload }) {
     }
   } catch (err) {
     console.log({ err: err.message });
-    Alert.alert('Wallet recovery failed!', err.message);
+    yield put( walletRecoveryFailed(true) );
+    // Alert.alert('Wallet recovery failed!', err.message);
   }
 
   yield put(switchS3Loader('restoreWallet'));
