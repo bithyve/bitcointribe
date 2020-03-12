@@ -20,6 +20,7 @@ export default function BottomInfoBox(props) {
     {props.linkText ? <Text style={{color: Colors.textColorGrey,
         fontSize: RFValue(12),
         fontFamily: Fonts.FiraSansRegular,textDecorationLine: 'underline'}}
+        onPress={props.onPress ? props.onPress : ()=>{}}
         >{props.linkText}
         </Text> : null}
         {props.italicText ? <Text style={{fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle:"italic", fontSize: RFValue(12),}}

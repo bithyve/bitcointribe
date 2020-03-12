@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -54,6 +54,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
+  let [message, setMessage] = useState('Creating your wallet');
   const [Elevation, setElevation] = useState(10);
   const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -278,6 +279,7 @@ export default function NewWalletQuestion(props) {
       <TouchableOpacity
         onPress={() => {
           (loaderBottomSheet as any).current.snapTo(1);
+          seLoaderMessages();
           setTimeout(() => {
             setElevation(0);
           }, 0.2);
@@ -297,16 +299,28 @@ export default function NewWalletQuestion(props) {
       </TouchableOpacity>
     );
   };
-  const renderLoaderModalContent = () => {
+
+  const seLoaderMessages = () =>{
+    setTimeout(() => {
+      setMessage("Setting up your accounts");
+      setTimeout(() => {
+        setMessage("Getting test bitcoins (sats) for the Test account");
+        setTimeout(() => {
+          setMessage("Generating Recovery Secrets for the wallet backup");
+        }, 3000);
+      }, 3000);
+    }, 3000);
+  }
+  
+  const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
-        headerText={'Creating your wallet'}
-        messageText={
-          'Make sure you try out the Test Account which has been preloaded with test bitcoins\nPerfect way to learn Bitcoin'
-        }
+        headerText={message}
+        messageText={'This may take a few seconds'}
       />
     );
-  };
+  },[message]);
+
   const renderLoaderModalHeader = () => {
     return (
       <View
@@ -314,7 +328,7 @@ export default function NewWalletQuestion(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('65%'),
+          height: hp('75%'),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',

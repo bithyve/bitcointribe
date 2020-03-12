@@ -28,6 +28,7 @@ import {
 import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
 
 export default function Login(props) {
+  let [message, setMessage] = useState('Getting the latest details');
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [passcodeFlag, setPasscodeFlag] = useState(true);
@@ -180,16 +181,15 @@ export default function Login(props) {
     }
   }, [isAuthenticated, dbFetched]);
 
-  const renderLoaderModalContent = () => {
+  const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
-        headerText={'Getting the latest details '}
-        messageText={
-          'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet'
-        }
+        headerText={message}
+        messageText={'This may take a few seconds'}
       />
     );
-  };
+  },[ message]);
+  
   const renderLoaderModalHeader = () => {
     return (
       <View
@@ -197,7 +197,7 @@ export default function Login(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('65%'),
+          height: hp('75%'),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',

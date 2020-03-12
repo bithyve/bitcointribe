@@ -53,6 +53,7 @@ import {
 import axios from 'axios';
 
 export default function RestoreSelectedContactsList(props) {
+  let [message, setMessage] = useState('Creating your wallet');
   const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
@@ -279,13 +280,12 @@ export default function RestoreSelectedContactsList(props) {
   const renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Creating your wallet'}
-        messageText={
-          'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'
-        }
+        headerText={message}
+        messageText={'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'}
       />
     );
   };
+
   const renderLoaderModalHeader = () => {
     return (
       <View
@@ -293,7 +293,7 @@ export default function RestoreSelectedContactsList(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('65%'),
+          height: hp('75%'),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',

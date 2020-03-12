@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -25,17 +25,27 @@ import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { FlatList } from "react-native-gesture-handler";
 import * as Permissions from 'expo-permissions';
-
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
+import Toast from "../components/Toast";
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
-  const [contactData, setContactData] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
   const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
   const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
+  const [
+    contactListErrorBottomSheet,
+    setcontactListErrorBottomSheet,
+  ] = useState(React.createRef());
   const selectectcontactlist = props.selectedContacts ? props.selectedContacts : [];
+  const [contactData, setContactData] = useState([]);
+
   useEffect(() => {
     if(props.selectedContacts){
       setSelectedContacts(selectectcontactlist);
@@ -76,7 +86,11 @@ export default function ContactList(props) {
 
   const getContact = () => {
     ExpoContacts.getContactsAsync().then(({ data }) => {
-      if (!data.length) Alert.alert('No contacts found!');
+      if (!data.length) {
+        //Alert.alert('No contacts found!');
+        setErrorMessage('No contacts found. Please add contacts to your address book and try again');
+        (contactListErrorBottomSheet as any).current.snapTo(1);
+      }
       setContactData(data);
       const contactList = data.sort(function(a, b) {
         if (a.name && b.name) {
@@ -94,7 +108,8 @@ export default function ContactList(props) {
       const granted = await requestContactsPermission();
         console.log("GRANTED", granted);
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          (contactListErrorBottomSheet as any).current.snapTo(1);
           setContactPermissionAndroid(false);
           return;
         } else {
@@ -102,9 +117,10 @@ export default function ContactList(props) {
     }
   } else if(Platform.OS === 'ios'){
     const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
-    if (status !== 'granted') {
-      setContactPermissionIOS(false)
-      Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+    if (status === 'denied') {
+      setContactPermissionIOS(false);
+      setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+      (contactListErrorBottomSheet as any).current.snapTo(1);
       return;
     } else {
       getContact();
@@ -153,7 +169,7 @@ export default function ContactList(props) {
 
   function onContactSelect(index) {
     if(selectedContacts.length==2 && !props.isTrustedContact){
-      Alert.alert("","Please remove one or more selected contacts to select a new one.");
+      Toast("Please remove one or more selected contacts to select a new one.");
       return;
     }
     let contacts = filterContactData;
@@ -212,7 +228,8 @@ export default function ContactList(props) {
         const granted = await requestContactsPermission();
         console.log("GRANTED", granted);
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          (contactListErrorBottomSheet as any).current.snapTo(1);
           setContactPermissionAndroid(false);
           return;
         } else {
@@ -230,9 +247,10 @@ export default function ContactList(props) {
         }
       } else if(Platform.OS === 'ios'){
         const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
-        if (status !== 'granted') {
-          setContactPermissionIOS(false)
-          Alert.alert('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+        if (status === 'denied') {
+          setContactPermissionIOS(false);
+          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          (contactListErrorBottomSheet as any).current.snapTo(1);
           return;
         } else {
           var newPerson = {
@@ -248,6 +266,37 @@ export default function ContactList(props) {
         }
       }
     }
+
+    const renderContactListErrorModalContent = useCallback(() => {
+      return (
+        <ErrorModalContents
+          modalRef={contactListErrorBottomSheet}
+          title={'Error while accessing your contacts '}
+          info={errorMessage}
+          proceedButtonText={'Open Setting'}
+          isIgnoreButton={true}
+          onPressProceed={() => {
+            (contactListErrorBottomSheet as any).current.snapTo(0);
+          }}
+          onPressIgnore={() => {
+            (contactListErrorBottomSheet as any).current.snapTo(0);
+          }}
+          isBottomImage={true}
+          bottomImage={require('../assets/images/icons/errorImage.png')}
+        />
+      );
+    }, [errorMessage]);
+  
+    const renderContactListErrorModalHeader = useCallback(() => {
+      return (
+        <ModalHeader
+          onPressHeader={() => {
+            (contactListErrorBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }, []);
+  
 
   return (
       <View style={{ flex: 1, ...props.style }}>
@@ -375,6 +424,16 @@ export default function ContactList(props) {
             </AppBottomSheetTouchableWrapper>
           </View>
         )}
+        <BottomSheet
+        enabledInnerScrolling={true}
+        ref={contactListErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('32%') : hp('40%'),
+        ]}
+        renderContent={renderContactListErrorModalContent}
+        renderHeader={renderContactListErrorModalHeader}
+      />
     </View>
   );
 }
