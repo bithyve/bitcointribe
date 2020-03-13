@@ -55,7 +55,7 @@ import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function Send(props) {
-  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [
     SendConfirmationBottomSheet,
     setSendConfirmationBottomSheet,
@@ -622,6 +622,16 @@ export default function Send(props) {
     }
   };
 
+  useEffect(()=>{
+    console.log('isInvalidAddress && recipientAddress && amount',isInvalidAddress , recipientAddress , amount)
+    if(isInvalidAddress && recipientAddress && amount){
+      setIsConfirmDisabled(false);
+    }
+    else{
+      setIsConfirmDisabled(true);
+    }
+  },[recipientAddress, isInvalidAddress, amount])
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -1005,6 +1015,7 @@ export default function Send(props) {
                       shadowColor: Colors.shadowBlue,
                       shadowOpacity: 1,
                       shadowOffset: { width: 15, height: 15 },
+                      opacity: isConfirmDisabled ? 0.5 : 1
                     }}
                   >
                     {loading.transfer && !isInvalidBalance ? (
