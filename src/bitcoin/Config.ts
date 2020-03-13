@@ -1,4 +1,3 @@
-import axios, { AxiosInstance } from 'axios';
 import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import {
