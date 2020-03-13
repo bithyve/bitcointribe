@@ -916,6 +916,7 @@ export default class SSS {
     }
 
     this.metaShares = metaShares;
+    this.healthCheckInitialized = true;
     return { restored: true };
   };
 

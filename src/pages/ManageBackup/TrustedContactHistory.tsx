@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Platform,
   AsyncStorage,
-  Alert
+  Alert,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -35,7 +35,7 @@ import _ from 'underscore';
 import TrustedContactQr from './TrustedContactQr';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { textWithoutEncoding, email } from 'react-native-communications';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShare, checkMSharesHealth } from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
 
 const TrustedContactHistory = props => {
@@ -59,10 +59,7 @@ const TrustedContactHistory = props => {
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef());
-  const [
-    ErrorBottomSheet,
-    setErrorBottomSheet,
-  ] = useState(React.createRef());
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [
     CommunicationModeBottomSheet,
     setCommunicationModeBottomSheet,
@@ -195,28 +192,34 @@ const TrustedContactHistory = props => {
   const renderCommunicationModeModalContent = useCallback(() => {
     return (
       <CommunicationMode
-        onContactUpdate = {(contact)=>{ setTimeout(() => {
+        onContactUpdate={contact => {
+          setTimeout(() => {
             setChosenContact(contact);
             setTemp(!Temp);
-          }, 2);  
+          }, 2);
         }}
         contact={chosenContact ? chosenContact : null}
         index={index}
         onPressBack={() => {
           (CommunicationModeBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={ async(OTP, index, selectedContactMode) => {
-          let selectedContactModeTemp = JSON.parse(await AsyncStorage.getItem("selectedContactMode"));
-          if(!selectedContactModeTemp){
-            selectedContactModeTemp = []
+        onPressContinue={async (OTP, index, selectedContactMode) => {
+          let selectedContactModeTemp = JSON.parse(
+            await AsyncStorage.getItem('selectedContactMode'),
+          );
+          if (!selectedContactModeTemp) {
+            selectedContactModeTemp = [];
           }
-          if(index == 1){
+          if (index == 1) {
             selectedContactModeTemp[0] = selectedContactMode;
           }
-          if(index == 2){
+          if (index == 2) {
             selectedContactModeTemp[1] = selectedContactMode;
           }
-          await AsyncStorage.setItem("selectedContactMode", JSON.stringify(selectedContactModeTemp));
+          await AsyncStorage.setItem(
+            'selectedContactMode',
+            JSON.stringify(selectedContactModeTemp),
+          );
           setSelectedContactMode(selectedContactModeTemp);
           if (selectedContactMode.type == 'qrcode') {
             (trustedContactQrBottomSheet as any).current.snapTo(1);
@@ -282,6 +285,9 @@ const TrustedContactHistory = props => {
 
   const onOTPShare = useCallback(
     async index => {
+      (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+      (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
+
       let selectedContactList = JSON.parse(
         await AsyncStorage.getItem('SelectedContacts'),
       );
@@ -301,9 +307,7 @@ const TrustedContactHistory = props => {
       updateAutoHighlightFlags();
       saveInTransitHistory();
       setActivateReshare(true);
-
-      (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
-      (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
+      dispatch(checkMSharesHealth());
     },
     [updateAutoHighlightFlags, saveInTransitHistory, chosenContact],
   );
@@ -374,7 +378,9 @@ const TrustedContactHistory = props => {
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
         title={'Failed to share'}
-        info={'There was some error while sharing the Recovery Secret, please try again'}
+        info={
+          'There was some error while sharing the Recovery Secret, please try again'
+        }
         proceedButtonText={'Try again'}
         onPressProceed={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
@@ -395,8 +401,9 @@ const TrustedContactHistory = props => {
     );
   }, []);
 
-  const communicate = async() => {
-    let selectedContactModeTmp = index == 1 ? selectedContactMode[0] :selectedContactMode[1];
+  const communicate = async () => {
+    let selectedContactModeTmp =
+      index == 1 ? selectedContactMode[0] : selectedContactMode[1];
     if (!SHARES_TRANSFER_DETAILS[index]) {
       (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert('Failed to share');
@@ -424,8 +431,10 @@ const TrustedContactHistory = props => {
         (trustedContactQrBottomSheet as any).current.snapTo(1);
         break;
     }
-    if(selectedContactModeTmp.type != "qrcode"){
-      let otpTemp = SHARES_TRANSFER_DETAILS[index].OTP ? SHARES_TRANSFER_DETAILS[index].OTP : null
+    if (selectedContactModeTmp.type != 'qrcode') {
+      let otpTemp = SHARES_TRANSFER_DETAILS[index].OTP
+        ? SHARES_TRANSFER_DETAILS[index].OTP
+        : null;
       setTimeout(() => {
         setRenderTimer(true);
         setOTP(otpTemp);
@@ -468,7 +477,9 @@ const TrustedContactHistory = props => {
         modalRef={ReshareBottomSheet}
         title={'Reshare Recovery Secret\nwith Trusted Contact'}
         info={'Did your contact not receive the Recovery Secret?'}
-        note={'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'}
+        note={
+          'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'
+        }
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -499,7 +510,9 @@ const TrustedContactHistory = props => {
         modalRef={ChangeBottomSheet}
         title={'Change your\nTrusted Contact'}
         info={'Having problems with your Trusted Contact'}
-        note={'You can change the Trusted Contact you selected to share your Recovery Secret'}
+        note={
+          'You can change the Trusted Contact you selected to share your Recovery Secret'
+        }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -560,7 +573,7 @@ const TrustedContactHistory = props => {
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           if (secondaryDeviceMessageBottomSheet.current)
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+            (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -569,7 +582,7 @@ const TrustedContactHistory = props => {
   const renderSecondaryDeviceMessageHeader = useCallback(() => {
     return (
       <ModalHeader
-      borderColor={Colors.blue}
+        borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
@@ -611,7 +624,9 @@ const TrustedContactHistory = props => {
 
   useEffect(() => {
     (async () => {
-      let selectedContactModeTemp = await AsyncStorage.getItem("selectedContactMode");
+      let selectedContactModeTemp = await AsyncStorage.getItem(
+        'selectedContactMode',
+      );
       setSelectedContactMode(JSON.parse(selectedContactModeTemp));
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
@@ -660,7 +675,15 @@ const TrustedContactHistory = props => {
               }}
             >
               {chosenContact && chosenContact.name
-                ? nameToInitials(chosenContact.firstName && chosenContact.lastName ? chosenContact.firstName+' '+chosenContact.lastName : chosenContact.firstName && !chosenContact.lastName ? chosenContact.firstName : !chosenContact.firstName && chosenContact.lastName ? chosenContact.lastName : "")
+                ? nameToInitials(
+                    chosenContact.firstName && chosenContact.lastName
+                      ? chosenContact.firstName + ' ' + chosenContact.lastName
+                      : chosenContact.firstName && !chosenContact.lastName
+                      ? chosenContact.firstName
+                      : !chosenContact.firstName && chosenContact.lastName
+                      ? chosenContact.lastName
+                      : '',
+                  )
                 : ''}
             </Text>
           </View>
@@ -714,7 +737,13 @@ const TrustedContactHistory = props => {
             {getImageIcon()}
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {chosenContact.firstName && chosenContact.lastName ? chosenContact.firstName+' '+chosenContact.lastName : chosenContact.firstName && !chosenContact.lastName ? chosenContact.firstName : !chosenContact.firstName && chosenContact.lastName ? chosenContact.lastName : props.navigation.state.params.selectedTitle}
+                {chosenContact.firstName && chosenContact.lastName
+                  ? chosenContact.firstName + ' ' + chosenContact.lastName
+                  : chosenContact.firstName && !chosenContact.lastName
+                  ? chosenContact.firstName
+                  : !chosenContact.firstName && chosenContact.lastName
+                  ? chosenContact.lastName
+                  : props.navigation.state.params.selectedTitle}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
