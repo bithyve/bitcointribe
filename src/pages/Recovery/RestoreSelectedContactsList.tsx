@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -33,7 +33,7 @@ import RecoveryQuestionModalContents from '../../components/RecoveryQuestionModa
 import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { downloadMShare, recoverWallet } from '../../store/actions/sss';
+import { downloadMShare, recoverWallet, walletRecoveryFailed } from '../../store/actions/sss';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
@@ -85,7 +85,11 @@ export default function RestoreSelectedContactsList(props) {
   );
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
-
+  const [ErrorBottomSheet1, setErrorBottomSheet1] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isWalletRecoveryFailed = useSelector(state => state.sss.walletRecoveryFailed);
+  console.log("isWalletRecoveryFailed", isWalletRecoveryFailed);
   // function openCloseModal() {
   //   if (!walletName) {
   //     walletNameBottomSheet.current.snapTo(0);
@@ -392,6 +396,42 @@ export default function RestoreSelectedContactsList(props) {
     );
   };
 
+  const renderErrorModalContent1 = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet1}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet1 as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader1 = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet1 as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+if(isWalletRecoveryFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('Error recovering your wallet!');
+    setErrorMessage(
+      'There was an error while recovering your wallet, please try again',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(walletRecoveryFailed(null));
+}
   const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
     state => state.storage.database,
   );
@@ -1103,6 +1143,16 @@ export default function RestoreSelectedContactsList(props) {
         snapPoints={[-50, hp('100%')]}
         renderContent={renderLoaderModalContent}
         renderHeader={renderLoaderModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet1}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent1}
+        renderHeader={renderErrorModalHeader1}
       />
     </View>
   );

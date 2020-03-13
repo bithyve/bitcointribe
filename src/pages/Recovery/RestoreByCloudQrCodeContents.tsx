@@ -13,8 +13,8 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import QrScanner from '../../components/QrScanner';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { useDispatch } from 'react-redux';
-import { restoreShareFromQR } from '../../store/actions/sss';
+import { useDispatch, useSelector } from 'react-redux';
+import { restoreShareFromQR, UnableRecoverShareFromQR } from '../../store/actions/sss';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -31,6 +31,8 @@ export default function RestoreByCloudQrCodeContents(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const unableRecoverShareFromQR = useSelector(state => state.sss.unableRecoverShareFromQR);
+  console.log("unableRecoverShareFromQR", unableRecoverShareFromQR);
 
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
@@ -139,8 +141,20 @@ export default function RestoreByCloudQrCodeContents(props) {
     );
   }, []);
 
+  if(unableRecoverShareFromQR){
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'Invalid QR or error while receiving, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(UnableRecoverShareFromQR(null));
+  }
+
   return (
-    <ScrollView style={styles.modalContainer}>
+    <View style={styles.modalContainer}>
+    <ScrollView>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
           {/* <AppBottomSheetTouchableWrapper
@@ -274,7 +288,9 @@ export default function RestoreByCloudQrCodeContents(props) {
           )}
         </View>
       </View>
-      <BottomSheet
+      
+    </ScrollView>
+    <BottomSheet
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet}
         snapPoints={[
@@ -284,7 +300,7 @@ export default function RestoreByCloudQrCodeContents(props) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       />
-    </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({

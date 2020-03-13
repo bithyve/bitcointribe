@@ -1,6 +1,7 @@
 import {
   FETCH_PDF_SHARE_DETAILS,
   PERSONAL_COPY_SHARED,
+  PDF_SHARING_FAILED,
 } from '../actions/manageBackup';
 
 const initialState = {
@@ -9,6 +10,7 @@ const initialState = {
     personalCopy1: false,
     personalCopy2: false,
   },
+  pdfSharingFailed: false,
 };
 
 export default (state = initialState, action) => {
@@ -41,6 +43,11 @@ export default (state = initialState, action) => {
             personalCopy2: true,
           },
         };
+    case PDF_SHARING_FAILED:
+      return {
+        ...state,
+        pdfSharingFailed: action.payload.isFailed,
+      };
   }
   return state;
 };

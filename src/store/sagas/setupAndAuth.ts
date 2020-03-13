@@ -16,6 +16,7 @@ import {
   INIT_RECOVERY,
   CHANGE_AUTH_CRED,
   credsChanged,
+  pinChangedFailed
 } from '../actions/setupAndAuth';
 import { insertIntoDB, keyFetched, fetchFromDB } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
@@ -156,7 +157,8 @@ function* changeAuthCredWorker({ payload }) {
     yield put(credsChanged('changed'));
   } catch (err) {
     console.log({ err });
-    Alert.alert('Pin change failed!', err.message);
+    yield put( pinChangedFailed(true) );
+   // Alert.alert('Pin change failed!', err.message);
     yield put(credsChanged('not-changed'));
   }
 }
