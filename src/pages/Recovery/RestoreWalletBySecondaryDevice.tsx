@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -29,13 +29,20 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestShare, downloadMShare } from '../../store/actions/sss';
+import { requestShare, downloadMShare, ErrorReceiving } from '../../store/actions/sss';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from '../../components/Toast';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
-
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
   const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
     state => state.storage.database,
   );
@@ -70,6 +77,43 @@ export default function RestoreWalletBySecondaryDevice(props) {
   if (META_SHARE) {
     Toast('Downloaded');
   }
+  if(isErrorReceivingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -182,6 +226,16 @@ export default function RestoreWalletBySecondaryDevice(props) {
             'Once you have scanned and accepted the request, press continue button'
           }
         />
+        <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
       </View>
     </SafeAreaView>
   );

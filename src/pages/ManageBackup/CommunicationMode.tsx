@@ -23,7 +23,7 @@ import { useSelector } from 'react-redux';
 import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -35,14 +35,16 @@ import ModalHeader from '../../components/ModalHeader';
 
 
 export default function CommunicationMode(props) {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
   const dispatch = useDispatch();
-  const [
-    ErrorBottomSheet,
-    setErrorBottomSheet,
-  ] = useState(React.createRef());
+
   const communicationInfo = [];
   if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
   if (contact.emails) communicationInfo.push(...contact.emails);
@@ -63,31 +65,7 @@ export default function CommunicationMode(props) {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
-  const renderErrorModalContent = useCallback(() => {
-    return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={'Failed to share'}
-        info={'There was some error while sharing the Recovery Secret, please try again'}
-        proceedButtonText={'Try again'}
-        onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/errorImage.png')}
-      />
-    );
-  }, []);
-
-  const renderErrorModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  
   const onContactSelect = index => {
     setContactInfo([
       ...contactInfo.map(item => {
@@ -118,6 +96,12 @@ export default function CommunicationMode(props) {
 
   const communicate = async selectedContactMode => {
     if (!SHARES_TRANSFER_DETAILS[index]) {
+      setTimeout(() => {
+        setErrorMessageHeader('Failed to share');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Secret, please try again',
+        );
+      }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
       return;
     }
@@ -236,6 +220,44 @@ export default function CommunicationMode(props) {
     });
     setContactInfo(contactInfoTemp);
   };
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+if(isErrorSendingFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('Error sending Recovery Secret');
+    setErrorMessage(
+      'There was an error while sending your Recovery Secret, please try again in a little while',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(ErrorSending(null));
+}
+
 
   return (
     <View
@@ -407,6 +429,16 @@ export default function CommunicationMode(props) {
           </AppBottomSheetTouchableWrapper>
         ) : null}
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet}

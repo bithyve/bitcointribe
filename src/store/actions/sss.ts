@@ -18,6 +18,8 @@ export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
 export const OVERALL_HEALTH = 'OVERALL_HEALTH';
 export const CHECK_PDF_HEALTH = 'CHECK_PDF_HEALTH';
 export const RESTORE_SHARE_FROM_QR = 'RESTORE_SHARE_FROM_QR';
+export const ERROR_SENDING = 'ERROR_SENDING';
+export const ERROR_RECEIVING = 'ERROR_RECEIVING';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -107,6 +109,7 @@ export const CHECKED_PDF_HEALTH = 'CHECKED_PDF_HEALTH';
 export const QR_CHECKED = 'QR_CHECKED';
 export const UNABLE_RECOVER_SHARE_FROM_QR = 'UNABLE_RECOVER_SHARE_FROM_QR';
 export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
+export const UPLOAD_SUCCEFULLY = 'UPLOAD_SUCCEFULLY';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -154,4 +157,16 @@ export const UnableRecoverShareFromQR = isFailed => {
 
 export const walletRecoveryFailed = isFailed => {
   return { type: WALLET_RECOVERY_FAILED, payload: { isFailed } };
+};
+
+export const ErrorSending = isFailed => {
+  return { type: ERROR_SENDING, payload: { isFailed } };
+};
+
+export const UploadSuccessfully = isUploaded => {
+  return { type: UPLOAD_SUCCEFULLY, payload: { isUploaded } };
+};
+
+export const ErrorReceiving = isFailed => {
+  return { type: ERROR_RECEIVING, payload: { isFailed } };
 };

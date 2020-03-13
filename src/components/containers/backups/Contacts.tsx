@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -17,14 +17,21 @@ import {
 } from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import ContactList from "../../ContactList";
-import { uploadEncMShare } from "../../../store/actions/sss";
+import { uploadEncMShare, ErrorSending } from "../../../store/actions/sss";
 import { useDispatch, useSelector } from "react-redux";
 import CommunicationModeModalContents from "../../CommunicationModeModalContents";
 import DeviceInfo from "react-native-device-info";
 import BottomSheet from "reanimated-bottom-sheet";
 import { textWithoutEncoding, email } from "react-native-communications";
+import ErrorModalContents from '../../../components/ErrorModalContents';
+import ModalHeader from '../../../components/ModalHeader';
 
 const Contacts = props => {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
   const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
@@ -99,6 +106,43 @@ const Contacts = props => {
     );
   }
 
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+if(isErrorSendingFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('Error sending Recovery Secret');
+    setErrorMessage(
+      'There was an error while sending your Recovery Secret, please try again in a little while',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(ErrorSending(null));
+}
+
   return (
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
@@ -146,6 +190,16 @@ const Contacts = props => {
         ]}
         renderContent={renderCommunicationModeContent}
         renderHeader={requestHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
       />
     </View>
   );

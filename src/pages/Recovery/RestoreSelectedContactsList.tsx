@@ -33,7 +33,7 @@ import RecoveryQuestionModalContents from '../../components/RecoveryQuestionModa
 import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { downloadMShare, recoverWallet, walletRecoveryFailed } from '../../store/actions/sss';
+import { downloadMShare, recoverWallet, walletRecoveryFailed, ErrorReceiving } from '../../store/actions/sss';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
@@ -89,6 +89,7 @@ export default function RestoreSelectedContactsList(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isWalletRecoveryFailed = useSelector(state => state.sss.walletRecoveryFailed);
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
   console.log("isWalletRecoveryFailed", isWalletRecoveryFailed);
   // function openCloseModal() {
   //   if (!walletName) {
@@ -432,6 +433,17 @@ if(isWalletRecoveryFailed){
   (ErrorBottomSheet as any).current.snapTo(1);
   dispatch(walletRecoveryFailed(null));
 }
+if(isErrorReceivingFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('Error receiving Recovery Secret');
+    setErrorMessage(
+      'There was an error while receiving your Recovery Secret, please try again',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(ErrorReceiving(null));
+}
+
   const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
     state => state.storage.database,
   );

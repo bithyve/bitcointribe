@@ -9,7 +9,10 @@ import {
   CHECKED_PDF_HEALTH,
   QR_CHECKED,
   UNABLE_RECOVER_SHARE_FROM_QR,
-  WALLET_RECOVERY_FAILED
+  WALLET_RECOVERY_FAILED,
+  ERROR_SENDING,
+  UPLOAD_SUCCEFULLY,
+  ERROR_RECEIVING
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -48,6 +51,9 @@ const initialState: {
   qrChecked: Boolean;
   unableRecoverShareFromQR: Boolean;
   walletRecoveryFailed: Boolean;
+  errorSending: Boolean;
+  uploadSuccessfully: Boolean;
+  errorReceiving: Boolean;
 } = {
   service: null,
   serviceEnriched: false,
@@ -63,7 +69,7 @@ const initialState: {
     downloadDynamicNonPMDD: false,
     restoreDynamicNonPMDD: false,
     restoreWallet: false,
-    pdfHealthChecked: false
+    pdfHealthChecked: false,
   },
   mnemonic: '',
   personalCopyIndex: 0,
@@ -73,6 +79,9 @@ const initialState: {
   qrChecked: false,
   unableRecoverShareFromQR: false,
   walletRecoveryFailed: false,
+  errorSending: false,
+  uploadSuccessfully: false,
+  errorReceiving: false,
 };
 
 export default (state = initialState, action) => {
@@ -168,6 +177,21 @@ export default (state = initialState, action) => {
       return {
         ...state,
         walletRecoveryFailed: action.payload.isFailed,
+      };
+      case ERROR_SENDING:
+      return {
+        ...state,
+        errorSending: action.payload.isFailed,
+      };
+      case UPLOAD_SUCCEFULLY:
+      return {
+        ...state,
+        uploadSuccessfully: action.payload.isUploaded,
+      };
+      case ERROR_RECEIVING:
+      return {
+        ...state,
+        errorReceiving: action.payload.isFailed,
       };
   }
   return state;

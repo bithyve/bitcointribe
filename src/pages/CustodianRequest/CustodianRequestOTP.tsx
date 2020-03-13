@@ -20,7 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { downloadMShare } from '../../store/actions/sss';
+import { downloadMShare, ErrorReceiving } from '../../store/actions/sss';
 import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommonStyle from '../../common/Styles';
@@ -30,6 +30,11 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function CustodianRequestOTP(props) {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const { requester, ek, otp } = custodyRequest;
   const [passcode, setPasscode] = useState([]);
@@ -42,10 +47,7 @@ export default function CustodianRequestOTP(props) {
     CustodianRequestAcceptBottomSheet,
     setCustodianRequestAcceptBottomSheet,
   ] = useState(React.createRef());
-  const [
-    ErrorBottomSheet,
-    setErrorBottomSheet,
-  ] = useState(React.createRef());
+
 
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
@@ -76,6 +78,13 @@ export default function CustodianRequestOTP(props) {
 
   // useEffect(() => {
   //   if (UNDER_CUSTODY[requester]) {
+    // setTimeout(() => {
+    //   setErrorMessageHeader('Failed to store Recovery Secret');
+    //   setErrorMessage(
+    //     'You cannot be the Guardian of multiple shares from the same user',
+    //   );
+    //   setButtonText('Ok')
+    // }, 2);
   //     (ErrorBottomSheet as any).current.snapTo(1);
   //   } else {
   //     if (passcode.join('').length === 6 || otp)
@@ -95,9 +104,9 @@ export default function CustodianRequestOTP(props) {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
-        title={'Failed to store Recovery Secret'}
-        info={'You cannot be the Guardian of multiple shares from the same user'}
-        proceedButtonText={'Ok'}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
         onPressProceed={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
@@ -105,7 +114,7 @@ export default function CustodianRequestOTP(props) {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, []);
+  }, [errorMessage,errorMessageHeader,buttonText]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -116,6 +125,19 @@ export default function CustodianRequestOTP(props) {
       />
     );
   }, []);
+
+  if(isErrorReceivingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+      setButtonText('Try again')
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
