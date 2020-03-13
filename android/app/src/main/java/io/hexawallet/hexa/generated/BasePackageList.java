@@ -1,4 +1,4 @@
-package com.hexa.generated;
+package io.hexawallet.hexa.generated;
 
 import java.util.Arrays;
 import java.util.List;

@@ -95,16 +95,16 @@ def enableSeparateBuildPerCPUArchitecture = false
  * Run Proguard to shrink the Java bytecode in release builds.
  */
 def enableProguardInReleaseBuilds = false
-    
+      
 android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
                                                 
     defaultConfig {
-        applicationId "com.hexa"
+        applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 28                  
+        versionCode 31                     
         versionName "0.7"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
