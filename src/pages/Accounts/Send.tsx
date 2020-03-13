@@ -521,6 +521,7 @@ export default function Send(props) {
           dispatch(clearTransfer(serviceType));
           if (SendUnSuccessWithAddressBottomSheet.current)
             SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+          checkBalance();
         }}
         onPressCancel={() => {
           dispatch(clearTransfer(serviceType));

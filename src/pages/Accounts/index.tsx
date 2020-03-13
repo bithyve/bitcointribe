@@ -565,8 +565,10 @@ export default function Accounts(props) {
                     <View style={styles.transactionModalAmountView}>
                       <Image
                         source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                        style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                        style={{ width: 12, height: 12, resizeMode: 'contain', alignSelf: 'center' }}
                       />
+                      <View style={{marginLeft: 5, alignSelf:'center',
+                                marginRight: 5, flexDirection: 'row'}}>
                       <Text
                         style={{
                           ...styles.transactionModalAmountText,
@@ -574,6 +576,7 @@ export default function Accounts(props) {
                             item.transactionType == 'Received'
                               ? Colors.green
                               : Colors.red,
+                              alignSelf: 'center',
                         }}
                       >
                         {/* {switchOn
@@ -584,7 +587,23 @@ export default function Accounts(props) {
                         ).toFixed(2)} */}
                         {item.amount}
                       </Text>
-                      <Text style={styles.transactionModalAmountUnitText}>
+                      <Text
+                              style={{
+                                alignSelf: 'center',
+                                fontSize: RFValue(13),
+                                fontFamily: Fonts.OpenSans,
+                                color: Colors.textColorGrey,
+                                lineHeight: 19
+                              }}
+                            >
+                              {item.accountType == 'Test Account'
+                                ? 't-sats'
+                                : switchOn
+                                ? 'sats'
+                                : CurrencyCode.toLocaleLowerCase()}
+                            </Text>
+                            </View>
+                      <Text style={{...styles.transactionModalAmountUnitText, alignSelf: 'center'}}>
                         {item.confirmations < 6 ? item.confirmations : '6+'}
                       </Text>
                       <Ionicons
@@ -601,10 +620,37 @@ export default function Accounts(props) {
           </View>
         </View>
         {transactions.transactionDetails.length <= 1 ? (
-          <View style={{backgroundColor:Colors.white}}>
-            <View style={{ margin:15, backgroundColor:Colors.backgroundColor, padding:10, paddingTop:20, paddingBottom:20, marginBottom:Platform.OS=="ios" && DeviceInfo.hasNotch() ? 30 : 20, borderRadius:7}}>
-              <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have any transactions yet</Text>
-              <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Start using your accounts to make transactions</Text>
+          <View style={{ backgroundColor: Colors.white }}>
+            <View
+              style={{
+                margin: 15,
+                backgroundColor: Colors.backgroundColor,
+                padding: 10,
+                paddingTop: 20,
+                paddingBottom: 20,
+                marginBottom:
+                  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                borderRadius: 7,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                You don't have any transactions yet
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Start using your accounts to make transactions
+              </Text>
             </View>
           </View>
         ) : null}
@@ -616,26 +662,105 @@ export default function Accounts(props) {
             flex: 1,
           }}
         >
-          {[1,2,3,4,5].map((value)=>{
-          return <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingTop: wp('5%'), paddingBottom: wp('5%'), borderBottomWidth:0.5, borderColor:Colors.borderColor }}>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-              <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('5%'), borderRadius:wp('5%')/2, marginLeft:10, marginRight:10}}/>
-              <View>
-                <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('25%'), borderRadius:10}}/>
-                <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('35%'), marginTop:5, borderRadius:10}}/>
+          {[1, 2, 3, 4, 5].map(value => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingTop: wp('5%'),
+                  paddingBottom: wp('5%'),
+                  borderBottomWidth: 0.5,
+                  borderColor: Colors.borderColor,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('5%'),
+                      width: wp('5%'),
+                      borderRadius: wp('5%') / 2,
+                      marginLeft: 10,
+                      marginRight: 10,
+                    }}
+                  />
+                  <View>
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('25%'),
+                        borderRadius: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('35%'),
+                        marginTop: 5,
+                        borderRadius: 10,
+                      }}
+                    />
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('7%'),
+                      width: wp('20%'),
+                      borderRadius: 10,
+                    }}
+                  />
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('5%'),
+                      width: wp('5%'),
+                      borderRadius: wp('5%') / 2,
+                      marginLeft: 10,
+                      marginRight: 10,
+                    }}
+                  />
+                </View>
               </View>
-            </View>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-              <View style={{backgroundColor:Colors.backgroundColor, height:wp('7%'), width:wp('20%'), borderRadius:10}}/>
-              <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('5%'), borderRadius:wp('5%')/2, marginLeft:10, marginRight:10}}/>
-            </View>
-          </View>
+            );
           })}
         </View>
-        <View style={{backgroundColor:Colors.white}}>
-          <View style={{ margin:15, backgroundColor:Colors.backgroundColor, padding:10, paddingTop:20, paddingBottom:20, marginBottom:Platform.OS=="ios" && DeviceInfo.hasNotch() ? 30 : 20, borderRadius:7}}>
-            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have any transactions yet</Text>
-            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Start using your accounts to make transactions</Text>
+        <View style={{ backgroundColor: Colors.white }}>
+          <View
+            style={{
+              margin: 15,
+              backgroundColor: Colors.backgroundColor,
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: 20,
+              marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+              borderRadius: 7,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              You don't have any transactions yet
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Start using your accounts to make transactions
+            </Text>
           </View>
         </View>
       </View>
@@ -1224,8 +1349,11 @@ export default function Accounts(props) {
                                 width: 12,
                                 height: 12,
                                 resizeMode: 'contain',
+                                alignSelf:'center',
                               }}
                             />
+                            <View style={{marginLeft: 5, alignSelf:'center',
+                                marginRight: 5, flexDirection: 'row'}}>
                             <Text
                               style={{
                                 ...styles.transactionModalAmountText,
@@ -1233,11 +1361,28 @@ export default function Accounts(props) {
                                   item.transactionType == 'Received'
                                     ? Colors.green
                                     : Colors.red,
+                                    alignSelf:'center',
                               }}
                             >
                               {UsNumberFormat(item.amount)}
                             </Text>
-                            <Text style={styles.transactionModalAmountUnitText}>
+                            <Text
+                              style={{
+                                alignSelf: 'center',
+                                fontSize: RFValue(13),
+                                fontFamily: Fonts.OpenSans,
+                                color: Colors.textColorGrey,
+                                lineHeight: 19
+                              }}
+                            >
+                              {item.accountType == 'Test Account'
+                                ? 't-sats'
+                                : switchOn
+                                ? 'sats'
+                                : CurrencyCode.toLocaleLowerCase()}
+                            </Text>
+                            </View>
+                            <Text style={{...styles.transactionModalAmountUnitText,alignSelf:'center'}}>
                               {item.confirmations < 6
                                 ? item.confirmations
                                 : '6+'}
@@ -1674,10 +1819,11 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
   },
   transactionModalAmountView: {
-    padding: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
     flexDirection: 'row',
     display: 'flex',
-    alignItems: 'center',
+    
   },
   transactionModalAmountText: {
     marginLeft: 5,
