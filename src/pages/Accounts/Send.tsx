@@ -568,7 +568,7 @@ export default function Send(props) {
       return 'Secure Account';
     }
     if (serviceType == 'REGULAR_ACCOUNT') {
-      return 'Regular Account';
+      return 'Checking Account';
     }
     if (serviceType == 'S3_SERVICE') {
       return 'S3 Service';

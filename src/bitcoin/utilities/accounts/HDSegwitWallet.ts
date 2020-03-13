@@ -439,7 +439,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { transactions } = await this.fetchTransactionsByAddresses(
       this.usedAddresses,
-      this.isTest ? 'Test Account' : 'Regular Account',
+      this.isTest ? 'Test Account' : 'Checking Account',
     );
     this.transactions = transactions;
     return { transactions };
@@ -488,7 +488,7 @@ export default class HDSegwitWallet extends Bitcoin {
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
       this.usedAddresses,
-      this.isTest ? 'Test Account' : 'Regular Account',
+      this.isTest ? 'Test Account' : 'Checking Account',
     );
     this.balances = balances;
     this.transactions = transactions;

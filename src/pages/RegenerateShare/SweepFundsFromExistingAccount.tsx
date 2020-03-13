@@ -28,7 +28,7 @@ const SweepFundsFromExistingAccount = props => {
 
     const [AllAccountData, setAllAccountData] = useState([
         {
-            title: "Regular Account",
+            title: "Checking Account",
             info: "234500 sats",
             image: require("../../assets/images/icons/icon_regular.png")
         },
