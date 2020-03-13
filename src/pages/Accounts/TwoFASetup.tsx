@@ -54,10 +54,10 @@ const TwoFASetup = props => {
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             Please scan the following QR on your authenticator app like Google
-            Authenticator{'\n'}in order to setup the 2FA
+            Authenticator in order to setup the 2FA
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            The authenticator app should be{'\n'}installed on another device
+            The authenticator app should be installed on another device
             like your Secondary Device
           </Text>
         </View>
