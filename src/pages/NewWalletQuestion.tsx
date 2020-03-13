@@ -236,22 +236,17 @@ export default function NewWalletQuestion(props) {
     }
   }, [isInitialized, exchangeRates, balances, transactions]);
 
-  const setConfirm = confirmAnswer1 => {
-    if (confirmAnswer1) {
-      setConfirmAnswer(tempAns);
-      if (answer && confirmAnswer && confirmAnswer != answer) {
+  const setConfirm = () => {
+    setConfirmAnswer(tempAns);
+    if (answer && confirmAnswer && confirmAnswer != answer) {
         setAnsError('Answers do not match');
       } else {
         setTimeout(() => {
           setAnsError('');
         }, 2);
       }
-    } else {
-      setTimeout(() => {
-        setAnsError('');
-      }, 2);
     }
-  };
+
   const setBackspace = event => {
     if (event.nativeEvent.key == 'Backspace') {
       setTimeout(() => {
@@ -268,6 +263,11 @@ export default function NewWalletQuestion(props) {
       setVisibleButton(true);
     } else {
       setVisibleButton(false);
+      if (answer && confirmAnswer && confirmAnswer != answer) {
+        setTimeout(() => {
+          setAnsError('Answers do not match');
+        }, 2);
+      }
     }
   }, [confirmAnswer]);
 
@@ -573,7 +573,7 @@ export default function NewWalletQuestion(props) {
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={event => setConfirm(tempAns)}
+                      onSubmitEditing={event => setConfirm()}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
@@ -593,7 +593,7 @@ export default function NewWalletQuestion(props) {
                           temp += '*';
                         }
                         setConfirmAnswerMasked(temp);
-                        setConfirm(tempAns);
+                        setConfirm();
                       }}
                     />
                     <TouchableWithoutFeedback

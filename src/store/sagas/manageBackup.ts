@@ -11,6 +11,7 @@ import {
   DBUPDATE_PDF_SEND,
   dbUpdatePdfSharing,
   personalCopyShared,
+  PDFSharingFailed
 } from '../actions/manageBackup';
 import { dbUpdateSSS } from '../actions/storage';
 import { AsyncStorage } from 'react-native';
@@ -199,7 +200,8 @@ function* sharePdfWorker( { payload } ) {
 
     yield put( personalCopyShared( item ) );
   } catch ( error ) {
-    Alert.alert( 'PDF Sharing failed', error.message );
+    yield put( PDFSharingFailed(true) );
+    //Alert.alert( 'PDF Sharing failed', error.message );
     console.log( { error } );
   }
 }

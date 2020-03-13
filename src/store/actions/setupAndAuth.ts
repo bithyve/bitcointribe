@@ -42,6 +42,7 @@ export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED';
 export const SETUP_INITIALIZED = 'SETUP_INITIALIZED';
 export const SETUP_LOADING = 'SETUP_LOADING';
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED';
+export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED';
 
 export const credsStored = () => {
   return { type: CREDS_STORED };
@@ -61,4 +62,8 @@ export const switchSetupLoader = beingLoaded => {
 
 export const credsChanged = changed => {
   return { type: AUTH_CRED_CHANGED, payload: { changed } };
+};
+
+export const pinChangedFailed = isFailed => {
+  return { type: PIN_CHANGED_FAILED, payload: { isFailed } };
 };

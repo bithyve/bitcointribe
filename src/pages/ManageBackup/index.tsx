@@ -1332,7 +1332,7 @@ export default function ManageBackup(props) {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               marginLeft: 'auto',
               marginRight: 10,
@@ -1351,7 +1351,7 @@ export default function ManageBackup(props) {
                 resizeMode: 'contain',
               }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {is_initiated ? (
           <View style={{ flex: 1 }}>

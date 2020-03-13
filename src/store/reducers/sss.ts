@@ -6,7 +6,10 @@ import {
   RESET_REQUESTED_SHARE_UPLOADS,
   DOWNLOADED_MSHARE,
   OVERALL_HEALTH_CALCULATED,
-  CHECKED_PDF_HEALTH
+  CHECKED_PDF_HEALTH,
+  QR_CHECKED,
+  UNABLE_RECOVER_SHARE_FROM_QR,
+  WALLET_RECOVERY_FAILED
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -42,6 +45,9 @@ const initialState: {
     qaStatus: string;
     sharesInfo: { shareId: string; shareStage: string }[];
   };
+  qrChecked: Boolean;
+  unableRecoverShareFromQR: Boolean;
+  walletRecoveryFailed: Boolean;
 } = {
   service: null,
   serviceEnriched: false,
@@ -64,6 +70,9 @@ const initialState: {
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
+  qrChecked: false,
+  unableRecoverShareFromQR: false,
+  walletRecoveryFailed: false,
 };
 
 export default (state = initialState, action) => {
@@ -144,6 +153,21 @@ export default (state = initialState, action) => {
           pdfHealthChecked: action.payload.pdfHealthChecked,
         },
         //personalCopyIndex: action.payload.index
+      };
+      case QR_CHECKED:
+      return {
+        ...state,
+        qrChecked: action.payload.isFailed,
+      };
+      case UNABLE_RECOVER_SHARE_FROM_QR:
+      return {
+        ...state,
+        unableRecoverShareFromQR: action.payload.isFailed,
+      };
+      case WALLET_RECOVERY_FAILED:
+      return {
+        ...state,
+        walletRecoveryFailed: action.payload.isFailed,
       };
   }
   return state;

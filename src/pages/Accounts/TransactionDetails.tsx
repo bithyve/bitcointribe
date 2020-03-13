@@ -28,6 +28,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 
 export default function TransactionDetails(props) {
   const txDetails = props.item;
@@ -74,8 +75,8 @@ export default function TransactionDetails(props) {
             {'Transaction Details'}
           </Text>
           {serviceType && serviceType == TEST_ACCOUNT ? (
+            <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto',}}onPress={() => props.onPressKnowMore()}>
             <Text
-              onPress={() => props.onPressKnowMore()}
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue(12),
@@ -84,6 +85,7 @@ export default function TransactionDetails(props) {
             >
               Know more
             </Text>
+            </AppBottomSheetTouchableWrapper>
           ) : null}
         </View>
       </View>

@@ -601,51 +601,44 @@ export default function Accounts(props) {
               }}
             />
           </View>
-          {transactions.transactionDetails.length <= 1 ? (
-            <View
-              style={{
-                flex: 1,
-                marginTop: hp('15%'),
-                alignItems: 'center',
-                padding: wp('10%'),
-                opacity: 0.5,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(15),
-                  textAlign: 'center',
-                }}
-              >
-                Recent transactions will appear here
-              </Text>
-            </View>
-          ) : null}
         </View>
+        {transactions.transactionDetails.length <= 1 ? (
+          <View style={{backgroundColor:Colors.white}}>
+            <View style={{ margin:15, backgroundColor:Colors.backgroundColor, padding:10, paddingTop:20, paddingBottom:20, marginBottom:Platform.OS=="ios" && DeviceInfo.hasNotch() ? 30 : 20, borderRadius:7}}>
+              <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have any transactions yet</Text>
+              <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Start using your accounts to make transactions</Text>
+            </View>
+          </View>
+        ) : null}
       </View>
     ) : (
       <View style={styles.modalContentContainer}>
         <View
           style={{
             flex: 1,
-            marginTop: hp('15%'),
-            alignItems: 'center',
-            padding: wp('10%'),
-            opacity: 0.5,
           }}
         >
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(15),
-              textAlign: 'center',
-            }}
-          >
-            Recent transactions will appear here
-          </Text>
+          {[1,2,3,4,5].map((value)=>{
+          return <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingTop: wp('5%'), paddingBottom: wp('5%'), borderBottomWidth:0.5, borderColor:Colors.borderColor }}>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+              <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('5%'), borderRadius:wp('5%')/2, marginLeft:10, marginRight:10}}/>
+              <View>
+                <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('25%'), borderRadius:10}}/>
+                <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('35%'), marginTop:5, borderRadius:10}}/>
+              </View>
+            </View>
+            <View style={{flexDirection:'row',alignItems:'center'}}>
+              <View style={{backgroundColor:Colors.backgroundColor, height:wp('7%'), width:wp('20%'), borderRadius:10}}/>
+              <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('5%'), borderRadius:wp('5%')/2, marginLeft:10, marginRight:10}}/>
+            </View>
+          </View>
+          })}
+        </View>
+        <View style={{backgroundColor:Colors.white}}>
+          <View style={{ margin:15, backgroundColor:Colors.backgroundColor, padding:10, paddingTop:20, paddingBottom:20, marginBottom:Platform.OS=="ios" && DeviceInfo.hasNotch() ? 30 : 20, borderRadius:7}}>
+            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have any transactions yet</Text>
+            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Start using your accounts to make transactions</Text>
+          </View>
         </View>
       </View>
     );

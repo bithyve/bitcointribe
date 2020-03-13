@@ -5,6 +5,7 @@ import {
   Text,
   Image,
   FlatList,
+  Platform
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,13 +18,21 @@ import Icons from '../../../../src/common/Icons';
 import Singleton from '../../../common/Singleton';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestSharePdf } from '../../../store/actions/manageBackup';
+import { requestSharePdf,PDFSharingFailed } from '../../../store/actions/manageBackup';
 import BottomInfoBox from '../../../components/BottomInfoBox';
 import { RFValue } from 'react-native-responsive-fontsize';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../../components/ErrorModalContents';
+import ModalHeader from '../../../components/ModalHeader';
 
 export default function ModalShareIntent(props) {
   const database = useSelector(state => state.storage.databaseSSS);
-
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isPDFSharedFailed = useSelector(state => state.manageBackup.pdfSharingFailed);
+  console.log("isPDFSharedFailed", isPDFSharedFailed);
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [arrShareOption, setArrShareOption] = useState([
     {
@@ -162,6 +171,42 @@ export default function ModalShareIntent(props) {
     return false;
   };
 
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+if(isPDFSharedFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('PDF Sharing failed');
+    setErrorMessage(
+      'There was some error while sharing the Recovery Secret, please try again',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(PDFSharingFailed(null));
+}
   return (
     <View style={[styles.modalContainer]}>
       <View
@@ -227,6 +272,16 @@ export default function ModalShareIntent(props) {
           'The answer your your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
         }
       />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }
@@ -236,7 +291,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
     width: '100%',
-    paddingBottom: hp('5%'),
   },
   headerContainer: {
     flexDirection: 'row',

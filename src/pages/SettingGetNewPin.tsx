@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -23,8 +23,12 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   changeAuthCred,
-  switchCredsChanged,
+  pinChangedFailed,
 } from '../store/actions/setupAndAuth';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
 
 export default function SettingGetNewPin(props) {
   const [passcode, setPasscode] = useState('');
@@ -32,6 +36,11 @@ export default function SettingGetNewPin(props) {
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [confirmPasscodeFlag, setConfirmPasscodeFlag] = useState(0);
   const oldPasscode = props.navigation.getParam('oldPasscode');
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isPinChangedFailed = useSelector(state => state.setupAndAuth.pinChangedFailed);
+  console.log("isPinChangedFailed", isPinChangedFailed);
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;
@@ -108,6 +117,43 @@ export default function SettingGetNewPin(props) {
     props.navigation.navigate("PasscodeChangeSuccessPage");
     }
   }, [credsChanged]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if(isPinChangedFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Passcode change error');
+      setErrorMessage(
+        'There was some error while changing the Passcode, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(pinChangedFailed(null));
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -598,6 +644,16 @@ export default function SettingGetNewPin(props) {
             </TouchableOpacity>
           </View>
         </View>
+        <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
       </View>
     </SafeAreaView>
   );

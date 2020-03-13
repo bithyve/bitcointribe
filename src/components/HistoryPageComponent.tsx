@@ -26,22 +26,10 @@ const HistoryPageComponent = props => {
     }
   };
 
-  function getImageByType(type) {
-    if (type == 'secondaryDevice') {
-      return require('../assets/images/icons/icon_secondarydevice.png');
-    } else if (type == 'contact') {
-      return require('../assets/images/icons/icon_user.png');
-    } else if (type == 'copy') {
-      return require('../assets/images/icons/note.png');
-    } else if (type == 'security') {
-      return require('../assets/images/icons/icon_securityquestion.png');
-    }
-  }
-
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ flex: 1, }}>
-        <View style={{ height:'auto' }}>
+      {props.data && props.data.length ? 
+      <View style={{ flex: 1 }}>
         <ScrollView style={{ }}>
         {props.data.map(value => {
           if (SelectedOption == value.id) {
@@ -70,16 +58,6 @@ const HistoryPageComponent = props => {
                 >
                   {value.title}
                 </Text>
-                {/* <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginTop: hp('0.5%'),
-                  }}
-                >
-                  Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit
-                </Text> */}
                 <Text
                   style={{
                     color: Colors.textColorGrey,
@@ -130,32 +108,42 @@ const HistoryPageComponent = props => {
                   {value.date}
                 </Text>
               </View>
-              {/* <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(8),
-                  fontFamily: Fonts.FiraSansRegular,
-                  marginTop: hp('0.5%'),
-                }}
-              >
-                Lorem ipsum dolor Lorem dolor sit amet, consectetur{' '}
-                <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-                  dolor sit
-                </Text>
-              </Text> */}
             </TouchableOpacity>
           );
         })}
         </ScrollView>
-        </View>
         {props.data.length<=1 ? 
-          <View style={{ flex:1, opacity:0.5, justifyContent:'center', alignSelf:'center', alignItems:'center', padding:wp('10%')}}> 
-            {/* <Image blurRadius={1} source={getImageByType(props.type)} style={{width:wp('60%'), height:wp('60%'), resizeMode:'contain'}}/> */}
-            <Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize:RFValue(15), textAlign:'center'}}>The history of your Recovery Secret will appear here</Text>
+        <View style={{ backgroundColor:Colors.backgroundColor, }}>
+          <View style={{ margin:15, backgroundColor:Colors.white, padding:10, paddingTop:20, borderRadius:7}}>
+            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have history of your Recovery Secret yet</Text>
+            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>The history of your Recovery Secret will appear here</Text>
           </View>
+        </View>
           : null
-        }
+      }
       </View>
+      :
+      <View style={{flex:1, }}>
+        <ScrollView>
+        {[1,2,3,4].map((value)=>{
+          return <View style={{ margin: wp('3%'), backgroundColor: Colors.white, borderRadius: 10, height: wp('20%'), width: wp('90%'), paddingLeft: wp('3%'), paddingRight: wp('3%'),
+          alignSelf: 'center', flexDirection:'row', alignItems:'center', justifyContent: 'space-between' }}>
+            <View>
+              <View style={{backgroundColor:Colors.backgroundColor, height:wp('4%'), width:wp('40%'), borderRadius:10}}/>
+              <View style={{backgroundColor:Colors.backgroundColor, height:wp('4%'), width:wp('30%'), marginTop:5, borderRadius:10}}/>
+              </View>
+          </View>
+          })}
+        </ScrollView>
+        <View style={{ backgroundColor:Colors.backgroundColor, }}>
+          <View style={{ margin:15, backgroundColor:Colors.white, padding:10, paddingTop:20, borderRadius:7}}>
+            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have history of your Recovery Secret yet</Text>
+            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>The history of your Recovery Secret will appear here</Text>
+          </View>
+        </View>
+      </View>
+    }
+      
       <View
         style={{
           justifyContent: 'center',
