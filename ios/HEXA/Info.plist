@@ -26,10 +26,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>hexa</string>
+			<string>Hexa</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>hexa</string>
+				<string>Hexa</string>
 			</array>
 		</dict>
 	</array>
@@ -93,7 +93,7 @@
 	<string>Our app does not request this permission or utilize this functionality but it is included in our info.plist since our app utilizes the react-native-permissions library, which references this permission in its code.</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
-		<key>iCloud.io.hexawallet.hexa</key>
+		<key>iCloud.io.Hexawallet.Hexa</key>
 		<dict>
 			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
 			<true/>
