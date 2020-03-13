@@ -85,7 +85,6 @@ export default function Send(props) {
   const [staticFees, setStaticFees] = useState(
     props.navigation.getParam('staticFees'),
   );
-  console.log("STATIC FEES on send", staticFees);
   const serviceType = props.navigation.getParam('serviceType');
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
@@ -149,7 +148,6 @@ export default function Send(props) {
     if (viewRef.current) {
       viewRef.current.measure((fx, fy, width, height, px) => {
         const location = (evt.nativeEvent.locationX - px) / width;
-        console.log('LOCATION', location, evt.nativeEvent.locationX, px, width);
         if (location >= -0.1 && location <= 0.2) {
           setSliderValue(0);
         } else if (location >= 0.3 && location <= 0.6) {
@@ -179,7 +177,6 @@ export default function Send(props) {
 
         const instance = service.hdWallet || service.secureHDWallet;
         const staticFees = await instance.getStaticFee();
-        console.log("STATIC FEES", staticFees);
         setStaticFees(staticFees);
         await AsyncStorage.setItem(
           'storedStaticFees',
@@ -717,7 +714,6 @@ export default function Send(props) {
                         let isAddressValid = instance.isValidAddress(
                           recipientAddress,
                         );
-                        console.log('isAddressValid', isAddressValid);
                         setIsInvalidAddress(isAddressValid);
                       }}
                     />
@@ -916,11 +912,9 @@ export default function Send(props) {
                           }}
                           value={sliderValue}
                           onValueChange={value => {
-                            console.log('Value', value);
                             setSliderValue(value);
                           }}
                           onSlidingComplete={value => {
-                            console.log('Value onSlidingComplete', value);
                             value == 0
                               ? setSliderValueText('Low Fee')
                               : value == 5
