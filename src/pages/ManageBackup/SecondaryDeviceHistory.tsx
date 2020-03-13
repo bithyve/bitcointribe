@@ -8,7 +8,7 @@ import {
   StatusBar,
   TouchableOpacity,
   AsyncStorage,
-  Platform
+  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -18,7 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShare, checkMSharesHealth } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -75,9 +75,10 @@ const SecondaryDeviceHistory = props => {
   const [secondaryDeviceBottomSheet, setSecondaryDeviceBottomSheet] = useState(
     React.createRef(),
   );
-  const [secondaryDeviceMessageBottomSheet, setSecondaryDeviceMessageBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [
+    secondaryDeviceMessageBottomSheet,
+    setSecondaryDeviceMessageBottomSheet,
+  ] = useState(React.createRef());
   const [secondaryQR, setSecondaryQR] = useState('');
   const [isReshare, setIsReshare] = useState(false);
   const SHARES_TRANSFER_DETAILS = useSelector(
@@ -121,6 +122,7 @@ const SecondaryDeviceHistory = props => {
         onPressOk={async () => {
           updateAutoHighlightFlags();
           saveInTransitHistory();
+          dispatch(checkMSharesHealth());
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
           if (next) {
             props.navigation.goBack();
@@ -156,11 +158,11 @@ const SecondaryDeviceHistory = props => {
         proceedButtonText={'Ok, got it'}
         onPressProceed={() => {
           if (secondaryDeviceMessageBottomSheet.current)
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+            (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
           if (secondaryDeviceMessageBottomSheet.current)
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+            (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={false}
       />
@@ -347,8 +349,10 @@ const SecondaryDeviceHistory = props => {
         }}
         enabledInnerScrolling={true}
         ref={secondaryDeviceMessageBottomSheet}
-        snapPoints={[-50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),]}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
         renderContent={renderSecondaryDeviceMessageContents}
         renderHeader={renderSecondaryDeviceMessageHeader}
       />
