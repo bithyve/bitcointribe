@@ -917,6 +917,14 @@ export default class SSS {
 
     this.metaShares = metaShares;
     this.healthCheckInitialized = true;
+
+    if (this.metaShares[3]) {
+      this.createQR(3); // enriching health if restoration is done via Personal Copy 1
+    }
+    if (this.metaShares[4]) {
+      this.createQR(4); // enriching health if restoration is done via Personal Copy 2
+    }
+
     return { restored: true };
   };
 
