@@ -58,12 +58,12 @@ export default function CustodianRequestRejectedModalContents(props) {
             alignItems: "center"
           }}
         >
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressViewThrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
             <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <Image
             source={require("../../assets/images/icons/reject.png")}
             style={styles.successModalImage}
