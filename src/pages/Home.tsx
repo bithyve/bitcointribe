@@ -40,7 +40,6 @@ import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddressBookContents from '../components/AddressBookContents';
 import CustodianRequestAcceptModalContents from '../components/CustodianRequestAcceptModalContents';
 import HomePageShield from '../components/HomePageShield';
-import ErrorModalContents from '../components/ErrorModalContents';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
 import TransactionListModalContents from '../components/TransactionListModalContents';
 import AddModalContents from '../components/AddModalContents';
@@ -71,6 +70,9 @@ import {
   downloadMShare,
   initHealthCheck,
   uploadRequestedShare,
+  ErrorSending,
+  ErrorReceiving,
+  UploadSuccessfully,
 } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
@@ -85,7 +87,8 @@ import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
-
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 // const { Value, abs, sub, min } = Animated
@@ -96,6 +99,14 @@ import Toast from '../components/Toast';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isUploadSuccessfully = useSelector(state => state.sss.uploadSuccessfully);
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
   let [AssociatedContact, setAssociatedContact] = useState([]);
@@ -127,7 +138,7 @@ export default function Home(props) {
   // const exchangeRate = props.navigation.state.params
   //   ? props.navigation.state.params.exchangeRates
   //   : null;
-
+  const dispatch = useDispatch();
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
@@ -561,6 +572,68 @@ export default function Home(props) {
       );
     }
   };
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader,buttonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if(isErrorSendingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+      setButtonText('Try again')
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
+  
+  if(isUploadSuccessfully){
+    setTimeout(() => {
+      setErrorMessageHeader('Sending successful');
+      setErrorMessage(
+        'The Recovery Secret has been sent, the receiver needs to accept ',
+      );
+      setButtonText('Done');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(UploadSuccessfully(null));
+  }
+
+  if(isErrorReceivingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+      setButtonText('Try again')
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
 
   const updateAccountCardData = () => {
     let newArrayFinal = [];
@@ -1789,7 +1862,7 @@ export default function Home(props) {
     }
   }, [custodyRequest, recoveryRequest]);
 
-  const dispatch = useDispatch();
+ 
 
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
@@ -2760,6 +2833,17 @@ export default function Home(props) {
           renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
         />
       ) : null}
+
+<BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
       {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);

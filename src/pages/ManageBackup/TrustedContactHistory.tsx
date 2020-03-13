@@ -35,10 +35,17 @@ import _ from 'underscore';
 import TrustedContactQr from './TrustedContactQr';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { textWithoutEncoding, email } from 'react-native-communications';
-import { uploadEncMShare, checkMSharesHealth } from '../../store/actions/sss';
+import { uploadEncMShare, checkMSharesHealth, ErrorSending } from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
 
+
 const TrustedContactHistory = props => {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
+
   const dispatch = useDispatch();
   const [selectedContactMode, setSelectedContactMode] = useState(null);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
@@ -59,7 +66,6 @@ const TrustedContactHistory = props => {
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef());
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [
     CommunicationModeBottomSheet,
     setCommunicationModeBottomSheet,
@@ -377,10 +383,8 @@ const TrustedContactHistory = props => {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
-        title={'Failed to share'}
-        info={
-          'There was some error while sharing the Recovery Secret, please try again'
-        }
+        title={errorMessageHeader}
+        info={errorMessage}
         proceedButtonText={'Try again'}
         onPressProceed={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
@@ -401,11 +405,27 @@ const TrustedContactHistory = props => {
     );
   }, []);
 
-  const communicate = async () => {
-    let selectedContactModeTmp =
-      index == 1 ? selectedContactMode[0] : selectedContactMode[1];
+  if(isErrorSendingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
+  
+  const communicate = async() => {
+    let selectedContactModeTmp = index == 1 ? selectedContactMode[0] :selectedContactMode[1];
     if (!SHARES_TRANSFER_DETAILS[index]) {
-      (ErrorBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        setErrorMessageHeader('Failed to share');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Secret, please try again',
+        );
+      }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert('Failed to share');
       return;
     }

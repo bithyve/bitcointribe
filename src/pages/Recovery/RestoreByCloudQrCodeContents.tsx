@@ -30,6 +30,7 @@ export default function RestoreByCloudQrCodeContents(props) {
   const dispatch = useDispatch();
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
+  const [processButtonText, setProcessButtonText] = useState('Okay');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const unableRecoverShareFromQR = useSelector(state => state.sss.unableRecoverShareFromQR);
   console.log("unableRecoverShareFromQR", unableRecoverShareFromQR);
@@ -38,14 +39,17 @@ export default function RestoreByCloudQrCodeContents(props) {
     let tempArray = qrDataArray;
     let shareCode = qrData.substring(0, 2);
     if (shareCode !== 'e0' && shareCode !== 'c0') {
+      console.log('shareCode', shareCode);
       setTimeout(() => {
         setErrorMessageHeader('Invalid QR');
         setErrorMessage(
           'Please try again',
         );
+      setProcessButtonText('Try again');
       }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
-     // Alert.alert('Invalid QR', 'Please try again');
+      console.log('shareCode1', shareCode);
+      //Alert.alert('Invalid QR', 'Please try again');
       return;
     }
     let startNumber1 = qrData.substring(2, 3);
@@ -62,13 +66,25 @@ export default function RestoreByCloudQrCodeContents(props) {
         ? 8
         : startNumberCounter + 'th';
     for (let i = 0; i < 8; i++) {
-      if (qrDataArray[i] == qrData) return;
-      if (startNumberCounter != startNumber1) {
+      if (qrDataArray[i] == qrData) {
         setTimeout(() => {
-          setErrorMessageHeader('Scan QR core');
+          setErrorMessageHeader('Scan QR code');
           setErrorMessage(
             'Please scan ' + temp1 + ' QR code'
           );
+          setProcessButtonText('Okay')
+        }, 2);
+        (ErrorBottomSheet as any).current.snapTo(1);
+        return;
+      }
+      if (startNumberCounter != startNumber1) {
+        console.log('in if', startNumber1, startNumberCounter);
+        setTimeout(() => {
+          setErrorMessageHeader('Scan QR code');
+          setErrorMessage(
+            'Please scan ' + temp1 + ' QR code'
+          );
+          setProcessButtonText('Okay')
         }, 2);
         (ErrorBottomSheet as any).current.snapTo(1);
        // Alert.alert('Please scan ' + temp1 + ' QR code');
@@ -89,10 +105,11 @@ export default function RestoreByCloudQrCodeContents(props) {
           ? 8
           : counter + 'th';
           setTimeout(() => {
-            setErrorMessageHeader('Scan QR core');
+            setErrorMessageHeader('Scan QR code');
             setErrorMessage(
               temp + ' QR code scanned, please scan the next one'
             );
+            setProcessButtonText('Okay')
           }, 2);
           (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert(temp + ' QR code scanned, please scan the next one');
@@ -121,7 +138,7 @@ export default function RestoreByCloudQrCodeContents(props) {
         modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
-        proceedButtonText={'Try again'}
+        proceedButtonText={processButtonText}
         onPressProceed={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
@@ -129,7 +146,7 @@ export default function RestoreByCloudQrCodeContents(props) {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage,errorMessageHeader,processButtonText]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -147,6 +164,7 @@ export default function RestoreByCloudQrCodeContents(props) {
       setErrorMessage(
         'Invalid QR or error while receiving, please try again',
       );
+      setProcessButtonText('Try again');
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(UnableRecoverShareFromQR(null));

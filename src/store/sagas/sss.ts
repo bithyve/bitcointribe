@@ -31,7 +31,10 @@ import {
   pdfHealthChecked,
   QRChecked,
   UnableRecoverShareFromQR,
-  walletRecoveryFailed
+  walletRecoveryFailed,
+  ErrorSending,
+  UploadSuccessfully,
+  ErrorReceiving
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -157,7 +160,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
-    Alert.alert('Upload Failed!', res.err);
+    yield put(ErrorSending(true) );
+   // Alert.alert('Upload Failed!', res.err);
     console.log({ err: res.err });
   }
   yield put(switchS3Loader('uploadMetaShare'));
@@ -210,7 +214,8 @@ function* uploadRequestedShareWorker({ payload }) {
   );
 
   if (!UNDER_CUSTODY[tag]) {
-    Alert.alert('Upload failed!', 'No share under custody for this wallet.');
+    yield put(ErrorSending(true) );
+    // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
   }
 
   const { META_SHARE, ENC_DYNAMIC_NONPMDD } = UNDER_CUSTODY[tag];
@@ -230,10 +235,11 @@ function* uploadRequestedShareWorker({ payload }) {
     // yield success
     console.log('Upload successful!');
     yield put(requestedShareUploaded(tag, true));
-    Alert.alert(
-      'Upload successful!',
-      "Requester's share has been uploaded to the relay.",
-    );
+    yield put(UploadSuccessfully(true));
+    // Alert.alert(
+    //   'Upload successful!',
+    //   "Requester's share has been uploaded to the relay.",
+    // );
   } else {
     yield put(requestedShareUploaded(tag, false, res.err));
   }
@@ -331,7 +337,8 @@ function* downloadMetaShareWorker({ payload }) {
     // ); // connecting insertion at updateMSharesHealth
   } else {
     console.log({ res });
-    Alert.alert('Download Failed!', res.err);
+    yield put(ErrorReceiving(true));
+   // Alert.alert('Download Failed!', res.err);
     yield put(downloadedMShare(otp, false, res.err));
   }
   yield put(switchS3Loader('downloadMetaShare'));

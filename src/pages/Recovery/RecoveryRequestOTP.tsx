@@ -24,6 +24,8 @@ import {
   downloadMShare,
   uploadRequestedShare,
   resetRequestedShareUpload,
+  ErrorSending,
+  UploadSuccessfully,
 } from '../../store/actions/sss';
 import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -34,6 +36,13 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function RecoveryRequestOTP(props) {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isUploadSuccessfully = useSelector(state => state.sss.uploadSuccessfully);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
   const { requester, rk, otp } = recoveryRequest;
   const [passcode, setPasscode] = useState([]);
@@ -46,10 +55,7 @@ export default function RecoveryRequestOTP(props) {
     RecoveryRequestAcceptBottomSheet,
     setRecoveryRequestAcceptBottomSheet,
   ] = useState(React.createRef());
-  const [
-    ErrorBottomSheet,
-    setErrorBottomSheet,
-  ] = useState(React.createRef());
+
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
     tempPasscode[i] = text;
@@ -77,6 +83,13 @@ export default function RecoveryRequestOTP(props) {
   useEffect(() => {
     if (requestedShareUpload[requester]) {
       if (!requestedShareUpload[requester].status) {
+        setTimeout(() => {
+          setErrorMessageHeader('Error sending Recovery Secret');
+          setErrorMessage(
+            'There was an error while sending your Recovery Secret, please try again in a little while',
+          );
+          setButtonText('Try again');
+        }, 2);
         (ErrorBottomSheet as any).current.snapTo(1);
         //Alert.alert('Upload failed', requestedShareUpload[requester].err);
       } else {
@@ -85,25 +98,22 @@ export default function RecoveryRequestOTP(props) {
       }
     }
   }, [requestedShareUpload]);
+
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={'Error sending Recovery Secret'}
-        info={'There was an error while sending your Recovery Secret, please try again in a little while'}
-        proceedButtonText={'Try again'}
-        isIgnoreButton={true}
+       modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
         onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, []);
+  }, [errorMessage,errorMessageHeader,buttonText]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -114,6 +124,31 @@ export default function RecoveryRequestOTP(props) {
       />
     );
   }, []);
+
+  if(isErrorSendingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+      setButtonText('Try again');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
+
+  if(isUploadSuccessfully){
+    setTimeout(() => {
+      setErrorMessageHeader('Sending successful');
+      setErrorMessage(
+        'The Recovery Secret has been sent, the receiver needs to accept ',
+      );
+      setButtonText('Done');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(UploadSuccessfully(null));
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />

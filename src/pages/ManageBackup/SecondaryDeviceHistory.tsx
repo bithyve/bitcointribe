@@ -18,7 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare, checkMSharesHealth } from '../../store/actions/sss';
+import { uploadEncMShare, checkMSharesHealth, ErrorSending } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -33,6 +33,11 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
 
 const SecondaryDeviceHistory = props => {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -245,6 +250,44 @@ const SecondaryDeviceHistory = props => {
       dispatch(uploadEncMShare(0));
     }
   }, [SHARES_TRANSFER_DETAILS]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+if(isErrorSendingFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('Error sending Recovery Secret');
+    setErrorMessage(
+      'There was an error while sending your Recovery Secret, please try again in a little while',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(ErrorSending(null));
+}
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -355,6 +398,16 @@ const SecondaryDeviceHistory = props => {
         ]}
         renderContent={renderSecondaryDeviceMessageContents}
         renderHeader={renderSecondaryDeviceMessageHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
       />
     </View>
   );
