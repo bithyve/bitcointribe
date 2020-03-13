@@ -97,7 +97,7 @@ export default function Accounts(props) {
       accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
     },
     {
-      accountType: 'Regular Account',
+      accountType: 'Checking Account',
       accountInfo: 'Fast and easy',
       backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
@@ -328,9 +328,7 @@ export default function Accounts(props) {
                 alignSelf: 'flex-start',
               }}
             >
-              {item.accountType == 'Regular Account'
-                ? 'Checking Account'
-                : item.accountType}
+              {item.accountType}
             </Text>
             <Text
               style={{
@@ -366,7 +364,7 @@ export default function Accounts(props) {
                   } else if (item.accountType == 'Savings Account') {
                     if (SecureAccountHelperBottomSheet.current)
                       SecureAccountHelperBottomSheet.current.snapTo(1);
-                  } else if (item.accountType == 'Regular Account') {
+                  } else if (item.accountType == 'Checking Account') {
                     if (RegularAccountHelperBottomSheet.current)
                       RegularAccountHelperBottomSheet.current.snapTo(1);
                   }

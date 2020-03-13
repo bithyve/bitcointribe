@@ -370,7 +370,7 @@ export default function Home(props) {
     },
     {
       id: 3,
-      title: 'Regular Account',
+      title: 'Checking Account',
       unit: 'sats',
       amount: '5,000',
       account: 'Fast and easy',
@@ -2313,10 +2313,7 @@ export default function Home(props) {
                               style={{ flex: 1, justifyContent: 'flex-end' }}
                             >
                               <Text style={styles.cardTitle}>
-                                {value.title == 'Regular Account'
-                                  ? 'Checking Account'
-                                  : value.title}
-                                {/* // {value.title} */}
+                                {value.title}
                               </Text>
                               <Text
                                 style={{

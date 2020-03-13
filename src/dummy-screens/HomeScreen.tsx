@@ -27,7 +27,7 @@ const HomeScreen = props => {
             Welcome to {`${walletName}'s`} wallet!
           </Text>
           <Button
-            title="Regular Account"
+            title="Checking Account"
             onPress={() => {
               props.navigation.navigate("Account", {
                 serviceType: REGULAR_ACCOUNT

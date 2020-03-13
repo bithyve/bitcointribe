@@ -53,7 +53,7 @@ function AllAccountsContents(props) {
       image: require('../assets/images/icons/icon_test.png'),
     },
     {
-      title: 'Regular Account',
+      title: 'Checking Account',
       info: 'Fast and easy',
       accountType: 'regular',
       unit: 'sats',
@@ -129,7 +129,7 @@ function AllAccountsContents(props) {
             <Image style={styles.listElementsIconImage} source={value.image} />
             <View style={{ flex: 1 }}>
               <Text style={styles.listElementsTitle}>
-              {value.title == 'Regular Account' ? 'Checking Account' : value.title}
+              {value.title}
               </Text>
               <Text style={styles.listElementsInfo}>{value.info}</Text>
             </View>
