@@ -85,6 +85,7 @@ export default function Send(props) {
   const [staticFees, setStaticFees] = useState(
     props.navigation.getParam('staticFees'),
   );
+  console.log("STATIC FEES on send", staticFees);
   const serviceType = props.navigation.getParam('serviceType');
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
@@ -178,6 +179,7 @@ export default function Send(props) {
 
         const instance = service.hdWallet || service.secureHDWallet;
         const staticFees = await instance.getStaticFee();
+        console.log("STATIC FEES", staticFees);
         setStaticFees(staticFees);
         await AsyncStorage.setItem(
           'storedStaticFees',
@@ -948,13 +950,7 @@ export default function Send(props) {
                       >
                         {'Low Fee\n'} (
                         {staticFees
-                          ? staticFees[
-                              sliderValueText === 'Low Fee\n'
-                                ? 'low'
-                                : sliderValueText === 'In the middle\n'
-                                ? 'medium'
-                                : 'high'
-                            ]
+                          ? staticFees['low']
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -971,13 +967,7 @@ export default function Send(props) {
                       >
                         {'In the middle\n'} (
                         {staticFees
-                          ? staticFees[
-                              sliderValueText === 'Low Fee\n'
-                                ? 'low'
-                                : sliderValueText === 'In the middle\n'
-                                ? 'medium'
-                                : 'high'
-                            ]
+                          ? staticFees['medium']
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -993,13 +983,7 @@ export default function Send(props) {
                       >
                         {'Fast Transaction\n'} (
                         {staticFees
-                          ? staticFees[
-                              sliderValueText === 'Low Fee'
-                                ? 'low'
-                                : sliderValueText === 'In the middle'
-                                ? 'medium'
-                                : 'high'
-                            ]
+                          ? staticFees['high']
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
