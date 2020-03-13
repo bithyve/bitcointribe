@@ -35,6 +35,7 @@ export default function CustodianRequestOTP(props) {
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const { requester, ek, otp } = custodyRequest;
   const [passcode, setPasscode] = useState([]);
@@ -69,6 +70,7 @@ export default function CustodianRequestOTP(props) {
   const onOTPSubmit = () => {
     console.log('passcode', passcode.join(''));
     if (passcode.join('').length !== 6 || !ek) return;
+    setIsConfirmDisabled(true);
     dispatch(downloadMShare(passcode.join(''), ek));
   };
 
@@ -95,7 +97,11 @@ export default function CustodianRequestOTP(props) {
   useEffect(() => {
     // check for whether the share from the same wallet is under custody is done prior to landing on this page
     if (UNDER_CUSTODY[requester]) {
+      
       if (passcode.join('').length === 6 || otp)
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
         props.navigation.navigate('CustodianRequestAccepted', { requester });
     }
   }, [UNDER_CUSTODY]);
@@ -128,6 +134,7 @@ export default function CustodianRequestOTP(props) {
 
   if(isErrorReceivingFailed){
     setTimeout(() => {
+      setIsConfirmDisabled(false);
       setErrorMessageHeader('Error receiving Recovery Secret');
       setErrorMessage(
         'There was an error while receiving your Recovery Secret, please try again',
@@ -138,6 +145,11 @@ export default function CustodianRequestOTP(props) {
     dispatch(ErrorReceiving(null));
   }
 
+  useEffect(()=>{
+    if(!loading.downloadMetaShare){
+      setIsConfirmDisabled(false);
+    }
+  },[loading])
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -351,11 +363,12 @@ export default function CustodianRequestOTP(props) {
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
             <TouchableOpacity
+              disabled={isConfirmDisabled}
               onPress={onOTPSubmit}
               style={{ ...styles.confirmModalButtonView }}
             >
-              {loading.downloadMetaShare ? (
-                <ActivityIndicator size="small" />
+              {isConfirmDisabled ? (
+                <ActivityIndicator size="small" color={Colors.white} />
               ) : (
                 <Text style={styles.confirmButtonText}>Confirm</Text>
               )}

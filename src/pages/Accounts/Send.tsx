@@ -55,6 +55,7 @@ import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function Send(props) {
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const [
     SendConfirmationBottomSheet,
     setSendConfirmationBottomSheet,
@@ -293,6 +294,9 @@ export default function Send(props) {
     } else if (transfer.executed === 'ST1') {
       if (SendConfirmationBottomSheet.current)
         SendConfirmationBottomSheet.current.snapTo(1);
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
@@ -585,6 +589,7 @@ export default function Send(props) {
   }
 
   const checkBalance = () => {
+    setIsConfirmDisabled(true);
     if (
       netBalance <
       Number(amount) +
@@ -1013,7 +1018,7 @@ export default function Send(props) {
                     onPress={() => {
                       checkBalance();
                     }}
-                    disabled={loading.transfer}
+                    disabled={isConfirmDisabled}
                     style={{
                       ...styles.confirmButtonView,
                       backgroundColor: Colors.blue,
@@ -1024,7 +1029,7 @@ export default function Send(props) {
                     }}
                   >
                     {loading.transfer && !isInvalidBalance ? (
-                      <ActivityIndicator size="small" />
+                      <ActivityIndicator size="small" color={Colors.white} />
                     ) : (
                       <Text style={styles.buttonText}>Confirm</Text>
                     )}
