@@ -615,9 +615,13 @@ export default class SSS {
     if (!this.metaShares.length)
       throw new Error('Can not initialize health check; missing MetaShares');
 
-    const shareIDs = this.metaShares
-      .slice(0, 3)
-      .map(metaShare => metaShare.shareId);
+    const metaShares = this.metaShares.slice(0, 3);
+    const shareIDs = [];
+    for (const metaShare of metaShares) {
+      if (metaShare && metaShare.shareId) {
+        shareIDs.push(metaShare.shareId);
+      }
+    }
 
     try {
       res = await BH_AXIOS.post('checkSharesHealth', {
@@ -633,7 +637,12 @@ export default class SSS {
       res.data.lastUpdateds;
 
     for (const { shareId, updatedAt } of updates) {
-      this.healthCheckStatus[shareId] = updatedAt;
+      for (let index = 0; index < metaShares.length; index++) {
+        console.log(metaShares[index]);
+        if (metaShares[index] && metaShares[index].shareId === shareId) {
+          this.healthCheckStatus[index] = { shareId, updatedAt };
+        }
+      }
     }
 
     return {

@@ -696,41 +696,86 @@ export default function ManageBackup(props) {
       return;
     }
 
-    if (!secondaryDevice && !overallHealth.sharesInfo[0].updatedAt) {
+    if (
+      !secondaryDevice &&
+      !(overallHealth.sharesInfo[0] && overallHealth.sharesInfo[0].updatedAt)
+    ) {
       setSelectedType('secondaryDevice');
-    } else if (!trustedContact1 && !overallHealth.sharesInfo[1].updatedAt) {
+    } else if (
+      !trustedContact1 &&
+      !(overallHealth.sharesInfo[1] && overallHealth.sharesInfo[1].updatedAt)
+    ) {
       setSelectedType('contact1');
-    } else if (!trustedContact2 && !overallHealth.sharesInfo[2].updatedAt) {
+    } else if (
+      !trustedContact2 &&
+      !(overallHealth.sharesInfo[2] && overallHealth.sharesInfo[2].updatedAt)
+    ) {
       setSelectedType('contact2');
-    } else if (!personalCopy1 && !overallHealth.sharesInfo[3].updatedAt) {
+    } else if (
+      !personalCopy1 &&
+      !(overallHealth.sharesInfo[3] && overallHealth.sharesInfo[3].updatedAt)
+    ) {
       setSelectedType('copy1');
-    } else if (!personalCopy2 && !overallHealth.sharesInfo[4].updatedAt) {
+    } else if (
+      !personalCopy2 &&
+      !(overallHealth.sharesInfo[4] && overallHealth.sharesInfo[4].updatedAt)
+    ) {
       setSelectedType('copy2');
     } else if (!securityAns && !overallHealth.qaStatus.updatedAt) {
       setSelectedType('security');
     } else {
       if (overallHealth) {
-        if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+        if (
+          overallHealth.sharesInfo[0] &&
+          overallHealth.sharesInfo[0].shareStage === 'Ugly'
+        ) {
           setSelectedType('secondaryDevice');
-        } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[1] &&
+          overallHealth.sharesInfo[1].shareStage === 'Ugly'
+        ) {
           setSelectedType('contact1');
-        } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[2] &&
+          overallHealth.sharesInfo[2].shareStage === 'Ugly'
+        ) {
           setSelectedType('contact2');
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[3] &&
+          overallHealth.sharesInfo[3].shareStage === 'Ugly'
+        ) {
           setSelectedType('copy1');
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[4] &&
+          overallHealth.sharesInfo[4].shareStage === 'Ugly'
+        ) {
           setSelectedType('copy2');
         } else if (overallHealth.qaStatus.stage === 'Ugly') {
           setSelectedType('security');
-        } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[0] &&
+          overallHealth.sharesInfo[0].shareStage === 'Bad'
+        ) {
           setSelectedType('secondaryDevice');
-        } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[1] &&
+          overallHealth.sharesInfo[1].shareStage === 'Bad'
+        ) {
           setSelectedType('contact1');
-        } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[2] &&
+          overallHealth.sharesInfo[2].shareStage === 'Bad'
+        ) {
           setSelectedType('contact2');
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[3] &&
+          overallHealth.sharesInfo[3].shareStage === 'Bad'
+        ) {
           setSelectedType('copy1');
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[4] &&
+          overallHealth.sharesInfo[4].shareStage === 'Bad'
+        ) {
           setSelectedType('copy2');
         } else if (overallHealth.qaStatus.stage === 'Bad') {
           setSelectedType('security');
@@ -803,19 +848,34 @@ export default function ManageBackup(props) {
     if (overallHealth) {
       // update acc to overall health (aids post wallet recovery)
       const updatedAutoHighlightFlags = { ...autoHighlightFlags };
-      if (overallHealth.sharesInfo[0].updatedAt) {
+      if (
+        overallHealth.sharesInfo[0] &&
+        overallHealth.sharesInfo[0].updatedAt
+      ) {
         updatedAutoHighlightFlags.secondaryDevice = true;
       }
-      if (overallHealth.sharesInfo[1].updatedAt) {
+      if (
+        overallHealth.sharesInfo[1] &&
+        overallHealth.sharesInfo[1].updatedAt
+      ) {
         updatedAutoHighlightFlags.trustedContact1 = true;
       }
-      if (overallHealth.sharesInfo[2].updatedAt) {
+      if (
+        overallHealth.sharesInfo[2] &&
+        overallHealth.sharesInfo[2].updatedAt
+      ) {
         updatedAutoHighlightFlags.trustedContact2 = true;
       }
-      if (overallHealth.sharesInfo[3].updatedAt) {
+      if (
+        overallHealth.sharesInfo[3] &&
+        overallHealth.sharesInfo[3].updatedAt
+      ) {
         updatedAutoHighlightFlags.personalCopy1 = true;
       }
-      if (overallHealth.sharesInfo[4].updatedAt) {
+      if (
+        overallHealth.sharesInfo[4] &&
+        overallHealth.sharesInfo[4].updatedAt
+      ) {
         updatedAutoHighlightFlags.personalCopy2 = true;
       }
       if (overallHealth.qaStatus.updatedAt) {
@@ -868,28 +928,38 @@ export default function ManageBackup(props) {
       updatedPageData.forEach(data => {
         switch (data.title) {
           case 'Secondary Device':
-            data.status = overallHealth.sharesInfo[0].shareStage;
-            data.time = overallHealth.sharesInfo[0].updatedAt;
+            if (overallHealth.sharesInfo[0]) {
+              data.status = overallHealth.sharesInfo[0].shareStage;
+              data.time = overallHealth.sharesInfo[0].updatedAt;
+            }
             break;
 
           case 'Trusted Contact 1':
-            data.status = overallHealth.sharesInfo[1].shareStage;
-            data.time = overallHealth.sharesInfo[1].updatedAt;
+            if (overallHealth.sharesInfo[1]) {
+              data.status = overallHealth.sharesInfo[1].shareStage;
+              data.time = overallHealth.sharesInfo[1].updatedAt;
+            }
             break;
 
           case 'Trusted Contact 2':
-            data.status = overallHealth.sharesInfo[2].shareStage;
-            data.time = overallHealth.sharesInfo[2].updatedAt;
+            if (overallHealth.sharesInfo[2]) {
+              data.status = overallHealth.sharesInfo[2].shareStage;
+              data.time = overallHealth.sharesInfo[2].updatedAt;
+            }
             break;
 
           case 'Personal Copy 1':
-            data.status = overallHealth.sharesInfo[3].shareStage;
-            data.time = overallHealth.sharesInfo[3].updatedAt;
+            if (overallHealth.sharesInfo[3]) {
+              data.status = overallHealth.sharesInfo[3].shareStage;
+              data.time = overallHealth.sharesInfo[3].updatedAt;
+            }
             break;
 
           case 'Personal Copy 2':
-            data.status = overallHealth.sharesInfo[4].shareStage;
-            data.time = overallHealth.sharesInfo[4].updatedAt;
+            if (overallHealth.sharesInfo[4]) {
+              data.status = overallHealth.sharesInfo[4].shareStage;
+              data.time = overallHealth.sharesInfo[4].updatedAt;
+            }
             break;
 
           case 'Security Questions':
@@ -928,7 +998,10 @@ export default function ManageBackup(props) {
       securityAns,
     } = autoHighlightFlags;
 
-    if (!secondaryDevice && !overallHealth.sharesInfo[0].updatedAt) {
+    if (
+      !secondaryDevice &&
+      !(overallHealth.sharesInfo[0] && overallHealth.sharesInfo[0].updatedAt)
+    ) {
       const data = pageData[0];
       props.navigation.navigate('SecondaryDeviceHistory', {
         selectedStatus: data.status,
@@ -941,7 +1014,10 @@ export default function ManageBackup(props) {
           }),
         next: 'true',
       });
-    } else if (!trustedContact1 && !overallHealth.sharesInfo[1].updatedAt) {
+    } else if (
+      !trustedContact1 &&
+      !(overallHealth.sharesInfo[1] && overallHealth.sharesInfo[1].updatedAt)
+    ) {
       props.navigation.navigate('TrustedContactHistory', {
         selectedStatus: pageData[1].status,
         selectedTime: getTime(pageData[1].time),
@@ -954,7 +1030,10 @@ export default function ManageBackup(props) {
         activateReshare: autoHighlightFlags.trustedContact1,
         next: 'true',
       });
-    } else if (!trustedContact2 && !overallHealth.sharesInfo[2].updatedAt) {
+    } else if (
+      !trustedContact2 &&
+      !(overallHealth.sharesInfo[2] && overallHealth.sharesInfo[2].updatedAt)
+    ) {
       props.navigation.navigate('TrustedContactHistory', {
         selectedStatus: pageData[2].status,
         selectedTime: getTime(pageData[2].time),
@@ -967,7 +1046,10 @@ export default function ManageBackup(props) {
         activateReshare: autoHighlightFlags.trustedContact2,
         next: 'true',
       });
-    } else if (!personalCopy1 && !overallHealth.sharesInfo[3].updatedAt) {
+    } else if (
+      !personalCopy1 &&
+      !(overallHealth.sharesInfo[3] && overallHealth.sharesInfo[3].updatedAt)
+    ) {
       const data = pageData[3];
       props.navigation.navigate('PersonalCopyHistory', {
         selectedStatus: data.status,
@@ -981,7 +1063,10 @@ export default function ManageBackup(props) {
           }),
         next: 'true',
       });
-    } else if (!personalCopy2 && !overallHealth.sharesInfo[4].updatedAt) {
+    } else if (
+      !personalCopy2 &&
+      !(overallHealth.sharesInfo[4] && overallHealth.sharesInfo[4].updatedAt)
+    ) {
       const data = pageData[4];
       props.navigation.navigate('PersonalCopyHistory', {
         selectedStatus: data.status,
@@ -1010,7 +1095,10 @@ export default function ManageBackup(props) {
       });
     } else {
       if (overallHealth) {
-        if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
+        if (
+          overallHealth.sharesInfo[0] &&
+          overallHealth.sharesInfo[0].shareStage === 'Ugly'
+        ) {
           const data = pageData[0];
           props.navigation.navigate('SecondaryDeviceHistory', {
             selectedStatus: data.status,
@@ -1023,7 +1111,10 @@ export default function ManageBackup(props) {
               }),
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[1] &&
+          overallHealth.sharesInfo[1].shareStage === 'Ugly'
+        ) {
           props.navigation.navigate('TrustedContactHistory', {
             selectedStatus: pageData[1].status,
             selectedTime: getTime(pageData[1].time),
@@ -1037,7 +1128,10 @@ export default function ManageBackup(props) {
             activateReshare: autoHighlightFlags.trustedContact1,
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[2] &&
+          overallHealth.sharesInfo[2].shareStage === 'Ugly'
+        ) {
           props.navigation.navigate('TrustedContactHistory', {
             selectedStatus: pageData[2].status,
             selectedTime: getTime(pageData[2].time),
@@ -1051,7 +1145,10 @@ export default function ManageBackup(props) {
             activateReshare: autoHighlightFlags.trustedContact2,
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[3] &&
+          overallHealth.sharesInfo[3].shareStage === 'Ugly'
+        ) {
           const data = pageData[3];
           props.navigation.navigate('PersonalCopyHistory', {
             selectedStatus: data.status,
@@ -1065,7 +1162,10 @@ export default function ManageBackup(props) {
               }),
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Ugly') {
+        } else if (
+          overallHealth.sharesInfo[4] &&
+          overallHealth.sharesInfo[4].shareStage === 'Ugly'
+        ) {
           const data = pageData[4];
           props.navigation.navigate('PersonalCopyHistory', {
             selectedStatus: data.status,
@@ -1093,7 +1193,10 @@ export default function ManageBackup(props) {
               }),
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[0] &&
+          overallHealth.sharesInfo[0].shareStage === 'Bad'
+        ) {
           // Secondary device
           const data = pageData[0];
           props.navigation.navigate('SecondaryDeviceHistory', {
@@ -1107,7 +1210,10 @@ export default function ManageBackup(props) {
               }),
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[1] &&
+          overallHealth.sharesInfo[1].shareStage === 'Bad'
+        ) {
           //Trusted contact 1
           props.navigation.navigate('TrustedContactHistory', {
             selectedStatus: pageData[1].status,
@@ -1122,7 +1228,10 @@ export default function ManageBackup(props) {
             activateReshare: autoHighlightFlags.trustedContact1,
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[2] &&
+          overallHealth.sharesInfo[2].shareStage === 'Bad'
+        ) {
           //Trusted contact 2
           props.navigation.navigate('TrustedContactHistory', {
             selectedStatus: pageData[2].status,
@@ -1137,7 +1246,10 @@ export default function ManageBackup(props) {
             activateReshare: autoHighlightFlags.trustedContact2,
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[3].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[3] &&
+          overallHealth.sharesInfo[3].shareStage === 'Bad'
+        ) {
           const data = pageData[3];
           props.navigation.navigate('PersonalCopyHistory', {
             selectedStatus: data.status,
@@ -1151,7 +1263,10 @@ export default function ManageBackup(props) {
               }),
             next: 'true',
           });
-        } else if (overallHealth.sharesInfo[4].shareStage === 'Bad') {
+        } else if (
+          overallHealth.sharesInfo[4] &&
+          overallHealth.sharesInfo[4].shareStage === 'Bad'
+        ) {
           const data = pageData[4];
           props.navigation.navigate('PersonalCopyHistory', {
             selectedStatus: data.status,

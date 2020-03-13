@@ -584,7 +584,10 @@ function* shareHistoryUpdateWorker({ payload }) {
   if (shareHistory) {
     const updatedShareHistory = [...shareHistory];
     for (let index = 0; index < overallHealth.sharesInfo.length; index++) {
-      if (overallHealth.sharesInfo[index].updatedAt) {
+      if (
+        overallHealth.sharesInfo[index] &&
+        overallHealth.sharesInfo[index].updatedAt
+      ) {
         if (overallHealth.sharesInfo[index].shareStage !== 'Ugly') {
           updatedShareHistory[index] = {
             ...updatedShareHistory[index],
@@ -637,10 +640,11 @@ function* overallHealthWorker({ payload }) {
     : yield select(state => state.sss.service);
 
   const { healthCheckStatus } = service.sss;
-  let shareStatus = Object.keys(healthCheckStatus).map(key => {
-    return {
-      shareId: key,
-      updatedAt: healthCheckStatus[key],
+  let shareStatus = new Array(5);
+  Object.keys(healthCheckStatus).map(key => {
+    shareStatus[key] = {
+      shareId: healthCheckStatus[key].shareId,
+      updatedAt: healthCheckStatus[key].updatedAt,
     };
   });
 
@@ -648,7 +652,6 @@ function* overallHealthWorker({ payload }) {
     AsyncStorage.getItem,
     'SecurityAnsTimestamp',
   );
-  console.log({ securityTimestamp });
 
   let storedPDFHealth = JSON.parse(
     yield call(AsyncStorage.getItem, 'PDF Health'),
