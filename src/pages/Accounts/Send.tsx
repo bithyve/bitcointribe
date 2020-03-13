@@ -806,12 +806,12 @@ export default function Send(props) {
                       <Text style={styles.errorText}>Insufficient balance</Text>
                     </View>
                   ) : null}
-                  <View style={{ ...styles.textBoxView, height: 100 }}>
+                  <View style={{ ...styles.textBoxView }}>
                     <TextInput
                       // ref={refs => setDescriptionRef(refs)}
                       editable={isEditable}
-                      multiline={true}
-                      numberOfLines={4}
+                      // multiline={true}
+                      // numberOfLines={4}
                       style={{
                         ...styles.textBox,
                         paddingRight: 20,
