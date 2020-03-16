@@ -104,9 +104,11 @@ export default function Home(props) {
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  const isUploadSuccessfully = useSelector(state => state.sss.uploadSuccessfully);
+  const isUploadSuccessfully = useSelector(
+    state => state.sss.uploadSuccessfully,
+  );
   const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
   let [AssociatedContact, setAssociatedContact] = useState([]);
@@ -198,8 +200,13 @@ export default function Home(props) {
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function(left, right) {
-        console.log("moment.utc(right.date),moment.utc(left.date)", moment.utc(right.date).unix(), moment.utc(left.date).unix(), moment.utc(right.date).unix() - moment.utc(left.date).unix());
-        return moment.utc(right.date).unix() - moment.utc(left.date).unix()
+        console.log(
+          'moment.utc(right.date),moment.utc(left.date)',
+          moment.utc(right.date).unix(),
+          moment.utc(left.date).unix(),
+          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
+        );
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
     setBalances({
@@ -581,37 +588,43 @@ export default function Home(props) {
         info={errorMessage}
         proceedButtonText={buttonText}
         onPressProceed={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require('../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader,buttonText]);
+  }, [errorMessage, errorMessageHeader, buttonText]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   }, []);
 
-  if(isErrorSendingFailed){
+  if (isErrorSendingFailed) {
     setTimeout(() => {
       setErrorMessageHeader('Error sending Recovery Secret');
       setErrorMessage(
         'There was an error while sending your Recovery Secret, please try again in a little while',
       );
-      setButtonText('Try again')
+      setButtonText('Try again');
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(ErrorSending(null));
   }
-  
-  if(isUploadSuccessfully){
+
+  if (isUploadSuccessfully) {
     setTimeout(() => {
       setErrorMessageHeader('Sending successful');
       setErrorMessage(
@@ -623,13 +636,13 @@ export default function Home(props) {
     dispatch(UploadSuccessfully(null));
   }
 
-  if(isErrorReceivingFailed){
+  if (isErrorReceivingFailed) {
     setTimeout(() => {
       setErrorMessageHeader('Error receiving Recovery Secret');
       setErrorMessage(
         'There was an error while receiving your Recovery Secret, please try again',
       );
-      setButtonText('Try again')
+      setButtonText('Try again');
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(ErrorReceiving(null));
@@ -749,39 +762,143 @@ export default function Home(props) {
           </View>
         </View>
         {transactions.length <= 1 ? (
-            <View style={{ margin:15, backgroundColor:Colors.backgroundColor, marginBottom:AtCloseEnd ? hp('12%')+15 : hp('30%')+15, padding:10, paddingTop:20, paddingBottom:20, borderRadius:7}}>
-                <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have any transactions yet</Text>
-                <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Start using your accounts to make transactions</Text>
-            </View>
-          ) : null}
+          <View
+            style={{
+              margin: 15,
+              backgroundColor: Colors.backgroundColor,
+              marginBottom: AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: 20,
+              borderRadius: 7,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              You don't have any transactions yet
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Start using your accounts to make transactions
+            </Text>
+          </View>
+        ) : null}
       </View>
     ) : (
-       <View style={styles.modalContentContainer}>
+      <View style={styles.modalContentContainer}>
         <View
           style={{
             flex: 1,
           }}
         >
-          {[1,2,3,4,5].map((value)=>{
-          return <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingTop: wp('5%'), paddingBottom: wp('5%'), borderBottomWidth:0.5, borderColor:Colors.borderColor }}>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-              <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('5%'), borderRadius:wp('5%')/2, marginLeft:10, marginRight:10}}/>
-              <View>
-                <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('25%'), borderRadius:10}}/>
-                <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('35%'), marginTop:5, borderRadius:10}}/>
+          {[1, 2, 3, 4, 5].map(value => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingTop: wp('5%'),
+                  paddingBottom: wp('5%'),
+                  borderBottomWidth: 0.5,
+                  borderColor: Colors.borderColor,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('5%'),
+                      width: wp('5%'),
+                      borderRadius: wp('5%') / 2,
+                      marginLeft: 10,
+                      marginRight: 10,
+                    }}
+                  />
+                  <View>
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('25%'),
+                        borderRadius: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('35%'),
+                        marginTop: 5,
+                        borderRadius: 10,
+                      }}
+                    />
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('7%'),
+                      width: wp('20%'),
+                      borderRadius: 10,
+                    }}
+                  />
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('5%'),
+                      width: wp('5%'),
+                      borderRadius: wp('5%') / 2,
+                      marginLeft: 10,
+                      marginRight: 10,
+                    }}
+                  />
+                </View>
               </View>
-            </View>
-            <View style={{flexDirection:'row',alignItems:'center'}}>
-              <View style={{backgroundColor:Colors.backgroundColor, height:wp('7%'), width:wp('20%'), borderRadius:10}}/>
-              <View style={{backgroundColor:Colors.backgroundColor, height:wp('5%'), width:wp('5%'), borderRadius:wp('5%')/2, marginLeft:10, marginRight:10}}/>
-            </View>
-          </View>
+            );
           })}
         </View>
-        <View style={{ backgroundColor:Colors.white}}>
-          <View style={{ margin:15, backgroundColor:Colors.backgroundColor, marginBottom:hp('12%')+15, padding:10, paddingTop:20, paddingBottom:20, borderRadius:7}}>
-            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>You don't have any transactions yet</Text>
-            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Start using your accounts to make transactions</Text>
+        <View style={{ backgroundColor: Colors.white }}>
+          <View
+            style={{
+              margin: 15,
+              backgroundColor: Colors.backgroundColor,
+              marginBottom: hp('12%') + 15,
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: 20,
+              borderRadius: 7,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              You don't have any transactions yet
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Start using your accounts to make transactions
+            </Text>
           </View>
         </View>
       </View>
@@ -820,7 +937,7 @@ export default function Home(props) {
         });
       }
       if ((secondaryDeviceOtp as any).type == 'secondaryDeviceQR') {
-        Toast('Shares downloaded successfully!');
+        Toast('Recovery Secret received successfully');
         setSecondaryDeviceAddresses();
       }
       getAssociatedContact();
@@ -870,9 +987,9 @@ export default function Home(props) {
     }
   };
 
-  const renderTransactionContent = useCallback( ()=> {
+  const renderTransactionContent = useCallback(() => {
     return renderTransactionsContent();
-  },[AtCloseEnd, transactions])
+  }, [AtCloseEnd, transactions]);
 
   function renderTransactionHeader() {
     return (
@@ -1862,8 +1979,6 @@ export default function Home(props) {
     }
   }, [custodyRequest, recoveryRequest]);
 
- 
-
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
@@ -1964,7 +2079,7 @@ export default function Home(props) {
         }
         subTitle={'Message from the Sender'}
         subTitleInfo={
-          'I lost my hexa wallet, need the shares back to restore my\nwallet'
+          'I am trying to restore my Hexa wallet and need the Recovery Secret shared with you'
         }
         acceptButtonName={'Accept Request'}
         rejectButtonName={'Reject Request'}
@@ -2409,7 +2524,7 @@ export default function Home(props) {
         />
       </TouchableWithoutFeedback> */}
       <BottomSheet
-        onOpenEnd={()=>{
+        onOpenEnd={() => {
           setAtCloseEnd(true);
         }}
         onCloseEnd={() => {
@@ -2614,7 +2729,9 @@ export default function Home(props) {
           ref={addressBookBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('64%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
@@ -2831,7 +2948,13 @@ export default function Home(props) {
         />
       ) : null}
 
-<BottomSheet
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet}
         snapPoints={[

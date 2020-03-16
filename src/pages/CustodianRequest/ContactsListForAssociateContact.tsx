@@ -22,7 +22,7 @@ const ContactsListForAssociateContact = props => {
       AssociatedContact.findIndex(value => value.id == contacts[0].id) == -1
     ) {
       AssociatedContact.push(contacts[0]);
-      Toast('Contact Associated Successfully.');
+      Toast('Contact associated successfully');
       props.navigation.navigate('Home');
     } else {
       Toast('Contact already Associated.');

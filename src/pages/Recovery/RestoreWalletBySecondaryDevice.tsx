@@ -199,7 +199,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
                     fontFamily: Fonts.FiraSansMedium,
                   }}
                 >
-                  Yes, I have shared
+                  Yes, I have scanned
                 </Text>
               </TouchableOpacity>
               {/* <Button

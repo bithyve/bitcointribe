@@ -180,6 +180,7 @@ const ReceivingAddress = props => {
                   elevation: 10,
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
+                  marginRight: 5,
                   shadowOffset: { width: 15, height: 15 },
                 }}
               >
@@ -198,6 +199,7 @@ const ReceivingAddress = props => {
                 style={{
                   ...styles.confirmButtonView,
                   width: wp('30%'),
+                  marginLeft: 5
                 }}
               >
                 <Text
