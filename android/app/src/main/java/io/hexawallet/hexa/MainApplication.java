@@ -1,4 +1,4 @@
-package com.hexa;
+package io.hexawallet.hexa;
 
 import android.app.Application;
 
@@ -24,7 +24,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.hexa.generated.BasePackageList;
+import io.hexawallet.hexa.generated.BasePackageList;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.swmansion.rnscreens.RNScreensPackage;
@@ -43,7 +43,7 @@ import java.util.List;
 import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
-import com.hexa.PdfPasswordPackage;
+import io.hexawallet.hexa.PdfPasswordPackage;
 
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
