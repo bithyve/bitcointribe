@@ -34,7 +34,7 @@ import {
   walletRecoveryFailed,
   ErrorSending,
   UploadSuccessfully,
-  ErrorReceiving
+  ErrorReceiving,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -160,8 +160,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
-    yield put(ErrorSending(true) );
-   // Alert.alert('Upload Failed!', res.err);
+    yield put(ErrorSending(true));
+    // Alert.alert('Upload Failed!', res.err);
     console.log({ err: res.err });
   }
   yield put(switchS3Loader('uploadMetaShare'));
@@ -214,7 +214,7 @@ function* uploadRequestedShareWorker({ payload }) {
   );
 
   if (!UNDER_CUSTODY[tag]) {
-    yield put(ErrorSending(true) );
+    yield put(ErrorSending(true));
     // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
   }
 
@@ -338,7 +338,7 @@ function* downloadMetaShareWorker({ payload }) {
   } else {
     console.log({ res });
     yield put(ErrorReceiving(true));
-   // Alert.alert('Download Failed!', res.err);
+    // Alert.alert('Download Failed!', res.err);
     yield put(downloadedMShare(otp, false, res.err));
   }
   yield put(switchS3Loader('downloadMetaShare'));
@@ -488,7 +488,7 @@ function* checkMSharesHealthWorker() {
   const res = yield call(s3Service.checkHealth);
   // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
-
+  console.log({ res });
   if (res.status === 200) {
     // if (preInstance !== postInstance) {
     //   const { SERVICES } = yield select(state => state.storage.database);
@@ -549,7 +549,7 @@ function* checkPDFHealthWorker({ payload }) {
     yield put(pdfHealthChecked('pdfHealthChecked'));
   } else {
     console.log({ pdfHealth, payload });
-    yield put( QRChecked(true) );
+    yield put(QRChecked(true));
     //Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
   }
 
@@ -584,7 +584,10 @@ function* shareHistoryUpdateWorker({ payload }) {
   if (shareHistory) {
     const updatedShareHistory = [...shareHistory];
     for (let index = 0; index < overallHealth.sharesInfo.length; index++) {
-      if (overallHealth.sharesInfo[index].updatedAt) {
+      if (
+        overallHealth.sharesInfo[index] &&
+        overallHealth.sharesInfo[index].updatedAt
+      ) {
         if (overallHealth.sharesInfo[index].shareStage !== 'Ugly') {
           updatedShareHistory[index] = {
             ...updatedShareHistory[index],
@@ -637,10 +640,11 @@ function* overallHealthWorker({ payload }) {
     : yield select(state => state.sss.service);
 
   const { healthCheckStatus } = service.sss;
-  let shareStatus = Object.keys(healthCheckStatus).map(key => {
-    return {
-      shareId: key,
-      updatedAt: healthCheckStatus[key],
+  let shareStatus = new Array(5);
+  Object.keys(healthCheckStatus).map(key => {
+    shareStatus[key] = {
+      shareId: healthCheckStatus[key].shareId,
+      updatedAt: healthCheckStatus[key].updatedAt,
     };
   });
 
@@ -648,7 +652,6 @@ function* overallHealthWorker({ payload }) {
     AsyncStorage.getItem,
     'SecurityAnsTimestamp',
   );
-  console.log({ securityTimestamp });
 
   let storedPDFHealth = JSON.parse(
     yield call(AsyncStorage.getItem, 'PDF Health'),
@@ -826,7 +829,7 @@ function* restoreShareFromQRWorker({ payload }) {
     console.log({ updatedBackup });
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
-    yield put( UnableRecoverShareFromQR(true) );
+    yield put(UnableRecoverShareFromQR(true));
     //Alert.alert('Unable to recover share from QR', res.err);
     console.log({ err: res.err });
   }
@@ -902,7 +905,7 @@ function* recoverWalletWorker({ payload }) {
     }
   } catch (err) {
     console.log({ err: err.message });
-    yield put( walletRecoveryFailed(true) );
+    yield put(walletRecoveryFailed(true));
     // Alert.alert('Wallet recovery failed!', err.message);
   }
 

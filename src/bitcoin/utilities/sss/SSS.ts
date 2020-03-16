@@ -99,10 +99,7 @@ export default class SSS {
 
     const { share, dynamicNonPMDD } = res.data;
     const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
-    if (dynamicNonPMDD) {
-      return { metaShare, dynamicNonPMDD, messageId };
-    }
-    return { metaShare, messageId };
+    return { metaShare, dynamicNonPMDD, messageId };
   };
 
   public static downloadDynamicNonPMDD = async (
@@ -479,6 +476,7 @@ export default class SSS {
   };
 
   public walletId: string;
+  public shareIDs: string[];
   public encryptedSecrets: string[];
   public metaShares: MetaShare[];
   public healthCheckInitialized: boolean;
@@ -490,6 +488,7 @@ export default class SSS {
     mnemonic: string,
     stateVars?: {
       encryptedSecrets: string[];
+      shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
@@ -509,6 +508,7 @@ export default class SSS {
           .update(bip39.mnemonicToSeedSync(this.mnemonic))
           .digest('hex');
     this.encryptedSecrets = stateVars ? stateVars.encryptedSecrets : [];
+    this.shareIDs = stateVars ? stateVars.shareIDs : [];
     this.metaShares = stateVars ? stateVars.metaShares : [];
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
@@ -542,7 +542,7 @@ export default class SSS {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    dynamicNonPMDD?: any,
   ): Promise<{
     otp: string;
     encryptedKey: string;
@@ -556,6 +556,9 @@ export default class SSS {
     const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
       metaShare,
     );
+    if (dynamicNonPMDD) {
+      dynamicNonPMDD = this.encryptDynamicNonPMDD(dynamicNonPMDD);
+    }
 
     try {
       res = await BH_AXIOS.post('uploadShare', {
@@ -615,15 +618,13 @@ export default class SSS {
     if (!this.metaShares.length)
       throw new Error('Can not initialize health check; missing MetaShares');
 
-    const shareIDs = this.metaShares
-      .slice(0, 3)
-      .map(metaShare => metaShare.shareId);
+    const metaShares = this.metaShares.slice(0, 3);
 
     try {
       res = await BH_AXIOS.post('checkSharesHealth', {
         HEXA_ID,
         walletID: this.walletId,
-        shareIDs,
+        shareIDs: this.shareIDs,
       });
     } catch (err) {
       throw new Error(err.response.data.err);
@@ -633,7 +634,11 @@ export default class SSS {
       res.data.lastUpdateds;
 
     for (const { shareId, updatedAt } of updates) {
-      this.healthCheckStatus[shareId] = updatedAt;
+      for (let index = 0; index < metaShares.length; index++) {
+        if (metaShares[index] && metaShares[index].shareId === shareId) {
+          this.healthCheckStatus[index] = { shareId, updatedAt };
+        }
+      }
     }
 
     return {
@@ -654,16 +659,22 @@ export default class SSS {
       bhXpub,
     } = secureAccAssets;
 
+    const shareIDs = this.shareIDs;
+
     const socialStaticNonPMDD: SocialStaticNonPMDD = {
       secondaryXpub,
       bhXpub,
+      shareIDs,
     };
     const buddyStaticNonPMDD: BuddyStaticNonPMDD = {
       secondaryMnemonic,
       twoFASecret,
       secondaryXpub,
       bhXpub,
+      shareIDs,
     };
+
+    console.log({ socialStaticNonPMDD });
 
     return {
       encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
@@ -725,7 +736,7 @@ export default class SSS {
   };
 
   public encryptDynamicNonPMDD = (
-    dynamicNonPMDD: MetaShare[],
+    dynamicNonPMDD: any,
   ): { encryptedDynamicNonPMDD: string } => {
     const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
@@ -907,7 +918,7 @@ export default class SSS {
   };
 
   public restoreMetaShares = (
-    metaShares: any[],
+    metaShares: MetaShare[],
   ): {
     restored: Boolean;
   } => {
@@ -916,7 +927,32 @@ export default class SSS {
     }
 
     this.metaShares = metaShares;
+
+    // restoring other assets
+
+    // restoring healthCheckInit variable
     this.healthCheckInitialized = true;
+
+    // enriching pdf health variable if restoration is done via Personal Copy
+    if (this.metaShares[3]) {
+      this.createQR(3);
+    }
+    if (this.metaShares[4]) {
+      this.createQR(4);
+    }
+
+    // replenishing shareIDs from any of the available shares
+    for (const share of metaShares) {
+      if (share) {
+        const { decryptedStaticNonPMDD } = this.decryptStaticNonPMDD(
+          share.encryptedStaticNonPMDD,
+        );
+        const { shareIDs } = decryptedStaticNonPMDD;
+        this.shareIDs = shareIDs;
+        break;
+      }
+    }
+
     return { restored: true };
   };
 
@@ -961,7 +997,7 @@ export default class SSS {
     encryptedSecrets: string[];
   } => {
     const key = SSS.getDerivedKey(answer);
-
+    const shareIDs = [];
     for (const secret of secretsToEncrypt) {
       const cipher = crypto.createCipheriv(
         SSS.cipherSpec.algorithm,
@@ -971,7 +1007,9 @@ export default class SSS {
       let encrypted = cipher.update(secret, 'utf8', 'hex');
       encrypted += cipher.final('hex');
       this.encryptedSecrets.push(encrypted);
+      shareIDs.push(SSS.getShareId(encrypted));
     }
+    this.shareIDs = shareIDs.slice(0, 3); // preserving just the online(relay-transmitted) shareIDs
     return { encryptedSecrets: this.encryptedSecrets };
   };
 }

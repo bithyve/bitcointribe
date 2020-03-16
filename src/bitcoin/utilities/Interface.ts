@@ -38,6 +38,7 @@ export interface EncDynamicNonPMDD {
 export interface SocialStaticNonPMDD {
   secondaryXpub: string;
   bhXpub: string;
+  shareIDs: string[];
 }
 
 export interface BuddyStaticNonPMDD {
@@ -45,4 +46,5 @@ export interface BuddyStaticNonPMDD {
   twoFASecret: string;
   secondaryXpub: string;
   bhXpub: string;
+  shareIDs: string[];
 }
