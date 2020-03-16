@@ -49,46 +49,54 @@ export default class HealthStatus {
       updatedAt: number;
     }>;
   } => {
-    const sharesInfo = [];
+    console.log({ shares });
+    const sharesInfo = new Array(shares.length);
     let SLOT1 = TIME_SLOTS.SHARE_SLOT1;
     let SLOT2 = TIME_SLOTS.SHARE_SLOT2;
     for (let itr = 0; itr < shares.length; itr++) {
-      const obj = shares[itr];
-      sharesInfo.push({
-        shareId: obj.shareId,
-        shareStage: ENTITY_HEALTH.STAGE1,
-        updatedAt: obj.updatedAt,
-      });
+      if (shares[itr]) {
+        const obj = shares[itr];
+        sharesInfo[itr] = {
+          shareId: obj.shareId,
+          shareStage: ENTITY_HEALTH.STAGE1,
+          updatedAt: obj.updatedAt,
+        };
+      }
     }
+
+    console.log({ sharesInfo });
     const delta: number[] = new Array(shares.length);
     const minutes: number[] = new Array(shares.length);
     for (let i = 0; i < delta.length; i++) {
-      const obj = shares[i];
-      delta[i] = Math.abs(Date.now() - obj.updatedAt);
+      if (shares[i]) {
+        const obj = shares[i];
+        delta[i] = Math.abs(Date.now() - obj.updatedAt);
+      }
     }
 
     for (let i = 0; i < minutes.length; i++) {
-      // numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
-      minutes[i] = Math.floor(delta[i] / (60 * 1000)); // in minutes; for test
+      if (sharesInfo[i]) {
+        // numberOfDays[i] = Math.floor(delta[i] / (60 * 60 * 24 * 1000));
+        minutes[i] = Math.floor(delta[i] / (60 * 1000)); // in minutes; for test
 
-      if (i >= 3) {
-        SLOT1 = 2 * TIME_SLOTS.SHARE_SLOT1; // 4 weeks SLOT1 for PDF
-        SLOT2 = 1.5 * TIME_SLOTS.SHARE_SLOT2; // 6 weeks SLOT2 for PDF
-      }
-      console.log({ SLOT1, SLOT2 });
-      const obj = sharesInfo[i];
-      if (minutes[i] > SLOT2) {
-        obj.shareStage = ENTITY_HEALTH.STAGE1;
-        this.counter.ugly++;
-      } else if (minutes[i] > SLOT1 && minutes[i] <= SLOT2) {
-        obj.shareStage = ENTITY_HEALTH.STAGE2;
-        this.counter.bad++;
-      } else if (minutes[i] <= SLOT1) {
-        obj.shareStage = ENTITY_HEALTH.STAGE3;
-        this.counter.good++;
+        if (i >= 3) {
+          SLOT1 = 2 * TIME_SLOTS.SHARE_SLOT1; // 4 weeks SLOT1 for PDF
+          SLOT2 = 1.5 * TIME_SLOTS.SHARE_SLOT2; // 6 weeks SLOT2 for PDF
+        }
+        const obj = sharesInfo[i];
+        if (minutes[i] > SLOT2) {
+          obj.shareStage = ENTITY_HEALTH.STAGE1;
+          this.counter.ugly++;
+        } else if (minutes[i] > SLOT1 && minutes[i] <= SLOT2) {
+          obj.shareStage = ENTITY_HEALTH.STAGE2;
+          this.counter.bad++;
+        } else if (minutes[i] <= SLOT1) {
+          obj.shareStage = ENTITY_HEALTH.STAGE3;
+          this.counter.good++;
+        }
       }
     }
-
+    console.log({ sharesInfo });
     return { sharesInfo };
   };
 

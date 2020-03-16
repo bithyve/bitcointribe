@@ -143,7 +143,7 @@ export const restoreShareFromQR = qrArray => {
   return { type: RESTORE_SHARE_FROM_QR, payload: { qrArray } };
 };
 
-export const pdfHealthChecked = (pdfHealthChecked) => {
+export const pdfHealthChecked = pdfHealthChecked => {
   return { type: CHECKED_PDF_HEALTH, payload: { pdfHealthChecked } };
 };
 
