@@ -55,7 +55,7 @@ import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function Send(props) {
-  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [
     SendConfirmationBottomSheet,
     setSendConfirmationBottomSheet,
@@ -148,7 +148,6 @@ export default function Send(props) {
     if (viewRef.current) {
       viewRef.current.measure((fx, fy, width, height, px) => {
         const location = (evt.nativeEvent.locationX - px) / width;
-        console.log('LOCATION', location, evt.nativeEvent.locationX, px, width);
         if (location >= -0.1 && location <= 0.2) {
           setSliderValue(0);
         } else if (location >= 0.3 && location <= 0.6) {
@@ -623,6 +622,16 @@ export default function Send(props) {
     }
   };
 
+  useEffect(()=>{
+    console.log('isInvalidAddress && recipientAddress && amount',isInvalidAddress , recipientAddress , amount)
+    if(isInvalidAddress && recipientAddress && amount){
+      setIsConfirmDisabled(false);
+    }
+    else{
+      setIsConfirmDisabled(true);
+    }
+  },[recipientAddress, isInvalidAddress, amount])
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -715,7 +724,6 @@ export default function Send(props) {
                         let isAddressValid = instance.isValidAddress(
                           recipientAddress,
                         );
-                        console.log('isAddressValid', isAddressValid);
                         setIsInvalidAddress(isAddressValid);
                       }}
                     />
@@ -914,11 +922,9 @@ export default function Send(props) {
                           }}
                           value={sliderValue}
                           onValueChange={value => {
-                            console.log('Value', value);
                             setSliderValue(value);
                           }}
                           onSlidingComplete={value => {
-                            console.log('Value onSlidingComplete', value);
                             value == 0
                               ? setSliderValueText('Low Fee')
                               : value == 5
@@ -948,13 +954,7 @@ export default function Send(props) {
                       >
                         {'Low Fee\n'} (
                         {staticFees
-                          ? staticFees[
-                              sliderValueText === 'Low Fee\n'
-                                ? 'low'
-                                : sliderValueText === 'In the middle\n'
-                                ? 'medium'
-                                : 'high'
-                            ]
+                          ? staticFees['low']
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -971,13 +971,7 @@ export default function Send(props) {
                       >
                         {'In the middle\n'} (
                         {staticFees
-                          ? staticFees[
-                              sliderValueText === 'Low Fee\n'
-                                ? 'low'
-                                : sliderValueText === 'In the middle\n'
-                                ? 'medium'
-                                : 'high'
-                            ]
+                          ? staticFees['medium']
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -993,13 +987,7 @@ export default function Send(props) {
                       >
                         {'Fast Transaction\n'} (
                         {staticFees
-                          ? staticFees[
-                              sliderValueText === 'Low Fee'
-                                ? 'low'
-                                : sliderValueText === 'In the middle'
-                                ? 'medium'
-                                : 'high'
-                            ]
+                          ? staticFees['high']
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -1027,6 +1015,7 @@ export default function Send(props) {
                       shadowColor: Colors.shadowBlue,
                       shadowOpacity: 1,
                       shadowOffset: { width: 15, height: 15 },
+                      opacity: isConfirmDisabled ? 0.5 : 1
                     }}
                   >
                     {loading.transfer && !isInvalidBalance ? (
