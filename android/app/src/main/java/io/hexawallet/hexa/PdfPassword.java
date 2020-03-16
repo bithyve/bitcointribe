@@ -1,4 +1,4 @@
-package com.hexa;
+package io.hexawallet.hexa;
 
 import android.content.Context;
 import android.os.Environment;

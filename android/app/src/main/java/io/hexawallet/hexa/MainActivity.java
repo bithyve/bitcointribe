@@ -1,4 +1,4 @@
-package com.hexa;
+package io.hexawallet.hexa;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

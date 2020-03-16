@@ -101,7 +101,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
                                                 
     defaultConfig {
-        applicationId "com.hexa"
+        applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 31           
