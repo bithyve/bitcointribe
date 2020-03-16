@@ -488,7 +488,7 @@ function* checkMSharesHealthWorker() {
   const res = yield call(s3Service.checkHealth);
   // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
-
+  console.log({ res });
   if (res.status === 200) {
     // if (preInstance !== postInstance) {
     //   const { SERVICES } = yield select(state => state.storage.database);

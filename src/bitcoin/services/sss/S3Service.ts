@@ -14,6 +14,7 @@ export default class S3Service {
     const {
       mnemonic,
       encryptedSecrets,
+      shareIDs,
       metaShares,
       healthCheckInitialized,
       walletId,
@@ -22,6 +23,7 @@ export default class S3Service {
     }: {
       mnemonic: string;
       encryptedSecrets: string[];
+      shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
@@ -31,6 +33,7 @@ export default class S3Service {
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
+      shareIDs,
       metaShares,
       healthCheckInitialized,
       walletId,
@@ -412,6 +415,7 @@ export default class S3Service {
     mnemonic: string,
     stateVars?: {
       encryptedSecrets: string[];
+      shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
@@ -708,7 +712,7 @@ export default class S3Service {
   };
 
   public restoreMetaShares = (
-    metaShares: any[],
+    metaShares: MetaShare[],
   ):
     | {
         status: number;
@@ -759,7 +763,7 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    dynamicNonPMDD?: any,
   ): Promise<
     | {
         status: number;
