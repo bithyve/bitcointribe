@@ -173,11 +173,10 @@ export default function RecoveryRequestOTP(props) {
         >
           <View style={{ ...styles.otpRequestHeaderView }}>
             <Text style={styles.modalTitleText}>
-              Enter OTP to{'\n'}accept request
+              Enter OTP to accept request
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              Please enter the 6 digit OTP the owner{'\n'}of secret shared with
-              you
+              Please enter the 6 digit OTP the owner of secret shared with you
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>
@@ -367,7 +366,7 @@ export default function RecoveryRequestOTP(props) {
               {loading.uploadRequestedShare ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={styles.confirmButtonText}>Upload</Text>
+                <Text style={styles.confirmButtonText}>Send Recovery Secret</Text>
               )}
             </TouchableOpacity>
           </View>

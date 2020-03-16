@@ -66,7 +66,7 @@ export default function SecondaryDeviceModelContents(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Yes, I have shared
+            Yes, I have scanned
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
