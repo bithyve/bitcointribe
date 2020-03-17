@@ -56,15 +56,29 @@ export default function RecoveryRequestOTP(props) {
     RecoveryRequestAcceptBottomSheet,
     setRecoveryRequestAcceptBottomSheet,
   ] = useState(React.createRef());
+  const [demo, setDemo] = useState(false);
 
   function onPressNumber(text, i) {
-    let tempPasscode = passcode;
-    tempPasscode[i] = text;
-    setPasscode(tempPasscode);
-    if (passcode.join('').length == 6) {
-      Keyboard.dismiss();
+    if (text.length == 6) {
+      setTimeout(() => {
+      setPasscode(Array.from(text));
+      }, 5);
+      setDemo(!demo);
+      if (passcode.join('').length == 6) {
+        Keyboard.dismiss();
+      }
+    } else {
+      let tempPasscode = passcode;
+      tempPasscode[i] = Array.from(text)[0];
+      setTimeout(() => {
+        setPasscode(tempPasscode);
+        }, 5);
+        setDemo(!demo);
+      if (passcode.join('').length == 6) {
+        Keyboard.dismiss();
+      }
     }
-  }
+    }
 
   const dispatch = useDispatch();
   const { loading, requestedShareUpload } = useSelector(state => state.sss);
@@ -188,12 +202,12 @@ export default function RecoveryRequestOTP(props) {
           </View>
           <View style={{ marginBottom: hp('2%') }}>
             <View style={styles.passcodeTextInputView}>
-              <TextInput
-                maxLength={1}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-                value={otp ? otp[0] : null}
+             <TextInput
+                value={passcode ? passcode[0] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoFocus={true}
                 autoCorrect={false}
                 ref={input => {
@@ -205,6 +219,7 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
+                  console.log('VALUE', value);
                   onPressNumber(value, 0);
                   if (value.length >= 1) {
                     this.textInput2.focus();
@@ -219,12 +234,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[1] : null}
+                value={passcode ? passcode[1] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput2 = input;
                 }}
@@ -246,12 +261,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[2] : null}
+                value={passcode ? passcode[2] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput3 = input;
                 }}
@@ -273,12 +288,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[3] : null}
+                value={passcode ? passcode[3] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput4 = input;
                 }}
@@ -300,12 +315,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[4] : null}
+                value={passcode ? passcode[4] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput5 = input;
                 }}
@@ -326,12 +341,12 @@ export default function RecoveryRequestOTP(props) {
                 }}
               />
               <TextInput
-                maxLength={1}
-                value={otp ? otp[5] : null}
+                value={passcode ? passcode[5] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 ref={input => {
                   this.textInput6 = input;
                 }}
@@ -361,8 +376,7 @@ export default function RecoveryRequestOTP(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              The OTP is time sensitive, please be sure to enter the OTP {'\n'}
-              shared within 10 minutes
+              The OTP is time sensitive, please be sure to enter the OTP shared within 10 minutes
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
