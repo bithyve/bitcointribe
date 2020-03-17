@@ -854,6 +854,12 @@ const TrustedContactHistory = props => {
         renderHeader={renderCommunicationModeModalHeader}
       />
       <BottomSheet
+        onCloseEnd={()=>{ 
+          if(Object.keys(chosenContact).length > 0){
+            setRenderTimer(false);
+            onOTPShare(index)
+          }
+        }}
         enabledInnerScrolling={true}
         ref={shareOtpWithTrustedContactBottomSheet as any}
         snapPoints={[-30, hp('70%')]}
