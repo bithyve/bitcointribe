@@ -36,6 +36,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function RecoveryRequestOTP(props) {
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -73,11 +74,15 @@ export default function RecoveryRequestOTP(props) {
 
   const onOTPSubmit = () => {
     if (passcode.join('').length !== 6 || !rk) return;
+    setIsConfirmDisabled(true);
     dispatch(uploadRequestedShare(requester, rk, passcode.join('')));
   };
 
   useEffect(() => {
-    if (otp) dispatch(uploadRequestedShare(requester, rk, otp));
+    if (otp) {
+      setIsConfirmDisabled(true);
+      dispatch(uploadRequestedShare(requester, rk, otp));
+    }
   }, []);
 
   useEffect(() => {
@@ -89,11 +94,13 @@ export default function RecoveryRequestOTP(props) {
             'There was an error while sending your Recovery Secret, please try again in a little while',
           );
           setButtonText('Try again');
+          setIsConfirmDisabled(false);
         }, 2);
         (ErrorBottomSheet as any).current.snapTo(1);
         //Alert.alert('Upload failed', requestedShareUpload[requester].err);
       } else {
         dispatch(resetRequestedShareUpload());
+        setIsConfirmDisabled(false);
         props.navigation.goBack();
       }
     }
@@ -360,11 +367,12 @@ export default function RecoveryRequestOTP(props) {
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
             <TouchableOpacity
+              disabled={isConfirmDisabled}
               onPress={onOTPSubmit}
               style={{ ...styles.confirmModalButtonView }}
             >
-              {loading.uploadRequestedShare ? (
-                <ActivityIndicator size="small" />
+              {isConfirmDisabled ? (
+                <ActivityIndicator size="small" color={Colors.white} />
               ) : (
                 <Text style={styles.confirmButtonText}>Send Recovery Secret</Text>
               )}
