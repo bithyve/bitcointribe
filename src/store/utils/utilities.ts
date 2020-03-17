@@ -100,6 +100,7 @@ export const serviceGenerator = async (
   else res = await secureAcc.importSecureAccount(secondaryXpub, bhXpub); // restoring
   if (res.status !== 200) {
     if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log({ res });
     throw new Error('Secure account setup/import failed');
   }
 

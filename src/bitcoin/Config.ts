@@ -16,6 +16,8 @@ import {
   BIT_BSI_MINUNUSEDINDEX,
   BIT_BSI_DEPTH_INIT,
   BIT_BSI_DEPTH_LIMIT,
+  BIT_API_URLS_RELAY_LOCAL,
+  BIT_API_URLS_SIGNING_SERVER_LOCAL,
   BIT_API_URLS_RELAY_DEV,
   BIT_API_URLS_SIGNING_SERVER_DEV,
   BIT_API_URLS_RELAY_PROD,
@@ -103,6 +105,10 @@ class Config {
     iv: Buffer.alloc(16, 0),
   };
   public BH_SERVERS = {
+    LOCAL: {
+      RELAY: BIT_API_URLS_RELAY_LOCAL,
+      SIGNING_SERVER: BIT_API_URLS_SIGNING_SERVER_LOCAL,
+    },
     DEV: {
       RELAY: BIT_API_URLS_RELAY_DEV,
       SIGNING_SERVER: BIT_API_URLS_SIGNING_SERVER_DEV,
@@ -221,10 +227,15 @@ class Config {
     if (BIT_SERVER_MODE === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;
       this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
-    } else {
+    } else if (BIT_SERVER_MODE === 'DEV') {
       this.RELAY = this.BH_SERVERS.DEV.RELAY;
       this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
+    } else if (BIT_SERVER_MODE === 'LOCAL') {
+      this.RELAY = this.BH_SERVERS.LOCAL.RELAY;
+      this.SIGNING_SERVER = this.BH_SERVERS.LOCAL.SIGNING_SERVER;
     }
+
+    console.log(this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
     this.BITCOIN_NODE = new Client({
       network:
@@ -239,10 +250,8 @@ class Config {
   public setNetwork = (): void => {
     if (this.ENVIRONMENT === 'MAIN') {
       this.NETWORK = bitcoinJS.networks.bitcoin;
-    } else if (this.ENVIRONMENT === 'TEST') {
-      this.NETWORK = bitcoinJS.networks.testnet;
     } else {
-      throw new Error('Please specify an apt environment(MAIN||TEST)');
+      this.NETWORK = bitcoinJS.networks.testnet;
     }
   };
 }

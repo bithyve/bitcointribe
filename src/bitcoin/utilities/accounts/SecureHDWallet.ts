@@ -376,8 +376,9 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     let res: AxiosResponse;
     const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
-
     try {
+      console.log({ SIGNING_SERVER });
+
       res = await BH_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
