@@ -16,6 +16,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
+import BottomInfoBox from './BottomInfoBox';
 
 export default function QrScanner(props) {
   const title = props.navigation.getParam('title');
@@ -65,6 +66,7 @@ export default function QrScanner(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" />
+      <View style={{flex: 1}}>
       <View
         style={{
           borderBottomWidth: 1,
@@ -182,6 +184,16 @@ export default function QrScanner(props) {
             />
           </View>
         </RNCamera> :  null }
+        
+      </View>
+      <View style={{marginTop: 'auto'}}></View>
+      {title == 'Scan Secondary Mnemonic' ?
+      <BottomInfoBox
+        title={"Note"}
+        infoText={
+          "Secondary Mnemonic This can be found on page of your pdf Recovery Secret. Please scan it to reset your 2FA"
+        }
+      /> : null}
       </View>
     </SafeAreaView>
   );

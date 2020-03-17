@@ -585,7 +585,17 @@ export default function Accounts(props) {
                           (item.amount / 1e8) *
                           exchangeRates[CurrencyCode].last
                         ).toFixed(2)} */}
-                        {item.amount}
+                        {/* {item.amount} */}
+                        {item.accountType == 'Test Account'
+                            ? UsNumberFormat(item.amount)
+                            : switchOn
+                            ? UsNumberFormat(item.amount)
+                            : exchangeRates
+                            ? (
+                                (item.amount / 1e8) *
+                                exchangeRates[CurrencyCode].last
+                              ).toFixed(2)
+                            : null}
                       </Text>
                       <Text
                               style={{
@@ -1364,7 +1374,18 @@ export default function Accounts(props) {
                                     alignSelf:'center',
                               }}
                             >
-                              {UsNumberFormat(item.amount)}
+                            {item.accountType == 'Test Account'
+                            ? UsNumberFormat(item.amount)
+                            : switchOn
+                            ? UsNumberFormat(item.amount)
+                            : exchangeRates
+                            ? (
+                                (item.amount / 1e8) *
+                                exchangeRates[CurrencyCode].last
+                              ).toFixed(2)
+                            : null}
+               
+                              {/* {UsNumberFormat(item.amount)} */}
                             </Text>
                             <Text
                               style={{
