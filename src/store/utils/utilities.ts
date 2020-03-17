@@ -3,7 +3,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { take, fork } from 'redux-saga/effects';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -25,7 +25,6 @@ export const serviceGenerator = async (
   console.log({ primaryMnemonic });
   // Test account
   const testAcc = new TestAccount(primaryMnemonic);
-  console.log({ testAcc });
 
   // Share generation/restoration
   const s3Service = new S3Service(primaryMnemonic);
@@ -99,7 +98,10 @@ export const serviceGenerator = async (
   const secureAcc = new SecureAccount(primaryMnemonic);
   if (!secondaryXpub) res = await secureAcc.setupSecureAccount();
   else res = await secureAcc.importSecureAccount(secondaryXpub, bhXpub); // restoring
-  if (res.status !== 200) throw new Error('Secure account setup/import failed');
+  if (res.status !== 200) {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Secure account setup/import failed');
+  }
 
   return {
     regularAcc,
@@ -116,4 +118,11 @@ export const createWatcher = (worker, type) => {
       yield fork(worker, action);
     }
   };
+};
+
+export const requestTimedout = () => {
+  Alert.alert(
+    'Request Timeout!',
+    'Unable to get a response from server. Please, try again shortly.',
+  );
 };

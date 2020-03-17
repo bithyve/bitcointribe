@@ -10,10 +10,11 @@ import {
   MetaShare,
   SocialStaticNonPMDD,
 } from '../Interface';
-const { RELAY, HEXA_ID } = config;
+const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
 
 const BH_AXIOS: AxiosInstance = axios.create({
   baseURL: RELAY,
+  timeout: REQUEST_TIMEOUT,
 });
 
 export default class SSS {
@@ -94,7 +95,8 @@ export default class SSS {
         messageId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { share, dynamicNonPMDD } = res.data;
@@ -114,7 +116,8 @@ export default class SSS {
         walletID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { dynamicNonPMDD } = res.data;
@@ -164,7 +167,8 @@ export default class SSS {
         messageId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     return { deleted: res.data.deleted };
@@ -220,7 +224,8 @@ export default class SSS {
         dynamicNonPMDD,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { success } = res.data;
@@ -375,7 +380,8 @@ export default class SSS {
         toUpdate,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { updationInfo } = res.data;
@@ -568,7 +574,8 @@ export default class SSS {
         dynamicNonPMDD,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { success } = res.data;
@@ -600,7 +607,8 @@ export default class SSS {
         shareIDs,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
@@ -627,7 +635,8 @@ export default class SSS {
         shareIDs: this.shareIDs,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const updates: Array<{ shareId: string; updatedAt: number }> =
@@ -831,7 +840,8 @@ export default class SSS {
         dynamicNonPMDD,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { updated } = res.data;

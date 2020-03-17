@@ -7,11 +7,13 @@ import config from '../../Config';
 import Bitcoin from './Bitcoin';
 import { Transactions } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
-const { RELAY, HEXA_ID } = config;
+const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
 
 const BH_AXIOS: AxiosInstance = axios.create({
   baseURL: RELAY,
+  timeout: REQUEST_TIMEOUT,
 });
+
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
   private passphrase: string;
@@ -177,9 +179,8 @@ export default class HDSegwitWallet extends Bitcoin {
       });
       console.log({ res });
     } catch (err) {
-      console.log({ res });
-
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { txid, funded } = res.data;

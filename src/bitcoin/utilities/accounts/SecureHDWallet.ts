@@ -8,10 +8,11 @@ import config from '../../Config';
 import { Transactions } from '../Interface';
 import Bitcoin from './Bitcoin';
 
-const { SIGNING_SERVER, HEXA_ID } = config;
+const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
 
 const BH_AXIOS: AxiosInstance = axios.create({
   baseURL: SIGNING_SERVER,
+  timeout: REQUEST_TIMEOUT,
 });
 
 export default class SecureHDWallet extends Bitcoin {
@@ -126,7 +127,8 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: walletId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     return {
@@ -210,7 +212,8 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: walletId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     return { isValid: res.data.isValid };
@@ -381,8 +384,10 @@ export default class SecureHDWallet extends Bitcoin {
         secondaryID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
+    console.log({ res });
     const { setupSuccessful, setupData } = res.data;
     if (!setupSuccessful) {
       throw new Error('Secure account setup failed');
@@ -440,7 +445,8 @@ export default class SecureHDWallet extends Bitcoin {
         secondaryID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
     const { qrData, secret } = res.data;
     this.twoFASetup = { qrData, secret };
@@ -455,7 +461,8 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: this.walletID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
     return res.data;
   };
@@ -656,7 +663,8 @@ export default class SecureHDWallet extends Bitcoin {
           childIndexArray,
         });
       } catch (err) {
-        throw new Error(err.response.data.err);
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
       }
 
       console.log(
