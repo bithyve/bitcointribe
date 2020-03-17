@@ -1,5 +1,9 @@
 import { call, put, select } from 'redux-saga/effects';
-import { createWatcher, serviceGenerator } from '../utils/utilities';
+import {
+  createWatcher,
+  serviceGenerator,
+  requestTimedout,
+} from '../utils/utilities';
 import {
   INIT_HEALTH_CHECK,
   switchS3Loader,
@@ -82,6 +86,7 @@ function* generateMetaSharesWorker() {
     // };
     // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);
   }
 }
@@ -112,6 +117,7 @@ function* initHCWorker() {
     console.log('Health Check Initialized');
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
     yield put(switchS3Loader('initHC'));
   }
@@ -160,6 +166,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
     // Alert.alert('Upload Failed!', res.err);
     console.log({ err: res.err });
@@ -241,6 +248,7 @@ function* uploadRequestedShareWorker({ payload }) {
     //   "Requester's share has been uploaded to the relay.",
     // );
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(requestedShareUploaded(tag, false, res.err));
   }
   yield put(switchS3Loader('uploadRequestedShare'));
@@ -336,6 +344,7 @@ function* downloadMetaShareWorker({ payload }) {
     //   }),
     // ); // connecting insertion at updateMSharesHealth
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ res });
     yield put(ErrorReceiving(true));
     // Alert.alert('Download Failed!', res.err);
@@ -470,6 +479,7 @@ function* updateMSharesHealthWorker({ payload }) {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
   }
   yield put(switchS3Loader('updateMSharesHealth'));
@@ -499,6 +509,7 @@ function* checkMSharesHealthWorker() {
     //   yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     // }
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
   }
 
@@ -710,7 +721,10 @@ function* updateDynamicNonPMDDWorker() {
 
   if (res.status === 200) {
   } // yield success
-  else console.log({ err: res.err }); // yield failure
+  else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
+  } // yield failure
 
   yield put(switchS3Loader('updateDynamicNonPMDD'));
 }
@@ -725,7 +739,10 @@ function* downloadDynamicNonPMDDWorker({ payload }) {
   const res = yield call(S3Service.downloadDynamicNonPMDD, payload.walletId);
   if (res.status === 200) {
     // TODO: add functionality as per the requirements
-  } else console.log({ err: res.err });
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
+  }
   yield put(switchS3Loader('downloadDynamicNonPMDD'));
 }
 
@@ -767,7 +784,8 @@ function* restoreDynamicNonPMDDWorker() {
     };
     yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
   } else {
-    console.log({ err: res.err });
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error(res.err);
   }
   yield put(switchS3Loader('restoreDynamicNonPMDD'));
 }

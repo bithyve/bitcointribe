@@ -1,5 +1,5 @@
 import { call, put, select, delay, all } from 'redux-saga/effects';
-import { createWatcher } from '../utils/utilities';
+import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
   FETCH_ADDR,
   addressFetched,
@@ -40,7 +40,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
 
 function* fetchAddrWorker({ payload }) {
@@ -61,6 +61,7 @@ function* fetchAddrWorker({ payload }) {
   ) {
     yield put(addressFetched(payload.serviceType, postFetchAddress));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(switchLoader(payload.serviceType, 'receivingAddress'));
   }
 }
@@ -192,6 +193,9 @@ function* fetchBalanceTxWorker({ payload }) {
       };
       yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to fetch balance/transactions from the indexer');
   }
 
   if (payload.options.loader) {
@@ -219,6 +223,7 @@ function* transferST1Worker({ payload }) {
   );
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(failedST1(payload.serviceType));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
@@ -247,6 +252,7 @@ function* transferST2Worker({ payload }) {
       yield put(executedST2(payload.serviceType, res.data));
     } else yield put(executedST2(payload.serviceType, res.data.txid));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(failedST2(payload.serviceType));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
@@ -302,6 +308,7 @@ function* alternateTransferST2Worker({ payload }) {
   if (res.status === 200) {
     yield put(alternateTransferST2Executed(payload.serviceType, res.data.txid));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(failedST2(payload.serviceType));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
@@ -330,6 +337,7 @@ function* transferST3Worker({ payload }) {
   if (res.status === 200) {
     yield put(executedST3(payload.serviceType, res.data.txid));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(failedST3(payload.serviceType));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
@@ -362,7 +370,10 @@ function* testcoinsWorker({ payload }) {
       [payload.serviceType]: JSON.stringify(service),
     };
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  } else console.log('Failed to get testcoins');
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to get testcoins');
+  }
   yield put(switchLoader(payload.serviceType, 'testcoins'));
 }
 
@@ -486,7 +497,11 @@ function* exchangeRateWorker() {
         return;
       } // maintaining half an hour difference b/w fetches
     }
-    const res = yield call(axios.get, 'https://blockchain.info/ticker');
+    const exchangeAxios = axios.create({
+      baseURL: 'https://blockchain.info/',
+      timeout: 15000, // 15 seconds
+    });
+    const res = yield call(exchangeAxios.get, 'ticker');
     if (res.status == 200) {
       const exchangeRates = res.data;
       exchangeRates.lastFetched = Date.now();
@@ -497,6 +512,7 @@ function* exchangeRateWorker() {
         JSON.stringify(exchangeRates),
       );
     } else {
+      if (res.err === 'ECONNABORTED') requestTimedout();
       console.log('Failed to retrieve exchange rates', res);
     }
   } catch (err) {
@@ -517,6 +533,7 @@ function* resetTwoFAWorker({ payload }) {
   if (res.status == 200) {
     yield put(twoFAResetted(true));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     console.log('Failed to reset twoFA', res.err);
     yield put(twoFAResetted(false));
   }
