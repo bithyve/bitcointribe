@@ -813,6 +813,7 @@ export default function ManageBackup(props) {
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
     if (highlightFlags) {
+      console.log('Setting autoHighlight flags');
       setAutoHighlightFlags(JSON.parse(highlightFlags));
     }
   };
@@ -890,7 +891,7 @@ export default function ManageBackup(props) {
 
         AsyncStorage.setItem(
           'AutoHighlightFlags',
-          JSON.stringify(autoHighlightFlags),
+          JSON.stringify(updatedAutoHighlightFlags),
         );
       }
     }
@@ -1337,11 +1338,10 @@ export default function ManageBackup(props) {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
-        console.log({ healthCheckInitialized });
-        dispatch(checkMSharesHealth());
+        // console.log({ healthCheckInitialized });
+        // dispatch(checkMSharesHealth());
       } else {
-        console.log({ healthCheckInitialized });
-
+        // console.log({ healthCheckInitialized });
         dispatch(initHealthCheck());
       }
     }
