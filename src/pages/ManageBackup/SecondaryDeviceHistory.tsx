@@ -18,7 +18,11 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare, checkMSharesHealth, ErrorSending } from '../../store/actions/sss';
+import {
+  uploadEncMShare,
+  checkMSharesHealth,
+  ErrorSending,
+} from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -37,7 +41,7 @@ const SecondaryDeviceHistory = props => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -224,7 +228,7 @@ const SecondaryDeviceHistory = props => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if (shareHistory[0].inTransit) {
+      if (shareHistory[0].inTransit || shareHistory[0].accessible) {
         setIsReshare(true);
       }
       if (shareHistory) updateHistory(shareHistory);
@@ -265,7 +269,7 @@ const SecondaryDeviceHistory = props => {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -277,16 +281,16 @@ const SecondaryDeviceHistory = props => {
     );
   }, []);
 
-if(isErrorSendingFailed){
-  setTimeout(() => {
-    setErrorMessageHeader('Error sending Recovery Secret');
-    setErrorMessage(
-      'There was an error while sending your Recovery Secret, please try again in a little while',
-    );
-  }, 2);
-  (ErrorBottomSheet as any).current.snapTo(1);
-  dispatch(ErrorSending(null));
-}
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
