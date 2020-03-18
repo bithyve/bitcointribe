@@ -6,7 +6,7 @@ import {
   Linking,
   Alert,
   AsyncStorage,
-  Platform
+  Platform,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Video from 'react-native-video';
@@ -24,10 +24,7 @@ import {
 
 export default function Launch(props) {
   const dispatch = useDispatch();
-  const [
-    ErrorBottomSheet,
-    setErrorBottomSheet,
-  ] = useState(React.createRef());
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
 
   useEffect(() => {
     dispatch(initializeDB());
@@ -72,17 +69,17 @@ export default function Launch(props) {
             if (!url) props.navigation.replace('Login');
             else {
               const splits = url.split('/');
-              const requester = splits[3];
-              if (splits[4] === 'sss') {
-                if (splits[5] === 'ek') {
+              const requester = splits[4];
+              if (splits[5] === 'sss') {
+                if (splits[6] === 'ek') {
                   const custodyRequest = {
                     requester,
-                    ek: splits[6],
-                    uploadedAt: splits[7],
+                    ek: splits[7],
+                    uploadedAt: splits[8],
                   };
                   props.navigation.replace('Login', { custodyRequest });
-                } else if (splits[5] === 'rk') {
-                  const recoveryRequest = { requester, rk: splits[6] };
+                } else if (splits[6] === 'rk') {
+                  const recoveryRequest = { requester, rk: splits[7] };
                   props.navigation.replace('Login', { recoveryRequest });
                 }
               }

@@ -1927,18 +1927,18 @@ export default function Home(props) {
 
   const handleDeepLink = useCallback(event => {
     const splits = event.url.split('/');
-    const requester = splits[3];
+    const requester = splits[4];
 
-    if (splits[4] === 'sss') {
-      if (splits[5] === 'ek') {
+    if (splits[5] === 'sss') {
+      if (splits[6] === 'ek') {
         const custodyRequest = {
           requester,
-          ek: splits[6],
-          uploadedAt: splits[7],
+          ek: splits[7],
+          uploadedAt: splits[8],
         };
         props.navigation.navigate('Home', { custodyRequest });
-      } else if (splits[5] === 'rk') {
-        const recoveryRequest = { requester, rk: splits[6] };
+      } else if (splits[6] === 'rk') {
+        const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
     }
@@ -2088,18 +2088,26 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }, 2);
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          if (recoveryRequest.isQR) {
-            dispatch(
-              uploadRequestedShare(
-                recoveryRequest.requester,
-                recoveryRequest.rk,
-                recoveryRequest.otp,
-              ),
+          if (!UNDER_CUSTODY[recoveryRequest.requester]) {
+            Alert.alert(
+              'Failed to send!',
+              'You do not host any secret for this user.',
             );
+            setLoading(false);
           } else {
-            props.navigation.navigate('RecoveryRequestOTP', {
-              recoveryRequest,
-            });
+            if (recoveryRequest.isQR) {
+              dispatch(
+                uploadRequestedShare(
+                  recoveryRequest.requester,
+                  recoveryRequest.rk,
+                  recoveryRequest.otp,
+                ),
+              );
+            } else {
+              props.navigation.navigate('RecoveryRequestOTP', {
+                recoveryRequest,
+              });
+            }
           }
         }}
         onPressReject={() => {

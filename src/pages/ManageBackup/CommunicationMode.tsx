@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -33,13 +33,12 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 
-
 export default function CommunicationMode(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
@@ -65,7 +64,7 @@ export default function CommunicationMode(props) {
       return require('../../assets/images/icons/icon_check.png');
     }
   };
-  
+
   const onContactSelect = index => {
     setContactInfo([
       ...contactInfo.map(item => {
@@ -106,7 +105,7 @@ export default function CommunicationMode(props) {
       return;
     }
     const deepLink =
-      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
       `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
 
@@ -235,7 +234,7 @@ export default function CommunicationMode(props) {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -247,17 +246,16 @@ export default function CommunicationMode(props) {
     );
   }, []);
 
-if(isErrorSendingFailed){
-  setTimeout(() => {
-    setErrorMessageHeader('Error sending Recovery Secret');
-    setErrorMessage(
-      'There was an error while sending your Recovery Secret, please try again in a little while',
-    );
-  }, 2);
-  (ErrorBottomSheet as any).current.snapTo(1);
-  dispatch(ErrorSending(null));
-}
-
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
 
   return (
     <View
