@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Platform
+  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -23,8 +23,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
-import DeviceInfo from "react-native-device-info";
-import BottomSheet from "reanimated-bottom-sheet";
+import DeviceInfo from 'react-native-device-info';
+import BottomSheet from 'reanimated-bottom-sheet';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 
@@ -33,7 +33,7 @@ const SecureScan = props => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
@@ -55,7 +55,7 @@ const SecureScan = props => {
     : null;
 
   const deepLink = SHARES_TRANSFER_DETAILS[0]
-    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+    ? `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
     : '';
   const dispatch = useDispatch();
@@ -80,7 +80,7 @@ const SecureScan = props => {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -92,7 +92,7 @@ const SecureScan = props => {
     );
   }, []);
 
-  if(isErrorSendingFailed){
+  if (isErrorSendingFailed) {
     setTimeout(() => {
       setErrorMessageHeader('Error sending Recovery Secret');
       setErrorMessage(
@@ -102,7 +102,7 @@ const SecureScan = props => {
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(ErrorSending(null));
   }
-  
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -127,10 +127,12 @@ const SecureScan = props => {
             Activate Secure Account
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-            Please scan the following QR on your authenticator app like Google Authenticator
+            Please scan the following QR on your authenticator app like Google
+            Authenticator
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
-          The authenticator app should be{'\n'}installed on another device like your Secondary Device
+            The authenticator app should be{'\n'}installed on another device
+            like your Secondary Device
           </Text>
         </View>
       </View>
@@ -158,9 +160,9 @@ const SecureScan = props => {
               alignItems: 'center',
               borderRadius: 10,
               elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+              shadowColor: Colors.shadowBlue,
+              shadowOpacity: 1,
+              shadowOffset: { width: 15, height: 15 },
             }}
           >
             <Text

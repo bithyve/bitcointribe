@@ -35,16 +35,19 @@ import _ from 'underscore';
 import TrustedContactQr from './TrustedContactQr';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { textWithoutEncoding, email } from 'react-native-communications';
-import { uploadEncMShare, checkMSharesHealth, ErrorSending } from '../../store/actions/sss';
+import {
+  uploadEncMShare,
+  checkMSharesHealth,
+  ErrorSending,
+} from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
-
 
 const TrustedContactHistory = props => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
 
   const dispatch = useDispatch();
   const [selectedContactMode, setSelectedContactMode] = useState(null);
@@ -405,7 +408,7 @@ const TrustedContactHistory = props => {
     );
   }, []);
 
-  if(isErrorSendingFailed){
+  if (isErrorSendingFailed) {
     setTimeout(() => {
       setErrorMessageHeader('Error sending Recovery Secret');
       setErrorMessage(
@@ -415,9 +418,10 @@ const TrustedContactHistory = props => {
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(ErrorSending(null));
   }
-  
-  const communicate = async() => {
-    let selectedContactModeTmp = index == 1 ? selectedContactMode[0] :selectedContactMode[1];
+
+  const communicate = async () => {
+    let selectedContactModeTmp =
+      index == 1 ? selectedContactMode[0] : selectedContactMode[1];
     if (!SHARES_TRANSFER_DETAILS[index]) {
       setTimeout(() => {
         setErrorMessageHeader('Failed to share');
@@ -425,12 +429,12 @@ const TrustedContactHistory = props => {
           'There was some error while sharing the Recovery Secret, please try again',
         );
       }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
+      (ErrorBottomSheet as any).current.snapTo(1);
       //Alert.alert('Failed to share');
       return;
     }
     const deepLink =
-      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
 
     switch (selectedContactModeTmp.type) {
@@ -854,10 +858,10 @@ const TrustedContactHistory = props => {
         renderHeader={renderCommunicationModeModalHeader}
       />
       <BottomSheet
-        onCloseEnd={()=>{ 
-          if(Object.keys(chosenContact).length > 0){
+        onCloseEnd={() => {
+          if (Object.keys(chosenContact).length > 0) {
             setRenderTimer(false);
-            onOTPShare(index)
+            onOTPShare(index);
           }
         }}
         enabledInnerScrolling={true}

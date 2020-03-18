@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,23 +6,23 @@ import {
   Image,
   Platform,
   TouchableOpacity,
-  Alert
-} from "react-native";
-import Fonts from "../../../common/Fonts";
-import BackupStyles from "./Styles";
-import Colors from "../../../common/Colors";
+  Alert,
+} from 'react-native';
+import Fonts from '../../../common/Fonts';
+import BackupStyles from './Styles';
+import Colors from '../../../common/Colors';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "../../ContactList";
-import { uploadEncMShare, ErrorSending } from "../../../store/actions/sss";
-import { useDispatch, useSelector } from "react-redux";
-import CommunicationModeModalContents from "../../CommunicationModeModalContents";
-import DeviceInfo from "react-native-device-info";
-import BottomSheet from "reanimated-bottom-sheet";
-import { textWithoutEncoding, email } from "react-native-communications";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import ContactList from '../../ContactList';
+import { uploadEncMShare, ErrorSending } from '../../../store/actions/sss';
+import { useDispatch, useSelector } from 'react-redux';
+import CommunicationModeModalContents from '../../CommunicationModeModalContents';
+import DeviceInfo from 'react-native-device-info';
+import BottomSheet from 'reanimated-bottom-sheet';
+import { textWithoutEncoding, email } from 'react-native-communications';
 import ErrorModalContents from '../../../components/ErrorModalContents';
 import ModalHeader from '../../../components/ModalHeader';
 
@@ -31,11 +31,11 @@ const Contacts = props => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
-  const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
+  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
   const [contacts, setContacts] = useState([]);
   const [communicationModeBottomSheet, setCommunicationMode] = useState(
-    React.createRef()
+    React.createRef(),
   );
 
   function selectedContactsList(list) {
@@ -44,7 +44,7 @@ const Contacts = props => {
 
   const dispatch = useDispatch();
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database
+    state => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
@@ -56,25 +56,25 @@ const Contacts = props => {
 
   const communicate = async selectedContactMode => {
     if (!SHARES_TRANSFER_DETAILS[props.index]) {
-      Alert.alert("Failed to share");
+      Alert.alert('Failed to share');
       return;
     }
     const deepLink =
-      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
+      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[props.index].ENCRYPTED_KEY;
 
     switch (selectedContactMode.type) {
-      case "number":
+      case 'number':
         textWithoutEncoding(selectedContactMode.info, deepLink);
         break;
 
-      case "email":
+      case 'email':
         email(
           [selectedContactMode.info],
           null,
           null,
-          "Guardian request",
-          deepLink
+          'Guardian request',
+          deepLink,
         );
         break;
     }
@@ -120,7 +120,7 @@ const Contacts = props => {
         bottomImage={require('../../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -132,21 +132,21 @@ const Contacts = props => {
     );
   }, []);
 
-if(isErrorSendingFailed){
-  setTimeout(() => {
-    setErrorMessageHeader('Error sending Recovery Secret');
-    setErrorMessage(
-      'There was an error while sending your Recovery Secret, please try again in a little while',
-    );
-  }, 2);
-  (ErrorBottomSheet as any).current.snapTo(1);
-  dispatch(ErrorSending(null));
-}
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
 
   return (
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
-        <View style={{ marginTop: hp("2%") }}>
+        <View style={{ marginTop: hp('2%') }}>
           <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
           <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
@@ -162,14 +162,14 @@ if(isErrorSendingFailed){
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
             fontSize: RFValue(12),
-            marginTop: 5
+            marginTop: 5,
           }}
         >
-          Select contact to{" "}
+          Select contact to{' '}
           <Text
             style={{
               fontFamily: Fonts.FiraSansMediumItalic,
-              fontWeight: "bold"
+              fontWeight: 'bold',
             }}
           >
             send recovery secret
@@ -185,8 +185,8 @@ if(isErrorSendingFailed){
         enabledInnerScrolling={true}
         ref={communicationModeBottomSheet}
         snapPoints={[
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("65%") : hp("75%")
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
         ]}
         renderContent={renderCommunicationModeContent}
         renderHeader={requestHeader}
@@ -207,16 +207,16 @@ if(isErrorSendingFailed){
 
 const styles = StyleSheet.create({
   modalHeaderContainer: {
-    paddingTop: 20
+    paddingTop: 20,
   },
   modalHeaderHandle: {
     width: 30,
     height: 5,
     backgroundColor: Colors.borderColor,
     borderRadius: 10,
-    alignSelf: "center",
+    alignSelf: 'center',
     marginTop: 7,
-    marginBottom: 7
-  }
+    marginBottom: 7,
+  },
 });
 export default Contacts;
