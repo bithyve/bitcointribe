@@ -138,7 +138,7 @@ export default function Accounts(props) {
     wallet.balances.balance + wallet.balances.unconfirmedBalance,
   );
   const [transactions, setTransactions] = useState(wallet.transactions);
-  const [staticFees, setStaticFees] = useState(0);
+  const [averageTxFees, setAverageTxFees] = useState();
 
   const accounts = useSelector(state => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
@@ -223,36 +223,36 @@ export default function Accounts(props) {
 
   useEffect(() => {
     (async () => {
-      const storedStaticFees = JSON.parse(
-        await AsyncStorage.getItem('storedStaticFees'),
+      const storedAverageTxFees = JSON.parse(
+        await AsyncStorage.getItem('storedAverageTxFees'),
       );
-      console.log({ storedStaticFees });
-      if (storedStaticFees && storedStaticFees[serviceType]) {
-        const { staticFees, lastFetched } = storedStaticFees[serviceType];
+      console.log({ storedAverageTxFees });
+      if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+        const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
         if (Date.now() - lastFetched < 1800000) {
           // maintaining a half an hour difference b/w fetches
-          setStaticFees(staticFees);
+          setAverageTxFees(averageTxFees);
         } else {
           const instance = service.hdWallet || service.secureHDWallet;
-          const staticFees = await instance.getStaticFee();
-          setStaticFees(staticFees);
+          const averageTxFees = await instance.averageTransactionFee();
+
+          setAverageTxFees(averageTxFees);
           await AsyncStorage.setItem(
-            'storedStaticFees',
+            'storedAverageTxFees',
             JSON.stringify({
-              ...storedStaticFees,
-              serviceType: { staticFees, lastFetched: Date.now() },
+              ...storedAverageTxFees,
+              serviceType: { averageTxFees, lastFetched: Date.now() },
             }),
           );
         }
       } else {
         const instance = service.hdWallet || service.secureHDWallet;
-        const staticFees = await instance.getStaticFee();
-        console.log({ staticFees });
-        setStaticFees(staticFees);
+        const averageTxFees = await instance.averageTransactionFee();
+        setAverageTxFees(averageTxFees);
         await AsyncStorage.setItem(
-          'storedStaticFees',
+          'storedAverageTxFees',
           JSON.stringify({
-            serviceType: { staticFees, lastFetched: Date.now() },
+            serviceType: { averageTxFees, lastFetched: Date.now() },
           }),
         );
       }
@@ -565,28 +565,39 @@ export default function Accounts(props) {
                     <View style={styles.transactionModalAmountView}>
                       <Image
                         source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                        style={{ width: 12, height: 12, resizeMode: 'contain', alignSelf: 'center' }}
-                      />
-                      <View style={{marginLeft: 5, alignSelf:'center',
-                                marginRight: 5, flexDirection: 'row'}}>
-                      <Text
                         style={{
-                          ...styles.transactionModalAmountText,
-                          color:
-                            item.transactionType == 'Received'
-                              ? Colors.green
-                              : Colors.red,
-                              alignSelf: 'center',
+                          width: 12,
+                          height: 12,
+                          resizeMode: 'contain',
+                          alignSelf: 'center',
+                        }}
+                      />
+                      <View
+                        style={{
+                          marginLeft: 5,
+                          alignSelf: 'center',
+                          marginRight: 5,
+                          flexDirection: 'row',
                         }}
                       >
-                        {/* {switchOn
+                        <Text
+                          style={{
+                            ...styles.transactionModalAmountText,
+                            color:
+                              item.transactionType == 'Received'
+                                ? Colors.green
+                                : Colors.red,
+                            alignSelf: 'center',
+                          }}
+                        >
+                          {/* {switchOn
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
                           exchangeRates[CurrencyCode].last
                         ).toFixed(2)} */}
-                        {/* {item.amount} */}
-                        {item.accountType == 'Test Account'
+                          {/* {item.amount} */}
+                          {item.accountType == 'Test Account'
                             ? UsNumberFormat(item.amount)
                             : switchOn
                             ? UsNumberFormat(item.amount)
@@ -596,24 +607,29 @@ export default function Accounts(props) {
                                 exchangeRates[CurrencyCode].last
                               ).toFixed(2)
                             : null}
-                      </Text>
+                        </Text>
+                        <Text
+                          style={{
+                            alignSelf: 'center',
+                            fontSize: RFValue(13),
+                            fontFamily: Fonts.OpenSans,
+                            color: Colors.textColorGrey,
+                            lineHeight: 19,
+                          }}
+                        >
+                          {item.accountType == 'Test Account'
+                            ? 't-sats'
+                            : switchOn
+                            ? 'sats'
+                            : CurrencyCode.toLocaleLowerCase()}
+                        </Text>
+                      </View>
                       <Text
-                              style={{
-                                alignSelf: 'center',
-                                fontSize: RFValue(13),
-                                fontFamily: Fonts.OpenSans,
-                                color: Colors.textColorGrey,
-                                lineHeight: 19
-                              }}
-                            >
-                              {item.accountType == 'Test Account'
-                                ? 't-sats'
-                                : switchOn
-                                ? 'sats'
-                                : CurrencyCode.toLocaleLowerCase()}
-                            </Text>
-                            </View>
-                      <Text style={{...styles.transactionModalAmountUnitText, alignSelf: 'center'}}>
+                        style={{
+                          ...styles.transactionModalAmountUnitText,
+                          alignSelf: 'center',
+                        }}
+                      >
                         {item.confirmations < 6 ? item.confirmations : '6+'}
                       </Text>
                       <Ionicons
@@ -1359,51 +1375,62 @@ export default function Accounts(props) {
                                 width: 12,
                                 height: 12,
                                 resizeMode: 'contain',
-                                alignSelf:'center',
+                                alignSelf: 'center',
                               }}
                             />
-                            <View style={{marginLeft: 5, alignSelf:'center',
-                                marginRight: 5, flexDirection: 'row'}}>
-                            <Text
+                            <View
                               style={{
-                                ...styles.transactionModalAmountText,
-                                color:
-                                  item.transactionType == 'Received'
-                                    ? Colors.green
-                                    : Colors.red,
-                                    alignSelf:'center',
-                              }}
-                            >
-                            {item.accountType == 'Test Account'
-                            ? UsNumberFormat(item.amount)
-                            : switchOn
-                            ? UsNumberFormat(item.amount)
-                            : exchangeRates
-                            ? (
-                                (item.amount / 1e8) *
-                                exchangeRates[CurrencyCode].last
-                              ).toFixed(2)
-                            : null}
-               
-                              {/* {UsNumberFormat(item.amount)} */}
-                            </Text>
-                            <Text
-                              style={{
+                                marginLeft: 5,
                                 alignSelf: 'center',
-                                fontSize: RFValue(13),
-                                fontFamily: Fonts.OpenSans,
-                                color: Colors.textColorGrey,
-                                lineHeight: 19
+                                marginRight: 5,
+                                flexDirection: 'row',
                               }}
                             >
-                              {item.accountType == 'Test Account'
-                                ? 't-sats'
-                                : switchOn
-                                ? 'sats'
-                                : CurrencyCode.toLocaleLowerCase()}
-                            </Text>
+                              <Text
+                                style={{
+                                  ...styles.transactionModalAmountText,
+                                  color:
+                                    item.transactionType == 'Received'
+                                      ? Colors.green
+                                      : Colors.red,
+                                  alignSelf: 'center',
+                                }}
+                              >
+                                {item.accountType == 'Test Account'
+                                  ? UsNumberFormat(item.amount)
+                                  : switchOn
+                                  ? UsNumberFormat(item.amount)
+                                  : exchangeRates
+                                  ? (
+                                      (item.amount / 1e8) *
+                                      exchangeRates[CurrencyCode].last
+                                    ).toFixed(2)
+                                  : null}
+
+                                {/* {UsNumberFormat(item.amount)} */}
+                              </Text>
+                              <Text
+                                style={{
+                                  alignSelf: 'center',
+                                  fontSize: RFValue(13),
+                                  fontFamily: Fonts.OpenSans,
+                                  color: Colors.textColorGrey,
+                                  lineHeight: 19,
+                                }}
+                              >
+                                {item.accountType == 'Test Account'
+                                  ? 't-sats'
+                                  : switchOn
+                                  ? 'sats'
+                                  : CurrencyCode.toLocaleLowerCase()}
+                              </Text>
                             </View>
-                            <Text style={{...styles.transactionModalAmountUnitText,alignSelf:'center'}}>
+                            <Text
+                              style={{
+                                ...styles.transactionModalAmountUnitText,
+                                alignSelf: 'center',
+                              }}
+                            >
                               {item.confirmations < 6
                                 ? item.confirmations
                                 : '6+'}
@@ -1468,7 +1495,7 @@ export default function Accounts(props) {
                       props.navigation.navigate('Send', {
                         serviceType,
                         getServiceType: getServiceType,
-                        staticFees,
+                        averageTxFees,
                         netBalance,
                       });
                     }}
@@ -1490,8 +1517,9 @@ export default function Accounts(props) {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
-                        Tran Fee : {staticFees['low']} (
-                        {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
+                        Tran Fee :
+                        {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
+                        ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -1520,7 +1548,7 @@ export default function Accounts(props) {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Receive</Text>
                       {/* <Text style={styles.bottomCardInfoText}>
-                        Tran Fee : {staticFees['high']} (
+                        Tran Fee : {averageTxFees['high']} (
                         {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
                       </Text> */}
                     </View>
@@ -1844,7 +1872,6 @@ const styles = StyleSheet.create({
     paddingRight: 10,
     flexDirection: 'row',
     display: 'flex',
-    
   },
   transactionModalAmountText: {
     marginLeft: 5,
