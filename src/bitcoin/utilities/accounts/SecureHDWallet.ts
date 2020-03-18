@@ -504,7 +504,8 @@ export default class SecureHDWallet extends Bitcoin {
   public createHDTransaction = async (
     recipientAddress: string,
     amount: number,
-    txnPriority?: string,
+    txnPriority: string,
+    feeRates?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -534,12 +535,21 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('Output UTXOs:', outputUTXOs);
       // const txnFee = await this.feeRatesPerByte(txnPriority);
 
-      const {
-        averageTxFee,
-        feePerByte,
-        estimatedBlocks,
-      } = await this.averageTransactionFee(txnPriority);
-      console.log({ averageTxFee, feePerByte });
+      let averageTxFee;
+      let feePerByte;
+      let estimatedBlocks;
+
+      if (feeRates) {
+        averageTxFee = feeRates[txnPriority].averageTxFee;
+        feePerByte = feeRates[txnPriority].feePerByte;
+        estimatedBlocks = feeRates[txnPriority].estimatedBlocks;
+      } else {
+        const feeRatesByPriority = await this.averageTransactionFee();
+        averageTxFee = feeRatesByPriority[txnPriority].averageTxFee;
+        feePerByte = feeRatesByPriority[txnPriority].feePerByte;
+        estimatedBlocks = feeRatesByPriority[txnPriority].estimatedBlocks;
+      }
+      console.log({ averageTxFee, feePerByte, estimatedBlocks });
 
       let balance: number = 0;
       inputUTXOs.forEach(utxo => {
