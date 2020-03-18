@@ -412,7 +412,8 @@ export default class BaseAccount {
   public transferST1 = async (
     recipientAddress: string,
     amount: number,
-    priority?: string,
+    priority: string = 'high',
+    feeRates?: any,
   ): Promise<
     | {
         status: number;
@@ -457,7 +458,8 @@ export default class BaseAccount {
         } = await this.hdWallet.createHDTransaction(
           recipientAddress,
           amount,
-          priority,
+          priority.toLowerCase(),
+          feeRates,
         );
 
         if (balance < amount + fee) {

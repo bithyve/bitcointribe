@@ -211,7 +211,12 @@ export const fetchBalanceTxWatcher = createWatcher(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  const { recipientAddress, amount, priority } = payload.transferInfo;
+  const {
+    recipientAddress,
+    amount,
+    priority,
+    averageTxFees,
+  } = payload.transferInfo;
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
@@ -220,6 +225,7 @@ function* transferST1Worker({ payload }) {
     recipientAddress,
     amount,
     priority,
+    averageTxFees,
   );
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {

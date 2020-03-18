@@ -82,8 +82,8 @@ export default function Send(props) {
   //   setUnSuccessWithContactBottomSheet,
   // ] = useState(React.createRef());
 
-  const [staticFees, setStaticFees] = useState(
-    props.navigation.getParam('staticFees'),
+  const [averageTxFees, setAverageTxFees] = useState(
+    props.navigation.getParam('averageTxFees'),
   );
   const serviceType = props.navigation.getParam('serviceType');
   const sweepSecure = props.navigation.getParam('sweepSecure');
@@ -164,23 +164,27 @@ export default function Send(props) {
   }, []);
 
   useEffect(() => {
-    if (!staticFees) {
+    if (!averageTxFees) {
       (async () => {
-        const storedStaticFees = await AsyncStorage.getItem('storedStaticFees');
-        if (storedStaticFees) {
-          const { staticFees, lastFetched } = JSON.parse(storedStaticFees);
+        const storedAverageTxFees = await AsyncStorage.getItem(
+          'storedAverageTxFees',
+        );
+        if (storedAverageTxFees) {
+          const { averageTxFees, lastFetched } = JSON.parse(
+            storedAverageTxFees,
+          );
           if (Date.now() - lastFetched < 1800000) {
-            setStaticFees(staticFees);
+            setAverageTxFees(averageTxFees);
             return;
           } // maintaining a half an hour difference b/w fetches
         }
 
         const instance = service.hdWallet || service.secureHDWallet;
-        const staticFees = await instance.getStaticFee();
-        setStaticFees(staticFees);
+        const averageTxFees = await instance.averageTransactionFee();
+        setAverageTxFees(averageTxFees);
         await AsyncStorage.setItem(
-          'storedStaticFees',
-          JSON.stringify({ staticFees, lastFetched: Date.now() }),
+          'storedAverageTxFees',
+          JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
         );
       })();
     }
@@ -195,13 +199,13 @@ export default function Send(props) {
         setAmount(
           `${netBalance -
             Number(
-              staticFees[
+              averageTxFees[
                 sliderValueText === 'Low Fee'
                   ? 'low'
                   : sliderValueText === 'In the middle'
                   ? 'medium'
                   : 'high'
-              ],
+              ].averageTxFee,
             )}`,
         );
       }
@@ -293,9 +297,9 @@ export default function Send(props) {
     } else if (transfer.executed === 'ST1') {
       if (SendConfirmationBottomSheet.current)
         SendConfirmationBottomSheet.current.snapTo(1);
-        setTimeout(() => {
-          setIsConfirmDisabled(false);
-        }, 10);
+      setTimeout(() => {
+        setIsConfirmDisabled(false);
+      }, 10);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
@@ -594,13 +598,13 @@ export default function Send(props) {
       netBalance <
       Number(amount) +
         Number(
-          staticFees[
+          averageTxFees[
             sliderValueText === 'Low Fee'
               ? 'low'
               : sliderValueText === 'In the middle'
               ? 'medium'
               : 'high'
-          ],
+          ].averageTxFee,
         )
     ) {
       setIsInvalidBalance(true);
@@ -617,20 +621,25 @@ export default function Send(props) {
           recipientAddress,
           amount: parseInt(amount),
           priority,
+          averageTxFees,
         }),
       );
     }
   };
 
-  useEffect(()=>{
-    console.log('isInvalidAddress && recipientAddress && amount',isInvalidAddress , recipientAddress , amount)
-    if(isInvalidAddress && recipientAddress && amount){
+  useEffect(() => {
+    console.log(
+      'isInvalidAddress && recipientAddress && amount',
+      isInvalidAddress,
+      recipientAddress,
+      amount,
+    );
+    if (isInvalidAddress && recipientAddress && amount) {
       setIsConfirmDisabled(false);
-    }
-    else{
+    } else {
       setIsConfirmDisabled(true);
     }
-  },[recipientAddress, isInvalidAddress, amount])
+  }, [recipientAddress, isInvalidAddress, amount]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -953,9 +962,7 @@ export default function Send(props) {
                         }}
                       >
                         {'Low Fee\n'} (
-                        {staticFees
-                          ? staticFees['low']
-                          : ''}
+                        {averageTxFees ? averageTxFees['low'].averageTxFee : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
                       <Text
@@ -970,8 +977,8 @@ export default function Send(props) {
                         }}
                       >
                         {'In the middle\n'} (
-                        {staticFees
-                          ? staticFees['medium']
+                        {averageTxFees
+                          ? averageTxFees['medium'].averageTxFee
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -986,8 +993,8 @@ export default function Send(props) {
                         }}
                       >
                         {'Fast Transaction\n'} (
-                        {staticFees
-                          ? staticFees['high']
+                        {averageTxFees
+                          ? averageTxFees['high'].averageTxFee
                           : ''}
                         {serviceType === TEST_ACCOUNT ? ' t-sats' : ' sats'})
                       </Text>
@@ -1015,7 +1022,7 @@ export default function Send(props) {
                       shadowColor: Colors.shadowBlue,
                       shadowOpacity: 1,
                       shadowOffset: { width: 15, height: 15 },
-                      opacity: isConfirmDisabled ? 0.5 : 1
+                      opacity: isConfirmDisabled ? 0.5 : 1,
                     }}
                   >
                     {loading.transfer && !isInvalidBalance ? (

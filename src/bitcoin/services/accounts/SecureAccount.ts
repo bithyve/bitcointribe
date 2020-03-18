@@ -570,7 +570,8 @@ export default class SecureAccount {
   public transferST1 = async (
     recipientAddress: string,
     amount: number,
-    priority?: string,
+    priority: string = 'high',
+    feeRates?: any,
   ): Promise<
     | {
         status: number;
@@ -617,6 +618,7 @@ export default class SecureAccount {
           recipientAddress,
           amount,
           priority,
+          feeRates,
         );
 
         if (balance < amount + fee) {
