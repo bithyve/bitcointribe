@@ -116,6 +116,8 @@ export default function RecoveryCommunication(props) {
       `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/rk/` + // rk: recovery key
       REQUEST_DETAILS.ENCRYPTED_KEY;
 
+    console.log("deepLink", deepLink)
+
     switch (selectedContactMode.type) {
       case 'number':
         textWithoutEncoding(selectedContactMode.info, deepLink);

@@ -11,6 +11,7 @@ import {
   Platform,
   AsyncStorage,
   Alert,
+  RefreshControl
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -59,6 +60,8 @@ import {
 import axios from 'axios';
 
 export default function RestoreSelectedContactsList(props) {
+  let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
+  let [onRefresh, setOnRefresh] = useState(false);
   let [message, setMessage] = useState('Creating your wallet');
   const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -208,11 +211,21 @@ export default function RestoreSelectedContactsList(props) {
         console.log('Failed to retrieve exchange rates', res);
       }
     })();
+    let temp = null;
+    onPullDown();
     let focusListener = props.navigation.addListener('didFocus', () => {
       getSelectedContactList();
+      temp = setInterval(()=>{
+        onPullDown();
+      }, 30000);
+    });
+    let focusListener1 = props.navigation.addListener('didBlur', () => {
+      getSelectedContactList();
+      clearInterval(temp);
     });
     return () => {
       focusListener.remove();
+      focusListener1.remove();
     };
   }, []);
 
@@ -440,7 +453,7 @@ export default function RestoreSelectedContactsList(props) {
         'There was an error while recovering your wallet, please try again',
       );
     }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
+    (ErrorBottomSheet1 as any).current.snapTo(1);
     dispatch(walletRecoveryFailed(null));
   }
   if (isErrorReceivingFailed) {
@@ -450,7 +463,7 @@ export default function RestoreSelectedContactsList(props) {
         'There was an error while receiving your Recovery Secret, please try again',
       );
     }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
+    (ErrorBottomSheet1 as any).current.snapTo(1);
     dispatch(ErrorReceiving(null));
   }
 
@@ -469,6 +482,10 @@ export default function RestoreSelectedContactsList(props) {
     const { META_SHARE } = RECOVERY_SHARES[key];
     if (META_SHARE) metaShares.push(META_SHARE);
   });
+
+  useEffect(()=>{
+    setSecondaryDeviceRS(META_SHARE);
+  },[META_SHARE])
 
   useEffect(() => {
     (async () => {
@@ -516,37 +533,39 @@ export default function RestoreSelectedContactsList(props) {
       console.log({ OTP, ENCRYPTED_KEY });
       dispatch(downloadMShare(OTP, ENCRYPTED_KEY, 'recovery'));
     } else {
-      Alert.alert('Downloaded', 'Secret already downloaded');
+      Alert.alert('Received', 'Secret already Received');
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      let mod = false;
-      selectedContacts.forEach((contact, index) => {
-        if (RECOVERY_SHARES[index + 1]) {
-          if (RECOVERY_SHARES[index + 1].META_SHARE) {
-            if (selectedContacts[index].status !== 'received') {
-              selectedContacts[index].status = 'received';
-              mod = true;
-            }
-          } else if (RECOVERY_SHARES[index + 1].REQUEST_DETAILS) {
-            if (selectedContacts[index].status !== 'inTransit') {
-              selectedContacts[index].status = 'inTransit';
-              mod = true;
-            }
+  const updateStatusOnShareDownloadForTrustedContact = async() =>{
+    let mod = false;
+    selectedContacts.forEach((contact, index) => {
+      if (RECOVERY_SHARES[index + 1]) {
+        if (RECOVERY_SHARES[index + 1].META_SHARE) {
+          if (selectedContacts[index].status !== 'received') {
+            selectedContacts[index].status = 'received';
+            mod = true;
+          }
+        } else if (RECOVERY_SHARES[index + 1].REQUEST_DETAILS) {
+          if (selectedContacts[index].status !== 'inTransit') {
+            selectedContacts[index].status = 'inTransit';
+            mod = true;
           }
         }
-      });
-
-      if (mod) {
-        await AsyncStorage.setItem(
-          'selectedContacts',
-          JSON.stringify(selectedContacts),
-        );
-        getSelectedContactList();
       }
-    })();
+    });
+
+    if (mod) {
+      await AsyncStorage.setItem(
+        'selectedContacts',
+        JSON.stringify(selectedContacts),
+      );
+      getSelectedContactList();
+    }
+  }
+
+  useEffect(() => {
+    updateStatusOnShareDownloadForTrustedContact()
   }, [RECOVERY_SHARES, selectedContacts]);
 
   useEffect(() => {
@@ -622,6 +641,14 @@ export default function RestoreSelectedContactsList(props) {
     );
   }
 
+  const onPullDown = async() =>{
+    if(META_SHARE){
+      setSecondaryDeviceRS(META_SHARE);
+    }
+    updateStatusOnShareDownloadForTrustedContact();
+    setOnRefresh(false);
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -638,7 +665,17 @@ export default function RestoreSelectedContactsList(props) {
           </View>
         </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={onRefresh}
+            onRefresh={() => {
+              setOnRefresh(true);
+              onPullDown();
+            }}
+          />
+        }
+      >
         <HeaderTitle
           firstLineTitle={'Restore wallet using'}
           secondLineTitle={'Recovery Secrets'}
@@ -676,7 +713,7 @@ export default function RestoreSelectedContactsList(props) {
             />
           </View>
         </TouchableOpacity>
-        {META_SHARE && (
+        {SecondaryDeviceRS && (
           <View style={{}}>
             <TouchableOpacity
               style={{
@@ -686,10 +723,10 @@ export default function RestoreSelectedContactsList(props) {
             >
               <View>
                 <Text style={styles.selectedContactName}>
-                  {META_SHARE ? 'Downloaded' : 'Download'}
+                  {SecondaryDeviceRS ? 'Received' : 'Receive'}
                 </Text>
               </View>
-              {META_SHARE ? (
+              {SecondaryDeviceRS ? (
                 <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
                   <View
                     style={{
@@ -704,7 +741,7 @@ export default function RestoreSelectedContactsList(props) {
                     />
                   </View>
                 </View>
-              ) : !META_SHARE ? (
+              ) : !SecondaryDeviceRS ? (
                 <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
                   <View
                     style={{
@@ -724,7 +761,7 @@ export default function RestoreSelectedContactsList(props) {
                 </View>
               ) : (
                 <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
-                  <Text>{META_SHARE ? 'Downloaded' : 'Download'}</Text>
+                  <Text>{SecondaryDeviceRS ? 'Received' : 'Receive'}</Text>
                   <View style={styles.dotsView} />
                   <View style={styles.dotsView} />
                   <View style={styles.dotsView} />
