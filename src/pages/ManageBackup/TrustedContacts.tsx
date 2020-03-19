@@ -43,13 +43,20 @@ const TrustedContacts = props => {
   );
 
   return (
-    <View style={{ height: '100%', backgroundColor: Colors.white, alignSelf: 'center', width: '100%' }}>
+    <View
+      style={{
+        height: '100%',
+        backgroundColor: Colors.white,
+        alignSelf: 'center',
+        width: '100%',
+      }}
+    >
       <View
         style={{
           ...BackupStyles.modalHeaderTitleView,
-          paddingTop: hp("0.5%"),
+          paddingTop: hp('0.5%'),
           alignItems: 'center',
-          marginLeft: 20 
+          marginLeft: 20,
         }}
       >
         <Text style={BackupStyles.modalHeaderTitleText}>Select Contact</Text>

@@ -29,8 +29,11 @@ export const prepareMShares = () => {
   return { type: PREPARE_MSHARES };
 };
 
-export const uploadEncMShare = (shareIndex: number) => {
-  return { type: UPLOAD_ENC_MSHARE, payload: { shareIndex } };
+export const uploadEncMShare = (
+  shareIndex: number,
+  changingGuardian?: boolean,
+) => {
+  return { type: UPLOAD_ENC_MSHARE, payload: { shareIndex, changingGuardian } };
 };
 
 export const uploadRequestedShare = (tag, encryptedKey, otp) => {
