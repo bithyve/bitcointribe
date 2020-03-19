@@ -711,6 +711,31 @@ export default class S3Service {
     }
   };
 
+  public reshareMetaShare = (
+    index: number,
+  ):
+    | {
+        status: number;
+        data: {
+          metaShare: MetaShare;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const metaShare = this.sss.reshareMetaShare(index);
+      return { status: config.STATUS.SUCCESS, data: { metaShare } };
+    } catch (err) {
+      return { status: 520, err: err.message, message: ErrMap[520] };
+    }
+  };
+
   public restoreMetaShares = (
     metaShares: MetaShare[],
   ):
@@ -732,7 +757,7 @@ export default class S3Service {
       const { restored } = this.sss.restoreMetaShares(metaShares);
       return { status: config.STATUS.SUCCESS, data: { restored } };
     } catch (err) {
-      return { status: 510, err: err.message, message: ErrMap[510] };
+      return { status: 520, err: err.message, message: ErrMap[520] };
     }
   };
 

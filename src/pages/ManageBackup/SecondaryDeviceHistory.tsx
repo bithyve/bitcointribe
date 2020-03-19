@@ -18,11 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  uploadEncMShare,
-  checkMSharesHealth,
-  ErrorSending,
-} from '../../store/actions/sss';
+import { checkMSharesHealth, ErrorSending } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -32,7 +28,6 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import SecondaryDevice from './SecondaryDevice';
 import moment from 'moment';
 import _ from 'underscore';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
 
@@ -88,19 +83,7 @@ const SecondaryDeviceHistory = props => {
     secondaryDeviceMessageBottomSheet,
     setSecondaryDeviceMessageBottomSheet,
   ] = useState(React.createRef());
-  const [secondaryQR, setSecondaryQR] = useState('');
   const [isReshare, setIsReshare] = useState(false);
-  const SHARES_TRANSFER_DETAILS = useSelector(
-    state =>
-      state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-  );
-  const WALLET_SETUP = useSelector(
-    state => state.storage.database.WALLET_SETUP,
-  );
-
-  const uploadMetaShare = useSelector(
-    state => state.sss.loading.uploadMetaShare,
-  );
 
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
@@ -122,12 +105,10 @@ const SecondaryDeviceHistory = props => {
       );
     }
   };
-
+  const dispatch = useDispatch();
   const renderSecondaryDeviceContents = useCallback(() => {
     return (
       <SecondaryDevice
-        secondaryQR={secondaryQR}
-        uploadMetaShare={uploadMetaShare}
         onPressOk={async () => {
           updateAutoHighlightFlags();
           saveInTransitHistory();
@@ -145,7 +126,7 @@ const SecondaryDeviceHistory = props => {
         }}
       />
     );
-  }, [secondaryQR, uploadMetaShare]);
+  }, []);
 
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
@@ -234,26 +215,6 @@ const SecondaryDeviceHistory = props => {
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    if (SHARES_TRANSFER_DETAILS[0]) {
-      if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
-        dispatch(uploadEncMShare(0));
-      } else {
-        // do nothing
-      }
-      setSecondaryQR(
-        JSON.stringify({
-          requester: WALLET_SETUP.walletName,
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: 'secondaryDeviceQR',
-        }),
-      );
-    } else {
-      dispatch(uploadEncMShare(0));
-    }
-  }, [SHARES_TRANSFER_DETAILS]);
 
   const renderErrorModalContent = useCallback(() => {
     return (

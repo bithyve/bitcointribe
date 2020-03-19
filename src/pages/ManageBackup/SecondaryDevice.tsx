@@ -1,9 +1,5 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
 import BackupStyles from '../../pages/ManageBackup/Styles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -15,8 +11,55 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import QRCode from 'react-native-qrcode-svg';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import { useDispatch, useSelector } from 'react-redux';
+import { uploadEncMShare } from '../../store/actions/sss';
 
 export default function SecondaryDeviceModelContents(props) {
+  const [secondaryQR, setSecondaryQR] = useState('');
+
+  const SHARES_TRANSFER_DETAILS = useSelector(
+    state =>
+      state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+  );
+
+  const WALLET_SETUP = useSelector(
+    state => state.storage.database.WALLET_SETUP,
+  );
+
+  const uploadMetaShare = useSelector(
+    state => state.sss.loading.uploadMetaShare,
+  );
+
+  const dispatch = useDispatch();
+  const [changeContact, setChangeContact] = useState(false);
+
+  useEffect(() => {
+    if (props.changeContact) setChangeContact(true);
+  }, [props.changeContact]);
+
+  useEffect(() => {
+    if (changeContact) {
+      dispatch(uploadEncMShare(0, true));
+      setChangeContact(false);
+    } else {
+      if (SHARES_TRANSFER_DETAILS[0]) {
+        if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
+          dispatch(uploadEncMShare(0));
+        } else {
+          // do nothing
+        }
+        setSecondaryQR(
+          JSON.stringify({
+            requester: WALLET_SETUP.walletName,
+            ...SHARES_TRANSFER_DETAILS[0],
+            type: 'secondaryDeviceQR',
+          }),
+        );
+      } else {
+        dispatch(uploadEncMShare(0));
+      }
+    }
+  }, [SHARES_TRANSFER_DETAILS, changeContact]);
 
   return (
     <View
@@ -31,20 +74,20 @@ export default function SecondaryDeviceModelContents(props) {
       <View
         style={{
           ...BackupStyles.modalHeaderTitleView,
-          paddingTop: hp("0.5%"),
+          paddingTop: hp('0.5%'),
           alignItems: 'center',
-          marginLeft: 20 
+          marginLeft: 20,
         }}
       >
         <Text style={BackupStyles.modalHeaderTitleText}>Scan the QR</Text>
       </View>
       <View style={BackupStyles.modalContentView}>
-        {props.uploadMetaShare || !props.secondaryQR ? (
+        {uploadMetaShare || !secondaryQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={props.secondaryQR} size={hp('27%')} />
+          <QRCode value={secondaryQR} size={hp('27%')} />
         )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
