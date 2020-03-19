@@ -281,19 +281,35 @@ export default function Send(props) {
       transfer.stage2.failed ||
       transfer.stage3.failed
     ) {
-      if (SendConfirmationBottomSheet.current)
+      if (SendConfirmationBottomSheet.current){
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
         SendConfirmationBottomSheet.current.snapTo(0);
-      if (SendUnSuccessWithAddressBottomSheet.current)
+      }
+      if (SendUnSuccessWithAddressBottomSheet.current){
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
         SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
+      }
       setIsEditable(true);
     } else if (transfer.txid) {
       if (description) {
         updateDescription(transfer.txid, description);
       }
-      if (SendConfirmationBottomSheet.current)
+      if (SendConfirmationBottomSheet.current){
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
         SendConfirmationBottomSheet.current.snapTo(0);
-      if (SendSuccessWithAddressBottomSheet.current)
+      }
+      if (SendSuccessWithAddressBottomSheet.current){
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
         SendSuccessWithAddressBottomSheet.current.snapTo(1);
+      }
     } else if (transfer.executed === 'ST1') {
       if (SendConfirmationBottomSheet.current)
         SendConfirmationBottomSheet.current.snapTo(1);
@@ -301,6 +317,7 @@ export default function Send(props) {
         setIsConfirmDisabled(false);
       }, 10);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
+      setIsConfirmDisabled(false);
       props.navigation.navigate('TwoFAToken', {
         serviceType,
         recipientAddress,
