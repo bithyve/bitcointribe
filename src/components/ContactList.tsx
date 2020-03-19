@@ -135,7 +135,7 @@ export default function ContactList(props) {
         if (err) console.log("ERROR in COntactData",err)
          else {
          let data = JSON.parse(value);
-         if(data.length){
+         if(data && data.length){
           setContactData(data);
           const contactList = data.sort(function(a, b) {
            if (a.name && b.name) {
