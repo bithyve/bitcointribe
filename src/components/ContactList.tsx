@@ -45,7 +45,7 @@ export default function ContactList(props) {
   ] = useState(React.createRef());
   const selectectcontactlist = props.selectedContacts ? props.selectedContacts : [];
   const [contactData, setContactData] = useState([]);
-
+  
   useEffect(() => {
     if(props.selectedContacts){
       setSelectedContacts(selectectcontactlist);
@@ -85,13 +85,14 @@ export default function ContactList(props) {
   
 
   const getContact = () => {
-    ExpoContacts.getContactsAsync().then(({ data }) => {
+    ExpoContacts.getContactsAsync().then(async ({ data }) => {
       if (!data.length) {
         //Alert.alert('No contacts found!');
         setErrorMessage('No contacts found. Please add contacts to your address book and try again');
         (contactListErrorBottomSheet as any).current.snapTo(1);
       }
       setContactData(data);
+      await AsyncStorage.setItem('ContactData', JSON.stringify(data));
       const contactList = data.sort(function(a, b) {
         if (a.name && b.name) {
           if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
@@ -130,6 +131,25 @@ export default function ContactList(props) {
 
   useEffect(() => {
     (async () => {
+     await AsyncStorage.getItem('ContactData', (err, value) => {
+        if (err) console.log("ERROR in COntactData",err)
+         else {
+         let data = JSON.parse(value);
+         if(data.length){
+          setContactData(data);
+          const contactList = data.sort(function(a, b) {
+           if (a.name && b.name) {
+             if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+             if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+           }
+           return 0;
+         });
+         setFilterContactData(contactList);
+         }
+        }
+    });
+
+
       let isContactOpen=false;
       AsyncStorage.getItem('isContactOpen', (err, value) => {
       if (err) console.log(err)
