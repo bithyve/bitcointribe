@@ -29,7 +29,11 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestShare, downloadMShare, ErrorReceiving } from '../../store/actions/sss';
+import {
+  requestShare,
+  downloadMShare,
+  ErrorReceiving,
+} from '../../store/actions/sss';
 import QRCode from 'react-native-qrcode-svg';
 import Toast from '../../components/Toast';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -65,7 +69,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
   // const deepLink = REQUEST_DETAILS
-  //   ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` +
+  //   ? `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/rk/` +
   //     REQUEST_DETAILS.ENCRYPTED_KEY
   //   : '';
 
@@ -77,7 +81,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
   if (META_SHARE) {
     Toast('Downloaded');
   }
-  if(isErrorReceivingFailed){
+  if (isErrorReceivingFailed) {
     setTimeout(() => {
       setErrorMessageHeader('Error receiving Recovery Secret');
       setErrorMessage(
@@ -102,7 +106,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -227,15 +231,17 @@ export default function RestoreWalletBySecondaryDevice(props) {
           }
         />
         <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
+          enabledInnerScrolling={true}
+          ref={ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('35%')
+              : hp('40%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
+        />
       </View>
     </SafeAreaView>
   );
