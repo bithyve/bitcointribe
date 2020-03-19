@@ -365,11 +365,16 @@ export default class SSS {
       throw new Error('No metaShare supplied');
     }
 
-    const toUpdate: Array<{ walletId: string; shareId: string }> = [];
+    const toUpdate: Array<{
+      walletId: string;
+      shareId: string;
+      reshareVersion: number;
+    }> = [];
     for (const metaShare of metaShares) {
       toUpdate.push({
         walletId: metaShare.meta.walletId,
         shareId: metaShare.shareId,
+        reshareVersion: metaShare.meta.reshareVersion,
       });
     }
 
@@ -897,6 +902,7 @@ export default class SSS {
             walletId: this.walletId,
             tag,
             timestamp,
+            reshareVersion: 0,
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         };
@@ -911,6 +917,7 @@ export default class SSS {
             walletId: this.walletId,
             tag,
             timestamp,
+            reshareVersion: 0,
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         };
@@ -925,6 +932,13 @@ export default class SSS {
     }
 
     return { metaShares: this.metaShares };
+  };
+
+  public reshareMetaShare = (index: number) => {
+    this.metaShares[index].meta.reshareVersion =
+      this.metaShares[index].meta.reshareVersion + 1;
+    console.log({ resharing: this.metaShares[index] });
+    return this.metaShares[index];
   };
 
   public restoreMetaShares = (

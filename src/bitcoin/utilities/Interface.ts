@@ -26,6 +26,7 @@ export interface MetaShare {
     walletId: string;
     tag: string;
     timestamp: string;
+    reshareVersion: number;
   };
   encryptedStaticNonPMDD: string;
 }
