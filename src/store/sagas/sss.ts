@@ -130,21 +130,32 @@ function* uploadEncMetaShareWorker({ payload }) {
   const s3Service: S3Service = yield select(state => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
 
-  const { DECENTRALIZED_BACKUP } = yield select(
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
     state => state.storage.database,
   );
-  // preventing re-uploads till expiry
-  if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
-    if (
-      Date.now() -
-        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
-          .UPLOADED_AT <
-      600000
-    ) {
-      // re-upload after 10 minutes (removal sync w/ relayer)
-      return;
+
+  let updatedSERVICES = SERVICES;
+  if (payload.changingGuardian) {
+    yield call(s3Service.reshareMetaShare, payload.shareIndex);
+    updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify(s3Service),
+    };
+  } else {
+    // preventing re-uploads till expiry
+    if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
+      if (
+        Date.now() -
+          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
+            .UPLOADED_AT <
+        600000
+      ) {
+        // re-upload after 10 minutes (removal sync w/ relayer)
+        return;
+      }
     }
   }
+
   yield put(switchS3Loader('uploadMetaShare'));
 
   const res = yield call(s3Service.uploadShare, payload.shareIndex);
@@ -164,7 +175,12 @@ function* uploadEncMetaShareWorker({ payload }) {
         },
       },
     };
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield put(
+      insertIntoDB({
+        DECENTRALIZED_BACKUP: updatedBackup,
+        SERVICES: updatedSERVICES,
+      }),
+    );
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
@@ -458,10 +474,12 @@ function* updateMSharesHealthWorker({ payload }) {
     tag => UNDER_CUSTODY[tag].META_SHARE,
   );
 
+  if (!metaShares.length) return;
   const res = yield call(S3Service.updateHealth, metaShares);
   if (res.status === 200) {
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
+    console.log({ updationInfo });
     Object.keys(UNDER_CUSTODY).forEach(tag => {
       for (let info of updationInfo) {
         if (info.updated) {
@@ -469,6 +487,12 @@ function* updateMSharesHealthWorker({ payload }) {
             UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
             if (info.dynamicNonPMDD)
               UNDER_CUSTODY[tag].DYNAMIC_NONPMDD = info.dynamicNonPMDD;
+          }
+        } else {
+          if (info.removeShare) {
+            if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+              delete UNDER_CUSTODY[tag];
+            }
           }
         }
       }
