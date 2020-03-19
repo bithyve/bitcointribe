@@ -52,6 +52,7 @@ const TrustedContactHistory = props => {
   const dispatch = useDispatch();
   const [selectedContactMode, setSelectedContactMode] = useState(null);
   const [ChangeBottomSheet, setChangeBottomSheet] = useState(React.createRef());
+  const [changeContact, setChangeContact] = useState(false);
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
     React.createRef(),
   );
@@ -209,6 +210,7 @@ const TrustedContactHistory = props => {
         }}
         contact={chosenContact ? chosenContact : null}
         index={index}
+        changeContact={changeContact}
         onPressBack={() => {
           (CommunicationModeBottomSheet as any).current.snapTo(0);
         }}
@@ -468,17 +470,17 @@ const TrustedContactHistory = props => {
     }
   };
 
-  useEffect(() => {
-    if (
-      !SHARES_TRANSFER_DETAILS[index] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-    )
-      dispatch(uploadEncMShare(index));
-    else {
-      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      console.log(SHARES_TRANSFER_DETAILS[index]);
-    }
-  }, [SHARES_TRANSFER_DETAILS[index]]);
+  // useEffect(() => {
+  //   if (
+  //     !SHARES_TRANSFER_DETAILS[index] ||
+  //     Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+  //   )
+  //     dispatch(uploadEncMShare(index));
+  //   else {
+  //     //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
+  //     console.log(SHARES_TRANSFER_DETAILS[index]);
+  //   }
+  // }, [SHARES_TRANSFER_DETAILS[index]]);
 
   const onPressReshare = useCallback(async () => {
     let selectedContactList = JSON.parse(
@@ -543,7 +545,9 @@ const TrustedContactHistory = props => {
         onPressProceed={() => {
           setTimeout(() => {
             setLoadContacts(true);
+            setChangeContact(true);
           }, 2);
+
           (trustedContactsBottomSheet as any).current.snapTo(1);
           (ChangeBottomSheet as any).current.snapTo(0);
         }}

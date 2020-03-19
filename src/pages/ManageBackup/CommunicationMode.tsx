@@ -88,6 +88,12 @@ export default function CommunicationMode(props) {
     }
   };
 
+  const [changeContact, setChangeContact] = useState(false);
+  console.log({ changeContact });
+  useEffect(() => {
+    if (props.changeContact) setChangeContact(true);
+  }, [props.changeContact]);
+
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
   );
@@ -136,14 +142,17 @@ export default function CommunicationMode(props) {
   const { loading } = useSelector(state => state.sss);
 
   useEffect(() => {
-    if (
-      !SHARES_TRANSFER_DETAILS[index] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-    )
-      dispatch(uploadEncMShare(index));
-    else {
+    if (changeContact) {
+      dispatch(uploadEncMShare(index, true));
+      setChangeContact(false);
+    } else {
+      if (
+        !SHARES_TRANSFER_DETAILS[index] ||
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+      )
+        dispatch(uploadEncMShare(index));
     }
-  }, [SHARES_TRANSFER_DETAILS[index]]);
+  }, [SHARES_TRANSFER_DETAILS[index], changeContact]);
 
   const editContact = () => {
     var newPerson = {
