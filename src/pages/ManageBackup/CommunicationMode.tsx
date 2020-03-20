@@ -114,6 +114,7 @@ export default function CommunicationMode(props) {
       `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
       SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
       `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+    console.log("deepLink", deepLink);
 
     switch (selectedContactMode.type) {
       case 'number':
