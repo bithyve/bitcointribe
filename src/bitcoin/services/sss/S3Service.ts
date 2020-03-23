@@ -78,11 +78,11 @@ export default class S3Service {
         data:
           | {
               metaShare: MetaShare;
-              dynamicNonPMDD: EncDynamicNonPMDD;
+              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
             }
           | {
               metaShare: MetaShare;
-              dynamicNonPMDD?: undefined;
+              encryptedDynamicNonPMDD?: undefined;
             };
         err?: undefined;
         message?: undefined;
@@ -213,7 +213,7 @@ export default class S3Service {
         status: number;
         data: {
           metaShare: MetaShare;
-          dynamicNonPMDD: EncDynamicNonPMDD;
+          encryptedDynamicNonPMDD: EncDynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
