@@ -158,7 +158,18 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   yield put(switchS3Loader('uploadMetaShare'));
 
-  const res = yield call(s3Service.uploadShare, payload.shareIndex);
+  // generate dynamic NonPMDD
+  const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+  let dynamicNonPMDD;
+  if (DYNAMIC_NONPMDD.META_SHARES) {
+    dynamicNonPMDD = DYNAMIC_NONPMDD;
+  }
+
+  const res = yield call(
+    s3Service.uploadShare,
+    payload.shareIndex,
+    dynamicNonPMDD,
+  );
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
@@ -302,12 +313,11 @@ function* downloadMetaShareWorker({ payload }) {
     );
   } else {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
-    console.log({ res });
   }
 
   console.log({ res });
   if (res.status === 200) {
-    const { metaShare, dynamicNonPMDD } = res.data;
+    const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
     if (payload.downloadType !== 'recovery') {
       updatedBackup = {
@@ -316,7 +326,7 @@ function* downloadMetaShareWorker({ payload }) {
           ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
           [metaShare.meta.tag]: {
             META_SHARE: metaShare,
-            ENC_DYNAMIC_NONPMDD: dynamicNonPMDD,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
           },
         },
         DYNAMIC_NONPMDD: {
@@ -339,7 +349,7 @@ function* downloadMetaShareWorker({ payload }) {
             updatedRecoveryShares[key] = {
               REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
               META_SHARE: metaShare,
-              ENC_DYNAMIC_NONPMDD: dynamicNonPMDD,
+              ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
             };
           } else {
             updatedRecoveryShares[key] = recoveryShare;

@@ -171,7 +171,7 @@ export default class S3Service {
     encryptedKey: string,
     otp: string,
     metaShare: MetaShare,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
     | {
         status: number;
@@ -195,7 +195,7 @@ export default class S3Service {
           encryptedKey,
           otp,
           metaShare,
-          dynamicNonPMDD,
+          encryptedDynamicNonPMDD,
         ),
       };
     } catch (err) {
