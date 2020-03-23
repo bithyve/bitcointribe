@@ -161,9 +161,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   // generate dynamic NonPMDD
   const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
   let dynamicNonPMDD;
-  if (DYNAMIC_NONPMDD.META_SHARES) {
-    dynamicNonPMDD = DYNAMIC_NONPMDD;
-  }
+  if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
 
   const res = yield call(
     s3Service.uploadShare,
@@ -494,9 +492,10 @@ function* updateMSharesHealthWorker({ payload }) {
       for (let info of updationInfo) {
         if (info.updated) {
           if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-            UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-            if (info.dynamicNonPMDD)
-              UNDER_CUSTODY[tag].DYNAMIC_NONPMDD = info.dynamicNonPMDD;
+            // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+            if (info.encryptedDynamicNonPMDD)
+              UNDER_CUSTODY[tag].encryptedDynamicNonPMDD =
+                info.encryptedDynamicNonPMDD;
           }
         } else {
           if (info.removeShare) {

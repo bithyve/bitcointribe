@@ -110,7 +110,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          dynamicNonPMDD: EncDynamicNonPMDD;
+          encryptedDynamicNonPMDD: EncDynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -306,7 +306,7 @@ export default class S3Service {
             shareId: string;
             updated: boolean;
             updatedAt?: number;
-            dynamicNonPMDD?: EncDynamicNonPMDD;
+            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
             err?: string;
           }>;
         };
@@ -578,13 +578,9 @@ export default class S3Service {
       }
   > => {
     try {
-      const { encryptedDynamicNonPMDD } = await this.sss.encryptDynamicNonPMDD(
-        dynamicNonPMDD,
-      );
-
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateDynamicNonPMDD(encryptedDynamicNonPMDD),
+        data: await this.sss.updateDynamicNonPMDD(dynamicNonPMDD),
       };
     } catch (err) {
       return { status: 515, err: err.message, message: ErrMap[515] };

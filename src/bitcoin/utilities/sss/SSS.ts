@@ -107,7 +107,7 @@ export default class SSS {
   public static downloadDynamicNonPMDD = async (
     walletID: string,
   ): Promise<{
-    dynamicNonPMDD: EncDynamicNonPMDD;
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   }> => {
     let res: AxiosResponse;
     try {
@@ -120,10 +120,10 @@ export default class SSS {
       if (err.code) throw new Error(err.code);
     }
 
-    const { dynamicNonPMDD } = res.data;
-    if (dynamicNonPMDD) {
+    const { encryptedDynamicNonPMDD } = res.data;
+    if (encryptedDynamicNonPMDD) {
       return {
-        dynamicNonPMDD,
+        encryptedDynamicNonPMDD,
       };
     } else {
       throw new Error('Unable to download EncDynamicNonPMDD');
@@ -361,7 +361,7 @@ export default class SSS {
       shareId: string;
       updated: boolean;
       updatedAt?: number;
-      dynamicNonPMDD?: EncDynamicNonPMDD;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
       err?: string;
     }>;
   }> => {
@@ -838,13 +838,14 @@ export default class SSS {
   };
 
   public updateDynamicNonPMDD = async (
-    encryptedDynamicNonPMDD: string,
+    dynamicNonPMDD,
   ): Promise<{
     updated: boolean;
   }> => {
-    const dynamicNonPMDD: EncDynamicNonPMDD = {
+    const encryptedDynamicNonPMDD: EncDynamicNonPMDD = {
       updatedAt: Date.now(),
-      encryptedDynamicNonPMDD,
+      encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+        .encryptedDynamicNonPMDD,
     };
 
     let res: AxiosResponse;
@@ -852,7 +853,7 @@ export default class SSS {
       res = await BH_AXIOS.post('updateDynamicNonPMDD', {
         HEXA_ID,
         walletID: this.walletId,
-        dynamicNonPMDD,
+        encryptedDynamicNonPMDD,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
