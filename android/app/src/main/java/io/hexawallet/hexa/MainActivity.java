@@ -25,4 +25,13 @@ public class MainActivity extends ReactActivity {
             }
         };
     }
+
+    // prevent tapjacking
+    // https://stackoverflow.com/questions/51818363/how-to-solve-tapjacking-vulnerability-in-reactnative-app
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        View v = findViewById(android.R.id.content);
+        v.setFilterTouchesWhenObscured(true);
+    }
 }
