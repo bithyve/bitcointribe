@@ -232,7 +232,12 @@ export default class BaseAccount {
     }
   };
 
-  public getBalance = async (): Promise<
+  public isValidAddress = (recipientAddress: string): Boolean =>
+    this.hdWallet.isValidAddress(recipientAddress);
+
+  public getBalance = async (options?: {
+    restore?;
+  }): Promise<
     | {
         status: number;
         data: {
@@ -252,10 +257,58 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalance(),
+        data: await this.hdWallet.fetchBalance(options),
       };
     } catch (err) {
       return { status: 0o2, err: err.message, message: ErrMap[0o2] };
+    }
+  };
+
+  public getBalanceTransactions = async (options?: {
+    restore?;
+  }): Promise<
+    | {
+        status: number;
+        data: {
+          balances: {
+            balance: number;
+            unconfirmedBalance: number;
+          };
+          transactions: {
+            totalTransactions: number;
+            confirmedTransactions: number;
+            unconfirmedTransactions: number;
+            transactionDetails: Array<{
+              txid: string;
+              status: string;
+              confirmations: number;
+              fee: string;
+              date: string;
+              transactionType: string;
+              amount: number;
+              accountType: string;
+              recipientAddresses?: string[];
+              senderAddresses?: string[];
+            }>;
+          };
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.fetchBalanceTransaction(options),
+      };
+    } catch (err) {
+      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
     }
   };
 
@@ -333,6 +386,8 @@ export default class BaseAccount {
         data: {
           txid: any;
           funded: any;
+          balances: any;
+          transactions: any;
         };
         err?: undefined;
         message?: undefined;
@@ -345,10 +400,9 @@ export default class BaseAccount {
       }
   > => {
     try {
-      const { address } = await this.hdWallet.getReceivingAddress();
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.testnetFaucet(address),
+        data: await this.hdWallet.testnetFaucet(),
       };
     } catch (err) {
       return { status: 0o5, err: err.message, message: ErrMap[0o5] };
@@ -358,7 +412,8 @@ export default class BaseAccount {
   public transferST1 = async (
     recipientAddress: string,
     amount: number,
-    priority?: string,
+    priority: string = 'high',
+    feeRates?: any,
   ): Promise<
     | {
         status: number;
@@ -403,7 +458,8 @@ export default class BaseAccount {
         } = await this.hdWallet.createHDTransaction(
           recipientAddress,
           amount,
-          priority,
+          priority.toLowerCase(),
+          feeRates,
         );
 
         if (balance < amount + fee) {

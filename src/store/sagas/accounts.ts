@@ -1,5 +1,5 @@
-import { call, put, select, delay } from 'redux-saga/effects';
-import { createWatcher } from '../utils/utilities';
+import { call, put, select, delay, all } from 'redux-saga/effects';
+import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
   FETCH_ADDR,
   addressFetched,
@@ -18,6 +18,21 @@ import {
   executedST3,
   fetchTransactions,
   ACCUMULATIVE_BAL_AND_TX,
+  failedST1,
+  failedST2,
+  failedST3,
+  testcoinsReceived,
+  SYNC_ACCOUNTS,
+  accountsSynched,
+  FETCH_BALANCE_TX,
+  EXCHANGE_RATE,
+  exchangeRatesCalculated,
+  ALTERNATE_TRANSFER_ST2,
+  secondaryXprivGenerated,
+  GENERATE_SECONDARY_XPRIV,
+  alternateTransferST2Executed,
+  RESET_TWO_FA,
+  twoFAResetted,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -25,7 +40,8 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import AsyncStorage from '@react-native-community/async-storage';
+import { AsyncStorage, Alert } from 'react-native';
+import axios from 'axios';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -45,6 +61,7 @@ function* fetchAddrWorker({ payload }) {
   ) {
     yield put(addressFetched(payload.serviceType, postFetchAddress));
   } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(switchLoader(payload.serviceType, 'receivingAddress'));
   }
 }
@@ -52,7 +69,8 @@ function* fetchAddrWorker({ payload }) {
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchBalanceWorker({ payload }) {
-  if (payload.loader) yield put(switchLoader(payload.serviceType, 'balances'));
+  if (payload.options && payload.options.loader)
+    yield put(switchLoader(payload.serviceType, 'balances'));
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
@@ -61,23 +79,37 @@ function* fetchBalanceWorker({ payload }) {
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
       : service.hdWallet.balances;
-  const res = yield call(service.getBalance);
+  const res = yield call(service.getBalance, {
+    restore: payload.options.restore,
+  });
   const postFetchBalances = res.status === 200 ? res.data : preFetchBalances;
 
   if (
     res.status === 200 &&
+    payload.options &&
+    payload.options.fetchTransactionsSync
+  ) {
+    yield call(fetchTransactionsWorker, {
+      payload: {
+        serviceType: payload.serviceType,
+        service,
+      },
+    }); // have to dispatch everytime (if selected) as the tx confirmations increments
+  } else if (
+    res.status === 200 &&
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
   ) {
-    yield put(balanceFetched(payload.serviceType, postFetchBalances));
-    // const { SERVICES } = yield select(state => state.storage.database);
-    // const updatedSERVICES = {
-    //   ...SERVICES,
-    //   [payload.serviceType]: JSON.stringify(service),
-    // };
-    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  } else {
-    if (payload.loader)
-      yield put(switchLoader(payload.serviceType, 'balances'));
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  }
+
+  if (payload.options.loader) {
+    // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
+    yield put(switchLoader(payload.serviceType, 'balances'));
   }
 }
 
@@ -122,9 +154,69 @@ export const fetchTransactionsWatcher = createWatcher(
   FETCH_TRANSACTIONS,
 );
 
+function* fetchBalanceTxWorker({ payload }) {
+  if (payload.options && payload.options.loader)
+    yield put(switchLoader(payload.serviceType, 'balanceTx'));
+  const service =
+    payload.options && payload.options.service
+      ? payload.options.service
+      : yield select(state => state.accounts[payload.serviceType].service);
+
+  const preFetchBalances =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.balances
+      : service.hdWallet.balances;
+  const preFetchTransactions =
+    payload.serviceType === SECURE_ACCOUNT
+      ? service.secureHDWallet.transactions
+      : service.hdWallet.transactions;
+
+  const res = yield call(service.getBalanceTransactions, {
+    restore: payload.options.restore,
+  });
+
+  const postFetchBalances =
+    res.status === 200 ? res.data.balances : preFetchBalances;
+  const postFetchTransactions =
+    res.status === 200 ? res.data.transactions : preFetchTransactions;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
+  ) {
+    if (!payload.options.shouldNotInsert) {
+      const { SERVICES } = yield select(state => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [payload.serviceType]: JSON.stringify(service),
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to fetch balance/transactions from the indexer');
+  }
+
+  if (payload.options.loader) {
+    // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
+    yield put(switchLoader(payload.serviceType, 'balanceTx'));
+  }
+}
+
+export const fetchBalanceTxWatcher = createWatcher(
+  fetchBalanceTxWorker,
+  FETCH_BALANCE_TX,
+);
+
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  const { recipientAddress, amount, priority } = payload.transferInfo;
+  const {
+    recipientAddress,
+    amount,
+    priority,
+    averageTxFees,
+  } = payload.transferInfo;
   const service = yield select(
     state => state.accounts[payload.serviceType].service,
   );
@@ -133,10 +225,14 @@ function* transferST1Worker({ payload }) {
     recipientAddress,
     amount,
     priority,
+    averageTxFees,
   );
-  res.status === 200
-    ? yield put(executedST1(payload.serviceType, res.data))
-    : yield put(switchLoader(payload.serviceType, 'transfer'));
+  if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
+  else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    yield put(failedST1(payload.serviceType));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
+  }
 }
 
 export const transferST1Watcher = createWatcher(
@@ -162,13 +258,71 @@ function* transferST2Worker({ payload }) {
       yield put(executedST2(payload.serviceType, res.data));
     } else yield put(executedST2(payload.serviceType, res.data.txid));
   } else {
-    yield put(switchLoader(payload.serviceType, 'transfer'));
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    yield put(failedST2(payload.serviceType));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
 
 export const transferST2Watcher = createWatcher(
   transferST2Worker,
   TRANSFER_ST2,
+);
+
+function* generateSecondaryXprivWorker({ payload }) {
+  const service = yield select(
+    state => state.accounts[payload.serviceType].service,
+  );
+
+  const { generated } = service.generateSecondaryXpriv(
+    payload.secondaryMnemonic,
+  );
+
+  if (generated) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield put(secondaryXprivGenerated(true));
+  } else {
+    yield put(secondaryXprivGenerated(false));
+  }
+}
+
+export const generateSecondaryXprivWatcher = createWatcher(
+  generateSecondaryXprivWorker,
+  GENERATE_SECONDARY_XPRIV,
+);
+
+function* alternateTransferST2Worker({ payload }) {
+  if (payload.serviceType !== SECURE_ACCOUNT) return;
+
+  yield put(switchLoader(payload.serviceType, 'transfer'));
+  const { service, transfer } = yield select(
+    state => state.accounts[payload.serviceType],
+  );
+
+  const { inputs, txb } = transfer.stage1;
+  if (!inputs && !txb) {
+    console.log('Transaction object missing');
+    return;
+  }
+  const res = yield call(service.alternateTransferST2, inputs, txb);
+  console.log({ res });
+  if (res.status === 200) {
+    yield put(alternateTransferST2Executed(payload.serviceType, res.data.txid));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    yield put(failedST2(payload.serviceType));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
+  }
+}
+
+export const alternateTransferST2Watcher = createWatcher(
+  alternateTransferST2Worker,
+  ALTERNATE_TRANSFER_ST2,
 );
 
 function* transferST3Worker({ payload }) {
@@ -189,7 +343,9 @@ function* transferST3Worker({ payload }) {
   if (res.status === 200) {
     yield put(executedST3(payload.serviceType, res.data.txid));
   } else {
-    yield put(switchLoader(payload.serviceType, 'transfer'));
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    yield put(failedST3(payload.serviceType));
+    // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }
 
@@ -205,14 +361,25 @@ function* testcoinsWorker({ payload }) {
     state => state.accounts[payload.serviceType].service,
   );
   const res = yield call(service.getTestcoins);
-
+  console.log({ res });
   if (res.status === 200) {
     console.log('testcoins received');
-    yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
     yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
-    yield put(fetchBalance(payload.serviceType));
-    yield put(fetchTransactions(payload.serviceType, service));
-  } else console.log('Failed to get testcoins');
+    // yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
+    // yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
+    // yield put(fetchTransactions(payload.serviceType, service));
+    yield put(testcoinsReceived(payload.serviceType, service));
+
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to get testcoins');
+  }
   yield put(switchLoader(payload.serviceType, 'testcoins'));
 }
 
@@ -259,3 +426,123 @@ export const accumulativeTxAndBalWatcher = createWatcher(
   accumulativeTxAndBalWorker,
   ACCUMULATIVE_BAL_AND_TX,
 );
+
+function* accountsSyncWorker({ payload }) {
+  try {
+    const accounts = yield select(state => state.accounts);
+
+    const testService = accounts[TEST_ACCOUNT].service;
+    const regularService = accounts[REGULAR_ACCOUNT].service;
+    const secureService = accounts[SECURE_ACCOUNT].service;
+
+    yield all([
+      fetchBalanceTxWorker({
+        payload: {
+          serviceType: TEST_ACCOUNT,
+          options: {
+            service: testService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
+        },
+      }),
+      fetchBalanceTxWorker({
+        payload: {
+          serviceType: REGULAR_ACCOUNT,
+          options: {
+            service: regularService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
+        },
+      }),
+      fetchBalanceTxWorker({
+        payload: {
+          serviceType: SECURE_ACCOUNT,
+          options: {
+            service: secureService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
+        },
+      }),
+    ]);
+
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [TEST_ACCOUNT]: JSON.stringify(testService),
+      [REGULAR_ACCOUNT]: JSON.stringify(regularService),
+      [SECURE_ACCOUNT]: JSON.stringify(secureService),
+    };
+
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield put(accountsSynched(true));
+  } catch (err) {
+    console.log({ err });
+    yield put(accountsSynched(false));
+  }
+}
+
+export const accountsSyncWatcher = createWatcher(
+  accountsSyncWorker,
+  SYNC_ACCOUNTS,
+);
+
+function* exchangeRateWorker() {
+  try {
+    const storedExchangeRates = yield call(
+      AsyncStorage.getItem,
+      'exchangeRates',
+    );
+
+    if (storedExchangeRates) {
+      const exchangeRates = JSON.parse(storedExchangeRates);
+      if (Date.now() - exchangeRates.lastFetched < 1800000) {
+        yield put(exchangeRatesCalculated(exchangeRates));
+        return;
+      } // maintaining half an hour difference b/w fetches
+    }
+    const exchangeAxios = axios.create({
+      baseURL: 'https://blockchain.info/',
+      timeout: 15000, // 15 seconds
+    });
+    const res = yield call(exchangeAxios.get, 'ticker');
+    if (res.status == 200) {
+      const exchangeRates = res.data;
+      exchangeRates.lastFetched = Date.now();
+      yield put(exchangeRatesCalculated(exchangeRates));
+      yield call(
+        AsyncStorage.setItem,
+        'exchangeRates',
+        JSON.stringify(exchangeRates),
+      );
+    } else {
+      if (res.err === 'ECONNABORTED') requestTimedout();
+      console.log('Failed to retrieve exchange rates', res);
+    }
+  } catch (err) {
+    console.log({ err });
+  }
+}
+
+export const exchangeRateWatcher = createWatcher(
+  exchangeRateWorker,
+  EXCHANGE_RATE,
+);
+
+function* resetTwoFAWorker({ payload }) {
+  const service = yield select(state => state.accounts[SECURE_ACCOUNT].service);
+
+  const res = yield call(service.resetTwoFA, payload.secondaryMnemonic);
+
+  if (res.status == 200) {
+    yield put(twoFAResetted(true));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    console.log('Failed to reset twoFA', res.err);
+    yield put(twoFAResetted(false));
+  }
+}
+
+export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);

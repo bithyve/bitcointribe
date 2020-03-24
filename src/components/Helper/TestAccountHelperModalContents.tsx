@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Image,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -15,91 +8,60 @@ import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-
+import { ScrollView } from 'react-native-gesture-handler';
 export default function TestAccountHelperModalContents(props) {
-  return (
-    <View style={styles.modalContainer}>
-      <ScrollView>
-        <View
+  const mainView = () =>{
+    return (<View
           style={{
             height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
+            marginLeft: wp('8%'),
+            marginRight: wp('8%'),
           }}
         >
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => {
-                if (props.onPressManageBackup) props.onPressManageBackup();
-              }}
+          <View
+            style={{
+              marginTop: hp('1%'),
+            }}
+          >
+            <Text
               style={{
-                width: wp('85%'),
-                height: wp('13%'),
-                backgroundColor: Colors.homepageButtonColor,
-                borderRadius: 10,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: hp('2%'),
+                color: Colors.white,
+                fontFamily: Fonts.FiraSansMedium,
+                fontSize: RFValue(15),
+                fontWeight: 'bold',
+                marginTop: hp('1%'),
                 marginBottom: hp('1%'),
+              }}
+            >
+              {props.topButtonText}
+            </Text>
+          </View>
+          {props.boldPara ? (
+            <View
+              style={{
+                marginTop: hp('1%'),
               }}
             >
               <Text
                 style={{
                   color: Colors.white,
+                  fontSize: RFValue(12),
                   fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(14),
                 }}
               >
-                {props.topButtonText}
+                {props.boldPara}
               </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View>
-          <View style={{ justifyContent: 'center', alignItems: 'center', }}>
-            <Image
-              source={require('../../assets/images/icons/testAccountHelperImage.png')}
-              style={{
-                width: wp('45%'),
-                height: wp('45%'),
-                resizeMode: 'contain',
-              }}
-            />
-          </View>
-          { props.boldPara ? 
+            </View>
+          ) : null}
+
           <View
             style={{
-              justifyContent: 'center',
-              alignItems: 'center',
               marginTop: hp('1%'),
             }}
           >
             <Text
               style={{
-                textAlign: 'center',
                 color: Colors.white,
-                marginLeft: 20,
-                marginRight: 20,
-                marginBottom: 10,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansMedium,
-              }}
-            >
-              {props.boldPara}
-            </Text>
-          </View> : null}
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: hp('1%'),
-            }}
-          >
-            <Text
-              style={{
-                textAlign: 'center',
-                color: Colors.white,
-                marginLeft: 20,
-                marginRight: 20,
-                marginBottom: 10,
                 fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansRegular,
               }}
@@ -108,14 +70,26 @@ export default function TestAccountHelperModalContents(props) {
             </Text>
           </View>
         </View>
-      </ScrollView>
-      <View
+    )
+  }
+  return (
+    <View style={styles.modalContainer}>
+      {
+        props.topButtonText == 'Receiving Bitcoins'?
+        (<ScrollView>
+          {mainView()}
+        </ScrollView>) : 
+        (<View>
+        {mainView()}
+        </View>)
+      }
+      {/* <View
         style={{
           flexDirection: 'row',
           marginTop: hp('1%'),
           marginBottom: hp('2%'),
-          justifyContent: 'center',
-          alignItems: 'center',
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
         }}
       >
         <AppBottomSheetTouchableWrapper
@@ -125,8 +99,8 @@ export default function TestAccountHelperModalContents(props) {
             height: wp('13%'),
             backgroundColor: Colors.white,
             borderRadius: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
           }}
         >
           <Text
@@ -139,7 +113,7 @@ export default function TestAccountHelperModalContents(props) {
             {props.continueButtonText}
           </Text>
         </AppBottomSheetTouchableWrapper>
-        <AppBottomSheetTouchableWrapper
+         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressQuit()}
           style={{
             width: wp('20%'),
@@ -158,8 +132,20 @@ export default function TestAccountHelperModalContents(props) {
           >
             {props.quitButtonText}
           </Text>
-        </AppBottomSheetTouchableWrapper>
-      </View>
+        </AppBottomSheetTouchableWrapper> 
+      </View>*/}
+      {props.image ? (
+        <View style={{ marginTop: 'auto', marginLeft: 'auto' }}>
+          <Image
+            source={props.image}
+            style={{
+              width: wp('28%'),
+              height: wp('28%'),
+              resizeMode: 'contain',
+            }}
+          />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -167,9 +153,6 @@ const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.blue,
-    alignSelf: 'center',
-    width: '100%',
-    paddingBottom: hp('5%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,

@@ -24,6 +24,7 @@ import {
   initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
+  changeAuthCredWatcher,
 } from './sagas/setupAndAuth';
 import {
   fetchAddrWatcher,
@@ -34,6 +35,12 @@ import {
   testcoinsWatcher,
   transferST3Watcher,
   accumulativeTxAndBalWatcher,
+  accountsSyncWatcher,
+  fetchBalanceTxWatcher,
+  exchangeRateWatcher,
+  alternateTransferST2Watcher,
+  generateSecondaryXprivWatcher,
+  resetTwoFAWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -53,6 +60,7 @@ import {
   generatePDFWatcher,
   checkPDFHealthWatcher,
   restoreShareFromQRWatcher,
+  shareHistoryUpdateWatcher,
 } from './sagas/sss';
 
 import {
@@ -93,16 +101,23 @@ const rootSaga = function*() {
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
+    changeAuthCredWatcher,
 
     // accounts watchers
     fetchAddrWatcher,
     fetchBalanceWatcher,
     fetchTransactionsWatcher,
+    fetchBalanceTxWatcher,
     transferST1Watcher,
     transferST2Watcher,
+    alternateTransferST2Watcher,
     transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
+    accountsSyncWatcher,
+    exchangeRateWatcher,
+    generateSecondaryXprivWatcher,
+    resetTwoFAWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -122,6 +137,7 @@ const rootSaga = function*() {
     recoverMnemonicWatcher,
     recoverWalletWatcher,
     restoreShareFromQRWatcher,
+    shareHistoryUpdateWatcher,
 
     // manage backup
     sharePdfWatcher,

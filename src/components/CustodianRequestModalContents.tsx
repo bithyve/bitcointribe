@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  Platform
+  Platform,
+  ActivityIndicator
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -64,7 +65,7 @@ export default function CustodianRequestModalContents(props) {
               Message from the Sender
             </Text>
             <Text style={{ ...styles.modalInfoText }}>
-              Please accept my secret, this will help me recover{"\n"}my wallet
+              Please accept my request, this will help me recover{"\n"}my wallet
               later
             </Text>
           </View>
@@ -77,14 +78,19 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <AppBottomSheetTouchableWrapper
+            disabled={props.loading}
             onPress={() => {
               props.onPressAcceptSecret();
             }}
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>Accept Secret</Text>
+            {props.loading && props.loading==true ? 
+              <ActivityIndicator size="small" />
+              : <Text style={styles.proceedButtonText}>Accept Secret</Text>
+            }
           </AppBottomSheetTouchableWrapper>
           <AppBottomSheetTouchableWrapper
+            disabled={props.loading}
             onPress={() => props.onPressRejectSecret()}
             style={{
               height: wp("13%"),

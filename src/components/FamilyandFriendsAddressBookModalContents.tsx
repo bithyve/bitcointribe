@@ -161,7 +161,7 @@ export default function FamilyandFriendsAddressBookModalContents(props) {
                             return <AppBottomSheetTouchableWrapper onPress={() => onContactSelect(index)} style={styles.contactView} >
                                 <RadioButton size={15} color={Colors.lightBlue} borderColor={Colors.borderColor} isChecked={selectedContact.id && selectedContact.id == value.id ? true : false} onpress={() => onContactSelect(index)} />
                                 <Text style={styles.contactText}>
-                                    {value.name.split(' ')[0]} <Text style={{ fontFamily: Fonts.FiraSansMedium }}>{value.name.split(' ')[1]}</Text>
+                                    {value.name && value.name.split(' ')[0] ? value.name.split(' ')[0] : ""} <Text style={{ fontFamily: Fonts.FiraSansMedium }}>{value.name && value.name.split(' ')[1] ? value.name.split(' ')[1]: ""}</Text>
                                 </Text>
                             </AppBottomSheetTouchableWrapper>
                         }

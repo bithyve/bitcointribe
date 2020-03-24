@@ -9,9 +9,10 @@ import coinselect from 'coinselect';
 import config from '../../Config';
 import { Transactions } from '../Interface';
 
-const { BH_AXIOS, HEXA_ID } = config;
-const { TESTNET, MAINNET } = config.API_URLS;
+const { API_URLS, REQUEST_TIMEOUT } = config;
+const { TESTNET, MAINNET } = API_URLS;
 
+const bitcoinAxios = axios.create({ timeout: REQUEST_TIMEOUT });
 export default class Bitcoin {
   public network: bitcoinJS.Network;
   public client: Client;
@@ -133,7 +134,7 @@ export default class Bitcoin {
     let res: AxiosResponse;
     if (this.network === bitcoinJS.networks.testnet) {
       try {
-        res = await axios.get(
+        res = await bitcoinAxios.get(
           `${TESTNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
         );
       } catch (err) {
@@ -146,7 +147,7 @@ export default class Bitcoin {
     } else {
       // throttled endPoint (required: full node/corresponding paid service));
       try {
-        res = await axios.get(
+        res = await bitcoinAxios.get(
           `${MAINNET.BALANCE_CHECK}${address}/balance?token=${config.TOKEN}`,
         );
       } catch (err) {
@@ -191,14 +192,14 @@ export default class Bitcoin {
     try {
       if (this.network === bitcoinJS.networks.testnet) {
         // throw new Error("fabricated error");
-        res = await axios.post(
+        res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCE,
           {
             addresses,
           },
         );
       } else {
-        res = await axios.post(
+        res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCE,
           {
             addresses,
@@ -233,13 +234,97 @@ export default class Bitcoin {
   public fetchAddressInfo = async (address: string): Promise<any> => {
     // fetches information corresponding to the  supplied address (including txns)
     if (this.network === bitcoinJS.networks.testnet) {
-      return await axios.get(
+      return await bitcoinAxios.get(
         `${TESTNET.BASE}/addrs/${address}/full?token=${config.TOKEN}`,
       );
     } else {
-      return await axios.get(
+      return await bitcoinAxios.get(
         `${MAINNET.BASE}/addrs/${address}/full?token=${config.TOKEN}`,
       );
+    }
+  };
+
+  public fetchBalanceTransactionsByAddresses = async (
+    addresses: string[],
+    accountType: string,
+  ): Promise<{
+    balances: { balance: number; unconfirmedBalance: number };
+    transactions: Transactions;
+  }> => {
+    let res: AxiosResponse;
+    try {
+      if (this.network === bitcoinJS.networks.testnet) {
+        res = await bitcoinAxios.post(
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCETXN,
+          {
+            addresses,
+          },
+        );
+      } else {
+        res = await bitcoinAxios.post(
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCETXN,
+          {
+            addresses,
+          },
+        );
+      }
+
+      const { Balance, Txs } = res.data;
+      const balances = {
+        balance: Balance.Balance,
+        unconfirmedBalance: Balance.UnconfirmedBalance,
+      };
+
+      const transactions: Transactions = {
+        totalTransactions: 0,
+        confirmedTransactions: 0,
+        unconfirmedTransactions: 0,
+        transactionDetails: [],
+      };
+
+      const addressesInfo = Txs;
+      const txMap = new Map();
+      for (const addressInfo of addressesInfo) {
+        console.log(
+          `Appending transactions corresponding to ${addressInfo.Address}`,
+        );
+        if (addressInfo.TotalTransactions === 0) {
+          continue;
+        }
+        transactions.totalTransactions += addressInfo.TotalTransactions;
+        transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
+        transactions.unconfirmedTransactions +=
+          addressInfo.UnconfirmedTransactions;
+
+        addressInfo.Transactions.forEach(tx => {
+          if (!txMap.has(tx.txid)) {
+            // check for duplicate tx (fetched against sending and  then again for change address)
+            txMap.set(tx.txid, true);
+            this.categorizeTx(tx, addresses, accountType);
+            transactions.transactionDetails.push({
+              txid: tx.txid,
+              confirmations: tx.NumberofConfirmations,
+              status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
+              fee: tx.fee,
+              date: tx.Status.block_time
+                ? new Date(tx.Status.block_time * 1000).toUTCString()
+                : new Date(Date.now()).toUTCString(),
+              transactionType: tx.transactionType,
+              amount: tx.amount,
+              accountType: tx.accountType,
+              recipientAddresses: tx.recipientAddresses,
+              senderAddresses: tx.senderAddresses,
+            });
+          }
+        });
+      }
+
+      return { balances, transactions };
+    } catch (err) {
+      console.log(
+        `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+      );
+      throw new Error('Fetching balance-txn by addresses failed');
     }
   };
 
@@ -303,14 +388,14 @@ export default class Bitcoin {
       let res: AxiosResponse;
       try {
         if (this.network === bitcoinJS.networks.testnet) {
-          res = await axios.post(
+          res = await bitcoinAxios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
               addresses,
             },
           );
         } else {
-          res = await axios.post(
+          res = await bitcoinAxios.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
             {
               addresses,
@@ -330,10 +415,21 @@ export default class Bitcoin {
         if (addressInfo.TotalTransactions === 0) {
           continue;
         }
-        transactions.totalTransactions += addressInfo.TotalTransactions;
         transactions.confirmedTransactions += addressInfo.ConfirmedTransactions;
         transactions.unconfirmedTransactions +=
           addressInfo.UnconfirmedTransactions;
+
+        if (
+          addressInfo.ConfirmedTransactions +
+            addressInfo.UnconfirmedTransactions >
+          addressInfo.totalTransactions
+        ) {
+          transactions.totalTransactions +=
+            addressInfo.ConfirmedTransactions +
+            addressInfo.UnconfirmedTransactions;
+        } else {
+          transactions.totalTransactions += addressInfo.TotalTransactions;
+        }
 
         addressInfo.Transactions.forEach(tx => {
           if (!txMap.has(tx.txid)) {
@@ -414,14 +510,14 @@ export default class Bitcoin {
       let res: AxiosResponse;
       try {
         if (this.network === bitcoinJS.networks.testnet) {
-          res = await axios.post(
+          res = await bitcoinAxios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
               addresses,
             },
           );
         } else {
-          res = await axios.post(
+          res = await bitcoinAxios.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
             {
               addresses,
@@ -459,65 +555,42 @@ export default class Bitcoin {
     }
   };
 
-  public fundTestNetAddress = async (address: string) => {
-    const funderAddress = '2N6aazKqLgqBRLisjeEU1DoLuieoZbDmiB8';
-    const funderPriv = 'cSB5QV1Tesqtou1FDZhgfKYiEH4m55H1jT1xM8hu9xKNzWSFFgAR';
-    const { balanceData } = await this.getBalance(funderAddress);
-    const { final_balance } = balanceData;
-    if (final_balance < 7000) {
-      throw new Error('Funding address is out of funds');
-    }
-    const transfer = {
-      senderAddress: funderAddress,
-      recipientAddress: address,
-      amount: 6000,
-    };
+  // public fundTestNetAddress = async (address: string) => {
+  //   const funderAddress = '2N6aazKqLgqBRLisjeEU1DoLuieoZbDmiB8';
+  //   const funderPriv = 'cSB5QV1Tesqtou1FDZhgfKYiEH4m55H1jT1xM8hu9xKNzWSFFgAR';
+  //   const { balanceData } = await this.getBalance(funderAddress);
+  //   const { final_balance } = balanceData;
+  //   if (final_balance < 7000) {
+  //     throw new Error('Funding address is out of funds');
+  //   }
+  //   const transfer = {
+  //     senderAddress: funderAddress,
+  //     recipientAddress: address,
+  //     amount: 6000,
+  //   };
 
-    const txnObj = await this.createTransaction(
-      transfer.senderAddress,
-      transfer.recipientAddress,
-      transfer.amount,
-    );
-    console.log('---- Transaction Created ----');
+  //   const txnObj = await this.createTransaction(
+  //     transfer.senderAddress,
+  //     transfer.recipientAddress,
+  //     transfer.amount,
+  //   );
+  //   console.log('---- Transaction Created ----');
 
-    const keyPair = this.getKeyPair(funderPriv);
-    const p2sh = this.getP2SH(keyPair);
-    const txb = this.signTransaction(
-      txnObj.inputs,
-      txnObj.txb,
-      [keyPair],
-      p2sh.redeem.output,
-    );
-    console.log('---- Transaction Signed ----');
+  //   const keyPair = this.getKeyPair(funderPriv);
+  //   const p2sh = this.getP2SH(keyPair);
+  //   const txb = this.signTransaction(
+  //     txnObj.inputs,
+  //     txnObj.txb,
+  //     [keyPair],
+  //     p2sh.redeem.output,
+  //   );
+  //   console.log('---- Transaction Signed ----');
 
-    const txHex = txb.build().toHex();
-    const res = await this.broadcastTransaction(txHex);
-    console.log('---- Transaction Broadcasted ----');
-    return res;
-  };
-
-  public testnetFaucet = async (
-    recipientAddress: string,
-  ): Promise<{
-    txid: any;
-    funded: any;
-  }> => {
-    // const amount = Math.trunc(Math.random() * 1e5) / 1e8;
-    const amount = 10000 / 1e8;
-    let res: AxiosResponse;
-    try {
-      res = await BH_AXIOS.post('/testnetFaucet', {
-        HEXA_ID,
-        recipientAddress,
-        amount,
-      });
-    } catch (err) {
-      throw new Error(err.response.data.err);
-    }
-
-    const { txid, funded } = res.data;
-    return { txid, funded };
-  };
+  //   const txHex = txb.build().toHex();
+  //   const res = await this.broadcastTransaction(txHex);
+  //   console.log('---- Transaction Broadcasted ----');
+  //   return res;
+  // };
 
   public generateMultiSig = (
     required: number,
@@ -562,12 +635,12 @@ export default class Bitcoin {
 
     try {
       if (this.network === bitcoinJS.networks.testnet) {
-        const { data } = await axios.get(
+        const { data } = await bitcoinAxios.get(
           `${TESTNET.BASE}?token=${config.TOKEN}`,
         );
         return data;
       } else {
-        const { data } = await axios.get(
+        const { data } = await bitcoinAxios.get(
           `${MAINNET.BASE}?token=${config.TOKEN}`,
         );
         return data;
@@ -589,12 +662,12 @@ export default class Bitcoin {
   > => {
     let data;
     if (this.network === bitcoinJS.networks.testnet) {
-      const res: AxiosResponse = await axios.get(
+      const res: AxiosResponse = await bitcoinAxios.get(
         `${TESTNET.UNSPENT_OUTPUTS}${address}?unspentOnly=true&token=${config.TOKEN}`,
       );
       data = res.data;
     } else {
-      const res: AxiosResponse = await axios.get(
+      const res: AxiosResponse = await bitcoinAxios.get(
         `${MAINNET.UNSPENT_OUTPUTS}${address}?unspentOnly=true&token=${config.TOKEN}`,
       );
       data = res.data;
@@ -653,13 +726,13 @@ export default class Bitcoin {
     try {
       let data;
       if (this.network === bitcoinJS.networks.testnet) {
-        const res: AxiosResponse = await axios.post(
+        const res: AxiosResponse = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXO,
           { addresses },
         );
         data = res.data;
       } else {
-        const res: AxiosResponse = await axios.post(
+        const res: AxiosResponse = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXO,
           { addresses },
         );
@@ -699,12 +772,12 @@ export default class Bitcoin {
     try {
       let data;
       if (this.network === bitcoinJS.networks.testnet) {
-        const res: AxiosResponse = await axios.get(
+        const res: AxiosResponse = await bitcoinAxios.get(
           config.ESPLORA_API_ENDPOINTS.TESTNET.TXNDETAILS + `/${txID}`,
         );
         data = res.data;
       } else {
-        const res: AxiosResponse = await axios.get(
+        const res: AxiosResponse = await bitcoinAxios.get(
           config.ESPLORA_API_ENDPOINTS.MAINNET.TXNDETAILS + `/${txID}`,
         );
         data = res.data;
@@ -719,10 +792,10 @@ export default class Bitcoin {
       let data;
       try {
         if (this.network === bitcoinJS.networks.testnet) {
-          const res = await axios.get(`${TESTNET.BASE}/txs/${txID}`);
+          const res = await bitcoinAxios.get(`${TESTNET.BASE}/txs/${txID}`);
           data = res.data;
         } else {
-          const res = await axios.get(`${MAINNET.BASE}/txs/${txID}`);
+          const res = await bitcoinAxios.get(`${MAINNET.BASE}/txs/${txID}`);
           data = res.data;
         }
         return data;
@@ -735,108 +808,47 @@ export default class Bitcoin {
     }
   };
 
-  public feeRatesPerByte = async (
-    txnPriority: string = 'high',
-  ): Promise<{
-    feePerByte: number;
-    estimatedBlocks: number;
+  public feeRatesPerByte = async (): Promise<{
+    high: { feePerByte: number; estimatedBlocks: number };
+    medium: { feePerByte: number; estimatedBlocks: number };
+    low: { feePerByte: number; estimatedBlocks: number };
   }> => {
     try {
       let rates;
       if (this.network === bitcoinJS.networks.testnet) {
-        const res: AxiosResponse = await axios.get(
+        const res: AxiosResponse = await bitcoinAxios.get(
           config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
         );
         rates = res.data;
       } else {
-        const res: AxiosResponse = await axios.get(
+        const res: AxiosResponse = await bitcoinAxios.get(
           config.ESPLORA_API_ENDPOINTS.MAINNET.TXN_FEE,
         );
         rates = res.data;
       }
 
-      txnPriority = txnPriority.toLowerCase();
-      if (txnPriority === 'high') {
-        return { feePerByte: Math.round(rates['2']), estimatedBlocks: 2 }; // high: within 2 blocks
-      } else if (txnPriority === 'medium') {
-        return { feePerByte: Math.round(rates['4']), estimatedBlocks: 4 }; // medium: within 4 blocks
-      } else if (txnPriority === 'low') {
-        return { feePerByte: Math.round(rates['6']), estimatedBlocks: 6 }; // low: within 6 blocks
-      }
-    } catch (err) {
-      console.log(
-        `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
-      );
-      try {
-        const chainInfo = await this.fetchChainInfo();
-        const {
-          high_fee_per_kb,
-          medium_fee_per_kb,
-          low_fee_per_kb,
-        } = chainInfo;
-        if (txnPriority === 'high') {
-          return {
-            feePerByte: Math.round(high_fee_per_kb / 1000),
-            estimatedBlocks: 2,
-          };
-        } else if (txnPriority === 'medium') {
-          return {
-            feePerByte: Math.round(medium_fee_per_kb / 1000),
-            estimatedBlocks: 4,
-          };
-        } else if (txnPriority === 'low') {
-          return {
-            feePerByte: Math.round(low_fee_per_kb / 1000),
-            estimatedBlocks: 6,
-          };
-        }
-      } catch (err) {
-        throw new Error('Falied to fetch feeRates');
-      }
-    }
-  };
+      const high = {
+        feePerByte: Math.round(rates['2'] + rates['3']) / 2,
+        estimatedBlocks: 3,
+      }; // high: within 3 blocks
 
-  public averageTransactionFee = async (
-    txnPriority: string = 'high',
-  ): Promise<{
-    averageTxFee: number;
-    feePerByte: number;
-    estimatedBlocks: number;
-  }> => {
-    const { feePerByte, estimatedBlocks } = await this.feeRatesPerByte(
-      txnPriority,
-    );
-    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
-    const inputUTXOSize = 147; // in bytes
+      const medium = {
+        feePerByte: Math.round((rates['4'] + rates['5'] + rates['6']) / 3),
+        estimatedBlocks: 8,
+      }; // medium: within 8 blocks
 
-    // calculating fee considering 2 inputs per transaction
-    const averageTxFee = (averageTxSize + inputUTXOSize) * feePerByte;
-    return { averageTxFee, feePerByte, estimatedBlocks };
-  };
+      const low = {
+        feePerByte: Math.round((rates['6'] + rates['10'] + rates['20']) / 3),
+        estimatedBlocks: 12,
+      }; // low: within 12 blocks
 
-  public getStaticFee = async () => {
-    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
-    const inputUTXOSize = 147; // in bytes
-
-    try {
-      let rates;
-      if (this.network === bitcoinJS.networks.testnet) {
-        const res: AxiosResponse = await axios.get(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.TXN_FEE,
-        );
-        rates = res.data;
-      } else {
-        const res: AxiosResponse = await axios.get(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.TXN_FEE,
-        );
-        rates = res.data;
-      }
-
-      return {
-        high: Math.round((averageTxSize + inputUTXOSize) * rates['2']),
-        medium: Math.round((averageTxSize + inputUTXOSize) * rates['4']),
-        low: Math.round((averageTxSize + inputUTXOSize) * rates['6']),
+      const feeRatesByPriority = {
+        high,
+        medium,
+        low,
       };
+
+      return feeRatesByPriority;
     } catch (err) {
       console.log(
         `Fee rates fetching failed @Bitcoin core: ${err}, using blockcypher fallback`,
@@ -848,21 +860,64 @@ export default class Bitcoin {
           medium_fee_per_kb,
           low_fee_per_kb,
         } = chainInfo;
-        return {
-          high: Math.round(
-            (averageTxSize + inputUTXOSize) * (high_fee_per_kb / 1000),
-          ),
-          medium: Math.round(
-            (averageTxSize + inputUTXOSize) * (medium_fee_per_kb / 1000),
-          ),
-          low: Math.round(
-            (averageTxSize + inputUTXOSize) * (low_fee_per_kb / 1000),
-          ),
+
+        const high = {
+          feePerByte: Math.round(high_fee_per_kb / 1000),
+          estimatedBlocks: 2,
         };
+        const medium = {
+          feePerByte: Math.round(medium_fee_per_kb / 1000),
+          estimatedBlocks: 4,
+        };
+        const low = {
+          feePerByte: Math.round(low_fee_per_kb / 1000),
+          estimatedBlocks: 6,
+        };
+
+        const feeRatesByPriority = {
+          high,
+          medium,
+          low,
+        };
+        return feeRatesByPriority;
       } catch (err) {
         throw new Error('Falied to fetch feeRates');
       }
     }
+  };
+
+  public averageTransactionFee = async () => {
+    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
+    const inputUTXOSize = 147; // in bytes
+
+    const feeRatesByPriority = await this.feeRatesPerByte();
+
+    return {
+      high: {
+        averageTxFee: Math.round(
+          (averageTxSize + inputUTXOSize) *
+            feeRatesByPriority['high'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['high'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
+      },
+      medium: {
+        averageTxFee: Math.round(
+          (averageTxSize + inputUTXOSize) *
+            feeRatesByPriority['medium'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['medium'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
+      },
+      low: {
+        averageTxFee: Math.round(
+          (averageTxSize + inputUTXOSize) *
+            feeRatesByPriority['low'].feePerByte,
+        ),
+        feePerByte: feeRatesByPriority['low'].feePerByte,
+        estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
+      },
+    };
   };
 
   public isValidAddress = (address: string): boolean => {
@@ -895,54 +950,54 @@ export default class Bitcoin {
     }
   };
 
-  public createTransaction = async (
-    senderAddress: string,
-    recipientAddress: string,
-    amount: number,
-    nSequence?: number,
-    txnPriority?: string,
-  ): Promise<{
-    inputs: object[];
-    txb: bitcoinJS.TransactionBuilder;
-    fee: number;
-  }> => {
-    console.log({ senderAddress });
-    const res = await this.multiFetchUnspentOutputs([senderAddress]);
-    const inputUTXOs = res.UTXOs;
-    console.log('Fetched the inputs');
-    const outputUTXOs = [{ address: recipientAddress, value: amount }];
+  // public createTransaction = async (
+  //   senderAddress: string,
+  //   recipientAddress: string,
+  //   amount: number,
+  //   nSequence?: number,
+  //   txnPriority?: string,
+  // ): Promise<{
+  //   inputs: object[];
+  //   txb: bitcoinJS.TransactionBuilder;
+  //   fee: number;
+  // }> => {
+  //   console.log({ senderAddress });
+  //   const res = await this.multiFetchUnspentOutputs([senderAddress]);
+  //   const inputUTXOs = res.UTXOs;
+  //   console.log('Fetched the inputs');
+  //   const outputUTXOs = [{ address: recipientAddress, value: amount }];
 
-    const { feePerByte } = await this.feeRatesPerByte(txnPriority);
+  //   const { feePerByte } = await this.feeRatesPerByte(txnPriority);
 
-    const { inputs, outputs, fee } = coinselect(
-      inputUTXOs,
-      outputUTXOs,
-      feePerByte,
-    );
-    console.log('-------Transaction--------');
-    console.log('\tFee', fee);
-    console.log('\tInputs:', inputs);
-    console.log('\tOutputs:', outputs);
+  //   const { inputs, outputs, fee } = coinselect(
+  //     inputUTXOs,
+  //     outputUTXOs,
+  //     feePerByte,
+  //   );
+  //   console.log('-------Transaction--------');
+  //   console.log('\tFee', fee);
+  //   console.log('\tInputs:', inputs);
+  //   console.log('\tOutputs:', outputs);
 
-    const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
-      this.network,
-    );
+  //   const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
+  //     this.network,
+  //   );
 
-    inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
-    outputs.forEach(output => {
-      if (!output.address) {
-        output.address = senderAddress;
-      }
-      console.log('Added Output:', output);
-      txb.addOutput(output.address, output.value);
-    });
+  //   inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
+  //   outputs.forEach(output => {
+  //     if (!output.address) {
+  //       output.address = senderAddress;
+  //     }
+  //     console.log('Added Output:', output);
+  //     txb.addOutput(output.address, output.value);
+  //   });
 
-    return {
-      inputs,
-      txb,
-      fee,
-    };
-  };
+  //   return {
+  //     inputs,
+  //     txb,
+  //     fee,
+  //   };
+  // };
 
   public signTransaction = (
     inputs: any,
@@ -1005,7 +1060,7 @@ export default class Bitcoin {
     try {
       let res: AxiosResponse;
       if (this.network === bitcoinJS.networks.testnet) {
-        res = await axios.post(
+        res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
           txHex,
           {
@@ -1013,7 +1068,7 @@ export default class Bitcoin {
           },
         );
       } else {
-        res = await axios.post(
+        res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
           txHex,
           {
@@ -1029,9 +1084,9 @@ export default class Bitcoin {
       try {
         let res: AxiosResponse;
         if (this.network === bitcoinJS.networks.testnet) {
-          res = await axios.post(TESTNET.BROADCAST, { hex: txHex });
+          res = await bitcoinAxios.post(TESTNET.BROADCAST, { hex: txHex });
         } else {
-          res = await axios.post(MAINNET.BROADCAST, { hex: txHex });
+          res = await bitcoinAxios.post(MAINNET.BROADCAST, { hex: txHex });
         }
 
         const { txid } = res.data;
@@ -1058,10 +1113,14 @@ export default class Bitcoin {
 
   public decodeTransaction = async (txHash: string): Promise<void> => {
     if (this.network === bitcoinJS.networks.testnet) {
-      const { data } = await axios.post(TESTNET.TX_DECODE, { hex: txHash });
+      const { data } = await bitcoinAxios.post(TESTNET.TX_DECODE, {
+        hex: txHash,
+      });
       console.log(JSON.stringify(data, null, 4));
     } else {
-      const { data } = await axios.post(MAINNET.TX_DECODE, { hex: txHash });
+      const { data } = await bitcoinAxios.post(MAINNET.TX_DECODE, {
+        hex: txHash,
+      });
       console.log(JSON.stringify(data, null, 4));
     }
   };

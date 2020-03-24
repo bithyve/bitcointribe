@@ -1,115 +1,171 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
+  AsyncStorage,
   PermissionsAndroid,
   Platform,
   Alert,
-  FlatList,
   TextInput,
-  SafeAreaView
-} from "react-native";
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
+  SafeAreaView,
+} from 'react-native';
+import Colors from '../common/Colors';
+import Fonts from '../common/Fonts';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import RadioButton from "../components/RadioButton";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import * as ExpoContacts from "expo-contacts";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import RadioButton from '../components/RadioButton';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import * as ExpoContacts from 'expo-contacts';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-
-async function requestContactsPermission() {
-  try {
-    global.isContactOpen = true;
-    await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
-      {
-        title: "Contacts Permission",
-        message: "Please grant permission to read contacts on your device",
-        buttonNeutral: "Ask Me Later",
-        buttonNegative: "Cancel",
-        buttonPositive: "OK"
-      }
-    );
-    return PermissionsAndroid.RESULTS.GRANTED;
-  } catch (err) {
-    console.warn(err);
-  }
-}
+import { FlatList } from "react-native-gesture-handler";
+import * as Permissions from 'expo-permissions';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
+import Toast from "../components/Toast";
 
 export default function ContactList(props) {
-  const [selectedContacts, setSelectedContacts] = useState([]);
+  let [selectedContacts, setSelectedContacts] = useState([]);
   const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
-  const [radioOnOff, setRadioOnOff] = useState(false);
-  const [contactData, setContactData] = useState([]);
-  const [alphabetsList] = useState([
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-    "Q",
-    "R",
-    "S",
-    "T",
-    "U",
-    "V",
-    "W",
-    "X",
-    "Y",
-    "Z"
-  ]);
-  const [searchBox, setSearchBox] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
-
-  const getContactsAsync = async () => {
-    if (Platform.OS === "android") {
-      if (!(await requestContactsPermission())) {
-        Alert.alert("Cannot select trusted contacts; permission denied");
-        return;
+  const [radioOnOff, setRadioOnOff] = useState(false);
+  const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
+  const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
+  const [
+    contactListErrorBottomSheet,
+    setcontactListErrorBottomSheet,
+  ] = useState(React.createRef());
+  const selectectcontactlist = props.selectedContacts ? props.selectedContacts : [];
+  const [contactData, setContactData] = useState([]);
+  
+  useEffect(() => {
+    if(props.selectedContacts){
+      setSelectedContacts(selectectcontactlist);
+      for (let i = 0; i < filterContactData.length; i++) {
+        if (
+          props.selectedContacts.findIndex(value => value.id == filterContactData[i].id) > -1
+        ) {
+          filterContactData[i].checked = true;
+        } else {
+          filterContactData[i].checked = false;
+        }
       }
+      setRadioOnOff(!radioOnOff);
+      setFilterContactData(filterContactData);
+      props.onSelectContact(selectectcontactlist);
     }
-   
-    ExpoContacts.getContactsAsync().then(({ data }) => {
-      if (!data.length) Alert.alert("No contacts found!");
+  },[selectectcontactlist, filterContactData]);
+
+  const requestContactsPermission = async () => {
+    try {
+      let isContactOpen=false;
+      AsyncStorage.getItem('isContactOpen', (err, value) => {
+        if (err) console.log(err)
+         else {
+          isContactOpen = JSON.parse(value)
+        }
+        });
+        if (!isContactOpen) {
+          await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
+        }
+        const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS);
+        return result;
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+  
+
+  const getContact = () => {
+    ExpoContacts.getContactsAsync().then(async ({ data }) => {
+      if (!data.length) {
+        //Alert.alert('No contacts found!');
+        setErrorMessage('No contacts found. Please add contacts to your address book and try again');
+        (contactListErrorBottomSheet as any).current.snapTo(1);
+      }
       setContactData(data);
-        const contactList = data
-        .sort(function (a, b) {
-          if(a.name && b.name){
-            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-          }
-          return 0;
-        })
+      await AsyncStorage.setItem('ContactData', JSON.stringify(data));
+      const contactList = data.sort(function(a, b) {
+        if (a.name && b.name) {
+          if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+        }
+        return 0;
+      });
       setFilterContactData(contactList);
     });
   }
+  
+  const getContactsAsync = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await requestContactsPermission();
+        console.log("GRANTED", granted);
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          (contactListErrorBottomSheet as any).current.snapTo(1);
+          setContactPermissionAndroid(false);
+          return;
+        } else {
+          getContact();
+    }
+  } else if(Platform.OS === 'ios'){
+    const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
+    if (status === 'denied') {
+      setContactPermissionIOS(false);
+      setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+      (contactListErrorBottomSheet as any).current.snapTo(1);
+      return;
+    } else {
+      getContact();
+    }
+  }
+  };
 
   useEffect(() => {
+    (async () => {
+     await AsyncStorage.getItem('ContactData', (err, value) => {
+        if (err) console.log("ERROR in COntactData",err)
+         else {
+         let data = JSON.parse(value);
+         if(data && data.length){
+          setContactData(data);
+          const contactList = data.sort(function(a, b) {
+           if (a.name && b.name) {
+             if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+             if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+           }
+           return 0;
+         });
+         setFilterContactData(contactList);
+         }
+        }
+    });
+
+
+      let isContactOpen=false;
+      AsyncStorage.getItem('isContactOpen', (err, value) => {
+      if (err) console.log(err)
+       else {
+        isContactOpen = JSON.parse(value)
+      }
+  });
+      if (!isContactOpen) {
+        await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
+      }
+    })();
     getContactsAsync();
-    setSearchBox('');
   }, []);
 
-  const filterContacts = (keyword) => {
-    console.log("contactData.length", contactData);
+  const filterContacts = keyword => {
+    console.log('contactData.length', contactData);
     if (contactData.length > 0) {
       if (!keyword.length) {
         setFilterContactData(contactData);
@@ -118,32 +174,45 @@ export default function ContactList(props) {
       let isFilter = true;
       let filterContactsForDisplay = [];
       for (let i = 0; i < contactData.length; i++) {
-       if (contactData[i].name && contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())) {
-            filterContactsForDisplay.push(contactData[i])
-          }
-        
+        if (
+          contactData[i].name &&
+          contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())
+        ) {
+          filterContactsForDisplay.push(contactData[i]);
+        }
       }
       setFilterContactData(filterContactsForDisplay);
     } else {
       return;
     }
-  }
-
+  };
 
   function onContactSelect(index) {
-    let contacts = filterContactData;
-    if (contacts[index].checked) {
-      selectedContacts.splice(
-        selectedContacts.findIndex(temp => temp.id == contacts[index].id),
-        1
-      );
-    } else {
-      if (selectedContacts.length === 2) {
-        selectedContacts.pop();
-      }
-      selectedContacts.push(contacts[index]);
+    if(selectedContacts.length==2 && !props.isTrustedContact){
+      Toast("Please remove one or more selected contacts to select a new one.");
+      return;
     }
-
+    let contacts = filterContactData;
+    if(props.isTrustedContact){
+      if (contacts[index].checked) {
+        selectedContacts=[];
+      } else {
+        selectedContacts[0]=contacts[index];
+      }
+    }
+    else{
+      if (contacts[index].checked) {
+        selectedContacts.splice(
+          selectedContacts.findIndex(temp => temp.id == contacts[index].id),
+          1
+        );
+      } else {
+        if (selectedContacts.length === 2) {
+          selectedContacts.pop();
+        }
+        selectedContacts.push(contacts[index]);
+      }
+    }
     setSelectedContacts(selectedContacts);
     for (let i = 0; i < contacts.length; i++) {
       if (
@@ -154,8 +223,8 @@ export default function ContactList(props) {
         contacts[i].checked = false;
       }
     }
-    setFilterContactData(contacts);
     setRadioOnOff(!radioOnOff);
+    setFilterContactData(contacts);
     props.onSelectContact(selectedContacts);
   }
 
@@ -167,7 +236,7 @@ export default function ContactList(props) {
     }
     selectedContacts.splice(
       selectedContacts.findIndex(temp => temp.id == value.id),
-      1
+      1,
     );
     setSelectedContacts(selectedContacts);
     setRadioOnOff(!radioOnOff);
@@ -175,22 +244,83 @@ export default function ContactList(props) {
   }
 
   const addContact = async() => {
-    var newPerson = {
-      displayName: ""
-    }
-    Contacts.openContactForm(newPerson, (err, contact) => {
-      if (err) throw err;
-      console.log("contact",contact);
-      if(contact){
-        getContactsAsync();
-        setSearchBox('');
+      if (Platform.OS === 'android') {
+        const granted = await requestContactsPermission();
+        console.log("GRANTED", granted);
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          (contactListErrorBottomSheet as any).current.snapTo(1);
+          setContactPermissionAndroid(false);
+          return;
+        } else {
+          var newPerson = {
+            displayName: '',
+          };
+          console.log('contact permission granted');
+          Contacts.openContactForm(newPerson, (err, contact) => {
+            if (err) return;
+            if (contact) {
+              console.log("contact",contact);
+              getContactsAsync();
+            }
+          });
+        }
+      } else if(Platform.OS === 'ios'){
+        const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
+        if (status === 'denied') {
+          setContactPermissionIOS(false);
+          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          (contactListErrorBottomSheet as any).current.snapTo(1);
+          return;
+        } else {
+          var newPerson = {
+            displayName: '',
+          };
+          Contacts.openContactForm(newPerson, (err, contact) => {
+              if (err) return;
+              if (contact) {
+                console.log("contact",contact);
+                getContactsAsync();
+              }
+            });
+        }
       }
-    })
-  }
- 
+    }
+
+    const renderContactListErrorModalContent = useCallback(() => {
+      return (
+        <ErrorModalContents
+          modalRef={contactListErrorBottomSheet}
+          title={'Error while accessing your contacts '}
+          info={errorMessage}
+          proceedButtonText={'Open Setting'}
+          isIgnoreButton={true}
+          onPressProceed={() => {
+            (contactListErrorBottomSheet as any).current.snapTo(0);
+          }}
+          onPressIgnore={() => {
+            (contactListErrorBottomSheet as any).current.snapTo(0);
+          }}
+          isBottomImage={true}
+          bottomImage={require('../assets/images/icons/errorImage.png')}
+        />
+      );
+    }, [errorMessage]);
+  
+    const renderContactListErrorModalHeader = useCallback(() => {
+      return (
+        <ModalHeader
+          onPressHeader={() => {
+            (contactListErrorBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }, []);
+  
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, ...props.style }}>
+        <SafeAreaView style={{ flex: 0 }} />
         <View style={styles.selectedContactContainer}>
           {selectedContacts.length > 0 ? selectedContacts.map(value => {
             return(
@@ -207,35 +337,50 @@ export default function ContactList(props) {
             </View>
           )}): null}
         </View>
-        <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto', marginRight: 10, padding: 10}} onPress={() => addContact()}>
-          <Text style={{fontSize: RFValue(13, 812),
-    fontFamily: Fonts.FiraSansRegular}} onPress={() => addContact()}>Add contact</Text>
+        <AppBottomSheetTouchableWrapper
+          style={{ marginLeft: 'auto', marginRight: 10, padding: 10 }}
+          onPress={() => addContact()}
+        >
+          <Text
+            style={{
+              fontSize: RFValue(13, 812),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+            onPress={() => addContact()}
+          >
+            Add contact
+          </Text>
         </AppBottomSheetTouchableWrapper>
         <View style={[styles.searchBoxContainer]}>
           <View style={styles.searchBoxIcon}>
-            <EvilIcons style={{ alignSelf: 'center' }} name="search" size={20} color={Colors.textColorGrey} />
+            <EvilIcons
+              style={{ alignSelf: 'center' }}
+              name="search"
+              size={20}
+              color={Colors.textColorGrey}
+            />
           </View>
           <TextInput
-            ref={element => setSearchBox(element)}
             style={styles.searchBoxInput}
+            keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
             placeholder="Search"
             placeholderTextColor={Colors.textColorGrey}
-            onChangeText={(nameKeyword) => filterContacts(nameKeyword)}
+            onChangeText={nameKeyword => filterContacts(nameKeyword)}
           />
         </View>
-        <View style={{ flex: 1, flexDirection: "row" }}>
-          <View style={{ flex: 11 }}>
-            {filterContactData ? <FlatList
+        <View style={{ flex: 1, flexDirection: 'row', position: 'relative' }}>
+          {filterContactData ? (
+            <FlatList
+              keyExtractor={(item, index) => item.id}
               data={filterContactData}
-              extraData={props.onSelectContact}
+              extraData={radioOnOff}
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => {
                 let selected = false;
-                if (
-                  selectedContacts.findIndex(temp => temp.id == item.id) > -1
-                ) {
+                if (selectedContacts.findIndex(temp => temp.id == item.id) > -1) {
                   selected = true;
                 }
+                if(item.phoneNumbers || item.emails){
                 return (
                   <AppBottomSheetTouchableWrapper
                     onPress={() => onContactSelect(index)}
@@ -246,51 +391,70 @@ export default function ContactList(props) {
                       size={15}
                       color={Colors.lightBlue}
                       borderColor={Colors.borderColor}
-                      isChecked={selected}
+                      isChecked={item.checked}
                       onpress={() => onContactSelect(index)}
                     />
                     <Text style={styles.contactText}>
-                      {item.name.split(" ")[0]}{" "}
+                      {item.name && item.name.split(' ')[0] ? item.name.split(' ')[0] : ""}{' '}
                       <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {item.name.split(" ")[1]}
+                        {item.name && item.name.split(' ')[1] ? item.name.split(' ')[1] : ""}
                       </Text>
                     </Text>
                   </AppBottomSheetTouchableWrapper>
-                )
-              }
-              }
-            /> : null}
-          </View>
-          {/* <View style={styles.contactIndexView}>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => {
+                );
+                }
+                else{
+                  return null;
+                }
               }}
-            >
-              <Text style={styles.contactIndexText}>#</Text>
-            </AppBottomSheetTouchableWrapper>
-            {alphabetsList.map(value => (
+            />
+          ) : null}
+          {/* <View style={styles.contactIndexView}>
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
-
                 }}
               >
-                <Text style={styles.contactIndexText}>{value}</Text>
+                <Text style={styles.contactIndexText}>#</Text>
               </AppBottomSheetTouchableWrapper>
-            ))}
-          </View>*/}
-        </View> 
+              {alphabetsList.map(value => (
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => {
+
+                  }}
+                >
+                  <Text style={styles.contactIndexText}>{value}</Text>
+                </AppBottomSheetTouchableWrapper>
+              ))}
+            </View>*/}
+        </View>
         {selectedContacts.length >= 1 && (
-          <View style={{marginTop:'auto',}}>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressContinue()}
-            style={styles.bottomButtonView}
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              width: wp('50%'),
+              alignSelf: 'center',
+            }}
           >
-            <Text style={styles.buttonText}>Confirm & Proceed</Text>
-          </AppBottomSheetTouchableWrapper>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressContinue()}
+              style={styles.bottomButtonView}
+            >
+              <Text style={styles.buttonText}>Confirm & Proceed</Text>
+            </AppBottomSheetTouchableWrapper>
           </View>
-         )} 
-      </View>
-    </SafeAreaView>
+        )}
+        <BottomSheet
+        enabledInnerScrolling={true}
+        ref={contactListErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderContactListErrorModalContent}
+        renderHeader={renderContactListErrorModalHeader}
+      />
+    </View>
   );
 }
 
@@ -298,80 +462,76 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13)
+    fontSize: RFValue(13),
   },
   bottomButtonView: {
     height: 50,
-    width: wp("50%"),
-    // position: "absolute",
+    width: wp('50%'),
     backgroundColor: Colors.blue,
-    // bottom: 0,
-    left: wp("25%"),
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-    marginBottom: 20
+    marginBottom: 20,
   },
   selectedContactView: {
-    width: wp("42%"),
-    height: wp("12%"),
+    width: wp('42%'),
+    height: wp('12%'),
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
     padding: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center"
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   selectedContactContainer: {
-    height: wp("20%"),
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexDirection: "row",
+    height: wp('20%'),
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   contactView: {
     height: 50,
-    alignItems: "center",
-    flexDirection: "row",
-    marginLeft: 20
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginLeft: 20,
   },
   contactText: {
     marginLeft: 10,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   contactIndexText: {
     fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   contactIndexView: {
     flex: 0.5,
-    height: "100%",
-    justifyContent: "space-evenly"
+    height: '100%',
+    justifyContent: 'space-evenly',
   },
   searchBoxContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderBottomColor: Colors.borderColor,
     borderBottomWidth: 0.5,
     marginLeft: 10,
     marginRight: 10,
     height: 40,
     justifyContent: 'center',
-
   },
   searchBoxIcon: {
     justifyContent: 'center',
-    marginBottom: -10
+    marginBottom: -10,
   },
   searchBoxInput: {
     flex: 1,
@@ -379,6 +539,6 @@ const styles = StyleSheet.create({
     color: Colors.blacl,
     borderBottomColor: Colors.borderColor,
     alignSelf: 'center',
-    marginBottom: -10
+    marginBottom: -10,
   },
 });

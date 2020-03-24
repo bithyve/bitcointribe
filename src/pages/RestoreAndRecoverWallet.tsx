@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,41 +6,51 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
-  Text
-} from "react-native";
+  Text,
+  AsyncStorage,
+  Linking
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../common/Fonts";
-import Colors from "../common/Colors";
-import { RFValue } from "react-native-responsive-fontsize";
-import BottomInfoBox from "../components/BottomInfoBox";
-import AsyncStorage from "@react-native-community/async-storage";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Fonts from '../common/Fonts';
+import Colors from '../common/Colors';
+import { RFValue } from 'react-native-responsive-fontsize';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 const RestoreAndRecoverWallet = props => {
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  }
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{ flex: 1 }}>
-        <View style={{ ...styles.viewSetupWallet, paddingTop: wp("10%") }}>
+        <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
           <Text style={styles.headerTitleText}>New Wallet</Text>
           <Text style={styles.headerInfoText}>
             The app creates a new wallet for you with accounts to start using
             right away
           </Text>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate("NewWalletName")}
+            onPress={() => props.navigation.navigate('NewWalletName')}
             style={styles.NewWalletTouchableView}
           >
             <Image
               style={styles.iconImage}
-              source={require("../assets/images/icons/icon_newwallet.png")}
+              source={require('../assets/images/icons/icon_newwallet.png')}
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
-                Start with a new Hexa Wallet
+                Start with a new Hexa wallet
               </Text>
             </View>
             <View style={styles.arrowIconView}>
@@ -48,33 +58,33 @@ const RestoreAndRecoverWallet = props => {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={15}
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: 'center' }}
               />
             </View>
           </TouchableOpacity>
         </View>
         <View style={styles.separator} />
-        <View style={{ ...styles.viewSetupWallet, paddingTop: wp("10%") }}>
+        <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
           <Text style={styles.headerTitleText}>Restore Wallet</Text>
           <Text style={styles.headerInfoText}>
-            If you previously had a Hexa wallet use this method to restore your
+            If you previously had a Hexa wallet, use this method to restore your
             wallet.
           </Text>
           <TouchableOpacity
             onPress={async () => {
-              if (await AsyncStorage.getItem("recoveryExists"))
-                props.navigation.navigate("RestoreSelectedContactsList");
-              else props.navigation.navigate("WalletNameRecovery");
+              if (await AsyncStorage.getItem('recoveryExists'))
+                props.navigation.navigate('RestoreSelectedContactsList');
+              else props.navigation.navigate('WalletNameRecovery');
             }}
             style={{
               ...styles.NewWalletTouchableView,
               paddingTop: 20,
-              paddingBottom: 20
+              paddingBottom: 20,
             }}
           >
             <Image
               style={styles.iconImage}
-              source={require("../assets/images/icons/icon_secrets.png")}
+              source={require('../assets/images/icons/icon_secrets.png')}
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>Using Recovery Secrets</Text>
@@ -84,19 +94,21 @@ const RestoreAndRecoverWallet = props => {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={15}
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: 'center' }}
               />
             </View>
           </TouchableOpacity>
         </View>
         <View style={styles.separator} />
         <View style={{ flex: 1 }}>
-          <View style={{ marginTop: "auto" }}>
+          <View style={{ marginTop: 'auto' }}>
             <BottomInfoBox
-              title={"Importing a wallet"}
+              title={"Terms of Service"}
               infoText={
-                'If you have seed words/ mnemonics from another wallet, this can be done once a Hexa wallet is created using “Import Wallet"'
+                'By proceeding to the next step, you agree to our '
               }
+              linkText={'Terms of Service'}
+              onPress={()=>openLink("https://hexawallet.io/terms-of-service/")}
             />
           </View>
         </View>
@@ -109,57 +121,57 @@ export default RestoreAndRecoverWallet;
 
 let styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   viewSetupWallet: {
-    height: wp("55%"),
-    backgroundColor: Colors.white
+    height: wp('55%'),
+    backgroundColor: Colors.white,
   },
   headerTitleText: {
     color: Colors.blue,
     fontSize: RFValue(20),
     marginLeft: 15,
     marginRight: 15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
     marginLeft: 15,
     marginRight: 15,
-    fontWeight: "normal",
+    fontWeight: 'normal',
     marginTop: 3,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   NewWalletTouchableView: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: 'row',
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   iconImage: {
-    resizeMode: "contain",
+    resizeMode: 'contain',
     width: 35,
     height: 35,
-    alignSelf: "center"
+    alignSelf: 'center',
   },
   textView: {
     marginLeft: 10,
     flex: 1,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   touchableText: {
     color: Colors.blue,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   arrowIconView: {
     marginLeft: 10,
-    justifyContent: "center",
-    alignItems: "center"
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   separator: {
     height: 4,
-    backgroundColor: Colors.backgroundColor
-  }
+    backgroundColor: Colors.backgroundColor,
+  },
 });

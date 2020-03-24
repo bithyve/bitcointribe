@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect,useCallback } from 'react';
 import {
   View,
   Image,
@@ -10,6 +10,8 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  Keyboard,
+  Platform
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -22,12 +24,26 @@ import {
   downloadMShare,
   uploadRequestedShare,
   resetRequestedShareUpload,
+  ErrorSending,
+  UploadSuccessfully,
 } from '../../store/actions/sss';
 import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommonStyle from '../../common/Styles';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function RecoveryRequestOTP(props) {
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isUploadSuccessfully = useSelector(state => state.sss.uploadSuccessfully);
+  console.log("isErrorSendingFailed", isErrorSendingFailed);
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
   const { requester, rk, otp } = recoveryRequest;
   const [passcode, setPasscode] = useState([]);
@@ -40,38 +56,119 @@ export default function RecoveryRequestOTP(props) {
     RecoveryRequestAcceptBottomSheet,
     setRecoveryRequestAcceptBottomSheet,
   ] = useState(React.createRef());
+  const [demo, setDemo] = useState(false);
 
   function onPressNumber(text, i) {
-    let tempPasscode = passcode;
-    tempPasscode[i] = text;
-    setPasscode(tempPasscode);
-  }
+    if (text.length == 6) {
+      setTimeout(() => {
+      setPasscode(Array.from(text));
+      }, 5);
+      setDemo(!demo);
+      if (passcode.join('').length == 6) {
+        Keyboard.dismiss();
+      }
+    } else {
+      let tempPasscode = passcode;
+      tempPasscode[i] = Array.from(text)[0];
+      setTimeout(() => {
+        setPasscode(tempPasscode);
+        }, 5);
+        setDemo(!demo);
+      if (passcode.join('').length == 6) {
+        Keyboard.dismiss();
+      }
+    }
+    }
 
   const dispatch = useDispatch();
   const { loading, requestedShareUpload } = useSelector(state => state.sss);
-  const { UNDER_CUSTODY } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+  // const { UNDER_CUSTODY } = useSelector(
+  //   state => state.storage.database.DECENTRALIZED_BACKUP,
+  // );
 
   const onOTPSubmit = () => {
     if (passcode.join('').length !== 6 || !rk) return;
+    setIsConfirmDisabled(true);
     dispatch(uploadRequestedShare(requester, rk, passcode.join('')));
   };
 
   useEffect(() => {
-    if (otp) dispatch(uploadRequestedShare(requester, rk, otp));
+    if (otp) {
+      setIsConfirmDisabled(true);
+      dispatch(uploadRequestedShare(requester, rk, otp));
+    }
   }, []);
 
   useEffect(() => {
     if (requestedShareUpload[requester]) {
       if (!requestedShareUpload[requester].status) {
-        Alert.alert('Upload failed', requestedShareUpload[requester].err);
+        setTimeout(() => {
+          setErrorMessageHeader('Error sending Recovery Secret');
+          setErrorMessage(
+            'There was an error while sending your Recovery Secret, please try again in a little while',
+          );
+          setButtonText('Try again');
+          setIsConfirmDisabled(false);
+        }, 2);
+        (ErrorBottomSheet as any).current.snapTo(1);
+        //Alert.alert('Upload failed', requestedShareUpload[requester].err);
       } else {
         dispatch(resetRequestedShareUpload());
+        setIsConfirmDisabled(false);
         props.navigation.goBack();
       }
     }
   }, [requestedShareUpload]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+       modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader,buttonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if(isErrorSendingFailed){
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+      setButtonText('Try again');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
+
+  if(isUploadSuccessfully){
+    setTimeout(() => {
+      setErrorMessageHeader('Sending successful');
+      setErrorMessage(
+        'The Recovery Secret has been sent, the receiver needs to accept ',
+      );
+      setButtonText('Done');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(UploadSuccessfully(null));
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -97,21 +194,21 @@ export default function RecoveryRequestOTP(props) {
         >
           <View style={{ ...styles.otpRequestHeaderView }}>
             <Text style={styles.modalTitleText}>
-              Enter OTP to{'\n'}accept request
+              Enter OTP to accept request
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              Please enter the 6 digit OTP the owner{'\n'}of secret shared with
-              you
+              Please enter the 6 digit OTP the owner of secret shared with you
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>
             <View style={styles.passcodeTextInputView}>
-              <TextInput
-                maxLength={1}
-                keyboardType="email-address"
-                value={otp ? otp[0] : null}
+             <TextInput
+                value={passcode ? passcode[0] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
+                autoFocus={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;
@@ -122,6 +219,7 @@ export default function RecoveryRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
+                  console.log('VALUE', value);
                   onPressNumber(value, 0);
                   if (value.length >= 1) {
                     this.textInput2.focus();
@@ -136,12 +234,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[1] : null}
+                value={passcode ? passcode[1] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
                 ref={input => {
                   this.textInput2 = input;
                 }}
@@ -163,12 +261,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[2] : null}
+                value={passcode ? passcode[2] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
                 ref={input => {
                   this.textInput3 = input;
                 }}
@@ -190,12 +288,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[3] : null}
+                value={passcode ? passcode[3] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
                 ref={input => {
                   this.textInput4 = input;
                 }}
@@ -217,12 +315,12 @@ export default function RecoveryRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[4] : null}
+                value={passcode ? passcode[4] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
                 ref={input => {
                   this.textInput5 = input;
                 }}
@@ -243,12 +341,12 @@ export default function RecoveryRequestOTP(props) {
                 }}
               />
               <TextInput
-                maxLength={1}
-                value={otp ? otp[5] : null}
+                value={passcode ? passcode[5] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
-                keyboardType="email-address"
                 ref={input => {
                   this.textInput6 = input;
                 }}
@@ -278,24 +376,34 @@ export default function RecoveryRequestOTP(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              The OTP is time sensitive, please be sure to enter the OTP {'\n'}
-              shared within 10 minutes
+              The OTP is time sensitive, please be sure to enter the OTP shared within 10 minutes
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
             <TouchableOpacity
+              disabled={isConfirmDisabled}
               onPress={onOTPSubmit}
               style={{ ...styles.confirmModalButtonView }}
             >
-              {loading.uploadRequestedShare ? (
-                <ActivityIndicator size="small" />
+              {isConfirmDisabled ? (
+                <ActivityIndicator size="small" color={Colors.white} />
               ) : (
-                <Text style={styles.confirmButtonText}>Upload</Text>
+                <Text style={styles.confirmButtonText}>Send Recovery Secret</Text>
               )}
             </TouchableOpacity>
           </View>
         </View>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </SafeAreaView>
   );
 }

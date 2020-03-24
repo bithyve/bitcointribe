@@ -59,6 +59,8 @@ PODS:
     - React
   - react-native-html-to-pdf (0.8.0):
     - React
+  - react-native-in-app-utils (6.0.2):
+    - React
   - react-native-mail (4.1.0):
     - React
   - react-native-netinfo (5.2.0):
@@ -125,8 +127,6 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - RNCAsyncStorage (1.7.1):
-    - React
   - RNDeviceInfo (5.4.0):
     - React
   - RNGestureHandler (1.3.0):
@@ -180,6 +180,7 @@ DEPENDENCIES:
   - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
+  - react-native-in-app-utils (from `../node_modules/react-native-in-app-utils`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-print (from `../node_modules/react-native-print`)
@@ -199,7 +200,6 @@ DEPENDENCIES:
   - React/RCTText (from `../node_modules/react-native`)
   - React/RCTVibration (from `../node_modules/react-native`)
   - React/RCTWebSocket (from `../node_modules/react-native`)
-  - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler/RNGestureHandler.podspec`)
   - RNReanimated (from `../node_modules/react-native-reanimated/RNReanimated.podspec`)
@@ -221,7 +221,7 @@ DEPENDENCIES:
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - boost-for-react-native
     - Crashlytics
     - Fabric
@@ -282,6 +282,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-contacts"
   react-native-html-to-pdf:
     :path: "../node_modules/react-native-html-to-pdf"
+  react-native-in-app-utils:
+    :path: "../node_modules/react-native-in-app-utils"
   react-native-mail:
     :path: "../node_modules/react-native-mail"
   react-native-netinfo:
@@ -292,8 +294,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-randombytes"
   react-native-video:
     :path: "../node_modules/react-native-video"
-  RNCAsyncStorage:
-    :path: "../node_modules/@react-native-community/async-storage"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNGestureHandler:
@@ -371,12 +371,12 @@ SPEC CHECKSUMS:
   react-native-camera: 52114c432860b89986c9ee4919d00a48a6ba7abb
   react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
+  react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: d3fb9723582eb9a111c128d37f896bae88c00f99
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
-  RNCAsyncStorage: 44395cb9c7c1523104c2b499eb426ef7aff82bca
   RNDeviceInfo: c7b1dc457611b9231bb780a882102e2c93edc7af
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
@@ -397,6 +397,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: 0aa4ac3babc41b8dea15201c864175a5133e6b6e
+PODFILE CHECKSUM: a755cb1cf91ef5ed5170bf09fb7c2c1b87ed2d02
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.9.1

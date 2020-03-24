@@ -28,10 +28,9 @@ import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
 import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
-import TransactionDetails from '../pages/Accounts/TransactionDetails';
+//import TransactionDetails from '../pages/Accounts/TransactionDetails';
 import Send from '../pages/Accounts/Send';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
-import HealthCheckSecurityAnswer from '../pages/ManageBackup/HealthCheckSecurityAnswer';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import SettingManagePin from '../pages/SettingManagePin';
 import RestoreByCloudQrCodeContents from '../pages/Recovery/RestoreByCloudQrCodeContents';
@@ -57,6 +56,14 @@ import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP';
 import Confirmation from '../pages/Accounts/Confirmation';
 import TwoFASetup from '../pages/Accounts/TwoFASetup';
 import ShareRecoveryOTP from '../pages/Recovery/ShareRecoveryOTP';
+import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory';
+import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory';
+import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory';
+import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory';
+import SettingGetNewPin from '../pages/SettingGetNewPin';
+import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
+import LostTwoFA from '../pages/Accounts/LostTwoFA';
+import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -73,6 +80,7 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletUsingDocuments,
     RestoreWalletByContacts,
     RecoveryCommunication,
+    ShareRecoveryOTP,
   },
   {
     initialRouteName: 'Launch',
@@ -90,18 +98,19 @@ const MODAL_ROUTES = [
   'Cloud',
   'CustodianRequestOTP',
   'CustodianRequestAccepted',
-  'ReceivingAddress',
-  'TransactionDetails',
-  'Send',
   'TwoFAToken',
   'HealthCheckSecurityAnswer',
   'RecoveryRequestOTP',
   'Confirmation',
+  'TransactionDetails',
 ];
 
 const HomeNavigator = createStackNavigator(
   {
-    Home,
+    Home: {
+      screen: Home,
+      path: 'Home',
+    },
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {
@@ -117,10 +126,13 @@ const HomeNavigator = createStackNavigator(
     CustodianRequestOTP,
     CustodianRequestAccepted,
     ReceivingAddress,
-    TransactionDetails,
-    Send,
+    Send: {
+      screen: Send,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     TwoFAToken,
-    HealthCheckSecurityAnswer,
     RecoveryRequestOTP,
     SettingManagePin,
     RestoreByCloudQrCodeContents,
@@ -145,8 +157,15 @@ const HomeNavigator = createStackNavigator(
     GoogleAuthenticatorOTP,
     Confirmation,
     TwoFASetup,
-    ShareRecoveryOTP: {
-      screen: ShareRecoveryOTP,
+    SecondaryDeviceHistory,
+    TrustedContactHistory,
+    PersonalCopyHistory,
+    SecurityQuestionHistory,
+    SettingGetNewPin,
+    ContactsListForAssociateContact,
+    LostTwoFA,
+    PasscodeChangeSuccessPage: {
+      screen: PasscodeChangeSuccessPage,
       navigationOptions: {
         gesturesEnabled: false,
       },

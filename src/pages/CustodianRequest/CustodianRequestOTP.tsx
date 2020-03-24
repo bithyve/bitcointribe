@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -10,6 +10,8 @@ import {
   Alert,
   SafeAreaView,
   StatusBar,
+  Keyboard,
+  Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -18,15 +20,26 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { downloadMShare } from '../../store/actions/sss';
+import { downloadMShare, ErrorReceiving } from '../../store/actions/sss';
 import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CommonStyle from '../../common/Styles';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function CustodianRequestOTP(props) {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const { requester, ek, otp } = custodyRequest;
   const [passcode, setPasscode] = useState([]);
+  const [demo, setDemo] = useState(false);
   const inputRef = useRef(null);
   const [
     CustodianRequestRejectedBottomSheet,
@@ -38,10 +51,26 @@ export default function CustodianRequestOTP(props) {
   ] = useState(React.createRef());
 
   function onPressNumber(text, i) {
-    let tempPasscode = passcode;
-    tempPasscode[i] = text;
-    setPasscode(tempPasscode);
-  }
+    if (text.length == 6) {
+      setTimeout(() => {
+      setPasscode(Array.from(text));
+      }, 5);
+      setDemo(!demo);
+      if (passcode.join('').length == 6) {
+        Keyboard.dismiss();
+      }
+    } else {
+      let tempPasscode = passcode;
+      tempPasscode[i] = Array.from(text)[0];
+      setTimeout(() => {
+        setPasscode(tempPasscode);
+        }, 5);
+        setDemo(!demo);
+      if (passcode.join('').length == 6) {
+        Keyboard.dismiss();
+      }
+    }
+    }
 
   const dispatch = useDispatch();
   const { loading } = useSelector(state => state.sss);
@@ -51,8 +80,8 @@ export default function CustodianRequestOTP(props) {
   }, []);
 
   const onOTPSubmit = () => {
-    console.log('passcode', passcode.join(''));
     if (passcode.join('').length !== 6 || !ek) return;
+    setIsConfirmDisabled(true);
     dispatch(downloadMShare(passcode.join(''), ek));
   };
 
@@ -60,16 +89,77 @@ export default function CustodianRequestOTP(props) {
     state => state.storage.database.DECENTRALIZED_BACKUP,
   );
 
+  // useEffect(() => {
+  //   if (UNDER_CUSTODY[requester]) {
+  // setTimeout(() => {
+  //   setErrorMessageHeader('Failed to store Recovery Secret');
+  //   setErrorMessage(
+  //     'You cannot be the Guardian of multiple shares from the same user',
+  //   );
+  //   setButtonText('Ok')
+  // }, 2);
+  //     (ErrorBottomSheet as any).current.snapTo(1);
+  //   } else {
+  //     if (passcode.join('').length === 6 || otp)
+  //       props.navigation.navigate('CustodianRequestAccepted', { requester });
+  //   }
+  // }, [UNDER_CUSTODY]);
+
   useEffect(() => {
+    // check for whether the share from the same wallet is under custody is done prior to landing on this page
     if (UNDER_CUSTODY[requester]) {
-      passcode.join('').length === 6 || otp
-        ? props.navigation.navigate('CustodianRequestAccepted', { requester })
-        : Alert.alert(
-            'Failed to store',
-            'You cannot custody multiple shares of the same user.',
-          );
+      if (passcode.join('').length === 6 || otp)
+        setTimeout(() => {
+          setIsConfirmDisabled(false);
+        }, 10);
+      props.navigation.navigate('CustodianRequestAccepted', { requester });
     }
   }, [UNDER_CUSTODY]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader, buttonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if (isErrorReceivingFailed) {
+    setTimeout(() => {
+      setIsConfirmDisabled(false);
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+      setButtonText('Try again');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
+
+  useEffect(() => {
+    if (!loading.downloadMetaShare) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -95,21 +185,21 @@ export default function CustodianRequestOTP(props) {
         >
           <View style={{ ...styles.otpRequestHeaderView }}>
             <Text style={styles.modalTitleText}>
-              Enter OTP to{'\n'}accept request
+              Enter OTP to accept request
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              Please enter the 6 digit OTP the owner{'\n'}of secret shared with
-              you
+              Please enter the 6 digit OTP the owner of secret shared with you
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>
             <View style={styles.passcodeTextInputView}>
               <TextInput
-                maxLength={1}
-                value={otp ? otp[0] : null}
-                keyboardType="email-address"
+                value={passcode ? passcode[0] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
+                autoFocus={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;
@@ -120,7 +210,8 @@ export default function CustodianRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,0);
+                  console.log('VALUE', value);
+                  onPressNumber(value, 0);
                   if (value.length >= 1) {
                     this.textInput2.focus();
                   }
@@ -128,17 +219,17 @@ export default function CustodianRequestOTP(props) {
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
-                    onPressNumber('',0);
+                    onPressNumber('', 0);
                   }
                 }}
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[1] : null}
-                keyboardType="email-address"
+                value={passcode ? passcode[1] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput2 = input;
@@ -152,7 +243,6 @@ export default function CustodianRequestOTP(props) {
                   onPressNumber(value, 1);
                   if (value.length >= 1) this.textInput3.focus();
                 }}
-                
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
@@ -162,11 +252,11 @@ export default function CustodianRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[2] : null}
-                keyboardType="email-address"
+                value={passcode ? passcode[2] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput3 = input;
@@ -179,7 +269,6 @@ export default function CustodianRequestOTP(props) {
                 onChangeText={value => {
                   onPressNumber(value, 2);
                   if (value.length >= 1) this.textInput4.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -190,11 +279,11 @@ export default function CustodianRequestOTP(props) {
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[3] : null}
-                keyboardType="email-address"
+                value={passcode ? passcode[3] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput4 = input;
@@ -207,7 +296,6 @@ export default function CustodianRequestOTP(props) {
                 onChangeText={value => {
                   onPressNumber(value, 3);
                   if (value.length >= 1) this.textInput5.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
@@ -215,15 +303,14 @@ export default function CustodianRequestOTP(props) {
                     onPressNumber('', 3);
                   }
                 }}
-                
               />
 
               <TextInput
-                maxLength={1}
-                value={otp ? otp[4] : null}
-                keyboardType="email-address"
+                value={passcode ? passcode[4] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput5 = input;
@@ -234,24 +321,22 @@ export default function CustodianRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,4);
+                  onPressNumber(value, 4);
                   if (value.length >= 1) this.textInput6.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
-                    onPressNumber('',4);
+                    onPressNumber('', 4);
                   }
                 }}
-                
               />
               <TextInput
-                maxLength={1}
-                value={otp ? otp[5] : null}
-                keyboardType="email-address"
+                value={passcode ? passcode[5] : ''}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
                 selectTextOnFocus={true}
-                contextMenuHidden={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput6 = input;
@@ -262,14 +347,13 @@ export default function CustodianRequestOTP(props) {
                     : styles.textBoxStyles,
                 ]}
                 onChangeText={value => {
-                  onPressNumber(value,5);
+                  onPressNumber(value, 5);
                   if (value.length >= 1) this.textInput6.focus();
-                  
                 }}
                 onKeyPress={e => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
-                    onPressNumber('',5);
+                    onPressNumber('', 5);
                   }
                 }}
               />
@@ -283,17 +367,18 @@ export default function CustodianRequestOTP(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              The OTP is time sensitive, please be sure to enter the OTP {'\n'}
-              shared within 10 minutes
+              The OTP is time sensitive, please be sure to enter the OTP shared
+              within 10 minutes
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
             <TouchableOpacity
+              disabled={isConfirmDisabled}
               onPress={onOTPSubmit}
               style={{ ...styles.confirmModalButtonView }}
             >
-              {loading.downloadMetaShare ? (
-                <ActivityIndicator size="small" />
+              {isConfirmDisabled ? (
+                <ActivityIndicator size="small" color={Colors.white} />
               ) : (
                 <Text style={styles.confirmButtonText}>Confirm</Text>
               )}
@@ -301,6 +386,16 @@ export default function CustodianRequestOTP(props) {
           </View>
         </View>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </SafeAreaView>
   );
 }

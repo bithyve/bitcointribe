@@ -14,12 +14,13 @@ import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouc
 export default function ErrorModalContents(props) {
     return (<View style={{ ...styles.modalContentContainer, height: '100%', }}>
         <View style={{ height: '100%' }}>
+           
             <View style={styles.successModalHeaderView}>
                 <Text style={styles.modalTitleText}>{props.title}{props.titleNextLine ? "\n" + props.titleNextLine : null}</Text>
-                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>{props.info}</Text>
-            </View>
+                {props.info ? <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>{props.info}</Text> : null}
+            </View> 
             <View style={styles.successModalAmountView}>
-                <Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>{props.note}{props.noteNextLine ? "\n" + props.noteNextLine : null}</Text>
+            {props.note ?<Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>{props.note}{props.noteNextLine ? "\n" + props.noteNextLine : null}</Text> : null }
             </View>
             <View style={{height: hp('18%'), flexDirection: 'row', marginTop: 'auto', alignItems: 'center', }} >
                 <AppBottomSheetTouchableWrapper
@@ -86,10 +87,7 @@ const styles = StyleSheet.create({
         marginLeft: wp('8%'),
     },
     successModalImage: {
-        width: wp('25%'),
-        height: hp('18%'),
-        marginLeft: 'auto',
-        resizeMode: "cover"
+        width: wp('30%'), height: wp('35%'), marginLeft: 'auto', resizeMode: "stretch" , marginRight: -5
     },
     proceedButtonText: {
         color: Colors.white,

@@ -24,6 +24,7 @@ import {
   transferST3,
   clearTransfer,
   fetchTransactions,
+  fetchBalanceTx,
 } from '../../store/actions/accounts';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -53,7 +54,12 @@ export default function TwoFAToken(props) {
       isSuccess={true}
       onPressViewAccount={() => {
         dispatch(clearTransfer(serviceType));
-        dispatch(fetchTransactions(serviceType));
+        // dispatch(fetchTransactions(serviceType));
+        dispatch(
+          fetchBalanceTx(serviceType, {
+            loader: true,
+          }),
+        );
         props.navigation.navigate('Accounts');
       }}
       transactionId={transfer.txid}
@@ -95,14 +101,12 @@ export default function TwoFAToken(props) {
         >
           <View style={{ ...styles.otpRequestHeaderView }}>
             <Text style={styles.modalTitleText}>
-              {'Enter OTP to'} {'\n'}
-              {'authenticate'}
+              {'Enter OTP to authenticate'}
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              {'Lorem ipsum dolor sit amet, consectetur'}
-
-              {'\n'}
-              {'adipiscing elit, sed do eiusmod tempor'}
+              {
+                'Please enter the OTP from the authenticator that you have set up'
+              }
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>
@@ -258,9 +262,9 @@ export default function TwoFAToken(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              {'Lorem ipsum dolor sit amet, consectetur adipiscing elit,'}
-              {'\n'}
-              {'sed do eiusmod tempor incididunt ut labore et dolore'}
+              {
+                'If you have not set up the authenticator yet, please see our FAQ section to see how to do it'
+              }
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
@@ -277,6 +281,21 @@ export default function TwoFAToken(props) {
               )}
             </TouchableOpacity>
           </View>
+        </View>
+        <View
+          style={{
+            alignItems: 'center',
+            marginBottom: 200,
+            marginTop: 200,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.navigate('LostTwoFA');
+            }}
+          >
+            <Text>I am having problems with my 2FA</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>

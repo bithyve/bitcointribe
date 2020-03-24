@@ -96,19 +96,20 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
     
-android {
+android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-   
+                                                
     defaultConfig {
-        applicationId "com.hexa"
+        applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1                
-        versionName "1.0.020120"        
+        versionCode 32           
+        versionName "0.7"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
-    }              
+    }                         
+                                 
      signingConfigs {      
         release {
             if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
@@ -172,7 +173,6 @@ dependencies {
     implementation project(':react-native-video')
     implementation project(':react-native-device-info')
     implementation project(':react-native-randombytes')
-    implementation project(':@react-native-community_async-storage')
     implementation project(':react-native-screens')
     implementation project(':react-native-reanimated')
     implementation project(':react-native-gesture-handler')
@@ -187,6 +187,13 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     implementation "com.facebook.react:react-native:+"  // From node_modules
     addUnimodulesDependencies()
+    // For animated GIF support
+    implementation 'com.facebook.fresco:animated-gif:1.10.0'
+    // For WebP support, including animated WebP
+    implementation 'com.facebook.fresco:animated-webp:1.10.0'
+    implementation 'com.facebook.fresco:webpsupport:1.10.0'
+    // For WebP support, without animations
+    implementation 'com.facebook.fresco:webpsupport:1.10.0'
 }  
 
 // Run this once to be able to run the application with BUCK

@@ -9,8 +9,8 @@ import {
 
 export default StyleSheet.create({
   cardIconImage: {
-    width: 12,
-    height: 14,
+    width: 14,
+    height: 16,
     resizeMode: "contain",
     marginLeft: "auto"
   },

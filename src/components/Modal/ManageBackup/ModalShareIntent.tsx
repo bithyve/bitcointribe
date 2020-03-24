@@ -1,35 +1,38 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   Image,
-  TouchableOpacity,
   FlatList,
+  Platform
 } from 'react-native';
-import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../../../src/common/Colors';
 import Fonts from '../../../../src/common/Fonts';
 import Icons from '../../../../src/common/Icons';
 import Singleton from '../../../common/Singleton';
-import ModalHeader from '../../ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
-import { useDispatch } from 'react-redux';
-import { requestSharePdf } from '../../../store/actions/manageBackup';
-import AsyncStorage from '@react-native-community/async-storage';
+import { useDispatch, useSelector } from 'react-redux';
+import { requestSharePdf,PDFSharingFailed } from '../../../store/actions/manageBackup';
+import BottomInfoBox from '../../../components/BottomInfoBox';
+import { RFValue } from 'react-native-responsive-fontsize';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../../components/ErrorModalContents';
+import ModalHeader from '../../../components/ModalHeader';
 
 export default function ModalShareIntent(props) {
-  console.log({ props });
-  const { selectedPersonalCopy } = props;
-  if (!selectedPersonalCopy) {
-    return <View style={[styles.modalContainer]}></View>;
-  }
+  const database = useSelector(state => state.storage.databaseSSS);
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isPDFSharedFailed = useSelector(state => state.manageBackup.pdfSharingFailed);
+  console.log("isPDFSharedFailed", isPDFSharedFailed);
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [arrShareOption, setArrShareOption] = useState([
     {
@@ -37,8 +40,7 @@ export default function ModalShareIntent(props) {
       title: 'Send pdf on email',
       type: 'Email',
       flagShare: false,
-      info:
-        'The pdf document is password protected with the answer to your secret question',
+      info: 'Make sure you delete the message from your sent folder',
       imageIcon: Icons.manageBackup.PersonalCopy.email,
     },
     {
@@ -46,7 +48,7 @@ export default function ModalShareIntent(props) {
       title: 'Print a copy',
       type: 'Print',
       flagShare: false,
-      info: 'Keep the printed copy (6 pages) safe',
+      info: 'Keep all the pages of the printed copy safe',
       imageIcon: Icons.manageBackup.PersonalCopy.print,
     },
     {
@@ -55,7 +57,7 @@ export default function ModalShareIntent(props) {
       type: 'Other',
       flagShare: false,
       info:
-        'The pdf document is password protected with the answer to your secret question',
+        'Make sure that you delete the message from your device once it is sent',
       imageIcon: Icons.manageBackup.PersonalCopy.icloud,
     },
   ]);
@@ -153,52 +155,91 @@ export default function ModalShareIntent(props) {
     // }
   };
 
+  const disableOrEnableOption = item => {
+    if (props.selectedPersonalCopy.type == 'copy1') {
+      return database.pdfDetails &&
+        database.pdfDetails.copy2.shareDetails.type == item.type
+        ? true
+        : false;
+    }
+    if (props.selectedPersonalCopy.type == 'copy2') {
+      return database.pdfDetails &&
+        database.pdfDetails.copy1.shareDetails.type == item.type
+        ? true
+        : false;
+    }
+    return false;
+  };
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+if(isPDFSharedFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('PDF Sharing failed');
+    setErrorMessage(
+      'There was some error while sharing the Recovery Secret, please try again',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(PDFSharingFailed(null));
+}
   return (
     <View style={[styles.modalContainer]}>
       <View
         style={{
-          flex: 0.2,
-          flexDirection: 'row',
-          borderBottomWidth: 0.5,
+          borderBottomWidth: 1,
           borderColor: Colors.borderColor,
+          flexDirection: "row",
+          paddingRight: 10,
+          paddingBottom: hp("1.5%"),
+          marginRight: 10,
+          marginBottom: hp("1.5%"),
+          paddingTop: hp("0.5%"),
+          alignItems: 'center',
+          marginLeft: 20 
         }}
       >
-        <View style={styles.headerContainer}>
-          <AppBottomSheetTouchableWrapper
-            style={styles.headerLeftIconContainer}
-            onPress={props.onPressBack}
-          >
-            <View style={styles.headerLeftIconInnerContainer}>
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </View>
-          </AppBottomSheetTouchableWrapper>
-        </View>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{ marginTop: hp('1%') }}>
-            <Text style={styles.modalHeaderTitleText}>Personal Copy</Text>
-            <Text style={styles.modalHeaderInfoText}>Select a source</Text>
-          </View>
-        </View>
+        <Text style={{color: Colors.blue, fontSize: RFValue(18), fontFamily: Fonts.FiraSansMedium}}>Store personal copy PDF</Text>
       </View>
       <View style={{ flex: 1 }}>
         <FlatList
           data={arrShareOption}
-          // onRefresh={ onRefresh }
           renderItem={({ item, index }) => (
+            <View>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
                 onShare(item);
               }}
-              // disabled={item.flagShare}
+              disabled={disableOrEnableOption(item)}
               style={[
                 styles.listElements,
-                item.flagShare == true
-                  ? { backgroundColor: '#ccc', borderRadius: 5 }
-                  : null,
+                disableOrEnableOption(item) ? 
+                { backgroundColor: Colors.borderColor }
+                : null,
               ]}
             >
               <Image
@@ -218,10 +259,29 @@ export default function ModalShareIntent(props) {
                 />
               </View>
             </AppBottomSheetTouchableWrapper>
+            <View style={{ marginLeft:20, marginRight:20, marginTop:2, marginBottom:2, height: 1,
+              backgroundColor: Colors.borderColor,}} />
+              </View>
           )}
           keyExtractor={(item, index) => index.toString()}
         />
       </View>
+      <BottomInfoBox
+        title={'Security question and answer'}
+        infoText={
+          'The answer your your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
+        }
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }
@@ -231,7 +291,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
     width: '100%',
-    paddingBottom: hp('5%'),
   },
   headerContainer: {
     flexDirection: 'row',
@@ -260,35 +319,33 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: 18,
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: 12,
+    fontSize: RFValue(12),
     marginTop: 5,
   },
   listElements: {
     flexDirection: 'row',
-    marginLeft: 20,
-    marginRight: 20,
-    borderBottomWidth: 0.5,
-    borderColor: Colors.borderColor,
+    paddingLeft: 20,
+    paddingRight: 20,
     paddingTop: 25,
     paddingBottom: 25,
-    paddingLeft: 10,
+    // paddingLeft: 10,
     alignItems: 'center',
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: 13,
+    fontSize: RFValue(13),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: 11,
+    fontSize: RFValue(11),
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,

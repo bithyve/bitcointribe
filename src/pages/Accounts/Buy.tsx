@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
-  Button,
+  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
@@ -66,8 +63,8 @@ export default function Buy(props) {
     if (!isBuyHelperDone && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isBuyHelperDone', 'true');
       setTimeout(() => {
-      BuyHelperBottomSheet.current.snapTo(1);
-    }, 1000);
+        BuyHelperBottomSheet.current.snapTo(1);
+      }, 1000);
     }
   };
 
@@ -83,12 +80,8 @@ export default function Buy(props) {
          local currency like dollar ($) or pound (£) typically through an exchange or 
         a similar service You will select the service you want to use and the account you want the
         bitcoins in. And once the process is done, the bitcoins will appear in your wallet Don’t worry you don’t need to buy Test Bitcoins in this account :)`}
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (BuyHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -97,7 +90,7 @@ export default function Buy(props) {
   const renderBuyHelperHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
+        borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);
@@ -110,71 +103,87 @@ export default function Buy(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={styles.modalContentContainer}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
-          enabled
-        >
-          <ScrollView>
-            <View style={styles.modalHeaderTitleView}>
-              <View
-                style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    if (getServiceType) {
-                      getServiceType(serviceType);
-                    }
-                    props.navigation.goBack();
+      <TouchableWithoutFeedback
+        onPress={() => {
+          BuyHelperBottomSheet.current.snapTo(0);
+        }}
+      >
+        <View style={styles.modalContentContainer}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS == 'ios' ? 'padding' : ''}
+            enabled
+          >
+            <ScrollView>
+              <View style={styles.modalHeaderTitleView}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
                   }}
-                  style={{ height: 30, width: 30, justifyContent: 'center' }}
                 >
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.blue}
-                    size={17}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.modalHeaderTitleText}>{'Buy'}</Text>
-                {serviceType == TEST_ACCOUNT ? (
-                  <Text
+                  <TouchableOpacity
                     onPress={() => {
-                      AsyncStorage.setItem('isBuyHelperDone', 'true');
-                      BuyHelperBottomSheet.current.snapTo(2);
+                      if (getServiceType) {
+                        getServiceType(serviceType);
+                      }
+                      props.navigation.goBack();
                     }}
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      marginLeft: 'auto',
-                    }}
+                    style={{ height: 30, width: 30, justifyContent: 'center' }}
                   >
-                    Know more
-                  </Text>
-                ) : null}
+                    <FontAwesome
+                      name="long-arrow-left"
+                      color={Colors.blue}
+                      size={17}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.modalHeaderTitleText}>{'Buy'}</Text>
+                  {serviceType == TEST_ACCOUNT ? (
+                    <Text
+                      onPress={() => {
+                        AsyncStorage.setItem('isBuyHelperDone', 'true');
+                        BuyHelperBottomSheet.current.snapTo(2);
+                      }}
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(12),
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      Know more
+                    </Text>
+                  ) : null}
+                </View>
               </View>
-            </View>
-            <View
-              style={{
-                alignItems: 'center',
-              }}
-            >
-              <Text>Coming Soon!</Text>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={BuyHelperBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
-          : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),hp('95%')]}
-          renderContent={renderBuyHelperContents}
-          renderHeader={renderBuyHelperHeader}
-        />
-      </View>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}
+              >
+                <Text>Coming Soon!</Text>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={BuyHelperBottomSheet}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('15%')
+                : Platform.OS == 'android'
+                ? hp('16%')
+                : hp('15%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('75%'),
+            ]}
+            renderContent={renderBuyHelperContents}
+            renderHeader={renderBuyHelperHeader}
+          />
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }

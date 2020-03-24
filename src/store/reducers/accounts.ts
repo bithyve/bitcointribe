@@ -7,6 +7,15 @@ import {
   CLEAR_TRANSFER,
   TRANSFER_ST3_EXECUTED,
   ACCOUNTS_LOADING,
+  TRANSFER_ST1_FAILED,
+  TRANSFER_ST2_FAILED,
+  TRANSFER_ST3_FAILED,
+  TESTCOINS_RECEIVED,
+  ACCOUNTS_SYNCHED,
+  EXCHANGE_RATE_CALCULATED,
+  SECONDARY_XPRIV_GENERATED,
+  ALTERNATE_TRANSFER_ST2_EXECUTED,
+  TWO_FA_RESETTED,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -30,12 +39,14 @@ const ACCOUNT_VARS: {
     executed: string;
     stage1: any;
     stage2: any;
+    stage3: any;
     txid: String;
   };
   loading: {
     receivingAddress: Boolean;
     balances: Boolean;
     transactions: Boolean;
+    balanceTx: Boolean;
     transfer: Boolean;
     testcoins: Boolean;
   };
@@ -51,19 +62,35 @@ const ACCOUNT_VARS: {
     executed: '',
     stage1: {},
     stage2: {},
+    stage3: {},
     txid: '',
   },
   loading: {
     receivingAddress: false,
     balances: false,
     transactions: false,
+    balanceTx: false,
     transfer: false,
     testcoins: false,
   },
 };
 
-const initialState = {
+const initialState: {
+  servicesEnriched: Boolean;
+  accountsSynched: Boolean;
+  exchangeRates: any;
+  REGULAR_ACCOUNT: any;
+  TEST_ACCOUNT: any;
+  SECURE_ACCOUNT: any;
+  additional?: {
+    regular?: any;
+    test?: any;
+    secure?: any;
+  };
+} = {
   servicesEnriched: false,
+  accountsSynched: false,
+  exchangeRates: null,
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
   SECURE_ACCOUNT: ACCOUNT_VARS,
@@ -82,6 +109,15 @@ export default (state = initialState, action) => {
             ...state[account].loading,
             receivingAddress: false,
           },
+        },
+      };
+
+    case TESTCOINS_RECEIVED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          service: action.payload.service,
         },
       };
 
@@ -128,6 +164,22 @@ export default (state = initialState, action) => {
         },
       };
 
+    case TRANSFER_ST1_FAILED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            stage1: { ...state[account].transfer.stage1, failed: true },
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
     case CLEAR_TRANSFER:
       return {
         ...state,
@@ -157,6 +209,7 @@ export default (state = initialState, action) => {
               },
             },
           };
+
         case SECURE_ACCOUNT:
           return {
             ...state,
@@ -175,6 +228,39 @@ export default (state = initialState, action) => {
           };
       }
 
+    case ALTERNATE_TRANSFER_ST2_EXECUTED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            txid: action.payload.result,
+            executed: 'ST2',
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
+    // case TRANSFER_ST2_FAILED:
+    //   return {
+    //     ...state,
+    //     [account]: {
+    //       ...state[account],
+    //       transfer: {
+    //         ...state[account].transfer,
+    //         stage2: { ...state[account].transfer.stage2, failed: true },
+    //       },
+    //       loading: {
+    //         ...state[account].loading,
+    //         transfer: false,
+    //       },
+    //     },
+    //   };
+
     case TRANSFER_ST3_EXECUTED:
       return {
         ...state,
@@ -184,6 +270,22 @@ export default (state = initialState, action) => {
             ...state[account].transfer,
             txid: action.payload.result,
             executing: false,
+          },
+          loading: {
+            ...state[account].loading,
+            transfer: false,
+          },
+        },
+      };
+
+    case TRANSFER_ST3_FAILED:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            stage3: { ...state[account].transfer.stage3, failed: true },
           },
           loading: {
             ...state[account].loading,
@@ -220,6 +322,38 @@ export default (state = initialState, action) => {
             [action.payload.beingLoaded]: !state[account].loading[
               action.payload.beingLoaded
             ],
+          },
+        },
+      };
+
+    case ACCOUNTS_SYNCHED:
+      return {
+        ...state,
+        accountsSynched: action.payload.synched,
+      };
+
+    case EXCHANGE_RATE_CALCULATED:
+      return {
+        ...state,
+        exchangeRates: action.payload.exchangeRates,
+      };
+
+    case SECONDARY_XPRIV_GENERATED:
+      return {
+        ...state,
+        additional: {
+          secure: {
+            xprivGenerated: action.payload.generated,
+          },
+        },
+      };
+
+    case TWO_FA_RESETTED:
+      return {
+        ...state,
+        additional: {
+          secure: {
+            twoFAResetted: action.payload.resetted,
           },
         },
       };

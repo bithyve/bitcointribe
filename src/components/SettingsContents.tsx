@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
-    ScrollView
+    AsyncStorage
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -17,15 +16,49 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import ToggleSwitch from './ToggleSwitch';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+import { FlatList } from 'react-native-gesture-handler';
 
 export default function SettingsContents(props) {
+    const [OpenCloseModal, setOpenCloseModal] = useState(false);
+    const [currencycode, setCurrencycode] = useState('');
     const [switchOn, setSwitchOn] = useState(false);
+    const [currencyList, setCurrencyList] = useState([
+        {
+            code:'USD',
+            symbol:'$'
+        },
+        {
+            code:'EUR',
+            symbol:'€'
+        },
+        {
+            code:'GBP',
+            symbol:'£'
+        },
+        {
+            code:'INR',
+            symbol:'₹'
+        },
+    ]);
+    const [selectedCurrencyCode, setSelectedCurrencyCode] = useState({code:'', symbol:''});
+
+    const setCurrencyCodeToAsync = async(item) =>{
+        setSelectedCurrencyCode(item);
+        setOpenCloseModal(false);
+        props.onPressManagePin('ManageCurrency', item.code);
+        await AsyncStorage.setItem("currencyCode", item.code);
+    }
+
+    useEffect(()=>{
+        setSelectedCurrencyCode(currencyList[currencyList.findIndex((value)=>value.code == props.currencyCode)]);
+    }, [])
+    
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+                {/* <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </AppBottomSheetTouchableWrapper>
+                </AppBottomSheetTouchableWrapper> */}
                 <Text style={styles.modalHeaderTitleText}>{"Settings"}</Text>
             </View>
         </View>
@@ -40,13 +73,13 @@ export default function SettingsContents(props) {
                     <ToggleSwitch isNotImage={true} toggleColor={Colors.lightBlue} toggleCircleColor={Colors.blue} onpress={() => { setSwitchOn(!switchOn); }} toggle={switchOn} />
                 </View>
             </View> */}
-            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManagePIn()} style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}>
+            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManagePin('ManagePin', currencycode)} style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}>
             <Image source={require('../assets/images/icons/icon_secrets.png')} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: 0, marginRight: 10 }} />
                 <View>
-                    <Text style={styles.titleText}>Manage Pin</Text>
-                    <Text style={styles.infoText}>Manage Passcode Change your passcode</Text>
+                    <Text style={styles.titleText}>Manage Passcode</Text>
+                    <Text style={styles.infoText}>Change your passcode</Text>
                 </View>
-                <View style={{width: wp('17%'), justifyContent:'center', alignItems:'center'}}>
+                <View style={{width: wp('17%'), justifyContent:'center', alignItems:'center', marginLeft: 'auto'}}>
                 <Ionicons
                     name="ios-arrow-forward"
                     color={Colors.textColorGrey}
@@ -55,6 +88,36 @@ export default function SettingsContents(props) {
                 />
                 </View>
             </AppBottomSheetTouchableWrapper>
+            <View style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}>
+            <Image source={require('../assets/images/icons/icon_secrets.png')} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: 0, marginRight: 10 }} />
+                <View>
+                    <Text style={styles.titleText}>Manage Currency</Text>
+                    <Text style={styles.infoText}>Choose your Currency</Text>
+                </View>
+                <View style={{width: wp('30%'), justifyContent:'center', alignItems:'center', marginLeft: 'auto', }}>
+                <View style={{position:'relative',}}>
+                    <AppBottomSheetTouchableWrapper onPress={()=>{
+                        setOpenCloseModal(!OpenCloseModal);
+                    }} style={{flexDirection:'row', height:wp('8%'), width:wp('30%'), alignItems:'center', paddingLeft:wp('2%'), paddingRight:wp('2%'), borderRadius:5, borderColor:Colors.blue, borderWidth:1,backgroundColor:Colors.white}}>
+                        <Text style={styles.infoText}>{selectedCurrencyCode.code ? selectedCurrencyCode.code : ''}</Text>
+                        <Text style={{...styles.infoText, marginLeft:'auto'}}>{selectedCurrencyCode.code ? selectedCurrencyCode.symbol : ''}</Text>
+                    </AppBottomSheetTouchableWrapper>
+                    {OpenCloseModal ? <View style={{position:'absolute', marginTop:wp('9%'), height:hp("10%"), borderRadius:5, borderColor:Colors.blue, borderWidth:1, backgroundColor:Colors.white, width:wp('30%'),}}>
+                        <FlatList
+                            data={currencyList}
+                            renderItem={({item, index})=>{
+                                return <AppBottomSheetTouchableWrapper onPress={()=>setCurrencyCodeToAsync(item)} style={{flexDirection:'row', height:wp('8%'), width:wp('30%'), alignItems:'center', paddingLeft:wp('2%'), paddingRight:wp('2%')}}>
+                                    <Text style={styles.infoText}>{item.code}</Text>
+                                    <Text style={{...styles.infoText, marginLeft:'auto'}}>{item.symbol}</Text>
+                                </AppBottomSheetTouchableWrapper>
+                            }}
+                            />
+                        </View>
+                    : null
+                    }
+                </View>
+                </View>
+            </View>
         </View>
         <View style={{
             flexDirection: 'row', elevation: 10,
@@ -73,9 +136,9 @@ export default function SettingsContents(props) {
             marginBottom: hp('6%'),
             borderRadius: 10
         }}>
-            <Text style={styles.addModalTitleText}>FAQ's</Text>
+            <Text style={styles.addModalTitleText}>FAQs</Text>
             <View style={{ height: 20, width: 1, backgroundColor: Colors.borderColor }} />
-            <Text style={styles.addModalTitleText}>Terms And Conditions</Text>
+            <Text style={styles.addModalTitleText}>Terms and conditions</Text>
             <View style={{ height: 20, width: 1, backgroundColor: Colors.borderColor }} />
             <Text style={styles.addModalTitleText}>Privacy Policy</Text>
         </View>

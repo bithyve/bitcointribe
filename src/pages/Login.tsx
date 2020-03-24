@@ -6,8 +6,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  Alert,
-  ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -20,13 +19,21 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
-import AsyncStorage from '@react-native-community/async-storage';
+import BottomSheet from 'reanimated-bottom-sheet';
+import LoaderModal from '../components/LoaderModal';
+import {
+  syncAccounts,
+  calculateExchangeRate,
+} from '../store/actions/accounts';
+import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
 
 export default function Login(props) {
+  let [message, setMessage] = useState('Getting the latest details');
   const [passcode, setPasscode] = useState('');
+  const [Elevation, setElevation] = useState(10);
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const onPressNumber = useCallback(
     text => {
       let tmpPasscode = passcode;
@@ -38,40 +45,190 @@ export default function Login(props) {
       }
       if (passcode && text == 'x') {
         setPasscode(passcode.slice(0, -1));
-        setCheckAuth(false)
+        setCheckAuth(false);
       }
     },
     [passcode],
   );
 
+  const DECENTRALIZED_BACKUP = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+  // const testAccService = accounts[TEST_ACCOUNT].service;
+  // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
   );
   const { dbFetched } = useSelector(state => state.storage);
+  // const [balances, setBalances] = useState({
+  //   testBalance: 0,
+  //   regularBalance: 0,
+  //   secureBalance: 0,
+  //   accumulativeBalance: 0,
+  // });
+  // const [transactions, setTransactions] = useState([]);
+
+  // useEffect(() => {
+  //   const testBalance = accounts[TEST_ACCOUNT].service
+  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+  //       accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //     : 0;
+  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
+  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+  //       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //     : 0;
+  //   const secureBalance = accounts[SECURE_ACCOUNT].service
+  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+  //       accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+  //         .unconfirmedBalance
+  //     : 0;
+  //   const accumulativeBalance = regularBalance + secureBalance;
+
+  //   const testTransactions = accounts[TEST_ACCOUNT].service
+  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+  //     : [];
+  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
+  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+  //         .transactionDetails
+  //     : [];
+
+  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
+  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+  //         .transactionDetails
+  //     : [];
+  //   const accumulativeTransactions = [
+  //     ...testTransactions,
+  //     ...regularTransactions,
+  //     ...secureTransactions,
+  //   ];
+
+  //   setBalances({
+  //     testBalance,
+  //     regularBalance,
+  //     secureBalance,
+  //     accumulativeBalance,
+  //   });
+  //   setTransactions(accumulativeTransactions);
+  // }, [accounts]);
+
+  const s3Service = useSelector(state => state.sss.service);
+  useEffect(() => {
+    // HC init and down-streaming
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+      if (healthCheckInitialized) {
+        dispatch(checkMSharesHealth());
+      }
+    }
+  }, [s3Service]);
 
   useEffect(() => {
-    const custodyRequest = props.navigation.getParam('custodyRequest');
-    const recoveryRequest = props.navigation.getParam('recoveryRequest');
-    if (isAuthenticated)
+    // HC up-streaming
+    if (DECENTRALIZED_BACKUP) {
+      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+        dispatch(updateMSharesHealth());
+      }
+    }
+  }, [DECENTRALIZED_BACKUP]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+  //     if (storedExchangeRates) {
+  //       const exchangeRates = JSON.parse(storedExchangeRates);
+  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
+  //         setExchangeRates(exchangeRates);
+  //         return;
+  //       } // maintaining an hour difference b/w fetches
+  //     }
+  //     const res = await axios.get('https://blockchain.info/ticker');
+  //     if (res.status == 200) {
+  //       const exchangeRates = res.data;
+  //       exchangeRates.lastFetched = Date.now();
+  //       setExchangeRates(exchangeRates);
+  //       await AsyncStorage.setItem(
+  //         'exchangeRates',
+  //         JSON.stringify(exchangeRates),
+  //       );
+  //     } else {
+  //       console.log('Failed to retrieve exchange rates', res);
+  //     }
+  //   })();
+  // }, []);
+
+  const custodyRequest = props.navigation.getParam('custodyRequest');
+  const recoveryRequest = props.navigation.getParam('recoveryRequest');
+
+  useEffect(() => {
+    if (isAuthenticated) {
       AsyncStorage.getItem('walletExists').then(exists => {
         if (exists) {
-          if (dbFetched)
-            props.navigation.navigate('Home', {
-              custodyRequest,
-              recoveryRequest,
-            });
+          if (dbFetched) {
+            // calculate the exchangeRate
+            dispatch(calculateExchangeRate());
+            setTimeout(() => {
+              (loaderBottomSheet as any).current.snapTo(0);
+              props.navigation.navigate('Home', {
+                custodyRequest,
+                recoveryRequest,
+              });
+            }, 2500);
+            dispatch(syncAccounts());
+          }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
+    }
   }, [isAuthenticated, dbFetched]);
 
+  const renderLoaderModalContent = useCallback(() => {
+    return (
+      <LoaderModal
+        headerText={message}
+        messageText={'This may take a few seconds'}
+      />
+    );
+  },[ message]);
+  
+  const renderLoaderModalHeader = () => {
+    return (
+      <View
+        style={{
+          marginTop: 'auto',
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          height: hp('75%'),
+          zIndex: 9999,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      />
+    );
+  };
+
+  const checkPasscode = () => {
+    if (checkAuth) {
+      (loaderBottomSheet as any).current.snapTo(0);
+      return (
+        <View style={{ marginLeft: 'auto' }}>
+          <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
+        </View>
+      );
+    }
+  };
+
   useEffect(() => {
-    authenticationFailed ? setCheckAuth(true) : setCheckAuth(false);
+    if (authenticationFailed) {
+      setCheckAuth(true);
+    } else {
+      setCheckAuth(false);
+    }
   }, [authenticationFailed]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <StatusBar />
+      <SafeAreaView style={{ flex: 0 }} />
       <View style={{ flex: 1 }}>
         <View style={{}}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
@@ -80,7 +237,7 @@ export default function Login(props) {
               Please enter your{' '}
               <Text style={styles.boldItalicText}>passcode</Text>
             </Text>
-            <View style={{alignSelf:'baseline'}}>
+            <View style={{ alignSelf: 'baseline' }}>
               <View style={styles.passcodeTextInputView}>
                 <View
                   style={[
@@ -205,28 +362,25 @@ export default function Login(props) {
                     )}
                   </Text>
                 </View>
-                
               </View>
-              {checkAuth ? (
-            <View style={{marginLeft: 'auto'}}>
-              <Text style={styles.errorText}>
-              Incorrect passcode, try again!
-              </Text>
+              {checkPasscode()}
             </View>
-          ) : null}
-            </View>
-            
           </View>
-          
+
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
+                  (loaderBottomSheet as any).current.snapTo(1);
+                  setTimeout(() => {
+                    setElevation(0);
+                  }, 2);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
                   ...styles.proceedButtonView,
+                  elevation: Elevation,
                   backgroundColor:
                     passcode.length == 4 ? Colors.blue : Colors.lightBlue,
                 }}
@@ -371,8 +525,17 @@ export default function Login(props) {
             </TouchableOpacity>
           </View>
         </View>
+        <BottomSheet
+          onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={loaderBottomSheet as any}
+          snapPoints={[-50, hp('100%')]}
+          renderContent={renderLoaderModalContent}
+          renderHeader={renderLoaderModalHeader}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -440,14 +603,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
   boldItalicText: {
@@ -458,31 +620,31 @@ const styles = StyleSheet.create({
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11, 812),
+    fontSize: RFValue(11),
     fontStyle: 'italic',
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     marginLeft: 20,
     marginTop: hp('10%'),
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(12),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular,
   },
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
   },
   passcodeTextInputView: {
     flexDirection: 'row',
     marginTop: hp('4.5%'),
     marginBottom: hp('1.5%'),
-    width: 'auto'
+    width: 'auto',
   },
 });

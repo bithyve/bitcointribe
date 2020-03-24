@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -7,8 +7,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Platform,
   AsyncStorage,
-  StatusBar,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import BackupStyles from './Styles';
@@ -23,23 +23,22 @@ import { useSelector } from 'react-redux';
 import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
-import ShareOtpWithTrustedContactContents from '../../components/ShareOtpWithTrustedContactContents';
+import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Contacts from 'react-native-contacts';
-import * as ExpoContacts from 'expo-contacts';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import {ScrollView} from "react-native-gesture-handler";
+import { ScrollView } from 'react-native-gesture-handler';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function CommunicationMode(props) {
-  // const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
-  const secretSharedTrustedContact1 = props.secretSharedTrustedContact1
-    ? props.secretSharedTrustedContact1
-    : null;
-  const secretSharedTrustedContact2 = props.secretSharedTrustedContact2
-    ? props.secretSharedTrustedContact2
-    : null;
-
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
@@ -50,46 +49,11 @@ export default function CommunicationMode(props) {
   if (contact.emails) communicationInfo.push(...contact.emails);
   const [Contact, setContact] = useState({});
   const [selectedContactMode, setSelectedContactMode] = useState();
-  const [contactInfo, setContactInfo] = useState(
-    communicationInfo.map(({ number, email }, index) => {
-      if (number || email) {
-        return {
-          id: index,
-          info: number || email,
-          isSelected: false,
-          type: number ? 'number' : 'email',
-        };
-      }
-    }));
+  const [contactInfo, setContactInfo] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setContact(contact);
-  });
-  
-  useEffect(()=>{
-    updateNewContactInfo();
-  },[Contact]);
-
-  const updateNewContactInfo = () =>{
-    let communicationInfo = [];
-    if (contact.phoneNumbers) communicationInfo.push(...contact.phoneNumbers);
-    if (contact.emails) communicationInfo.push(...contact.emails);
-    if(contactInfo.length == 0 || (contactInfo.length>0 && communicationInfo.findIndex((value)=>value.email ==contactInfo[0].info || value.number ==contactInfo[0].info)==-1 )){
-      let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
-        if (number || email) {
-          return {
-            id: index,
-            info: number || email,
-            isSelected: false,
-            type: number ? 'number' : 'email',
-          };
-        }
-      });
-      setTimeout(() => {
-        setContactInfo(contactInfoTemp);
-      }, 2);
-    }
-  }
+  }, [contact]);
 
   const getIconByStatus = status => {
     if (status == 'Ugly') {
@@ -117,7 +81,6 @@ export default function CommunicationMode(props) {
         }
       }),
     ]);
-    // contactInfo[index].isSelected would become true during the next render cycle (batched state updates)
     if (!contactInfo[index].isSelected) {
       setSelectedContactMode({ ...contactInfo[index], isSelected: true });
     } else {
@@ -125,13 +88,11 @@ export default function CommunicationMode(props) {
     }
   };
 
-  useEffect(()=>{
-    if(!selectedContactMode){
-      let temp = [];setTimeout(() => {
-        setContactInfo(temp);
-      }, 1000);
-    }
-  }, [selectedContactMode])
+  const [changeContact, setChangeContact] = useState(false);
+  console.log({ changeContact });
+  useEffect(() => {
+    if (props.changeContact) setChangeContact(true);
+  }, [props.changeContact]);
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     state => state.storage.database,
@@ -140,22 +101,24 @@ export default function CommunicationMode(props) {
 
   const communicate = async selectedContactMode => {
     if (!SHARES_TRANSFER_DETAILS[index]) {
-      Alert.alert('Failed to share');
+      setTimeout(() => {
+        setErrorMessageHeader('Failed to share');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Secret, please try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
       return;
     }
     const deepLink =
-      `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
+      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
+      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
+      `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+    console.log("deepLink", deepLink);
 
     switch (selectedContactMode.type) {
       case 'number':
         textWithoutEncoding(selectedContactMode.info, deepLink);
-        if (secretSharedTrustedContact1) {
-          secretSharedTrustedContact1(true);
-        }
-        if (secretSharedTrustedContact2) {
-          secretSharedTrustedContact2(true);
-        }
         break;
 
       case 'email':
@@ -166,12 +129,6 @@ export default function CommunicationMode(props) {
           'Guardian request',
           deepLink,
         );
-        if (secretSharedTrustedContact1) {
-          secretSharedTrustedContact1(true);
-        }
-        if (secretSharedTrustedContact2) {
-          secretSharedTrustedContact2(true);
-        }
         break;
     }
     props.onPressContinue(
@@ -179,91 +136,136 @@ export default function CommunicationMode(props) {
         ? SHARES_TRANSFER_DETAILS[index].OTP
         : null,
       index,
+      selectedContactMode,
     );
-    // props.navigation.navigate('ShareOtpWithTrustedContactContents', {
-    //   OTP:'123456'
-    //   // OTP: SHARES_TRANSFER_DETAILS[index].OTP,
-    // });
   };
 
   const { loading } = useSelector(state => state.sss);
 
   useEffect(() => {
-    // console.log({ DETAILS: SHARES_TRANSFER_DETAILS });
-    if (
-      !SHARES_TRANSFER_DETAILS[index] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-    )
-      dispatch(uploadEncMShare(index));
-    else {
-      //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-      // console.log(SHARES_TRANSFER_DETAILS[index]);
+    if (changeContact) {
+      dispatch(uploadEncMShare(index, true));
+      setChangeContact(false);
+    } else {
+      if (
+        !SHARES_TRANSFER_DETAILS[index] ||
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+      )
+        dispatch(uploadEncMShare(index));
     }
-  }, [SHARES_TRANSFER_DETAILS[index]]);
+  }, [SHARES_TRANSFER_DETAILS[index], changeContact]);
 
   const editContact = () => {
-    let contactId = contact.id;
-    // ExpoContacts.presentFormAsync(contactId).then(() => {
-    //       console.log("DATA");
-    // })
     var newPerson = {
-      recordID: contact.id ? contact.id : '',
-      emailAddresses: contact.emails ? contact.emails : [],
-      familyName: contact.lastName ? contact.lastName : '',
-      givenName: contact.firstName ? contact.firstName : '',
-      middleName: contact.middleName ? contact.middleName : '',
-      phoneNumbers: contact.phoneNumbers ? contact.phoneNumbers : [],
+      recordID: Contact.id ? Contact.id : '',
+      emailAddresses: Contact.emails ? Contact.emails : [],
+      familyName: Contact.lastName ? Contact.lastName : '',
+      givenName: Contact.firstName ? Contact.firstName : '',
+      middleName: Contact.middleName ? Contact.middleName : '',
+      phoneNumbers: Contact.phoneNumbers ? Contact.phoneNumbers : [],
     };
 
     Contacts.openExistingContact(newPerson, async (err, contact) => {
-      if (err) throw err;
-      // console.log('contact editContact', contact);
-      if (contact) {
-        let contactListArray = [];
-        const contactList = JSON.parse(
+      if (err) return;
+      if (Contact.id && contact) {
+        let ContactTemp = Contact;
+        ContactTemp.emails = contact.emailAddresses
+          ? contact.emailAddresses
+          : [];
+        ContactTemp.lastName = contact.familyName ? contact.familyName : '';
+        ContactTemp.firstName = contact.givenName ? contact.givenName : '';
+        ContactTemp.middleName = contact.middleName ? contact.middleName : '';
+        ContactTemp.phoneNumbers = contact.phoneNumbers
+          ? contact.phoneNumbers
+          : [];
+        ContactTemp.imageAvailable = contact.hasThumbnail
+          ? contact.hasThumbnail
+          : '';
+        ContactTemp.image = contact.thumbnailPath ? contact.thumbnailPath : '';
+        setContact(ContactTemp);
+        updateNewContactInfo();
+        let selectedContactsAsync = JSON.parse(
           await AsyncStorage.getItem('SelectedContacts'),
         );
-        if (contactList) {
-          contactListArray = contactList;
-          for (let i = 0; i < contactListArray.length; i++) {
-            if (contact.recordID == contactListArray[i].id) {
-              (contactListArray[i].id = contact.recordID
-                ? contact.recordID
-                : ''),
-                (contactListArray[i].emails = contact.emailAddresses
-                  ? contact.emailAddresses
-                  : ''),
-                (contactListArray[i].lastName = contact.familyName
-                  ? contact.familyName
-                  : ''),
-                (contactListArray[i].firstName = contact.givenName
-                  ? contact.givenName
-                  : ''),
-                (contactListArray[i].middleName = contact.middleName
-                  ? contact.middleName
-                  : ''),
-                (contactListArray[i].phoneNumbers = contact.phoneNumbers
-                  ? contact.phoneNumbers
-                  : ''),
-                (contactListArray[i].imageAvailable = contact.hasThumbnail
-                  ? contact.hasThumbnail
-                  : ''),
-                (contactListArray[i].image = contact.thumbnailPath
-                  ? contact.thumbnailPath
-                  : ''),
-                (contactListArray[i].name = contact.givenName
-                  ? contact.givenName
-                  : '' + contact.familyName
-                  ? contact.familyName
-                  : ''),
-                setContact(contactListArray[i]);
-              //await AsyncStorage.setItem('SelectedContacts', JSON.stringify(contactListArray[i]));
-            }
+        if (selectedContactsAsync) {
+          if (index == 1) {
+            selectedContactsAsync[0] = ContactTemp;
+          } else if (index == 2) {
+            selectedContactsAsync[1] = ContactTemp;
           }
+          await AsyncStorage.setItem(
+            'SelectedContacts',
+            JSON.stringify(selectedContactsAsync),
+          );
         }
+        props.onContactUpdate(ContactTemp);
       }
     });
   };
+
+  useEffect(() => {
+    updateNewContactInfo();
+  }, [Contact]);
+
+  const updateNewContactInfo = () => {
+    let communicationInfo = [];
+    if (Contact.phoneNumbers) communicationInfo.push(...Contact.phoneNumbers);
+    if (Contact.emails) communicationInfo.push(...Contact.emails);
+    let contactInfoTemp = communicationInfo.map(({ number, email }, index) => {
+      if (number || email) {
+        return {
+          id: index,
+          info: number || email,
+          isSelected: false,
+          type: number ? 'number' : 'email',
+        };
+      }
+    });
+    contactInfoTemp.push({
+      id: contactInfoTemp.length,
+      info: 'QR code',
+      isSelected: false,
+      type: 'qrcode',
+    });
+    setContactInfo(contactInfoTemp);
+  };
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
 
   return (
     <View
@@ -334,7 +336,15 @@ export default function CommunicationMode(props) {
                 borderRadius: 10,
               }}
             >
-              <Text style={styles.contactNameText}>{contact.name}</Text>
+              <Text style={styles.contactNameText}>
+                {Contact.firstName && Contact.lastName
+                  ? Contact.firstName + ' ' + Contact.lastName
+                  : Contact.firstName && !Contact.lastName
+                  ? Contact.firstName
+                  : !Contact.firstName && Contact.lastName
+                  ? Contact.lastName
+                  : ''}
+              </Text>
             </View>
             <View
               style={{
@@ -366,11 +376,19 @@ export default function CommunicationMode(props) {
                   <Text
                     style={{
                       textAlign: 'center',
-                      fontSize: 13,
-                      lineHeight: 13, //... One for top and one for bottom alignment
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
                     }}
                   >
-                    {contact.name ? nameToInitials(contact.name) : ''}
+                    {nameToInitials(
+                      Contact.firstName && Contact.lastName
+                        ? Contact.firstName + ' ' + Contact.lastName
+                        : Contact.firstName && !Contact.lastName
+                        ? Contact.firstName
+                        : !Contact.firstName && Contact.lastName
+                        ? Contact.lastName
+                        : '',
+                    )}
                   </Text>
                 </View>
               )}
@@ -380,9 +398,9 @@ export default function CommunicationMode(props) {
         <View style={{ height: hp('20%') }}>
           <ScrollView>
             {contactInfo.map((item, index) => {
-              // console.log("contact commmunication", contact);
               return (
                 <AppBottomSheetTouchableWrapper
+                  key={index}
                   onPress={() => onContactSelect(index)}
                   style={styles.contactInfo}
                 >
@@ -402,7 +420,9 @@ export default function CommunicationMode(props) {
         </View>
         {selectedContactMode ? (
           <AppBottomSheetTouchableWrapper
-            onPress={() =>{ setSelectedContactMode(null); communicate(selectedContactMode)}}
+            onPress={() => {
+              communicate(selectedContactMode);
+            }}
             disabled={loading.uploadMetaShare}
             style={{
               ...styles.proceedButtonView,
@@ -417,6 +437,26 @@ export default function CommunicationMode(props) {
           </AppBottomSheetTouchableWrapper>
         ) : null}
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }

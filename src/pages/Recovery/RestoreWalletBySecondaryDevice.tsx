@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -29,12 +29,24 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import CopyThisText from '../../components/CopyThisText';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestShare, downloadMShare } from '../../store/actions/sss';
+import {
+  requestShare,
+  downloadMShare,
+  ErrorReceiving,
+} from '../../store/actions/sss';
 import QRCode from 'react-native-qrcode-svg';
+import Toast from '../../components/Toast';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
-
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
   const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
     state => state.storage.database,
   );
@@ -49,21 +61,61 @@ export default function RestoreWalletBySecondaryDevice(props) {
         JSON.stringify({
           ...REQUEST_DETAILS,
           requester: WALLET_SETUP.walletName,
-          type: 'secondaryDeviceQRRecovery',
+          type: 'recoveryQR',
         }),
       )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
 
-  const deepLink = REQUEST_DETAILS
-    ? `https://hexawallet.io/${WALLET_SETUP.walletName}/sss/rk/` +
-      REQUEST_DETAILS.ENCRYPTED_KEY
-    : '';
+  // const deepLink = REQUEST_DETAILS
+  //   ? `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/rk/` +
+  //     REQUEST_DETAILS.ENCRYPTED_KEY
+  //   : '';
 
   const dispatch = useDispatch();
   useEffect(() => {
     if (!REQUEST_DETAILS) dispatch(requestShare(0));
+  }, []);
+
+  if (META_SHARE) {
+    Toast('Downloaded');
+  }
+  if (isErrorReceivingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   }, []);
 
   return (
@@ -74,7 +126,8 @@ export default function RestoreWalletBySecondaryDevice(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate('RestoreSelectedContactsList');
+              props.navigation.goBack();
+              // props.navigation.navigate('RestoreSelectedContactsList');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -115,8 +168,45 @@ export default function RestoreWalletBySecondaryDevice(props) {
           </View>
 
           {REQUEST_DETAILS ? (
-            <View>
-              <Button
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: hp('3%'),
+                marginBottom: hp('3%'),
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  dispatch(
+                    downloadMShare(
+                      REQUEST_DETAILS.OTP,
+                      REQUEST_DETAILS.ENCRYPTED_KEY,
+                      'recovery',
+                    ),
+                  );
+                }}
+                disabled={!!META_SHARE}
+                style={{
+                  backgroundColor: Colors.blue,
+                  borderRadius: 10,
+                  width: wp('50%'),
+                  height: wp('13%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansMedium,
+                  }}
+                >
+                  Yes, I have scanned
+                </Text>
+              </TouchableOpacity>
+              {/* <Button
                 title={META_SHARE ? 'Downloaded' : 'Download'}
                 disabled={!!META_SHARE}
                 onPress={() =>
@@ -128,12 +218,30 @@ export default function RestoreWalletBySecondaryDevice(props) {
                     ),
                   )
                 }
-              />
+              /> */}
             </View>
           ) : null}
 
           <View style={{ flex: 2, justifyContent: 'flex-end' }}></View>
         </KeyboardAvoidingView>
+        <BottomInfoBox
+          title={'Note'}
+          infoText={
+            'Once you have scanned and accepted the request, press continue button'
+          }
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('35%')
+              : hp('40%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
+        />
       </View>
     </SafeAreaView>
   );

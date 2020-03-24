@@ -17,31 +17,32 @@ export default function WalletBackupAndRecoveryContents(props) {
 
     return (<ScrollView style={styles.modalContainer}>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManageBackup()} style={{
+            {/* <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManageBackup()} style={{
                 width: wp('50%'), height: wp('13%'), backgroundColor: Colors.homepageButtonColor,
                 borderRadius: 10,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: hp('2%'), marginBottom: hp('2%')
-            }} >
-                <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(20) }}>Manage Backup</Text>
-            </AppBottomSheetTouchableWrapper>
+            }} > */}
+                <Text style={{ color: Colors.white, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(20), marginTop: hp('1%'),
+                marginBottom: hp('1%'), }}>Manage Backup</Text>
+            {/* </AppBottomSheetTouchableWrapper> */}
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image source={require("../../assets/images/icons/shieldWithRoundBorder.png")} style={{ width: wp("50%"), height: wp("50%"), resizeMode: "contain" }} />
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%') }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>In <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>Hexa</Text>, you have full control of your bitcoins.{"\n"}This gives you <Text style={{ color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>better privacy and more security.</Text></Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>In <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>Hexa</Text>, you have full control of your bitcoins.{"\n"}This gives you <Text style={{ color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>better privacy and more security</Text></Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/mobileWithCircle.png")} style={{ width: wp("25%"), height: wp("25%"), resizeMode: "contain" }} />
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Since, you and only you can access your wallet,{"\n"}it is important to back it up properly{"\n"}in case you lose your phone.</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>As only you can access your wallet,{"\n"}it is important to back it up properly{"\n"}in case you lose your phone</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("5%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once backed up,{"\n"}the automated health process help{"\n"}keep the back up accessible at all times.</Text>
-            <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>The shield tells you{"\n"}how healthy your wallet back-up is.</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once backed up,{"\n"}the automated health process help{"\n"}keep the back-up accessible at all times</Text>
+            <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>The shield tells you{"\n"}how healthy your wallet back-up is</Text>
         </View>
         <View style={{
             flexDirection: 'row',

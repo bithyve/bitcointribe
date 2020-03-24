@@ -53,7 +53,7 @@ function AllAccountsContents(props) {
       image: require('../assets/images/icons/icon_test.png'),
     },
     {
-      title: 'Regular Account',
+      title: 'Checking Account',
       info: 'Fast and easy',
       accountType: 'regular',
       unit: 'sats',
@@ -90,13 +90,13 @@ function AllAccountsContents(props) {
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <AppBottomSheetTouchableWrapper
+        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <Text style={styles.modalHeaderTitleText}>{'All Accounts'}</Text>
         </View>
       </View>
@@ -128,7 +128,9 @@ function AllAccountsContents(props) {
           >
             <Image style={styles.listElementsIconImage} source={value.image} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.listElementsTitle}>{value.title}</Text>
+              <Text style={styles.listElementsTitle}>
+              {value.title}
+              </Text>
               <Text style={styles.listElementsInfo}>{value.info}</Text>
             </View>
             <View style={styles.listElementIcon}>

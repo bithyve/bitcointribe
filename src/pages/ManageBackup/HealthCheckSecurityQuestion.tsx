@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Image,
-  TouchableOpacity,
   Text,
+  AsyncStorage,
   StyleSheet,
-  ScrollView,
   TextInput,
   Platform,
 } from 'react-native';
@@ -19,8 +17,8 @@ import {
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { useDispatch, useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-community/async-storage';
+import { useSelector } from 'react-redux';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
@@ -39,15 +37,13 @@ export default function HealthCheckSecurityQuestion(props) {
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
 
-  const setConfirm = event => {
-    if (event.text) {
-      if (event.text.length > 0 && event.text != securityAnswer) {
-        if(AnswerCounter<2){
+  const setConfirm = () => {
+    if (answer.length > 0 && answer != securityAnswer) {
+        if (AnswerCounter < 2) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
-        }
-        else{
-          setAnswer(securityAnswer)
+        } else {
+          setAnswer(securityAnswer);
           setErrorText('');
           return;
         }
@@ -55,10 +51,7 @@ export default function HealthCheckSecurityQuestion(props) {
       } else {
         setErrorText('');
       }
-    } else {
-      setErrorText('');
-    }
-  };
+  }
 
   const setBackspace = event => {
     if (event.nativeEvent.key == 'Backspace') {
@@ -72,15 +65,18 @@ export default function HealthCheckSecurityQuestion(props) {
     }
   }, [answer]);
 
-  const onQuestionSelect = (value) =>{
+  const onQuestionSelect = value => {
     if (securityQuestion != value.question) {
-      if(QuestionCounter<2){
+      if (QuestionCounter < 2) {
         QuestionCounter++;
         setQuestionCounter(QuestionCounter);
-      }
-      else{
-        setDropdownBoxValue(dropdownBoxList[dropdownBoxList.findIndex((tmp)=>tmp.question==securityQuestion)]);
-        setDropdownBoxOpenClose(false)
+      } else {
+        setDropdownBoxValue(
+          dropdownBoxList[
+            dropdownBoxList.findIndex(tmp => tmp.question == securityQuestion)
+          ],
+        );
+        setDropdownBoxOpenClose(false);
         setErrorText('');
         return;
       }
@@ -90,7 +86,7 @@ export default function HealthCheckSecurityQuestion(props) {
     }
     setDropdownBoxValue(value);
     setDropdownBoxOpenClose(false);
-  }
+  };
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -107,7 +103,7 @@ export default function HealthCheckSecurityQuestion(props) {
               </Text>
             </View>
           </View>
-          <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
+          <ScrollView style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
             <AppBottomSheetTouchableWrapper
               activeOpacity={10}
               style={[
@@ -205,9 +201,11 @@ export default function HealthCheckSecurityQuestion(props) {
                   setBackspace(event);
                 }}
                 onChangeText={text => {
+                  text = text.replace(/[^a-z]/g, '')
                   setAnswer(text);
                 }}
-                onSubmitEditing={event => setConfirm(event.nativeEvent)}
+                keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+                onSubmitEditing={event => setConfirm()}
                 onFocus={() => {
                   if (Platform.OS == 'ios') {
                     props.bottomSheetRef.current.snapTo(2);
@@ -238,15 +236,31 @@ export default function HealthCheckSecurityQuestion(props) {
                 even your contacts don’t know this answer
               </Text>
             </View>
+          </ScrollView>
+          
+        </View>
+        <View
+            style={{
+              paddingLeft: wp('6%'),
+              paddingRight: wp('6%'),
+              height: hp('15%'),
+              justifyContent: 'center',
+            }}
+          >
             <AppBottomSheetTouchableWrapper
               disabled={errorText || !answer ? true : false}
               onPress={() => {
-                AsyncStorage.setItem(
-                  'SecurityAnsTimestamp',
-                  JSON.stringify(Date.now()),
-                ).then(() => {
-                  props.onPressConfirm();
-                });
+                setConfirm();
+                if (answer.trim() == securityAnswer.trim()) {
+                  AsyncStorage.setItem(
+                    'SecurityAnsTimestamp',
+                    JSON.stringify(Date.now()),
+                  ).then(() => {
+                    props.onPressConfirm();
+                  });
+                } else {
+                  setErrorText('Answer is incorrect');
+                }
               }}
               style={styles.questionConfirmButton}
             >
@@ -255,7 +269,6 @@ export default function HealthCheckSecurityQuestion(props) {
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
-        </View>
       </View>
     </View>
   );
@@ -272,7 +285,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
   },
   modalInfoText: {
-    marginTop: hp('6%'),
+    marginTop: hp('3%'),
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
@@ -340,7 +353,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
     backgroundColor: Colors.blue,
-    marginTop: hp('6%'),
   },
   inputBox: {
     borderWidth: 0.5,

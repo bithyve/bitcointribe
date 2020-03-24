@@ -1,4 +1,4 @@
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import * as bip32 from 'bip32';
 import * as bip39 from 'bip39';
 import * as bitcoinJS from 'bitcoinjs-lib';
@@ -8,7 +8,12 @@ import config from '../../Config';
 import { Transactions } from '../Interface';
 import Bitcoin from './Bitcoin';
 
-const { BH_AXIOS, HEXA_ID } = config;
+const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
+
+const BH_AXIOS: AxiosInstance = axios.create({
+  baseURL: SIGNING_SERVER,
+  timeout: REQUEST_TIMEOUT,
+});
 
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
@@ -38,6 +43,7 @@ export default class SecureHDWallet extends Bitcoin {
   private consumedAddresses: string[];
   private nextFreeChildIndex: number;
   private primaryXpriv: string;
+  private secondaryXpriv: string;
   private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
@@ -57,6 +63,7 @@ export default class SecureHDWallet extends Bitcoin {
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -89,6 +96,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
 
     this.primaryXpriv = stateVars ? stateVars.primaryXpriv : undefined;
+    this.secondaryXpriv = stateVars ? stateVars.secondaryXpriv : undefined;
     this.xpubs = stateVars ? stateVars.xpubs : undefined;
     this.cipherSpec = {
       algorithm: 'aes-192-cbc',
@@ -119,7 +127,8 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: walletId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     return {
@@ -132,6 +141,18 @@ export default class SecureHDWallet extends Bitcoin {
     const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic);
     hash.update(seed);
     return { walletId: hash.digest('hex') };
+  };
+
+  public getSecondaryID = (secondaryMnemonic): { secondaryID: string } => {
+    if (!this.secondaryMnemonic) {
+      throw new Error(
+        'SecondaryID generation failed; missing secondary mnemonic',
+      );
+    }
+    const hash = crypto.createHash('sha256');
+    const seed = bip39.mnemonicToSeedSync(secondaryMnemonic);
+    hash.update(seed);
+    return { secondaryID: hash.digest('hex') };
   };
 
   public getSecondaryMnemonic = (): { secondaryMnemonic: string } => {
@@ -191,22 +212,27 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: walletId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     return { isValid: res.data.isValid };
   };
 
-  public fetchBalance = async (): Promise<{
+  public fetchBalance = async (options?: {
+    restore?;
+  }): Promise<{
     balance: number;
     unconfirmedBalance: number;
   }> => {
     try {
-      if (!(await this.isWalletEmpty())) {
-        console.log('Executing consumed binary search');
-        this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
-          config.BSI.INIT_INDEX,
-        );
+      if (options && options.restore) {
+        if (!(await this.isWalletEmpty())) {
+          console.log('Executing consumed binary search');
+          this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
+            config.BSI.INIT_INDEX,
+          );
+        }
       }
 
       await this.gapLimitCatchUp();
@@ -260,6 +286,45 @@ export default class SecureHDWallet extends Bitcoin {
     return { transactions };
   };
 
+  public fetchBalanceTransaction = async (options?: {
+    restore?;
+  }): Promise<{
+    balances: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions: Transactions;
+  }> => {
+    if (options && options.restore) {
+      if (!(await this.isWalletEmpty())) {
+        console.log('Executing consumed binary search');
+        this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
+          config.BSI.INIT_INDEX,
+        );
+      }
+    }
+
+    await this.gapLimitCatchUp();
+
+    this.consumedAddresses = [];
+    // generating all consumed addresses:
+    for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
+      const multiSig = this.createSecureMultiSig(itr);
+      this.consumedAddresses.push(multiSig.address);
+    }
+
+    const {
+      balances,
+      transactions,
+    } = await this.fetchBalanceTransactionsByAddresses(
+      this.consumedAddresses,
+      'Savings Account',
+    );
+    this.balances = balances;
+    this.transactions = transactions;
+    return { balances, transactions };
+  };
+
   public getReceivingAddress = async (): Promise<{ address: string }> => {
     try {
       // looking for free external address
@@ -310,14 +375,20 @@ export default class SecureHDWallet extends Bitcoin {
     };
   }> => {
     let res: AxiosResponse;
+    const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
     try {
+      console.log({ SIGNING_SERVER });
+
       res = await BH_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
+        secondaryID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
+    console.log({ res });
     const { setupSuccessful, setupData } = res.data;
     if (!setupSuccessful) {
       throw new Error('Secure account setup failed');
@@ -334,24 +405,53 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  // public resetTwoFA = async (
+  //   token: number,
+  // ): Promise<{
+  //   qrData: any;
+  //   secret: any;
+  // }> => {
+  //   let res: AxiosResponse;
+  //   try {
+  //     res = await BH_AXIOS.post('resetTwoFA', {
+  //       HEXA_ID,
+  //       walletID: this.walletID,
+  //       token,
+  //     });
+  //   } catch (err) {
+  //     throw new Error(err.response.data.err);
+  //   }
+  //   const { qrData, secret } = res.data;
+  //   return { qrData, secret };
+  // };
+
   public resetTwoFA = async (
-    token: number,
+    secondaryMnemonic: string,
   ): Promise<{
     qrData: any;
     secret: any;
   }> => {
+    const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      throw new Error('Invaild secondary mnemonic');
+    }
+
     let res: AxiosResponse;
+    const { secondaryID } = this.getSecondaryID(secondaryMnemonic);
     try {
       res = await BH_AXIOS.post('resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
-        token,
+        secondaryID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
     const { qrData, secret } = res.data;
-    return { qrData, secret };
+    this.twoFASetup = { qrData, secret };
+    return this.twoFASetup;
   };
 
   public isActive = async (): Promise<{ isActive: boolean }> => {
@@ -362,7 +462,8 @@ export default class SecureHDWallet extends Bitcoin {
         walletID: this.walletID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
     return res.data;
   };
@@ -403,7 +504,8 @@ export default class SecureHDWallet extends Bitcoin {
   public createHDTransaction = async (
     recipientAddress: string,
     amount: number,
-    txnPriority?: string,
+    txnPriority: string,
+    feeRates?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -433,12 +535,21 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('Output UTXOs:', outputUTXOs);
       // const txnFee = await this.feeRatesPerByte(txnPriority);
 
-      const {
-        averageTxFee,
-        feePerByte,
-        estimatedBlocks,
-      } = await this.averageTransactionFee(txnPriority);
-      console.log({ averageTxFee, feePerByte });
+      let averageTxFee;
+      let feePerByte;
+      let estimatedBlocks;
+
+      if (feeRates) {
+        averageTxFee = feeRates[txnPriority].averageTxFee;
+        feePerByte = feeRates[txnPriority].feePerByte;
+        estimatedBlocks = feeRates[txnPriority].estimatedBlocks;
+      } else {
+        const feeRatesByPriority = await this.averageTransactionFee();
+        averageTxFee = feeRatesByPriority[txnPriority].averageTxFee;
+        feePerByte = feeRatesByPriority[txnPriority].feePerByte;
+        estimatedBlocks = feeRatesByPriority[txnPriority].estimatedBlocks;
+      }
+      console.log({ averageTxFee, feePerByte, estimatedBlocks });
 
       let balance: number = 0;
       inputUTXOs.forEach(utxo => {
@@ -508,6 +619,7 @@ export default class SecureHDWallet extends Bitcoin {
       };
     }>;
   } => {
+    // single signature (via primary mnemonic), to be followed by server signing
     try {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
@@ -562,7 +674,8 @@ export default class SecureHDWallet extends Bitcoin {
           childIndexArray,
         });
       } catch (err) {
-        throw new Error(err.response.data.err);
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
       }
 
       console.log(
@@ -576,6 +689,53 @@ export default class SecureHDWallet extends Bitcoin {
       return { txid };
     } catch (err) {
       throw new Error(`Unable to transfer: ${err.message}`);
+    }
+  };
+
+  public dualSignHDTransaction = (
+    inputs: any,
+    txb: bitcoinJS.TransactionBuilder,
+  ): {
+    signedTxb: bitcoinJS.TransactionBuilder;
+  } => {
+    // dual signing (via primary and secondary mnemonic), generates a fully-signed broadcastable transaction
+    try {
+      console.log('------ Transaction Signing ----------');
+      let vin = 0;
+      inputs.forEach(input => {
+        console.log('Signing Input:', input);
+        const {
+          multiSig,
+          primaryPriv,
+          secondaryPriv,
+        } = this.getSigningEssentials(input.address);
+
+        txb.sign(
+          vin,
+          bip32.fromBase58(primaryPriv, this.network),
+          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          null,
+          input.value,
+          Buffer.from(multiSig.scripts.witness, 'hex'),
+        );
+
+        if (!secondaryPriv) {
+          throw new Error('Private key from secondary mnemonic is missing');
+        }
+        txb.sign(
+          vin,
+          bip32.fromBase58(secondaryPriv, this.network),
+          Buffer.from(multiSig.scripts.redeem, 'hex'),
+          null,
+          input.value,
+          Buffer.from(multiSig.scripts.witness, 'hex'),
+        );
+        vin += 1;
+      });
+
+      return { signedTxb: txb };
+    } catch (err) {
+      throw new Error(`Transaction signing failed: ${err.message}`);
     }
   };
 
@@ -613,6 +773,21 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public generateSecondaryXpriv = (secondaryMnemonic: string): Boolean => {
+    const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      throw new Error('Invaild secondary mnemonic');
+    }
+
+    this.secondaryXpriv = this.getRecoverableXKey(
+      secondaryMnemonic,
+      path,
+      true,
+    );
+    return true;
+  };
+
   private getSigningEssentials = (address: string) => {
     if (this.signingEssentialsCache[address]) {
       return this.signingEssentialsCache[address];
@@ -625,6 +800,9 @@ export default class SecureHDWallet extends Bitcoin {
         return (this.signingEssentialsCache[address] = {
           multiSig,
           primaryPriv: this.deriveChildXKey(this.primaryXpriv, itr),
+          secondaryPriv: this.secondaryXpriv
+            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            : null,
           childIndex: itr,
         });
       }

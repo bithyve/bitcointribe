@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, Alert, StatusBar } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Image, Text, StyleSheet, Alert, Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import {
   widthPercentageToDP as wp,
@@ -13,8 +13,13 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import QrScanner from '../../components/QrScanner';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { useDispatch } from 'react-redux';
-import { restoreShareFromQR } from '../../store/actions/sss';
+import { useDispatch, useSelector } from 'react-redux';
+import { restoreShareFromQR, UnableRecoverShareFromQR } from '../../store/actions/sss';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ModalHeader from '../../components/ModalHeader';
+
 
 export default function RestoreByCloudQrCodeContents(props) {
   const [qrData, setQrData] = useState('');
@@ -23,13 +28,28 @@ export default function RestoreByCloudQrCodeContents(props) {
   let [counter, setCounter] = useState(1);
   let [startNumberCounter, setStartNumberCounter] = useState(1);
   const dispatch = useDispatch();
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [processButtonText, setProcessButtonText] = useState('Okay');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const unableRecoverShareFromQR = useSelector(state => state.sss.unableRecoverShareFromQR);
+  console.log("unableRecoverShareFromQR", unableRecoverShareFromQR);
 
   const getQrCodeData = qrData => {
     let tempArray = qrDataArray;
     let shareCode = qrData.substring(0, 2);
-
     if (shareCode !== 'e0' && shareCode !== 'c0') {
-      Alert.alert('Invalid QR', 'Please try again');
+      console.log('shareCode', shareCode);
+      setTimeout(() => {
+        setErrorMessageHeader('Invalid QR');
+        setErrorMessage(
+          'Please try again',
+        );
+      setProcessButtonText('Try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      console.log('shareCode1', shareCode);
+      //Alert.alert('Invalid QR', 'Please try again');
       return;
     }
     let startNumber1 = qrData.substring(2, 3);
@@ -46,9 +66,28 @@ export default function RestoreByCloudQrCodeContents(props) {
         ? 8
         : startNumberCounter + 'th';
     for (let i = 0; i < 8; i++) {
-      if (qrDataArray[i] == qrData) return;
+      if (qrDataArray[i] == qrData) {
+        setTimeout(() => {
+          setErrorMessageHeader('Scan QR code');
+          setErrorMessage(
+            'Please scan ' + temp1 + ' QR code'
+          );
+          setProcessButtonText('Okay')
+        }, 2);
+        (ErrorBottomSheet as any).current.snapTo(1);
+        return;
+      }
       if (startNumberCounter != startNumber1) {
-        Alert.alert('Please scan ' + temp1 + ' QR code');
+        console.log('in if', startNumber1, startNumberCounter);
+        setTimeout(() => {
+          setErrorMessageHeader('Scan QR code');
+          setErrorMessage(
+            'Please scan ' + temp1 + ' QR code'
+          );
+          setProcessButtonText('Okay')
+        }, 2);
+        (ErrorBottomSheet as any).current.snapTo(1);
+       // Alert.alert('Please scan ' + temp1 + ' QR code');
         return;
       }
     }
@@ -65,8 +104,15 @@ export default function RestoreByCloudQrCodeContents(props) {
           : counter == 9
           ? 8
           : counter + 'th';
-
-      Alert.alert(temp + ' QR code scanned, please scan the next one');
+          setTimeout(() => {
+            setErrorMessageHeader('Scan QR code');
+            setErrorMessage(
+              temp + ' QR code scanned, please scan the next one'
+            );
+            setProcessButtonText('Okay')
+          }, 2);
+          (ErrorBottomSheet as any).current.snapTo(1);
+      //Alert.alert(temp + ' QR code scanned, please scan the next one');
       counter++;
       setCounter(counter);
       startNumberCounter++;
@@ -81,27 +127,66 @@ export default function RestoreByCloudQrCodeContents(props) {
       setCounter(1);
       setQrData('');
       setStartNumberCounter(1);
+      props.onScanCompleted(shareCode);
       props.onPressBack();
     }
   };
 
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={processButtonText}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage,errorMessageHeader,processButtonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if(unableRecoverShareFromQR){
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'Invalid QR or error while receiving, please try again',
+      );
+      setProcessButtonText('Try again');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(UnableRecoverShareFromQR(null));
+  }
+
   return (
-    <ScrollView style={styles.modalContainer}>
+    <View style={styles.modalContainer}>
+    <ScrollView>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressBack()}
             style={{ height: 30, width: 30 }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
-              Enter Recovery Secret{'\n'}from Cloud
+              Enter Recovery Secret
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              {props.pageInfo}These are the 8 QR codes saved in the{'\n'}PDF you
-              stored in your cloud service
+              {props.pageInfo}There are 8 QR codes in the {'\n'}PDF you have stored
             </Text>
           </View>
           <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
@@ -221,7 +306,19 @@ export default function RestoreByCloudQrCodeContents(props) {
           )}
         </View>
       </View>
+      
     </ScrollView>
+    <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
+    </View>
   );
 }
 const styles = StyleSheet.create({

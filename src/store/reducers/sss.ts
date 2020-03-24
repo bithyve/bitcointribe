@@ -6,6 +6,13 @@ import {
   RESET_REQUESTED_SHARE_UPLOADS,
   DOWNLOADED_MSHARE,
   OVERALL_HEALTH_CALCULATED,
+  CHECKED_PDF_HEALTH,
+  QR_CHECKED,
+  UNABLE_RECOVER_SHARE_FROM_QR,
+  WALLET_RECOVERY_FAILED,
+  ERROR_SENDING,
+  UPLOAD_SUCCEFULLY,
+  ERROR_RECEIVING
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -26,8 +33,10 @@ const initialState: {
     downloadDynamicNonPMDD: Boolean;
     restoreDynamicNonPMDD: Boolean;
     restoreWallet: Boolean;
+    pdfHealthChecked: Boolean;
   };
   mnemonic: String;
+  personalCopyIndex: Number;
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
@@ -39,6 +48,12 @@ const initialState: {
     qaStatus: string;
     sharesInfo: { shareId: string; shareStage: string }[];
   };
+  qrChecked: Boolean;
+  unableRecoverShareFromQR: Boolean;
+  walletRecoveryFailed: Boolean;
+  errorSending: Boolean;
+  uploadSuccessfully: Boolean;
+  errorReceiving: Boolean;
 } = {
   service: null,
   serviceEnriched: false,
@@ -54,11 +69,19 @@ const initialState: {
     downloadDynamicNonPMDD: false,
     restoreDynamicNonPMDD: false,
     restoreWallet: false,
+    pdfHealthChecked: false,
   },
   mnemonic: '',
+  personalCopyIndex: 0,
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
+  qrChecked: false,
+  unableRecoverShareFromQR: false,
+  walletRecoveryFailed: false,
+  errorSending: false,
+  uploadSuccessfully: false,
+  errorReceiving: false,
 };
 
 export default (state = initialState, action) => {
@@ -130,6 +153,45 @@ export default (state = initialState, action) => {
             action.payload.beingLoaded
           ],
         },
+      };
+      case CHECKED_PDF_HEALTH:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          pdfHealthChecked: action.payload.pdfHealthChecked,
+        },
+        //personalCopyIndex: action.payload.index
+      };
+      case QR_CHECKED:
+      return {
+        ...state,
+        qrChecked: action.payload.isFailed,
+      };
+      case UNABLE_RECOVER_SHARE_FROM_QR:
+      return {
+        ...state,
+        unableRecoverShareFromQR: action.payload.isFailed,
+      };
+      case WALLET_RECOVERY_FAILED:
+      return {
+        ...state,
+        walletRecoveryFailed: action.payload.isFailed,
+      };
+      case ERROR_SENDING:
+      return {
+        ...state,
+        errorSending: action.payload.isFailed,
+      };
+      case UPLOAD_SUCCEFULLY:
+      return {
+        ...state,
+        uploadSuccessfully: action.payload.isUploaded,
+      };
+      case ERROR_RECEIVING:
+      return {
+        ...state,
+        errorReceiving: action.payload.isFailed,
       };
   }
   return state;

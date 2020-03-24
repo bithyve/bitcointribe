@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Platform,
+  AsyncStorage,
   TouchableOpacity,
   Text,
   SafeAreaView,
@@ -16,18 +16,40 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
+import BottomInfoBox from './BottomInfoBox';
 
 export default function QrScanner(props) {
+  const title = props.navigation.getParam('title');
   const [cameraRef, setcameraRef] = useState(React.createRef());
-  global.isCameraOpen = true;
+  const [openCameraFlag, setOpenCameraFlag] = useState(true)
+  const [scanQRFlag, setScanQRFlag] = useState([RNCamera.Constants.BarCodeType.qr])
   const barcodeRecognized = async barcodes => {
     if (barcodes.data) {
+      setScanQRFlag([]);
+      setOpenCameraFlag(false);
       props.navigation.state.params.scanedCode(
         getFormattedString(barcodes.data),
       );
       props.navigation.goBack();
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      let isCameraOpen;
+      AsyncStorage.getItem('isCameraOpen', (err, value) => {
+        if (err) {
+          console.log(err);
+        } else {
+          isCameraOpen = JSON.parse(value); // boolean false
+        }
+      });
+      console.log('isCameraOpen in QR Scanner', isCameraOpen);
+      if (!isCameraOpen) {
+        await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
+      }
+    })();
+  }, []);
 
   const getFormattedString = (qrString: string) => {
     qrString = qrString.split('Dquote').join('"');
@@ -44,6 +66,7 @@ export default function QrScanner(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" />
+      <View style={{flex: 1}}>
       <View
         style={{
           borderBottomWidth: 1,
@@ -71,7 +94,7 @@ export default function QrScanner(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Scan QR code
+            {title ? title : 'Scan QR code'}
           </Text>
         </View>
       </View>
@@ -84,17 +107,19 @@ export default function QrScanner(props) {
           marginTop: hp('3%'),
         }}
       >
+        { openCameraFlag ?
         <RNCamera
           ref={ref => {
             this.cameraRef = ref;
           }}
+          barCodeTypes={scanQRFlag}
           style={{
             width: wp('100%'),
             height: wp('100%'),
           }}
-          onBarCodeRead={barcodeRecognized}
+          onBarCodeRead={barcode => barcodeRecognized(barcode)}
           captureAudio={false}
-        >
+        > 
           <View
             style={{
               flexDirection: 'row',
@@ -158,7 +183,17 @@ export default function QrScanner(props) {
               }}
             />
           </View>
-        </RNCamera>
+        </RNCamera> :  null }
+        
+      </View>
+      <View style={{marginTop: 'auto'}}></View>
+      {title == 'Scan Secondary Mnemonic' ?
+      <BottomInfoBox
+        title={"Note"}
+        infoText={
+          "Secondary Mnemonic This can be found on page of your pdf Recovery Secret. Please scan it to reset your 2FA"
+        }
+      /> : null}
       </View>
     </SafeAreaView>
   );

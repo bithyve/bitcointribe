@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Clipboard
-} from 'react-native';
+import { View, Text, StyleSheet, Clipboard } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -15,35 +10,42 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import Toast from "../../components/Toast";
+import Toast from '../../components/Toast';
+import CountDown from 'react-native-countdown-component';
 
 export default function ShareOtpWithTrustedContact(props) {
   const OTP = props.OTP;
   const index = props.index;
   const writeToClipboard = () => {
     Clipboard.setString(OTP);
-    Toast("Copied Successfully");
-  }
+    Toast('Copied Successfully');
+  };
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', flex: 1 }}>
-          <AppBottomSheetTouchableWrapper onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30 }} >
+          {/* <AppBottomSheetTouchableWrapper onPress={() => { props.onPressBack(); }} style={{ height: 30, width: 30 }} >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
-              Share OTP with{'\n'}trusted contact
+              Share OTP with trusted contact
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               Please provide this OTP to your trusted contact in order for them
               to send you the recovery secret
             </Text>
+            <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
+              Please make sure you use a different to channel to send the OTP
+            </Text>
           </View>
         </View>
       </View>
       <View style={{ flex: 1, marginLeft: 30, marginRight: 30 }}>
-        <AppBottomSheetTouchableWrapper onPress={() => writeToClipboard()} style={styles.otpView}>
+        <AppBottomSheetTouchableWrapper
+          onPress={() => writeToClipboard()}
+          style={styles.otpView}
+        >
           <View style={styles.otpTextView}>
             <Text style={styles.otpText}>{OTP[0]}</Text>
           </View>
@@ -63,7 +65,10 @@ export default function ShareOtpWithTrustedContact(props) {
             <Text style={styles.otpText}>{OTP[5]}</Text>
           </View>
         </AppBottomSheetTouchableWrapper>
-        <Text numberOfLines={2} style={{ ...styles.modalHeaderInfoText, marginBottom: hp('5%'), }}>
+        <Text
+          numberOfLines={2}
+          style={{ ...styles.modalHeaderInfoText, marginBottom: hp('5%') }}
+        >
           Tap on OTP to copy
         </Text>
         <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
@@ -74,10 +79,49 @@ export default function ShareOtpWithTrustedContact(props) {
         <View style={styles.bottomView}>
           <View style={styles.bottomInnerView}>
             <Ionicons color={Colors.blue} size={17} name={'md-time'} />
-            <Text style={styles.timerText}>09 : 12</Text>
+            {props.renderTimer ? 
+            <CountDown
+              size={15}
+              until={600}
+              digitStyle={{
+                backgroundColor: '#FFF',
+                borderWidth: 0,
+                borderColor: '#FFF',
+                margin: -10,
+                
+              }}
+              digitTxtStyle={{ color: Colors.blue,fontSize: RFValue(19),
+                fontFamily: Fonts.FiraSansRegular, }}
+              separatorStyle={{ color: Colors.blue, }}
+              timeToShow={['M', 'S']}
+              timeLabels={{ m: null, s: null }}
+              showSeparator
+            /> : null}
+            {/* <Text style={styles.timerText}>09 : 12</Text> */}
           </View>
-          <AppBottomSheetTouchableWrapper onPress={() => props.onPressOk(index)} style={{ backgroundColor: Colors.blue, borderRadius: 10, width: wp('50%'), height: wp('13%'), justifyContent: 'center', alignItems: 'center', marginTop: hp('3%'), marginBottom: hp('3%') }}>
-            <Text style={{ color: Colors.white, fontSize: RFValue(13), fontFamily: Fonts.FiraSansMedium }}>Yes, I have shared</Text>
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => props.onPressOk(index)}
+            style={{
+              backgroundColor: Colors.blue,
+              borderRadius: 10,
+              width: wp('50%'),
+              height: wp('13%'),
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: hp('3%'),
+              marginBottom: hp('3%'),
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansMedium,
+              }}
+            >
+              Yes, I have shared
+            </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
@@ -86,10 +130,10 @@ export default function ShareOtpWithTrustedContact(props) {
 }
 const styles = StyleSheet.create({
   modalContainer: {
-    height: "100%",
+    height: '100%',
     backgroundColor: Colors.white,
-    alignSelf: "center",
-    width: "100%"
+    alignSelf: 'center',
+    width: '100%',
   },
   modalHeaderTitleView: {
     alignItems: 'center',
@@ -144,12 +188,12 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     flexDirection: 'row',
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
   bottomInnerView: {
     flexDirection: 'row',
-    justifyContent: "space-around",
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
   timerText: {
@@ -157,5 +201,5 @@ const styles = StyleSheet.create({
     fontSize: RFValue(19),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
-  }
+  },
 });

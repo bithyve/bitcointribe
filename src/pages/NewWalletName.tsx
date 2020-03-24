@@ -66,7 +66,11 @@ export default function NewWalletName(props) {
               placeholder={"Enter a name for your wallet"}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
-              onChangeText={text => setWalletName(text)}
+              keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+              maxLength={20}
+              onChangeText={text => {
+                text = text.replace(/[^A-Za-z]/g, '')
+                setWalletName(text)}}
               onFocus={() => {
                 setInputStyle(styles.inputBoxFocused);
               }}
@@ -98,8 +102,8 @@ export default function NewWalletName(props) {
           {walletName.trim() == "" ? (
             <View style={{marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0}}>
               <BottomInfoBox
-                title={"We do not store this anywhere."}
-                infoText={"Your contacts will see this to identify you"}
+                title={"We do not store this"}
+                infoText={"Only your contacts will see this when you transact with them, to identify you"}
               />
             </View>
           ) : null}

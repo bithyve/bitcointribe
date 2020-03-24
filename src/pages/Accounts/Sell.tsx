@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  TextInput,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
-  Button,
+  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
@@ -66,8 +63,8 @@ export default function Sell(props) {
     if (!isSellHelperDone && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isSellHelperDone', 'true');
       setTimeout(() => {
-      SellHelperBottomSheet.current.snapTo(1);
-    }, 1000);
+        SellHelperBottomSheet.current.snapTo(1);
+      }, 1000);
     }
   };
 
@@ -82,12 +79,8 @@ export default function Sell(props) {
         helperInfo={`You can also sell bitcoins to an exchange or a similar service provider. 
           You will typically get your local currency like the dollar ($) or the pound (£) in your 
           bank account after processing As the Test Bitcoins have no market value, you don’t need to sell them`}
-        continueButtonText={'Continue'}
-        quitButtonText={'Quit'}
+        continueButtonText={'Ok, got it'}
         onPressContinue={() => {
-          (SellHelperBottomSheet as any).current.snapTo(0);
-        }}
-        onPressQuit={() => {
           (SellHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -96,9 +89,9 @@ export default function Sell(props) {
   const renderSellHelperHeader = () => {
     return (
       <SmallHeaderModal
-      borderColor={Colors.blue}
-      backgroundColor={Colors.blue}
-      onPressHeader={() => {
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
           (SellHelperBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -109,71 +102,87 @@ export default function Sell(props) {
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={styles.modalContentContainer}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
-          enabled
-        >
-          <ScrollView>
-            <View style={styles.modalHeaderTitleView}>
-              <View
-                style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-              >
-                <TouchableOpacity
-                  onPress={() => {
-                    if (getServiceType) {
-                      getServiceType(serviceType);
-                    }
-                    props.navigation.goBack();
+      <TouchableWithoutFeedback
+        onPress={() => {
+          SellHelperBottomSheet.current.snapTo(0);
+        }}
+      >
+        <View style={styles.modalContentContainer}>
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS == 'ios' ? 'padding' : ''}
+            enabled
+          >
+            <ScrollView>
+              <View style={styles.modalHeaderTitleView}>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
                   }}
-                  style={{ height: 30, width: 30, justifyContent: 'center' }}
                 >
-                  <FontAwesome
-                    name="long-arrow-left"
-                    color={Colors.blue}
-                    size={17}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.modalHeaderTitleText}>{'Sell'}</Text>
-                {serviceType == TEST_ACCOUNT ? (
-                  <Text
+                  <TouchableOpacity
                     onPress={() => {
-                      AsyncStorage.setItem('isSellHelperDone', 'true');
-                      SellHelperBottomSheet.current.snapTo(2);
+                      if (getServiceType) {
+                        getServiceType(serviceType);
+                      }
+                      props.navigation.goBack();
                     }}
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      marginLeft: 'auto',
-                    }}
+                    style={{ height: 30, width: 30, justifyContent: 'center' }}
                   >
-                    Know more
-                  </Text>
-                ) : null}
+                    <FontAwesome
+                      name="long-arrow-left"
+                      color={Colors.blue}
+                      size={17}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles.modalHeaderTitleText}>{'Sell'}</Text>
+                  {serviceType == TEST_ACCOUNT ? (
+                    <Text
+                      onPress={() => {
+                        AsyncStorage.setItem('isSellHelperDone', 'true');
+                        SellHelperBottomSheet.current.snapTo(2);
+                      }}
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(12),
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      Know more
+                    </Text>
+                  ) : null}
+                </View>
               </View>
-            </View>
-            <View
-              style={{
-                alignItems: 'center',
-              }}
-            >
-              <Text>Coming Soon!</Text>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={SellHelperBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('18%')
-          : Platform.OS == 'android'
-          ? hp('20%')
-          : hp('19%'),hp('95%')]}
-          renderContent={renderSellHelperContents}
-          renderHeader={renderSellHelperHeader}
-        />
-      </View>
+              <View
+                style={{
+                  alignItems: 'center',
+                }}
+              >
+                <Text>Coming Soon!</Text>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={SellHelperBottomSheet}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('15%')
+                : Platform.OS == 'android'
+                ? hp('16%')
+                : hp('15%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('65%')
+                : hp('75%'),
+            ]}
+            renderContent={renderSellHelperContents}
+            renderHeader={renderSellHelperHeader}
+          />
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }

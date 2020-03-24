@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,9 +9,9 @@ import {
   Text,
   Image,
   Platform,
-  TextInput,
-  KeyboardAvoidingView,
+  AsyncStorage,
   Alert,
+  RefreshControl
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -27,25 +27,46 @@ import {
 } from 'react-native-responsive-screen';
 import Feather from 'react-native-vector-icons/Feather';
 import HeaderTitle from '../../components/HeaderTitle';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import KnowMoreButton from '../../components/KnowMoreButton';
 import RequestModalContents from '../../components/RequestModalContents';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import Entypo from 'react-native-vector-icons/Entypo';
 import RecoveryQuestionModalContents from '../../components/RecoveryQuestionModalContents';
 import RecoverySuccessModalContents from '../../components/RecoverySuccessModalContents';
-import RecoveryWalletNameModalContents from '../../components/RecoveryWalletNameModalContents';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { downloadMShare, recoverWallet } from '../../store/actions/sss';
-import AsyncStorage from '@react-native-community/async-storage';
+import {
+  downloadMShare,
+  recoverWallet,
+  walletRecoveryFailed,
+  ErrorReceiving,
+  checkMSharesHealth,
+} from '../../store/actions/sss';
 import ModalHeader from '../../components/ModalHeader';
 import RestoreByCloudQrCodeContents from './RestoreByCloudQrCodeContents';
 
+import LoaderModal from '../../components/LoaderModal';
+import {
+  TEST_ACCOUNT,
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import {
+  getTestcoins,
+  fetchBalance,
+  fetchTransactions,
+  syncAccounts,
+  calculateExchangeRate,
+} from '../../store/actions/accounts';
+import axios from 'axios';
+
 export default function RestoreSelectedContactsList(props) {
+  let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
+  let [onRefresh, setOnRefresh] = useState(false);
+  let [message, setMessage] = useState('Creating your wallet');
+  const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [walletNameBottomSheet, setWalletNameBottomSheet] = useState(
     React.createRef(),
   );
@@ -73,6 +94,14 @@ export default function RestoreSelectedContactsList(props) {
   );
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [openmodal, setOpenmodal] = useState('closed');
+  const [ErrorBottomSheet1, setErrorBottomSheet1] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isWalletRecoveryFailed = useSelector(
+    state => state.sss.walletRecoveryFailed,
+  );
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  console.log('isWalletRecoveryFailed', isWalletRecoveryFailed);
   // function openCloseModal() {
   //   if (!walletName) {
   //     walletNameBottomSheet.current.snapTo(0);
@@ -102,14 +131,101 @@ export default function RestoreSelectedContactsList(props) {
       setSelectedDocuments(JSON.parse(documentList));
     }
   };
+  const [exchangeRates, setExchangeRates] = useState();
+  const accounts = useSelector(state => state.accounts);
+
+  const dispatch = useDispatch();
+
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+    const regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const secureTransactions = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+          .transactionDetails
+      : [];
+    const accumulativeTransactions = [
+      ...testTransactions,
+      ...regularTransactions,
+      ...secureTransactions,
+    ];
+
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+    setTransactions(accumulativeTransactions);
+  }, [accounts]);
 
   useEffect(() => {
     // (ErrorBottomSheet as any).current.snapTo(1);
+    (async () => {
+      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+      if (storedExchangeRates) {
+        const exchangeRates = JSON.parse(storedExchangeRates);
+        if (Date.now() - exchangeRates.lastFetched < 1800000) {
+          setExchangeRates(exchangeRates);
+          return;
+        } // maintaining a half an hour difference b/w fetches
+      }
+      const res = await axios.get('https://blockchain.info/ticker');
+      if (res.status == 200) {
+        const exchangeRates = res.data;
+        exchangeRates.lastFetched = Date.now();
+        setExchangeRates(exchangeRates);
+        await AsyncStorage.setItem(
+          'exchangeRates',
+          JSON.stringify(exchangeRates),
+        );
+      } else {
+        console.log('Failed to retrieve exchange rates', res);
+      }
+    })();
+    let temp = null;
+    onPullDown();
     let focusListener = props.navigation.addListener('didFocus', () => {
       getSelectedContactList();
+      temp = setInterval(()=>{
+        onPullDown();
+      }, 30000);
+    });
+    let focusListener1 = props.navigation.addListener('didBlur', () => {
+      getSelectedContactList();
+      clearInterval(temp);
     });
     return () => {
       focusListener.remove();
+      focusListener1.remove();
     };
   }, []);
 
@@ -186,6 +302,33 @@ export default function RestoreSelectedContactsList(props) {
   function renderHeader() {
     return <TransparentHeaderModal onPressheader={() => closeModal()} />;
   }
+
+  const renderLoaderModalContent = () => {
+    return (
+      <LoaderModal
+        headerText={message}
+        messageText={
+          'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'
+        }
+      />
+    );
+  };
+
+  const renderLoaderModalHeader = () => {
+    return (
+      <View
+        style={{
+          marginTop: 'auto',
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          height: hp('75%'),
+          zIndex: 9999,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      />
+    );
+  };
 
   function closeModal() {
     (successMessageBottomSheet as any).current.snapTo(0);
@@ -277,28 +420,110 @@ export default function RestoreSelectedContactsList(props) {
     );
   };
 
-  const dispatch = useDispatch();
+  const renderErrorModalContent1 = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet1}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet1 as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader]);
+
+  const renderErrorModalHeader1 = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet1 as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if (isWalletRecoveryFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error recovering your wallet!');
+      setErrorMessage(
+        'There was an error while recovering your wallet, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet1 as any).current.snapTo(1);
+    dispatch(walletRecoveryFailed(null));
+  }
+  if (isErrorReceivingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet1 as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
 
   const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
     state => state.storage.database,
   );
 
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+
+  const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[0]
+    ? RECOVERY_SHARES[0]
+    : { REQUEST_DETAILS: null, META_SHARE: null };
+
   const metaShares = [];
   Object.keys(RECOVERY_SHARES).forEach(key => {
     const { META_SHARE } = RECOVERY_SHARES[key];
     if (META_SHARE) metaShares.push(META_SHARE);
   });
 
+  useEffect(()=>{
+    setSecondaryDeviceRS(META_SHARE);
+  },[META_SHARE])
+
   useEffect(() => {
     (async () => {
       if (SERVICES) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
-        props.navigation.navigate('Home');
+        // props.navigation.navigate('Home');
+        // dispatch(fetchBalance(TEST_ACCOUNT, { fetchTransactionsSync: true }));
+        // dispatch(
+        //   fetchBalance(REGULAR_ACCOUNT, { fetchTransactionsSync: true }),
+        // );
+        // dispatch(fetchBalance(SECURE_ACCOUNT, { fetchTransactionsSync: true }));
+        // // dispatch(fetchTransactions(TEST_ACCOUNT));
+        // dispatch(fetchTransactions(REGULAR_ACCOUNT));
+        // dispatch(fetchTransactions(SECURE_ACCOUNT));
+        // dispatch(syncAccounts(true)); // syncAccounts(true) would do a hard refresh for the accounts (BST executed)
+
+        dispatch(calculateExchangeRate());
+        dispatch(checkMSharesHealth());
+
+        // setTimeout(() => {
+        //   (loaderBottomSheet as any).current.snapTo(0);
+        //   props.navigation.navigate('Home');
+        // }, 4000);
+
+        dispatch(syncAccounts());
       }
     })();
   }, [SERVICES]);
+
+  if (accounts.accountsSynched) {
+    (loaderBottomSheet as any).current.snapTo(0);
+    props.navigation.navigate('Home', {
+      exchangeRates,
+      balances,
+      transactions,
+    });
+  }
 
   const downloadSecret = shareIndex => {
     const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
@@ -308,37 +533,39 @@ export default function RestoreSelectedContactsList(props) {
       console.log({ OTP, ENCRYPTED_KEY });
       dispatch(downloadMShare(OTP, ENCRYPTED_KEY, 'recovery'));
     } else {
-      Alert.alert('Downloaded', 'Secret already downloaded');
+      Alert.alert('Received', 'Secret already Received');
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      let mod = false;
-      selectedContacts.forEach((contact, index) => {
-        if (RECOVERY_SHARES[index + 1]) {
-          if (RECOVERY_SHARES[index + 1].META_SHARE) {
-            if (selectedContacts[index].status !== 'received') {
-              selectedContacts[index].status = 'received';
-              mod = true;
-            }
-          } else if (RECOVERY_SHARES[index + 1].REQUEST_DETAILS) {
-            if (selectedContacts[index].status !== 'inTransit') {
-              selectedContacts[index].status = 'inTransit';
-              mod = true;
-            }
+  const updateStatusOnShareDownloadForTrustedContact = async() =>{
+    let mod = false;
+    selectedContacts.forEach((contact, index) => {
+      if (RECOVERY_SHARES[index + 1]) {
+        if (RECOVERY_SHARES[index + 1].META_SHARE) {
+          if (selectedContacts[index].status !== 'received') {
+            selectedContacts[index].status = 'received';
+            mod = true;
+          }
+        } else if (RECOVERY_SHARES[index + 1].REQUEST_DETAILS) {
+          if (selectedContacts[index].status !== 'inTransit') {
+            selectedContacts[index].status = 'inTransit';
+            mod = true;
           }
         }
-      });
-
-      if (mod) {
-        await AsyncStorage.setItem(
-          'selectedContacts',
-          JSON.stringify(selectedContacts),
-        );
-        getSelectedContactList();
       }
-    })();
+    });
+
+    if (mod) {
+      await AsyncStorage.setItem(
+        'selectedContacts',
+        JSON.stringify(selectedContacts),
+      );
+      getSelectedContactList();
+    }
+  }
+
+  useEffect(() => {
+    updateStatusOnShareDownloadForTrustedContact()
   }, [RECOVERY_SHARES, selectedContacts]);
 
   useEffect(() => {
@@ -365,9 +592,35 @@ export default function RestoreSelectedContactsList(props) {
     }
   }
 
+  const onScanCompleted = async shareCode => {
+    let selectedDocsTemp = JSON.parse(
+      await AsyncStorage.getItem('selectedDocuments'),
+    );
+    if (!selectedDocsTemp) {
+      selectedDocsTemp = [];
+    }
+    let obj = null;
+    if (shareCode == 'e0') {
+      obj = { title: 'Personal Copy 1', status: 'received' };
+      selectedDocsTemp[0] = obj;
+    } else if (shareCode == 'c0') {
+      obj = { title: 'Personal Copy 2', status: 'received' };
+      selectedDocsTemp[1] = obj;
+    }
+    await AsyncStorage.setItem(
+      'selectedDocuments',
+      JSON.stringify(selectedDocsTemp),
+    );
+    selectedDocsTemp = JSON.parse(
+      await AsyncStorage.getItem('selectedDocuments'),
+    );
+    setSelectedDocuments(selectedDocsTemp);
+  };
+
   function renderRestoreByCloudQrCodeContent() {
     return (
       <RestoreByCloudQrCodeContents
+        onScanCompleted={shareCode => onScanCompleted(shareCode)}
         modalRef={RestoreByCloudQrCodeContents}
         isOpenedFlag={QrBottomSheetsFlag}
         onPressBack={() => {
@@ -388,6 +641,14 @@ export default function RestoreSelectedContactsList(props) {
     );
   }
 
+  const onPullDown = async() =>{
+    if(META_SHARE){
+      setSecondaryDeviceRS(META_SHARE);
+    }
+    updateStatusOnShareDownloadForTrustedContact();
+    setOnRefresh(false);
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -404,7 +665,17 @@ export default function RestoreSelectedContactsList(props) {
           </View>
         </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={onRefresh}
+            onRefresh={() => {
+              setOnRefresh(true);
+              onPullDown();
+            }}
+          />
+        }
+      >
         <HeaderTitle
           firstLineTitle={'Restore wallet using'}
           secondLineTitle={'Recovery Secrets'}
@@ -414,7 +685,11 @@ export default function RestoreSelectedContactsList(props) {
           infoTextBold={'You need three of them restore your wallet'}
         />
         <TouchableOpacity
-          style={{ ...styles.listElements, marginTop: 60 }}
+          style={{
+            ...styles.listElements,
+            marginTop: 60,
+            marginBottom: META_SHARE ? 0 : 10,
+          }}
           onPress={() =>
             props.navigation.navigate('RestoreWalletBySecondaryDevice')
           }
@@ -438,6 +713,63 @@ export default function RestoreSelectedContactsList(props) {
             />
           </View>
         </TouchableOpacity>
+        {SecondaryDeviceRS && (
+          <View style={{}}>
+            <TouchableOpacity
+              style={{
+                ...styles.selectedContactView,
+                marginBottom: 15,
+              }}
+            >
+              <View>
+                <Text style={styles.selectedContactName}>
+                  {SecondaryDeviceRS ? 'Received' : 'Receive'}
+                </Text>
+              </View>
+              {SecondaryDeviceRS ? (
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <View
+                    style={{
+                      ...styles.secretReceivedCheckSignView,
+                      backgroundColor: Colors.green,
+                    }}
+                  >
+                    <Feather
+                      name={'check'}
+                      size={12}
+                      color={Colors.darkGreen}
+                    />
+                  </View>
+                </View>
+              ) : !SecondaryDeviceRS ? (
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <View
+                    style={{
+                      height: 25,
+                      width: 25,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginLeft: 5,
+                    }}
+                  >
+                    <Entypo
+                      name={'dots-three-horizontal'}
+                      size={15}
+                      color={Colors.borderColor}
+                    />
+                  </View>
+                </View>
+              ) : (
+                <View style={{ flexDirection: 'row', marginLeft: 'auto' }}>
+                  <Text>{SecondaryDeviceRS ? 'Received' : 'Receive'}</Text>
+                  <View style={styles.dotsView} />
+                  <View style={styles.dotsView} />
+                  <View style={styles.dotsView} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={() =>
@@ -488,23 +820,27 @@ export default function RestoreSelectedContactsList(props) {
                   >
                     <View>
                       <Text style={styles.selectedContactName}>
-                        {contact.name.split(' ')[0]}{' '}
+                        {contact.name && contact.name.split(' ')[0]
+                          ? contact.name.split(' ')[0]
+                          : ''}{' '}
                         <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {contact.name.split(' ')[1]}
+                          {contact.name && contact.name.split(' ')[0]
+                            ? contact.name.split(' ')[1]
+                            : ''}
                         </Text>
                       </Text>
-                      <Text
-                        style={{
-                          ...styles.selectedContactName,
-                          fontSize: RFValue(11),
-                        }}
-                      >
-                        {contact &&
-                        contact.communicationMode &&
-                        contact.communicationMode.length
-                          ? contact.communicationMode[0].info
-                          : ''}
-                      </Text>
+                      {contact &&
+                      contact.communicationMode &&
+                      contact.communicationMode.length ? (
+                        <Text
+                          style={{
+                            ...styles.selectedContactName,
+                            fontSize: RFValue(11),
+                          }}
+                        >
+                          {contact.communicationMode[0].info}
+                        </Text>
+                      ) : null}
                     </View>
                     {contact.status == 'received' ? (
                       <View
@@ -626,7 +962,7 @@ export default function RestoreSelectedContactsList(props) {
         <View style={styles.separator} />
         <TouchableOpacity
           onPress={
-            () => RestoreByCloudQrCode.current.snapTo(1)
+            () => (RestoreByCloudQrCode as any).current.snapTo(1)
             // props.navigation.navigate('RestoreWalletUsingDocuments')
           }
         >
@@ -661,99 +997,106 @@ export default function RestoreSelectedContactsList(props) {
           {selectedDocuments.length > 0 && (
             <View style={{}}>
               {selectedDocuments.map(value => {
-                return (
-                  <TouchableOpacity
-                    activeOpacity={value.status != 'received' ? 0 : 10}
-                    onPress={() =>
-                      value.status != 'received' ? handleDocuments() : {}
-                    }
-                    style={{ ...styles.selectedContactView, marginBottom: 15 }}
-                  >
-                    <View>
-                      <Text style={styles.selectedContactName}>
-                        {value.title}
-                      </Text>
-                    </View>
-                    {value.status == 'received' ? (
-                      <View
-                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                      >
+                if (value) {
+                  return (
+                    <TouchableOpacity
+                      activeOpacity={value.status != 'received' ? 0 : 10}
+                      onPress={() =>
+                        value.status != 'received' ? handleDocuments() : {}
+                      }
+                      style={{
+                        ...styles.selectedContactView,
+                        marginBottom: 15,
+                      }}
+                    >
+                      <View>
+                        <Text style={styles.selectedContactName}>
+                          {value.title}
+                        </Text>
+                      </View>
+                      {value.status == 'received' ? (
                         <View
-                          style={{
-                            ...styles.secretReceivedView,
-                            backgroundColor: Colors.green,
-                          }}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
                         >
-                          <Text
+                          <View
                             style={{
-                              ...styles.secretReceivedText,
-                              color: Colors.darkGreen,
+                              ...styles.secretReceivedView,
+                              backgroundColor: Colors.green,
                             }}
                           >
-                            Secret Entered
-                          </Text>
-                        </View>
-                        <View
-                          style={{
-                            ...styles.secretReceivedCheckSignView,
-                            backgroundColor: Colors.green,
-                          }}
-                        >
-                          <Feather
-                            name={'check'}
-                            size={12}
-                            color={Colors.darkGreen}
-                          />
-                        </View>
-                      </View>
-                    ) : value.status == 'rejected' ? (
-                      <View
-                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                      >
-                        <View
-                          style={{
-                            ...styles.secretReceivedView,
-                            backgroundColor: Colors.lightRed,
-                          }}
-                        >
-                          <Text
+                            <Text
+                              style={{
+                                ...styles.secretReceivedText,
+                                color: Colors.darkGreen,
+                              }}
+                            >
+                              Secret Entered
+                            </Text>
+                          </View>
+                          <View
                             style={{
-                              ...styles.secretReceivedText,
-                              color: Colors.red,
+                              ...styles.secretReceivedCheckSignView,
+                              backgroundColor: Colors.green,
                             }}
                           >
-                            Secret Invalid
-                          </Text>
+                            <Feather
+                              name={'check'}
+                              size={12}
+                              color={Colors.darkGreen}
+                            />
+                          </View>
                         </View>
+                      ) : value.status == 'rejected' ? (
                         <View
-                          style={{
-                            height: 25,
-                            width: 25,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginLeft: 5,
-                          }}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
                         >
-                          <Entypo
-                            name={'dots-three-horizontal'}
-                            size={15}
-                            color={Colors.borderColor}
-                          />
+                          <View
+                            style={{
+                              ...styles.secretReceivedView,
+                              backgroundColor: Colors.lightRed,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                ...styles.secretReceivedText,
+                                color: Colors.red,
+                              }}
+                            >
+                              Secret Invalid
+                            </Text>
+                          </View>
+                          <View
+                            style={{
+                              height: 25,
+                              width: 25,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              marginLeft: 5,
+                            }}
+                          >
+                            <Entypo
+                              name={'dots-three-horizontal'}
+                              size={15}
+                              color={Colors.borderColor}
+                            />
+                          </View>
                         </View>
-                      </View>
-                    ) : (
-                      <TouchableOpacity
-                        onPress={() => handleDocuments()}
-                        style={{ flexDirection: 'row', marginLeft: 'auto' }}
-                      >
-                        <Text>{value.status}</Text>
-                        <View style={styles.dotsView} />
-                        <View style={styles.dotsView} />
-                        <View style={styles.dotsView} />
-                      </TouchableOpacity>
-                    )}
-                  </TouchableOpacity>
-                );
+                      ) : (
+                        <TouchableOpacity
+                          onPress={() => handleDocuments()}
+                          style={{ flexDirection: 'row', marginLeft: 'auto' }}
+                        >
+                          <Text>{value.status}</Text>
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                          <View style={styles.dotsView} />
+                        </TouchableOpacity>
+                      )}
+                    </TouchableOpacity>
+                  );
+                } else {
+                  null;
+                }
               })}
             </View>
           )}
@@ -761,8 +1104,18 @@ export default function RestoreSelectedContactsList(props) {
         {metaShares.length >= 3 ? (
           <View>
             <TouchableOpacity
-              style={{ ...styles.questionConfirmButton, margin: 20 }}
-              onPress={() => dispatch(recoverWallet())}
+              style={{
+                ...styles.questionConfirmButton,
+                margin: 20,
+                elevation: Elevation,
+              }}
+              onPress={() => {
+                (loaderBottomSheet as any).current.snapTo(1);
+                setTimeout(() => {
+                  setElevation(0);
+                }, 2);
+                dispatch(recoverWallet());
+              }}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>
             </TouchableOpacity>
@@ -783,7 +1136,7 @@ export default function RestoreSelectedContactsList(props) {
       /> */}
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={successMessageBottomSheet}
+        ref={successMessageBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
           hp('60%'),
@@ -804,7 +1157,7 @@ export default function RestoreSelectedContactsList(props) {
       /> */}
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={requestBottomSheet}
+        ref={requestBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('75%'),
@@ -816,7 +1169,7 @@ export default function RestoreSelectedContactsList(props) {
         onOpenEnd={() => {}}
         onCloseEnd={() => {}}
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
@@ -837,10 +1190,29 @@ export default function RestoreSelectedContactsList(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={RestoreByCloudQrCode}
+        ref={RestoreByCloudQrCode as any}
         snapPoints={[-30, hp('90%')]}
         renderContent={renderRestoreByCloudQrCodeContent}
         renderHeader={renderRestoreByCloudQrCodeHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet as any}
+        snapPoints={[-50, hp('100%')]}
+        renderContent={renderLoaderModalContent}
+        renderHeader={renderLoaderModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet1}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent1}
+        renderHeader={renderErrorModalHeader1}
       />
     </View>
   );
@@ -941,7 +1313,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },

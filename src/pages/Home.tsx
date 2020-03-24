@@ -7,16 +7,12 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
-  TextInput,
   ImageBackground,
   Platform,
-  ScrollView,
-  KeyboardAvoidingView,
+  AsyncStorage,
   Linking,
+  NativeModules,
   Alert,
-  Keyboard,
-  Dimensions,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
@@ -44,7 +40,6 @@ import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddressBookContents from '../components/AddressBookContents';
 import CustodianRequestAcceptModalContents from '../components/CustodianRequestAcceptModalContents';
 import HomePageShield from '../components/HomePageShield';
-import ErrorModalContents from '../components/ErrorModalContents';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
 import TransactionListModalContents from '../components/TransactionListModalContents';
 import AddModalContents from '../components/AddModalContents';
@@ -74,10 +69,13 @@ import {
   updateMSharesHealth,
   downloadMShare,
   initHealthCheck,
+  uploadRequestedShare,
+  ErrorSending,
+  ErrorReceiving,
+  UploadSuccessfully,
 } from '../store/actions/sss';
 import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
 import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
-import AsyncStorage from '@react-native-community/async-storage';
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
@@ -86,8 +84,13 @@ import {
   fetchTransactions,
 } from '../store/actions/accounts';
 import axios from 'axios';
+import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
-
+import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
+import TransactionDetails from './Accounts/TransactionDetails';
+import Toast from '../components/Toast';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -96,6 +99,24 @@ import { UsNumberFormat } from '../common/utilities';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isUploadSuccessfully = useSelector(
+    state => state.sss.uploadSuccessfully,
+  );
+  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  console.log('isErrorSendingFailed', isErrorSendingFailed);
+  let [AtCloseEnd, setAtCloseEnd] = useState(false);
+  let [loading, setLoading] = useState(false);
+  let [AssociatedContact, setAssociatedContact] = useState([]);
+  let [SelectedContacts, setSelectedContacts] = useState([]);
+  let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
+  let SecondaryDeviceStatus = useSelector(state => state.sss.downloadedMShare);
+  const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
     false,
@@ -109,20 +130,41 @@ export default function Home(props) {
   const WALLET_SETUP = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
-  const DECENTRALIZED_BACKUP = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+  const { status } = useSelector(state => state.sss);
+  // alert(status);
+  // const DECENTRALIZED_BACKUP = useSelector(
+  //   state => state.storage.database.DECENTRALIZED_BACKUP,
+  // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector(state => state.accounts);
-  const [exchangeRates, setExchangeRates] = useState();
+  // const exchangeRate = props.navigation.state.params
+  //   ? props.navigation.state.params.exchangeRates
+  //   : null;
+  const dispatch = useDispatch();
+  const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
+  useEffect(() => {
+    if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
+  }, [accounts.exchangeRates]);
+  // const [balances, setBalances] = useState({
+  //   testBalance: 0,
+  //   regularBalance: 0,
+  //   secureBalance: 0,
+  //   accumulativeBalance: 0,
+  // });
+  // const [transactions, setTransactions] = useState([]);
+
+  // const balancesParam = props.navigation.getParam('balances');
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
     secureBalance: 0,
     accumulativeBalance: 0,
   });
-  const [qrData, setqrData] = useState('');
+  // const transactionsParam = props.navigation.getParam('transactions');
   const [transactions, setTransactions] = useState([]);
+
+  const [qrData, setqrData] = useState('');
+
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -156,7 +198,17 @@ export default function Home(props) {
       ...regularTransactions,
       ...secureTransactions,
     ];
-
+    if (accumulativeTransactions.length) {
+      accumulativeTransactions.sort(function(left, right) {
+        console.log(
+          'moment.utc(right.date),moment.utc(left.date)',
+          moment.utc(right.date).unix(),
+          moment.utc(left.date).unix(),
+          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
+        );
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+    }
     setBalances({
       testBalance,
       regularBalance,
@@ -164,6 +216,34 @@ export default function Home(props) {
       accumulativeBalance,
     });
     setTransactions(accumulativeTransactions);
+
+    // if (balancesParam) {
+    //   if (
+    //     JSON.stringify(balancesParam) !==
+    //     JSON.stringify({
+    //       testBalance,
+    //       regularBalance,
+    //       secureBalance,
+    //       accumulativeBalance,
+    //     })
+    //   ) {
+    //     setBalances({
+    //       testBalance,
+    //       regularBalance,
+    //       secureBalance,
+    //       accumulativeBalance,
+    //     });
+    //     setTransactions(accumulativeTransactions);
+    //   }
+    // } else {
+    //   setBalances({
+    //     testBalance,
+    //     regularBalance,
+    //     secureBalance,
+    //     accumulativeBalance,
+    //   });
+    //   setTransactions(accumulativeTransactions);
+    // }
   }, [accounts]);
 
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
@@ -174,6 +254,7 @@ export default function Home(props) {
   const [selectToAdd, setSelectToAdd] = useState('Getbittr');
   const [openmodal, setOpenmodal] = useState('closed');
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
+  const [deepLinkModalOpen, setDeepLinkModalOpen] = useState(false);
   const [tabSelected, setTabSelected] = useState('sell');
   const [switchOn, setSwitchOn] = useState(true);
   const [selected, setSelected] = useState('Transactions');
@@ -184,22 +265,22 @@ export default function Home(props) {
   //   ShareRecoverySecretBottomSheet,
   //   setShareRecoverySecretBottomSheet,
   // ] = useState(React.createRef());
-  const [
-    ShareRecoverySecretOtpBottomSheet,
-    setShareRecoverySecretOtpBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSuccessBottomSheet,
-    setHealthCheckSuccessBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckGoogleAuthBottomSheet,
-    setHealthCheckGoogleAuthBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    HealthCheckSecurityQuestionBottomSheet,
-    setHealthCheckSecurityQuestionBottomSheet,
-  ] = useState(React.createRef());
+  // const [
+  //   ShareRecoverySecretOtpBottomSheet,
+  //   setShareRecoverySecretOtpBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckSuccessBottomSheet,
+  //   setHealthCheckSuccessBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckGoogleAuthBottomSheet,
+  //   setHealthCheckGoogleAuthBottomSheet,
+  // ] = useState(React.createRef());
+  // const [
+  //   HealthCheckSecurityQuestionBottomSheet,
+  //   setHealthCheckSecurityQuestionBottomSheet,
+  // ] = useState(React.createRef());
   const [
     ContactSelectedFromAddressBookQrCodeBottomSheet,
     setContactSelectedFromAddressBookQrCodeBottomSheet,
@@ -227,12 +308,10 @@ export default function Home(props) {
   const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
     React.createRef(),
   );
-  const [MoreTabBottomSheet, setMoreTabBottomSheet] = useState(
+
+  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
     React.createRef(),
   );
-  // const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-  //   React.createRef(),
-  // );
   // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   // const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
   //   React.createRef(),
@@ -258,10 +337,6 @@ export default function Home(props) {
   //   CustodianRequestAcceptBottomSheet,
   //   setCustodianRequestAcceptBottomSheet,
   // ] = useState(React.createRef());
-  const [
-    transactionDetailsBottomSheet,
-    setTransactionDetailsBottomSheet,
-  ] = useState(React.createRef());
   const [settingsBottomSheet, setSettingsBottomSheet] = useState(
     React.createRef(),
   );
@@ -289,7 +364,7 @@ export default function Home(props) {
       amount: '400,000',
       account: `Learn Bitcoin`,
       accountType: 'test',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
     },
     {
       id: 2,
@@ -298,16 +373,16 @@ export default function Home(props) {
       amount: '60,000',
       account: 'Multi-factor security',
       accountType: 'secure',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
     {
       id: 3,
-      title: 'Regular Account',
+      title: 'Checking Account',
       unit: 'sats',
       amount: '5,000',
       account: 'Fast and easy',
       accountType: 'regular',
-      bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
+      bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
     },
     {
       id: 4,
@@ -393,6 +468,16 @@ export default function Home(props) {
     },
   ]);
   const [modaldata, setModaldata] = useState(transactionData);
+  const [
+    TransactionDetailsBottomSheet,
+    setTransactionDetailsBottomSheet,
+  ] = useState(React.createRef());
+  const [transactionItem, setTransactionItem] = useState({});
+  const [
+    TransactionDetailsHelperBottomSheet,
+    setTransactionDetailsHelperBottomSheet,
+  ] = useState(React.createRef());
+  const [isHelperDone, setIsHelperDone] = useState(true);
 
   function getIconByAccountType(type) {
     if (type == 'saving') {
@@ -409,36 +494,66 @@ export default function Home(props) {
   }
 
   useEffect(function() {
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      setCurrencyCodeFromAsync();
+      getAssociatedContact();
+    });
+    getAssociatedContact();
+    setCurrencyCodeFromAsync();
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
     (moreTabBarBottomSheet as any).current.snapTo(0);
     AppState.addEventListener('change', handleAppStateChange);
-    // NetInfo.addEventListener(state => {
-    //   if (!state.isConnected) (NoInternetBottomSheet as any).current.snapTo(1);
-    //   else if (state.isConnected)
-    //     (NoInternetBottomSheet as any).current.snapTo(0);
-    // });
+
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
-    // HC up-streaming
-    if (DECENTRALIZED_BACKUP) {
-      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
-        dispatch(updateMSharesHealth());
-      }
-    }
 
-    (async () => {
-      if (!overallHealth) {
-        const storedHealth = await AsyncStorage.getItem('overallHealth');
-        if (storedHealth) {
-          setOverallHealth(JSON.parse(storedHealth));
-        }
-      }
-    })();
-    console.log('overallHealthoverallHealth', overallHealth);
+    // HC up-streaming
+    // if (DECENTRALIZED_BACKUP) {
+    //   if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+    //     dispatch(updateMSharesHealth());
+    //   }
+    // }
+    return () => {
+      focusListener.remove();
+    };
   }, []);
+
+  const setCurrencyCodeFromAsync = async () => {
+    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    if (!currencyCodeTmp) {
+      const identifiers = ['io.hexawallet.hexa'];
+      NativeModules.InAppUtils.loadProducts(
+        identifiers,
+        async (error, products) => {
+          await AsyncStorage.setItem(
+            'currencyCode',
+            products && products.length ? products[0].currencyCode : 'USD',
+          );
+          setCurrencyCode(
+            products && products.length ? products[0].currencyCode : 'USD',
+          );
+        },
+      );
+    } else {
+      setCurrencyCode(currencyCodeTmp);
+    }
+    let currencyToggleValueTmp = await AsyncStorage.getItem(
+      'currencyToggleValue',
+    );
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+  };
+
+  // const getOverAllHealthFromAsync = async () => {
+  //   if (!overallHealth) {
+  //     const storedHealth = await AsyncStorage.getItem('overallHealth');
+  //     if (storedHealth) {
+  //       setOverallHealth(JSON.parse(storedHealth));
+  //     }
+  //   }
+  // };
 
   const messageAsPerHealth = health => {
     if (health == 0) {
@@ -465,6 +580,74 @@ export default function Home(props) {
     }
   };
 
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
+        onPressProceed={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader, buttonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+      setButtonText('Try again');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
+
+  if (isUploadSuccessfully) {
+    setTimeout(() => {
+      setErrorMessageHeader('Sending successful');
+      setErrorMessage(
+        'The Recovery Secret has been sent, the receiver needs to accept ',
+      );
+      setButtonText('Done');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(UploadSuccessfully(null));
+  }
+
+  if (isErrorReceivingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessage(
+        'There was an error while receiving your Recovery Secret, please try again',
+      );
+      setButtonText('Try again');
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorReceiving(null));
+  }
+
   const updateAccountCardData = () => {
     let newArrayFinal = [];
     let tempArray = [];
@@ -484,120 +667,329 @@ export default function Home(props) {
   };
 
   const renderTransactionsContent = () => {
-    return (
+    return transactions.length ? (
       <View style={styles.modalContentContainer}>
-        <FlatList
-          data={transactions}
-          ItemSeparatorComponent={() => (
-            <View style={{ backgroundColor: Colors.white }}>
-              <View style={styles.separatorView} />
-            </View>
-          )}
-          renderItem={({ item }) => (
-            <AppBottomSheetTouchableWrapper
-              onPress={() =>
-                props.navigation.navigate('TransactionDetails', { item })
-              }
-              style={{
-                ...styles.transactionModalElementView,
-                backgroundColor: Colors.white,
-              }}
-            >
-              <View style={styles.modalElementInfoView}>
-                <View style={{ justifyContent: 'center' }}>
-                  <FontAwesome
-                    name={
-                      item.transactionType == 'Received'
-                        ? 'long-arrow-down'
-                        : 'long-arrow-up'
-                    }
-                    size={15}
-                    color={
-                      item.transactionType == 'Received'
-                        ? Colors.green
-                        : Colors.red
-                    }
-                  />
+        <View style={{ flex: 1 }}>
+          <View
+            style={{ height: 'auto', marginTop: 10, marginBottom: hp('13%') }}
+          >
+            <FlatList
+              data={transactions}
+              ItemSeparatorComponent={() => (
+                <View style={{ backgroundColor: Colors.white }}>
+                  <View style={styles.separatorView} />
                 </View>
-                <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                  <Text style={styles.transactionModalTitleText}>
-                    {item.accountType}{' '}
-                  </Text>
-                  <Text style={styles.transactionModalDateText}>
-                    {moment(item.date)
-                      .utc()
-                      .format('DD MMMM YYYY')}{' '}
-                    {/* <Entypo
+              )}
+              renderItem={({ item }) => (
+                <AppBottomSheetTouchableWrapper
+                  onPress={
+                    () => {
+                      (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                      setTimeout(() => {
+                        setTransactionItem(item);
+                        setTabBarZIndex(0);
+                      }, 10);
+                    }
+                    //props.navigation.navigate('TransactionDetails', { item })
+                  }
+                  style={{
+                    ...styles.transactionModalElementView,
+                    backgroundColor: Colors.white,
+                  }}
+                >
+                  <View style={styles.modalElementInfoView}>
+                    <View style={{ justifyContent: 'center' }}>
+                      <FontAwesome
+                        name={
+                          item.transactionType == 'Received'
+                            ? 'long-arrow-down'
+                            : 'long-arrow-up'
+                        }
+                        size={15}
+                        color={
+                          item.transactionType == 'Received'
+                            ? Colors.green
+                            : Colors.red
+                        }
+                      />
+                    </View>
+                    <View style={{ justifyContent: 'center', marginLeft: 10 }}>
+                      <Text style={styles.transactionModalTitleText}>
+                        {item.accountType}{' '}
+                      </Text>
+                      <Text style={styles.transactionModalDateText}>
+                        {moment(item.date)
+                          .utc()
+                          .format('DD MMMM YYYY')}{' '}
+                        {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
                     {item.time} */}
-                  </Text>
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.transactionModalAmountView}>
+                    <Image
+                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
+                    />
+                    <Text
+                      style={{
+                        ...styles.transactionModalAmountText,
+                        color:
+                          item.transactionType == 'Received'
+                            ? Colors.green
+                            : Colors.red,
+                      }}
+                    >
+                      {UsNumberFormat(item.amount)}
+                    </Text>
+                    <Text style={styles.transactionModalAmountUnitText}>
+                      {item.confirmations < 6 ? item.confirmations : '6+'}
+                    </Text>
+                    <Ionicons
+                      name="ios-arrow-forward"
+                      color={Colors.textColorGrey}
+                      size={12}
+                      style={{ marginLeft: 20, alignSelf: 'center' }}
+                    />
+                  </View>
+                </AppBottomSheetTouchableWrapper>
+              )}
+            />
+          </View>
+        </View>
+        {transactions.length <= 1 ? (
+          <View
+            style={{
+              margin: 15,
+              backgroundColor: Colors.backgroundColor,
+              marginBottom: AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: 20,
+              borderRadius: 7,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              You don't have any transactions yet
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Start using your accounts to make transactions
+            </Text>
+          </View>
+        ) : null}
+      </View>
+    ) : (
+      <View style={styles.modalContentContainer}>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
+          {[1, 2, 3, 4, 5].map(value => {
+            return (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingTop: wp('5%'),
+                  paddingBottom: wp('5%'),
+                  borderBottomWidth: 0.5,
+                  borderColor: Colors.borderColor,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('5%'),
+                      width: wp('5%'),
+                      borderRadius: wp('5%') / 2,
+                      marginLeft: 10,
+                      marginRight: 10,
+                    }}
+                  />
+                  <View>
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('25%'),
+                        borderRadius: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('35%'),
+                        marginTop: 5,
+                        borderRadius: 10,
+                      }}
+                    />
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('7%'),
+                      width: wp('20%'),
+                      borderRadius: 10,
+                    }}
+                  />
+                  <View
+                    style={{
+                      backgroundColor: Colors.backgroundColor,
+                      height: wp('5%'),
+                      width: wp('5%'),
+                      borderRadius: wp('5%') / 2,
+                      marginLeft: 10,
+                      marginRight: 10,
+                    }}
+                  />
                 </View>
               </View>
-              <View style={styles.transactionModalAmountView}>
-                <Image
-                  source={require('../assets/images/icons/icon_bitcoin_gray.png')}
-                  style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                />
-                <Text
-                  style={{
-                    ...styles.transactionModalAmountText,
-                    color:
-                      item.transactionType == 'Received'
-                        ? Colors.green
-                        : Colors.red,
-                  }}
-                >
-                  {UsNumberFormat(item.amount)}
-                </Text>
-                <Text style={styles.transactionModalAmountUnitText}>
-                  {item.confirmations < 6 ? item.confirmations : '6+'}
-                </Text>
-                <Ionicons
-                  name="ios-arrow-forward"
-                  color={Colors.textColorGrey}
-                  size={12}
-                  style={{ marginLeft: 20, alignSelf: 'center' }}
-                />
-              </View>
-            </AppBottomSheetTouchableWrapper>
-          )}
-        />
+            );
+          })}
+        </View>
+        <View style={{ backgroundColor: Colors.white }}>
+          <View
+            style={{
+              margin: 15,
+              backgroundColor: Colors.backgroundColor,
+              marginBottom: hp('12%') + 15,
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: 20,
+              borderRadius: 7,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              You don't have any transactions yet
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Start using your accounts to make transactions
+            </Text>
+          </View>
+        </View>
       </View>
     );
   };
 
+  const setSecondaryDeviceAddresses = async () => {
+    let secondaryDeviceOtpTemp = JSON.parse(
+      await AsyncStorage.getItem('secondaryDeviceAddress'),
+    );
+    if (!secondaryDeviceOtpTemp) {
+      secondaryDeviceOtpTemp = [];
+    }
+    if (
+      secondaryDeviceOtpTemp.findIndex(
+        value => value.otp == (secondaryDeviceOtp as any).otp,
+      ) == -1
+    ) {
+      secondaryDeviceOtpTemp.push(secondaryDeviceOtp);
+      await AsyncStorage.setItem(
+        'secondaryDeviceAddress',
+        JSON.stringify(secondaryDeviceOtpTemp),
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (
+      (secondaryDeviceOtp as any).otp &&
+      SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp] &&
+      SecondaryDeviceStatus[(secondaryDeviceOtp as any).otp].status
+    ) {
+      if ((secondaryDeviceOtp as any).type == 'trustedContactQR') {
+        props.navigation.navigate('CustodianRequestAccepted', {
+          requester: (secondaryDeviceOtp as any).requester,
+        });
+      }
+      if ((secondaryDeviceOtp as any).type == 'secondaryDeviceQR') {
+        Toast('Recovery Secret received successfully');
+        setSecondaryDeviceAddresses();
+      }
+      getAssociatedContact();
+    }
+  }, [SecondaryDeviceStatus]);
+
   const getQrCodeData = qrData => {
-    // console.log('Qrcodedata', data);
     const scannedData = JSON.parse(qrData);
-    console.log({ scannedData });
     switch (scannedData.type) {
-      case 'secondaryDeviceQR':
-        const custodyRequest = {
+      case 'trustedContactQR':
+        const custodyRequest1 = {
           requester: scannedData.requester,
           ek: scannedData.ENCRYPTED_KEY,
+          uploadedAt: scannedData.UPLOADED_AT,
           otp: scannedData.OTP,
+          isQR: true,
+          type: scannedData.type,
         };
-        props.navigation.navigate('Home', { custodyRequest });
+        setLoading(false);
+        setSecondaryDeviceOtp(custodyRequest1);
+        props.navigation.navigate('Home', { custodyRequest: custodyRequest1 });
         break;
-      case 'secondaryDeviceQRRecovery':
+      case 'secondaryDeviceQR':
+        const custodyRequest2 = {
+          requester: scannedData.requester,
+          ek: scannedData.ENCRYPTED_KEY,
+          uploadedAt: scannedData.UPLOADED_AT,
+          otp: scannedData.OTP,
+          isQR: true,
+          type: scannedData.type,
+        }; //trustedContactQR
+        setLoading(false);
+        setSecondaryDeviceOtp(custodyRequest2);
+        props.navigation.navigate('Home', { custodyRequest: custodyRequest2 });
+        break;
+      case 'recoveryQR':
         const recoveryRequest = {
           requester: scannedData.requester,
           rk: scannedData.ENCRYPTED_KEY,
           otp: scannedData.OTP,
+          isQR: true,
         };
+        setLoading(false);
         props.navigation.navigate('Home', { recoveryRequest });
-
       default:
         break;
     }
   };
 
-  function renderTransactionContent() {
+  const renderTransactionContent = useCallback(() => {
     return renderTransactionsContent();
-  }
+  }, [AtCloseEnd, transactions]);
 
   function renderTransactionHeader() {
     return (
@@ -611,6 +1003,30 @@ export default function Home(props) {
       </TouchableOpacity>
     );
   }
+
+  const renderTransactionDetailsContents = useCallback(() => {
+    return (
+      <TransactionDetails
+        item={transactionItem}
+        onPressKnowMore={() => {
+          (TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
+        }}
+      />
+    );
+  }, [transactionItem]);
+
+  const renderTransactionDetailsHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.white}
+        backgroundColor={Colors.white}
+        onPressHeader={() => {
+          if (TransactionDetailsBottomSheet.current)
+            (TransactionDetailsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [transactionItem]);
 
   function renderAddContent() {
     return (
@@ -760,20 +1176,20 @@ export default function Home(props) {
         setSelected(tabTitle);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(0);
-      addTabBarBottomSheet.current.snapTo(0);
-      QrTabBarBottomSheet.current.snapTo(0);
-      moreTabBarBottomSheet.current.snapTo(2);
+      (transactionTabBarBottomSheet as any).current.snapTo(0);
+      (addTabBarBottomSheet.current as any).snapTo(0);
+      (QrTabBarBottomSheet.current as any).snapTo(0);
+      (moreTabBarBottomSheet.current as any).snapTo(2);
     }
     if (tabTitle == 'Transactions') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(2);
-      addTabBarBottomSheet.current.snapTo(0);
-      QrTabBarBottomSheet.current.snapTo(0);
-      moreTabBarBottomSheet.current.snapTo(0);
+      (transactionTabBarBottomSheet as any).current.snapTo(2);
+      (addTabBarBottomSheet.current as any).snapTo(0);
+      (QrTabBarBottomSheet.current as any).snapTo(0);
+      (moreTabBarBottomSheet.current as any).snapTo(0);
     }
     if (tabTitle == 'Add') {
       setTimeout(() => {
@@ -781,31 +1197,46 @@ export default function Home(props) {
         setModaldata([]);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(0);
-      addTabBarBottomSheet.current.snapTo(2);
-      QrTabBarBottomSheet.current.snapTo(0);
-      moreTabBarBottomSheet.current.snapTo(0);
+      (transactionTabBarBottomSheet as any).current.snapTo(0);
+      (addTabBarBottomSheet.current as any).snapTo(2);
+      (QrTabBarBottomSheet.current as any).snapTo(0);
+      (moreTabBarBottomSheet.current as any).snapTo(0);
     }
     if (tabTitle == 'QR') {
       setTimeout(() => {
         setModaldata(transactionData);
         setSelected(tabTitle);
       }, 2);
-      transactionTabBarBottomSheet.current.snapTo(0);
-      addTabBarBottomSheet.current.snapTo(0);
-      QrTabBarBottomSheet.current.snapTo(2);
-      moreTabBarBottomSheet.current.snapTo(0);
+      (transactionTabBarBottomSheet as any).current.snapTo(0);
+      (addTabBarBottomSheet.current as any).snapTo(0);
+      (QrTabBarBottomSheet.current as any).snapTo(2);
+      (moreTabBarBottomSheet.current as any).snapTo(0);
     }
   }
 
-  // const renderNoInternetModalContent = () => {
-  //   return (
-  //     <NoInternetModalContents
-  //       onPressTryAgain={() => {}}
-  //       onPressIgnore={() => {}}
-  //     />
-  //   );
-  // };
+  const renderNoInternetModalContent = () => {
+    return (
+      <NoInternetModalContents
+        onPressTryAgain={() => {}}
+        onPressIgnore={() => {
+          (NoInternetBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderNoInternetModalHeader = () => {
+    return (
+      <TransparentHeaderModal
+        onPressheader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+          (NoInternetBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   // const renderErrorModalContent = () => {
   //   return (
@@ -841,17 +1272,49 @@ export default function Home(props) {
   //   );
   // };
 
+  const { UNDER_CUSTODY } = useSelector(
+    state => state.storage.database.DECENTRALIZED_BACKUP,
+  );
   const renderCustodianRequestModalContent = useCallback(() => {
-    if (!custodyRequest) return <View></View>;
+    if (!custodyRequest) return;
+
     return (
       <CustodianRequestModalContents
+        loading={loading}
         userName={custodyRequest.requester}
         onPressAcceptSecret={() => {
+          setLoading(true);
           setTimeout(() => {
             setTabBarZIndex(0);
+            setDeepLinkModalOpen(false);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('CustodianRequestOTP', { custodyRequest });
+
+          if (Date.now() - custodyRequest.uploadedAt > 600000) {
+            Alert.alert(
+              'Request expired!',
+              'Please ask the sender to initiate a new request',
+            );
+            setLoading(false);
+          } else {
+            if (UNDER_CUSTODY[custodyRequest.requester]) {
+              Alert.alert(
+                'Failed to store',
+                'You cannot custody multiple shares of the same user.',
+              );
+              setLoading(false);
+            } else {
+              if (custodyRequest.isQR) {
+                dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+                setLoading(false);
+              } else {
+                props.navigation.navigate('CustodianRequestOTP', {
+                  custodyRequest,
+                });
+                setLoading(false);
+              }
+            }
+          }
         }}
         onPressRejectSecret={() => {
           setTimeout(() => {
@@ -862,7 +1325,7 @@ export default function Home(props) {
         }}
       />
     );
-  }, [custodyRequest]);
+  }, [custodyRequest, loading]);
 
   // const renderRecoveryRequestModalContent = useCallback(() => {
   //   if (!recoveryRequest) return <View></View>;
@@ -941,25 +1404,13 @@ export default function Home(props) {
   //   );
   // };
 
-  // const renderNoInternetModalHeader = () => {
-  //   return (
-  //     <TransparentHeaderModal
-  //       onPressheader={() => {
-  //         setTimeout(() => {
-  //           setTabBarZIndex(999);
-  //         }, 2);
-  //         (NoInternetBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // };
-
   const renderCustodianRequestModalHeader = useCallback(() => {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
         }}
@@ -994,12 +1445,13 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-    } else if (item.title == 'All accounts and funds') {
-      (AllAccountsBottomSheet as any).current.snapTo(1);
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
     }
+    // else if (item.title == 'All accounts and funds') {
+    //   (AllAccountsBottomSheet as any).current.snapTo(1);
+    //   setTimeout(() => {
+    //     setTabBarZIndex(0);
+    //   }, 10);
+    // }
   };
 
   const managePinSuccessProceed = pin => {
@@ -1009,14 +1461,23 @@ export default function Home(props) {
     (settingsBottomSheet as any).current.snapTo(0);
   };
 
+  const onPressSettingsElements = async (type, currencycode) => {
+    if (type == 'ManagePin') {
+      return props.navigation.navigate('SettingManagePin', {
+        managePinSuccessProceed: pin => managePinSuccessProceed(pin),
+      });
+    } else if (type == 'ManageCurrency') {
+      setCurrencyCode(currencycode);
+    }
+  };
+
   const renderSettingsContents = () => {
     return (
       <SettingsContents
-        onPressManagePIn={() => {
-          return props.navigation.navigate('SettingManagePin', {
-            managePinSuccessProceed: pin => managePinSuccessProceed(pin),
-          });
-        }}
+        currencyCode={CurrencyCode}
+        onPressManagePin={(type, currencycode) =>
+          onPressSettingsElements(type, currencycode)
+        }
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1070,9 +1531,27 @@ export default function Home(props) {
     );
   };
 
+  const getAssociatedContact = async () => {
+    let SelectedContacts = JSON.parse(
+      await AsyncStorage.getItem('SelectedContacts'),
+    );
+    setSelectedContacts(SelectedContacts);
+    let AssociatedContact = JSON.parse(
+      await AsyncStorage.getItem('AssociatedContacts'),
+    );
+    setAssociatedContact(AssociatedContact);
+    let SecondaryDeviceAddress = JSON.parse(
+      await AsyncStorage.getItem('secondaryDeviceAddress'),
+    );
+    setSecondaryDeviceAddress(SecondaryDeviceAddress);
+  };
+
   const renderAddressBookContents = () => {
     return (
       <AddressBookContents
+        SecondaryDeviceAddress={SecondaryDeviceAddress}
+        AssociatedContact={AssociatedContact}
+        SelectedContacts={SelectedContacts}
         onPressBack={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1093,33 +1572,6 @@ export default function Home(props) {
             setTabBarZIndex(999);
           }, 2);
           (addressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderTransactionDetailsContents = () => {
-    return (
-      <TransactionDetailsContents
-        onPressBack={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (transactionDetailsBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderTransactionDetailsHeader = () => {
-    return (
-      <SmallHeaderModal
-        headerColor={Colors.backgroundColor}
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (transactionDetailsBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -1433,19 +1885,34 @@ export default function Home(props) {
   // };
 
   let isNavigate = false;
-  const handleAppStateChange = nextAppState => {
-    console.log('nextAppState', nextAppState);
-    if (global.isCameraOpen) {
-      global.isCameraOpen = false;
+  let isContactOpen = false;
+  let isCameraOpen = false;
+  const handleAppStateChange = async nextAppState => {
+    AsyncStorage.getItem('isContactOpen', (err, value) => {
+      if (err) console.log(err);
+      else {
+        isContactOpen = JSON.parse(value);
+      }
+    });
+    AsyncStorage.getItem('isCameraOpen', (err, value) => {
+      if (err) console.log(err);
+      else {
+        isCameraOpen = JSON.parse(value);
+      }
+    });
+    if (isCameraOpen) {
+      await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
+      return;
     }
-    if (global.isContactOpen) {
-      global.isContactOpen = false;
+    if (isContactOpen) {
+      await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
+      return;
     }
-    var blockApp = setTimeout(function() {
+    var blockApp = setTimeout(() => {
       if (isNavigate) {
         props.navigation.navigate('ReLogin');
       }
-    }, 30000);
+    }, 15000);
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
@@ -1460,14 +1927,18 @@ export default function Home(props) {
 
   const handleDeepLink = useCallback(event => {
     const splits = event.url.split('/');
-    const requester = splits[3];
+    const requester = splits[4];
 
-    if (splits[4] === 'sss') {
-      if (splits[5] === 'ek') {
-        const custodyRequest = { requester, ek: splits[6] };
+    if (splits[5] === 'sss') {
+      if (splits[6] === 'ek') {
+        const custodyRequest = {
+          requester,
+          ek: splits[7],
+          uploadedAt: splits[8],
+        };
         props.navigation.navigate('Home', { custodyRequest });
-      } else if (splits[5] === 'rk') {
-        const recoveryRequest = { requester, rk: splits[6] };
+      } else if (splits[6] === 'rk') {
+        const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
     }
@@ -1475,88 +1946,127 @@ export default function Home(props) {
 
   useEffect(() => {
     if (custodyRequest) {
+      if (tabBarZIndex == 999) {
+        setTimeout(() => {
+          setTabBarZIndex(0);
+          setDeepLinkModalOpen(true);
+        }, 2);
+      }
       setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
-      (CustodianRequestBottomSheet as any).current.snapTo(1);
-      (transactionTabBarBottomSheet as any).current.snapTo(1);
+        if (
+          addressBookBottomSheet.current &&
+          AllAccountsBottomSheet.current &&
+          settingsBottomSheet.current
+        ) {
+          (addressBookBottomSheet as any).current.snapTo(0);
+          (AllAccountsBottomSheet as any).current.snapTo(0);
+          (settingsBottomSheet.current as any).snapTo(0);
+        }
+        (CustodianRequestBottomSheet as any).current.snapTo(1);
+        (transactionTabBarBottomSheet as any).current.snapTo(1);
+      }, 30);
     }
 
     if (recoveryRequest) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 2);
+      if (tabBarZIndex == 999) {
+        setTimeout(() => {
+          setTabBarZIndex(0);
+          setDeepLinkModalOpen(true);
+        }, 2);
+      }
       (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
       (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
   }, [custodyRequest, recoveryRequest]);
 
-  const dispatch = useDispatch();
-
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
-  // const health = useSelector(state => state.sss.overallHealth);
+  const health = useSelector(state => state.sss.overallHealth);
+  useEffect(() => {
+    console.log({ health });
+    if (health) setOverallHealth(health);
+  }, [health]);
+
   // useEffect(() => {
-  //   console.log({ health });
-  //   if (health) setOverallHealth(health);
-  // }, [health]);
+  //   const unsubscribe = NetInfo.addEventListener(state => {
+  //     console.log('Connection type', state.type);
+  //     console.log('Is connected?', state.isConnected);
+  //
+  //     if (!state.isConnected) {
+  //       (NoInternetBottomSheet as any).current.snapTo(1);
+  //     } else {
+  //       (NoInternetBottomSheet as any).current.snapTo(0);
+  //     }
+  //   });
 
-  const s3Service = useSelector(state => state.sss.service);
-  useEffect(() => {
-    if (s3Service)
-      if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  }, [s3Service]);
+  //   // return unsubscribe; // unsubscribing
+  // }, []);
 
-  const testAccService = accounts[TEST_ACCOUNT].service;
-  useEffect(() => {
-    if (testAccService)
-      (async () => {
-        if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-          const { balances } = testAccService.hdWallet;
-          const netBalance = testAccService
-            ? balances.balance + balances.unconfirmedBalance
-            : 0;
-          if (!netBalance) dispatch(getTestcoins(TEST_ACCOUNT));
-        }
-      })();
-  }, [testAccService]);
+  // const s3Service = useSelector(state => state.sss.service);
+  // useEffect(() => {
+  //   if (s3Service)
+  //     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
+  // }, [s3Service]);
 
-  useEffect(() => {
-    (async () => {
-      const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-      if (storedExchangeRates) {
-        const exchangeRates = JSON.parse(storedExchangeRates);
-        if (Date.now() - exchangeRates.lastFetched < 1800000) {
-          setExchangeRates(exchangeRates);
-          return;
-        } // maintaining a half an hour difference b/w fetches
-      }
-      const res = await axios.get('https://blockchain.info/ticker');
-      if (res.status == 200) {
-        const exchangeRates = res.data;
-        exchangeRates.lastFetched = Date.now();
-        setExchangeRates(exchangeRates);
-        await AsyncStorage.setItem(
-          'exchangeRates',
-          JSON.stringify(exchangeRates),
-        );
-      } else {
-        console.log('Failed to retrieve exchange rates', res);
-      }
-    })();
-  }, []);
+  // const testAccService = accounts[TEST_ACCOUNT].service;
+  // useEffect(() => {
+  //   (async () => {
+  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
+  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
+  //         const { balances } = testAccService.hdWallet;
+  //         const netBalance = testAccService
+  //           ? balances.balance + balances.unconfirmedBalance
+  //           : 0;
+  //         if (!netBalance) {
+  //           console.log('Getting Testcoins');
+  //           dispatch(getTestcoins(TEST_ACCOUNT));
+  //         }
+  //       }
+  //   })();
+  // }, [testAccService]);
 
-  useEffect(() => {
-    (async () => {
-      if (await AsyncStorage.getItem('walletRecovered')) {
-        dispatch(fetchBalance(REGULAR_ACCOUNT));
-        dispatch(fetchBalance(SECURE_ACCOUNT));
-        dispatch(fetchTransactions(REGULAR_ACCOUNT));
-        dispatch(fetchTransactions(SECURE_ACCOUNT));
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
+  //     if (storedExchangeRates) {
+  //       const exchangeRates = JSON.parse(storedExchangeRates);
+  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
+  //         setExchangeRates(exchangeRates);
+  //         return;
+  //       } // maintaining a half an hour difference b/w fetches
+  //     }
+  //     const res = await axios.get('https://blockchain.info/ticker');
+  //     if (res.status == 200) {
+  //       const exchangeRates = res.data;
+  //       exchangeRates.lastFetched = Date.now();
+  //       setExchangeRates(exchangeRates);
+  //       await AsyncStorage.setItem(
+  //         'exchangeRates',
+  //         JSON.stringify(exchangeRates),
+  //       );
+  //     } else {
+  //       console.log('Failed to retrieve exchange rates', res);
+  //     }
+  //   })();
+  // }, []);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     if (await AsyncStorage.getItem('walletRecovered')) {
+  //       dispatch(fetchBalance(TEST_ACCOUNT));
+  //       dispatch(fetchBalance(REGULAR_ACCOUNT));
+  //       dispatch(fetchBalance(SECURE_ACCOUNT));
+  //       dispatch(fetchTransactions(TEST_ACCOUNT));
+  //       dispatch(fetchTransactions(REGULAR_ACCOUNT));
+  //       dispatch(fetchTransactions(SECURE_ACCOUNT));
+
+  //       setTimeout(() => {
+  //         AsyncStorage.removeItem('walletRecovered');
+  //       }, 3000);
+  //     }
+  //   })();
+  // }, []);
 
   const renderRecoverySecretRequestModalContent = useCallback(() => {
     if (!recoveryRequest) return <View></View>;
@@ -1569,7 +2079,7 @@ export default function Home(props) {
         }
         subTitle={'Message from the Sender'}
         subTitleInfo={
-          'I lost my hexa wallet, need the shares back to restore my\nwallet'
+          'I am trying to restore my Hexa wallet and need the Recovery Secret shared with you'
         }
         acceptButtonName={'Accept Request'}
         rejectButtonName={'Reject Request'}
@@ -1578,7 +2088,27 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }, 2);
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('RecoveryRequestOTP', { recoveryRequest });
+          if (!UNDER_CUSTODY[recoveryRequest.requester]) {
+            Alert.alert(
+              'Failed to send!',
+              'You do not host any secret for this user.',
+            );
+            setLoading(false);
+          } else {
+            if (recoveryRequest.isQR) {
+              dispatch(
+                uploadRequestedShare(
+                  recoveryRequest.requester,
+                  recoveryRequest.rk,
+                  recoveryRequest.otp,
+                ),
+              );
+            } else {
+              props.navigation.navigate('RecoveryRequestOTP', {
+                recoveryRequest,
+              });
+            }
+          }
         }}
         onPressReject={() => {
           setTimeout(() => {
@@ -1596,7 +2126,7 @@ export default function Home(props) {
         onPressheader={() => {
           (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
           setTimeout(() => {
-            setTabBarZIndex(999);
+            setTabBarZIndex(0);
           }, 2);
         }}
       />
@@ -1727,13 +2257,19 @@ export default function Home(props) {
               <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                 {switchOn ? (
                   <Image
-                    style={CommonStyles.homepageAmountImage}
+                    style={{
+                      ...CommonStyles.homepageAmountImage,
+                      marginBottom: wp('1.5%'),
+                    }}
                     source={require('../assets/images/icons/icon_bitcoin_light.png')}
                   />
                 ) : (
                   <Image
-                    style={styles.cardBitCoinImage}
-                    source={require('../assets/images/icons/icon_dollar_white.png')}
+                    style={{
+                      ...styles.cardBitCoinImage,
+                      marginBottom: wp('1.5%'),
+                    }}
+                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
                   />
                 )}
                 <Text
@@ -1744,10 +2280,12 @@ export default function Home(props) {
                 >
                   {switchOn
                     ? UsNumberFormat(balances.accumulativeBalance)
-                    : (
+                    : exchangeRates
+                    ? (
                         (balances.accumulativeBalance / 1e8) *
-                        exchangeRates['USD'].last
-                      ).toFixed(2)}
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : 0}
                 </Text>
                 <Text
                   style={{
@@ -1755,14 +2293,17 @@ export default function Home(props) {
                     color: Colors.white,
                   }}
                 >
-                  {switchOn ? 'sats' : 'usd'}
+                  {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
             </View>
             <View style={styles.headerToggleSwitchContainer}>
               <ToggleSwitch
+                currencyCodeValue={CurrencyCode}
                 onpress={async () => {
                   setSwitchOn(!switchOn);
+                  let temp = !switchOn ? 'true' : '';
+                  await AsyncStorage.setItem('currencyToggleValue', temp);
                 }}
                 toggle={switchOn}
               />
@@ -1871,7 +2412,7 @@ export default function Home(props) {
                               {value.accountType == 'secure' ? (
                                 <TouchableOpacity
                                   onPress={() => {
-                                    alert('2FA');
+                                    // alert('2FA');
                                   }}
                                   style={{
                                     marginLeft: 'auto',
@@ -1920,10 +2461,19 @@ export default function Home(props) {
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}
-                                    source={require('../assets/images/icons/icon_dollar_dark.png')}
+                                    source={getCurrencyImageByRegion(
+                                      CurrencyCode,
+                                      'light_blue',
+                                    )}
                                   />
                                 )}
-                                <Text style={styles.cardAmountText}>
+                                <Text
+                                  style={
+                                    accounts.accountsSynched
+                                      ? styles.cardAmountText
+                                      : styles.cardAmountTextGrey
+                                  }
+                                >
                                   {switchOn
                                     ? value.accountType === 'test'
                                       ? UsNumberFormat(balances.testBalance)
@@ -1932,22 +2482,25 @@ export default function Home(props) {
                                       : UsNumberFormat(balances.secureBalance)
                                     : value.accountType === 'test'
                                     ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular'
+                                    : value.accountType === 'regular' &&
+                                      exchangeRates
                                     ? (
                                         (balances.regularBalance / 1e8) *
-                                        exchangeRates['USD'].last
+                                        exchangeRates[CurrencyCode].last
                                       ).toFixed(2)
-                                    : (
+                                    : exchangeRates
+                                    ? (
                                         (balances.secureBalance / 1e8) *
-                                        exchangeRates['USD'].last
-                                      ).toFixed(2)}
+                                        exchangeRates[CurrencyCode].last
+                                      ).toFixed(2)
+                                    : 0}
                                 </Text>
                                 <Text style={styles.cardAmountUnitText}>
                                   {switchOn
                                     ? value.unit
                                     : value.accountType === 'test'
                                     ? value.unit
-                                    : 'usd'}
+                                    : CurrencyCode.toLocaleLowerCase()}
                                 </Text>
                               </View>
                             </View>
@@ -1979,25 +2532,29 @@ export default function Home(props) {
         />
       </TouchableWithoutFeedback> */}
       <BottomSheet
+        onOpenEnd={() => {
+          setAtCloseEnd(true);
+        }}
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
           if (selected == 'Transactions')
             (transactionTabBarBottomSheet as any).current.snapTo(1);
         }}
         onCloseStart={() => {
+          setAtCloseEnd(false);
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={transactionTabBarBottomSheet}
+        ref={transactionTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
-          hp('90%'),
+            ? hp('19%')
+            : hp('18%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -2012,15 +2569,15 @@ export default function Home(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={addTabBarBottomSheet}
+        ref={addTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+            ? hp('19%')
+            : hp('18%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderAddContent}
         renderHeader={renderAddHeader}
@@ -2045,15 +2602,15 @@ export default function Home(props) {
         // snapPoints={ snapPoints }
         // callbackNode={ position }
         // ref={bottomSheet}
-        ref={QrTabBarBottomSheet}
+        ref={QrTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
-          hp('90%'),
+            ? hp('19%')
+            : hp('18%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
@@ -2068,48 +2625,60 @@ export default function Home(props) {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={moreTabBarBottomSheet}
+        ref={moreTabBarBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('20%')
-            : hp('19%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('75%'),
+            ? hp('19%')
+            : hp('18%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
       />
-      {/* <BottomSheet
-        onCloseEnd={() => {
-          setTabBarZIndex(999);
-        }}
-        enabledInnerScrolling={true}
-        ref={NoInternetBottomSheet}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderNoInternetModalContent}
-        renderHeader={renderNoInternetModalHeader}
-      /> */}
       <BottomSheet
         onCloseEnd={() => {
           setTabBarZIndex(999);
         }}
         enabledInnerScrolling={true}
-        ref={CustodianRequestBottomSheet}
+        ref={NoInternetBottomSheet as any}
+        snapPoints={[-50, hp('60%')]}
+        renderContent={renderNoInternetModalContent}
+        renderHeader={renderNoInternetModalHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {
+          if (tabBarZIndex == 0 && !deepLinkModalOpen) {
+            setTabBarZIndex(999);
+          }
+        }}
+        onOpenEnd={() => {
+          if (tabBarZIndex == 999) {
+            setTabBarZIndex(0);
+          }
+          setDeepLinkModalOpen(true);
+        }}
+        enabledInnerScrolling={true}
+        ref={CustodianRequestBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
       />
       <BottomSheet
-        onOpenStart={() => {
-          setTabBarZIndex(0);
-        }}
         onCloseEnd={() => {
-          setTabBarZIndex(999);
+          setTimeout(() => {
+            setTabBarZIndex(999);
+          }, 2);
+        }}
+        onOpenEnd={() => {
+          setTimeout(() => {
+            setTabBarZIndex(0);
+          }, 2);
         }}
         enabledInnerScrolling={true}
-        ref={RecoverySecretRequestBottomSheet}
+        ref={RecoverySecretRequestBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
@@ -2140,28 +2709,37 @@ export default function Home(props) {
         renderHeader={renderCustodianRequestOtpModalHeader}
       /> */}
       <BottomSheet
-        onCloseEnd={() => {
+        onCloseStart={() => {
           setTabBarZIndex(999);
         }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
         enabledInnerScrolling={true}
-        ref={CustodianRequestRejectedBottomSheet}
+        ref={CustodianRequestRejectedBottomSheet as any}
         snapPoints={[-50, hp('60%')]}
         renderContent={renderCustodianRequestRejectedModalContent}
         renderHeader={renderCustodianRequestRejectedModalHeader}
       />
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
-          onOpenEnd={() => {}}
+          onOpenEnd={() => {
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(0);
+            }
+          }}
           onCloseEnd={() => {
-            setTabBarZIndex(999);
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(999);
+            }
           }}
           enabledInnerScrolling={true}
-          ref={addressBookBottomSheet}
+          ref={addressBookBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+              ? hp('65%')
+              : hp('64%'),
           ]}
           renderContent={renderAddressBookContents}
           renderHeader={renderAddressBookHeader}
@@ -2170,18 +2748,22 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            setTabBarZIndex(0);
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(0);
+            }
           }}
           onCloseEnd={() => {
-            setTabBarZIndex(999);
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(999);
+            }
           }}
           enabledInnerScrolling={true}
-          ref={AllAccountsBottomSheet}
+          ref={AllAccountsBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+              ? hp('65%')
+              : hp('64%'),
           ]}
           renderContent={renderAllAccountsContents}
           renderHeader={renderAllAccountsHeader}
@@ -2190,15 +2772,22 @@ export default function Home(props) {
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            setTabBarZIndex(0);
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(0);
+            }
+          }}
+          onCloseEnd={() => {
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(999);
+            }
           }}
           enabledInnerScrolling={true}
-          ref={settingsBottomSheet}
+          ref={settingsBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+              ? hp('65%')
+              : hp('64%'),
           ]}
           renderContent={renderSettingsContents}
           renderHeader={renderSettingsHeader}
@@ -2227,7 +2816,7 @@ export default function Home(props) {
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       /> */}
-      <BottomSheet
+      {/* <BottomSheet
         onOpenEnd={() => {}}
         onCloseEnd={() => {
           setTabBarZIndex(999);
@@ -2240,7 +2829,28 @@ export default function Home(props) {
         ]}
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
+      /> */}
+
+      <BottomSheet
+        enabledInnerScrolling={true}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        onCloseStart={() => {
+          setTabBarZIndex(999);
+        }}
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        ref={TransactionDetailsBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+        ]}
+        renderContent={renderTransactionDetailsContents}
+        renderHeader={renderTransactionDetailsHeader}
       />
+
       {addBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
@@ -2251,7 +2861,7 @@ export default function Home(props) {
             setAddSubBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
-          ref={AddBottomSheet}
+          ref={AddBottomSheet as any}
           snapPoints={[-50, hp('63%')]}
           renderContent={renderAddModalContents}
           renderHeader={renderAddModalHeader}
@@ -2263,7 +2873,7 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }}
           enabledInnerScrolling={true}
-          ref={fastBitcoinRedeemCalculationBottomSheet}
+          ref={fastBitcoinRedeemCalculationBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2281,7 +2891,7 @@ export default function Home(props) {
             setTabBarZIndex(0);
           }}
           enabledInnerScrolling={true}
-          ref={fastBitcoinSellCalculationBottomSheet}
+          ref={fastBitcoinSellCalculationBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2304,7 +2914,7 @@ export default function Home(props) {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
-          ref={FamilyAndFriendAddressBookBottomSheet}
+          ref={FamilyAndFriendAddressBookBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2319,7 +2929,7 @@ export default function Home(props) {
         <BottomSheet
           onOpenEnd={() => {}}
           enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookBottomSheet}
+          ref={ContactSelectedFromAddressBookBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2334,7 +2944,7 @@ export default function Home(props) {
         <BottomSheet
           onOpenEnd={() => {}}
           enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookQrCodeBottomSheet}
+          ref={ContactSelectedFromAddressBookQrCodeBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -2345,6 +2955,23 @@ export default function Home(props) {
           renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
         />
       ) : null}
+
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
       {/* <BottomSheet
         onOpenStart={() => {
           setTabBarZIndex(0);
@@ -2460,7 +3087,7 @@ export default function Home(props) {
             </View>
           )}
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => selectTab('Add')}
           style={styles.tabBarTabView}
         >
@@ -2480,7 +3107,7 @@ export default function Home(props) {
               />
             </View>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           onPress={() => selectTab('QR')}
           style={styles.tabBarTabView}
@@ -2585,7 +3212,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowOffset: { width: 2, height: -1 },
     paddingTop: hp('1.5%'),
-    paddingBottom: hp('7%'),
+    paddingBottom: hp('5%'),
     width: '100%',
     overflow: 'hidden',
     paddingLeft: wp('3%'),
@@ -2594,7 +3221,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginTop: 'auto',
     flex: 1,
-    height: Platform.OS == 'ios' ? 47 : 42,
+    height:
+      Platform.OS == 'ios' && DeviceInfo.hasNotch()
+        ? 50
+        : Platform.OS == 'android'
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
@@ -2620,7 +3252,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   headerViewContainer: {
-    marginTop: hp('3%'),
+    marginTop: hp('2%'),
     marginLeft: 20,
     marginRight: 20,
   },
@@ -2645,7 +3277,7 @@ const styles = StyleSheet.create({
   headerInfoText: {
     fontSize: RFValue(12),
     color: Colors.white,
-    marginBottom: hp('4%'),
+    marginBottom: hp('3%'),
   },
   headerButton: {
     backgroundColor: Colors.homepageButtonColor,
@@ -2665,20 +3297,31 @@ const styles = StyleSheet.create({
     width: wp('3%'),
     height: wp('3%'),
     marginRight: 5,
-    marginBottom: wp('0.5%'),
     resizeMode: 'contain',
+    marginBottom: wp('0.7%'),
   },
   cardAmountText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(17),
     marginRight: 5,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
+  },
+  cardAmountTextGrey: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(17),
+    marginRight: 5,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(11),
-    marginBottom: 2,
+    marginTop: 'auto',
+    lineHeight: RFValue(17),
   },
   tabBarImage: {
     width: 21,

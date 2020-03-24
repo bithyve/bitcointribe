@@ -15,6 +15,7 @@ export default class SecureAccount {
       multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
+      secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
@@ -29,6 +30,7 @@ export default class SecureAccount {
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -51,6 +53,7 @@ export default class SecureAccount {
       multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
+      secondaryXpriv,
       xpubs,
       gapLimit,
       balances,
@@ -71,6 +74,7 @@ export default class SecureAccount {
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
+      secondaryXpriv?: string;
       xpubs: {
         primary: string;
         secondary: string;
@@ -244,7 +248,7 @@ export default class SecureAccount {
   };
 
   public resetTwoFA = async (
-    token: number,
+    secondaryMnemonic: string,
   ): Promise<
     | {
         status: number;
@@ -265,7 +269,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.resetTwoFA(token),
+        data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
       };
     } catch (err) {
       return { status: 306, err: err.message, message: ErrMap[306] };
@@ -373,7 +377,12 @@ export default class SecureAccount {
     }
   };
 
-  public getBalance = async (): Promise<
+  public isValidAddress = (recipientAddress: string): Boolean =>
+    this.secureHDWallet.isValidAddress(recipientAddress);
+
+  public getBalance = async (options?: {
+    restore?;
+  }): Promise<
     | {
         status: number;
         data: {
@@ -393,7 +402,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalance(),
+        data: await this.secureHDWallet.fetchBalance(options),
       };
     } catch (err) {
       return { status: 0o2, err: err.message, message: ErrMap[0o2] };
@@ -442,6 +451,54 @@ export default class SecureAccount {
     }
   };
 
+  public getBalanceTransactions = async (options?: {
+    restore?;
+  }): Promise<
+    | {
+        status: number;
+        data: {
+          balances: {
+            balance: number;
+            unconfirmedBalance: number;
+          };
+          transactions: {
+            totalTransactions: number;
+            confirmedTransactions: number;
+            unconfirmedTransactions: number;
+            transactionDetails: Array<{
+              txid: string;
+              status: string;
+              confirmations: number;
+              fee: string;
+              date: string;
+              transactionType: string;
+              amount: number;
+              accountType: string;
+              recipientAddresses?: string[];
+              senderAddresses?: string[];
+            }>;
+          };
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.fetchBalanceTransaction(options),
+      };
+    } catch (err) {
+      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
+    }
+  };
+
   public getTransactionDetails = async (
     txHash: string,
   ): Promise<
@@ -468,38 +525,53 @@ export default class SecureAccount {
     }
   };
 
-  public getTestcoins = async (): Promise<
-    | {
-        status: number;
-        data: {
-          txid: any;
-          funded: any;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
+  // public getTestcoins = async (): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         txid: any;
+  //         funded: any;
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     const { address } = await this.secureHDWallet.getReceivingAddress();
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.secureHDWallet.testnetFaucet(address),
+  //     };
+  //   } catch (err) {
+  //     return { status: 0o5, err: err.message, message: ErrMap[0o5] };
+  //   }
+  // };
+
+  public generateSecondaryXpriv = (
+    secondaryMnemonic: string,
+  ): { generated: Boolean } => {
     try {
-      const { address } = await this.secureHDWallet.getReceivingAddress();
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.testnetFaucet(address),
-      };
+      const generated = this.secureHDWallet.generateSecondaryXpriv(
+        secondaryMnemonic,
+      );
+      return { generated };
     } catch (err) {
-      return { status: 0o5, err: err.message, message: ErrMap[0o5] };
+      console.log({ err });
+      return { generated: false };
     }
   };
 
   public transferST1 = async (
     recipientAddress: string,
     amount: number,
-    priority?: string,
+    priority: string = 'high',
+    feeRates?: any,
   ): Promise<
     | {
         status: number;
@@ -546,6 +618,7 @@ export default class SecureAccount {
           recipientAddress,
           amount,
           priority,
+          feeRates,
         );
 
         if (balance < amount + fee) {
@@ -665,6 +738,48 @@ export default class SecureAccount {
       };
     } catch (err) {
       return { status: 311, err: err.message, message: ErrMap[311] };
+    }
+  };
+
+  public alternateTransferST2 = async (
+    inputs: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+    }>,
+    txb: TransactionBuilder,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          txid: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      const { signedTxb } = this.secureHDWallet.dualSignHDTransaction(
+        inputs,
+        txb,
+      );
+      console.log('---- Transaction Signed ----');
+
+      const txHex = signedTxb.build().toHex();
+      console.log({ txHex });
+      const { txid } = await this.secureHDWallet.broadcastTransaction(txHex);
+      console.log('---- Transaction Broadcasted ----');
+
+      return { status: config.STATUS.SUCCESS, data: { txid } };
+    } catch (err) {
+      return { status: 107, err: err.message, message: ErrMap[107] };
     }
   };
 }

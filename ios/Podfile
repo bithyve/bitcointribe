@@ -36,7 +36,6 @@ target 'HEXA' do
   pod 'PDFGenerator'
    pod 'QRCoder'
 
-  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
 
   pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
 
@@ -60,5 +59,7 @@ target 'HEXA' do
   pod 'react-native-mail', :path => '../node_modules/react-native-mail'
 
   pod 'react-native-contacts', :path => '../node_modules/react-native-contacts'
+
+  pod 'react-native-in-app-utils', :path => '../node_modules/react-native-in-app-utils'
 
 end

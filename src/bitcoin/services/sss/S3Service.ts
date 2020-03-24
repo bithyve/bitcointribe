@@ -14,6 +14,7 @@ export default class S3Service {
     const {
       mnemonic,
       encryptedSecrets,
+      shareIDs,
       metaShares,
       healthCheckInitialized,
       walletId,
@@ -22,6 +23,7 @@ export default class S3Service {
     }: {
       mnemonic: string;
       encryptedSecrets: string[];
+      shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
@@ -31,6 +33,7 @@ export default class S3Service {
 
     return new S3Service(mnemonic, {
       encryptedSecrets,
+      shareIDs,
       metaShares,
       healthCheckInitialized,
       walletId,
@@ -412,6 +415,7 @@ export default class S3Service {
     mnemonic: string,
     stateVars?: {
       encryptedSecrets: string[];
+      shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
@@ -707,6 +711,56 @@ export default class S3Service {
     }
   };
 
+  public reshareMetaShare = (
+    index: number,
+  ):
+    | {
+        status: number;
+        data: {
+          metaShare: MetaShare;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const metaShare = this.sss.reshareMetaShare(index);
+      return { status: config.STATUS.SUCCESS, data: { metaShare } };
+    } catch (err) {
+      return { status: 520, err: err.message, message: ErrMap[520] };
+    }
+  };
+
+  public restoreMetaShares = (
+    metaShares: MetaShare[],
+  ):
+    | {
+        status: number;
+        data: {
+          restored: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const { restored } = this.sss.restoreMetaShares(metaShares);
+      return { status: config.STATUS.SUCCESS, data: { restored } };
+    } catch (err) {
+      return { status: 520, err: err.message, message: ErrMap[520] };
+    }
+  };
+
   public createQR = (
     index: number,
   ):
@@ -734,7 +788,7 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    dynamicNonPMDD?: any,
   ): Promise<
     | {
         status: number;

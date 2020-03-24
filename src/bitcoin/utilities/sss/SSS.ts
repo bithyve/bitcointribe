@@ -1,15 +1,21 @@
-import { AxiosResponse } from 'axios';
+import { AxiosResponse, AxiosInstance } from 'axios';
 import * as bip39 from 'bip39';
 import crypto from 'crypto';
 import secrets from 'secrets.js-grempe';
 import config from '../../Config';
+import axios from 'axios';
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD,
 } from '../Interface';
-const { BH_AXIOS, HEXA_ID } = config;
+const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
+
+const BH_AXIOS: AxiosInstance = axios.create({
+  baseURL: RELAY,
+  timeout: REQUEST_TIMEOUT,
+});
 
 export default class SSS {
   public static cipherSpec: {
@@ -89,15 +95,13 @@ export default class SSS {
         messageId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { share, dynamicNonPMDD } = res.data;
     const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
-    if (dynamicNonPMDD) {
-      return { metaShare, dynamicNonPMDD, messageId };
-    }
-    return { metaShare, messageId };
+    return { metaShare, dynamicNonPMDD, messageId };
   };
 
   public static downloadDynamicNonPMDD = async (
@@ -112,7 +116,8 @@ export default class SSS {
         walletID,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { dynamicNonPMDD } = res.data;
@@ -162,7 +167,8 @@ export default class SSS {
         messageId,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     return { deleted: res.data.deleted };
@@ -218,7 +224,8 @@ export default class SSS {
         dynamicNonPMDD,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { success } = res.data;
@@ -358,11 +365,16 @@ export default class SSS {
       throw new Error('No metaShare supplied');
     }
 
-    const toUpdate: Array<{ walletId: string; shareId: string }> = [];
+    const toUpdate: Array<{
+      walletId: string;
+      shareId: string;
+      reshareVersion: number;
+    }> = [];
     for (const metaShare of metaShares) {
       toUpdate.push({
         walletId: metaShare.meta.walletId,
         shareId: metaShare.shareId,
+        reshareVersion: metaShare.meta.reshareVersion,
       });
     }
 
@@ -373,7 +385,8 @@ export default class SSS {
         toUpdate,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { updationInfo } = res.data;
@@ -474,6 +487,7 @@ export default class SSS {
   };
 
   public walletId: string;
+  public shareIDs: string[];
   public encryptedSecrets: string[];
   public metaShares: MetaShare[];
   public healthCheckInitialized: boolean;
@@ -485,6 +499,7 @@ export default class SSS {
     mnemonic: string,
     stateVars?: {
       encryptedSecrets: string[];
+      shareIDs: string[];
       metaShares: MetaShare[];
       healthCheckInitialized: boolean;
       walletId: string;
@@ -504,6 +519,7 @@ export default class SSS {
           .update(bip39.mnemonicToSeedSync(this.mnemonic))
           .digest('hex');
     this.encryptedSecrets = stateVars ? stateVars.encryptedSecrets : [];
+    this.shareIDs = stateVars ? stateVars.shareIDs : [];
     this.metaShares = stateVars ? stateVars.metaShares : [];
     this.healthCheckInitialized = stateVars
       ? stateVars.healthCheckInitialized
@@ -537,7 +553,7 @@ export default class SSS {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    dynamicNonPMDD?: any,
   ): Promise<{
     otp: string;
     encryptedKey: string;
@@ -551,6 +567,9 @@ export default class SSS {
     const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
       metaShare,
     );
+    if (dynamicNonPMDD) {
+      dynamicNonPMDD = this.encryptDynamicNonPMDD(dynamicNonPMDD);
+    }
 
     try {
       res = await BH_AXIOS.post('uploadShare', {
@@ -560,7 +579,8 @@ export default class SSS {
         dynamicNonPMDD,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { success } = res.data;
@@ -592,7 +612,8 @@ export default class SSS {
         shareIDs,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
@@ -610,25 +631,28 @@ export default class SSS {
     if (!this.metaShares.length)
       throw new Error('Can not initialize health check; missing MetaShares');
 
-    const shareIDs = this.metaShares
-      .slice(0, 3)
-      .map(metaShare => metaShare.shareId);
+    const metaShares = this.metaShares.slice(0, 3);
 
     try {
       res = await BH_AXIOS.post('checkSharesHealth', {
         HEXA_ID,
         walletID: this.walletId,
-        shareIDs,
+        shareIDs: this.shareIDs,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const updates: Array<{ shareId: string; updatedAt: number }> =
       res.data.lastUpdateds;
 
     for (const { shareId, updatedAt } of updates) {
-      this.healthCheckStatus[shareId] = updatedAt;
+      for (let index = 0; index < metaShares.length; index++) {
+        if (metaShares[index] && metaShares[index].shareId === shareId) {
+          this.healthCheckStatus[index] = { shareId, updatedAt };
+        }
+      }
     }
 
     return {
@@ -649,16 +673,22 @@ export default class SSS {
       bhXpub,
     } = secureAccAssets;
 
+    const shareIDs = this.shareIDs;
+
     const socialStaticNonPMDD: SocialStaticNonPMDD = {
       secondaryXpub,
       bhXpub,
+      shareIDs,
     };
     const buddyStaticNonPMDD: BuddyStaticNonPMDD = {
       secondaryMnemonic,
       twoFASecret,
       secondaryXpub,
       bhXpub,
+      shareIDs,
     };
+
+    console.log({ socialStaticNonPMDD });
 
     return {
       encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
@@ -720,7 +750,7 @@ export default class SSS {
   };
 
   public encryptDynamicNonPMDD = (
-    dynamicNonPMDD: MetaShare[],
+    dynamicNonPMDD: any,
   ): { encryptedDynamicNonPMDD: string } => {
     const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
@@ -815,7 +845,8 @@ export default class SSS {
         dynamicNonPMDD,
       });
     } catch (err) {
-      throw new Error(err.response.data.err);
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
     }
 
     const { updated } = res.data;
@@ -871,6 +902,7 @@ export default class SSS {
             walletId: this.walletId,
             tag,
             timestamp,
+            reshareVersion: 0,
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         };
@@ -885,6 +917,7 @@ export default class SSS {
             walletId: this.walletId,
             tag,
             timestamp,
+            reshareVersion: 0,
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         };
@@ -899,6 +932,52 @@ export default class SSS {
     }
 
     return { metaShares: this.metaShares };
+  };
+
+  public reshareMetaShare = (index: number) => {
+    this.metaShares[index].meta.reshareVersion =
+      this.metaShares[index].meta.reshareVersion + 1;
+    console.log({ resharing: this.metaShares[index] });
+    return this.metaShares[index];
+  };
+
+  public restoreMetaShares = (
+    metaShares: MetaShare[],
+  ): {
+    restored: Boolean;
+  } => {
+    if (Object.keys(metaShares).length !== 3) {
+      throw new Error('Restoration requires a minimum of 3 metaShares');
+    }
+
+    this.metaShares = metaShares;
+
+    // restoring other assets
+
+    // restoring healthCheckInit variable
+    this.healthCheckInitialized = true;
+
+    // enriching pdf health variable if restoration is done via Personal Copy
+    if (this.metaShares[3]) {
+      this.createQR(3);
+    }
+    if (this.metaShares[4]) {
+      this.createQR(4);
+    }
+
+    // replenishing shareIDs from any of the available shares
+    for (const share of metaShares) {
+      if (share) {
+        const { decryptedStaticNonPMDD } = this.decryptStaticNonPMDD(
+          share.encryptedStaticNonPMDD,
+        );
+        const { shareIDs } = decryptedStaticNonPMDD;
+        this.shareIDs = shareIDs;
+        break;
+      }
+    }
+
+    return { restored: true };
   };
 
   public createQR = (index: number): { qrData: string[] } => {
@@ -942,7 +1021,7 @@ export default class SSS {
     encryptedSecrets: string[];
   } => {
     const key = SSS.getDerivedKey(answer);
-
+    const shareIDs = [];
     for (const secret of secretsToEncrypt) {
       const cipher = crypto.createCipheriv(
         SSS.cipherSpec.algorithm,
@@ -952,7 +1031,9 @@ export default class SSS {
       let encrypted = cipher.update(secret, 'utf8', 'hex');
       encrypted += cipher.final('hex');
       this.encryptedSecrets.push(encrypted);
+      shareIDs.push(SSS.getShareId(encrypted));
     }
+    this.shareIDs = shareIDs.slice(0, 3); // preserving just the online(relay-transmitted) shareIDs
     return { encryptedSecrets: this.encryptedSecrets };
   };
 }
