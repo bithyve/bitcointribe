@@ -6,8 +6,7 @@
     "android-release": "cd android && ./gradlew app:assembleRelease",
     "ios": "react-native run-ios",
     "web": "expo start --web",
-    "start": "react-native start",
-    "test": "jest"
+    "start": "react-native start"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^5.0.0",
@@ -98,18 +97,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
-    "@types/jest": "^24.0.22",
     "@types/react": "^16.8.23",
     "@types/react-native": "^0.57.65",
     "@types/react-test-renderer": "^16.9.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "^7.0.0",
-    "jest-expo": "^35.0.0",
     "jetifier": "^1.6.4",
     "typescript": "^3.7.2"
-  },
-  "jest": {
-    "preset": "react-native"
   },
   "private": true,
   "react-native": {
