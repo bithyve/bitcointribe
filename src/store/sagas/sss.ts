@@ -913,10 +913,18 @@ function* recoverWalletWorker({ payload }) {
     const { security } = WALLET_SETUP;
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
+    let encDynamicNonPMDD;
     const metaShares = Array(5);
     Object.keys(RECOVERY_SHARES).forEach(key => {
-      const { META_SHARE } = RECOVERY_SHARES[key];
+      const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[key];
       if (META_SHARE) metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
+      if (!encDynamicNonPMDD) {
+        encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      } else {
+        if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
+          encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+        }
+      }
     });
 
     if (Object.keys(metaShares).length !== 3) {
@@ -945,13 +953,36 @@ function* recoverWalletWorker({ payload }) {
         metaShares,
       );
 
+      const UNDER_CUSTODY = {};
+      const DYNAMIC_NONPMDD = {};
+      if (encDynamicNonPMDD) {
+        const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
+
+        if (res.status !== 200)
+          console.log('Failed to decrypt dynamic nonPMDD');
+        const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
+        dynamicNonPMDD.forEach(metaShare => {
+          UNDER_CUSTODY[metaShare.meta.tag] = {
+            META_SHARE: metaShare,
+          };
+          DYNAMIC_NONPMDD['META_SHARES'] = dynamicNonPMDD;
+        });
+      }
+
+      const DECENTRALIZED_BACKUP = {
+        RECOVERY_SHARES: {},
+        SHARES_TRANSFER_DETAILS: {},
+        UNDER_CUSTODY,
+        DYNAMIC_NONPMDD,
+      };
+
       const SERVICES = {
         REGULAR_ACCOUNT: JSON.stringify(regularAcc),
         TEST_ACCOUNT: JSON.stringify(testAcc),
         SECURE_ACCOUNT: JSON.stringify(secureAcc),
         S3_SERVICE: JSON.stringify(s3Service),
       };
-      yield put(insertIntoDB({ SERVICES }));
+      yield put(insertIntoDB({ SERVICES, DECENTRALIZED_BACKUP }));
 
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));

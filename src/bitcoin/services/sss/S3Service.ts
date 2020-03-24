@@ -588,7 +588,7 @@ export default class S3Service {
   };
 
   public decryptDynamicNonPMDD = (
-    encryptedDynamicNonPMDD: string,
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD,
   ):
     | {
         status: number;
@@ -784,7 +784,7 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: any,
+    dynamicNonPMDD?: MetaShare[],
   ): Promise<
     | {
         status: number;

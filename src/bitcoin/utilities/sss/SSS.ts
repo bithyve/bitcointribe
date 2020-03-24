@@ -557,7 +557,7 @@ export default class SSS {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: any,
+    dynamicNonPMDD?: MetaShare[],
   ): Promise<{
     otp: string;
     encryptedKey: string;
@@ -760,7 +760,7 @@ export default class SSS {
   };
 
   public encryptDynamicNonPMDD = (
-    dynamicNonPMDD: any,
+    dynamicNonPMDD: MetaShare[],
   ): { encryptedDynamicNonPMDD: string } => {
     const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
@@ -787,7 +787,7 @@ export default class SSS {
   };
 
   public decryptDynamicNonPMDD = (
-    encryptedDynamicNonPMDD: string,
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD,
   ): {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
@@ -805,7 +805,11 @@ export default class SSS {
       key,
       SSS.cipherSpec.iv,
     );
-    let decrypted = decipher.update(encryptedDynamicNonPMDD, 'hex', 'utf8');
+    let decrypted = decipher.update(
+      encryptedDynamicNonPMDD.encryptedDynamicNonPMDD,
+      'hex',
+      'utf8',
+    );
     decrypted += decipher.final('utf8');
 
     const decryptedDynamicNonPMDD = JSON.parse(decrypted);
