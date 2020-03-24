@@ -318,6 +318,13 @@ function* downloadMetaShareWorker({ payload }) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
     if (payload.downloadType !== 'recovery') {
+      const dynamicNonPMDD = {
+        ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
+        META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
+          ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
+          : [metaShare],
+      };
+
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY: {
@@ -327,13 +334,10 @@ function* downloadMetaShareWorker({ payload }) {
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
           },
         },
-        DYNAMIC_NONPMDD: {
-          ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
-          META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
-            ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
-            : [metaShare],
-        },
+        DYNAMIC_NONPMDD: dynamicNonPMDD,
       };
+
+      yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
       yield put(updateMSharesHealth(updatedBackup));
     } else {
@@ -740,26 +744,33 @@ export const overallHealthWatcher = createWatcher(
   OVERALL_HEALTH,
 );
 
-function* updateDynamicNonPMDDWorker() {
+function* updateDynamicNonPMDDWorker({ payload }) {
   yield put(switchS3Loader('updateDynamicNonPMDD'));
 
-  const { DYNAMIC_NONPMDD } = yield select(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+  let dynamicNonPMDD = payload.dynamicNonPMDD;
+  if (!dynamicNonPMDD) {
+    const { DYNAMIC_NONPMDD } = yield select(
+      state => state.storage.database.DECENTRALIZED_BACKUP,
+    );
 
-  if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
-
+    if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
+    dynamicNonPMDD = DYNAMIC_NONPMDD;
+  }
   const s3Service: S3Service = yield select(state => state.sss.service);
-  const res = yield call(s3Service.updateDynamicNonPMDD, DYNAMIC_NONPMDD);
+  const res = yield call(s3Service.updateDynamicNonPMDD, dynamicNonPMDD);
 
   if (res.status === 200) {
+    const { updated } = res.data;
+    if (!updated) {
+      yield put(switchS3Loader('updateDynamicNonPMDD'));
+      throw new Error('Failed to update dynamic nonPMDD');
+    }
   } // yield success
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
+    yield put(switchS3Loader('updateDynamicNonPMDD'));
     throw new Error(res.err);
   } // yield failure
-
-  yield put(switchS3Loader('updateDynamicNonPMDD'));
 }
 
 export const updateDynamicNonPMDDWatcher = createWatcher(
