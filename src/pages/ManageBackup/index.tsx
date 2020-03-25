@@ -1338,8 +1338,15 @@ export default function ManageBackup(props) {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
-        // console.log({ healthCheckInitialized });
-        // dispatch(checkMSharesHealth());
+        (async () => {
+          const intialHealthSync = await AsyncStorage.getItem(
+            'initalHealthSync',
+          );
+          if (!intialHealthSync) {
+            dispatch(checkMSharesHealth());
+            AsyncStorage.setItem('initalHealthSync', 'true');
+          }
+        })();
       } else {
         // console.log({ healthCheckInitialized });
         dispatch(initHealthCheck());

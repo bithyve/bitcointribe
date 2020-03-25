@@ -77,13 +77,13 @@ export default class SSS {
   ): Promise<
     | {
         metaShare: MetaShare;
-        dynamicNonPMDD: EncDynamicNonPMDD;
+        encryptedDynamicNonPMDD: EncDynamicNonPMDD;
         messageId: string;
       }
     | {
         metaShare: MetaShare;
         messageId: string;
-        dynamicNonPMDD?: undefined;
+        encryptedDynamicNonPMDD?: undefined;
       }
   > => {
     const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
@@ -99,15 +99,15 @@ export default class SSS {
       if (err.code) throw new Error(err.code);
     }
 
-    const { share, dynamicNonPMDD } = res.data;
+    const { share, encryptedDynamicNonPMDD } = res.data;
     const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare;
-    return { metaShare, dynamicNonPMDD, messageId };
+    return { metaShare, encryptedDynamicNonPMDD, messageId };
   };
 
   public static downloadDynamicNonPMDD = async (
     walletID: string,
   ): Promise<{
-    dynamicNonPMDD: EncDynamicNonPMDD;
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   }> => {
     let res: AxiosResponse;
     try {
@@ -120,10 +120,10 @@ export default class SSS {
       if (err.code) throw new Error(err.code);
     }
 
-    const { dynamicNonPMDD } = res.data;
-    if (dynamicNonPMDD) {
+    const { encryptedDynamicNonPMDD } = res.data;
+    if (encryptedDynamicNonPMDD) {
       return {
-        dynamicNonPMDD,
+        encryptedDynamicNonPMDD,
       };
     } else {
       throw new Error('Unable to download EncDynamicNonPMDD');
@@ -207,7 +207,7 @@ export default class SSS {
     encryptedKey: string,
     otp: string,
     metaShare: MetaShare,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<{ success: boolean }> => {
     const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
     const { encryptedMetaShare, messageId } = SSS.encryptMetaShare(
@@ -221,7 +221,7 @@ export default class SSS {
         HEXA_ID,
         share: encryptedMetaShare,
         messageId,
-        dynamicNonPMDD,
+        encryptedDynamicNonPMDD,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
@@ -240,18 +240,22 @@ export default class SSS {
     otp: string,
     existingShares?: MetaShare[],
     walletId?: string,
-  ) => {
-    const { metaShare, messageId, dynamicNonPMDD } = await SSS.downloadShare(
-      encryptedKey,
-      otp,
-    );
+  ): Promise<{
+    metaShare: MetaShare;
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  }> => {
+    const {
+      metaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    } = await SSS.downloadShare(encryptedKey, otp);
 
     if (SSS.validateStorage(metaShare, existingShares, walletId)) {
       const { deleted } = await SSS.affirmDecryption(messageId);
       if (!deleted) {
         console.log('Unable to remove the share from the server');
       }
-      return { metaShare, dynamicNonPMDD };
+      return { metaShare, encryptedDynamicNonPMDD };
     }
   };
 
@@ -357,7 +361,7 @@ export default class SSS {
       shareId: string;
       updated: boolean;
       updatedAt?: number;
-      dynamicNonPMDD?: EncDynamicNonPMDD;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
       err?: string;
     }>;
   }> => {
@@ -553,7 +557,7 @@ export default class SSS {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: any,
+    dynamicNonPMDD?: MetaShare[],
   ): Promise<{
     otp: string;
     encryptedKey: string;
@@ -567,8 +571,14 @@ export default class SSS {
     const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
       metaShare,
     );
+
+    let encryptedDynamicNonPMDD: EncDynamicNonPMDD;
     if (dynamicNonPMDD) {
-      dynamicNonPMDD = this.encryptDynamicNonPMDD(dynamicNonPMDD);
+      encryptedDynamicNonPMDD = {
+        encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+          .encryptedDynamicNonPMDD,
+        updatedAt: Date.now(),
+      };
     }
 
     try {
@@ -576,7 +586,7 @@ export default class SSS {
         HEXA_ID,
         share: encryptedMetaShare,
         messageId,
-        dynamicNonPMDD,
+        encryptedDynamicNonPMDD,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
@@ -750,7 +760,7 @@ export default class SSS {
   };
 
   public encryptDynamicNonPMDD = (
-    dynamicNonPMDD: any,
+    dynamicNonPMDD: MetaShare[],
   ): { encryptedDynamicNonPMDD: string } => {
     const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
@@ -777,7 +787,7 @@ export default class SSS {
   };
 
   public decryptDynamicNonPMDD = (
-    encryptedDynamicNonPMDD: string,
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD,
   ): {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
@@ -795,7 +805,11 @@ export default class SSS {
       key,
       SSS.cipherSpec.iv,
     );
-    let decrypted = decipher.update(encryptedDynamicNonPMDD, 'hex', 'utf8');
+    let decrypted = decipher.update(
+      encryptedDynamicNonPMDD.encryptedDynamicNonPMDD,
+      'hex',
+      'utf8',
+    );
     decrypted += decipher.final('utf8');
 
     const decryptedDynamicNonPMDD = JSON.parse(decrypted);
@@ -828,13 +842,14 @@ export default class SSS {
   };
 
   public updateDynamicNonPMDD = async (
-    encryptedDynamicNonPMDD: string,
+    dynamicNonPMDD,
   ): Promise<{
     updated: boolean;
   }> => {
-    const dynamicNonPMDD: EncDynamicNonPMDD = {
+    const encryptedDynamicNonPMDD: EncDynamicNonPMDD = {
       updatedAt: Date.now(),
-      encryptedDynamicNonPMDD,
+      encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+        .encryptedDynamicNonPMDD,
     };
 
     let res: AxiosResponse;
@@ -842,7 +857,7 @@ export default class SSS {
       res = await BH_AXIOS.post('updateDynamicNonPMDD', {
         HEXA_ID,
         walletID: this.walletId,
-        dynamicNonPMDD,
+        encryptedDynamicNonPMDD,
       });
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
