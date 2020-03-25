@@ -200,28 +200,28 @@ export default function NewWalletQuestion(props) {
 
   useEffect(() => {
     (async () => {
-    if (isLoaderStart) {
-      const security = {
-        question: dropdownBoxValue.question,
-        answer,
-      };
-      dispatch(initializeSetup(walletName, security));
-      const current = Date.now();
-      await AsyncStorage.setItem(
-        'SecurityAnsTimestamp',
-        JSON.stringify(current),
-      );
-      const securityQuestionHistory = {
-        created: current,
-        confirmed: current,
-      };
-      await AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify(securityQuestionHistory),
-      );
-    }
+      if (isLoaderStart) {
+        const security = {
+          question: dropdownBoxValue.question,
+          answer,
+        };
+        dispatch(initializeSetup(walletName, security));
+        const current = Date.now();
+        await AsyncStorage.setItem(
+          'SecurityAnsTimestamp',
+          JSON.stringify(current),
+        );
+        const securityQuestionHistory = {
+          created: current,
+          confirmed: current,
+        };
+        await AsyncStorage.setItem(
+          'securityQuestionHistory',
+          JSON.stringify(securityQuestionHistory),
+        );
+      }
     })();
-    }, [isLoaderStart]);
+  }, [isLoaderStart]);
 
   useEffect(() => {
     if (
@@ -239,13 +239,13 @@ export default function NewWalletQuestion(props) {
   const setConfirm = () => {
     setConfirmAnswer(tempAns);
     if (answer && confirmAnswer && confirmAnswer != answer) {
-        setAnsError('Answers do not match');
-      } else {
-        setTimeout(() => {
-          setAnsError('');
-        }, 2);
-      }
+      setAnsError('Answers do not match');
+    } else {
+      setTimeout(() => {
+        setAnsError('');
+      }, 2);
     }
+  };
 
   const setBackspace = event => {
     if (event.nativeEvent.key == 'Backspace') {
@@ -300,18 +300,18 @@ export default function NewWalletQuestion(props) {
     );
   };
 
-  const seLoaderMessages = () =>{
+  const seLoaderMessages = () => {
     setTimeout(() => {
-      setMessage("Setting up your accounts");
+      setMessage('Setting up your accounts');
       setTimeout(() => {
-        setMessage("Getting test bitcoins (sats) for the Test account");
+        setMessage('Getting test bitcoins (sats) for the Test account');
         setTimeout(() => {
-          setMessage("Generating Recovery Secrets for the wallet backup");
+          setMessage('Generating Recovery Secrets for the wallet backup');
         }, 3000);
       }, 3000);
     }, 3000);
-  }
-  
+  };
+
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
@@ -319,7 +319,7 @@ export default function NewWalletQuestion(props) {
         messageText={'This may take a few seconds'}
       />
     );
-  },[message]);
+  }, [message]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -411,7 +411,10 @@ export default function NewWalletQuestion(props) {
 
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
-                  <ScrollView nestedScrollEnabled={true} style={{ height: hp('40%') }}>
+                  <ScrollView
+                    nestedScrollEnabled={true}
+                    style={{ height: hp('40%') }}
+                  >
                     {dropdownBoxList.map((value, index) => (
                       <TouchableOpacity
                         onPress={() => {

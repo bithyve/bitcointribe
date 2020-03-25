@@ -145,6 +145,14 @@ export default function Home(props) {
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
+
+  const s3Service = useSelector(state => state.sss.service);
+  useEffect(() => {
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+      if (!healthCheckInitialized) dispatch(initHealthCheck());
+    }
+  }, [s3Service]);
   // const [balances, setBalances] = useState({
   //   testBalance: 0,
   //   regularBalance: 0,

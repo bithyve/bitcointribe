@@ -224,7 +224,6 @@ class Config {
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
-
     console.log({ BIT_SERVER_MODE });
     if (BIT_SERVER_MODE === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;

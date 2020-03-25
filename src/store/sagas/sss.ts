@@ -163,11 +163,13 @@ function* uploadEncMetaShareWorker({ payload }) {
   let dynamicNonPMDD;
   if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
 
+  console.log({ dynamicNonPMDD });
   const res = yield call(
     s3Service.uploadShare,
     payload.shareIndex,
     dynamicNonPMDD,
   );
+  console.log({ res });
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
@@ -318,12 +320,14 @@ function* downloadMetaShareWorker({ payload }) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
     if (payload.downloadType !== 'recovery') {
+      console.log({ DECENTRALIZED_BACKUP });
       const dynamicNonPMDD = {
         ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
         META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
           ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
           : [metaShare],
       };
+      console.log({ dynamicNonPMDD });
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
@@ -336,6 +340,8 @@ function* downloadMetaShareWorker({ payload }) {
         },
         DYNAMIC_NONPMDD: dynamicNonPMDD,
       };
+
+      console.log({ updatedBackup });
 
       yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
@@ -498,7 +504,7 @@ function* updateMSharesHealthWorker({ payload }) {
           if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
             // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
             if (info.encryptedDynamicNonPMDD)
-              UNDER_CUSTODY[tag].encryptedDynamicNonPMDD =
+              UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
                 info.encryptedDynamicNonPMDD;
           }
         } else {
@@ -748,6 +754,8 @@ function* updateDynamicNonPMDDWorker({ payload }) {
   yield put(switchS3Loader('updateDynamicNonPMDD'));
 
   let dynamicNonPMDD = payload.dynamicNonPMDD;
+  console.log({ dynamicNonPMDD });
+
   if (!dynamicNonPMDD) {
     const { DYNAMIC_NONPMDD } = yield select(
       state => state.storage.database.DECENTRALIZED_BACKUP,
@@ -756,9 +764,10 @@ function* updateDynamicNonPMDDWorker({ payload }) {
     if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
     dynamicNonPMDD = DYNAMIC_NONPMDD;
   }
+
   const s3Service: S3Service = yield select(state => state.sss.service);
   const res = yield call(s3Service.updateDynamicNonPMDD, dynamicNonPMDD);
-
+  console.log({ res });
   if (res.status === 200) {
     const { updated } = res.data;
     if (!updated) {
@@ -925,6 +934,7 @@ function* recoverWalletWorker({ payload }) {
           encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
         }
       }
+      console.log({ encDynamicNonPMDD });
     });
 
     if (Object.keys(metaShares).length !== 3) {
@@ -954,19 +964,19 @@ function* recoverWalletWorker({ payload }) {
       );
 
       const UNDER_CUSTODY = {};
-      const DYNAMIC_NONPMDD = {};
+      let DYNAMIC_NONPMDD = {};
       if (encDynamicNonPMDD) {
         const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
 
         if (res.status !== 200)
           console.log('Failed to decrypt dynamic nonPMDD');
         const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
-        dynamicNonPMDD.forEach(metaShare => {
+        dynamicNonPMDD.META_SHARES.forEach(metaShare => {
           UNDER_CUSTODY[metaShare.meta.tag] = {
             META_SHARE: metaShare,
           };
-          DYNAMIC_NONPMDD['META_SHARES'] = dynamicNonPMDD;
         });
+        DYNAMIC_NONPMDD = dynamicNonPMDD;
       }
 
       const DECENTRALIZED_BACKUP = {
@@ -975,6 +985,7 @@ function* recoverWalletWorker({ payload }) {
         UNDER_CUSTODY,
         DYNAMIC_NONPMDD,
       };
+      console.log({ DECENTRALIZED_BACKUP });
 
       const SERVICES = {
         REGULAR_ACCOUNT: JSON.stringify(regularAcc),
