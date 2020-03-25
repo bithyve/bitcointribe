@@ -14,6 +14,8 @@ import {
   NativeModules,
   Alert,
   SafeAreaView,
+  TextInput,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -30,10 +32,49 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Toast from '../../components/Toast';
 import Octicons from 'react-native-vector-icons/Octicons';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import ModalHeader from '../../components/ModalHeader';
+import ErrorModalContents from '../../components/ErrorModalContents';
 
-export default function SignUpInfo(props) {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={`Verification link sent`}
+        info={
+          'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email\n\n'
+        }
+        note={emailAddress}
+        noteNextLine={mobileNumber}
+        proceedButtonText={'Start Over'}
+        onPressProceed={() => {
+          if (ErrorBottomSheet.current)
+            (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          if (ErrorBottomSheet.current)
+            (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+          bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, []);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -62,21 +103,51 @@ export default function SignUpInfo(props) {
         <View
           style={{ flex: 1, marginTop: 10, marginLeft: 25, marginBottom: 20, marginRight: 20 }}
         >
-          <Text style={styles.modalHeaderSmallTitleText}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae rem
-            porro ducimus repudiandae alias optio accusantium numquam illum
-            autem, voluptatum ullam reiciendis laboriosam obcaecati hic! Ab sit
-            iusto facere minus?
-          </Text>
-          <View style={{marginTop: 10}}>
-            {[1, 2, 3, 4].map(value => {
-              return (
-                <Text style={styles.modalHeaderSmallTitleText}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit 
-                </Text>
-              );
-            })}
-          </View>
+          <View style={{ ...styles.textBoxView }}>
+                    <TextInput
+                      style={{
+                        ...styles.textBox,
+                        paddingRight: 20,
+                        marginTop: 10,
+                        marginBottom: 10,
+                      }}
+                      returnKeyLabel="Done"
+                      returnKeyType="done"
+                      onSubmitEditing={Keyboard.dismiss}
+                      keyboardType={
+                        Platform.OS == 'ios'
+                          ? 'ascii-capable'
+                          : 'visible-password'
+                      }
+                      placeholder={'Enter email address'}
+                      value={emailAddress}
+                      onChangeText={value => {
+                        setEmailAddress(value)
+                      }}
+                      placeholderTextColor={Colors.borderColor}
+                     />
+                  </View>
+
+                  <View style={{ ...styles.textBoxView }}>
+                    <TextInput
+                      style={{
+                        ...styles.textBox,
+                        paddingRight: 20,
+                        marginTop: 10,
+                        marginBottom: 10,
+                      }}
+                      returnKeyLabel="Done"
+                      returnKeyType="done"
+                      onSubmitEditing={Keyboard.dismiss}
+                      keyboardType={'numeric'}
+                      placeholder={'Enter phone number'}
+                      value={mobileNumber}
+                      onChangeText={value => {
+                        setMobileNumber(value)}
+                      }
+                      placeholderTextColor={Colors.borderColor}
+                     />
+                  </View>
         </View>
         <View style={{marginTop: 'auto'}}>
         <BottomInfoBox
@@ -99,7 +170,7 @@ export default function SignUpInfo(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate('SignUpDetails');
+              (ErrorBottomSheet as any).current.snapTo(1);
             }}
             style={{
               height: wp('13%'),
@@ -115,7 +186,7 @@ export default function SignUpInfo(props) {
               
             }}
           >
-            <Text>Continue</Text>
+            <Text>SignUp</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -132,7 +203,18 @@ export default function SignUpInfo(props) {
             <Text>Back</Text>
           </TouchableOpacity>
         </View>
+        <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('50%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
       </View>
+      
     </SafeAreaView>
   );
 }
@@ -152,6 +234,22 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(17),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  textBox: {
+    flex: 1,
+    paddingLeft: 20,
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(13),
+  },
+  textBoxView: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    height: 50,
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
   },
   modalContainer: {
     height: '100%',

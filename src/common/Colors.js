@@ -12,6 +12,7 @@ export default {
   red: '#FF7761',
   homepageButtonColor: "#2C85C1",
   yellow:"#E9BB35",
+  shadowYellow: '#fff2cc',
   lightRed:"#FF78614D",
   backgroundColor1: "#FCFCFC"
 };

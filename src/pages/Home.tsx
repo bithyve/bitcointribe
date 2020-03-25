@@ -1441,7 +1441,8 @@ export default function Home(props) {
 
   const onPressElement = item => {
     if (item.title == 'Backup Health') {
-      props.navigation.navigate('ManageBackup');
+      props.navigation.navigate('SignUpInfo');
+     // props.navigation.navigate('ManageBackup');
     }
     if (item.title == 'Address Book') {
       (addressBookBottomSheet as any).current.snapTo(1);
