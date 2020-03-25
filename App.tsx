@@ -9,7 +9,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { AppState, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 const prefix = 'hexa://'
 export default () => {
