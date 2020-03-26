@@ -168,7 +168,7 @@ export default function SignUpDetails(props) {
 
   const renderConfirmOTPModalContent = useCallback(() => {
     return (
-      <View style={{ backgroundColor: Colors.white, height: '100%' }}>
+      <View style={{ backgroundColor: Colors.white, height: '100%', paddingBottom:wp('10%') }}>
         <View
           style={{
             height: '100%',
@@ -177,13 +177,13 @@ export default function SignUpDetails(props) {
             marginBottom: hp('2%'),
           }}
         >
-          <View style={{ marginTop: hp('3.5%') }}>
+          <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.commModeModalHeaderText}>
               {'Enter OTP to\nconfirm phone number'}
             </Text>
-            <Text style={styles.commModeModalInfoText}>
+            <Text style={{...styles.commModeModalInfoText, marginTop:5}}>
               {
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
               }
             </Text>
           </View>
@@ -328,7 +328,7 @@ export default function SignUpDetails(props) {
             </View>
             <Text style={styles.commModeModalInfoText}>
               {
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
               }
             </Text>
           </View>

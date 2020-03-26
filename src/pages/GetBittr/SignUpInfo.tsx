@@ -54,40 +54,40 @@ export default function SignUpInfo(props) {
             <View style={{flex: 1,marginRight: 10, marginBottom: 10}}>
               <Text style={styles.modalHeaderTitleText}>{'Get Bittr'}</Text>
               <Text style={{...styles.modalHeaderSmallTitleText, marginBottom: 10}}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
               </Text>
             </View>
           </View>
         </View>
         <View
-          style={{ flex: 1, marginTop: 10, marginLeft: 25, marginBottom: 20, marginRight: 20 }}
+          style={{ flex: 1, marginTop: 10, marginLeft:wp('12%'), marginRight:wp('10%') }}
         >
-          <Text style={styles.modalHeaderSmallTitleText}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae rem
-            porro ducimus repudiandae alias optio accusantium numquam illum
-            autem, voluptatum ullam reiciendis laboriosam obcaecati hic! Ab sit
-            iusto facere minus?
+          <Text style={{...styles.modalHeaderSmallTitleText, marginBottom:wp('7%')}}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
           </Text>
           <View style={{marginTop: 10}}>
             {[1, 2, 3, 4].map(value => {
               return (
-                <Text style={styles.modalHeaderSmallTitleText}>
-                  <Octicons size={RFValue(13)} color={Colors.yellow} name={"primitive-dot"}/> Lorem ipsum dolor sit amet consectetur adipisicing elit 
-                </Text>
+                <View style={{flexDirection: "row", }}>
+                  <Octicons size={RFValue(10)} color={Colors.yellow} style={{marginTop:3}} name={"primitive-dot"}/> 
+                  <Text style={{...styles.modalHeaderSmallTitleText, marginLeft:8}}>
+                    Lorem ipsum dolor sit amet conse ctetur adipi sicing elit 
+                  </Text>
+                </View>
               );
             })}
           </View>
         </View>
         <View style={{marginTop: 'auto'}}>
-        <BottomInfoBox
-        backgroundColor={Colors.white}
-        titleColor={Colors.black1}
-        title={"Note"}
-        infoText={
-          'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
-        }
-      />
-      </View>
+          <BottomInfoBox
+            backgroundColor={Colors.white}
+            titleColor={Colors.black1}
+            title={"Note"}
+            infoText={
+              'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+            }
+          />
+        </View>
         <View
           style={{
             alignItems: 'center',
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderSmallTitleText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
   },
 });
