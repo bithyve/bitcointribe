@@ -47,7 +47,7 @@ export default function SignUpInfo(props) {
             >
               <FontAwesome
                 name="long-arrow-left"
-                color={Colors.textColorGrey}
+                color={Colors.black1}
                 size={17}
               />
             </TouchableOpacity>
@@ -72,7 +72,7 @@ export default function SignUpInfo(props) {
             {[1, 2, 3, 4].map(value => {
               return (
                 <Text style={styles.modalHeaderSmallTitleText}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit 
+                  <Octicons size={RFValue(13)} color={Colors.yellow} name={"primitive-dot"}/> Lorem ipsum dolor sit amet consectetur adipisicing elit 
                 </Text>
               );
             })}
@@ -81,7 +81,7 @@ export default function SignUpInfo(props) {
         <View style={{marginTop: 'auto'}}>
         <BottomInfoBox
         backgroundColor={Colors.white}
-        titleColor={Colors.textColorGrey}
+        titleColor={Colors.black1}
         title={"Note"}
         infoText={
           'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
@@ -93,7 +93,7 @@ export default function SignUpInfo(props) {
             alignItems: 'center',
             flexDirection: 'row',
             marginTop: 'auto',
-            marginBottom: hp('5%'),
+            marginBottom: hp('4%'),
             marginLeft: wp('8%'),
           }}
         >
@@ -149,9 +149,9 @@ const styles = StyleSheet.create({
     marginTop: hp('5%'),
   },
   modalHeaderTitleText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(17),
-    fontFamily: Fonts.FiraSansMedium,
+    color: Colors.black1,
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
     height: '100%',

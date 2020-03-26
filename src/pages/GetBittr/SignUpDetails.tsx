@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   TextInput,
   Keyboard,
+  ScrollView,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -35,30 +36,70 @@ export default function SignUpDetails(props) {
   const [VerificationSuccessBottomSheet, setVerificationSuccessBottomSheet] = useState(React.createRef());
   const [InstructionsBottomSheet, setInstructionsBottomSheet] =useState(React.createRef());
   
+  const [OTPBottomSheet, setOTPBottomSheet] = useState(React.createRef());
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const [errorProceedButton, setErrorProceedButton] = useState('');
+  const [errorIgnoreButton, setErrorIgnoreButton] = useState('');
+  const [isIgnoreButton, setIsIgnoreButton] = useState(false);
+  const [passcode, setPasscode] = useState([]);
+
+  function onPressNumber(text, i) {
+    let tempPasscode = passcode;
+    tempPasscode[i] = text;
+    setPasscode(tempPasscode);
+
+    if (passcode.join('').length == 4) {
+      props.navigation.navigate('WalletCreationSuccess');
+    }
+  }
+  //TODO: when we handle error add this code
+  // setTimeout(() => {
+  //   setErrorMessageHeader(`Oops!\nSomething went wrong`);
+  //   setErrorMessage(
+  //     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magn'
+  //   );
+  //   setErrorProceedButton('Try Again');
+  //   setIsIgnoreButton(true);
+  //    setErrorIgnoreButton('Back')
+  // }, 2);
+  // (ErrorBottomSheet as any).current.snapTo(1);
+
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
-        title={`Verification link sent`}
-        info={
-          'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email\n\n'
-        }
+        title={errorMessageHeader}
+        info={errorMessage}
         note={emailAddress}
         noteNextLine={mobileNumber}
-        proceedButtonText={'Start Over'}
+        proceedButtonText={errorProceedButton}
+        headerTextColor={Colors.black1}
+        buttonTextColor={Colors.buttonText}
+        buttonColor={Colors.yellow}
+        buttonShadowColor={Colors.shadowYellow}
         onPressProceed={() => {
           if (ErrorBottomSheet.current)
             (ErrorBottomSheet as any).current.snapTo(0);
         }}
+        isIgnoreButton={isIgnoreButton}
+        cancelButtonText={errorIgnoreButton}
         onPressIgnore={() => {
           if (ErrorBottomSheet.current)
             (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
-          bottomImage={require('../../assets/images/icons/errorImage.png')}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, []);
+  }, [
+    emailAddress,
+    mobileNumber,
+    errorMessage,
+    errorMessageHeader,
+    errorProceedButton,
+    errorIgnoreButton,
+    isIgnoreButton,
+  ]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -121,12 +162,213 @@ export default function SignUpDetails(props) {
         onPressHeader={() => {
           (InstructionsBottomSheet as any).current.snapTo(0);
         }}
+        />
+      );
+    }, []);
+
+  const renderConfirmOTPModalContent = useCallback(() => {
+    return (
+      <View style={{ backgroundColor: Colors.white, height: '100%' }}>
+        <View
+          style={{
+            height: '100%',
+            marginRight: wp('4%'),
+            marginLeft: wp('4%'),
+            marginBottom: hp('2%'),
+          }}
+        >
+          <View style={{ marginTop: hp('3.5%') }}>
+            <Text style={styles.commModeModalHeaderText}>
+              {'Enter OTP to\nconfirm phone number'}
+            </Text>
+            <Text style={styles.commModeModalInfoText}>
+              {
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
+              }
+            </Text>
+          </View>
+          <View
+            style={{
+              marginBottom: hp('4%'),
+              paddingBottom: 20,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+              }}
+            >
+              {passcode.join('').length == 4 ? (
+                <Text
+                  style={{
+                    color: Colors.red,
+                    fontSize: RFValue(10),
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                  }}
+                >
+                  Incorrect OTP, Try Again
+                </Text>
+              ) : null}
+            </View>
+            <View style={styles.passcodeTextInputView}>
+              <TextInput
+                maxLength={1}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
+                autoFocus={true}
+                autoCorrect={false}
+                ref={input => {
+                  this.textInput = input;
+                }}
+                style={[
+                  this.textInput && this.textInput.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={value => {
+                  onPressNumber(value, 0);
+                  if (value.length >= 1) {
+                    this.textInput2.focus();
+                  }
+                }}
+                onKeyPress={e => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput.focus();
+                    onPressNumber('', 0);
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
+                autoCorrect={false}
+                ref={input => {
+                  this.textInput2 = input;
+                }}
+                style={[
+                  this.textInput2 && this.textInput2.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={value => {
+                  onPressNumber(value, 1);
+                  if (value.length >= 1) this.textInput3.focus();
+                }}
+                onKeyPress={e => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput.focus();
+                    onPressNumber('', 1);
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
+                autoCorrect={false}
+                ref={input => {
+                  this.textInput3 = input;
+                }}
+                style={[
+                  this.textInput3 && this.textInput3.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={value => {
+                  onPressNumber(value, 2);
+                  if (value.length >= 1) this.textInput4.focus();
+                }}
+                onKeyPress={e => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput2.focus();
+                    onPressNumber('', 2);
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                selectTextOnFocus={true}
+                contextMenuHidden={true}
+                autoCorrect={false}
+                ref={input => {
+                  this.textInput4 = input;
+                }}
+                style={[
+                  this.textInput4 && this.textInput4.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={value => {
+                  onPressNumber(value, 3);
+                  if (value.length >= 1) this.textInput5.focus();
+                }}
+                onKeyPress={e => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput3.focus();
+                    onPressNumber('', 3);
+                  }
+                }}
+              />
+            </View>
+            <Text style={styles.commModeModalInfoText}>
+              {
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
+              }
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            onPress={() => {}}
+            style={{
+              height: wp('13%'),
+              width: wp('40%'),
+              backgroundColor: Colors.yellow,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 8,
+              elevation: 10,
+              shadowColor: Colors.shadowYellow,
+              shadowOpacity: 1,
+              shadowOffset: { width: 15, height: 15 },
+              marginRight: 25,
+              marginLeft: 25,
+            }}
+          >
+            <Text>Confirm</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }, []);
+
+  const renderConfirmOTPModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (OTPBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1, paddingBottom:wp('10%') }}>
+    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
       <StatusBar backgroundColor={Colors.backgroundColor1} barStyle="dark-content" />
       <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
       <View style={styles.modalContainer}>
@@ -138,88 +380,104 @@ export default function SignUpDetails(props) {
             >
               <FontAwesome
                 name="long-arrow-left"
-                color={Colors.textColorGrey}
+                color={Colors.black1}
                 size={17}
               />
             </TouchableOpacity>
-            <View style={{flex: 1,marginRight: 10, marginBottom: 10}}>
+            <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
               <Text style={styles.modalHeaderTitleText}>{'Get Bittr'}</Text>
-              <Text style={{...styles.modalHeaderSmallTitleText, marginBottom: 10}}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. 
+              <Text
+                style={{
+                  ...styles.modalHeaderSmallTitleText,
+                  marginBottom: 10,
+                }}
+              >
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
               </Text>
             </View>
           </View>
         </View>
         <View
-          style={{ flex: 1, marginTop: 10, marginLeft: 25, marginBottom: 20, marginRight: 20 }}
+          style={{
+            flex: 1,
+            marginTop: 10,
+            marginLeft: 25,
+            marginBottom: 20,
+            marginRight: 20,
+          }}
         >
           <View style={{ ...styles.textBoxView }}>
-                    <TextInput
-                      style={{
-                        ...styles.textBox,
-                        paddingRight: 20,
-                        marginTop: 10,
-                        marginBottom: 10,
-                      }}
-                      returnKeyLabel="Done"
-                      returnKeyType="done"
-                      onSubmitEditing={Keyboard.dismiss}
-                      keyboardType={
-                        Platform.OS == 'ios'
-                          ? 'ascii-capable'
-                          : 'visible-password'
-                      }
-                      placeholder={'Enter email address'}
-                      value={emailAddress}
-                      onChangeText={value => {
-                        setEmailAddress(value)
-                      }}
-                      placeholderTextColor={Colors.borderColor}
-                     />
-                  </View>
+            <TextInput
+              style={{
+                ...styles.textBox,
+                paddingRight: 20,
+                marginTop: 10,
+                marginBottom: 10,
+              }}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              }
+              placeholder={'Enter email address'}
+              value={emailAddress}
+              onChangeText={value => {
+                setEmailAddress(value);
+              }}
+              placeholderTextColor={Colors.borderColor}
+            />
+          </View>
 
-                  <View style={{ ...styles.textBoxView }}>
-                    <TextInput
-                      style={{
-                        ...styles.textBox,
-                        paddingRight: 20,
-                        marginTop: 10,
-                        marginBottom: 10,
-                      }}
-                      returnKeyLabel="Done"
-                      returnKeyType="done"
-                      onSubmitEditing={Keyboard.dismiss}
-                      keyboardType={'numeric'}
-                      placeholder={'Enter phone number'}
-                      value={mobileNumber}
-                      onChangeText={value => {
-                        setMobileNumber(value)}
-                      }
-                      placeholderTextColor={Colors.borderColor}
-                     />
-                  </View>
-        </View>
-        <View style={{marginTop: 'auto'}}>
-        <BottomInfoBox
-        backgroundColor={Colors.white}
-        titleColor={Colors.textColorGrey}
-        title={"Note"}
-        infoText={
-          'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
-        }
-      />
+          <View style={{ ...styles.textBoxView }}>
+            <TextInput
+              style={{
+                ...styles.textBox,
+                paddingRight: 20,
+                marginTop: 10,
+                marginBottom: 10,
+              }}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
+              keyboardType={'numeric'}
+              placeholder={'Enter phone number'}
+              value={mobileNumber}
+              onChangeText={value => {
+                setMobileNumber(value);
+              }}
+              placeholderTextColor={Colors.borderColor}
+            />
+          </View>
+        </View> 
+        
       </View>
-        <View
+      <View style={{ marginTop: 'auto', marginBottom: hp('4%'), }}>
+          <BottomInfoBox
+            backgroundColor={Colors.white}
+            titleColor={Colors.black1}
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+            }
+          />
+       
+      <View
           style={{
             alignItems: 'center',
             flexDirection: 'row',
-            marginTop: 'auto',
-            marginBottom: hp('5%'),
             marginLeft: wp('8%'),
           }}
         >
           <TouchableOpacity
             onPress={() => {
+              setTimeout(() => {
+                setErrorMessageHeader(`Verification link sent`);
+                setErrorMessage(
+                  'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email',
+                );
+                setErrorProceedButton('Start Over');
+              }, 2);
               (ErrorBottomSheet as any).current.snapTo(1);
             }}
             style={{
@@ -233,13 +491,13 @@ export default function SignUpDetails(props) {
               shadowColor: Colors.shadowYellow,
               shadowOpacity: 1,
               shadowOffset: { width: 15, height: 15 },
-              
             }}
           >
             <Text>SignUp</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
+              //(OTPBottomSheet as any).current.snapTo(1);
               props.navigation.goBack()
             }}
             style={{
@@ -247,12 +505,26 @@ export default function SignUpDetails(props) {
               height: wp('13%'),
               justifyContent: 'center',
               alignItems: 'center',
-              marginLeft: 10
+              marginLeft: 10,
             }}
           >
             <Text>Back</Text>
           </TouchableOpacity>
         </View>
+        </View>
+      <BottomSheet
+          enabledInnerScrolling={true}
+          ref={ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('40%')
+              : hp('45%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
+        />
+
         <BottomSheet
           enabledInnerScrolling={true}
           ref={ErrorBottomSheet}
@@ -283,7 +555,18 @@ export default function SignUpDetails(props) {
           renderContent={renderInstructionsModalContent}
           renderHeader={renderInstructionsModalHeader}
         />
-      </View>
+        <BottomSheet
+        enabledInnerScrolling={true}
+          ref={OTPBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('50%')
+              : hp('55%'),
+          ]}
+          renderContent={renderConfirmOTPModalContent}
+          renderHeader={renderConfirmOTPModalHeader}
+        />
     </View>
   );
 }
@@ -300,9 +583,9 @@ const styles = StyleSheet.create({
     marginTop: hp('5%'),
   },
   modalHeaderTitleText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(17),
-    fontFamily: Fonts.FiraSansMedium,
+    color: Colors.black1,
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansRegular,
   },
   textBox: {
     flex: 1,
@@ -329,5 +612,60 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
+  },
+  commModeModalHeaderText: {
+    color: Colors.black1,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(18),
+    marginLeft: 25,
+    marginRight: 25,
+  },
+  commModeModalInfoText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(11),
+    marginLeft: 25,
+    marginRight: 25,
+    // marginTop: hp('0.7%')
+  },
+  textBoxStyles: {
+    borderWidth: 0.5,
+    height: wp('12%'),
+    width: wp('12%'),
+    borderRadius: 7,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    marginLeft: 8,
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textBoxActive: {
+    borderWidth: 0.5,
+    height: wp('12%'),
+    width: wp('12%'),
+    borderRadius: 7,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 3 },
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    marginLeft: 8,
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  passcodeTextInputView: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: hp('4.5%'),
+    marginBottom: hp('4.5%'),
   },
 });

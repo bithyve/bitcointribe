@@ -2956,7 +2956,7 @@ export default function Home(props) {
         ref={GetBittrRecurringBuy as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('90%') : hp('90%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
         ]}
         renderContent={renderGetBittrRecurringBuyContents}
         renderHeader={renderGetBittrRecurringBuyHeader}

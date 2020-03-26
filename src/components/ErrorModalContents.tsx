@@ -16,7 +16,9 @@ export default function ErrorModalContents(props) {
         <View style={{ height: '100%' }}>
            
             <View style={styles.successModalHeaderView}>
-                <Text style={styles.modalTitleText}>{props.title}{props.titleNextLine ? "\n" + props.titleNextLine : null}</Text>
+                <Text style={{color: props.headerTextColor ? props.headerTextColor : Colors.blue,
+        fontSize: RFValue(18),
+        fontFamily: Fonts.FiraSansMedium,}}>{props.title}{props.titleNextLine ? "\n" + props.titleNextLine : null}</Text>
                 {props.info ? <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>{props.info}</Text> : null}
             </View> 
             <View style={styles.successModalAmountView}>
@@ -25,16 +27,17 @@ export default function ErrorModalContents(props) {
             <View style={{height: hp('18%'), flexDirection: 'row', marginTop: 'auto', alignItems: 'center', }} >
                 <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressProceed()}
-                    style={{ ...styles.successModalButtonView }}
+                    style={{ ...styles.successModalButtonView, shadowColor: props.buttonShadowColor ? props. buttonShadowColor : Colors.shadowBlue,
+                        backgroundColor: props.buttonColor ? props. buttonColor : Colors.blue, }}
                 >
-                    <Text style={styles.proceedButtonText}>{props.proceedButtonText}</Text>
+                    <Text style={{...styles.proceedButtonText, color: props.buttonTextColor ? props.buttonTextColor : Colors.white}}>{props.proceedButtonText}</Text>
                 </AppBottomSheetTouchableWrapper>
                 {props.isIgnoreButton &&
                     <AppBottomSheetTouchableWrapper
                         onPress={() => props.onPressIgnore()}
                         style={{ height: wp('13%'), width: wp('35%'), justifyContent: 'center', alignItems: 'center', }}
                     >
-                        <Text style={{ ...styles.proceedButtonText, color: Colors.blue, }}>{props.cancelButtonText ? props.cancelButtonText : 'Ignore'}</Text>
+                        <Text style={{ ...styles.proceedButtonText, color: props.buttonTextColor ? props.buttonTextColor : Colors.blue, }}>{props.cancelButtonText ? props.cancelButtonText : 'Ignore'}</Text>
                     </AppBottomSheetTouchableWrapper>
                 }
                 {props.isBottomImage &&
@@ -55,11 +58,6 @@ const styles = StyleSheet.create({
         marginRight: wp('8%'),
         marginLeft: wp('8%'),
         marginTop: wp('8%'),
-    },
-    modalTitleText: {
-        color: Colors.blue,
-        fontSize: RFValue(18),
-        fontFamily: Fonts.FiraSansMedium,
     },
     modalInfoText: {
         color: Colors.textColorGrey,
