@@ -410,7 +410,7 @@ export default function SignUpDetails(props) {
             <TextInput
               style={{
                 ...styles.textBox,
-                paddingRight: 20,
+                paddingRight: 10,
                 marginTop: 10,
                 marginBottom: 10,
               }}
@@ -497,8 +497,8 @@ export default function SignUpDetails(props) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              //(OTPBottomSheet as any).current.snapTo(1);
-              props.navigation.goBack()
+              (OTPBottomSheet as any).current.snapTo(1);
+              //props.navigation.goBack()
             }}
             style={{
               width: wp('20%'),
@@ -664,8 +664,8 @@ const styles = StyleSheet.create({
   },
   passcodeTextInputView: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
     marginTop: hp('4.5%'),
     marginBottom: hp('4.5%'),
+    marginLeft: 25,
   },
 });
