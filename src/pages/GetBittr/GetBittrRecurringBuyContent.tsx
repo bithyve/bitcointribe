@@ -189,32 +189,4 @@ const styles = StyleSheet.create({
         fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
     },
-    separatorView: {
-        marginLeft: 15,
-        marginRight: 15,
-        height: 2,
-        backgroundColor: Colors.backgroundColor
-    },
-    modalElementInfoView: {
-        padding: 10,
-        flexDirection: 'row',
-        justifyContent: "center",
-        alignItems: 'center'
-    },
-    addModalView: {
-        backgroundColor: Colors.white,
-        padding: 7,
-        flexDirection: 'row',
-        display: 'flex',
-        // marginTop: 10,
-        justifyContent: "space-between"
-    },
-    addModalTitleText: {
-        color: Colors.blue,
-        fontSize: RFValue( 14 ),
-    },
-    addModalInfoText: {
-        color: Colors.textColorGrey,
-        fontSize: RFValue( 11 ),
-    },
 });

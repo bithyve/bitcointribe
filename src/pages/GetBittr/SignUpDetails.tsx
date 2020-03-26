@@ -4,15 +4,8 @@ import {
   StyleSheet,
   StatusBar,
   Text,
-  Image,
   TouchableOpacity,
-  FlatList,
-  ImageBackground,
   Platform,
-  AsyncStorage,
-  Linking,
-  NativeModules,
-  Alert,
   SafeAreaView,
   TextInput,
   Keyboard,
@@ -25,21 +18,22 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CommonStyles from '../../common/Styles';
 import DeviceInfo from 'react-native-device-info';
-import ToggleSwitch from '../../components/ToggleSwitch';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Toast from '../../components/Toast';
 import Octicons from 'react-native-vector-icons/Octicons';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import ModalHeader from '../../components/ModalHeader';
 import ErrorModalContents from '../../components/ErrorModalContents';
+import VerificationSuccessModalContents from "./VerificationSuccessModalContents";
+import InstructionsModalContents from "./InstructionsModalContents";
 
 export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [VerificationSuccessBottomSheet, setVerificationSuccessBottomSheet] = useState(React.createRef());
+  const [InstructionsBottomSheet, setInstructionsBottomSheet] =useState(React.createRef());
   
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -76,9 +70,65 @@ export default function SignUpDetails(props) {
     );
   }, []);
 
+  const renderVerificationSuccessContent = useCallback(() => {
+    return (
+      <VerificationSuccessModalContents
+        modalRef={VerificationSuccessBottomSheet}
+        title={`Email Address and\nphone number verified`}
+        info={'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'}
+        note={emailAddress}
+        noteNextLine={mobileNumber}
+        proceedButtonText={'Continue'}
+        onPressProceed={() => {
+          
+        }}
+        isIgnoreButton={false}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/illustration.png')}
+      />
+    );
+  }, []);
+
+  const renderVerificationSuccessHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (VerificationSuccessBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderInstructionsModalContent = useCallback(() => {
+    return (
+      <InstructionsModalContents
+        modalRef={InstructionsBottomSheet}
+        title={`Instructions and\ndetails for transfer`}
+        info={'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'}
+        subInfo={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"}
+        proceedButtonText={'Help'}
+        bulletPoints={["aliqua. Ut faucibus pulvinar elementum", "neque volutpat. Leo integer malesuada nunc","Purus faucibus ornare suspendisse sed nisi","Et ligula ullamcorper malesuada proin"]}
+        onPressProceed={() => {
+          
+        }}
+      />
+    );
+  }, []);
+
+  const renderInstructionsModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (InstructionsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
+    <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1, paddingBottom:wp('10%') }}>
       <StatusBar backgroundColor={Colors.backgroundColor1} barStyle="dark-content" />
+      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flexDirection: 'row' }}>
@@ -204,18 +254,37 @@ export default function SignUpDetails(props) {
           </TouchableOpacity>
         </View>
         <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('50%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
+          enabledInnerScrolling={true}
+          ref={ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('50%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={VerificationSuccessBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('45%'),
+          ]}
+          renderContent={renderVerificationSuccessContent}
+          renderHeader={renderVerificationSuccessHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={InstructionsBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+          ]}
+          renderContent={renderInstructionsModalContent}
+          renderHeader={renderInstructionsModalHeader}
+        />
       </View>
-      
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -2904,7 +2904,7 @@ export default function Home(props) {
           }}
           enabledInnerScrolling={true}
           ref={AddBottomSheet as any}
-          snapPoints={[-50, hp('63%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%')]}
           renderContent={renderAddModalContents}
           renderHeader={renderAddModalHeader}
         />
