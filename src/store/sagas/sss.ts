@@ -158,17 +158,18 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   yield put(switchS3Loader('uploadMetaShare'));
 
-  // generate dynamic NonPMDD
-  const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
-  let dynamicNonPMDD;
-  if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
+  // TODO: reactivate DNP Transportation for Hexa Premium
+  // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+  // let dynamicNonPMDD;
+  // if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
 
-  console.log({ dynamicNonPMDD });
-  const res = yield call(
-    s3Service.uploadShare,
-    payload.shareIndex,
-    dynamicNonPMDD,
-  );
+  // const res = yield call(
+  //   s3Service.uploadShare,
+  //   payload.shareIndex,
+  //   dynamicNonPMDD,
+  // );
+
+  const res = yield call(s3Service.uploadShare, payload.shareIndex);
   console.log({ res });
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
@@ -320,14 +321,13 @@ function* downloadMetaShareWorker({ payload }) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
     if (payload.downloadType !== 'recovery') {
-      console.log({ DECENTRALIZED_BACKUP });
-      const dynamicNonPMDD = {
-        ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
-        META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
-          ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
-          : [metaShare],
-      };
-      console.log({ dynamicNonPMDD });
+      //TODO: activate DNP Transportation Layer for Hexa Premium
+      // const dynamicNonPMDD = {
+      //   ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
+      //   META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
+      //     ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
+      //     : [metaShare],
+      // };
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
@@ -338,12 +338,12 @@ function* downloadMetaShareWorker({ payload }) {
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
           },
         },
-        DYNAMIC_NONPMDD: dynamicNonPMDD,
+        // DYNAMIC_NONPMDD: dynamicNonPMDD,
       };
 
       console.log({ updatedBackup });
 
-      yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
+      // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedMShare(otp, true));
       yield put(updateMSharesHealth(updatedBackup));
     } else {
@@ -934,7 +934,6 @@ function* recoverWalletWorker({ payload }) {
           encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
         }
       }
-      console.log({ encDynamicNonPMDD });
     });
 
     if (Object.keys(metaShares).length !== 3) {
