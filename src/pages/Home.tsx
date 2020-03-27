@@ -1633,8 +1633,6 @@ export default function Home(props) {
         onPressBack={() => {
           (GetBittrRecurringBuy as any).current.snapTo(0);
         }}
-        onPressElements={()=>{ }}
-        onPressProceed={()=>{props.navigation.navigate('SignUpInfo');}}
       />
     );
   };

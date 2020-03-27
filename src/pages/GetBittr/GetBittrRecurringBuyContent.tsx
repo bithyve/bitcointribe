@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect,} from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,16 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 import RadioButton from '../../components/RadioButton';
 import { ScrollView } from 'react-native-gesture-handler';
+import {
+    TEST_ACCOUNT,
+    REGULAR_ACCOUNT,
+    SECURE_ACCOUNT,
+  } from '../../common/constants/serviceTypes';
+import { fetchAddress } from '../../store/actions/accounts';
+import { useDispatch, useSelector } from 'react-redux';
+import { withNavigation } from "react-navigation";
 
-export default function GetBittrRecurringBuyContents(props) {
+function GetBittrRecurringBuyContents(props) {
     const [serviceData, setServiceData] = useState([
         {
             title:"Fast Bitcoin",
@@ -37,23 +45,40 @@ export default function GetBittrRecurringBuyContents(props) {
             title:"Test Account",
             image:require("../../assets/images/icons/icon_test.png"),
             isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
+            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+            type:TEST_ACCOUNT
         },
         {
             title:"Regular Account",
             image:require("../../assets/images/icons/icon_regular.png"),
             isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
+            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+            type:REGULAR_ACCOUNT
         },
         {
             title:"Savings Account",
             image:require("../../assets/images/icons/icon_secureaccount.png"),
             isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
+            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+            type:SECURE_ACCOUNT
         }
     ])
     const [selectedService, setSelectedService] =useState({});
-    const [selectedAccount, setSelectedAccount] =useState({});
+    const [selectedAccount, setSelectedAccount] =useState({
+        title:"Regular Account",
+        image:require("../../assets/images/icons/icon_regular.png"),
+        isSelected:false,
+        info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+        type:REGULAR_ACCOUNT
+    });
+    const { loading, service } = useSelector(
+        state => state.accounts[selectedAccount.type],
+      );
+    let { bitcoinAddress } = selectedAccount.type === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+    const dispatch = useDispatch();
+    useEffect(() => {
+        if (!bitcoinAddress) dispatch(fetchAddress(selectedAccount.type));
+    },[selectedAccount.type, service]);
 
     return (
         <View style={styles.modalContainer}>
@@ -141,7 +166,7 @@ export default function GetBittrRecurringBuyContents(props) {
                 </View>
             </ScrollView>
             <View style={{ paddingBottom:wp('8%'), paddingLeft:wp("5%"), paddingTop:wp("5%")}}>
-                <AppBottomSheetTouchableWrapper onPress={()=>props.onPressProceed()} style={{height:wp('13%'), width:wp('50%'), justifyContent:'center', alignItems:'center', backgroundColor:Colors.blue, borderRadius:10}} >
+                <AppBottomSheetTouchableWrapper onPress={()=>{props.navigation.navigate('SignUpInfo', {address: bitcoinAddress, selectedAccount: selectedAccount});}} style={{height:wp('13%'), width:wp('50%'), justifyContent:'center', alignItems:'center', backgroundColor:Colors.blue, borderRadius:10}} >
                     <Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13)}}>Proceed</Text>
                 </AppBottomSheetTouchableWrapper>
             </View>
@@ -190,3 +215,5 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.FiraSansRegular,
     },
 });
+
+export default withNavigation(GetBittrRecurringBuyContents);
