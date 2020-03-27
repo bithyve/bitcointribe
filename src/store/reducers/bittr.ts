@@ -30,7 +30,7 @@ const INITIAL_STATE = {
   xpubVerifyRequest: null
 }
 
-const reducer = (state = {}, action) => {
+const reducer = (state = INITIAL_STATE, action) => {
   const { payload } = action
   switch (action.type) {
     case CREATE_USER_SUCCESS:

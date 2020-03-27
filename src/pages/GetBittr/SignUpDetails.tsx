@@ -25,23 +25,36 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import ModalHeader from '../../components/ModalHeader';
 import ErrorModalContents from '../../components/ErrorModalContents';
-import VerificationSuccessModalContents from "./VerificationSuccessModalContents";
-import InstructionsModalContents from "./InstructionsModalContents";
+import VerificationSuccessModalContents from './VerificationSuccessModalContents';
+import InstructionsModalContents from './InstructionsModalContents';
+import { useDispatch, useSelector } from 'react-redux';
+import { sendEmailRequest, sendSmsRequest } from '../../store/actions/bittr';
 
 export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [VerificationSuccessBottomSheet, setVerificationSuccessBottomSheet] = useState(React.createRef());
-  const [InstructionsBottomSheet, setInstructionsBottomSheet] =useState(React.createRef());
-  
+  const [
+    VerificationSuccessBottomSheet,
+    setVerificationSuccessBottomSheet,
+  ] = useState(React.createRef());
+  const [InstructionsBottomSheet, setInstructionsBottomSheet] = useState(
+    React.createRef(),
+  );
+  const bitcoinAddress = props.navigation.state.params ? props.navigation.state.params.address : '';
+  const selectedAccount = props.navigation.state.params ? props.navigation.state.params.selectedAccount : '';
   const [OTPBottomSheet, setOTPBottomSheet] = useState(React.createRef());
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [errorProceedButton, setErrorProceedButton] = useState('');
   const [errorIgnoreButton, setErrorIgnoreButton] = useState('');
   const [isIgnoreButton, setIsIgnoreButton] = useState(false);
+  const [buttonDisable, setButtonDisable] = useState(true);
+
   const [passcode, setPasscode] = useState([]);
+
+  const smsSent = useSelector(state => state.bittr);
+  const emailSent = useSelector(state => state.bittr);
 
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
@@ -101,6 +114,10 @@ export default function SignUpDetails(props) {
     isIgnoreButton,
   ]);
 
+  useEffect(() => {
+    if (emailAddress && mobileNumber) setButtonDisable(false);
+  }, [emailAddress, mobileNumber]);
+
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
@@ -116,13 +133,13 @@ export default function SignUpDetails(props) {
       <VerificationSuccessModalContents
         modalRef={VerificationSuccessBottomSheet}
         title={`Email Address and\nphone number verified`}
-        info={'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'}
+        info={
+          'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'
+        }
         note={emailAddress}
         noteNextLine={mobileNumber}
         proceedButtonText={'Continue'}
-        onPressProceed={() => {
-          
-        }}
+        onPressProceed={() => {}}
         isIgnoreButton={false}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
@@ -145,13 +162,20 @@ export default function SignUpDetails(props) {
       <InstructionsModalContents
         modalRef={InstructionsBottomSheet}
         title={`Instructions and\ndetails for transfer`}
-        info={'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'}
-        subInfo={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"}
+        info={
+          'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'
+        }
+        subInfo={
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'
+        }
         proceedButtonText={'Help'}
-        bulletPoints={["aliqua. Ut faucibus pulvinar elementum", "neque volutpat. Leo integer malesuada nunc","Purus faucibus ornare suspendisse sed nisi","Et ligula ullamcorper malesuada proin"]}
-        onPressProceed={() => {
-          
-        }}
+        bulletPoints={[
+          'aliqua. Ut faucibus pulvinar elementum',
+          'neque volutpat. Leo integer malesuada nunc',
+          'Purus faucibus ornare suspendisse sed nisi',
+          'Et ligula ullamcorper malesuada proin',
+        ]}
+        onPressProceed={() => {}}
       />
     );
   }, []);
@@ -162,13 +186,19 @@ export default function SignUpDetails(props) {
         onPressHeader={() => {
           (InstructionsBottomSheet as any).current.snapTo(0);
         }}
-        />
-      );
-    }, []);
+      />
+    );
+  }, []);
 
   const renderConfirmOTPModalContent = useCallback(() => {
     return (
-      <View style={{ backgroundColor: Colors.white, height: '100%', paddingBottom:wp('10%') }}>
+      <View
+        style={{
+          backgroundColor: Colors.white,
+          height: '100%',
+          paddingBottom: wp('10%'),
+        }}
+      >
         <View
           style={{
             height: '100%',
@@ -181,7 +211,7 @@ export default function SignUpDetails(props) {
             <Text style={styles.commModeModalHeaderText}>
               {'Enter OTP to\nconfirm phone number'}
             </Text>
-            <Text style={{...styles.commModeModalInfoText, marginTop:5}}>
+            <Text style={{ ...styles.commModeModalInfoText, marginTop: 5 }}>
               {
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
               }
@@ -367,10 +397,30 @@ export default function SignUpDetails(props) {
     );
   }, []);
 
+  if (emailSent.emailSent && smsSent.smsSent) {
+    setTimeout(() => {
+      setErrorMessageHeader(`Verification link sent`);
+      setErrorMessage(
+        'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email',
+      );
+      setErrorProceedButton('Start Over');
+    }, 2);
+    console.log("emailSent", emailSent, smsSent);
+    (ErrorBottomSheet as any).current.snapTo(1);
+  } else {
+    console.log("fails");
+  }
+
+  const dispatch = useDispatch();
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
-      <StatusBar backgroundColor={Colors.backgroundColor1} barStyle="dark-content" />
-      <SafeAreaView style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }} />
+      <StatusBar
+        backgroundColor={Colors.backgroundColor1}
+        barStyle="dark-content"
+      />
+      <SafeAreaView
+        style={{ flex: 0, backgroundColor: Colors.backgroundColor1 }}
+      />
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flexDirection: 'row' }}>
@@ -414,6 +464,7 @@ export default function SignUpDetails(props) {
                 marginTop: 10,
                 marginBottom: 10,
               }}
+              autoCapitalize="none"
               returnKeyLabel="Done"
               returnKeyType="done"
               onSubmitEditing={Keyboard.dismiss}
@@ -437,6 +488,7 @@ export default function SignUpDetails(props) {
                 marginTop: 10,
                 marginBottom: 10,
               }}
+              autoCapitalize="none"
               returnKeyLabel="Done"
               returnKeyType="done"
               onSubmitEditing={Keyboard.dismiss}
@@ -449,20 +501,19 @@ export default function SignUpDetails(props) {
               placeholderTextColor={Colors.borderColor}
             />
           </View>
-        </View> 
-        
+        </View>
       </View>
-      <View style={{ marginTop: 'auto', marginBottom: hp('4%'), }}>
-          <BottomInfoBox
-            backgroundColor={Colors.white}
-            titleColor={Colors.black1}
-            title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
-            }
-          />
-       
-      <View
+      <View style={{ marginTop: 'auto', marginBottom: hp('4%') }}>
+        <BottomInfoBox
+          backgroundColor={Colors.white}
+          titleColor={Colors.black1}
+          title={'Note'}
+          infoText={
+            'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+          }
+        />
+
+        <View
           style={{
             alignItems: 'center',
             flexDirection: 'row',
@@ -471,15 +522,20 @@ export default function SignUpDetails(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              setTimeout(() => {
-                setErrorMessageHeader(`Verification link sent`);
-                setErrorMessage(
-                  'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email',
-                );
-                setErrorProceedButton('Start Over');
-              }, 2);
-              (ErrorBottomSheet as any).current.snapTo(1);
+              let formData = {
+                email: emailAddress,
+                language: 'en',
+                bitcoin_address: bitcoinAddress,
+                category: 'hexa',
+              };
+              let contactData = {
+                phone: mobileNumber,
+                country_code:"91"
+              }
+              dispatch(sendEmailRequest(formData));
+              dispatch(sendSmsRequest(contactData));
             }}
+            disabled={buttonDisable}
             style={{
               height: wp('13%'),
               width: wp('40%'),
@@ -511,62 +567,58 @@ export default function SignUpDetails(props) {
             <Text>Back</Text>
           </TouchableOpacity>
         </View>
-        </View>
+      </View>
       <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ErrorBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('40%')
-              : hp('45%'),
-          ]}
-          renderContent={renderErrorModalContent}
-          renderHeader={renderErrorModalHeader}
-        />
-
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={ErrorBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('50%'),
-          ]}
-          renderContent={renderErrorModalContent}
-          renderHeader={renderErrorModalHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={VerificationSuccessBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('45%'),
-          ]}
-          renderContent={renderVerificationSuccessContent}
-          renderHeader={renderVerificationSuccessHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={InstructionsBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
-          ]}
-          renderContent={renderInstructionsModalContent}
-          renderHeader={renderInstructionsModalHeader}
-        />
-        <BottomSheet
         enabledInnerScrolling={true}
-          ref={OTPBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('50%')
-              : hp('55%'),
-          ]}
-          renderContent={renderConfirmOTPModalContent}
-          renderHeader={renderConfirmOTPModalHeader}
-        />
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('40%') : hp('45%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
+
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('50%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={VerificationSuccessBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('45%'),
+        ]}
+        renderContent={renderVerificationSuccessContent}
+        renderHeader={renderVerificationSuccessHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={InstructionsBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
+        renderContent={renderInstructionsModalContent}
+        renderHeader={renderInstructionsModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={OTPBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('55%'),
+        ]}
+        renderContent={renderConfirmOTPModalContent}
+        renderHeader={renderConfirmOTPModalHeader}
+      />
     </View>
   );
 }

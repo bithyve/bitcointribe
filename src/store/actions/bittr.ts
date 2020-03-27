@@ -21,51 +21,59 @@ export const VERIFY_XPUB_REQUEST = 'VERIFY_XPUB_REQUEST'
 export const VERIFY_XPUB_SUCCESS = 'VERIFY_XPUB_SUCCESS'
 export const VERIFY_XPUB_FAIL = 'VERIFY_XPUB_FAIL'
 
-export function createUserSuccess(data) {
-  return {
+export const sendEmailRequest = data => {
+  return { type: SEND_EMAIL_REQUEST, payload: { data } };
+};
+
+export const sendSmsRequest = data => {
+  return { type: SEND_SMS_REQUEST, payload: { data } };
+};
+
+export const createUserSuccess = data => {
+return {
     type: CREATE_USER_SUCCESS,
-    payload: { userDetails: data }
+    payload: { data }
   }
 }
 
-export function createUserFail() {
+export const createUserFail = () => {
   return { type: CREATE_USER_FAIL }
 }
 
-export function sendEmailSuccess(data) {
+export const sendEmailSuccess = data => {
   return {
     type: SEND_EMAIL_SUCCESS,
     payload: { emailSent: true, emailSentDetails: data }
   }
 }
 
-export function sendEmailFail() {
+export const sendEmailFail = () => {
   return { type: SEND_EMAIL_FAIL, payload: { emailSent: false } }
 }
 
-export function sendSmsSuccess(data) {
+export const sendSmsSuccess = data => {
   return {
     type: SEND_SMS_SUCCESS,
     payload: { smsSent: true, smsSentDetails: data }
   }
 }
 
-export function sendSmsFail() {
+export const sendSmsFail = () => {
   return { type: SEND_SMS_FAIL, payload: { smsSent: false } }
 }
 
-export function verifyEmailSuccess(data) {
+export const verifyEmailSuccess = data => {
   return {
     type: VERIFY_EMAIL_SUCCESS,
     payload: { emailVerified: true, emailVerifiedDetails: data }
   }
 }
 
-export function verifyEmailFail() {
+export const verifyEmailFail = () => {
   return { type: VERIFY_EMAIL_FAIL, payload: { emailVerified: false } }
 }
 
-export function verifyXpubSuccess(data) {
+export const verifyXpubSuccess = data => {
   return {
     type: VERIFY_XPUB_SUCCESS,
     payload: {
@@ -75,7 +83,7 @@ export function verifyXpubSuccess(data) {
   }
 }
 
-export function verifyXpubFail() {
+export const verifyXpubFail = () => {
   return {
     type: VERIFY_XPUB_FAIL,
     payload: {

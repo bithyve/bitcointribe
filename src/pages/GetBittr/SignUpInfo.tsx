@@ -4,37 +4,23 @@ import {
   StyleSheet,
   StatusBar,
   Text,
-  Image,
   TouchableOpacity,
-  FlatList,
-  ImageBackground,
-  Platform,
-  AsyncStorage,
-  Linking,
-  NativeModules,
-  Alert,
   SafeAreaView,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import BottomSheet from 'reanimated-bottom-sheet';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CommonStyles from '../../common/Styles';
-import DeviceInfo from 'react-native-device-info';
-import ToggleSwitch from '../../components/ToggleSwitch';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Toast from '../../components/Toast';
 import Octicons from 'react-native-vector-icons/Octicons';
 import BottomInfoBox from '../../components/BottomInfoBox';
 
 export default function SignUpInfo(props) {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [errorMessage, setErrorMessage] = useState('');
-
+  const bitcoinAddress = props.navigation.state.params ? props.navigation.state.params.address : '';
+  const selectedAccount = props.navigation.state.params ? props.navigation.state.params.selectedAccount : '';
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
       <StatusBar backgroundColor={Colors.backgroundColor1} barStyle="dark-content" />
@@ -99,7 +85,7 @@ export default function SignUpInfo(props) {
         >
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate('SignUpDetails');
+              props.navigation.navigate('SignUpDetails', {address: bitcoinAddress, selectedAccount: selectedAccount});
             }}
             style={{
               height: wp('13%'),

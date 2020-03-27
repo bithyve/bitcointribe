@@ -20,7 +20,6 @@ export default function InstructionsModalContents(props) {
             </View> 
             <View style={{ height:'auto', marginRight: wp('8%'), marginLeft: wp('8%'), marginTop:wp('3%'),}}>
                 {props.bulletPoints.map((value)=>{
-                    console.log("value",value)
                     return <View style={{flexDirection:'row', alignItems:'center'}}>
                         <Octicons name={"primitive-dot"} size={RFValue(10)} color={Colors.yellow} />
                         <Text style={{ marginLeft:wp("2%"), color: Colors.textColorGrey, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>{value}</Text>
