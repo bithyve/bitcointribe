@@ -32,8 +32,11 @@ import InstructionsModalContents from './InstructionsModalContents';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail } from '../../store/actions/bittr';
 import { validateEmail } from '../../common/CommonFunctions';
+import OtpModalContents from "./OtpModalContents";
 
 export default function SignUpDetails(props) {
+  const [isIncorrectOtp, setIsIncorrectOtp] = useState(false)
+  const [otp, setOtp] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -75,6 +78,10 @@ export default function SignUpDetails(props) {
       props.navigation.navigate('WalletCreationSuccess');
     }
   }
+
+  useEffect(()=>{
+    OTPBottomSheet.current.snapTo(1);
+  }, [])
   //TODO: when we handle error add this code
   // 
 
@@ -141,12 +148,6 @@ export default function SignUpDetails(props) {
       (ErrorBottomSheet as any).current.snapTo(1);
     }
   }, [emailSent]);
-
-  
-
-  
-
- 
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -263,200 +264,22 @@ export default function SignUpDetails(props) {
 
   const renderConfirmOTPModalContent = useCallback(() => {
     return (
-      <View
-        style={{
-          backgroundColor: Colors.white,
-          height: '100%',
-          paddingBottom: wp('10%'),
+      <OtpModalContents 
+        isIncorrectOtp={isIncorrectOtp}
+        onOtpDone={(otpValue)=>{
+          if(otpValue!='1111' && otpValue!=""){
+            setIsIncorrectOtp(true);
+          }
+          else{
+            setIsIncorrectOtp(false);
+          }
+          setOtp(otpValue);
         }}
-      >
-        <View
-          style={{
-            height: '100%',
-            marginRight: wp('4%'),
-            marginLeft: wp('4%'),
-            marginBottom: hp('2%'),
-          }}
-        >
-          <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.commModeModalHeaderText}>
-              {'Enter OTP to\nconfirm phone number'}
-            </Text>
-            <Text style={{ ...styles.commModeModalInfoText, marginTop: 5 }}>
-              {
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
-              }
-            </Text>
-          </View>
-          <View
-            style={{
-              marginBottom: hp('4%'),
-              paddingBottom: 20,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-              }}
-            >
-              {passcode.join('').length == 4 ? (
-                <Text
-                  style={{
-                    color: Colors.red,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                  }}
-                >
-                  Incorrect OTP, Try Again
-                </Text>
-              ) : null}
-            </View>
-            <View style={styles.passcodeTextInputView}>
-              <TextInput
-                maxLength={1}
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoFocus={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput = input;
-                }}
-                style={[
-                  this.textInput && this.textInput.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  onPressNumber(value, 0);
-                  if (value.length >= 1) {
-                    this.textInput2.focus();
-                  }
-                }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput.focus();
-                    onPressNumber('', 0);
-                  }
-                }}
-              />
-
-              <TextInput
-                maxLength={1}
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput2 = input;
-                }}
-                style={[
-                  this.textInput2 && this.textInput2.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  onPressNumber(value, 1);
-                  if (value.length >= 1) this.textInput3.focus();
-                }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput.focus();
-                    onPressNumber('', 1);
-                  }
-                }}
-              />
-
-              <TextInput
-                maxLength={1}
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput3 = input;
-                }}
-                style={[
-                  this.textInput3 && this.textInput3.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  onPressNumber(value, 2);
-                  if (value.length >= 1) this.textInput4.focus();
-                }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput2.focus();
-                    onPressNumber('', 2);
-                  }
-                }}
-              />
-
-              <TextInput
-                maxLength={1}
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                selectTextOnFocus={true}
-                contextMenuHidden={true}
-                autoCorrect={false}
-                ref={input => {
-                  this.textInput4 = input;
-                }}
-                style={[
-                  this.textInput4 && this.textInput4.isFocused()
-                    ? styles.textBoxActive
-                    : styles.textBoxStyles,
-                ]}
-                onChangeText={value => {
-                  onPressNumber(value, 3);
-                  if (value.length >= 1) this.textInput5.focus();
-                }}
-                onKeyPress={e => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput3.focus();
-                    onPressNumber('', 3);
-                  }
-                }}
-              />
-            </View>
-            <Text style={styles.commModeModalInfoText}>
-              {
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt'
-              }
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => {}}
-            style={{
-              height: wp('13%'),
-              width: wp('40%'),
-              backgroundColor: Colors.yellow,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 8,
-              elevation: 10,
-              shadowColor: Colors.shadowYellow,
-              shadowOpacity: 1,
-              shadowOffset: { width: 15, height: 15 },
-              marginRight: 25,
-              marginLeft: 25,
-            }}
-          >
-            <Text>Confirm</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        modalRef={OTPBottomSheet}
+        onPressConfirm={()=>{}}
+      />
     );
-  }, []);
+  }, [isIncorrectOtp, otp]);
 
   const renderConfirmOTPModalHeader = useCallback(() => {
     return (
@@ -468,8 +291,6 @@ export default function SignUpDetails(props) {
     );
   }, []);
 
-  
- 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
       <StatusBar
@@ -679,6 +500,7 @@ export default function SignUpDetails(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('55%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('75%') : hp('80%'),
         ]}
         renderContent={renderConfirmOTPModalContent}
         renderHeader={renderConfirmOTPModalHeader}
@@ -729,65 +551,10 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
-  commModeModalHeaderText: {
-    color: Colors.black1,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(18),
-    marginLeft: 25,
-    marginRight: 25,
-  },
-  commModeModalInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
-    marginLeft: 25,
-    marginRight: 25,
-    // marginTop: hp('0.7%')
-  },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
     fontSize: RFValue(11),
     fontStyle: 'italic',
-  },
-  textBoxStyles: {
-    borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
-    borderRadius: 7,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    marginLeft: 8,
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textBoxActive: {
-    borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
-    borderRadius: 7,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 3 },
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    marginLeft: 8,
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  passcodeTextInputView: {
-    flexDirection: 'row',
-    marginTop: hp('4.5%'),
-    marginBottom: hp('4.5%'),
-    marginLeft: 25,
   },
 });
