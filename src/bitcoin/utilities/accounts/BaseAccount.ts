@@ -23,6 +23,7 @@ export default class BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      derivativeAccount: any;
     },
     network?: Network,
   ) {
@@ -207,7 +208,7 @@ export default class BaseAccount {
   };
 
   public getDerivativeReceivingXpub = (
-    type: string,
+    accountType: string,
     accountNumber?: number,
   ):
     | {
@@ -225,13 +226,16 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getDerivativeReceivingXpub(type, accountNumber),
+        data: this.hdWallet.getDerivativeReceivingXpub(
+          accountType,
+          accountNumber,
+        ),
       };
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to generate Get Bittr xpub',
+        message: "Failed to generate derivative account's xpub",
       };
     }
   };

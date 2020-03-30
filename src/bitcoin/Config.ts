@@ -82,8 +82,9 @@ import {
   BIT_SHARE_HEALTH_TIME_SLOT1_PROD,
   BIT_SHARE_HEALTH_TIME_SLOT2_DEV,
   BIT_SHARE_HEALTH_TIME_SLOT2_PROD,
-  BIT_MNEMONIC_HEALTH_TIME_SLOT,
+  BIT_GET_BITTR_SERIES,
 } from 'react-native-dotenv';
+import { DerivativeAccount } from './utilities/Interface';
 
 class Config {
   public ENVIRONMENT: string;
@@ -222,8 +223,11 @@ class Config {
     },
   };
 
+  GET_BITTR: DerivativeAccount = {
+    series: parseInt(BIT_GET_BITTR_SERIES, 10),
+  };
   public DERVIATIVE_ACC = {
-    GET_BITTR: 'GET_BITTR',
+    GET_BITTR: this.GET_BITTR,
   };
 
   constructor(env: string) {

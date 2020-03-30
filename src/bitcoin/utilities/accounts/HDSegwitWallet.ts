@@ -5,7 +5,7 @@ import coinselect from 'coinselect';
 import crypto from 'crypto';
 import config from '../../Config';
 import Bitcoin from './Bitcoin';
-import { Transactions } from '../Interface';
+import { Transactions, DerivativeAccount } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
 
@@ -27,9 +27,7 @@ export default class HDSegwitWallet extends Bitcoin {
   private internalAddresssesCache: {};
   private externalAddressesCache: {};
   private addressToWIFCache: {};
-  private derivativeAccountXpubs: {
-    getBitter: {};
-  };
+  private derivativeAccount = config.DERVIATIVE_ACC;
 
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -58,6 +56,7 @@ export default class HDSegwitWallet extends Bitcoin {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      derivativeAccount: any;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -92,6 +91,9 @@ export default class HDSegwitWallet extends Bitcoin {
       ? stateVars.receivingAddress
       : this.receivingAddress;
     this.transactions = stateVars ? stateVars.transactions : this.transactions;
+    this.derivativeAccount = stateVars
+      ? stateVars.derivativeAccount
+      : this.derivativeAccount;
   }
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -122,12 +124,12 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public getDerivativeReceivingXpub = (
-    type: string,
+    accountType: string,
     accountNumber?: number,
   ): string => {
     // generates receiving xpub for derivative accounts
 
-    const baseXpub = this.generateDerivativeXpub(type, accountNumber);
+    const baseXpub = this.generateDerivativeXpub(accountType, accountNumber);
     console.log({ baseXpub });
     const node = bip32.fromBase58(baseXpub, this.network);
     const child = node.derive(0).neutered(); //external chain
@@ -886,22 +888,26 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   private generateDerivativeXpub = (
-    type: string,
+    accountType: string,
     accountNumber: number = 0,
   ) => {
-    if (!config.DERVIATIVE_ACC[type])
+    if (!this.derivativeAccount[accountType])
       throw new Error('Unsupported dervative account');
     if (accountNumber > 9)
       throw Error('Cannot create more than 10 GB accounts');
-    if (this.derivativeAccountXpubs[type][accountNumber]) {
-      return this.derivativeAccountXpubs[type][accountNumber];
+    if (this.derivativeAccount[accountType][accountNumber]) {
+      return this.derivativeAccount[accountType][accountNumber]['xpub'];
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
-      const path = `m/${this.purpose}'/0'/${11 + accountNumber}'`; // series 11-20 for GBXpubs
+      const path = `m/${this.purpose}'/0'/${this.derivativeAccount[accountType][
+        'series'
+      ] + accountNumber}'`;
       const child = root.derivePath(path).neutered();
       const xpubGB = child.toBase58();
-      return (this.derivativeAccountXpubs[type][accountNumber] = xpubGB);
+      return (this.derivativeAccount[accountType][accountNumber][
+        'xpub'
+      ] = xpubGB);
     }
   };
 }
