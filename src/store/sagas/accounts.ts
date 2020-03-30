@@ -33,6 +33,7 @@ import {
   alternateTransferST2Executed,
   RESET_TWO_FA,
   twoFAResetted,
+  RUN_TEST,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -546,3 +547,15 @@ function* resetTwoFAWorker({ payload }) {
 }
 
 export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
+
+function* testWorker({ payload }) {
+  console.log('---------Executing Test Saga---------');
+
+  const service = yield select(
+    state => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  console.log('---------Executed Test Saga---------');
+}
+
+export const testWatcher = createWatcher(testWorker, RUN_TEST);
