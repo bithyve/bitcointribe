@@ -881,12 +881,14 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   private generateGBXpub = (accountNumber: number = 0) => {
+    if (accountNumber > 9)
+      throw Error('Cannot create more than 10 GB accounts');
     if (this.derivativeAccountXpubs.getBitter[accountNumber]) {
       return this.derivativeAccountXpubs.getBitter[accountNumber];
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
-      const path = `m/${this.purpose}'/0'/11'`; // series 11-20 for GBXpubs
+      const path = `m/${this.purpose}'/0'/${11 + accountNumber}'`; // series 11-20 for GBXpubs
       const child = root.derivePath(path).neutered();
       const xpubGB = child.toBase58();
       return (this.derivativeAccountXpubs.getBitter[accountNumber] = xpubGB);
