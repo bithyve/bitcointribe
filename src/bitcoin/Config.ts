@@ -226,7 +226,7 @@ class Config {
   GET_BITTR: DerivativeAccount = {
     series: parseInt(BIT_GET_BITTR_SERIES, 10),
   };
-  public DERVIATIVE_ACC = {
+  public DERIVATIVE_ACC = {
     GET_BITTR: this.GET_BITTR,
   };
 

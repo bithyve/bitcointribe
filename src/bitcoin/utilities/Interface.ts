@@ -57,5 +57,6 @@ export interface DerivativeAccount {
   [accounts: number]: {
     xpub: string;
     usedAddresses?: string[];
+    nextFreeAddressIndex?: number;
   };
 }

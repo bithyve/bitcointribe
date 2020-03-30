@@ -240,6 +240,58 @@ export default class BaseAccount {
     }
   };
 
+  public getDerivativeAccBalanceTransactions = async (
+    accountType: string,
+    accountNumber?: number,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          balances: {
+            balance: number;
+            unconfirmedBalance: number;
+          };
+          transactions: {
+            totalTransactions: number;
+            confirmedTransactions: number;
+            unconfirmedTransactions: number;
+            transactionDetails: Array<{
+              txid: string;
+              status: string;
+              confirmations: number;
+              fee: string;
+              date: string;
+              transactionType: string;
+              amount: number;
+              accountType: string;
+              recipientAddresses?: string[];
+              senderAddresses?: string[];
+            }>;
+          };
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.fetchDerivativeAccBalanceTxs(
+          accountType,
+          accountNumber,
+        ),
+      };
+    } catch (err) {
+      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
+    }
+  };
+
   public getAddress = async (): Promise<
     | {
         status: number;
