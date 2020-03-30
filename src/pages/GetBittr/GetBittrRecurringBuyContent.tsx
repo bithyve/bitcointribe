@@ -74,10 +74,10 @@ function GetBittrRecurringBuyContents(props) {
     const { loading, service } = useSelector(
         state => state.accounts[selectedAccount.type],
       );
-    let { bitcoinAddress } = selectedAccount.type === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+    let { receivingAddress } = selectedAccount.type === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
     const dispatch = useDispatch();
     useEffect(() => {
-        if (!bitcoinAddress) dispatch(fetchAddress(selectedAccount.type));
+        if (!receivingAddress) dispatch(fetchAddress(selectedAccount.type));
     },[selectedAccount.type, service]);
 
     return (
@@ -166,7 +166,7 @@ function GetBittrRecurringBuyContents(props) {
                 </View>
             </ScrollView>
             <View style={{ paddingBottom:wp('8%'), paddingLeft:wp("5%"), paddingTop:wp("5%")}}>
-                <AppBottomSheetTouchableWrapper onPress={()=>{props.navigation.navigate('SignUpInfo', {address: bitcoinAddress, selectedAccount: selectedAccount});}} style={{height:wp('13%'), width:wp('50%'), justifyContent:'center', alignItems:'center', backgroundColor:Colors.blue, borderRadius:10}} >
+                <AppBottomSheetTouchableWrapper onPress={()=>{props.navigation.navigate('SignUpInfo', {address: receivingAddress, selectedAccount: selectedAccount});}} style={{height:wp('13%'), width:wp('50%'), justifyContent:'center', alignItems:'center', backgroundColor:Colors.blue, borderRadius:10}} >
                     <Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13)}}>Proceed</Text>
                 </AppBottomSheetTouchableWrapper>
             </View>
