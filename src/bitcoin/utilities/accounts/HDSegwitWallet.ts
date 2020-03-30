@@ -27,6 +27,9 @@ export default class HDSegwitWallet extends Bitcoin {
   private internalAddresssesCache: {};
   private externalAddressesCache: {};
   private addressToWIFCache: {};
+  private derivativeAccountXpubs: {
+    getBitter: {};
+  };
 
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -116,6 +119,16 @@ export default class HDSegwitWallet extends Bitcoin {
         .update(address)
         .digest('hex'),
     };
+  };
+
+  public getGBReceivingXpub = (accountNumber?: number): string => {
+    const baseXpub = this.generateGBXpub(accountNumber);
+    console.log({ baseXpub });
+    const node = bip32.fromBase58(baseXpub, this.network);
+    const child = node.derive(0).neutered();
+    const receivingXpub = child.toBase58();
+    console.log({ receivingXpub });
+    return receivingXpub;
   };
 
   public getReceivingAddress = async (): Promise<{ address: string }> => {
@@ -865,5 +878,18 @@ export default class HDSegwitWallet extends Bitcoin {
     this.xpub = child.toBase58();
 
     return this.xpub;
+  };
+
+  private generateGBXpub = (accountNumber: number = 0) => {
+    if (this.derivativeAccountXpubs.getBitter[accountNumber]) {
+      return this.derivativeAccountXpubs.getBitter[accountNumber];
+    } else {
+      const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
+      const root = bip32.fromSeed(seed, this.network);
+      const path = `m/${this.purpose}'/0'/11'`; // series 11-20 for GBXpubs
+      const child = root.derivePath(path).neutered();
+      const xpubGB = child.toBase58();
+      return (this.derivativeAccountXpubs.getBitter[accountNumber] = xpubGB);
+    }
   };
 }

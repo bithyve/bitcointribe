@@ -206,6 +206,35 @@ export default class BaseAccount {
     }
   };
 
+  public getGBReceivingXpub = (
+    accountNumber?: number,
+  ):
+    | {
+        status: number;
+        data: string;
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.hdWallet.getGBReceivingXpub(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to generate Get Bittr xpub',
+      };
+    }
+  };
+
   public getAddress = async (): Promise<
     | {
         status: number;
