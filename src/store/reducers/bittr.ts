@@ -13,7 +13,10 @@ import {
   VERIFY_EMAIL_FAIL,
   VERIFY_XPUB_REQUEST,
   VERIFY_XPUB_SUCCESS,
-  VERIFY_XPUB_FAIL
+  VERIFY_XPUB_FAIL,
+  SENT_EMAIL_REQUEST,
+  SENT_SMS_REQUEST,
+  VERIFIED_EMAIL
 } from '../actions/bittr'
 
 const INITIAL_STATE = {
@@ -60,6 +63,8 @@ const reducer = (state = INITIAL_STATE, action) => {
       }
     case SEND_EMAIL_FAIL:
       return { ...state, emailSent: false, sendEmailRequest: false }
+      case SENT_EMAIL_REQUEST:
+      return { ...state, emailSent: false, sendEmailRequest: false }
     case SEND_EMAIL_REQUEST:
       return {
         ...state,
@@ -74,6 +79,8 @@ const reducer = (state = INITIAL_STATE, action) => {
       }
     case SEND_SMS_FAIL:
       return { ...state, smsSent: payload.smsSent, sendSmsRequest: false }
+      case SENT_SMS_REQUEST:
+      return { ...state, smsSent: false, sendSmsRequest: false }
     case SEND_SMS_REQUEST:
       return {
         ...state,
@@ -92,6 +99,12 @@ const reducer = (state = INITIAL_STATE, action) => {
         emailVerified: payload.emailVerified,
         emailVerifyRequest: false
       }
+      case VERIFIED_EMAIL:
+        return {
+          ...state,
+          emailVerified: false,
+          emailVerifyRequest: false
+        } 
     case VERIFY_EMAIL_REQUEST:
       return {
         ...state,

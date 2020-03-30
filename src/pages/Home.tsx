@@ -1977,6 +1977,10 @@ export default function Home(props) {
         const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
+    } else{
+      const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
+    console.log("EmailToken",EmailToken);
+      props.navigation.navigate('SignUpDetails', { EmailToken });
     }
   }, []);
 

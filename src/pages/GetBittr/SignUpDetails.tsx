@@ -10,6 +10,8 @@ import {
   TextInput,
   Keyboard,
   ScrollView,
+  Linking,
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -28,7 +30,8 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import VerificationSuccessModalContents from './VerificationSuccessModalContents';
 import InstructionsModalContents from './InstructionsModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendEmailRequest, sendSmsRequest } from '../../store/actions/bittr';
+import { sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail } from '../../store/actions/bittr';
+import { validateEmail } from '../../common/CommonFunctions';
 
 export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
@@ -42,20 +45,27 @@ export default function SignUpDetails(props) {
   const [InstructionsBottomSheet, setInstructionsBottomSheet] = useState(
     React.createRef(),
   );
-  const bitcoinAddress = props.navigation.state.params ? props.navigation.state.params.address : '';
-  const selectedAccount = props.navigation.state.params ? props.navigation.state.params.selectedAccount : '';
+  const bitcoinAddress = props.navigation.state.params
+    ? props.navigation.state.params.address
+    : '';
+  const selectedAccount = props.navigation.state.params
+    ? props.navigation.state.params.selectedAccount
+    : '';
+    const EmailTokenNavigate = props.navigation.state.params ? props.navigation.state.params.EmailToken : '';
   const [OTPBottomSheet, setOTPBottomSheet] = useState(React.createRef());
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [errorProceedButton, setErrorProceedButton] = useState('');
   const [errorIgnoreButton, setErrorIgnoreButton] = useState('');
   const [isIgnoreButton, setIsIgnoreButton] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(true);
-
+  const [isEmailValid, setIsEmailValid] = useState(true);
   const [passcode, setPasscode] = useState([]);
 
   const smsSent = useSelector(state => state.bittr);
   const emailSent = useSelector(state => state.bittr);
-
+  const emailVerified = useSelector(state => state.bittr);
+  const emailVerifiedDetails = useSelector(state => state.bittr.emailVerifiedDetails);
+  const dispatch = useDispatch();
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
     tempPasscode[i] = text;
@@ -66,16 +76,77 @@ export default function SignUpDetails(props) {
     }
   }
   //TODO: when we handle error add this code
-  // setTimeout(() => {
-  //   setErrorMessageHeader(`Oops!\nSomething went wrong`);
-  //   setErrorMessage(
-  //     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magn'
-  //   );
-  //   setErrorProceedButton('Try Again');
-  //   setIsIgnoreButton(true);
-  //    setErrorIgnoreButton('Back')
-  // }, 2);
-  // (ErrorBottomSheet as any).current.snapTo(1);
+  // 
+
+  useEffect(() => {
+    Linking.addEventListener('url', handleDeepLink);
+  }, []);
+
+  const handleDeepLink = useCallback(event => {
+    const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
+    console.log("EmailToken",EmailToken);
+    let data = {
+      token : EmailToken ? EmailToken : EmailTokenNavigate
+    }
+    dispatch(verifyEmailRequest(data));
+  }, []);
+
+  useEffect(() => {
+    (async()=>{
+    if(!emailVerified && emailVerifiedDetails && !emailVerifiedDetails.success){
+      setTimeout(() => {
+          setErrorMessageHeader(`Verification link\nhas expired`);
+          setErrorMessage(
+            'The Verification link has expired,\nplease start over again'
+          );
+          setErrorProceedButton('Try Again');
+          setIsIgnoreButton(true);
+           setErrorIgnoreButton('Back')
+        }, 2);
+        (ErrorBottomSheet as any).current.snapTo(1);
+    } else {
+      if(emailVerified && emailVerifiedDetails && emailVerifiedDetails.success){
+        let mobileNumber = await AsyncStorage.getItem('MobileNo');
+        console.log("mobileNumber", mobileNumber);
+        let contactData = {
+          phone: mobileNumber,
+          country_code: '91',
+        };
+        dispatch(sendSmsRequest(contactData));
+        dispatch(verifiedEmail());
+      }
+    }})(); 
+  }, [emailVerified, emailVerifiedDetails]);
+
+  useEffect(() => {
+    if (smsSent.smsSent) {
+      (OTPBottomSheet as any).current.snapTo(1);
+      dispatch(sentEmailRequest());
+    } else {
+      console.log('fails');
+    }
+  }, [smsSent]);
+  
+  useEffect(() => {
+    if (emailSent.emailSent) {
+      setTimeout(() => {
+        setErrorMessageHeader(`Verification link sent`);
+        setErrorMessage(
+          'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email',
+        );
+        setErrorProceedButton('Start Over');
+      }, 2);
+      console.log('emailSent', emailSent, smsSent);
+      dispatch(sentEmailRequest());
+      (ErrorBottomSheet as any).current.snapTo(1);
+    }
+  }, [emailSent]);
+
+  
+
+  
+
+ 
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -397,21 +468,8 @@ export default function SignUpDetails(props) {
     );
   }, []);
 
-  if (emailSent.emailSent && smsSent.smsSent) {
-    setTimeout(() => {
-      setErrorMessageHeader(`Verification link sent`);
-      setErrorMessage(
-        'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email',
-      );
-      setErrorProceedButton('Start Over');
-    }, 2);
-    console.log("emailSent", emailSent, smsSent);
-    (ErrorBottomSheet as any).current.snapTo(1);
-  } else {
-    console.log("fails");
-  }
-
-  const dispatch = useDispatch();
+  
+ 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
       <StatusBar
@@ -479,7 +537,11 @@ export default function SignUpDetails(props) {
               placeholderTextColor={Colors.borderColor}
             />
           </View>
-
+          {!isEmailValid ? (
+            <View style={{ marginLeft: 'auto' }}>
+              <Text style={styles.errorText}>Enter valid email address</Text>
+            </View>
+          ) : null}
           <View style={{ ...styles.textBoxView }}>
             <TextInput
               style={{
@@ -521,19 +583,22 @@ export default function SignUpDetails(props) {
           }}
         >
           <TouchableOpacity
-            onPress={() => {
-              let formData = {
-                email: emailAddress,
-                language: 'en',
-                bitcoin_address: bitcoinAddress,
-                category: 'hexa',
-              };
-              let contactData = {
-                phone: mobileNumber,
-                country_code:"91"
+            onPress={async() => {
+              if (validateEmail(emailAddress)) {
+                await AsyncStorage.setItem('MobileNo', mobileNumber);
+                setIsEmailValid(true);
+                let formData = {
+                  email: emailAddress,
+                  language: 'en',
+                  bitcoin_address: bitcoinAddress,
+                  category: 'hexa',
+                };
+                
+                dispatch(sendEmailRequest(formData));
+                
+              } else {
+                setIsEmailValid(false);
               }
-              dispatch(sendEmailRequest(formData));
-              dispatch(sendSmsRequest(contactData));
             }}
             disabled={buttonDisable}
             style={{
@@ -553,8 +618,7 @@ export default function SignUpDetails(props) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              (OTPBottomSheet as any).current.snapTo(1);
-              //props.navigation.goBack()
+              props.navigation.goBack()
             }}
             style={{
               width: wp('20%'),
@@ -679,6 +743,12 @@ const styles = StyleSheet.create({
     marginLeft: 25,
     marginRight: 25,
     // marginTop: hp('0.7%')
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11),
+    fontStyle: 'italic',
   },
   textBoxStyles: {
     borderWidth: 0.5,
