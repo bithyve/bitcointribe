@@ -121,11 +121,16 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public getGBReceivingXpub = (accountNumber?: number): string => {
-    const baseXpub = this.generateGBXpub(accountNumber);
+  public getDerivativeReceivingXpub = (
+    type: string,
+    accountNumber?: number,
+  ): string => {
+    // generates receiving xpub for derivative accounts
+
+    const baseXpub = this.generateDerivativeXpub(type, accountNumber);
     console.log({ baseXpub });
     const node = bip32.fromBase58(baseXpub, this.network);
-    const child = node.derive(0).neutered();
+    const child = node.derive(0).neutered(); //external chain
     const receivingXpub = child.toBase58();
     console.log({ receivingXpub });
     return receivingXpub;
@@ -880,18 +885,23 @@ export default class HDSegwitWallet extends Bitcoin {
     return this.xpub;
   };
 
-  private generateGBXpub = (accountNumber: number = 0) => {
+  private generateDerivativeXpub = (
+    type: string,
+    accountNumber: number = 0,
+  ) => {
+    if (!config.DERVIATIVE_ACC[type])
+      throw new Error('Unsupported dervative account');
     if (accountNumber > 9)
       throw Error('Cannot create more than 10 GB accounts');
-    if (this.derivativeAccountXpubs.getBitter[accountNumber]) {
-      return this.derivativeAccountXpubs.getBitter[accountNumber];
+    if (this.derivativeAccountXpubs[type][accountNumber]) {
+      return this.derivativeAccountXpubs[type][accountNumber];
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/0'/${11 + accountNumber}'`; // series 11-20 for GBXpubs
       const child = root.derivePath(path).neutered();
       const xpubGB = child.toBase58();
-      return (this.derivativeAccountXpubs.getBitter[accountNumber] = xpubGB);
+      return (this.derivativeAccountXpubs[type][accountNumber] = xpubGB);
     }
   };
 }

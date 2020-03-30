@@ -222,6 +222,10 @@ class Config {
     },
   };
 
+  public DERVIATIVE_ACC = {
+    GET_BITTR: 'GET_BITTR',
+  };
+
   constructor(env: string) {
     this.ENVIRONMENT = env;
     console.log({ BIT_SERVER_MODE });

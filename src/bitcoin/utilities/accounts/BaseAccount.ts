@@ -206,7 +206,8 @@ export default class BaseAccount {
     }
   };
 
-  public getGBReceivingXpub = (
+  public getDerivativeReceivingXpub = (
+    type: string,
     accountNumber?: number,
   ):
     | {
@@ -224,7 +225,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getGBReceivingXpub(),
+        data: this.hdWallet.getDerivativeReceivingXpub(type, accountNumber),
       };
     } catch (err) {
       return {
