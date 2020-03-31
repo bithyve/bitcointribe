@@ -62,7 +62,6 @@ export default function OtpModalContents(props) {
                 keyboardType={'number-pad'}
                 selectTextOnFocus={true}
                 contextMenuHidden={true}
-                autoFocus={true}
                 autoCorrect={false}
                 ref={input => {
                   this.textInput = input;

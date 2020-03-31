@@ -30,7 +30,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import VerificationSuccessModalContents from './VerificationSuccessModalContents';
 import InstructionsModalContents from './InstructionsModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail } from '../../store/actions/bittr';
+import { sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail, sentSmsRequest } from '../../store/actions/bittr';
 import { validateEmail } from '../../common/CommonFunctions';
 import OtpModalContents from "./OtpModalContents";
 
@@ -68,6 +68,7 @@ export default function SignUpDetails(props) {
   const emailSent = useSelector(state => state.bittr);
   const emailVerified = useSelector(state => state.bittr);
   const emailVerifiedDetails = useSelector(state => state.bittr.emailVerifiedDetails);
+  const smsSentDetails = useSelector(state => state.bittr.smsSentDetails);
   const dispatch = useDispatch();
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
@@ -79,9 +80,6 @@ export default function SignUpDetails(props) {
     }
   }
 
-  useEffect(()=>{
-    OTPBottomSheet.current.snapTo(1);
-  }, [])
   //TODO: when we handle error add this code
   // 
 
@@ -126,11 +124,10 @@ export default function SignUpDetails(props) {
   }, [emailVerified, emailVerifiedDetails]);
 
   useEffect(() => {
-    if (smsSent.smsSent) {
+    if (smsSent.smsSent && smsSentDetails && smsSentDetails.success) {
+      console.log("smsSent.smsSent", smsSent.smsSent);
       (OTPBottomSheet as any).current.snapTo(1);
-      dispatch(sentEmailRequest());
-    } else {
-      console.log('fails');
+      dispatch(sentSmsRequest());
     }
   }, [smsSent]);
   

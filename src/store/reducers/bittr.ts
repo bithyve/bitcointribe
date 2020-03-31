@@ -102,6 +102,7 @@ const reducer = (state = INITIAL_STATE, action) => {
       case VERIFIED_EMAIL:
         return {
           ...state,
+          emailVerifiedDetails: null,
           emailVerified: false,
           emailVerifyRequest: false
         } 
