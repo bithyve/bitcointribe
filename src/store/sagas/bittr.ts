@@ -38,7 +38,6 @@ export function* createUserWorker({ payload }) {
 export const createUserWatcher = createWatcher(createUserWorker, CREATE_USER_REQUEST);
 
 function* sendEmailWorker({ payload }) {
-  console.log('Email result', payload.data)
   const result = yield call(sendEmailService, payload.data)
   console.log('Email result', result)
   if (!result) {

@@ -12,6 +12,7 @@ import {
   ScrollView,
   Linking,
   AsyncStorage,
+  ActivityIndicator,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -41,6 +42,7 @@ export default function SignUpDetails(props) {
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [SmsErrorBottomSheet, setSmsErrorBottomSheet] = useState(React.createRef());
   const [
     VerificationSuccessBottomSheet,
     setVerificationSuccessBottomSheet,
@@ -63,12 +65,14 @@ export default function SignUpDetails(props) {
   const [buttonDisable, setButtonDisable] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [passcode, setPasscode] = useState([]);
-
+  const [sendSmsCheck, setSendSmsCheck] = useState(false);
   const smsSent = useSelector(state => state.bittr);
   const emailSent = useSelector(state => state.bittr);
   const emailVerified = useSelector(state => state.bittr);
   const emailVerifiedDetails = useSelector(state => state.bittr.emailVerifiedDetails);
   const smsSentDetails = useSelector(state => state.bittr.smsSentDetails);
+  const emailSentDetails = useSelector(state => state.bittr.emailSentDetails);
+  const loading = useSelector(state => state.bittr.loading);
   const dispatch = useDispatch();
   function onPressNumber(text, i) {
     let tempPasscode = passcode;
@@ -118,6 +122,7 @@ export default function SignUpDetails(props) {
           country_code: '91',
         };
         dispatch(sendSmsRequest(contactData));
+        setSendSmsCheck(true);
         dispatch(verifiedEmail());
       }
     }})(); 
@@ -125,14 +130,24 @@ export default function SignUpDetails(props) {
 
   useEffect(() => {
     if (smsSent.smsSent && smsSentDetails && smsSentDetails.success) {
+      setSendSmsCheck(false);
       console.log("smsSent.smsSent", smsSent.smsSent);
       (OTPBottomSheet as any).current.snapTo(1);
       dispatch(sentSmsRequest());
     }
-  }, [smsSent]);
+     else if(sendSmsCheck) {
+      setTimeout(() => {
+        setErrorMessageHeader(`Unable to generate sms validation code`);
+        setErrorProceedButton('Try Again');
+        setIsIgnoreButton(true);
+         setErrorIgnoreButton('Back')
+      }, 2);
+      (SmsErrorBottomSheet as any).current.snapTo(1);
+    }
+  }, [smsSent, smsSentDetails]);
   
   useEffect(() => {
-    if (emailSent.emailSent) {
+    if (emailSent.emailSent && emailSentDetails && emailSentDetails.success) {
       setTimeout(() => {
         setErrorMessageHeader(`Verification link sent`);
         setErrorMessage(
@@ -140,11 +155,12 @@ export default function SignUpDetails(props) {
         );
         setErrorProceedButton('Start Over');
       }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
       console.log('emailSent', emailSent, smsSent);
       dispatch(sentEmailRequest());
-      (ErrorBottomSheet as any).current.snapTo(1);
+      
     }
-  }, [emailSent]);
+  }, [emailSent,emailSentDetails]);
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -192,6 +208,50 @@ export default function SignUpDetails(props) {
       <ModalHeader
         onPressHeader={() => {
           (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSmsErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={SmsErrorBottomSheet}
+        title={errorMessageHeader}
+        proceedButtonText={errorProceedButton}
+        headerTextColor={Colors.black1}
+        buttonTextColor={Colors.buttonText}
+        buttonColor={Colors.yellow}
+        buttonShadowColor={Colors.shadowYellow}
+        onPressProceed={() => {
+          if (SmsErrorBottomSheet.current)
+            (SmsErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isIgnoreButton={isIgnoreButton}
+        cancelButtonText={errorIgnoreButton}
+        onPressIgnore={() => {
+          if (SmsErrorBottomSheet.current)
+            (SmsErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [
+    emailAddress,
+    mobileNumber,
+    errorMessage,
+    errorMessageHeader,
+    errorProceedButton,
+    errorIgnoreButton,
+    isIgnoreButton,
+  ]);
+
+  const renderSmsErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (SmsErrorBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -403,8 +463,11 @@ export default function SignUpDetails(props) {
           <TouchableOpacity
             onPress={async() => {
               if (validateEmail(emailAddress)) {
+                setTimeout(() => {
+                  setIsEmailValid(true);
+                  setButtonDisable(true)
+                }, 2);
                 await AsyncStorage.setItem('MobileNo', mobileNumber);
-                setIsEmailValid(true);
                 let formData = {
                   email: emailAddress,
                   language: 'en',
@@ -415,7 +478,11 @@ export default function SignUpDetails(props) {
                 dispatch(sendEmailRequest(formData));
                 
               } else {
-                setIsEmailValid(false);
+                setTimeout(() => {
+                  setIsEmailValid(false);
+                  setButtonDisable(false);
+                }, 2);
+                
               }
             }}
             disabled={buttonDisable}
@@ -432,7 +499,11 @@ export default function SignUpDetails(props) {
               shadowOffset: { width: 15, height: 15 },
             }}
           >
-            <Text>SignUp</Text>
+            {loading ? 
+              <ActivityIndicator size="small" />
+              : <Text>SignUp</Text>
+            }
+            
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -459,6 +530,17 @@ export default function SignUpDetails(props) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SmsErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('30%') : hp('35%'),
+        ]}
+        renderContent={renderSmsErrorModalContent}
+        renderHeader={renderSmsErrorModalHeader}
       />
 
       <BottomSheet

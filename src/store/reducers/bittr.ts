@@ -30,7 +30,8 @@ const INITIAL_STATE = {
   emailVerifiedDetails: null,
   xpubVerified: null,
   xpubDetails: null,
-  xpubVerifyRequest: null
+  xpubVerifyRequest: null,
+  loading: false,
 }
 
 const reducer = (state = INITIAL_STATE, action) => {
@@ -57,19 +58,17 @@ const reducer = (state = INITIAL_STATE, action) => {
     case SEND_EMAIL_SUCCESS:
       return {
         ...state,
+        loading : true,
         emailSent: payload.emailSent,
         emailSentDetails: payload.emailSentDetails,
         sendEmailRequest: false
       }
     case SEND_EMAIL_FAIL:
-      return { ...state, emailSent: false, sendEmailRequest: false }
-      case SENT_EMAIL_REQUEST:
-      return { ...state, emailSent: false, sendEmailRequest: false }
-    case SEND_EMAIL_REQUEST:
-      return {
-        ...state,
-        sendEmailRequest: true
-      }
+      return { ...state, loading : false, emailSent: false, sendEmailRequest: false }
+    
+    case SENT_EMAIL_REQUEST:
+      return { ...state, loading : false, emailSent: false, emailSentDetails: null, sendEmailRequest: false }
+    
     case SEND_SMS_SUCCESS:
       return {
         ...state,
