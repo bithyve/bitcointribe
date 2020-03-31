@@ -24,6 +24,10 @@ export const VERIFY_XPUB_REQUEST = 'VERIFY_XPUB_REQUEST'
 export const VERIFY_XPUB_SUCCESS = 'VERIFY_XPUB_SUCCESS'
 export const VERIFY_XPUB_FAIL = 'VERIFY_XPUB_FAIL'
 
+export const createCustomer = (data) =>{
+  return { type: CREATE_USER_REQUEST, payload: { data } };
+}
+
 export const sendEmailRequest = data => {
   return { type: SEND_EMAIL_REQUEST, payload: { data } };
 };

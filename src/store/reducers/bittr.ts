@@ -40,7 +40,7 @@ const reducer = (state = INITIAL_STATE, action) => {
     case CREATE_USER_SUCCESS:
       return {
         ...state,
-        userDetails: payload.userDetails,
+        userDetails: payload.data,
         createUserRequest: false
       }
     case CREATE_USER_FAIL:

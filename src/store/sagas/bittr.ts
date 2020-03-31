@@ -29,10 +29,11 @@ import { createWatcher } from '../utils/utilities'
 
 export function* createUserWorker({ payload }) {
   const result = yield call(createService, payload.data)
-  if (!result || !result.data) {
-    yield put(createUserFail())
-  } else {
+  if(result && result.data && result.data){
     yield put(createUserSuccess(result.data))
+  }
+  else{
+    yield put(createUserFail())
   }
 }
 export const createUserWatcher = createWatcher(createUserWorker, CREATE_USER_REQUEST);

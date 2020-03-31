@@ -111,7 +111,6 @@ export default function Home(props) {
     state => state.sss.uploadSuccessfully,
   );
   const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
   let [AssociatedContact, setAssociatedContact] = useState([]);
@@ -2024,7 +2023,6 @@ export default function Home(props) {
 
   const health = useSelector(state => state.sss.overallHealth);
   useEffect(() => {
-    console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
 

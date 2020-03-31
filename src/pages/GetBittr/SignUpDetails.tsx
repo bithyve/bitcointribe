@@ -31,7 +31,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import VerificationSuccessModalContents from './VerificationSuccessModalContents';
 import InstructionsModalContents from './InstructionsModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail, sentSmsRequest } from '../../store/actions/bittr';
+import { createCustomer, sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail, sentSmsRequest } from '../../store/actions/bittr';
 import { validateEmail } from '../../common/CommonFunctions';
 import OtpModalContents from "./OtpModalContents";
 
@@ -41,6 +41,7 @@ export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
+  const [EmailToken, setEmailToken] = useState("");
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [SmsErrorBottomSheet, setSmsErrorBottomSheet] = useState(React.createRef());
   const [
@@ -67,6 +68,8 @@ export default function SignUpDetails(props) {
   const [passcode, setPasscode] = useState([]);
   const [sendSmsCheck, setSendSmsCheck] = useState(false);
   const smsSent = useSelector(state => state.bittr);
+  const userDetails = useSelector(state => state.bittr.userDetails);
+  const createUserRequest = useSelector(state => state.bittr);
   const emailSent = useSelector(state => state.bittr);
   const emailVerified = useSelector(state => state.bittr);
   const emailVerifiedDetails = useSelector(state => state.bittr.emailVerifiedDetails);
@@ -91,11 +94,14 @@ export default function SignUpDetails(props) {
     Linking.addEventListener('url', handleDeepLink);
   }, []);
 
-  const handleDeepLink = useCallback(event => {
-    const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-    console.log("EmailToken",EmailToken);
+  const handleDeepLink = useCallback(async(event) => {
+    const EmailToken1 = event.url.substr(event.url.lastIndexOf('/') + 1);
+    await AsyncStorage.setItem("emailToken", EmailToken1 ? EmailToken1 : EmailTokenNavigate);
+    setTimeout(() => {
+      setEmailToken(EmailToken1 ? EmailToken1 : EmailTokenNavigate);
+    }, 2);
     let data = {
-      token : EmailToken ? EmailToken : EmailTokenNavigate
+      token : EmailToken1 ? EmailToken1 : EmailTokenNavigate
     }
     dispatch(verifyEmailRequest(data));
   }, []);
@@ -268,13 +274,61 @@ export default function SignUpDetails(props) {
         note={emailAddress}
         noteNextLine={mobileNumber}
         proceedButtonText={'Continue'}
-        onPressProceed={() => {}}
+        onPressProceed={() => onPressProceed()}
         isIgnoreButton={false}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
       />
     );
   }, []);
+
+  const onPressProceed = async() =>{
+    let emailAddress = await AsyncStorage.getItem('emailAddress');
+    let emailToken = await AsyncStorage.getItem('emailToken');
+    let mobileNumber = await AsyncStorage.getItem('MobileNo');
+    let data = {
+      phone: mobileNumber,
+      country_code: "1",
+      verification_code: "0000", 
+      email: emailAddress,
+      bitcoin_address: "1JVhSfciiJEMk3b7yTPaPZ7AkVjopPjmCn",
+      email_token: emailToken,
+      initial_address_type: "simple",
+      category: "hexa"
+    }
+    dispatch(createCustomer(data));
+  }
+
+  useEffect( ()=>{
+    (async()=>{
+      if( createUserRequest.userDetails ){
+          let obj = {
+            ...createUserRequest.userDetails,
+            accountType: selectedAccount.type
+          }
+        let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAcccounts"));
+        if(!getBittrAccounts){
+          getBittrAccounts = [];
+          getBittrAccounts.push(obj)
+        }
+        else{
+          let index = getBittrAccounts.findIndex((value)=>value.accountType==selectedAccount.type);
+          if(index!=-1){
+            getBittrAccounts[index] = obj;
+          }
+          else{
+            getBittrAccounts.push(obj)
+          }
+        }
+        await AsyncStorage.setItem("getBittrAcccounts", JSON.stringify(getBittrAccounts));
+        VerificationSuccessBottomSheet.current.snapTo(0);
+        InstructionsBottomSheet.current.snapTo(1);
+      }
+      else{
+        console.log("userDetails else", userDetails)
+      }
+    })();
+  },[createUserRequest, userDetails])
 
   const renderVerificationSuccessHeader = useCallback(() => {
     return (
@@ -325,12 +379,20 @@ export default function SignUpDetails(props) {
         isIncorrectOtp={isIncorrectOtp}
         onOtpDone={(otpValue)=>{
           if(otpValue!='1111' && otpValue!=""){
-            setIsIncorrectOtp(true);
+            setTimeout(() => {
+              setIsIncorrectOtp(true);
+            }, 2);
           }
           else{
-            setIsIncorrectOtp(false);
+            setTimeout(() => {
+              setIsIncorrectOtp(false);
+            }, 2);
+            OTPBottomSheet.current.snapTo(0);
+            VerificationSuccessBottomSheet.current.snapTo(1)
           }
-          setOtp(otpValue);
+          setTimeout(() => {
+            setOtp(otpValue);
+          }, 2);
         }}
         modalRef={OTPBottomSheet}
         onPressConfirm={()=>{}}
@@ -467,6 +529,7 @@ export default function SignUpDetails(props) {
                   setIsEmailValid(true);
                   setButtonDisable(true)
                 }, 2);
+                await AsyncStorage.setItem('emailAddress', emailAddress);
                 await AsyncStorage.setItem('MobileNo', mobileNumber);
                 let formData = {
                   email: emailAddress,
