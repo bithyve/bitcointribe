@@ -223,22 +223,6 @@ export default function Accounts(props) {
   }, []);
 
   useEffect(() => {
-    if (serviceType === REGULAR_ACCOUNT) {
-      const derivativeAccountType = 'GET_BITTR';
-      const accountNumber = 0;
-      const { derivativeAccount } = service.hdWallet;
-
-      if (!derivativeAccount[derivativeAccountType][accountNumber])
-        dispatch(fetchDerivativeAccXpub(derivativeAccountType));
-      else
-        console.log({
-          getBittrXpub:
-            derivativeAccount[derivativeAccountType][accountNumber].xpub,
-        });
-    }
-  }, [service]);
-
-  useEffect(() => {
     (async () => {
       const storedAverageTxFees = JSON.parse(
         await AsyncStorage.getItem('storedAverageTxFees'),

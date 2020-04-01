@@ -181,8 +181,12 @@ export default class HDSegwitWallet extends Bitcoin {
       usedAddresses,
       accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
     );
-    this.balances = balances;
-    this.transactions = transactions;
+
+    this.derivativeAccount[accountType][accountNumber].balances = balances;
+    this.derivativeAccount[accountType][
+      accountNumber
+    ].transactions = transactions;
+
     return { balances, transactions };
   };
 
