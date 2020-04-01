@@ -1721,7 +1721,7 @@ export default function Home(props) {
   const renderAddModalHeader = () => {
     return (
       <ModalHeader
-        onPressheader={() => {
+        onPressHeader={() => {
           setTimeout(() => {
             setAddSubBottomSheetsFlag(false);
             setTabBarZIndex(999);

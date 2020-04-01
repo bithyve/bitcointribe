@@ -27,12 +27,12 @@ import { withNavigation } from "react-navigation";
 
 function GetBittrRecurringBuyContents(props) {
     const [serviceData, setServiceData] = useState([
-        {
-            title:"Fast Bitcoin",
-            image:require("../../assets/images/icons/fastbitcoin_dark.png"),
-            isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
-        },
+        // {
+        //     title:"Fast Bitcoin",
+        //     image:require("../../assets/images/icons/fastbitcoin_dark.png"),
+        //     isSelected:false,
+        //     info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
+        // },
         {
             title:"Get Bittr",
             image:require("../../assets/images/icons/icon_getbitter.png"),
@@ -41,13 +41,6 @@ function GetBittrRecurringBuyContents(props) {
         }
     ]);
     const [accountData, setAccountData] = useState([
-        {
-            title:"Test Account",
-            image:require("../../assets/images/icons/icon_test.png"),
-            isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
-            type:TEST_ACCOUNT
-        },
         {
             title:"Regular Account",
             image:require("../../assets/images/icons/icon_regular.png"),
@@ -63,7 +56,12 @@ function GetBittrRecurringBuyContents(props) {
             type:SECURE_ACCOUNT
         }
     ])
-    const [selectedService, setSelectedService] =useState({});
+    const [selectedService, setSelectedService] =useState({
+        title:"Get Bittr",
+        image:require("../../assets/images/icons/icon_getbitter.png"),
+        isSelected:false,
+        info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
+    });
     const [selectedAccount, setSelectedAccount] =useState({
         title:"Regular Account",
         image:require("../../assets/images/icons/icon_regular.png"),

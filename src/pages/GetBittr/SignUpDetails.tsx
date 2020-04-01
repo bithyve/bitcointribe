@@ -290,8 +290,11 @@ export default function SignUpDetails(props) {
       email_token: emailToken,
       initial_address_type: 'simple',
       category: 'hexa',
-      ...(selectedAccount.type==REGULAR_ACCOUNT && {xpub_key:'xpub6CPaz6tavH68fxBJpdJykvXjsjtpJ4cKPW1BuxgnGHaL3SApxkYNppJnEHo3xbyzUy9ortD6jJYk9ejSb3s4nkCvgC8qpuivsfUqcxDF2oB',xpub_addr_type:'auto', 
-      xpub_path:'m/0/x'})
+      ...(selectedAccount.type==REGULAR_ACCOUNT && {
+        xpub_key:'xpub6CPaz6tavH68fxBJpdJykvXjsjtpJ4cKPW1BuxgnGHaL3SApxkYNppJnEHo3xbyzUy9ortD6jJYk9ejSb3s4nkCvgC8qpuivsfUqcxDF2oB', 
+        xpub_addr_type:'auto', 
+        xpub_path:'m/0/x'
+      })
     };
     dispatch(createCustomer(data));
   };
@@ -299,7 +302,7 @@ export default function SignUpDetails(props) {
   useEffect( ()=>{
     (async()=>{
       if( userDetails ){
-        let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAcccounts"));
+        let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAccounts"));
         let obj = {
           getBitrrAccounts: [userDetails],
           accountType: selectedAccount.type
@@ -319,7 +322,7 @@ export default function SignUpDetails(props) {
             getBittrAccounts[index].getBitrrAccounts = GBAccounts;
           }
         }
-        await AsyncStorage.setItem("getBittrAcccounts", JSON.stringify(getBittrAccounts));
+        await AsyncStorage.setItem("getBittrAccounts", JSON.stringify(getBittrAccounts));
         setTimeout(() => {
           VerificationSuccessBottomSheet.current.snapTo(0);
           InstructionsBottomSheet.current.snapTo(1);
