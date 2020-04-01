@@ -34,6 +34,7 @@ import {
   RESET_TWO_FA,
   twoFAResetted,
   RUN_TEST,
+  FETCH_DERIVATIVE_ACC_XPUB,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -69,6 +70,30 @@ function* fetchAddrWorker({ payload }) {
 }
 
 export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
+
+function* fetchDerivativeAccXpubWorker({ payload }) {
+  const { accountType, accountNumber } = payload;
+  const service: RegularAccount = yield select(
+    state => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const res = yield call(
+    service.getDerivativeReceivingXpub,
+    accountType,
+    accountNumber,
+  );
+
+  if (res.status === 200) {
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to generate derivative acc xpub');
+  }
+}
+
+export const fetchDerivativeAccXpubWatcher = createWatcher(
+  fetchDerivativeAccXpubWorker,
+  FETCH_DERIVATIVE_ACC_XPUB,
+);
 
 function* fetchBalanceWorker({ payload }) {
   if (payload.options && payload.options.loader)
