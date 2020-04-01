@@ -82,6 +82,7 @@ import {
   getTestcoins,
   fetchBalance,
   fetchTransactions,
+  runTest,
 } from '../store/actions/accounts';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
@@ -99,6 +100,9 @@ import Toast from '../components/Toast';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  // useEffect(() => {
+  //   dispatch(runTest());
+  // }, []);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -108,7 +112,6 @@ export default function Home(props) {
     state => state.sss.uploadSuccessfully,
   );
   const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
   let [AssociatedContact, setAssociatedContact] = useState([]);

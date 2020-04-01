@@ -14,6 +14,7 @@ export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
+export const RUN_TEST = 'RUN_TEST';
 
 export const fetchAddress = serviceType => {
   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -87,6 +88,10 @@ export const resetTwoFA = secondaryMnemonic => {
     type: RESET_TWO_FA,
     payload: { secondaryMnemonic },
   };
+};
+
+export const runTest = () => {
+  return { type: RUN_TEST };
 };
 
 // types and action creators (saga): dispatched by saga workers
