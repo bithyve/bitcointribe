@@ -27,7 +27,6 @@ export default class HDSegwitWallet extends Bitcoin {
   private internalAddresssesCache: {};
   private externalAddressesCache: {};
   private addressToWIFCache: {};
-  private derivativeAccount = config.DERIVATIVE_ACC;
 
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -40,6 +39,7 @@ export default class HDSegwitWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
+  public derivativeAccount = config.DERIVATIVE_ACC;
 
   constructor(
     mnemonic?: string,
@@ -123,7 +123,7 @@ export default class HDSegwitWallet extends Bitcoin {
     };
   };
 
-  public getDerivativeReceivingXpub = (
+  public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
   ): string => {
@@ -134,10 +134,11 @@ export default class HDSegwitWallet extends Bitcoin {
     const node = bip32.fromBase58(baseXpub, this.network);
     const address = this.getAddress(node.derive(0).derive(0), this.purpose);
     console.log({ address });
-    const child = node.derive(0).neutered(); //external chain
-    const receivingXpub = child.toBase58();
-    console.log({ receivingXpub });
-    return receivingXpub;
+    return baseXpub;
+    // const child = node.derive(0).neutered(); //external chain
+    // const receivingXpub = child.toBase58();
+    // console.log({ receivingXpub });
+    // return receivingXpub;
   };
 
   public fetchDerivativeAccBalanceTxs = async (
