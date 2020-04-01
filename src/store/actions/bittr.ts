@@ -4,6 +4,7 @@ import { TransactionBuilder } from 'bitcoinjs-lib'
 export const CREATE_USER_REQUEST = 'CREATE_USER_REQUEST'
 export const CREATE_USER_SUCCESS = 'CREATE_USER_SUCCESS'
 export const CREATE_USER_FAIL = 'CREATE_USER_FAIL'
+export const CLEAR_USER_REQUEST = 'CLEAR_USER_REQUEST'
 
 export const SEND_EMAIL_REQUEST = 'SEND_EMAIL_REQUEST'
 export const SEND_EMAIL_SUCCESS = 'SEND_EMAIL_SUCCESS'
@@ -26,6 +27,10 @@ export const VERIFY_XPUB_FAIL = 'VERIFY_XPUB_FAIL'
 
 export const createCustomer = (data) =>{
   return { type: CREATE_USER_REQUEST, payload: { data } };
+}
+
+export const ClearUserRequest = () =>{
+  return { type: CLEAR_USER_REQUEST };
 }
 
 export const sendEmailRequest = data => {

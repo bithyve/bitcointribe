@@ -2,6 +2,7 @@ import {
   CREATE_USER_REQUEST,
   CREATE_USER_SUCCESS,
   CREATE_USER_FAIL,
+  CLEAR_USER_REQUEST,
   SEND_EMAIL_REQUEST,
   SEND_EMAIL_SUCCESS,
   SEND_EMAIL_FAIL,
@@ -55,6 +56,14 @@ const reducer = (state = INITIAL_STATE, action) => {
         ...state,
         createUserRequest: true
       }
+
+    case CLEAR_USER_REQUEST:
+      return {
+        ...state,
+        userDetails: '',
+        createUserRequest: false
+      }
+
     case SEND_EMAIL_SUCCESS:
       return {
         ...state,

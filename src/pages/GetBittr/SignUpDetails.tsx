@@ -31,15 +31,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import VerificationSuccessModalContents from './VerificationSuccessModalContents';
 import InstructionsModalContents from './InstructionsModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  createCustomer,
-  sendEmailRequest,
-  sendSmsRequest,
-  verifyEmailRequest,
-  sentEmailRequest,
-  verifiedEmail,
-  sentSmsRequest,
-} from '../../store/actions/bittr';
+import { createCustomer, sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail, sentSmsRequest, ClearUserRequest } from '../../store/actions/bittr';
 import { validateEmail } from '../../common/CommonFunctions';
 import OtpModalContents from './OtpModalContents';
 
@@ -330,37 +322,38 @@ export default function SignUpDetails(props) {
     dispatch(createCustomer(data));
   };
 
-  useEffect(() => {
-    (async () => {
-      if (dataGetBittr.userDetails) {
+  useEffect( ()=>{
+    (async()=>{
+      if( userDetails ){
+        let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAcccounts"));
         let obj = {
-          ...dataGetBittr.userDetails,
-          accountType: selectedAccount.type,
-        };
-        let getBittrAccounts = JSON.parse(
-          await AsyncStorage.getItem('getBittrAcccounts'),
-        );
-        if (!getBittrAccounts) {
+          getBitrrAccounts: [userDetails],
+          accountType: selectedAccount.type
+        }
+        if(!getBittrAccounts){
           getBittrAccounts = [];
-          getBittrAccounts.push(obj);
-        } else {
-          let index = getBittrAccounts.findIndex(
-            value => value.accountType == selectedAccount.type,
-          );
-          if (index != -1) {
+          getBittrAccounts.push(obj)
+        }
+        else{
+          let index = getBittrAccounts.findIndex((value)=>value.accountType==selectedAccount.type);
+          if(index!=-1){
+
             getBittrAccounts[index] = obj;
-          } else {
-            getBittrAccounts.push(obj);
+          }
+          else{
+            let GBAccounts = getBittrAccounts[index].getBitrrAccounts;
+            GBAccounts.push(userDetails);
+            getBittrAccounts[index].getBitrrAccounts = GBAccounts;
           }
         }
-        await AsyncStorage.setItem(
-          'getBittrAcccounts',
-          JSON.stringify(getBittrAccounts),
-        );
+        await AsyncStorage.setItem("getBittrAcccounts", JSON.stringify(getBittrAccounts));
+        console.log("getBittrAccounts", getBittrAccounts)
         VerificationSuccessBottomSheet.current.snapTo(0);
         InstructionsBottomSheet.current.snapTo(1);
-      } else {
-        console.log('userDetails else', userDetails);
+        dispatch(ClearUserRequest());
+      }
+      else{
+        console.log("userDetails else", userDetails)
       }
     })();
   }, [dataGetBittr, userDetails]);
@@ -412,24 +405,16 @@ export default function SignUpDetails(props) {
     return (
       <OtpModalContents
         isIncorrectOtp={isIncorrectOtp}
-        onOtpDone={otpValue => {
-          if (otpValue != '') {
-            setTimeout(() => {
-              setIsIncorrectOtp(true);
-            }, 2);
-          } else {
-            setTimeout(() => {
-              setIsIncorrectOtp(false);
-            }, 2);
-            OTPBottomSheet.current.snapTo(0);
-            VerificationSuccessBottomSheet.current.snapTo(1);
-          }
+        onOtpDone={(otpValue)=>{
           setTimeout(() => {
             setOtp(otpValue);
           }, 2);
         }}
         modalRef={OTPBottomSheet}
-        onPressConfirm={() => {}}
+        onPressConfirm={()=>{
+          OTPBottomSheet.current.snapTo(0);
+          VerificationSuccessBottomSheet.current.snapTo(1);
+        }}
       />
     );
   }, [isIncorrectOtp, otp]);
