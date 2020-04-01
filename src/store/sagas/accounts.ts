@@ -43,6 +43,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -551,10 +552,19 @@ export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
 function* testWorker({ payload }) {
   console.log('---------Executing Test Saga---------');
 
-  const service = yield select(
+  const service: RegularAccount = yield select(
     state => state.accounts[REGULAR_ACCOUNT].service,
   );
 
+  const res = yield call(service.getDerivativeReceivingXpub, 'GET_BITTR', 1);
+  console.log({ res });
+
+  const res2 = yield call(
+    service.getDerivativeAccBalanceTransactions,
+    'GET_BITTR',
+    1,
+  );
+  console.log({ res2 });
   console.log('---------Executed Test Saga---------');
 }
 

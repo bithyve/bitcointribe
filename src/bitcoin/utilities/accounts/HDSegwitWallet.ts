@@ -132,6 +132,8 @@ export default class HDSegwitWallet extends Bitcoin {
     const baseXpub = this.generateDerivativeXpub(accountType, accountNumber);
     console.log({ baseXpub });
     const node = bip32.fromBase58(baseXpub, this.network);
+    const address = this.getAddress(node.derive(0).derive(0), this.purpose);
+    console.log({ address });
     const child = node.derive(0).neutered(); //external chain
     const receivingXpub = child.toBase58();
     console.log({ receivingXpub });
@@ -158,7 +160,12 @@ export default class HDSegwitWallet extends Bitcoin {
     ];
     const usedAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
-      usedAddresses.push(this.getExternalAddressByIndex(itr));
+      usedAddresses.push(
+        this.getExternalAddressByIndex(
+          itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        ),
+      );
     }
 
     this.derivativeAccount[accountType][accountNumber][
@@ -345,7 +352,6 @@ export default class HDSegwitWallet extends Bitcoin {
   private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
     // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
-
     const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
       accountNumber
     ];
@@ -879,7 +885,7 @@ export default class HDSegwitWallet extends Bitcoin {
     index: number,
     xpub?: string,
   ): string => {
-    if (this.externalAddressesCache[index]) {
+    if (!xpub && this.externalAddressesCache[index]) {
       return this.externalAddressesCache[index];
     } // cache hit
 
@@ -978,14 +984,13 @@ export default class HDSegwitWallet extends Bitcoin {
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
-      const path = `m/${this.purpose}'/0'/${this.derivativeAccount[accountType][
+      const path = `m/${this.purpose}'/1'/${this.derivativeAccount[accountType][
         'series'
       ] + accountNumber}'`;
       const child = root.derivePath(path).neutered();
-      const xpubGB = child.toBase58();
-      return (this.derivativeAccount[accountType][accountNumber][
-        'xpub'
-      ] = xpubGB);
+      const xpub = child.toBase58();
+      this.derivativeAccount[accountType][accountNumber] = { xpub };
+      return xpub;
     }
   };
 }
