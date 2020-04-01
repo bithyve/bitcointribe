@@ -83,6 +83,7 @@ import {
   getTestcoins,
   fetchBalance,
   fetchTransactions,
+  runTest,
 } from '../store/actions/accounts';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';

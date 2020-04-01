@@ -1,3 +1,5 @@
+import accounts from '../../store/reducers/accounts';
+
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
@@ -48,4 +50,13 @@ export interface BuddyStaticNonPMDD {
   secondaryXpub: string;
   bhXpub: string;
   shareIDs: string[];
+}
+
+export interface DerivativeAccount {
+  series: number;
+  [accounts: number]: {
+    xpub: string;
+    usedAddresses?: string[];
+    nextFreeAddressIndex?: number;
+  };
 }
