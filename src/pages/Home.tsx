@@ -100,9 +100,6 @@ import Toast from '../components/Toast';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
-  // useEffect(() => {
-  //   dispatch(runTest());
-  // }, []);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -1998,6 +1995,10 @@ export default function Home(props) {
     console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
+
+  // useEffect(() => {
+  //   dispatch(runTest());
+  // }, []);
 
   // useEffect(() => {
   //   const unsubscribe = NetInfo.addEventListener(state => {

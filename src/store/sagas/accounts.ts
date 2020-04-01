@@ -77,13 +77,22 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
     state => state.accounts[REGULAR_ACCOUNT].service,
   );
 
+  const { derivativeAccount } = service.hdWallet;
+  if (derivativeAccount[accountType][accountNumber]) return; // xpub already exists
+
   const res = yield call(
-    service.getDerivativeReceivingXpub,
+    service.getDerivativeAccXpub,
     accountType,
     accountNumber,
   );
 
   if (res.status === 200) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [REGULAR_ACCOUNT]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to generate derivative acc xpub');
@@ -581,13 +590,12 @@ function* testWorker({ payload }) {
     state => state.accounts[REGULAR_ACCOUNT].service,
   );
 
-  const res = yield call(service.getDerivativeReceivingXpub, 'GET_BITTR', 1);
+  const res = yield call(service.getDerivativeAccXpub, 'GET_BITTR');
   console.log({ res });
 
   const res2 = yield call(
     service.getDerivativeAccBalanceTransactions,
     'GET_BITTR',
-    1,
   );
   console.log({ res2 });
   console.log('---------Executed Test Saga---------');

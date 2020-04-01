@@ -95,7 +95,7 @@ export const runTest = () => {
   return { type: RUN_TEST };
 };
 
-export const fetchDerivativeAccXpub = (accountType, accountNumber) => {
+export const fetchDerivativeAccXpub = (accountType, accountNumber?) => {
   return {
     type: FETCH_DERIVATIVE_ACC_XPUB,
     payload: { accountType, accountNumber },

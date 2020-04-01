@@ -6,7 +6,7 @@ import HDSegwitWallet from './HDSegwitWallet';
 import { Transactions } from '../Interface';
 
 export default class BaseAccount {
-  private hdWallet: HDSegwitWallet;
+  public hdWallet: HDSegwitWallet;
 
   constructor(
     mnemonic?: string,
@@ -207,7 +207,7 @@ export default class BaseAccount {
     }
   };
 
-  public getDerivativeReceivingXpub = (
+  public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
   ):
@@ -226,10 +226,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getDerivativeReceivingXpub(
-          accountType,
-          accountNumber,
-        ),
+        data: this.hdWallet.getDerivativeAccXpub(accountType, accountNumber),
       };
     } catch (err) {
       return {
