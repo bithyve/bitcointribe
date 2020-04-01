@@ -100,9 +100,9 @@ import Toast from '../components/Toast';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
-  useEffect(() => {
-    dispatch(runTest());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(runTest());
+  // }, []);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
