@@ -15,6 +15,7 @@ export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
 export const RUN_TEST = 'RUN_TEST';
+export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
 
 export const fetchAddress = serviceType => {
   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -92,6 +93,13 @@ export const resetTwoFA = secondaryMnemonic => {
 
 export const runTest = () => {
   return { type: RUN_TEST };
+};
+
+export const fetchDerivativeAccXpub = (accountType, accountNumber?) => {
+  return {
+    type: FETCH_DERIVATIVE_ACC_XPUB,
+    payload: { accountType, accountNumber },
+  };
 };
 
 // types and action creators (saga): dispatched by saga workers

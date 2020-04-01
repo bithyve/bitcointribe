@@ -2028,6 +2028,10 @@ export default function Home(props) {
   }, [health]);
 
   // useEffect(() => {
+  //   dispatch(runTest());
+  // }, []);
+
+  // useEffect(() => {
   //   const unsubscribe = NetInfo.addEventListener(state => {
   //     console.log('Connection type', state.type);
   //     console.log('Is connected?', state.isConnected);
