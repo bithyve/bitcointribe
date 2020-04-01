@@ -1640,7 +1640,7 @@ export default function Home(props) {
   const renderGetBittrRecurringBuyHeader = () => {
     return (
       <ModalHeader
-        onPressheader={() => {
+        onPressHeader={() => {
           setTimeout(() => {
             setAddSubBottomSheetsFlag(false);
             setTabBarZIndex(999)

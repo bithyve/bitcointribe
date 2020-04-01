@@ -285,9 +285,6 @@ export default class Bitcoin {
       const addressesInfo = Txs;
       const txMap = new Map();
       for (const addressInfo of addressesInfo) {
-        // console.log(
-        //   `Appending transactions corresponding to ${addressInfo.Address}`,
-        // );
         if (addressInfo.TotalTransactions === 0) {
           continue;
         }

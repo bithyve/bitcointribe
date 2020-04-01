@@ -34,6 +34,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createCustomer, sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail, sentSmsRequest, ClearUserRequest } from '../../store/actions/bittr';
 import { validateEmail } from '../../common/CommonFunctions';
 import OtpModalContents from './OtpModalContents';
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function SignUpDetails(props) {
   const [isIncorrectOtp, setIsIncorrectOtp] = useState(false);
@@ -125,7 +126,6 @@ export default function SignUpDetails(props) {
           emailVerifiedDetails.success
         ) {
           let mobileNumber = await AsyncStorage.getItem('MobileNo');
-          console.log('mobileNumber', mobileNumber);
           let contactData = {
             phone: mobileNumber,
             country_code: '91',
@@ -138,20 +138,10 @@ export default function SignUpDetails(props) {
   }, [dataGetBittr.emailVerified, emailVerifiedDetails]);
 
   useEffect(() => {
-    console.log(
-      'dataGetBittr.smsSent1',
-      dataGetBittr.smsSent,
-      smsSentDetails,
-    );
     if (smsSentDetails && !smsSentDetails.success) {
       (SmsErrorBottomSheet as any).current.snapTo(1);
     } else {
       if (dataGetBittr.smsSent && smsSentDetails && smsSentDetails.success) {
-        console.log(
-          'dataGetBittr.smsSent',
-          dataGetBittr.smsSent,
-          smsSentDetails,
-        );
         setTimeout(() => {
         (OTPBottomSheet as any).current.snapTo(1);
       }, 2);
@@ -177,7 +167,6 @@ export default function SignUpDetails(props) {
         setErrorProceedButton('Start Over');
       }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
-      console.log('emailSent', dataGetBittr);
       dispatch(sentEmailRequest());
     }
   }, [dataGetBittr.emailSent, emailSentDetails]);
@@ -301,6 +290,8 @@ export default function SignUpDetails(props) {
       email_token: emailToken,
       initial_address_type: 'simple',
       category: 'hexa',
+      ...(selectedAccount.type==REGULAR_ACCOUNT && {xpub_key:'xpub6CPaz6tavH68fxBJpdJykvXjsjtpJ4cKPW1BuxgnGHaL3SApxkYNppJnEHo3xbyzUy9ortD6jJYk9ejSb3s4nkCvgC8qpuivsfUqcxDF2oB',xpub_addr_type:'auto', 
+      xpub_path:'m/0/x'})
     };
     dispatch(createCustomer(data));
   };
@@ -309,7 +300,6 @@ export default function SignUpDetails(props) {
     (async()=>{
       if( userDetails ){
         let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAcccounts"));
-        console.log("getBittrAccounts", getBittrAccounts)
         let obj = {
           getBitrrAccounts: [userDetails],
           accountType: selectedAccount.type
@@ -320,31 +310,23 @@ export default function SignUpDetails(props) {
         }
         else{
           let index = getBittrAccounts.findIndex((value)=>value.accountType==selectedAccount.type);
-          console.log("INDEX", index);
           if(index==-1){
             getBittrAccounts.push(obj);
-            console.log("getBittrAccounts after push in index", getBittrAccounts)
           }
           else{
-            console.log("getBittrAccounts[index]", getBittrAccounts[index], getBittrAccounts[index].getBitrrAccounts)
             let GBAccounts = getBittrAccounts[index].getBitrrAccounts;
-            console.log("GBAccounts", GBAccounts);
             GBAccounts.push(userDetails);
             getBittrAccounts[index].getBitrrAccounts = GBAccounts;
           }
         }
-        console.log("getBittrAccounts before", getBittrAccounts)
         await AsyncStorage.setItem("getBittrAcccounts", JSON.stringify(getBittrAccounts));
-        console.log("getBittrAccounts1 after", getBittrAccounts)
         setTimeout(() => {
           VerificationSuccessBottomSheet.current.snapTo(0);
           InstructionsBottomSheet.current.snapTo(1);
         }, 2);
-       
         dispatch(ClearUserRequest());
       }
       else{
-        console.log("userDetails else", userDetails)
       }
     })();
   }, [userDetails]);
