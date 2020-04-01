@@ -257,12 +257,7 @@ export default function SignUpDetails(props) {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [
-    errorMessageHeader,
-    errorProceedButton,
-    errorIgnoreButton,
-    isIgnoreButton,
-  ]);
+  }, []);
 
   const renderSmsErrorModalHeader = useCallback(() => {
     return (
