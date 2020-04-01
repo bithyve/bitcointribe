@@ -81,19 +81,7 @@ export default function SignUpDetails(props) {
 
   const loading = useSelector(state => state.bittr.loading);
   const dispatch = useDispatch();
-  function onPressNumber(text, i) {
-    let tempPasscode = passcode;
-    tempPasscode[i] = text;
-    setPasscode(tempPasscode);
-
-    if (passcode.join('').length == 4) {
-      props.navigation.navigate('WalletCreationSuccess');
-    }
-  }
-
-  //TODO: when we handle error add this code
-  //
-
+  
   useEffect(() => {
     Linking.addEventListener('url', handleDeepLink);
   }, []);
@@ -150,14 +138,12 @@ export default function SignUpDetails(props) {
   }, [dataGetBittr.emailVerified, emailVerifiedDetails]);
 
   useEffect(() => {
-    if (!dataGetBittr.smsSent && smsSentDetails && !smsSentDetails.success) {
-      console.log('in if else', dataGetBittr.smsSent, smsSentDetails);
-      setTimeout(() => {
-        setErrorMessageHeader(`Unable to generate sms validation code`);
-        setErrorProceedButton('Try Again');
-        setIsIgnoreButton(true);
-        setErrorIgnoreButton('Back');
-      }, 2);
+    console.log(
+      'dataGetBittr.smsSent1',
+      dataGetBittr.smsSent,
+      smsSentDetails,
+    );
+    if (smsSentDetails && !smsSentDetails.success) {
       (SmsErrorBottomSheet as any).current.snapTo(1);
     } else {
       if (dataGetBittr.smsSent && smsSentDetails && smsSentDetails.success) {
@@ -166,8 +152,10 @@ export default function SignUpDetails(props) {
           dataGetBittr.smsSent,
           smsSentDetails,
         );
+        setTimeout(() => {
         (OTPBottomSheet as any).current.snapTo(1);
-        (SmsErrorBottomSheet as any).current.snapTo(0);
+      }, 2);
+       // (SmsErrorBottomSheet as any).current.snapTo(0);
         dispatch(sentSmsRequest());
       } else {
         (SmsErrorBottomSheet as any).current.snapTo(0);
@@ -249,8 +237,8 @@ export default function SignUpDetails(props) {
     return (
       <ErrorModalContents
         modalRef={SmsErrorBottomSheet}
-        title={errorMessageHeader}
-        proceedButtonText={errorProceedButton}
+        title={`Unable to generate sms validation code`}
+        proceedButtonText={'Try Again'}
         headerTextColor={Colors.black1}
         buttonTextColor={Colors.buttonText}
         buttonColor={Colors.yellow}
@@ -259,8 +247,8 @@ export default function SignUpDetails(props) {
           if (SmsErrorBottomSheet.current)
             (SmsErrorBottomSheet as any).current.snapTo(0);
         }}
-        isIgnoreButton={isIgnoreButton}
-        cancelButtonText={errorIgnoreButton}
+        isIgnoreButton={true}
+        cancelButtonText={'Back'}
         onPressIgnore={() => {
           if (SmsErrorBottomSheet.current)
             (SmsErrorBottomSheet as any).current.snapTo(0);
@@ -312,7 +300,7 @@ export default function SignUpDetails(props) {
     let data = {
       phone: mobileNumber,
       country_code: '1',
-      verification_code: '0000',
+      verification_code: otp,
       email: emailAddress,
       bitcoin_address: '1JVhSfciiJEMk3b7yTPaPZ7AkVjopPjmCn',
       email_token: emailToken,
@@ -326,6 +314,7 @@ export default function SignUpDetails(props) {
     (async()=>{
       if( userDetails ){
         let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAcccounts"));
+        console.log("getBittrAccounts", getBittrAccounts)
         let obj = {
           getBitrrAccounts: [userDetails],
           accountType: selectedAccount.type
@@ -336,27 +325,34 @@ export default function SignUpDetails(props) {
         }
         else{
           let index = getBittrAccounts.findIndex((value)=>value.accountType==selectedAccount.type);
-          if(index!=-1){
-
-            getBittrAccounts[index] = obj;
+          console.log("INDEX", index);
+          if(index==-1){
+            getBittrAccounts.push(obj);
+            console.log("getBittrAccounts after push in index", getBittrAccounts)
           }
           else{
+            console.log("getBittrAccounts[index]", getBittrAccounts[index], getBittrAccounts[index].getBitrrAccounts)
             let GBAccounts = getBittrAccounts[index].getBitrrAccounts;
+            console.log("GBAccounts", GBAccounts);
             GBAccounts.push(userDetails);
             getBittrAccounts[index].getBitrrAccounts = GBAccounts;
           }
         }
+        console.log("getBittrAccounts before", getBittrAccounts)
         await AsyncStorage.setItem("getBittrAcccounts", JSON.stringify(getBittrAccounts));
-        console.log("getBittrAccounts", getBittrAccounts)
-        VerificationSuccessBottomSheet.current.snapTo(0);
-        InstructionsBottomSheet.current.snapTo(1);
+        console.log("getBittrAccounts1 after", getBittrAccounts)
+        setTimeout(() => {
+          VerificationSuccessBottomSheet.current.snapTo(0);
+          InstructionsBottomSheet.current.snapTo(1);
+        }, 2);
+       
         dispatch(ClearUserRequest());
       }
       else{
         console.log("userDetails else", userDetails)
       }
     })();
-  }, [dataGetBittr, userDetails]);
+  }, [userDetails]);
 
   const renderVerificationSuccessHeader = useCallback(() => {
     return (
@@ -386,7 +382,7 @@ export default function SignUpDetails(props) {
           'Purus faucibus ornare suspendisse sed nisi',
           'Et ligula ullamcorper malesuada proin',
         ]}
-        onPressProceed={() => {}}
+        onPressProceed={() => {props.navigation.pop(2)}}
       />
     );
   }, []);

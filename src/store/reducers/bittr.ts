@@ -47,7 +47,7 @@ const reducer = (state = INITIAL_STATE, action) => {
     case CREATE_USER_FAIL:
       return {
         ...state,
-        userDetails: '',
+        userDetails: false,
         createUserRequest: false
       }
 
@@ -56,11 +56,10 @@ const reducer = (state = INITIAL_STATE, action) => {
         ...state,
         createUserRequest: true
       }
-
     case CLEAR_USER_REQUEST:
       return {
         ...state,
-        userDetails: '',
+        userDetails: false,
         createUserRequest: false
       }
 
