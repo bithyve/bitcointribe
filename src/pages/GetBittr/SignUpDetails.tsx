@@ -67,14 +67,14 @@ export default function SignUpDetails(props) {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [passcode, setPasscode] = useState([]);
   const [sendSmsCheck, setSendSmsCheck] = useState(false);
-  const smsSent = useSelector(state => state.bittr);
+
+  const dataGetBittr = useSelector(state => state.bittr);
+
   const userDetails = useSelector(state => state.bittr.userDetails);
-  const createUserRequest = useSelector(state => state.bittr);
-  const emailSent = useSelector(state => state.bittr);
-  const emailVerified = useSelector(state => state.bittr);
   const emailVerifiedDetails = useSelector(state => state.bittr.emailVerifiedDetails);
   const smsSentDetails = useSelector(state => state.bittr.smsSentDetails);
   const emailSentDetails = useSelector(state => state.bittr.emailSentDetails);
+
   const loading = useSelector(state => state.bittr.loading);
   const dispatch = useDispatch();
   function onPressNumber(text, i) {
@@ -108,7 +108,7 @@ export default function SignUpDetails(props) {
 
   useEffect(() => {
     (async()=>{
-    if(!emailVerified && emailVerifiedDetails && !emailVerifiedDetails.success){
+    if(!dataGetBittr.emailVerified && emailVerifiedDetails && !emailVerifiedDetails.success){
       setTimeout(() => {
           setErrorMessageHeader(`Verification link\nhas expired`);
           setErrorMessage(
@@ -120,7 +120,7 @@ export default function SignUpDetails(props) {
         }, 2);
         (ErrorBottomSheet as any).current.snapTo(1);
     } else {
-      if(emailVerified && emailVerifiedDetails && emailVerifiedDetails.success){
+      if(dataGetBittr.emailVerified && emailVerifiedDetails && emailVerifiedDetails.success){
         let mobileNumber = await AsyncStorage.getItem('MobileNo');
         console.log("mobileNumber", mobileNumber);
         let contactData = {
@@ -132,13 +132,16 @@ export default function SignUpDetails(props) {
         dispatch(verifiedEmail());
       }
     }})(); 
-  }, [emailVerified, emailVerifiedDetails]);
+  }, [dataGetBittr.emailVerified, emailVerifiedDetails]);
 
   useEffect(() => {
-    if (smsSent.smsSent && smsSentDetails && smsSentDetails.success) {
+    if (dataGetBittr.smsSent && smsSentDetails && smsSentDetails.success) {
+      setTimeout(() => {
       setSendSmsCheck(false);
-      console.log("smsSent.smsSent", smsSent.smsSent);
+    }, 2);
+      console.log("dataGetBittr.smsSent", dataGetBittr.smsSent, smsSentDetails);
       (OTPBottomSheet as any).current.snapTo(1);
+      (SmsErrorBottomSheet as any).current.snapTo(0);
       dispatch(sentSmsRequest());
     }
      else if(sendSmsCheck) {
@@ -149,11 +152,13 @@ export default function SignUpDetails(props) {
          setErrorIgnoreButton('Back')
       }, 2);
       (SmsErrorBottomSheet as any).current.snapTo(1);
+    } else {
+      (SmsErrorBottomSheet as any).current.snapTo(0);
     }
-  }, [smsSent, smsSentDetails]);
+  }, [dataGetBittr.smsSent, smsSentDetails]);
   
   useEffect(() => {
-    if (emailSent.emailSent && emailSentDetails && emailSentDetails.success) {
+    if (dataGetBittr.emailSent && emailSentDetails && emailSentDetails.success) {
       setTimeout(() => {
         setErrorMessageHeader(`Verification link sent`);
         setErrorMessage(
@@ -162,11 +167,11 @@ export default function SignUpDetails(props) {
         setErrorProceedButton('Start Over');
       }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
-      console.log('emailSent', emailSent, smsSent);
+      console.log('emailSent', dataGetBittr);
       dispatch(sentEmailRequest());
       
     }
-  }, [emailSent,emailSentDetails]);
+  }, [dataGetBittr.emailSent, emailSentDetails]);
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -244,9 +249,6 @@ export default function SignUpDetails(props) {
       />
     );
   }, [
-    emailAddress,
-    mobileNumber,
-    errorMessage,
     errorMessageHeader,
     errorProceedButton,
     errorIgnoreButton,
@@ -301,9 +303,9 @@ export default function SignUpDetails(props) {
 
   useEffect( ()=>{
     (async()=>{
-      if( createUserRequest.userDetails ){
+      if( dataGetBittr.userDetails ){
           let obj = {
-            ...createUserRequest.userDetails,
+            ...dataGetBittr.userDetails,
             accountType: selectedAccount.type
           }
         let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAcccounts"));
@@ -328,7 +330,7 @@ export default function SignUpDetails(props) {
         console.log("userDetails else", userDetails)
       }
     })();
-  },[createUserRequest, userDetails])
+  },[dataGetBittr, userDetails])
 
   const renderVerificationSuccessHeader = useCallback(() => {
     return (
@@ -378,7 +380,7 @@ export default function SignUpDetails(props) {
       <OtpModalContents 
         isIncorrectOtp={isIncorrectOtp}
         onOtpDone={(otpValue)=>{
-          if(otpValue!='1111' && otpValue!=""){
+          if(otpValue!=""){
             setTimeout(() => {
               setIsIncorrectOtp(true);
             }, 2);
