@@ -44,6 +44,7 @@ import {
   getTestcoins,
   fetchBalanceTx,
   fetchDerivativeAccXpub,
+  fetchDerivativeAccBalTx,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -221,6 +222,39 @@ export default function Accounts(props) {
 
     getServiceType(serviceType);
   }, []);
+
+  // useEffect(() => {
+  //   if (serviceType === REGULAR_ACCOUNT) {
+  //     const derivativeAccountType = 'GET_BITTR';
+  //     const accountNumber = 0;
+  //     const { derivativeAccount } = service.hdWallet;
+
+  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
+  //       dispatch(fetchDerivativeAccXpub(derivativeAccountType));
+  //     else {
+  //       console.log({
+  //         getBittrXpub:
+  //           derivativeAccount[derivativeAccountType][accountNumber].xpub,
+  //       });
+  //     }
+  //   }
+  // }, [service]);
+
+  // useEffect(() => {
+  //   if (serviceType === REGULAR_ACCOUNT) {
+  //     const derivativeAccountType = 'GET_BITTR';
+  //     const accountNumber = 0;
+  //     const { derivativeAccount } = service.hdWallet;
+  //     console.log({
+  //       balances:
+  //         derivativeAccount[derivativeAccountType][accountNumber].balances,
+  //       transactions:
+  //         derivativeAccount[derivativeAccountType][accountNumber].transactions,
+  //     });
+  //     if (derivativeAccount[derivativeAccountType][accountNumber].xpub)
+  //       dispatch(fetchDerivativeAccBalTx(derivativeAccountType));
+  //   }
+  // }, []);
 
   useEffect(() => {
     (async () => {
