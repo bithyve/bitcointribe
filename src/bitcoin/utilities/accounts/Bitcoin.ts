@@ -5,9 +5,9 @@ import * as bip39 from 'bip39';
 import bip65 from 'bip65';
 import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import coinselect from 'coinselect';
 import config from '../../Config';
 import { Transactions } from '../Interface';
+import bs58check from 'bs58check';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
 const { TESTNET, MAINNET } = API_URLS;
@@ -51,6 +51,19 @@ export default class Bitcoin {
         network: this.network,
       }).address;
     }
+  };
+
+  public xpubToYpub = (xpub?, xpriv?, network = bitcoinJS.networks.bitcoin) => {
+    let data = bs58check.decode(xpub || xpriv);
+    data = data.slice(4);
+    let versionBytes;
+    if (network == bitcoinJS.networks.bitcoin) {
+      versionBytes = xpub ? '049d7cb2' : '049d7878';
+    } else {
+      versionBytes = xpub ? '044a5262' : '044a4e28';
+    }
+    data = Buffer.concat([Buffer.from(versionBytes, 'hex'), data]);
+    return bs58check.encode(data);
   };
 
   // public getAddress = (keyPair: ECPair): string =>

@@ -997,13 +997,14 @@ export default class HDSegwitWallet extends Bitcoin {
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
-      const path = `m/${this.purpose}'/0'/${this.derivativeAccount[accountType][
-        'series'
-      ] + accountNumber}'`;
+      const path = `m/${this.purpose}'/${
+        this.network === bitcoinJS.networks.bitcoin ? 0 : 1
+      }'/${this.derivativeAccount[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
-      this.derivativeAccount[accountType][accountNumber] = { xpub };
+      const ypub = this.xpubToYpub(xpub, null, this.network);
+      this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
       return xpub;
     }
   };

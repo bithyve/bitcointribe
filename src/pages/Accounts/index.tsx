@@ -233,8 +233,8 @@ export default function Accounts(props) {
   //       dispatch(fetchDerivativeAccXpub(derivativeAccountType));
   //     else {
   //       console.log({
-  //         getBittrXpub:
-  //           derivativeAccount[derivativeAccountType][accountNumber].xpub,
+  //         getBittrYpub:
+  //           derivativeAccount[derivativeAccountType][accountNumber].ypub,
   //       });
   //     }
   //   }
