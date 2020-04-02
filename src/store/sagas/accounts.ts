@@ -35,6 +35,7 @@ import {
   twoFAResetted,
   RUN_TEST,
   FETCH_DERIVATIVE_ACC_XPUB,
+  FETCH_DERIVATIVE_ACC_BALANCE_TX,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -243,6 +244,61 @@ function* fetchBalanceTxWorker({ payload }) {
 export const fetchBalanceTxWatcher = createWatcher(
   fetchBalanceTxWorker,
   FETCH_BALANCE_TX,
+);
+
+function* fetchDerivativeAccBalanceTxWorker({ payload }) {
+  const service: RegularAccount = yield select(
+    state => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const accountType = payload.accountType;
+  const accountNumber = payload.accountNumber ? payload.accountNumber : 0;
+
+  const { derivativeAccount } = service.hdWallet;
+  console.log({ dA: derivativeAccount[accountType] });
+  if (
+    !derivativeAccount[accountType] ||
+    !derivativeAccount[accountType][accountNumber].xpub
+  ) {
+    throw new Error('Following derivative account does not exists');
+  }
+
+  const preFetchBalances =
+    derivativeAccount[accountType][accountNumber].balances;
+  const preFetchTransactions =
+    derivativeAccount[accountType][accountNumber].transactions;
+
+  const res = yield call(
+    service.getDerivativeAccBalanceTransactions,
+    accountType,
+    accountNumber,
+  );
+
+  const postFetchBalances =
+    res.status === 200 ? res.data.balances : preFetchBalances;
+  const postFetchTransactions =
+    res.status === 200 ? res.data.transactions : preFetchTransactions;
+
+  if (
+    res.status === 200 &&
+    JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
+      JSON.stringify({ postFetchBalances, postFetchTransactions })
+  ) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [REGULAR_ACCOUNT]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to fetch balance/transactions from the indexer');
+  }
+}
+
+export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
+  fetchDerivativeAccBalanceTxWorker,
+  FETCH_DERIVATIVE_ACC_BALANCE_TX,
 );
 
 function* transferST1Worker({ payload }) {

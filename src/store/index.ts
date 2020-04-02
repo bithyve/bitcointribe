@@ -43,6 +43,7 @@ import {
   resetTwoFAWatcher,
   testWatcher,
   fetchDerivativeAccXpubWatcher,
+  fetchDerivativeAccBalanceTxWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -121,6 +122,7 @@ const rootSaga = function*() {
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
+    fetchDerivativeAccBalanceTxWatcher,
     testWatcher,
 
     // sss watchers
