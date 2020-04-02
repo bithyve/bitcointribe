@@ -223,22 +223,22 @@ export default function Accounts(props) {
     getServiceType(serviceType);
   }, []);
 
-  useEffect(() => {
-    if (serviceType === REGULAR_ACCOUNT) {
-      const derivativeAccountType = 'GET_BITTR';
-      const accountNumber = 0;
-      const { derivativeAccount } = service.hdWallet;
+  // useEffect(() => {
+  //   if (serviceType === REGULAR_ACCOUNT) {
+  //     const derivativeAccountType = 'GET_BITTR';
+  //     const accountNumber = 0;
+  //     const { derivativeAccount } = service.hdWallet;
 
-      if (!derivativeAccount[derivativeAccountType][accountNumber])
-        dispatch(fetchDerivativeAccXpub(derivativeAccountType));
-      else {
-        console.log({
-          getBittrXpub:
-            derivativeAccount[derivativeAccountType][accountNumber].ypub,
-        });
-      }
-    }
-  }, [service]);
+  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
+  //       dispatch(fetchDerivativeAccXpub(derivativeAccountType));
+  //     else {
+  //       console.log({
+  //         getBittrYpub:
+  //           derivativeAccount[derivativeAccountType][accountNumber].ypub,
+  //       });
+  //     }
+  //   }
+  // }, [service]);
 
   // useEffect(() => {
   //   if (serviceType === REGULAR_ACCOUNT) {
