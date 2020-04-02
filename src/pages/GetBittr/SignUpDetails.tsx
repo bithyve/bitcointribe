@@ -38,6 +38,7 @@ import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT } from '../../common/cons
 import { fetchDerivativeAccXpub } from '../../store/actions/accounts';
 
 export default function SignUpDetails(props) {
+  const [isLoading, setIsLoading] = useState(false);
   const [isIncorrectOtp, setIsIncorrectOtp] = useState(false);
   const [otp, setOtp] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -303,11 +304,15 @@ export default function SignUpDetails(props) {
         isIgnoreButton={false}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
+        isLoading={isLoading}
       />
     );
-  }, []);
+  }, [isLoading]);
 
   const onPressProceed = async () => {
+    setTimeout(() => {
+      setIsLoading(true);
+    }, 2);
     let emailAddress = await AsyncStorage.getItem('emailAddress');
     let emailToken = await AsyncStorage.getItem('emailToken');
     let mobileNumber = await AsyncStorage.getItem('MobileNo');
@@ -354,12 +359,18 @@ export default function SignUpDetails(props) {
         }
         await AsyncStorage.setItem("getBittrAccounts", JSON.stringify(getBittrAccounts));
         setTimeout(() => {
+          setIsLoading(false);
+        }, 2);
+        setTimeout(() => {
           VerificationSuccessBottomSheet.current.snapTo(0);
           InstructionsBottomSheet.current.snapTo(1);
-        }, 2);
+        }, 4);
         dispatch(ClearUserRequest());
       }
       else{
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 2);
       }
     })();
   }, [userDetails]);

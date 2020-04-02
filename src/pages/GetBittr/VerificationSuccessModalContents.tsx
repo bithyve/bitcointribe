@@ -4,6 +4,7 @@ import {
     Image,
     Text,
     StyleSheet,
+    ActivityIndicator
 } from 'react-native';
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
@@ -33,7 +34,9 @@ export default function VerificationSuccessModalContents(props) {
                         onPress={() => props.onPressIgnore()}
                         style={{ height: wp('13%'), width: wp('35%'), justifyContent: 'center', alignItems: 'center', }}
                     >
+                        {props.isLoading ? <ActivityIndicator size="small" color={Colors.black} /> : 
                         <Text style={{ ...styles.proceedButtonText, color: Colors.blue, }}>{props.cancelButtonText ? props.cancelButtonText : 'Ignore'}</Text>
+                        }
                     </AppBottomSheetTouchableWrapper>
                 }
                 {props.isBottomImage &&
