@@ -70,10 +70,11 @@ export default function SignUpDetails(props) {
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [errorProceedButton, setErrorProceedButton] = useState('');
   const [errorIgnoreButton, setErrorIgnoreButton] = useState('');
+  const [OtherText, setOtherText] = useState('');
   const [isIgnoreButton, setIsIgnoreButton] = useState(false);
   const [buttonDisable, setButtonDisable] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
-  const [passcode, setPasscode] = useState([]);
+  const [accountNumber, setAccountNumber] = useState(0);
   const dataGetBittr = useSelector(state => state.bittr);
   const [getBittrXpub, setGetBittrXpub] = useState("");
   const userDetails = useSelector(state => state.bittr.userDetails);
@@ -88,15 +89,30 @@ export default function SignUpDetails(props) {
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
       ? props.navigation.state.params.selectedAccount.type
-      : TEST_ACCOUNT,
+      : REGULAR_ACCOUNT,
   );
   const service = useSelector(state => state.accounts[serviceType].service);
   const derivativeAccountType = 'GET_BITTR';
-  let accountNumber = 0;
-  const { derivativeAccount } = serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-
+  const { derivativeAccount } = serviceType === REGULAR_ACCOUNT ? service.hdWallet : '';
+  
   useEffect(() => {
     Linking.addEventListener('url', handleDeepLink);
+    let getBittrAccounts;
+    (async () => {
+      AsyncStorage.getItem('getBittrAccounts', (err, value) => {
+        if (err) {
+          console.log(err);
+          setAccountNumber(0)
+        }
+        else if(value){
+          getBittrAccounts = JSON.parse(value);
+          console.log("getBittrAccounts", getBittrAccounts, getBittrAccounts[0].getBitrrAccounts.length)
+          setAccountNumber(getBittrAccounts[0].getBitrrAccounts.length);
+        } else {
+          setAccountNumber(0)
+        }
+      });
+  })();
   }, []);
 
   useEffect(() => {
@@ -108,9 +124,9 @@ export default function SignUpDetails(props) {
       {
         console.log({
           getBittrXpub:
-            derivativeAccount[derivativeAccountType][accountNumber].xpub,
+            derivativeAccount[derivativeAccountType][accountNumber].ypub,
         });
-        setGetBittrXpub(derivativeAccount[derivativeAccountType][accountNumber].xpub);
+        setGetBittrXpub(derivativeAccount[derivativeAccountType][accountNumber].ypub);
       }
     }
   }
@@ -191,10 +207,13 @@ export default function SignUpDetails(props) {
       setTimeout(() => {
         setErrorMessageHeader(`Verification link sent`);
         setErrorMessage(
-          'We have sent you a verification link, you will need to verify your details to proceed\n\nPlease check your email',
-        );
-        setErrorProceedButton('Start Over');
+          'Please verify your details to proceed'
+          );
+        setOtherText('if you donot receive and email or entered a wrong address/number you can choose to start over')
+        setErrorProceedButton('Continue');
       }, 2);
+      setIsIgnoreButton(true);
+      setErrorIgnoreButton('Start Over');
       (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(sentEmailRequest());
     }
@@ -208,6 +227,7 @@ export default function SignUpDetails(props) {
         info={errorMessage}
         note={emailAddress}
         noteNextLine={mobileNumber}
+        otherText={OtherText}
         proceedButtonText={errorProceedButton}
         headerTextColor={Colors.black1}
         buttonTextColor={Colors.buttonText}
@@ -235,6 +255,7 @@ export default function SignUpDetails(props) {
     errorProceedButton,
     errorIgnoreButton,
     isIgnoreButton,
+    OtherText
   ]);
 
   useEffect(() => {
@@ -295,8 +316,6 @@ export default function SignUpDetails(props) {
         info={
           'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'
         }
-        note={emailAddress}
-        noteNextLine={mobileNumber}
         proceedButtonText={'Continue'}
         onPressProceed={() => onPressProceed()}
         isIgnoreButton={false}
@@ -421,7 +440,7 @@ export default function SignUpDetails(props) {
           'Purus faucibus ornare suspendisse sed nisi',
           'Et ligula ullamcorper malesuada proin',
         ]}
-        onPressProceed={() => {props.navigation.pop(2)}}
+        onPressProceed={() => {props.navigation.replace('Home')}}
       />
     );
   }, []);
@@ -450,9 +469,17 @@ export default function SignUpDetails(props) {
           OTPBottomSheet.current.snapTo(0);
           VerificationSuccessBottomSheet.current.snapTo(1);
         }}
+        onPressResendOTP={async()=>{
+          let mobileNumber = await AsyncStorage.getItem('MobileNo');
+          let contactData = {
+            phone: mobileNumber,
+            country_code: countryCode,
+          };
+          dispatch(sendSmsRequest(contactData));
+        }}
       />
     );
-  }, [isIncorrectOtp, otp]);
+  }, [isIncorrectOtp]);
 
   const renderConfirmOTPModalHeader = useCallback(() => {
     return (
@@ -659,7 +686,7 @@ export default function SignUpDetails(props) {
         ref={ErrorBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('50%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('40%') : hp('45%'),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}

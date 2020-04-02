@@ -24,6 +24,10 @@ export default function ErrorModalContents(props) {
             <View style={styles.successModalAmountView}>
             {props.note ?<Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>{props.note}{props.noteNextLine ? "\n" + props.noteNextLine : null}</Text> : null }
             </View>
+            {props.otherText ?
+            <View style={styles.successModalAmountView}>
+            <Text style={{ ...styles.modalInfoText, marginBottom: hp('1%'), marginTop: 'auto' }}>{props.otherText}</Text>
+            </View> : null}
             <View style={{height: hp('18%'), flexDirection: 'row', marginTop: 'auto', alignItems: 'center', }} >
                 <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressProceed()}
@@ -68,7 +72,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginRight: wp('8%'),
         marginLeft: wp('8%'),
-        marginTop:hp('3%')
+        marginTop:hp('2%')
     },
     successModalButtonView: {
         height: wp('13%'),
