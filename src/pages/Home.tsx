@@ -1657,10 +1657,19 @@ export default function Home(props) {
         onPressBack={() => {
           (AddBottomSheet as any).current.snapTo(0);
         }}
-        onPressElements={()=>{(GetBittrRecurringBuy as any).current.snapTo(1) }}
+        onPressElements={(type)=>onPressSaveBitcoinElements(type)}
       />
     );
   };
+
+  const onPressSaveBitcoinElements = (type) =>{
+    if(type=="recurringBuy"){
+      (GetBittrRecurringBuy as any).current.snapTo(1)
+    }
+    else if(type=="existingSavingMethods"){
+      props.navigation.navigate("ExistingSavingMethods");
+    }
+  }
 
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
