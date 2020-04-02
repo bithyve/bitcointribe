@@ -44,6 +44,7 @@ export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('91');
   const [EmailToken, setEmailToken] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [SmsErrorBottomSheet, setSmsErrorBottomSheet] = useState(
@@ -90,15 +91,13 @@ export default function SignUpDetails(props) {
       : TEST_ACCOUNT,
   );
   const service = useSelector(state => state.accounts[serviceType].service);
-  console.log("service.hdWallet", service.hdWallet);
   const derivativeAccountType = 'GET_BITTR';
   let accountNumber = 0;
-  const { derivativeAccount } = service.hdWallet;
+  const { derivativeAccount } = serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
 
   useEffect(() => {
     Linking.addEventListener('url', handleDeepLink);
   }, []);
-
 
   useEffect(() => {
     if(service){
@@ -113,7 +112,6 @@ export default function SignUpDetails(props) {
         });
         setGetBittrXpub(derivativeAccount[derivativeAccountType][accountNumber].xpub);
       }
-        
     }
   }
   }, [service]);
@@ -159,7 +157,7 @@ export default function SignUpDetails(props) {
           let mobileNumber = await AsyncStorage.getItem('MobileNo');
           let contactData = {
             phone: mobileNumber,
-            country_code: '91',
+            country_code: countryCode,
           };
           dispatch(sendSmsRequest(contactData));
           dispatch(verifiedEmail());
@@ -338,10 +336,30 @@ export default function SignUpDetails(props) {
     (async()=>{
       if( userDetails ){
         let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAccounts"));
-        let obj = {
-          getBitrrAccounts: [userDetails],
-          accountType: selectedAccount.type
+        let emailAddress = await AsyncStorage.getItem('emailAddress');
+        let emailToken = await AsyncStorage.getItem('emailToken');
+        let mobileNumber = await AsyncStorage.getItem('MobileNo');
+        let tempObj = {
+          ...userDetails,
+          ...{
+            phone: mobileNumber,
+            country_code: countryCode,
+            verification_code: otp,
+            email: emailAddress,
+            bitcoin_address: bitcoinAddress,
+            email_token: emailToken,
+            initial_address_type: 'simple',
+            category: 'hexa',
+            xpub_key: selectedAccount.type==REGULAR_ACCOUNT ? getBittrXpub : "",
+            xpub_addr_type: selectedAccount.type==REGULAR_ACCOUNT ? 'auto' : "",
+            xpub_path:selectedAccount.type==REGULAR_ACCOUNT ? 'm/0/x' : ""
+          }
         }
+        let obj = {
+          accountType: selectedAccount.type,
+          getBitrrAccounts: [tempObj],
+          
+        };
         if(!getBittrAccounts){
           getBittrAccounts = [];
           getBittrAccounts.push(obj)
@@ -353,7 +371,7 @@ export default function SignUpDetails(props) {
           }
           else{
             let GBAccounts = getBittrAccounts[index].getBitrrAccounts;
-            GBAccounts.push(userDetails);
+            GBAccounts.push(tempObj);
             getBittrAccounts[index].getBitrrAccounts = GBAccounts;
           }
         }
