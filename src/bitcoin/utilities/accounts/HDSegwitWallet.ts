@@ -159,6 +159,10 @@ export default class HDSegwitWallet extends Bitcoin {
     const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
       accountNumber
     ];
+
+    console.log({
+      xpub: this.derivativeAccount[accountType][accountNumber].xpub,
+    });
     const usedAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
       usedAddresses.push(
@@ -172,7 +176,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.derivativeAccount[accountType][accountNumber][
       'usedAddresses'
     ] = usedAddresses;
-    console.log({ usedAddresses });
+    console.log({ derivativeAccUsedAddresses: usedAddresses });
 
     const {
       balances,
@@ -181,8 +185,12 @@ export default class HDSegwitWallet extends Bitcoin {
       usedAddresses,
       accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
     );
-    this.balances = balances;
-    this.transactions = transactions;
+
+    this.derivativeAccount[accountType][accountNumber].balances = balances;
+    this.derivativeAccount[accountType][
+      accountNumber
+    ].transactions = transactions;
+
     return { balances, transactions };
   };
 
@@ -892,7 +900,11 @@ export default class HDSegwitWallet extends Bitcoin {
     const keyPair = node.derive(0).derive(index);
 
     const address = this.getAddress(keyPair, this.purpose);
-    return (this.externalAddressesCache[index] = address);
+
+    if (!xpub) {
+      this.externalAddressesCache[index] = address;
+    }
+    return address;
   };
 
   private getInternalAddressByIndex = (index: number): string => {
@@ -983,12 +995,14 @@ export default class HDSegwitWallet extends Bitcoin {
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
-      const path = `m/${this.purpose}'/0'/${this.derivativeAccount[accountType][
-        'series'
-      ] + accountNumber}'`;
+      const path = `m/${this.purpose}'/${
+        this.network === bitcoinJS.networks.bitcoin ? 0 : 1
+      }'/${this.derivativeAccount[accountType]['series'] + accountNumber}'`;
+      console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
-      this.derivativeAccount[accountType][accountNumber] = { xpub };
+      const ypub = this.xpubToYpub(xpub, null, this.network);
+      this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
       return xpub;
     }
   };
