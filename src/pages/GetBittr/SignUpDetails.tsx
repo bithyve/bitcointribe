@@ -35,6 +35,7 @@ import { createCustomer, sendEmailRequest, sendSmsRequest, verifyEmailRequest, s
 import { validateEmail } from '../../common/CommonFunctions';
 import OtpModalContents from './OtpModalContents';
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes';
+import { fetchDerivativeAccXpub } from '../../store/actions/accounts';
 
 export default function SignUpDetails(props) {
   const [isIncorrectOtp, setIsIncorrectOtp] = useState(false);
@@ -72,7 +73,7 @@ export default function SignUpDetails(props) {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [passcode, setPasscode] = useState([]);
   const dataGetBittr = useSelector(state => state.bittr);
-
+  const [getBittrXpub, setGetBittrXpub] = useState("");
   const userDetails = useSelector(state => state.bittr.userDetails);
   const emailVerifiedDetails = useSelector(
     state => state.bittr.emailVerifiedDetails,
@@ -82,10 +83,39 @@ export default function SignUpDetails(props) {
 
   const loading = useSelector(state => state.bittr.loading);
   const dispatch = useDispatch();
-  
+  const [serviceType, setServiceType] = useState(
+    props.navigation.state.params
+      ? props.navigation.state.params.selectedAccount.type
+      : TEST_ACCOUNT,
+  );
+  const service = useSelector(state => state.accounts[serviceType].service);
+  console.log("service.hdWallet", service.hdWallet);
+  const derivativeAccountType = 'GET_BITTR';
+  let accountNumber = 0;
+  const { derivativeAccount } = service.hdWallet;
+
   useEffect(() => {
     Linking.addEventListener('url', handleDeepLink);
   }, []);
+
+
+  useEffect(() => {
+    if(service){
+    if (serviceType === REGULAR_ACCOUNT) {
+      if (derivativeAccount && !derivativeAccount[derivativeAccountType][accountNumber])
+        dispatch(fetchDerivativeAccXpub(derivativeAccountType,accountNumber));
+      else
+      {
+        console.log({
+          getBittrXpub:
+            derivativeAccount[derivativeAccountType][accountNumber].xpub,
+        });
+        setGetBittrXpub(derivativeAccount[derivativeAccountType][accountNumber].xpub);
+      }
+        
+    }
+  }
+  }, [service]);
 
   const handleDeepLink = useCallback(async event => {
     const EmailToken1 = event.url.substr(event.url.lastIndexOf('/') + 1);
@@ -286,14 +316,14 @@ export default function SignUpDetails(props) {
       country_code: '1',
       verification_code: otp,
       email: emailAddress,
-      bitcoin_address: '1JVhSfciiJEMk3b7yTPaPZ7AkVjopPjmCn',
+      bitcoin_address: bitcoinAddress,
       email_token: emailToken,
       initial_address_type: 'simple',
       category: 'hexa',
       ...(selectedAccount.type==REGULAR_ACCOUNT && {
-        xpub_key:'xpub6CPaz6tavH68fxBJpdJykvXjsjtpJ4cKPW1BuxgnGHaL3SApxkYNppJnEHo3xbyzUy9ortD6jJYk9ejSb3s4nkCvgC8qpuivsfUqcxDF2oB', 
-        xpub_addr_type:'auto', 
-        xpub_path:'m/0/x'
+        xpub_key: getBittrXpub,
+        xpub_addr_type: 'auto', 
+        xpub_path:' m/0/x'
       })
     };
     dispatch(createCustomer(data));
