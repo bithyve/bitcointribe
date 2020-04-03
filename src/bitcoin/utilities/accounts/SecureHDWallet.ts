@@ -397,6 +397,138 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public getDerivativeAccReceivingAddress = async (
+    accountType: string,
+    accountNumber: number = 0,
+  ): Promise<{ address: string }> => {
+    // generates receiving address for derivative accounts
+    if (!this.derivativeAccount[accountType])
+      throw new Error(`${accountType} does not exists`);
+
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
+    try {
+      // looking for free external address
+      let freeAddress = '';
+      let itr;
+
+      const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+        accountNumber
+      ];
+      if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+        this.derivativeAccount[accountType][
+          accountNumber
+        ].nextFreeAddressIndex = 0;
+
+      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+        if (
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex +
+            itr <
+          0
+        ) {
+          continue;
+        }
+
+        const { address } = this.createSecureMultiSig(
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex + itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        );
+
+        const txCounts = await this.getTxCounts([address]);
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          this.derivativeAccount[accountType][
+            accountNumber
+          ].nextFreeAddressIndex += itr;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        // giving up as we could find a free address in the above cycle
+
+        console.log(
+          'Failed to find a free address in the above cycle, using the next address without checking',
+        );
+        const multiSig = this.createSecureMultiSig(
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex + itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        );
+        freeAddress = multiSig.address; // not checking this one, it might be free
+        this.derivativeAccount[accountType][
+          accountNumber
+        ].nextFreeAddressIndex += itr + 1;
+      }
+
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].receivingAddress = freeAddress;
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Unable to generate receiving address: ${err.message}`);
+    }
+  };
+
+  public fetchDerivativeAccBalanceTxs = async (
+    accountType: string,
+    accountNumber: number = 0,
+  ): Promise<{
+    balances: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions: Transactions;
+  }> => {
+    if (!this.derivativeAccount[accountType])
+      throw new Error(`${accountType} does not exists`);
+
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
+    await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
+
+    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      accountNumber
+    ];
+
+    const consumedAddresses = [];
+    for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
+      consumedAddresses.push(
+        this.createSecureMultiSig(
+          itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        ).address,
+      );
+    }
+
+    this.derivativeAccount[accountType][accountNumber][
+      'consumedAddresses'
+    ] = consumedAddresses;
+    console.log({ derivativeAccConsumedAddresses: consumedAddresses });
+
+    const {
+      balances,
+      transactions,
+    } = await this.fetchBalanceTransactionsByAddresses(
+      consumedAddresses,
+      accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
+    );
+
+    this.derivativeAccount[accountType][accountNumber].balances = balances;
+    this.derivativeAccount[accountType][
+      accountNumber
+    ].transactions = transactions;
+
+    return { balances, transactions };
+  };
+
   public setupSecureAccount = async (): Promise<{
     setupData: {
       qrData: string;
@@ -979,6 +1111,15 @@ export default class SecureHDWallet extends Bitcoin {
     return childXKey.toBase58();
   };
 
+  private deriveDerivativeChildXKey = (
+    extendedKey: string, // account xpub
+    childIndex: number,
+  ): string => {
+    const xKey = bip32.fromBase58(extendedKey, this.network);
+    const childXKey = xKey.derive(0).derive(childIndex); // deriving on external chain
+    return childXKey.toBase58();
+  };
+
   private validateXpub = async (xpub: string) => {
     try {
       bip32.fromBase58(xpub, this.network);
@@ -1001,6 +1142,7 @@ export default class SecureHDWallet extends Bitcoin {
 
   private createSecureMultiSig = (
     childIndex: number,
+    derivativeXpub?: string,
   ): {
     scripts: {
       redeem: string;
@@ -1008,15 +1150,22 @@ export default class SecureHDWallet extends Bitcoin {
     };
     address: string;
   } => {
-    if (this.multiSigCache[childIndex]) {
+    if (!derivativeXpub && this.multiSigCache[childIndex]) {
       return this.multiSigCache[childIndex];
     } // cache hit
 
     console.log(`creating multiSig against index: ${childIndex}`);
 
-    const childPrimaryPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.primary, childIndex),
-    );
+    let childPrimaryPub;
+    if (!derivativeXpub)
+      childPrimaryPub = this.getPub(
+        this.deriveChildXKey(this.xpubs.primary, childIndex),
+      );
+    else
+      childPrimaryPub = this.getPub(
+        this.deriveDerivativeChildXKey(derivativeXpub, childIndex),
+      );
+
     const childRecoveryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.secondary, childIndex),
     );
@@ -1030,13 +1179,17 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log({ pubs });
     const multiSig = this.generateMultiSig(2, pubs);
 
-    return (this.multiSigCache[childIndex] = {
+    const construct = {
       scripts: {
         redeem: multiSig.p2sh.redeem.output.toString('hex'),
         witness: multiSig.p2wsh.redeem.output.toString('hex'),
       },
       address: multiSig.address,
-    });
+    };
+    if (!derivativeXpub) {
+      this.multiSigCache[childIndex] = construct;
+    }
+    return construct;
   };
 
   private generateKey = (psuedoKey: string): string => {
@@ -1047,5 +1200,64 @@ export default class SecureHDWallet extends Bitcoin {
       key = hash.update(key).digest('hex');
     }
     return key.slice(key.length - this.cipherSpec.keyLength);
+  };
+
+  private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
+    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    let tryAgain = false;
+    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      accountNumber
+    ];
+    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].nextFreeAddressIndex = 0;
+
+    const multiSig = this.createSecureMultiSig(
+      this.derivativeAccount[accountType][accountNumber].nextFreeAddressIndex +
+        this.gapLimit -
+        1,
+      this.derivativeAccount[accountType][accountNumber].xpub,
+    );
+
+    const txCounts = await this.getTxCounts([multiSig.address]);
+
+    if (txCounts[multiSig.address] > 0) {
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].nextFreeAddressIndex += this.gapLimit;
+      tryAgain = true;
+    }
+
+    if (tryAgain) {
+      return this.derivativeAccGapLimitCatchup(accountType, accountNumber);
+    }
+  };
+
+  private generateDerivativeXpub = (
+    accountType: string,
+    accountNumber: number = 0,
+  ) => {
+    if (!this.derivativeAccount[accountType])
+      throw new Error('Unsupported dervative account');
+    if (accountNumber > 9)
+      throw Error(
+        `Cannot create more than 10 ${accountType} derivative accounts`,
+      );
+    if (this.derivativeAccount[accountType][accountNumber]) {
+      return this.derivativeAccount[accountType][accountNumber]['xpub'];
+    } else {
+      const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic);
+      const root = bip32.fromSeed(seed, this.network);
+      const path = `m/${config.DPATH_PURPOSE}'/${
+        this.network === bitcoinJS.networks.bitcoin ? 0 : 1
+      }'/${this.derivativeAccount[accountType]['series'] + accountNumber}'`;
+      console.log({ path });
+      const child = root.derivePath(path).neutered();
+      const xpub = child.toBase58();
+      const ypub = this.xpubToYpub(xpub, null, this.network);
+      this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
+      return xpub;
+    }
   };
 }
