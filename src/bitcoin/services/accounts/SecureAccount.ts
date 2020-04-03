@@ -787,7 +787,7 @@ export default class SecureAccount {
     }
   };
 
-  public getDerivativeAccXpub = async (
+  public getDerivativeAccAddress = async (
     accountType: string,
     accountNumber?: number,
   ): Promise<

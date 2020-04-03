@@ -46,6 +46,7 @@ import {
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -74,8 +75,9 @@ export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
+  const serivceType = REGULAR_ACCOUNT;
   const service: RegularAccount = yield select(
-    state => state.accounts[REGULAR_ACCOUNT].service,
+    state => state.accounts[serivceType].service,
   );
 
   const { derivativeAccount } = service.hdWallet;
@@ -91,7 +93,7 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
     const { SERVICES } = yield select(state => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
-      [REGULAR_ACCOUNT]: JSON.stringify(service),
+      [serivceType]: JSON.stringify(service),
     };
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
@@ -102,6 +104,42 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
 
 export const fetchDerivativeAccXpubWatcher = createWatcher(
   fetchDerivativeAccXpubWorker,
+  FETCH_DERIVATIVE_ACC_XPUB,
+);
+
+function* fetchDerivativeAccAddressWorker({ payload }) {
+  const { accountType, accountNumber } = payload;
+
+  const serviceType = SECURE_ACCOUNT;
+  const service: SecureAccount = yield select(
+    state => state.accounts[serviceType].service,
+  );
+
+  const { derivativeAccount } = service.secureHDWallet;
+  if (!derivativeAccount[accountType])
+    throw new Error('Invalid derivative account type');
+
+  const res = yield call(
+    service.getDerivativeAccAddress,
+    accountType,
+    accountNumber,
+  );
+
+  if (res.status === 200) {
+    const { SERVICES } = yield select(state => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [serviceType]: JSON.stringify(service),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to generate derivative acc address');
+  }
+}
+
+export const fetchDerivativeAccAddressWatcher = createWatcher(
+  fetchDerivativeAccAddressWorker,
   FETCH_DERIVATIVE_ACC_XPUB,
 );
 
@@ -247,15 +285,14 @@ export const fetchBalanceTxWatcher = createWatcher(
 );
 
 function* fetchDerivativeAccBalanceTxWorker({ payload }) {
-  const service: RegularAccount = yield select(
-    state => state.accounts[REGULAR_ACCOUNT].service,
-  );
+  let { serviceType, accountNumber, accountType } = payload;
 
-  const accountType = payload.accountType;
-  const accountNumber = payload.accountNumber ? payload.accountNumber : 0;
+  const service = yield select(state => state.accounts[serviceType].service);
 
-  const { derivativeAccount } = service.hdWallet;
-  console.log({ dA: derivativeAccount[accountType] });
+  if (!accountNumber) accountNumber = 0;
+
+  const { derivativeAccount } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   if (
     !derivativeAccount[accountType] ||
     !derivativeAccount[accountType][accountNumber].xpub
@@ -287,7 +324,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
     const { SERVICES } = yield select(state => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
-      [REGULAR_ACCOUNT]: JSON.stringify(service),
+      [serviceType]: JSON.stringify(service),
     };
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {

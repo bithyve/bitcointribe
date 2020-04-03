@@ -16,6 +16,8 @@ export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
 export const RUN_TEST = 'RUN_TEST';
 export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
+export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
+
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 
@@ -104,10 +106,21 @@ export const fetchDerivativeAccXpub = (accountType, accountNumber?) => {
   };
 };
 
-export const fetchDerivativeAccBalTx = (accountType, accountNumber?) => {
+export const fetchDerivativeAccAddress = (accountType, accountNumber?) => {
+  return {
+    type: FETCH_DERIVATIVE_ACC_ADDRESS,
+    payload: { accountType, accountNumber },
+  };
+};
+
+export const fetchDerivativeAccBalTx = (
+  serviceType,
+  accountType,
+  accountNumber?,
+) => {
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
-    payload: { accountType, accountNumber },
+    payload: { serviceType, accountType, accountNumber },
   };
 };
 

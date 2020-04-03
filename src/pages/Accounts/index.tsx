@@ -45,6 +45,7 @@ import {
   fetchBalanceTx,
   fetchDerivativeAccXpub,
   fetchDerivativeAccBalTx,
+  fetchDerivativeAccAddress,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -241,7 +242,25 @@ export default function Accounts(props) {
   // }, [service]);
 
   // useEffect(() => {
-  //   if (serviceType === REGULAR_ACCOUNT) {
+  //   if (serviceType === SECURE_ACCOUNT) {
+  //     const derivativeAccountType = 'GET_BITTR';
+  //     const accountNumber = 0;
+  //     const { derivativeAccount } = service.secureHDWallet;
+
+  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
+  //       dispatch(fetchDerivativeAccAddress(derivativeAccountType));
+  //     else {
+  //       console.log({
+  //         getBittrAddress:
+  //           derivativeAccount[derivativeAccountType][accountNumber]
+  //             .receivingAddress,
+  //       });
+  //     }
+  //   }
+  // }, [service]);
+
+  // useEffect(() => {
+  //   if (serviceType === REGULAR_ACCOUNT || SECURE_ACCOUNT) {
   //     const derivativeAccountType = 'GET_BITTR';
   //     const accountNumber = 0;
   //     const { derivativeAccount } = service.hdWallet;
@@ -252,7 +271,7 @@ export default function Accounts(props) {
   //         derivativeAccount[derivativeAccountType][accountNumber].transactions,
   //     });
   //     if (derivativeAccount[derivativeAccountType][accountNumber].xpub)
-  //       dispatch(fetchDerivativeAccBalTx(derivativeAccountType));
+  //       dispatch(fetchDerivativeAccBalTx(serviceType, derivativeAccountType));
   //   }
   // }, []);
 
