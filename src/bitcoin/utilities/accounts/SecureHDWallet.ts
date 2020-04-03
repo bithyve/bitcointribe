@@ -504,7 +504,7 @@ export default class SecureHDWallet extends Bitcoin {
         this.createSecureMultiSig(
           itr,
           this.derivativeAccount[accountType][accountNumber].xpub,
-        ),
+        ).address,
       );
     }
 

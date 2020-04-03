@@ -36,6 +36,7 @@ import {
   RUN_TEST,
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
+  FETCH_DERIVATIVE_ACC_ADDRESS,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -119,11 +120,13 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
   if (!derivativeAccount[accountType])
     throw new Error('Invalid derivative account type');
 
+  console.log({ derivativeAccount });
   const res = yield call(
     service.getDerivativeAccAddress,
     accountType,
     accountNumber,
   );
+  console.log({ res });
 
   if (res.status === 200) {
     const { SERVICES } = yield select(state => state.storage.database);
@@ -140,7 +143,7 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
 
 export const fetchDerivativeAccAddressWatcher = createWatcher(
   fetchDerivativeAccAddressWorker,
-  FETCH_DERIVATIVE_ACC_XPUB,
+  FETCH_DERIVATIVE_ACC_ADDRESS,
 );
 
 function* fetchBalanceWorker({ payload }) {

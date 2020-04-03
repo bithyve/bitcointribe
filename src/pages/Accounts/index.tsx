@@ -263,7 +263,10 @@ export default function Accounts(props) {
   //   if (serviceType === REGULAR_ACCOUNT || SECURE_ACCOUNT) {
   //     const derivativeAccountType = 'GET_BITTR';
   //     const accountNumber = 0;
-  //     const { derivativeAccount } = service.hdWallet;
+  //     const { derivativeAccount } =
+  //       serviceType === REGULAR_ACCOUNT
+  //         ? service.hdWallet
+  //         : service.secureHDWallet;
   //     console.log({
   //       balances:
   //         derivativeAccount[derivativeAccountType][accountNumber].balances,
