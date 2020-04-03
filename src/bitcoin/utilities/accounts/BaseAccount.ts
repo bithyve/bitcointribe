@@ -285,7 +285,12 @@ export default class BaseAccount {
         ),
       };
     } catch (err) {
-      return { status: 0o3, err: err.message, message: ErrMap[0o3] };
+      return {
+        status: 0o3,
+        err: err.message,
+        message:
+          "Failed to generate derivative account's balance and transactions",
+      };
     }
   };
 

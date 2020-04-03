@@ -5,7 +5,7 @@ import * as bitcoinJS from 'bitcoinjs-lib';
 import coinselect from 'coinselect';
 import crypto from 'crypto';
 import config from '../../Config';
-import { Transactions } from '../Interface';
+import { Transactions, DerivativeAccount } from '../Interface';
 import Bitcoin from './Bitcoin';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -37,6 +37,7 @@ export default class SecureHDWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
+  public derivativeAccount = config.DERIVATIVE_ACC;
 
   private primaryMnemonic: string;
   private walletID: string;
@@ -52,6 +53,11 @@ export default class SecureHDWallet extends Bitcoin {
     salt: string;
     iv: Buffer;
     keyLength: number;
+  } = {
+    algorithm: 'aes-192-cbc',
+    salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
+    keyLength: 24,
+    iv: Buffer.alloc(16, 0),
   };
 
   constructor(
@@ -77,6 +83,7 @@ export default class SecureHDWallet extends Bitcoin {
         qrData: string;
         secret: string;
       };
+      derivativeAccount: any;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -84,33 +91,56 @@ export default class SecureHDWallet extends Bitcoin {
     this.primaryMnemonic = primaryMnemonic;
     const { walletId } = this.getWalletId();
     this.walletID = walletId;
-    this.secondaryMnemonic = stateVars
-      ? stateVars.secondaryMnemonic
-      : bip39.generateMnemonic(256);
-    this.consumedAddresses = stateVars ? stateVars.consumedAddresses : [];
-    this.nextFreeChildIndex = stateVars ? stateVars.nextFreeChildIndex : 0;
-    this.multiSigCache = stateVars ? stateVars.multiSigCache : {};
-    this.signingEssentialsCache = stateVars
-      ? stateVars.signingEssentialsCache
-      : {};
-    this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
-
-    this.primaryXpriv = stateVars ? stateVars.primaryXpriv : undefined;
-    this.secondaryXpriv = stateVars ? stateVars.secondaryXpriv : undefined;
-    this.xpubs = stateVars ? stateVars.xpubs : undefined;
-    this.cipherSpec = {
-      algorithm: 'aes-192-cbc',
-      salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
-      keyLength: 24,
-      iv: Buffer.alloc(16, 0),
-    };
-    this.balances = stateVars ? stateVars.balances : this.balances;
-    this.receivingAddress = stateVars
-      ? stateVars.receivingAddress
-      : this.receivingAddress;
-    this.transactions = stateVars ? stateVars.transactions : this.transactions;
-    this.twoFASetup = stateVars ? stateVars.twoFASetup : undefined;
+    this.initializeStateVars(stateVars);
   }
+
+  public initializeStateVars = stateVars => {
+    this.secondaryMnemonic =
+      stateVars && stateVars.secondaryMnemonic
+        ? stateVars.secondaryMnemonic
+        : bip39.generateMnemonic(256);
+    this.consumedAddresses =
+      stateVars && stateVars.consumedAddresses
+        ? stateVars.consumedAddresses
+        : [];
+    this.nextFreeChildIndex =
+      stateVars && stateVars.nextFreeChildIndex
+        ? stateVars.nextFreeChildIndex
+        : 0;
+    this.multiSigCache =
+      stateVars && stateVars.multiSigCache ? stateVars.multiSigCache : {};
+    this.signingEssentialsCache =
+      stateVars && stateVars.signingEssentialsCache
+        ? stateVars.signingEssentialsCache
+        : {};
+    this.gapLimit =
+      stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
+
+    this.primaryXpriv =
+      stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined;
+    this.secondaryXpriv =
+      stateVars && stateVars.secondaryXpriv
+        ? stateVars.secondaryXpriv
+        : undefined;
+    this.xpubs = stateVars && stateVars.xpubs ? stateVars.xpubs : undefined;
+    this.balances =
+      stateVars && stateVars.balances ? stateVars.balances : this.balances;
+    this.receivingAddress =
+      stateVars && stateVars.receivingAddress
+        ? stateVars.receivingAddress
+        : this.receivingAddress;
+    this.transactions =
+      stateVars && stateVars.transactions
+        ? stateVars.transactions
+        : this.transactions;
+    this.twoFASetup =
+      stateVars && stateVars.twoFASetup ? stateVars.twoFASetup : undefined;
+    this.derivativeAccount =
+      stateVars && stateVars.derivativeAccount
+        ? stateVars.derivativeAccount
+        : this.derivativeAccount;
+    console.log({ derivativeAcc: this.derivativeAccount });
+  };
 
   public importBHXpub = async (
     token: number,
@@ -365,6 +395,138 @@ export default class SecureHDWallet extends Bitcoin {
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
+  };
+
+  public getDerivativeAccReceivingAddress = async (
+    accountType: string,
+    accountNumber: number = 0,
+  ): Promise<{ address: string }> => {
+    // generates receiving address for derivative accounts
+    if (!this.derivativeAccount[accountType])
+      throw new Error(`${accountType} does not exists`);
+
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
+    try {
+      // looking for free external address
+      let freeAddress = '';
+      let itr;
+
+      const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+        accountNumber
+      ];
+      if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+        this.derivativeAccount[accountType][
+          accountNumber
+        ].nextFreeAddressIndex = 0;
+
+      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+        if (
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex +
+            itr <
+          0
+        ) {
+          continue;
+        }
+
+        const { address } = this.createSecureMultiSig(
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex + itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        );
+
+        const txCounts = await this.getTxCounts([address]);
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          this.derivativeAccount[accountType][
+            accountNumber
+          ].nextFreeAddressIndex += itr;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        // giving up as we could find a free address in the above cycle
+
+        console.log(
+          'Failed to find a free address in the above cycle, using the next address without checking',
+        );
+        const multiSig = this.createSecureMultiSig(
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex + itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        );
+        freeAddress = multiSig.address; // not checking this one, it might be free
+        this.derivativeAccount[accountType][
+          accountNumber
+        ].nextFreeAddressIndex += itr + 1;
+      }
+
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].receivingAddress = freeAddress;
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Unable to generate receiving address: ${err.message}`);
+    }
+  };
+
+  public fetchDerivativeAccBalanceTxs = async (
+    accountType: string,
+    accountNumber: number = 0,
+  ): Promise<{
+    balances: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions: Transactions;
+  }> => {
+    if (!this.derivativeAccount[accountType])
+      throw new Error(`${accountType} does not exists`);
+
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
+    await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
+
+    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      accountNumber
+    ];
+
+    const consumedAddresses = [];
+    for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
+      consumedAddresses.push(
+        this.createSecureMultiSig(
+          itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        ).address,
+      );
+    }
+
+    this.derivativeAccount[accountType][accountNumber][
+      'consumedAddresses'
+    ] = consumedAddresses;
+    console.log({ derivativeAccConsumedAddresses: consumedAddresses });
+
+    const {
+      balances,
+      transactions,
+    } = await this.fetchBalanceTransactionsByAddresses(
+      consumedAddresses,
+      accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
+    );
+
+    this.derivativeAccount[accountType][accountNumber].balances = balances;
+    this.derivativeAccount[accountType][
+      accountNumber
+    ].transactions = transactions;
+
+    return { balances, transactions };
   };
 
   public setupSecureAccount = async (): Promise<{
@@ -949,6 +1111,15 @@ export default class SecureHDWallet extends Bitcoin {
     return childXKey.toBase58();
   };
 
+  private deriveDerivativeChildXKey = (
+    extendedKey: string, // account xpub
+    childIndex: number,
+  ): string => {
+    const xKey = bip32.fromBase58(extendedKey, this.network);
+    const childXKey = xKey.derive(0).derive(childIndex); // deriving on external chain
+    return childXKey.toBase58();
+  };
+
   private validateXpub = async (xpub: string) => {
     try {
       bip32.fromBase58(xpub, this.network);
@@ -971,6 +1142,7 @@ export default class SecureHDWallet extends Bitcoin {
 
   private createSecureMultiSig = (
     childIndex: number,
+    derivativeXpub?: string,
   ): {
     scripts: {
       redeem: string;
@@ -978,15 +1150,22 @@ export default class SecureHDWallet extends Bitcoin {
     };
     address: string;
   } => {
-    if (this.multiSigCache[childIndex]) {
+    if (!derivativeXpub && this.multiSigCache[childIndex]) {
       return this.multiSigCache[childIndex];
     } // cache hit
 
     console.log(`creating multiSig against index: ${childIndex}`);
 
-    const childPrimaryPub = this.getPub(
-      this.deriveChildXKey(this.xpubs.primary, childIndex),
-    );
+    let childPrimaryPub;
+    if (!derivativeXpub)
+      childPrimaryPub = this.getPub(
+        this.deriveChildXKey(this.xpubs.primary, childIndex),
+      );
+    else
+      childPrimaryPub = this.getPub(
+        this.deriveDerivativeChildXKey(derivativeXpub, childIndex),
+      );
+
     const childRecoveryPub = this.getPub(
       this.deriveChildXKey(this.xpubs.secondary, childIndex),
     );
@@ -1000,13 +1179,17 @@ export default class SecureHDWallet extends Bitcoin {
     // console.log({ pubs });
     const multiSig = this.generateMultiSig(2, pubs);
 
-    return (this.multiSigCache[childIndex] = {
+    const construct = {
       scripts: {
         redeem: multiSig.p2sh.redeem.output.toString('hex'),
         witness: multiSig.p2wsh.redeem.output.toString('hex'),
       },
       address: multiSig.address,
-    });
+    };
+    if (!derivativeXpub) {
+      this.multiSigCache[childIndex] = construct;
+    }
+    return construct;
   };
 
   private generateKey = (psuedoKey: string): string => {
@@ -1017,5 +1200,64 @@ export default class SecureHDWallet extends Bitcoin {
       key = hash.update(key).digest('hex');
     }
     return key.slice(key.length - this.cipherSpec.keyLength);
+  };
+
+  private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
+    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    let tryAgain = false;
+    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      accountNumber
+    ];
+    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].nextFreeAddressIndex = 0;
+
+    const multiSig = this.createSecureMultiSig(
+      this.derivativeAccount[accountType][accountNumber].nextFreeAddressIndex +
+        this.gapLimit -
+        1,
+      this.derivativeAccount[accountType][accountNumber].xpub,
+    );
+
+    const txCounts = await this.getTxCounts([multiSig.address]);
+
+    if (txCounts[multiSig.address] > 0) {
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].nextFreeAddressIndex += this.gapLimit;
+      tryAgain = true;
+    }
+
+    if (tryAgain) {
+      return this.derivativeAccGapLimitCatchup(accountType, accountNumber);
+    }
+  };
+
+  private generateDerivativeXpub = (
+    accountType: string,
+    accountNumber: number = 0,
+  ) => {
+    if (!this.derivativeAccount[accountType])
+      throw new Error('Unsupported dervative account');
+    if (accountNumber > 9)
+      throw Error(
+        `Cannot create more than 10 ${accountType} derivative accounts`,
+      );
+    if (this.derivativeAccount[accountType][accountNumber]) {
+      return this.derivativeAccount[accountType][accountNumber]['xpub'];
+    } else {
+      const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic);
+      const root = bip32.fromSeed(seed, this.network);
+      const path = `m/${config.DPATH_PURPOSE}'/${
+        this.network === bitcoinJS.networks.bitcoin ? 0 : 1
+      }'/${this.derivativeAccount[accountType]['series'] + accountNumber}'`;
+      console.log({ path });
+      const child = root.derivePath(path).neutered();
+      const xpub = child.toBase58();
+      const ypub = this.xpubToYpub(xpub, null, this.network);
+      this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
+      return xpub;
+    }
   };
 }

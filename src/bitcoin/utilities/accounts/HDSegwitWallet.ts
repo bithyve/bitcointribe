@@ -73,28 +73,49 @@ export default class HDSegwitWallet extends Bitcoin {
       ? `m/${this.purpose}'/1'/0'`
       : `m/${this.purpose}'/0'/0'`; // helps with seperating regular and test acc (even on the testnet)
 
-    this.usedAddresses = stateVars ? stateVars.usedAddresses : [];
-    this.nextFreeAddressIndex = stateVars ? stateVars.nextFreeAddressIndex : 0;
-    this.nextFreeChangeAddressIndex = stateVars
-      ? stateVars.nextFreeChangeAddressIndex
-      : 0;
-    this.internalAddresssesCache = stateVars
-      ? stateVars.internalAddresssesCache
-      : {}; // index => address
-    this.externalAddressesCache = stateVars
-      ? stateVars.externalAddressesCache
-      : {}; // index => address
-    this.addressToWIFCache = stateVars ? stateVars.addressToWIFCache : {};
-    this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
-    this.balances = stateVars ? stateVars.balances : this.balances;
-    this.receivingAddress = stateVars
-      ? stateVars.receivingAddress
-      : this.receivingAddress;
-    this.transactions = stateVars ? stateVars.transactions : this.transactions;
-    this.derivativeAccount = stateVars
-      ? stateVars.derivativeAccount
-      : this.derivativeAccount;
+    this.initializeStateVars(stateVars);
   }
+
+  public initializeStateVars = stateVars => {
+    this.usedAddresses =
+      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : [];
+    this.nextFreeAddressIndex =
+      stateVars && stateVars.nextFreeAddressIndex
+        ? stateVars.nextFreeAddressIndex
+        : 0;
+    this.nextFreeChangeAddressIndex =
+      stateVars && stateVars.nextFreeChangeAddressIndex
+        ? stateVars.nextFreeChangeAddressIndex
+        : 0;
+    this.internalAddresssesCache =
+      stateVars && stateVars.internalAddresssesCache
+        ? stateVars.internalAddresssesCache
+        : {}; // index => address
+    this.externalAddressesCache =
+      stateVars && stateVars.externalAddressesCache
+        ? stateVars.externalAddressesCache
+        : {}; // index => address
+    this.addressToWIFCache =
+      stateVars && stateVars.addressToWIFCache
+        ? stateVars.addressToWIFCache
+        : {};
+    this.gapLimit =
+      stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
+    this.balances =
+      stateVars && stateVars.balances ? stateVars.balances : this.balances;
+    this.receivingAddress =
+      stateVars && stateVars.receivingAddress
+        ? stateVars.receivingAddress
+        : this.receivingAddress;
+    this.transactions =
+      stateVars && stateVars.transactions
+        ? stateVars.transactions
+        : this.transactions;
+    this.derivativeAccount =
+      stateVars && stateVars.derivativeAccount
+        ? stateVars.derivativeAccount
+        : this.derivativeAccount;
+  };
 
   public getMnemonic = (): { mnemonic: string } => {
     return { mnemonic: this.mnemonic };
@@ -130,10 +151,10 @@ export default class HDSegwitWallet extends Bitcoin {
     // generates receiving xpub for derivative accounts
 
     const baseXpub = this.generateDerivativeXpub(accountType, accountNumber);
-    console.log({ baseXpub });
-    const node = bip32.fromBase58(baseXpub, this.network);
-    const address = this.getAddress(node.derive(0).derive(0), this.purpose);
-    console.log({ address });
+    // console.log({ baseXpub });
+    // const node = bip32.fromBase58(baseXpub, this.network);
+    // const address = this.getAddress(node.derive(0).derive(0), this.purpose);
+    // console.log({ address });
     return baseXpub;
     // const child = node.derive(0).neutered(); //external chain
     // const receivingXpub = child.toBase58();
@@ -154,15 +175,16 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!this.derivativeAccount[accountType])
       throw new Error(`${accountType} does not exists`);
 
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
     await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
     const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
       accountNumber
     ];
 
-    console.log({
-      xpub: this.derivativeAccount[accountType][accountNumber].xpub,
-    });
     const usedAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
       usedAddresses.push(
@@ -890,18 +912,21 @@ export default class HDSegwitWallet extends Bitcoin {
 
   private getExternalAddressByIndex = (
     index: number,
-    xpub?: string,
+    derivativeXpub?: string,
   ): string => {
-    if (!xpub && this.externalAddressesCache[index]) {
+    if (!derivativeXpub && this.externalAddressesCache[index]) {
       return this.externalAddressesCache[index];
     } // cache hit
 
-    const node = bip32.fromBase58(xpub ? xpub : this.getXpub(), this.network);
+    const node = bip32.fromBase58(
+      derivativeXpub ? derivativeXpub : this.getXpub(),
+      this.network,
+    );
     const keyPair = node.derive(0).derive(index);
 
     const address = this.getAddress(keyPair, this.purpose);
 
-    if (!xpub) {
+    if (!derivativeXpub) {
       this.externalAddressesCache[index] = address;
     }
     return address;

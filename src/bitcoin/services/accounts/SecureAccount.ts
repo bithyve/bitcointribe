@@ -22,6 +22,7 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       twoFASetup,
+      derivativeAccount,
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
@@ -44,6 +45,7 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
+      derivativeAccount: any;
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
@@ -60,6 +62,7 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       twoFASetup,
+      derivativeAccount,
     });
   };
 
@@ -88,6 +91,7 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
+      derivativeAccount: any;
     },
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);
@@ -780,6 +784,97 @@ export default class SecureAccount {
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {
       return { status: 107, err: err.message, message: ErrMap[107] };
+    }
+  };
+
+  public getDerivativeAccAddress = async (
+    accountType: string,
+    accountNumber?: number,
+  ): Promise<
+    | {
+        status: number;
+        data: { address: string };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.getDerivativeAccReceivingAddress(
+          accountType,
+          accountNumber,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: "Failed to generate derivative account's address",
+      };
+    }
+  };
+
+  public getDerivativeAccBalanceTransactions = async (
+    accountType: string,
+    accountNumber?: number,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          balances: {
+            balance: number;
+            unconfirmedBalance: number;
+          };
+          transactions: {
+            totalTransactions: number;
+            confirmedTransactions: number;
+            unconfirmedTransactions: number;
+            transactionDetails: Array<{
+              txid: string;
+              status: string;
+              confirmations: number;
+              fee: string;
+              date: string;
+              transactionType: string;
+              amount: number;
+              accountType: string;
+              recipientAddresses?: string[];
+              senderAddresses?: string[];
+            }>;
+          };
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.fetchDerivativeAccBalanceTxs(
+          accountType,
+          accountNumber,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message:
+          "Failed to generate derivative account's balance and transactions",
+      };
     }
   };
 }
