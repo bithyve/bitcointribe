@@ -31,11 +31,27 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import VerificationSuccessModalContents from './VerificationSuccessModalContents';
 import InstructionsModalContents from './InstructionsModalContents';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCustomer, sendEmailRequest, sendSmsRequest, verifyEmailRequest, sentEmailRequest, verifiedEmail, sentSmsRequest, ClearUserRequest } from '../../store/actions/bittr';
+import {
+  createCustomer,
+  sendEmailRequest,
+  sendSmsRequest,
+  verifyEmailRequest,
+  sentEmailRequest,
+  verifiedEmail,
+  sentSmsRequest,
+  ClearUserRequest,
+} from '../../store/actions/bittr';
 import { validateEmail } from '../../common/CommonFunctions';
 import OtpModalContents from './OtpModalContents';
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 import { fetchDerivativeAccXpub } from '../../store/actions/accounts';
+import Toast from '../../components/Toast';
+import CountryCode from '../../common/CountryCode';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SignUpDetails(props) {
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +92,7 @@ export default function SignUpDetails(props) {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [accountNumber, setAccountNumber] = useState(0);
   const dataGetBittr = useSelector(state => state.bittr);
-  const [getBittrXpub, setGetBittrXpub] = useState("");
+  const [getBittrXpub, setGetBittrXpub] = useState('');
   const userDetails = useSelector(state => state.bittr.userDetails);
   const emailVerifiedDetails = useSelector(
     state => state.bittr.emailVerifiedDetails,
@@ -93,46 +109,69 @@ export default function SignUpDetails(props) {
   );
   const service = useSelector(state => state.accounts[serviceType].service);
   const derivativeAccountType = 'GET_BITTR';
-  const { derivativeAccount } = serviceType === REGULAR_ACCOUNT ? service.hdWallet : '';
-  
+  const { derivativeAccount } =
+    serviceType === REGULAR_ACCOUNT ? service.hdWallet : '';
+  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
+  const [dropdownBoxValue, setDropdownBoxValue] = useState({
+    name: '',
+    code: '',
+  });
+  const [dropdownBoxList, setDropdownBoxList] = useState(CountryCode);
+
   useEffect(() => {
-    Linking.addEventListener('url', handleDeepLink);
     let getBittrAccounts;
     (async () => {
       AsyncStorage.getItem('getBittrAccounts', (err, value) => {
         if (err) {
           console.log(err);
-          setAccountNumber(0)
-        }
-        else if(value){
+          setAccountNumber(0);
+        } else if (value) {
           getBittrAccounts = JSON.parse(value);
-          console.log("getBittrAccounts", getBittrAccounts, getBittrAccounts[0].getBitrrAccounts.length)
+          console.log(
+            'getBittrAccounts',
+            getBittrAccounts,
+            getBittrAccounts[0].getBitrrAccounts.length,
+          );
           setAccountNumber(getBittrAccounts[0].getBitrrAccounts.length);
         } else {
-          setAccountNumber(0)
+          setAccountNumber(0);
         }
       });
-  })();
+    })();
+    Linking.addEventListener('url', handleDeepLink);
+    return () => Linking.removeEventListener('url', handleDeepLink);
   }, []);
 
   useEffect(() => {
-    if(service){
-    if (serviceType === REGULAR_ACCOUNT) {
-      if (derivativeAccount && !derivativeAccount[derivativeAccountType][accountNumber])
-        dispatch(fetchDerivativeAccXpub(derivativeAccountType,accountNumber));
-      else
-      {
-        console.log({
-          getBittrXpub:
-            derivativeAccount[derivativeAccountType][accountNumber].ypub,
-        });
-        setGetBittrXpub(derivativeAccount[derivativeAccountType][accountNumber].ypub);
+    if (service) {
+      if (serviceType === REGULAR_ACCOUNT) {
+        if (accountNumber < 10) {
+          if (
+            derivativeAccount &&
+            !derivativeAccount[derivativeAccountType][accountNumber]
+          ) {
+            console.log('Account number', accountNumber);
+            dispatch(
+              fetchDerivativeAccXpub(derivativeAccountType, accountNumber),
+            );
+          } else {
+            console.log({
+              getBittrXpub:
+                derivativeAccount[derivativeAccountType][accountNumber].ypub,
+            });
+            setGetBittrXpub(
+              derivativeAccount[derivativeAccountType][accountNumber].ypub,
+            );
+          }
+        } else {
+          Toast('Getbittr Account creation limit exeeded');
+        }
       }
     }
-  }
-  }, [service]);
+  }, [service, accountNumber]);
 
   const handleDeepLink = useCallback(async event => {
+    console.log('EVENT', event);
     const EmailToken1 = event.url.substr(event.url.lastIndexOf('/') + 1);
     await AsyncStorage.setItem(
       'emailToken',
@@ -188,9 +227,9 @@ export default function SignUpDetails(props) {
     } else {
       if (dataGetBittr.smsSent && smsSentDetails && smsSentDetails.success) {
         setTimeout(() => {
-        (OTPBottomSheet as any).current.snapTo(1);
-      }, 2);
-       // (SmsErrorBottomSheet as any).current.snapTo(0);
+          (OTPBottomSheet as any).current.snapTo(1);
+        }, 2);
+        // (SmsErrorBottomSheet as any).current.snapTo(0);
         dispatch(sentSmsRequest());
       } else {
         (SmsErrorBottomSheet as any).current.snapTo(0);
@@ -206,14 +245,19 @@ export default function SignUpDetails(props) {
     ) {
       setTimeout(() => {
         setErrorMessageHeader(`Verification link sent`);
-        setErrorMessage(
-          'Please verify your details to proceed'
-          );
-        setOtherText('if you donot receive and email or entered a wrong address/number you can choose to start over')
+        setErrorMessage('Please verify your details to proceed');
+        setOtherText(
+          'if you donot receive and email or entered a wrong address/number you can choose to start over',
+        );
         setErrorProceedButton('Continue');
+        setIsIgnoreButton(true);
+        setErrorIgnoreButton('Start Over');
       }, 2);
-      setIsIgnoreButton(true);
-      setErrorIgnoreButton('Start Over');
+      console.log(
+        'dataGetBittr.emailSent emailSentDetails.success',
+        dataGetBittr.emailSent,
+        emailSentDetails.success,
+      );
       (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(sentEmailRequest());
     }
@@ -255,7 +299,7 @@ export default function SignUpDetails(props) {
     errorProceedButton,
     errorIgnoreButton,
     isIgnoreButton,
-    OtherText
+    OtherText,
   ]);
 
   useEffect(() => {
@@ -342,19 +386,21 @@ export default function SignUpDetails(props) {
       email_token: emailToken,
       initial_address_type: 'simple',
       category: 'hexa',
-      ...(selectedAccount.type==REGULAR_ACCOUNT && {
+      ...(selectedAccount.type == REGULAR_ACCOUNT && {
         xpub_key: getBittrXpub,
-        xpub_addr_type: 'auto', 
-        xpub_path:' m/0/x'
-      })
+        xpub_addr_type: 'auto',
+        xpub_path: ' m/0/x',
+      }),
     };
     dispatch(createCustomer(data));
   };
 
-  useEffect( ()=>{
-    (async()=>{
-      if( userDetails ){
-        let getBittrAccounts = JSON.parse(await AsyncStorage.getItem("getBittrAccounts"));
+  useEffect(() => {
+    (async () => {
+      if (userDetails) {
+        let getBittrAccounts = JSON.parse(
+          await AsyncStorage.getItem('getBittrAccounts'),
+        );
         let emailAddress = await AsyncStorage.getItem('emailAddress');
         let emailToken = await AsyncStorage.getItem('emailToken');
         let mobileNumber = await AsyncStorage.getItem('MobileNo');
@@ -369,32 +415,36 @@ export default function SignUpDetails(props) {
             email_token: emailToken,
             initial_address_type: 'simple',
             category: 'hexa',
-            xpub_key: selectedAccount.type==REGULAR_ACCOUNT ? getBittrXpub : "",
-            xpub_addr_type: selectedAccount.type==REGULAR_ACCOUNT ? 'auto' : "",
-            xpub_path:selectedAccount.type==REGULAR_ACCOUNT ? 'm/0/x' : ""
-          }
-        }
+            xpub_key:
+              selectedAccount.type == REGULAR_ACCOUNT ? getBittrXpub : '',
+            xpub_addr_type:
+              selectedAccount.type == REGULAR_ACCOUNT ? 'auto' : '',
+            xpub_path: selectedAccount.type == REGULAR_ACCOUNT ? 'm/0/x' : '',
+          },
+        };
         let obj = {
           accountType: selectedAccount.type,
           getBitrrAccounts: [tempObj],
-          
         };
-        if(!getBittrAccounts){
+        if (!getBittrAccounts) {
           getBittrAccounts = [];
-          getBittrAccounts.push(obj)
-        }
-        else{
-          let index = getBittrAccounts.findIndex((value)=>value.accountType==selectedAccount.type);
-          if(index==-1){
+          getBittrAccounts.push(obj);
+        } else {
+          let index = getBittrAccounts.findIndex(
+            value => value.accountType == selectedAccount.type,
+          );
+          if (index == -1) {
             getBittrAccounts.push(obj);
-          }
-          else{
+          } else {
             let GBAccounts = getBittrAccounts[index].getBitrrAccounts;
             GBAccounts.push(tempObj);
             getBittrAccounts[index].getBitrrAccounts = GBAccounts;
           }
         }
-        await AsyncStorage.setItem("getBittrAccounts", JSON.stringify(getBittrAccounts));
+        await AsyncStorage.setItem(
+          'getBittrAccounts',
+          JSON.stringify(getBittrAccounts),
+        );
         setTimeout(() => {
           setIsLoading(false);
         }, 2);
@@ -403,8 +453,7 @@ export default function SignUpDetails(props) {
           InstructionsBottomSheet.current.snapTo(1);
         }, 4);
         dispatch(ClearUserRequest());
-      }
-      else{
+      } else {
         setTimeout(() => {
           setIsLoading(false);
         }, 2);
@@ -440,7 +489,9 @@ export default function SignUpDetails(props) {
           'Purus faucibus ornare suspendisse sed nisi',
           'Et ligula ullamcorper malesuada proin',
         ]}
-        onPressProceed={() => {props.navigation.replace('Home')}}
+        onPressProceed={() => {
+          props.navigation.pop(2);
+        }}
       />
     );
   }, []);
@@ -459,17 +510,17 @@ export default function SignUpDetails(props) {
     return (
       <OtpModalContents
         isIncorrectOtp={isIncorrectOtp}
-        onOtpDone={(otpValue)=>{
+        onOtpDone={otpValue => {
           setTimeout(() => {
             setOtp(otpValue);
           }, 2);
         }}
         modalRef={OTPBottomSheet}
-        onPressConfirm={()=>{
+        onPressConfirm={() => {
           OTPBottomSheet.current.snapTo(0);
           VerificationSuccessBottomSheet.current.snapTo(1);
         }}
-        onPressResendOTP={async()=>{
+        onPressResendOTP={async () => {
           let mobileNumber = await AsyncStorage.getItem('MobileNo');
           let contactData = {
             phone: mobileNumber,
@@ -564,6 +615,38 @@ export default function SignUpDetails(props) {
             </View>
           ) : null}
           <View style={{ ...styles.textBoxView }}>
+          <TouchableOpacity
+              activeOpacity={10}
+              style={
+                {...dropdownBoxOpenClose
+                  ? styles.dropdownBoxOpened
+                  : styles.dropdownBox,
+                  
+                }
+              }
+              onPress={() => {
+                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+              }}
+            >
+               <Text
+                style={{
+                  ...styles.dropdownBoxText,
+                  color: dropdownBoxValue.code
+                    ? Colors.textColorGrey
+                    : Colors.borderColor,
+                }}
+              >
+                {dropdownBoxValue.code
+                  ? dropdownBoxValue.code
+                  : ''}
+              </Text>
+            <Ionicons
+                style={{ marginLeft: 30 }}
+                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
+                size={15}
+                color={Colors.borderColor}
+              />
+            </TouchableOpacity>
             <TextInput
               style={{
                 ...styles.textBox,
@@ -583,9 +666,11 @@ export default function SignUpDetails(props) {
               }}
               placeholderTextColor={Colors.borderColor}
             />
+            
           </View>
-        </View>
+         </View>
       </View>
+      
       <View style={{ marginTop: 'auto', marginBottom: hp('4%') }}>
         <BottomInfoBox
           backgroundColor={Colors.white}
@@ -618,7 +703,6 @@ export default function SignUpDetails(props) {
                   bitcoin_address: bitcoinAddress,
                   category: 'hexa',
                 };
-
                 dispatch(sendEmailRequest(formData));
               } else {
                 setTimeout(() => {
@@ -773,5 +857,42 @@ const styles = StyleSheet.create({
     color: Colors.red,
     fontSize: RFValue(11),
     fontStyle: 'italic',
+  },
+  dropdownBoxModal: {
+    borderRadius: 10,
+    borderColor: Colors.borderColor,
+    borderWidth: 0.5,
+    marginTop: hp('1%'),
+    width: '100%',
+    height: '110%',
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    zIndex: 9999,
+    overflow: 'hidden',
+  },
+  dropdownBoxModalElementView: {
+    height: 55,
+    justifyContent: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+  dropdownBox: {
+    flexDirection: 'row',
+    borderColor: '#E3E3E3',
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+  },
+  dropdownBoxOpened: {
+    flexDirection: 'row',
+    backgroundColor: '#E3E3E3',
+    alignItems: 'center',
+  },
+  dropdownBoxText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(13),
   },
 });
