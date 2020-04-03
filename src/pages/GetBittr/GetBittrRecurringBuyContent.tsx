@@ -15,7 +15,6 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 import RadioButton from '../../components/RadioButton';
-import { ScrollView } from 'react-native-gesture-handler';
 import {
     TEST_ACCOUNT,
     REGULAR_ACCOUNT,
@@ -24,54 +23,37 @@ import {
 import { fetchAddress } from '../../store/actions/accounts';
 import { useDispatch, useSelector } from 'react-redux';
 import { withNavigation } from "react-navigation";
+import { ScrollView } from 'react-native-gesture-handler';
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 function GetBittrRecurringBuyContents(props) {
-    const [serviceData, setServiceData] = useState([
-        // {
-        //     title:"Fast Bitcoin",
-        //     image:require("../../assets/images/icons/fastbitcoin_dark.png"),
-        //     isSelected:false,
-        //     info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
-        // },
-        {
-            title:"Get Bittr",
-            image:require("../../assets/images/icons/icon_getbitter.png"),
-            isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
-        }
-    ]);
+    const [isVisibleList, setIsVisibleList] = useState(false);
     const [accountData, setAccountData] = useState([
         {
             title:"Regular Account",
             image:require("../../assets/images/icons/icon_regular.png"),
             isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+            info:"Lorem ipsum dolor sit amet consec",
             type:REGULAR_ACCOUNT
         },
         {
             title:"Savings Account",
             image:require("../../assets/images/icons/icon_secureaccount.png"),
             isSelected:false,
-            info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+            info:"Lorem ipsum dolor sit amet consec",
             type:SECURE_ACCOUNT
         }
     ])
-    const [selectedService, setSelectedService] =useState({
-        title:"Get Bittr",
-        image:require("../../assets/images/icons/icon_getbitter.png"),
-        isSelected:false,
-        info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit."
-    });
     const [selectedAccount, setSelectedAccount] =useState({
         title:"Regular Account",
         image:require("../../assets/images/icons/icon_regular.png"),
         isSelected:false,
-        info:"Lorem ipsum dolor sit amet consec tetur adipisicing elit.",
+        info:"Lorem ipsum dolor sit amet consec",
         type:REGULAR_ACCOUNT
     });
     const { loading, service } = useSelector(
         state => state.accounts[selectedAccount.type],
-      );
+    );
     let { receivingAddress } = selectedAccount.type === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
     const dispatch = useDispatch();
     useEffect(() => {
@@ -80,6 +62,7 @@ function GetBittrRecurringBuyContents(props) {
 
     return (
         <View style={styles.modalContainer}>
+            <ScrollView>
             <View style={styles.modalHeaderTitleView}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <AppBottomSheetTouchableWrapper
@@ -91,82 +74,93 @@ function GetBittrRecurringBuyContents(props) {
                     <View style={{flex:1}}>
                         <Text style={styles.modalHeaderTitleText}>Recurring Buy</Text>
                         <Text style={{...styles.pageInfoText, marginRight: 15}}>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae rem porro ducimus repudiandae alias
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
                         </Text>
+                    </View>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:wp('10%'), marginRight:wp('10%'), marginBottom:wp('4%'), marginTop:wp('4%')}}>
+                    <View style={{justifyContent:'center', alignItems:'center', marginRight:wp('3%')}}>
+                        <Image source={require("../../assets/images/icons/icon_getbitter.png")} style={{width:wp('7%'), height:wp("7%"), }} />
+                    </View>
+                    <View style={{flex:1, }}>
+                        <Text style={styles.pageSubTitleText}>{'GetBitrr'}</Text>
+                        <Text style={styles.pageInfoText}>{'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed'}</Text>
                     </View>
                 </View>
             </View>
-            <ScrollView style={{flex:1}}>
-                <View style={{marginLeft:wp('13%'), marginRight:wp('13%'), marginTop:20, marginBottom:20}}>
-                    <Text style={styles.pageTitleText}>Choose a service</Text>
-                    <Text style={{...styles.pageInfoText, fontSize:RFValue(10)}}>
-                        Lorem ipsum dolor sit amet consectetur adipisicing
-                    </Text>
+            <View style={{marginLeft:wp('13%'), marginRight:wp('10%'), marginTop:wp('3%'), marginBottom:wp('2%')}}>
+                <Text style={styles.pageTitleText}>Choose an existing account</Text>
+                <Text style={{...styles.pageInfoText, fontSize:RFValue(10)}}>
+                    Lorem ipsum dolor sit amet consectetur adipisicing
+                </Text>
+            </View>
+            <AppBottomSheetTouchableWrapper onPress={()=>{setIsVisibleList(true)}} style={{ flexDirection: 'row', alignItems: 'center', marginLeft:wp('13%'), marginRight:wp('10%'), marginBottom:wp('5%'), borderRadius:10, borderWidth:1, borderColor:Colors.borderColor, padding:wp('3%'), marginTop:wp('5%') }}>
+                <View style={{justifyContent:'center', alignItems:'center', marginRight:wp('3%')}}>
+                    <Image source={selectedAccount.image} style={{width:wp('7%'), height:wp("7%"), }} />
                 </View>
-                {serviceData.map((item)=>{
-                    return <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:wp('13%'), marginRight:wp('13%'), marginBottom:wp('5%')}}>
-                    <AppBottomSheetTouchableWrapper onPress={()=>{setSelectedService(item)}} style={{marginRight:wp('3%'), justifyContent:'center', alignItems:'center'}} >
-                        <RadioButton
-                            size={17}
-                            color={Colors.lightBlue}
-                            borderColor={Colors.borderColor}
-                            isChecked={selectedService.title && item.title==selectedService.title ? true : false}
-                            onpress={() => {setSelectedService(item)}}
-                        />
-                    </AppBottomSheetTouchableWrapper>
-                    <View style={{justifyContent:'center', alignItems:'center', marginRight:wp('3%')}}>
-                        <Image source={item.image} style={{width:wp('7%'), height:wp("7%"), }} />
-                    </View>
-                    <View style={{flex:1, }}>
-                        <Text style={styles.pageSubTitleText}>{item.title}</Text>
-                        <Text style={styles.pageInfoText}>{item.info}</Text>
-                    </View>
+                <View style={{flex:1, }}>
+                    <Text style={styles.pageSubTitleText}>{selectedAccount.title}</Text>
+                    <Text style={styles.pageInfoText}>{selectedAccount.info}</Text>
                 </View>
-                })}
-                <View style={{marginLeft:20, marginRight:20, backgroundColor:Colors.borderColor, height:1}}/>
-
-                <View style={{marginLeft:wp('13%'), marginRight:wp('13%'), marginTop:20, marginBottom:20}}>
-                    <Text style={styles.pageTitleText}>Choose an account</Text>
-                    <Text style={{...styles.pageInfoText, fontSize:RFValue(10)}}>
-                        Lorem ipsum dolor sit amet consectetur adipisicing
-                    </Text>
-                </View>
-                {accountData.map((item)=>{
-                    return <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:wp('13%'), marginRight:wp('13%'), marginBottom:wp('5%')}}>
-                    <AppBottomSheetTouchableWrapper onPress={()=>{setSelectedAccount(item)}} style={{marginRight:wp('3%'), justifyContent:'center', alignItems:'center'}} >
-                        <RadioButton
-                            size={17}
-                            color={Colors.lightBlue}
-                            borderColor={Colors.borderColor}
-                            isChecked={selectedAccount.title && item.title==selectedAccount.title ? true : false}
-                            onpress={() => setSelectedAccount(item)}
-                        />
-                    </AppBottomSheetTouchableWrapper>
-                    <View style={{justifyContent:'center', alignItems:'center', marginRight:wp('3%')}}>
-                        <Image source={item.image} style={{width:wp('7%'), height:wp("7%"), }} />
-                    </View>
-                    <View style={{flex:1, }}>
-                        <Text style={styles.pageSubTitleText}>{item.title}</Text>
-                        <Text style={styles.pageInfoText}>{item.info}</Text>
-                    </View>
-                </View>
-                })}
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft:wp('13%'), marginRight:wp('13%'), marginBottom:wp('5%')}}>
-                    <View style={{justifyContent:'center', alignItems:'center', marginRight:wp('3%')}}>
-                        <Image source={require("../../assets/images/icons/icon_addaccount.png")} style={{width:wp('7%'), height:wp("7%"), }} />
-                    </View>
+                <Ionicons
+                    name={isVisibleList ? "ios-arrow-up" : "ios-arrow-down"}
+                    color={Colors.borderColor}
+                    size={RFValue(16)}
+                    style={{ alignSelf: 'center' }}
+                />  
+            </AppBottomSheetTouchableWrapper>
+            <View style={{ position:'relative', }}>
+            <View style={{ marginLeft:wp('13%'), marginRight:wp('10%'), backgroundColor:Colors.borderColor, height:1}}/>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop:wp('5%'), marginLeft:wp('13%'), marginRight:wp('13%'), marginBottom:wp('5%')}}>
                     <View style={{flex:1}}>
-                        <Text style={styles.pageSubTitleText}>Add Account</Text>
+                        <Text style={styles.pageSubTitleText}>Or Create a New Account</Text>
                         <Text style={styles.pageInfoText}>
-                            Add account to your wallet, select from options
+                            Create a new account to link to GetBittr
                         </Text>
                     </View>
+                    <Ionicons
+                        name={"ios-arrow-forward"}
+                        color={Colors.borderColor}
+                        size={RFValue(16)}
+                        style={{ alignSelf: 'center' }}
+                    />  
                 </View>
+                { isVisibleList?
+                <View style={{ overflow:'hidden', marginLeft:wp('13%'), marginRight:wp('10%'), position:'absolute', backgroundColor:Colors.white, zIndex:999, width:wp('77%'), borderWidth:1, borderColor:Colors.borderColor, borderRadius:10 }}>
+                    {accountData.map((item)=>{
+                        return <AppBottomSheetTouchableWrapper onPress={()=>{setSelectedAccount(item); setIsVisibleList(false)}} style={{ flexDirection: 'row', alignItems: 'center', padding:wp('3.5%'), backgroundColor:'white', height:'auto'}}>
+                            <View style={{justifyContent:'center', alignItems:'center', marginRight:wp('3%')}}>
+                                <Image source={item.image} style={{ width:wp('7%'), height:wp("7%"), }} />
+                            </View>
+                            <View style={{flex:1, }}>
+                                <Text style={styles.pageSubTitleText}>{item.title}</Text>
+                                <Text style={styles.pageInfoText}>{item.info}</Text>
+                            </View>
+                        </AppBottomSheetTouchableWrapper>
+                    })}
+                </View>
+                : null
+                }
+                <View style={{marginLeft:20, marginRight:20, backgroundColor:Colors.borderColor, height:1}}/>
+                <View style={{marginLeft:wp('13%'), marginRight:wp('10%'), marginTop:wp('3%'), marginBottom:wp('2%')}}>
+                    <Text style={styles.pageTitleText}>Instructions to{'\n'}Setup Recurring Buy</Text>
+                    <Text style={{...styles.pageInfoText, fontSize:RFValue(10), lineHeight:RFValue(13), marginTop:5}}>
+                        Lorem ipsum dolor sit amet consectetur adipisicing{'\n'}
+                    </Text>
+                    <Text style={{...styles.pageInfoText, fontSize:RFValue(10), lineHeight:RFValue(13)}}>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.{'\n'}
+                    </Text>
+                    <Text style={{...styles.pageInfoText, fontSize:RFValue(10), lineHeight:RFValue(13)}}>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore{'\n'}
+                    </Text>
+                </View>
+                
+            </View>
             </ScrollView>
             <View style={{ paddingBottom:wp('8%'), paddingLeft:wp("5%"), paddingTop:wp("5%")}}>
-                <AppBottomSheetTouchableWrapper onPress={()=>{props.navigation.navigate('SignUpInfo', {address: receivingAddress, selectedAccount: selectedAccount});}} style={{height:wp('13%'), width:wp('50%'), justifyContent:'center', alignItems:'center', backgroundColor:Colors.blue, borderRadius:10}} >
-                    <Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13)}}>Proceed</Text>
-                </AppBottomSheetTouchableWrapper>
+                    <AppBottomSheetTouchableWrapper onPress={()=>{props.navigation.navigate('SignUpDetails', {address: receivingAddress, selectedAccount: selectedAccount});}} style={{height:wp('13%'), width:wp('50%'), justifyContent:'center', alignItems:'center', backgroundColor:Colors.blue, borderRadius:10}} >
+                        <Text style={{color:Colors.white, fontFamily:Fonts.FiraSansMedium, fontSize:RFValue(13)}}>Proceed</Text>
+                    </AppBottomSheetTouchableWrapper>
             </View>
         </View>
     );
@@ -183,9 +177,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: Colors.borderColor,
         alignItems: 'center',
-        flexDirection: 'row',
+        // flexDirection: 'row',
         paddingRight: 10,
-        paddingBottom: 15,
+        // paddingBottom: 15,
         paddingTop: 10,
         marginLeft: 20,
         marginRight: 20,
@@ -207,7 +201,6 @@ const styles = StyleSheet.create({
         fontFamily: Fonts.FiraSansRegular,
     },
     pageInfoText: {
-        marginTop:5,
         color: Colors.textColorGrey,
         fontSize: RFValue(11),
         fontFamily: Fonts.FiraSansRegular,
