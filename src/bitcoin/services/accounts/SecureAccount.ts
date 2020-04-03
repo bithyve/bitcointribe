@@ -22,6 +22,7 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       twoFASetup,
+      derivativeAccount,
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
@@ -44,6 +45,7 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
+      derivativeAccount: any;
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
@@ -60,6 +62,7 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       twoFASetup,
+      derivativeAccount,
     });
   };
 
@@ -88,6 +91,7 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
+      derivativeAccount: any;
     },
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);
