@@ -355,6 +355,77 @@ export default class SecureHDWallet extends Bitcoin {
     return { balances, transactions };
   };
 
+  public getDerivativeAccReceivingAddress = async (
+    accountType: string,
+    accountNumber: number = 0,
+  ): Promise<{ address: string }> => {
+    // generates receiving address for derivative accounts
+    if (!this.derivativeAccount[accountType])
+      throw new Error(`${accountType} does not exists`);
+
+    try {
+      // looking for free external address
+      let freeAddress = '';
+      let itr;
+
+      const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+        accountNumber
+      ];
+      if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+        this.derivativeAccount[accountType][
+          accountNumber
+        ].nextFreeAddressIndex = 0;
+
+      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+        if (
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex +
+            itr <
+          0
+        ) {
+          continue;
+        }
+
+        const { address } = this.createSecureMultiSig(
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex + itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        );
+
+        const txCounts = await this.getTxCounts([address]);
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          this.derivativeAccount[accountType][
+            accountNumber
+          ].nextFreeAddressIndex += itr;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        // giving up as we could find a free address in the above cycle
+
+        console.log(
+          'Failed to find a free address in the above cycle, using the next address without checking',
+        );
+        const multiSig = this.createSecureMultiSig(
+          this.derivativeAccount[accountType][accountNumber]
+            .nextFreeAddressIndex + itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        );
+        freeAddress = multiSig.address; // not checking this one, it might be free
+        this.derivativeAccount[accountType][
+          accountNumber
+        ].nextFreeAddressIndex += itr + 1;
+      }
+
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Unable to generate receiving address: ${err.message}`);
+    }
+  };
+
   public getReceivingAddress = async (): Promise<{ address: string }> => {
     try {
       // looking for free external address
