@@ -73,28 +73,49 @@ export default class HDSegwitWallet extends Bitcoin {
       ? `m/${this.purpose}'/1'/0'`
       : `m/${this.purpose}'/0'/0'`; // helps with seperating regular and test acc (even on the testnet)
 
-    this.usedAddresses = stateVars ? stateVars.usedAddresses : [];
-    this.nextFreeAddressIndex = stateVars ? stateVars.nextFreeAddressIndex : 0;
-    this.nextFreeChangeAddressIndex = stateVars
-      ? stateVars.nextFreeChangeAddressIndex
-      : 0;
-    this.internalAddresssesCache = stateVars
-      ? stateVars.internalAddresssesCache
-      : {}; // index => address
-    this.externalAddressesCache = stateVars
-      ? stateVars.externalAddressesCache
-      : {}; // index => address
-    this.addressToWIFCache = stateVars ? stateVars.addressToWIFCache : {};
-    this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
-    this.balances = stateVars ? stateVars.balances : this.balances;
-    this.receivingAddress = stateVars
-      ? stateVars.receivingAddress
-      : this.receivingAddress;
-    this.transactions = stateVars ? stateVars.transactions : this.transactions;
-    this.derivativeAccount = stateVars
-      ? stateVars.derivativeAccount
-      : this.derivativeAccount;
+    this.initializeStateVars(stateVars);
   }
+
+  public initializeStateVars = stateVars => {
+    this.usedAddresses =
+      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : [];
+    this.nextFreeAddressIndex =
+      stateVars && stateVars.nextFreeAddressIndex
+        ? stateVars.nextFreeAddressIndex
+        : 0;
+    this.nextFreeChangeAddressIndex =
+      stateVars && stateVars.nextFreeChangeAddressIndex
+        ? stateVars.nextFreeChangeAddressIndex
+        : 0;
+    this.internalAddresssesCache =
+      stateVars && stateVars.internalAddresssesCache
+        ? stateVars.internalAddresssesCache
+        : {}; // index => address
+    this.externalAddressesCache =
+      stateVars && stateVars.externalAddressesCache
+        ? stateVars.externalAddressesCache
+        : {}; // index => address
+    this.addressToWIFCache =
+      stateVars && stateVars.addressToWIFCache
+        ? stateVars.addressToWIFCache
+        : {};
+    this.gapLimit =
+      stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
+    this.balances =
+      stateVars && stateVars.balances ? stateVars.balances : this.balances;
+    this.receivingAddress =
+      stateVars && stateVars.receivingAddress
+        ? stateVars.receivingAddress
+        : this.receivingAddress;
+    this.transactions =
+      stateVars && stateVars.transactions
+        ? stateVars.transactions
+        : this.transactions;
+    this.derivativeAccount =
+      stateVars && stateVars.derivativeAccount
+        ? stateVars.derivativeAccount
+        : this.derivativeAccount;
+  };
 
   public getMnemonic = (): { mnemonic: string } => {
     return { mnemonic: this.mnemonic };
