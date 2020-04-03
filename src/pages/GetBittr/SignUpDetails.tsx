@@ -60,7 +60,6 @@ export default function SignUpDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [emailAddress, setEmailAddress] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
-  const [countryCode, setCountryCode] = useState('91');
   const [EmailToken, setEmailToken] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [SmsErrorBottomSheet, setSmsErrorBottomSheet] = useState(
@@ -113,8 +112,9 @@ export default function SignUpDetails(props) {
     serviceType === REGULAR_ACCOUNT ? service.hdWallet : '';
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
-    name: '',
-    code: '',
+    name:"India",
+    dial_code:"+91",
+    code:"IN"
   });
   const [dropdownBoxList, setDropdownBoxList] = useState(CountryCode);
 
@@ -123,15 +123,9 @@ export default function SignUpDetails(props) {
     (async () => {
       AsyncStorage.getItem('getBittrAccounts', (err, value) => {
         if (err) {
-          console.log(err);
           setAccountNumber(0);
         } else if (value) {
           getBittrAccounts = JSON.parse(value);
-          console.log(
-            'getBittrAccounts',
-            getBittrAccounts,
-            getBittrAccounts[0].getBitrrAccounts.length,
-          );
           setAccountNumber(getBittrAccounts[0].getBitrrAccounts.length);
         } else {
           setAccountNumber(0);
@@ -150,15 +144,10 @@ export default function SignUpDetails(props) {
             derivativeAccount &&
             !derivativeAccount[derivativeAccountType][accountNumber]
           ) {
-            console.log('Account number', accountNumber);
             dispatch(
               fetchDerivativeAccXpub(derivativeAccountType, accountNumber),
             );
           } else {
-            console.log({
-              getBittrXpub:
-                derivativeAccount[derivativeAccountType][accountNumber].ypub,
-            });
             setGetBittrXpub(
               derivativeAccount[derivativeAccountType][accountNumber].ypub,
             );
@@ -171,7 +160,6 @@ export default function SignUpDetails(props) {
   }, [service, accountNumber]);
 
   const handleDeepLink = useCallback(async event => {
-    console.log('EVENT', event);
     const EmailToken1 = event.url.substr(event.url.lastIndexOf('/') + 1);
     await AsyncStorage.setItem(
       'emailToken',
@@ -212,7 +200,7 @@ export default function SignUpDetails(props) {
           let mobileNumber = await AsyncStorage.getItem('MobileNo');
           let contactData = {
             phone: mobileNumber,
-            country_code: countryCode,
+            country_code: dropdownBoxValue.dial_code,
           };
           dispatch(sendSmsRequest(contactData));
           dispatch(verifiedEmail());
@@ -253,11 +241,6 @@ export default function SignUpDetails(props) {
         setIsIgnoreButton(true);
         setErrorIgnoreButton('Start Over');
       }, 2);
-      console.log(
-        'dataGetBittr.emailSent emailSentDetails.success',
-        dataGetBittr.emailSent,
-        emailSentDetails.success,
-      );
       (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(sentEmailRequest());
     }
@@ -408,7 +391,7 @@ export default function SignUpDetails(props) {
           ...userDetails,
           ...{
             phone: mobileNumber,
-            country_code: countryCode,
+            country_code: dropdownBoxValue.dial_code,
             verification_code: otp,
             email: emailAddress,
             bitcoin_address: bitcoinAddress,
@@ -524,7 +507,7 @@ export default function SignUpDetails(props) {
           let mobileNumber = await AsyncStorage.getItem('MobileNo');
           let contactData = {
             phone: mobileNumber,
-            country_code: countryCode,
+            country_code: dropdownBoxValue.dial_code,
           };
           dispatch(sendSmsRequest(contactData));
         }}
@@ -614,59 +597,39 @@ export default function SignUpDetails(props) {
               <Text style={styles.errorText}>Enter valid email address</Text>
             </View>
           ) : null}
-          <View style={{ ...styles.textBoxView }}>
-          <TouchableOpacity
-              activeOpacity={10}
-              style={
-                {...dropdownBoxOpenClose
-                  ? styles.dropdownBoxOpened
-                  : styles.dropdownBox,
-                  
-                }
-              }
-              onPress={() => {
-                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
-              }}
-            >
-               <Text
-                style={{
-                  ...styles.dropdownBoxText,
-                  color: dropdownBoxValue.code
-                    ? Colors.textColorGrey
-                    : Colors.borderColor,
-                }}
-              >
-                {dropdownBoxValue.code
-                  ? dropdownBoxValue.code
-                  : ''}
-              </Text>
-            <Ionicons
-                style={{ marginLeft: 30 }}
-                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
-                size={15}
-                color={Colors.borderColor}
-              />
+          <View style={{ flexDirection: 'row', borderRadius: 10, borderWidth: 1, borderColor: Colors.borderColor, height: 50, marginTop: hp('1%'), marginBottom: hp('1%'), alignItems:'center', overflow:'hidden' }}>
+            <TouchableOpacity onPress={()=>{setDropdownBoxOpenClose(true)}} style={{ flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:Colors.borderColor, height: 50, width:wp('23%')}}>
+              <Text style={{color: Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize: RFValue(13), fontWeight:'bold'}}>{dropdownBoxValue.code} </Text>
+              <Text style={{color: Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize: RFValue(13), fontWeight:'bold'}}>{dropdownBoxValue.dial_code} </Text>
+              <Ionicons
+                name={"ios-arrow-down"}
+                color={Colors.textColorGrey}
+                size={RFValue(13)}
+                style={{ marginLeft:5 }}
+              /> 
             </TouchableOpacity>
             <TextInput
-              style={{
-                ...styles.textBox,
-                paddingRight: 20,
-                marginTop: 10,
-                marginBottom: 10,
-              }}
-              autoCapitalize="none"
-              returnKeyLabel="Done"
-              returnKeyType="done"
-              onSubmitEditing={Keyboard.dismiss}
-              keyboardType={'numeric'}
-              placeholder={'Enter phone number'}
-              value={mobileNumber}
-              onChangeText={value => {
-                setMobileNumber(value);
-              }}
-              placeholderTextColor={Colors.borderColor}
-            />
-            {dropdownBoxOpenClose && (
+                style={{
+                  ...styles.textBox,
+                  paddingRight: 20,
+                  marginTop: 10,
+                  marginBottom: 10,
+                }}
+                autoCapitalize="none"
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                onSubmitEditing={Keyboard.dismiss}
+                keyboardType={'numeric'}
+                placeholder={'Enter phone number'}
+                value={mobileNumber}
+                onChangeText={value => {
+                  setMobileNumber(value);
+                }}
+                placeholderTextColor={Colors.borderColor}
+            /> 
+          </View>
+          <View style={{flex:1, position:'relative'}}>
+          {dropdownBoxOpenClose && (
               <View style={styles.dropdownBoxModal}>
                 <ScrollView>
                   {dropdownBoxList.map((value, index) => (
@@ -677,38 +640,37 @@ export default function SignUpDetails(props) {
                       }}
                       style={{
                         ...styles.dropdownBoxModalElementView,
-                        borderTopLeftRadius: index == 0 ? 10 : 0,
-                        borderTopRightRadius: index == 0 ? 10 : 0,
-                        borderBottomLeftRadius:
-                          index == dropdownBoxList.length - 1 ? 10 : 0,
-                        borderBottomRightRadius:
-                          index == dropdownBoxList.length - 1 ? 10 : 0,
-                        paddingTop: index == 0 ? 5 : 0,
-                        backgroundColor:
-                          dropdownBoxValue.name == value.name
-                            ? Colors.lightBlue
-                            : Colors.white,
+                        backgroundColor: dropdownBoxValue.code == value.code ? Colors.lightBlue : Colors.white,
                       }}
                     >
                       <Text
                         style={{
-                          color:
-                            dropdownBoxValue.name == value.name
-                              ? Colors.blue
-                              : Colors.black,
+                          color: dropdownBoxValue.code == value.code ? Colors.blue : Colors.black,
                           fontFamily: Fonts.FiraSansRegular,
                           fontSize: RFValue(12),
                         }}
                       >
-                        {value.name + ' ' + value.code}
+                        {value.code}
+                      </Text>
+                      <Text
+                        style={{
+                          color:
+                            dropdownBoxValue.code == value.code
+                              ? Colors.blue
+                              : Colors.black,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(12),
+                          marginLeft:'auto'
+                        }}
+                      >
+                        {value.dial_code}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
               </View>
             )}
-           
-          </View>
+            </View>
          </View>
       </View>
       
@@ -904,8 +866,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     marginTop: hp('1%'),
-    width: '100%',
-    height: '110%',
+    width: wp("23%"),
+    height: hp("30%"),
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
@@ -917,20 +879,16 @@ const styles = StyleSheet.create({
   },
   dropdownBoxModalElementView: {
     height: 55,
-    justifyContent: 'center',
+    alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 15,
+    flexDirection:'row'
   },
   dropdownBox: {
     flexDirection: 'row',
     borderColor: '#E3E3E3',
     alignItems: 'center',
     backgroundColor: Colors.white,
-  },
-  dropdownBoxOpened: {
-    flexDirection: 'row',
-    backgroundColor: '#E3E3E3',
-    alignItems: 'center',
   },
   dropdownBoxText: {
     fontFamily: Fonts.FiraSansRegular,

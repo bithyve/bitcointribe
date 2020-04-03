@@ -64,7 +64,6 @@ import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
 import LostTwoFA from '../pages/Accounts/LostTwoFA';
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
-import SignUpInfo from '../pages/GetBittr/SignUpInfo';
 import SignUpDetails from '../pages/GetBittr/SignUpDetails';
 import ExistingSavingMethods from "../pages/GetBittr/ExistingSavingMethods";
 import ExistingSavingMethodDetails from "../pages/GetBittr/ExistingSavingMethodDetails";
@@ -168,7 +167,6 @@ const HomeNavigator = createStackNavigator(
     SettingGetNewPin,
     ContactsListForAssociateContact,
     LostTwoFA,
-    SignUpInfo,
     SignUpDetails,
     ExistingSavingMethods,
     ExistingSavingMethodDetails,
