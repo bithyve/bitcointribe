@@ -151,10 +151,10 @@ export default class HDSegwitWallet extends Bitcoin {
     // generates receiving xpub for derivative accounts
 
     const baseXpub = this.generateDerivativeXpub(accountType, accountNumber);
-    console.log({ baseXpub });
-    const node = bip32.fromBase58(baseXpub, this.network);
-    const address = this.getAddress(node.derive(0).derive(0), this.purpose);
-    console.log({ address });
+    // console.log({ baseXpub });
+    // const node = bip32.fromBase58(baseXpub, this.network);
+    // const address = this.getAddress(node.derive(0).derive(0), this.purpose);
+    // console.log({ address });
     return baseXpub;
     // const child = node.derive(0).neutered(); //external chain
     // const receivingXpub = child.toBase58();
