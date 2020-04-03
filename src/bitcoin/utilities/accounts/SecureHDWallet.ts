@@ -5,7 +5,7 @@ import * as bitcoinJS from 'bitcoinjs-lib';
 import coinselect from 'coinselect';
 import crypto from 'crypto';
 import config from '../../Config';
-import { Transactions } from '../Interface';
+import { Transactions, DerivativeAccount } from '../Interface';
 import Bitcoin from './Bitcoin';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -37,6 +37,7 @@ export default class SecureHDWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
+  public derivativeAccount = config.DERIVATIVE_ACC;
 
   private primaryMnemonic: string;
   private walletID: string;
@@ -52,6 +53,11 @@ export default class SecureHDWallet extends Bitcoin {
     salt: string;
     iv: Buffer;
     keyLength: number;
+  } = {
+    algorithm: 'aes-192-cbc',
+    salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
+    keyLength: 24,
+    iv: Buffer.alloc(16, 0),
   };
 
   constructor(
@@ -77,6 +83,7 @@ export default class SecureHDWallet extends Bitcoin {
         qrData: string;
         secret: string;
       };
+      derivativeAccount: any;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -84,33 +91,56 @@ export default class SecureHDWallet extends Bitcoin {
     this.primaryMnemonic = primaryMnemonic;
     const { walletId } = this.getWalletId();
     this.walletID = walletId;
-    this.secondaryMnemonic = stateVars
-      ? stateVars.secondaryMnemonic
-      : bip39.generateMnemonic(256);
-    this.consumedAddresses = stateVars ? stateVars.consumedAddresses : [];
-    this.nextFreeChildIndex = stateVars ? stateVars.nextFreeChildIndex : 0;
-    this.multiSigCache = stateVars ? stateVars.multiSigCache : {};
-    this.signingEssentialsCache = stateVars
-      ? stateVars.signingEssentialsCache
-      : {};
-    this.gapLimit = stateVars ? stateVars.gapLimit : config.GAP_LIMIT;
-
-    this.primaryXpriv = stateVars ? stateVars.primaryXpriv : undefined;
-    this.secondaryXpriv = stateVars ? stateVars.secondaryXpriv : undefined;
-    this.xpubs = stateVars ? stateVars.xpubs : undefined;
-    this.cipherSpec = {
-      algorithm: 'aes-192-cbc',
-      salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
-      keyLength: 24,
-      iv: Buffer.alloc(16, 0),
-    };
-    this.balances = stateVars ? stateVars.balances : this.balances;
-    this.receivingAddress = stateVars
-      ? stateVars.receivingAddress
-      : this.receivingAddress;
-    this.transactions = stateVars ? stateVars.transactions : this.transactions;
-    this.twoFASetup = stateVars ? stateVars.twoFASetup : undefined;
+    this.initializeStateVars(stateVars);
   }
+
+  public initializeStateVars = stateVars => {
+    this.secondaryMnemonic =
+      stateVars && stateVars.secondaryMnemonic
+        ? stateVars.secondaryMnemonic
+        : bip39.generateMnemonic(256);
+    this.consumedAddresses =
+      stateVars && stateVars.consumedAddresses
+        ? stateVars.consumedAddresses
+        : [];
+    this.nextFreeChildIndex =
+      stateVars && stateVars.nextFreeChildIndex
+        ? stateVars.nextFreeChildIndex
+        : 0;
+    this.multiSigCache =
+      stateVars && stateVars.multiSigCache ? stateVars.multiSigCache : {};
+    this.signingEssentialsCache =
+      stateVars && stateVars.signingEssentialsCache
+        ? stateVars.signingEssentialsCache
+        : {};
+    this.gapLimit =
+      stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
+
+    this.primaryXpriv =
+      stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined;
+    this.secondaryXpriv =
+      stateVars && stateVars.secondaryXpriv
+        ? stateVars.secondaryXpriv
+        : undefined;
+    this.xpubs = stateVars && stateVars.xpubs ? stateVars.xpubs : undefined;
+    this.balances =
+      stateVars && stateVars.balances ? stateVars.balances : this.balances;
+    this.receivingAddress =
+      stateVars && stateVars.receivingAddress
+        ? stateVars.receivingAddress
+        : this.receivingAddress;
+    this.transactions =
+      stateVars && stateVars.transactions
+        ? stateVars.transactions
+        : this.transactions;
+    this.twoFASetup =
+      stateVars && stateVars.twoFASetup ? stateVars.twoFASetup : undefined;
+    this.derivativeAccount =
+      stateVars && stateVars.derivativeAccount
+        ? stateVars.derivativeAccount
+        : this.derivativeAccount;
+    console.log({ derivativeAcc: this.derivativeAccount });
+  };
 
   public importBHXpub = async (
     token: number,

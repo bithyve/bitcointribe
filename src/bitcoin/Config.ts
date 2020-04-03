@@ -233,6 +233,7 @@ class Config {
   constructor(env: string) {
     this.ENVIRONMENT = env;
     console.log({ BIT_SERVER_MODE });
+    console.log({ env });
     if (BIT_SERVER_MODE === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;
       this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
