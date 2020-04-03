@@ -913,18 +913,21 @@ export default class HDSegwitWallet extends Bitcoin {
 
   private getExternalAddressByIndex = (
     index: number,
-    xpub?: string,
+    derivativeXpub?: string,
   ): string => {
-    if (!xpub && this.externalAddressesCache[index]) {
+    if (!derivativeXpub && this.externalAddressesCache[index]) {
       return this.externalAddressesCache[index];
     } // cache hit
 
-    const node = bip32.fromBase58(xpub ? xpub : this.getXpub(), this.network);
+    const node = bip32.fromBase58(
+      derivativeXpub ? derivativeXpub : this.getXpub(),
+      this.network,
+    );
     const keyPair = node.derive(0).derive(index);
 
     const address = this.getAddress(keyPair, this.purpose);
 
-    if (!xpub) {
+    if (!derivativeXpub) {
       this.externalAddressesCache[index] = address;
     }
     return address;

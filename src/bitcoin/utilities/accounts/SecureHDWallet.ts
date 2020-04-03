@@ -355,6 +355,48 @@ export default class SecureHDWallet extends Bitcoin {
     return { balances, transactions };
   };
 
+  public getReceivingAddress = async (): Promise<{ address: string }> => {
+    try {
+      // looking for free external address
+      let freeAddress = '';
+      let itr;
+      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+        if (this.nextFreeChildIndex + itr < 0) {
+          continue;
+        }
+        const { address } = this.createSecureMultiSig(
+          this.nextFreeChildIndex + itr,
+        );
+
+        const txCounts = await this.getTxCounts([address]);
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          this.nextFreeChildIndex += itr;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        // giving up as we could find a free address in the above cycle
+
+        console.log(
+          'Failed to find a free address in the above cycle, using the next address without checking',
+        );
+        const multiSig = this.createSecureMultiSig(
+          this.nextFreeChildIndex + itr,
+        );
+        freeAddress = multiSig.address; // not checking this one, it might be free
+        this.nextFreeChildIndex += itr + 1;
+      }
+
+      this.receivingAddress = freeAddress;
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Unable to generate receiving address: ${err.message}`);
+    }
+  };
+
   public getDerivativeAccReceivingAddress = async (
     accountType: string,
     accountNumber: number = 0,
@@ -362,6 +404,10 @@ export default class SecureHDWallet extends Bitcoin {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccount[accountType])
       throw new Error(`${accountType} does not exists`);
+
+    if (this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
 
     try {
       // looking for free external address
@@ -420,48 +466,9 @@ export default class SecureHDWallet extends Bitcoin {
         ].nextFreeAddressIndex += itr + 1;
       }
 
-      return { address: freeAddress };
-    } catch (err) {
-      throw new Error(`Unable to generate receiving address: ${err.message}`);
-    }
-  };
-
-  public getReceivingAddress = async (): Promise<{ address: string }> => {
-    try {
-      // looking for free external address
-      let freeAddress = '';
-      let itr;
-      for (itr = 0; itr < this.gapLimit + 1; itr++) {
-        if (this.nextFreeChildIndex + itr < 0) {
-          continue;
-        }
-        const { address } = this.createSecureMultiSig(
-          this.nextFreeChildIndex + itr,
-        );
-
-        const txCounts = await this.getTxCounts([address]);
-        if (txCounts[address] === 0) {
-          // free address found
-          freeAddress = address;
-          this.nextFreeChildIndex += itr;
-          break;
-        }
-      }
-
-      if (!freeAddress) {
-        // giving up as we could find a free address in the above cycle
-
-        console.log(
-          'Failed to find a free address in the above cycle, using the next address without checking',
-        );
-        const multiSig = this.createSecureMultiSig(
-          this.nextFreeChildIndex + itr,
-        );
-        freeAddress = multiSig.address; // not checking this one, it might be free
-        this.nextFreeChildIndex += itr + 1;
-      }
-
-      this.receivingAddress = freeAddress;
+      this.derivativeAccount[accountType][
+        accountNumber
+      ].receivingAddress = freeAddress;
       return { address: freeAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
