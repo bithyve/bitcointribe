@@ -405,7 +405,7 @@ export default class SecureHDWallet extends Bitcoin {
     if (!this.derivativeAccount[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (this.derivativeAccount[accountType][accountNumber]) {
+    if (!this.derivativeAccount[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
@@ -473,6 +473,60 @@ export default class SecureHDWallet extends Bitcoin {
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
+  };
+
+  public fetchDerivativeAccBalanceTxs = async (
+    accountType: string,
+    accountNumber: number = 0,
+  ): Promise<{
+    balances: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions: Transactions;
+  }> => {
+    if (!this.derivativeAccount[accountType])
+      throw new Error(`${accountType} does not exists`);
+
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
+    await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
+
+    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      accountNumber
+    ];
+
+    const consumedAddresses = [];
+    for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
+      consumedAddresses.push(
+        this.createSecureMultiSig(
+          itr,
+          this.derivativeAccount[accountType][accountNumber].xpub,
+        ),
+      );
+    }
+
+    this.derivativeAccount[accountType][accountNumber][
+      'consumedAddresses'
+    ] = consumedAddresses;
+    console.log({ derivativeAccConsumedAddresses: consumedAddresses });
+
+    const {
+      balances,
+      transactions,
+    } = await this.fetchBalanceTransactionsByAddresses(
+      consumedAddresses,
+      accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
+    );
+
+    this.derivativeAccount[accountType][accountNumber].balances = balances;
+    this.derivativeAccount[accountType][
+      accountNumber
+    ].transactions = transactions;
+
+    return { balances, transactions };
   };
 
   public setupSecureAccount = async (): Promise<{

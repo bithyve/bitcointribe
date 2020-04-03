@@ -175,15 +175,16 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!this.derivativeAccount[accountType])
       throw new Error(`${accountType} does not exists`);
 
+    if (!this.derivativeAccount[accountType][accountNumber]) {
+      this.generateDerivativeXpub(accountType, accountNumber);
+    }
+
     await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
     const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
       accountNumber
     ];
 
-    console.log({
-      xpub: this.derivativeAccount[accountType][accountNumber].xpub,
-    });
     const usedAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
       usedAddresses.push(
