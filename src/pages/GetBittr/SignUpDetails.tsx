@@ -666,7 +666,48 @@ export default function SignUpDetails(props) {
               }}
               placeholderTextColor={Colors.borderColor}
             />
-            
+            {dropdownBoxOpenClose && (
+              <View style={styles.dropdownBoxModal}>
+                <ScrollView>
+                  {dropdownBoxList.map((value, index) => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setDropdownBoxValue(value);
+                        setDropdownBoxOpenClose(false);
+                      }}
+                      style={{
+                        ...styles.dropdownBoxModalElementView,
+                        borderTopLeftRadius: index == 0 ? 10 : 0,
+                        borderTopRightRadius: index == 0 ? 10 : 0,
+                        borderBottomLeftRadius:
+                          index == dropdownBoxList.length - 1 ? 10 : 0,
+                        borderBottomRightRadius:
+                          index == dropdownBoxList.length - 1 ? 10 : 0,
+                        paddingTop: index == 0 ? 5 : 0,
+                        backgroundColor:
+                          dropdownBoxValue.name == value.name
+                            ? Colors.lightBlue
+                            : Colors.white,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color:
+                            dropdownBoxValue.name == value.name
+                              ? Colors.blue
+                              : Colors.black,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(12),
+                        }}
+                      >
+                        {value.name + ' ' + value.code}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+           
           </View>
          </View>
       </View>
