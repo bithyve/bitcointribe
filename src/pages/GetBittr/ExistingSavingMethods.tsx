@@ -28,9 +28,13 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Feather from "react-native-vector-icons/Feather";
 import { useDispatch, useSelector } from 'react-redux';
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes';
+import { fetchDerivativeAccBalTx } from '../../store/actions/accounts';
 
 export default function ExistingSavingMethods(props) {
     const [getBittrAccounts, setGetBittrAcounts] = useState([]);
+    const serviceRegularAccount = useSelector(state => state.accounts[REGULAR_ACCOUNT].service);
+    const serviceSavingAccount = useSelector(state => state.accounts[SECURE_ACCOUNT].service);
+    const dispatch = useDispatch();
 
     useEffect(()=>{
         (async()=>{
@@ -39,11 +43,27 @@ export default function ExistingSavingMethods(props) {
             if(accounts){
                 for (let i = 0; i < accounts.length; i++) {
                     const element = accounts[i];
+                    const derivativeAccountType = 'GET_BITTR';
+                    let { derivativeAccount } = accounts[i].accountType == REGULAR_ACCOUNT
+                    ? serviceRegularAccount.hdWallet
+                    : serviceSavingAccount.secureHDWallet;
                     for (let j = 0; j < element.getBitrrAccounts.length; j++) {
+                        console.log("ACOUNT NUMBER ", j);
+                        console.log({
+                                  balances:
+                                    derivativeAccount[derivativeAccountType][j].balances,
+                                  transactions:
+                                    derivativeAccount[derivativeAccountType][j].transactions,
+                                });
+                                if (derivativeAccount[derivativeAccountType][j].xpub)
+                                  dispatch(fetchDerivativeAccBalTx(accounts[i].accountType, derivativeAccountType));
+                              
                         const subElement = element.getBitrrAccounts[j];
                         let obj={
                             ...subElement, 
-                            accountType: accounts[i].accountType
+                            accountType: accounts[i].accountType, 
+                            balances: derivativeAccount[derivativeAccountType][j].balances,
+                            transactions: derivativeAccount[derivativeAccountType][j].transactions,
                         }
                         getBittrAccounts.push(obj);
                     }
@@ -52,7 +72,7 @@ export default function ExistingSavingMethods(props) {
             }
             console.log("accounts", getBittrAccounts)
         })();
-    },[])
+    },[]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>

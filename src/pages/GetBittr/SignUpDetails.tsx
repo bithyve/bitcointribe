@@ -48,7 +48,7 @@ import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { fetchDerivativeAccXpub } from '../../store/actions/accounts';
+import { fetchDerivativeAccXpub, fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import Toast from '../../components/Toast';
 import CountryCode from '../../common/CountryCode';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -72,7 +72,7 @@ export default function SignUpDetails(props) {
   const [InstructionsBottomSheet, setInstructionsBottomSheet] = useState(
     React.createRef(),
   );
-  const bitcoinAddress = props.navigation.state.params
+  const [bitcoinAddress, setBitcoinAddress] = props.navigation.state.params
     ? props.navigation.state.params.address
     : '';
   const selectedAccount = props.navigation.state.params
@@ -109,7 +109,7 @@ export default function SignUpDetails(props) {
   const service = useSelector(state => state.accounts[serviceType].service);
   const derivativeAccountType = 'GET_BITTR';
   const { derivativeAccount } =
-    serviceType === REGULAR_ACCOUNT ? service.hdWallet : '';
+    serviceType === REGULAR_ACCOUNT ? service.hdWallet : service.secureHDWallet;
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     name:"India",
@@ -156,6 +156,19 @@ export default function SignUpDetails(props) {
           Toast('Getbittr Account creation limit exeeded');
         }
       }
+      if (serviceType === SECURE_ACCOUNT) {
+            if (!derivativeAccount[derivativeAccountType][accountNumber])
+              dispatch(fetchDerivativeAccAddress(derivativeAccountType));
+            else {
+              console.log({
+                getBittrAddress:
+                  derivativeAccount[derivativeAccountType][accountNumber]
+                    .receivingAddress,
+              });
+              setBitcoinAddress(derivativeAccount[derivativeAccountType][accountNumber]
+                .receivingAddress);
+            }
+          }
     }
   }, [service, accountNumber]);
 

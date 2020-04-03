@@ -32,17 +32,17 @@ import { FlatList } from 'react-native-gesture-handler';
   
 export default function ExistingSavingMethodDetails(props) {
 	const getBittrAccount = props.navigation.state.params.getBittrAccount ? props.navigation.state.params.getBittrAccount : {};
-
+	let balances = getBittrAccount.balances.balance ? getBittrAccount.balances.balance : 0 +  getBittrAccount.balances.unconfirmedBalance ? getBittrAccount.balances.unconfirmedBalance : 0;
 	const [transactions, setTransactions] = useState([
-		{
-			amount:'0.7'
-		},
-		{
-			amount:'0.3'
-		},
-		{
-			amount:'0.8'
-		},
+		// {
+		// 	amount:'0.7'
+		// },
+		// {
+		// 	amount:'0.3'
+		// },
+		// {
+		// 	amount:'0.8'
+		// },
 
 	])
 
@@ -100,7 +100,7 @@ export default function ExistingSavingMethodDetails(props) {
 									source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
 									style={{ width: 12, height: 12, resizeMode: 'contain' }}
 								/>
-								<Text style={styles.transactionModalAmountText}>0.059</Text>
+								<Text style={styles.transactionModalAmountText}>{balances}</Text>
 								<Text style={styles.transactionModalAmountUnitText}>sats</Text>
 							</View>
 						</View>
@@ -148,7 +148,7 @@ export default function ExistingSavingMethodDetails(props) {
 					<Text style={{color:Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize: RFValue(13), marginTop:5}}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
 				</View>
 				<FlatList 
-					data={transactions}
+					data={getBittrAccount.transactions.transactionDetails}
 					ItemSeparatorComponent={ () => <View style={ { backgroundColor: Colors.borderColor, height:1,marginLeft:25, marginRight:25, } }/> }
 					renderItem={({item, index})=>{
 						return <View style={{marginLeft:20, marginRight:20, marginTop:index==0 ? 15 : 5, marginBottom:5, alignItems:'center', borderRadius: 10, padding:wp('4%'), paddingLeft:wp('6%'), flexDirection:'row',}} >
