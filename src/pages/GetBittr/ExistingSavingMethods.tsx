@@ -48,6 +48,7 @@ export default function ExistingSavingMethods(props) {
                     ? serviceRegularAccount.hdWallet
                     : serviceSavingAccount.secureHDWallet;
                     for (let j = 0; j < element.getBitrrAccounts.length; j++) {
+                      if(derivativeAccount[derivativeAccountType][j].balances && derivativeAccount[derivativeAccountType][j].transactions){
                         console.log("ACOUNT NUMBER ", j);
                         console.log({
                                   balances:
@@ -57,15 +58,15 @@ export default function ExistingSavingMethods(props) {
                                 });
                                 if (derivativeAccount[derivativeAccountType][j].xpub)
                                   dispatch(fetchDerivativeAccBalTx(accounts[i].accountType, derivativeAccountType));
-                              
-                        const subElement = element.getBitrrAccounts[j];
-                        let obj={
-                            ...subElement, 
-                            accountType: accounts[i].accountType, 
-                            balances: derivativeAccount[derivativeAccountType][j].balances,
-                            transactions: derivativeAccount[derivativeAccountType][j].transactions,
-                        }
-                        getBittrAccounts.push(obj);
+                      }
+                      const subElement = element.getBitrrAccounts[j];
+                      let obj={
+                        ...subElement, 
+                        accountType: accounts[i].accountType, 
+                        balances: derivativeAccount[derivativeAccountType][j].balances ? derivativeAccount[derivativeAccountType][j].balances : 0,
+                        transactions: derivativeAccount[derivativeAccountType][j].transactions ? derivativeAccount[derivativeAccountType][j].transactions : {},
+                      }
+                      getBittrAccounts.push(obj);
                     }
                 }
                 setGetBittrAcounts(getBittrAccounts ? getBittrAccounts : []);
@@ -119,7 +120,7 @@ export default function ExistingSavingMethods(props) {
                                 source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                                 style={{ width: 12, height: 12, resizeMode: 'contain' }}
                             />
-                            <Text style={styles.transactionModalAmountText}>0.059</Text>
+                            <Text style={styles.transactionModalAmountText}>{value.balances.balance ? value.balances.balance : 0}</Text>
                             <Text style={styles.transactionModalAmountUnitText}>sats</Text>
                         </View>
                     </View>
