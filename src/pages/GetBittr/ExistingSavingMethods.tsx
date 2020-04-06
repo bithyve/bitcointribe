@@ -101,7 +101,7 @@ export default function ExistingSavingMethods(props) {
                 </View>
             </View>
         </View>
-        <View style={{flex:1}}>
+        <ScrollView style={{flex:1}}>
             {getBittrAccounts.map((value)=>{
                 return <TouchableOpacity onPress={()=>{props.navigation.navigate("ExistingSavingMethodDetails", {getBittrAccount: value})}} style={{marginLeft:20, marginRight:20, marginTop:5, marginBottom:5, flexDirection:'row', alignItems:'center', borderColor: Colors.borderColor, borderWidth: 1, borderRadius: 10}} >
                 <View style={{ width:wp('10%'), height:wp('10%'), borderRadius:wp("10%")/2, backgroundColor:Colors.backgroundColor, justifyContent:'center', alignItems:'center', marginLeft:wp('3%'), }}>
@@ -142,7 +142,7 @@ export default function ExistingSavingMethods(props) {
                 </View>
             </TouchableOpacity>
             })}
-        </View>
+        </ScrollView>
     </View>
   );
 }

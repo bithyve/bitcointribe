@@ -110,12 +110,12 @@ export default function SignUpDetails(props) {
   const derivativeAccountType = 'GET_BITTR';
   const { derivativeAccount } =
     serviceType === REGULAR_ACCOUNT ? service.hdWallet : service.secureHDWallet;
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
-    name:"India",
-    dial_code:"+91",
-    code:"IN"
-  });
+  // const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
+  // const [dropdownBoxValue, setDropdownBoxValue] = useState({
+  //   name:"India",
+  //   dial_code:"+91",
+  //   code:"IN"
+  // });
   const [dropdownBoxList, setDropdownBoxList] = useState(CountryCode);
 
   useEffect(() => {
@@ -210,12 +210,15 @@ export default function SignUpDetails(props) {
           emailVerifiedDetails &&
           emailVerifiedDetails.success
         ) {
-          let mobileNumber = await AsyncStorage.getItem('MobileNo');
-          let contactData = {
-            phone: mobileNumber,
-            country_code: dropdownBoxValue.dial_code,
-          };
-          dispatch(sendSmsRequest(contactData));
+          setTimeout(() => {
+            VerificationSuccessBottomSheet.current.snapTo(1);
+          }, 2);
+          // let mobileNumber = await AsyncStorage.getItem('MobileNo');
+          // let contactData = {
+          //   phone: mobileNumber,
+          //   country_code: dropdownBoxValue.dial_code,
+          // };
+          // dispatch(sendSmsRequest(contactData));
           dispatch(verifiedEmail());
         }
       }
@@ -228,7 +231,7 @@ export default function SignUpDetails(props) {
     } else {
       if (dataGetBittr.smsSent && smsSentDetails && smsSentDetails.success) {
         setTimeout(() => {
-          (OTPBottomSheet as any).current.snapTo(1);
+          // (OTPBottomSheet as any).current.snapTo(1);
         }, 2);
         // (SmsErrorBottomSheet as any).current.snapTo(0);
         dispatch(sentSmsRequest());
@@ -266,7 +269,7 @@ export default function SignUpDetails(props) {
         title={errorMessageHeader}
         info={errorMessage}
         note={emailAddress}
-        noteNextLine={mobileNumber}
+        // noteNextLine={mobileNumber}
         otherText={OtherText}
         proceedButtonText={errorProceedButton}
         headerTextColor={Colors.black1}
@@ -289,7 +292,7 @@ export default function SignUpDetails(props) {
     );
   }, [
     emailAddress,
-    mobileNumber,
+    // mobileNumber,
     errorMessage,
     errorMessageHeader,
     errorProceedButton,
@@ -299,8 +302,9 @@ export default function SignUpDetails(props) {
   ]);
 
   useEffect(() => {
-    if (emailAddress && mobileNumber) setButtonDisable(false);
-  }, [emailAddress, mobileNumber]);
+    // if (emailAddress && mobileNumber) setButtonDisable(false);
+    if (emailAddress) setButtonDisable(false);
+  }, [emailAddress]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -372,10 +376,10 @@ export default function SignUpDetails(props) {
     }, 2);
     let emailAddress = await AsyncStorage.getItem('emailAddress');
     let emailToken = await AsyncStorage.getItem('emailToken');
-    let mobileNumber = await AsyncStorage.getItem('MobileNo');
+    // let mobileNumber = await AsyncStorage.getItem('MobileNo');
     let data = {
       phone: mobileNumber,
-      country_code: '1',
+      country_code: '',
       verification_code: otp,
       email: emailAddress,
       bitcoin_address: bitcoinAddress,
@@ -399,12 +403,12 @@ export default function SignUpDetails(props) {
         );
         let emailAddress = await AsyncStorage.getItem('emailAddress');
         let emailToken = await AsyncStorage.getItem('emailToken');
-        let mobileNumber = await AsyncStorage.getItem('MobileNo');
+        // let mobileNumber = await AsyncStorage.getItem('MobileNo');
         let tempObj = {
           ...userDetails,
           ...{
             phone: mobileNumber,
-            country_code: dropdownBoxValue.dial_code,
+            country_code: '', // dropdownBoxValue.dial_code,
             verification_code: otp,
             email: emailAddress,
             bitcoin_address: bitcoinAddress,
@@ -502,41 +506,41 @@ export default function SignUpDetails(props) {
     );
   }, []);
 
-  const renderConfirmOTPModalContent = useCallback(() => {
-    return (
-      <OtpModalContents
-        isIncorrectOtp={isIncorrectOtp}
-        onOtpDone={otpValue => {
-          setTimeout(() => {
-            setOtp(otpValue);
-          }, 2);
-        }}
-        modalRef={OTPBottomSheet}
-        onPressConfirm={() => {
-          OTPBottomSheet.current.snapTo(0);
-          VerificationSuccessBottomSheet.current.snapTo(1);
-        }}
-        onPressResendOTP={async () => {
-          let mobileNumber = await AsyncStorage.getItem('MobileNo');
-          let contactData = {
-            phone: mobileNumber,
-            country_code: dropdownBoxValue.dial_code,
-          };
-          dispatch(sendSmsRequest(contactData));
-        }}
-      />
-    );
-  }, [isIncorrectOtp]);
+  // const renderConfirmOTPModalContent = useCallback(() => {
+  //   return (
+  //     <OtpModalContents
+  //       isIncorrectOtp={isIncorrectOtp}
+  //       onOtpDone={otpValue => {
+  //         setTimeout(() => {
+  //           setOtp(otpValue);
+  //         }, 2);
+  //       }}
+  //       modalRef={OTPBottomSheet}
+  //       onPressConfirm={() => {
+  //         OTPBottomSheet.current.snapTo(0);
+  //         VerificationSuccessBottomSheet.current.snapTo(1);
+  //       }}
+  //       onPressResendOTP={async () => {
+  //         // let mobileNumber = await AsyncStorage.getItem('MobileNo');
+  //         // let contactData = {
+  //         //   phone: mobileNumber,
+  //         //   country_code: dropdownBoxValue.dial_code,
+  //         // };
+  //         // dispatch(sendSmsRequest(contactData));
+  //       }}
+  //     />
+  //   );
+  // }, [isIncorrectOtp]);
 
-  const renderConfirmOTPModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (OTPBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  // const renderConfirmOTPModalHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (OTPBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -610,7 +614,7 @@ export default function SignUpDetails(props) {
               <Text style={styles.errorText}>Enter valid email address</Text>
             </View>
           ) : null}
-          <View style={{ flexDirection: 'row', borderRadius: 10, borderWidth: 1, borderColor: Colors.borderColor, height: 50, marginTop: hp('1%'), marginBottom: hp('1%'), alignItems:'center', overflow:'hidden' }}>
+          {/* <View style={{ flexDirection: 'row', borderRadius: 10, borderWidth: 1, borderColor: Colors.borderColor, height: 50, marginTop: hp('1%'), marginBottom: hp('1%'), alignItems:'center', overflow:'hidden' }}>
             <TouchableOpacity onPress={()=>{setDropdownBoxOpenClose(true)}} style={{ flexDirection:'row', alignItems:'center', justifyContent:'center', backgroundColor:Colors.borderColor, height: 50, width:wp('23%')}}>
               <Text style={{color: Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize: RFValue(13), fontWeight:'bold'}}>{dropdownBoxValue.code} </Text>
               <Text style={{color: Colors.textColorGrey, fontFamily:Fonts.FiraSansRegular, fontSize: RFValue(13), fontWeight:'bold'}}>{dropdownBoxValue.dial_code} </Text>
@@ -640,8 +644,8 @@ export default function SignUpDetails(props) {
                 }}
                 placeholderTextColor={Colors.borderColor}
             /> 
-          </View>
-          <View style={{flex:1, position:'relative'}}>
+          </View> */}
+          {/* <View style={{flex:1, position:'relative'}}>
           {dropdownBoxOpenClose && (
               <View style={styles.dropdownBoxModal}>
                 <ScrollView>
@@ -683,7 +687,7 @@ export default function SignUpDetails(props) {
                 </ScrollView>
               </View>
             )}
-            </View>
+            </View> */}
          </View>
       </View>
       
@@ -712,7 +716,7 @@ export default function SignUpDetails(props) {
                   setButtonDisable(true);
                 }, 2);
                 await AsyncStorage.setItem('emailAddress', emailAddress);
-                await AsyncStorage.setItem('MobileNo', mobileNumber);
+                // await AsyncStorage.setItem('MobileNo', mobileNumber);
                 let formData = {
                   email: emailAddress,
                   language: 'en',
@@ -811,7 +815,7 @@ export default function SignUpDetails(props) {
         renderContent={renderInstructionsModalContent}
         renderHeader={renderInstructionsModalHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={OTPBottomSheet}
         snapPoints={[
@@ -821,7 +825,7 @@ export default function SignUpDetails(props) {
         ]}
         renderContent={renderConfirmOTPModalContent}
         renderHeader={renderConfirmOTPModalHeader}
-      />
+      /> */}
     </View>
   );
 }
