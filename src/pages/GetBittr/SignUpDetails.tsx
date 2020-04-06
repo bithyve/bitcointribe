@@ -251,7 +251,7 @@ export default function SignUpDetails(props) {
         setErrorMessageHeader(`Verification link sent`);
         setErrorMessage('Please verify your details to proceed');
         setOtherText(
-          'if you donot receive and email or entered a wrong address/number you can choose to start over',
+          'if you donot receive and email or entered a wrong address you can choose to start over',
         );
         setErrorProceedButton('Continue');
         setIsIgnoreButton(true);
@@ -356,7 +356,7 @@ export default function SignUpDetails(props) {
     return (
       <VerificationSuccessModalContents
         modalRef={VerificationSuccessBottomSheet}
-        title={`Email Address and\nphone number verified`}
+        title={`Email Address verified`}
         info={
           'Please proceed to find instructions and\nall necessary details to save bitcoins\n\n'
         }
