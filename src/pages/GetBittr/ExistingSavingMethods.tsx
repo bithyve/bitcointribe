@@ -40,6 +40,7 @@ export default function ExistingSavingMethods(props) {
         (async()=>{
             let getBittrAccounts = [];
             let accounts = JSON.parse(await AsyncStorage.getItem("getBittrAccounts"));
+            console.log("accounts",accounts);
             if(accounts){
                 for (let i = 0; i < accounts.length; i++) {
                     const element = accounts[i];
@@ -48,17 +49,16 @@ export default function ExistingSavingMethods(props) {
                     ? serviceRegularAccount.hdWallet
                     : serviceSavingAccount.secureHDWallet;
                     for (let j = 0; j < element.getBitrrAccounts.length; j++) {
-                      if(derivativeAccount[derivativeAccountType][j].balances && derivativeAccount[derivativeAccountType][j].transactions){
-                        console.log("ACOUNT NUMBER ", j);
+                      console.log("derivativeAccount[derivativeAccountType][j]",derivativeAccount[derivativeAccountType][j]);
+                     if (derivativeAccount[derivativeAccountType][j].xpub)
+                            dispatch(fetchDerivativeAccBalTx(accounts[i].accountType, derivativeAccountType, j));
+                            console.log("ACOUNT NUMBER ", j);
                         console.log({
                                   balances:
                                     derivativeAccount[derivativeAccountType][j].balances,
                                   transactions:
                                     derivativeAccount[derivativeAccountType][j].transactions,
                                 });
-                                if (derivativeAccount[derivativeAccountType][j].xpub)
-                                  dispatch(fetchDerivativeAccBalTx(accounts[i].accountType, derivativeAccountType));
-                      }
                       const subElement = element.getBitrrAccounts[j];
                       let obj={
                         ...subElement, 
