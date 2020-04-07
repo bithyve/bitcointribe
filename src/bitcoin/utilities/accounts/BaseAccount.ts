@@ -207,6 +207,36 @@ export default class BaseAccount {
     }
   };
 
+  public getBittrDetails = async (): Promise<
+    | {
+        status: number;
+        data: {
+          details: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.getBittrDetails(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch Get Bittr details',
+      };
+    }
+  };
+
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,

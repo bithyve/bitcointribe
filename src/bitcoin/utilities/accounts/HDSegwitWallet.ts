@@ -76,7 +76,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.initializeStateVars(stateVars);
   }
 
-  public initializeStateVars = stateVars => {
+  public initializeStateVars = (stateVars) => {
     this.usedAddresses =
       stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : [];
     this.nextFreeAddressIndex =
@@ -124,10 +124,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public getWalletId = (): { walletId: string } => {
     const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
     return {
-      walletId: crypto
-        .createHash('sha256')
-        .update(seed)
-        .digest('hex'),
+      walletId: crypto.createHash('sha256').update(seed).digest('hex'),
     };
   };
 
@@ -137,10 +134,7 @@ export default class HDSegwitWallet extends Bitcoin {
     const keyPair = node.derive(0).derive(0);
     const address = this.getAddress(keyPair, this.purpose); // getting the first receiving address
     return {
-      accountId: crypto
-        .createHash('sha256')
-        .update(address)
-        .digest('hex'),
+      accountId: crypto.createHash('sha256').update(address).digest('hex'),
     };
   };
 
@@ -657,7 +651,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const outputUTXOs = [{ address: recipientAddress, value: amount }];
       console.log('Output UTXOs:', outputUTXOs);
       let balance: number = 0;
-      inputUTXOs.forEach(utxo => {
+      inputUTXOs.forEach((utxo) => {
         balance += utxo.value;
       });
 
@@ -708,15 +702,17 @@ export default class HDSegwitWallet extends Bitcoin {
         this.network,
       );
 
-      inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
+      inputs.forEach((input) =>
+        txb.addInput(input.txId, input.vout, nSequence),
+      );
 
-      outputs.forEach(output => {
+      outputs.forEach((output) => {
         if (!output.address) {
           output.value = output.value + fee - averageTxFee; // applying static fee (averageTxFee)
         }
       });
       const sortedOuts = await this.sortOutputs(outputs);
-      sortedOuts.forEach(output => {
+      sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
         txb.addOutput(output.address, output.value);
       });
@@ -741,7 +737,7 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
-      inputs.forEach(input => {
+      inputs.forEach((input) => {
         console.log('Signing Input:', input);
 
         const keyPair = this.getKeyPair(this.getWifForAddress(input.address));
@@ -814,6 +810,24 @@ export default class HDSegwitWallet extends Bitcoin {
       return UTXOs;
     } catch (err) {
       throw new Error(`Fetch UTXOs failed: ${err.message}`);
+    }
+  };
+
+  public getBittrDetails = async () => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('getBittrDetails', {
+          HEXA_ID,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { details } = res.data;
+      return { details };
+    } catch (err) {
+      throw new Error('Failed to fetch GetBittr Details');
     }
   };
 
