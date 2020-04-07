@@ -2,6 +2,7 @@ import {
   CREATE_USER_REQUEST,
   CREATE_USER_SUCCESS,
   CREATE_USER_FAIL,
+  CLEAR_USER_REQUEST,
   SEND_EMAIL_REQUEST,
   SEND_EMAIL_SUCCESS,
   SEND_EMAIL_FAIL,
@@ -13,7 +14,10 @@ import {
   VERIFY_EMAIL_FAIL,
   VERIFY_XPUB_REQUEST,
   VERIFY_XPUB_SUCCESS,
-  VERIFY_XPUB_FAIL
+  VERIFY_XPUB_FAIL,
+  SENT_EMAIL_REQUEST,
+  SENT_SMS_REQUEST,
+  VERIFIED_EMAIL
 } from '../actions/bittr'
 
 const INITIAL_STATE = {
@@ -27,22 +31,23 @@ const INITIAL_STATE = {
   emailVerifiedDetails: null,
   xpubVerified: null,
   xpubDetails: null,
-  xpubVerifyRequest: null
+  xpubVerifyRequest: null,
+  loading: false,
 }
 
-const reducer = (state = {}, action) => {
+const reducer = (state = INITIAL_STATE, action) => {
   const { payload } = action
   switch (action.type) {
     case CREATE_USER_SUCCESS:
       return {
         ...state,
-        userDetails: payload.userDetails,
+        userDetails: payload.data,
         createUserRequest: false
       }
     case CREATE_USER_FAIL:
       return {
         ...state,
-        userDetails: '',
+        userDetails: false,
         createUserRequest: false
       }
 
@@ -51,20 +56,27 @@ const reducer = (state = {}, action) => {
         ...state,
         createUserRequest: true
       }
+    case CLEAR_USER_REQUEST:
+      return {
+        ...state,
+        userDetails: false,
+        createUserRequest: false
+      }
+
     case SEND_EMAIL_SUCCESS:
       return {
         ...state,
+        loading : true,
         emailSent: payload.emailSent,
         emailSentDetails: payload.emailSentDetails,
         sendEmailRequest: false
       }
     case SEND_EMAIL_FAIL:
-      return { ...state, emailSent: false, sendEmailRequest: false }
-    case SEND_EMAIL_REQUEST:
-      return {
-        ...state,
-        sendEmailRequest: true
-      }
+      return { ...state, loading : false, emailSent: false, sendEmailRequest: false }
+    
+    case SENT_EMAIL_REQUEST:
+      return { ...state, loading : false, emailSent: false, emailSentDetails: null, sendEmailRequest: false }
+    
     case SEND_SMS_SUCCESS:
       return {
         ...state,
@@ -74,6 +86,8 @@ const reducer = (state = {}, action) => {
       }
     case SEND_SMS_FAIL:
       return { ...state, smsSent: payload.smsSent, sendSmsRequest: false }
+      case SENT_SMS_REQUEST:
+      return { ...state, smsSent: false, sendSmsRequest: false }
     case SEND_SMS_REQUEST:
       return {
         ...state,
@@ -92,6 +106,13 @@ const reducer = (state = {}, action) => {
         emailVerified: payload.emailVerified,
         emailVerifyRequest: false
       }
+      case VERIFIED_EMAIL:
+        return {
+          ...state,
+          emailVerifiedDetails: null,
+          emailVerified: false,
+          emailVerifyRequest: false
+        } 
     case VERIFY_EMAIL_REQUEST:
       return {
         ...state,

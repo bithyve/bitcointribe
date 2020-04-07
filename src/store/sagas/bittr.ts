@@ -11,7 +11,12 @@ import {
   verifyEmailSuccess,
   verifyEmailFail,
   verifyXpubSuccess,
-  verifyXpubFail
+  verifyXpubFail,
+  SEND_EMAIL_REQUEST,
+  CREATE_USER_REQUEST,
+  SEND_SMS_REQUEST,
+  VERIFY_EMAIL_REQUEST,
+  VERIFY_XPUB_REQUEST
 } from '../actions/bittr'
 import {
   createService,
@@ -20,20 +25,21 @@ import {
   verifyEmailService,
   xpubService
 } from '../../services/bittr'
+import { createWatcher } from '../utils/utilities'
 
-export function* createUserSaga({ params }) {
-  // yield take(types.CREATE_USER_REQUEST);
-  const result = yield call(createService, params)
-  if (!result || !result.data) {
-    yield put(createUserFail())
-  } else {
+export function* createUserWorker({ payload }) {
+  const result = yield call(createService, payload.data)
+  if(result && result.data && result.data){
     yield put(createUserSuccess(result.data))
   }
+  else{
+    yield put(createUserFail())
+  }
 }
+export const createUserWatcher = createWatcher(createUserWorker, CREATE_USER_REQUEST);
 
-export function* sendEmailSaga({ params }) {
-  // yield take(types.SEND_EMAIL_REQUEST);
-  const result = yield call(sendEmailService, params)
+function* sendEmailWorker({ payload }) {
+  const result = yield call(sendEmailService, payload.data)
   console.log('Email result', result)
   if (!result) {
     yield put(sendEmailFail())
@@ -41,10 +47,12 @@ export function* sendEmailSaga({ params }) {
     yield put(sendEmailSuccess(result.data))
   }
 }
+export const sendEmailWatcher = createWatcher(sendEmailWorker, SEND_EMAIL_REQUEST);
 
-export function* sendSmsSaga({ params }) {
+
+export function* sendSmsWorker({ payload }) {
   // yield take(types.SEND_SMS_REQUEST);
-  const result = yield call(smsService, params)
+  const result = yield call(smsService, payload.data)
   console.log('SMS result', result)
   if (!result) {
     yield put(sendSmsFail())
@@ -52,10 +60,11 @@ export function* sendSmsSaga({ params }) {
     yield put(sendSmsSuccess(result.data))
   }
 }
+export const sendSmsWatcher = createWatcher(sendSmsWorker, SEND_SMS_REQUEST);
 
-export function* verifyEmailSaga({ params }) {
+export function* verifyEmailWorker({ payload }) {
   // yield take(types.VERIFY_EMAIL_REQUEST);
-  const result = yield call(verifyEmailService, params)
+  const result = yield call(verifyEmailService, payload.data)
   console.log('Email token result', result)
   if (!result) {
     yield put(verifyEmailFail())
@@ -63,10 +72,11 @@ export function* verifyEmailSaga({ params }) {
     yield put(verifyEmailSuccess(result.data))
   }
 }
+export const verifyEmailWatcher = createWatcher(verifyEmailWorker, VERIFY_EMAIL_REQUEST);
 
-export function* verifyXpubSaga({ params }) {
+export function* verifyXpubWorker({ payload }) {
   // yield take(types.VERIFY_XPUB_REQUEST);
-  const result = yield call(xpubService, params)
+  const result = yield call(xpubService, payload.data)
   console.log('XPUB RESULT', result)
   if (!result) {
     yield put(verifyXpubFail())
@@ -74,13 +84,4 @@ export function* verifyXpubSaga({ params }) {
     yield put(verifyXpubSuccess(result.data))
   }
 }
-
-export default function* rootSaga() {
-  yield all([
-    takeLatest(types.CREATE_USER_REQUEST, createUserSaga),
-    takeLatest(types.SEND_EMAIL_REQUEST, sendEmailSaga),
-    takeLatest(types.VERIFY_EMAIL_REQUEST, verifyEmailSaga),
-    takeLatest(types.SEND_SMS_REQUEST, sendSmsSaga),
-    takeLatest(types.VERIFY_XPUB_REQUEST, verifyXpubSaga)
-  ])
-}
+export const verifyXpubWatcher = createWatcher(verifyXpubWorker, VERIFY_XPUB_REQUEST);

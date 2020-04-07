@@ -83,6 +83,11 @@ export default function Launch(props) {
                   props.navigation.replace('Login', { recoveryRequest });
                 }
               }
+              else{
+                const EmailToken = url.substr(url.lastIndexOf('/') + 1);
+              console.log("EmailToken",EmailToken);
+                props.navigation.navigate('SignUpDetails', { EmailToken });
+              }
             }
           else props.navigation.replace('PasscodeConfirm');
         }, 3500);
