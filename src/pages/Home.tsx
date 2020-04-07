@@ -92,6 +92,7 @@ import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
+import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -104,18 +105,22 @@ export default function Home(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   const isUploadSuccessfully = useSelector(
-    state => state.sss.uploadSuccessfully,
+    (state) => state.sss.uploadSuccessfully,
   );
-  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  const isErrorReceivingFailed = useSelector(
+    (state) => state.sss.errorReceiving,
+  );
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
   let [AssociatedContact, setAssociatedContact] = useState([]);
   let [SelectedContacts, setSelectedContacts] = useState([]);
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
-  let SecondaryDeviceStatus = useSelector(state => state.sss.downloadedMShare);
+  let SecondaryDeviceStatus = useSelector(
+    (state) => state.sss.downloadedMShare,
+  );
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
@@ -128,15 +133,15 @@ export default function Home(props) {
     setFamilyAndFriendsBookBottomSheetsFlag,
   ] = useState(false);
   const WALLET_SETUP = useSelector(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
   );
-  const { status } = useSelector(state => state.sss);
+  const { status } = useSelector((state) => state.sss);
   // alert(status);
   // const DECENTRALIZED_BACKUP = useSelector(
   //   state => state.storage.database.DECENTRALIZED_BACKUP,
   // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
-  const accounts = useSelector(state => state.accounts);
+  const accounts = useSelector((state) => state.accounts);
   // const exchangeRate = props.navigation.state.params
   //   ? props.navigation.state.params.exchangeRates
   //   : null;
@@ -146,7 +151,7 @@ export default function Home(props) {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
 
-  const s3Service = useSelector(state => state.sss.service);
+  const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
@@ -207,7 +212,7 @@ export default function Home(props) {
       ...secureTransactions,
     ];
     if (accumulativeTransactions.length) {
-      accumulativeTransactions.sort(function(left, right) {
+      accumulativeTransactions.sort(function (left, right) {
         console.log(
           'moment.utc(right.date),moment.utc(left.date)',
           moment.utc(right.date).unix(),
@@ -501,7 +506,7 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function() {
+  useEffect(function () {
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
@@ -563,7 +568,7 @@ export default function Home(props) {
   //   }
   // };
 
-  const messageAsPerHealth = health => {
+  const messageAsPerHealth = (health) => {
     if (health == 0) {
       return (
         <Text style={styles.headerInfoText}>
@@ -726,9 +731,7 @@ export default function Home(props) {
                         {item.accountType}{' '}
                       </Text>
                       <Text style={styles.transactionModalDateText}>
-                        {moment(item.date)
-                          .utc()
-                          .format('DD MMMM YYYY')}{' '}
+                        {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
                         {/* <Entypo
                       size={10}
                       name={"dot-single"}
@@ -809,7 +812,7 @@ export default function Home(props) {
             flex: 1,
           }}
         >
-          {[1, 2, 3, 4, 5].map(value => {
+          {[1, 2, 3, 4, 5].map((value) => {
             return (
               <View
                 style={{
@@ -922,7 +925,7 @@ export default function Home(props) {
     }
     if (
       secondaryDeviceOtpTemp.findIndex(
-        value => value.otp == (secondaryDeviceOtp as any).otp,
+        (value) => value.otp == (secondaryDeviceOtp as any).otp,
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push(secondaryDeviceOtp);
@@ -952,7 +955,7 @@ export default function Home(props) {
     }
   }, [SecondaryDeviceStatus]);
 
-  const getQrCodeData = qrData => {
+  const getQrCodeData = (qrData) => {
     const scannedData = JSON.parse(qrData);
     switch (scannedData.type) {
       case 'trustedContactQR':
@@ -1039,7 +1042,7 @@ export default function Home(props) {
   function renderAddContent() {
     return (
       <AddModalContents
-        onPressElements={type => {
+        onPressElements={(type) => {
           if (
             type == 'Fastbitcoins' ||
             type == 'Getbittr' ||
@@ -1076,7 +1079,7 @@ export default function Home(props) {
       <QrCodeModalContents
         modalRef={QrTabBarBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={qrData => getQrCodeData(qrData)}
+        onQrScan={(qrData) => getQrCodeData(qrData)}
         onPressQrScanner={() => {
           props.navigation.navigate('QrScanner', {
             scanedCode: getQrCodeData,
@@ -1101,7 +1104,9 @@ export default function Home(props) {
 
   function renderMoreContent() {
     return (
-      <MoreHomePageTabContents onPressElements={item => onPressElement(item)} />
+      <MoreHomePageTabContents
+        onPressElements={(item) => onPressElement(item)}
+      />
     );
   }
 
@@ -1281,7 +1286,7 @@ export default function Home(props) {
   // };
 
   const { UNDER_CUSTODY } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
   const renderCustodianRequestModalContent = useCallback(() => {
     if (!custodyRequest) return;
@@ -1439,7 +1444,7 @@ export default function Home(props) {
   //   );
   // }, []);
 
-  const onPressElement = item => {
+  const onPressElement = (item) => {
     if (item.title == 'Backup Health') {
       props.navigation.navigate('ManageBackup');
     }
@@ -1462,7 +1467,7 @@ export default function Home(props) {
     // }
   };
 
-  const managePinSuccessProceed = pin => {
+  const managePinSuccessProceed = (pin) => {
     setTimeout(() => {
       setTabBarZIndex(999);
     }, 10);
@@ -1472,7 +1477,7 @@ export default function Home(props) {
   const onPressSettingsElements = async (type, currencycode) => {
     if (type == 'ManagePin') {
       return props.navigation.navigate('SettingManagePin', {
-        managePinSuccessProceed: pin => managePinSuccessProceed(pin),
+        managePinSuccessProceed: (pin) => managePinSuccessProceed(pin),
       });
     } else if (type == 'ManageCurrency') {
       setCurrencyCode(currencycode);
@@ -1895,7 +1900,7 @@ export default function Home(props) {
   let isNavigate = false;
   let isContactOpen = false;
   let isCameraOpen = false;
-  const handleAppStateChange = async nextAppState => {
+  const handleAppStateChange = async (nextAppState) => {
     AsyncStorage.getItem('isContactOpen', (err, value) => {
       if (err) console.log(err);
       else {
@@ -1933,7 +1938,7 @@ export default function Home(props) {
     }
   };
 
-  const handleDeepLink = useCallback(event => {
+  const handleDeepLink = useCallback((event) => {
     const splits = event.url.split('/');
     const requester = splits[4];
 
@@ -1990,11 +1995,34 @@ export default function Home(props) {
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
-  const health = useSelector(state => state.sss.overallHealth);
+  const health = useSelector((state) => state.sss.overallHealth);
   useEffect(() => {
     console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
+
+  useEffect(() => {
+    (async () => {
+      const getBittrDetails = JSON.parse(
+        await AsyncStorage.getItem('getBittrDetails'),
+      );
+      console.log({ getBittrDetails });
+      if (!getBittrDetails) {
+        const service: RegularAccount = accounts[REGULAR_ACCOUNT].service;
+        const res = await service.getBittrDetails();
+        if (res.status === 200) {
+          const { details } = res.data;
+          console.log({ details });
+          await AsyncStorage.setItem(
+            'getBittrDetails',
+            JSON.stringify(details),
+          );
+        } else {
+          console.log('Failed to fetch GetBittr Details');
+        }
+      }
+    })();
+  }, []);
 
   // useEffect(() => {
   //   dispatch(runTest());
@@ -2357,10 +2385,10 @@ export default function Home(props) {
             showsHorizontalScrollIndicator={false}
             data={newData}
             extraData={{ balances, switchOn, walletName }}
-            renderItem={Items => {
+            renderItem={(Items) => {
               return (
                 <View style={{ flexDirection: 'column' }}>
-                  {Items.item.map(value => {
+                  {Items.item.map((value) => {
                     if (value.accountType === 'add') {
                       return (
                         <TouchableOpacity disabled={true}>
