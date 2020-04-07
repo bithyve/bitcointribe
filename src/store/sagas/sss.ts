@@ -541,7 +541,6 @@ function* checkMSharesHealthWorker() {
   const res = yield call(s3Service.checkHealth);
   // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
-  console.log({ res });
   if (res.status === 200) {
     // if (preInstance !== postInstance) {
     //   const { SERVICES } = yield select(state => state.storage.database);
@@ -655,7 +654,6 @@ function* shareHistoryUpdateWorker({ payload }) {
         }
       }
     }
-    console.log({ updatedShareHistory });
     yield call(
       AsyncStorage.setItem,
       'shareHistory',
@@ -738,7 +736,6 @@ function* overallHealthWorker({ payload }) {
       'overallHealth',
       JSON.stringify(overallHealth),
     );
-    console.log({ overallHealth });
     yield put(overallHealthCalculated(overallHealth));
   } else {
     throw new Error('Failed to calculate overall health');

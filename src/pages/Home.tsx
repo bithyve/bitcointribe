@@ -38,6 +38,7 @@ import CustodianRequestOtpModalContents from '../components/CustodianRequestOtpM
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddressBookContents from '../components/AddressBookContents';
+import SaveBitcoinModalContents from './GetBittr/SaveBitcoinModalContents';
 import CustodianRequestAcceptModalContents from '../components/CustodianRequestAcceptModalContents';
 import HomePageShield from '../components/HomePageShield';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
@@ -93,6 +94,8 @@ import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
+
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -101,6 +104,7 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
+  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(React.createRef());
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -1446,7 +1450,7 @@ export default function Home(props) {
 
   const onPressElement = (item) => {
     if (item.title == 'Backup Health') {
-      props.navigation.navigate('ManageBackup');
+     props.navigation.navigate('ManageBackup');
     }
     if (item.title == 'Address Book') {
       (addressBookBottomSheet as any).current.snapTo(1);
@@ -1629,19 +1633,53 @@ export default function Home(props) {
   //   );
   // };
 
+  const renderGetBittrRecurringBuyContents = () => {
+    return (
+      <GetBittrRecurringBuyContents
+        onPressBack={() => {
+          (GetBittrRecurringBuy as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderGetBittrRecurringBuyHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setAddSubBottomSheetsFlag(false);
+            setTabBarZIndex(999)
+          }, 2);
+          (GetBittrRecurringBuy as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderGetBittrSaveBitcoinContents = () => {
+    return (
+      <SaveBitcoinModalContents
+        onPressBack={() => {
+          (AddBottomSheet as any).current.snapTo(0);
+        }}
+        onPressElements={(type)=>onPressSaveBitcoinElements(type)}
+      />
+    );
+  };
+
+  const onPressSaveBitcoinElements = (type) =>{
+    if(type=="recurringBuy"){
+      (GetBittrRecurringBuy as any).current.snapTo(1)
+    }
+    else if(type=="existingSavingMethods"){
+      props.navigation.navigate("ExistingSavingMethods");
+    }
+  }
+
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
-      return (
-        <GetBittrModalContents
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
+      return renderGetBittrSaveBitcoinContents()
     } else if (selectToAdd == 'Fastbitcoins') {
       return (
         <FastBitcoinModalContents
@@ -1697,8 +1735,8 @@ export default function Home(props) {
 
   const renderAddModalHeader = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
+      <ModalHeader
+        onPressHeader={() => {
           setTimeout(() => {
             setAddSubBottomSheetsFlag(false);
             setTabBarZIndex(999);
@@ -1954,6 +1992,10 @@ export default function Home(props) {
         const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
+    } else{
+      const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
+    console.log("EmailToken",EmailToken);
+      props.navigation.navigate('SignUpDetails', { EmailToken });
     }
   }, []);
 
@@ -1997,7 +2039,6 @@ export default function Home(props) {
 
   const health = useSelector((state) => state.sss.overallHealth);
   useEffect(() => {
-    console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
 
@@ -2894,15 +2935,19 @@ export default function Home(props) {
       {addBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
-            setTabBarZIndex(0);
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(0);
+            }
           }}
           onCloseEnd={() => {
-            setTabBarZIndex(999);
+            if (!deepLinkModalOpen) {
+              setTabBarZIndex(999);
+            }
             setAddSubBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
           ref={AddBottomSheet as any}
-          snapPoints={[-50, hp('63%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%')]}
           renderContent={renderAddModalContents}
           renderHeader={renderAddModalHeader}
         />
@@ -2943,13 +2988,29 @@ export default function Home(props) {
           renderHeader={renderFastBitcoinSellCalculationHeader}
         />
       ) : null}
+      <BottomSheet
+        onOpenEnd={() => {
+        }}
+        onCloseEnd={() => {
+        }}
+        onCloseStart={() => {
+        }}
+        enabledInnerScrolling={true}
+        ref={GetBittrRecurringBuy as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+        ]}
+        renderContent={renderGetBittrRecurringBuyContents}
+        renderHeader={renderGetBittrRecurringBuyHeader}
+      />
       {addSubBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
             setTabBarZIndex(0);
             setFamilyAndFriendsBookBottomSheetsFlag(true);
           }}
-          onCloseEnd={() => {
+          onCloseStart={() => {
             setTabBarZIndex(999);
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }}
@@ -3127,7 +3188,7 @@ export default function Home(props) {
             </View>
           )}
         </TouchableOpacity>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => selectTab('Add')}
           style={styles.tabBarTabView}
         >
@@ -3147,7 +3208,7 @@ export default function Home(props) {
               />
             </View>
           )}
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
           style={styles.tabBarTabView}

@@ -19,9 +19,9 @@ import Entypo from "react-native-vector-icons/Entypo";
 
 export default function AddModalContents( props ) {
 	const [ addData, setAddData ] = useState( [
-		// {
-		// 	title: 'Getbittr', image: require('../assets/images/icons/icon_getbitter.png'), info: 'GetBittr gives you an easy way to stack sats',
-		// },
+		{
+			title: 'Getbittr', image: require('../assets/images/icons/icon_getbitter.png'), info: 'GetBittr gives you an easy way to stack sats',
+		},
 		{
 			title: `Buy Bitcoins`, image: require( '../assets/images/icons/icon_fastbicoin.png' ), info: 'Buy bitcoins directly into your Hexa wallet',
 		},
@@ -41,7 +41,7 @@ export default function AddModalContents( props ) {
 			data={ addData }
 			ItemSeparatorComponent={ () => <View style={ { backgroundColor: Colors.white } }><View style={ styles.separatorView } /></View> }
 			renderItem={ ( { item } ) =>
-				<AppBottomSheetTouchableWrapper disabled={ true } onPress={ () => props.onPressElements( item.title ) } style={ styles.addModalView } >
+				<AppBottomSheetTouchableWrapper onPress={ () => props.onPressElements( item.title ) } style={ {...styles.addModalView, opacity:item.title=='Getbittr'? 1 : 0.3, backgroundColor: item.title=='Getbittr' ? Colors.white : Colors.borderColor}} >
 					<View style={ styles.modalElementInfoView }>
 						<View style={ { justifyContent: "center", } }>
 							<Image source={ item.image } style={ { width: 25, height: 25 } } />
@@ -64,8 +64,6 @@ const styles = StyleSheet.create( {
 		paddingBottom: hp( '10%' )
 	},
 	addModalView: {
-		opacity: 0.3,
-		backgroundColor: Colors.borderColor,//Colors.white,
 		padding: 7,
 		flexDirection: 'row',
 		display: 'flex',

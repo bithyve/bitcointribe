@@ -59,6 +59,7 @@ import { UsNumberFormat } from '../../common/utilities';
 import TransactionDetails from './TransactionDetails';
 
 export default function Accounts(props) {
+  const [GetBittrAccount, setGetBittrAccount] = useState([]);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
@@ -98,18 +99,21 @@ export default function Accounts(props) {
       accountInfo: 'Learn Bitcoin',
       backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
+      type: TEST_ACCOUNT
     },
     {
       accountType: 'Checking Account',
       accountInfo: 'Fast and easy',
       backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
+      type: REGULAR_ACCOUNT
     },
     {
       accountType: 'Savings Account',
       accountInfo: 'Multi-factor security',
       backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
+      type: SECURE_ACCOUNT
     },
   ]);
 
@@ -190,6 +194,7 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
+    checkGetBittrAccount();
     if (wallet.transactions.transactionDetails.length) {
       wallet.transactions.transactionDetails.sort(function(left, right) {
         console.log(
@@ -224,6 +229,10 @@ export default function Accounts(props) {
     getServiceType(serviceType);
   }, []);
 
+  const checkGetBittrAccount = async() =>{
+    let getBittrAccount = JSON.parse(await AsyncStorage.getItem("getBittrAccounts"));
+    setGetBittrAccount(getBittrAccount ? getBittrAccount : []);
+  }
   // useEffect(() => {
   //   if (serviceType === REGULAR_ACCOUNT) {
   //     const derivativeAccountType = 'GET_BITTR';
@@ -441,40 +450,72 @@ export default function Accounts(props) {
               source={require('../../assets/images/icons/icon_settings.png')}
             />
           </View>
-          {item.accountType == 'Savings Account' && (
-            <TouchableOpacity
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={() => {
-                props.navigation.navigate('SecureScan', {
-                  serviceType,
-                  getServiceType: getServiceType,
-                });
-              }}
-            >
-              <Text
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'row',
+              marginLeft: 'auto',
+            }}
+          >
+            { (GetBittrAccount.findIndex((value)=>value.accountType == item.type) >-1) ?
+              (<View
                 style={{
-                  paddingLeft: 10,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  marginLeft: 'auto',
-                  fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(15),
-                  color: Colors.white,
-                  alignSelf: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.white,
+                  borderRadius: 15,
+                  padding: 5,
+                }}
+              >
+                <Image
+                  style={{
+                    marginLeft: 'auto',
+                    width: wp('3%'),
+                    height: wp('3%'),
+                    resizeMode: 'contain',
+                    padding: 5,
+                  }}
+                  source={require('../../assets/images/icons/icon_getbitter.png')}
+                />
+              </View>)
+              : null
+            }
+            {item.accountType == 'Savings Account' && (
+              <TouchableOpacity
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
                 onPress={() => {
-                  props.navigation.navigate('TwoFASetup', {
-                    twoFASetup: service.secureHDWallet.twoFASetup,
+                  props.navigation.navigate('SecureScan', {
+                    serviceType,
+                    getServiceType: getServiceType,
                   });
                 }}
               >
-                2FA
-              </Text>
-            </TouchableOpacity>
-          )}
+                <Text
+                  style={{
+                    paddingLeft: 10,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    marginLeft: 'auto',
+                    fontFamily: Fonts.FiraSansMedium,
+                    fontSize: RFValue(15),
+                    color: Colors.white,
+                    alignSelf: 'center',
+                  }}
+                  onPress={() => {
+                    props.navigation.navigate('TwoFASetup', {
+                      twoFASetup: service.secureHDWallet.twoFASetup,
+                    });
+                  }}
+                >
+                  2FA
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <View style={{ flexDirection: 'row' }}>
             {item.accountType == 'Test Account' || switchOn ? (
               <Image

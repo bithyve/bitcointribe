@@ -544,7 +544,6 @@ export default class HDSegwitWallet extends Bitcoin {
         this.usedAddresses.push(this.getInternalAddressByIndex(itr));
       }
 
-      console.log({ usedAddresses: this.usedAddresses });
       const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
         this.usedAddresses,
       );
@@ -606,7 +605,6 @@ export default class HDSegwitWallet extends Bitcoin {
       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
     }
 
-    console.log({ usedAddresses: this.usedAddresses });
 
     const {
       balances,

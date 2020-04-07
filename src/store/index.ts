@@ -9,6 +9,7 @@ import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
 import manageBackupReducer from './reducers/manageBackup';
+import GetBittrReducer from './reducers/bittr';
 
 import {
   initDBWatcher,
@@ -71,6 +72,10 @@ import {
   sharePdfWatcher,
   dbUpdatePdfSharingWatcher,
 } from './sagas/manageBackup';
+
+import {
+  sendEmailWatcher, createUserWatcher, sendSmsWatcher, verifyEmailWatcher, verifyXpubWatcher,
+} from './sagas/bittr';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -150,6 +155,13 @@ const rootSaga = function*() {
     // manage backup
     sharePdfWatcher,
     dbUpdatePdfSharingWatcher,
+
+    //GetBittr
+    sendEmailWatcher,
+    createUserWatcher,
+    sendSmsWatcher,
+    verifyEmailWatcher,
+    verifyXpubWatcher
   ];
 
   yield all(
@@ -174,6 +186,7 @@ const rootReducer = combineReducers({
   accounts: accountsReducer,
   sss: sssReducer,
   manageBackup: manageBackupReducer,
+  bittr: GetBittrReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
