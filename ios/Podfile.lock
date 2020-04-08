@@ -43,6 +43,8 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
+  - jail-monkey (2.3.2):
+    - React
   - PDFGenerator (3.1.0)
   - QRCoder (1.1.0)
   - React (0.59.10):
@@ -175,6 +177,7 @@ DEPENDENCIES:
   - Fabric
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
+  - jail-monkey (from `../node_modules/jail-monkey`)
   - PDFGenerator
   - QRCoder
   - react-native-camera (from `../node_modules/react-native-camera`)
@@ -274,6 +277,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/Folly.podspec"
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
+  jail-monkey:
+    :path: "../node_modules/jail-monkey"
   React:
     :path: "../node_modules/react-native"
   react-native-camera:
@@ -365,6 +370,7 @@ SPEC CHECKSUMS:
   Fabric: 706c8b8098fff96c33c0db69cbf81f9c551d0d74
   Folly: de497beb10f102453a1afa9edbf8cf8a251890de
   glog: aefd1eb5dda2ab95ba0938556f34b98e2da3a60d
+  jail-monkey: d7c5048b2336f22ee9c9e0efa145f1f917338ea9
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
@@ -397,6 +403,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: a755cb1cf91ef5ed5170bf09fb7c2c1b87ed2d02
+PODFILE CHECKSUM: 3340b80f2c767de2178085de239c1ae19dae74ab
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4

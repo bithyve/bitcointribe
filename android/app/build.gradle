@@ -156,6 +156,7 @@ android {
 }
 
 dependencies {
+    implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
     implementation project(':react-native-mail')
     implementation project(':react-native-print')
@@ -185,7 +186,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.itextpdf:itextg:5.5.10'
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:0.59.10"  // From node_modules
     addUnimodulesDependencies()
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:1.10.0'
