@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
+  Alert,
+  Platform,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -26,6 +28,8 @@ import {
   calculateExchangeRate,
 } from '../store/actions/accounts';
 import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
+import JailMonkey from 'jail-monkey';
+import DeviceInfo from 'react-native-device-info';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Getting the latest details');
@@ -132,6 +136,18 @@ export default function Login(props) {
     }
   }, [DECENTRALIZED_BACKUP]);
 
+  useEffect(()=>{
+    if(JailMonkey.isJailBroken()){
+      Alert.alert(Platform.OS == "ios" ? "Your device is Jail Broken" : "Your device is Rooted");
+    }
+    console.log("JailMonkey.isJailBroken()",JailMonkey.isJailBroken());
+    DeviceInfo.isPinOrFingerprintSet().then(isPinOrFingerprintSet => {
+      if (!isPinOrFingerprintSet) {
+        Alert.alert("Your Phone don't have any Secure entry like Pin or Biometric");
+      }
+      console.log("isPinOrFingerprintSet",isPinOrFingerprintSet);
+    });
+  }, []);
   // useEffect(() => {
   //   (async () => {
   //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');

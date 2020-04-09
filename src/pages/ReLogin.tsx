@@ -8,6 +8,7 @@ import {
   StatusBar,
   Alert,
   BackHandler,
+  Platform,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../common/Colors';
@@ -23,6 +24,8 @@ import { credsAuth, switchReLogin } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import SmallHeaderModal from '../components/SmallHeaderModal';
+import JailMonkey from 'jail-monkey';
+import DeviceInfo from 'react-native-device-info';
 
 export default function Login(props) {
   const [passcode, setPasscode] = useState('');
@@ -62,6 +65,16 @@ export default function Login(props) {
   }; // returning true disables the hardware back button
 
   useEffect(() => {
+    if(JailMonkey.isJailBroken()){
+      Alert.alert(Platform.OS == "ios" ? "Your device is Jail Broken" : "Your device is Rooted");
+    }
+    console.log("JailMonkey.isJailBroken()",JailMonkey.isJailBroken());
+    DeviceInfo.isPinOrFingerprintSet().then(isPinOrFingerprintSet => {
+      if (!isPinOrFingerprintSet) {
+        Alert.alert("Your Phone don't have any Secure entry like Pin or Biometric");
+      }
+      console.log("isPinOrFingerprintSet",isPinOrFingerprintSet);
+    });
     BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
 
     return () =>

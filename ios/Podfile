@@ -62,4 +62,6 @@ target 'HEXA' do
 
   pod 'react-native-in-app-utils', :path => '../node_modules/react-native-in-app-utils'
 
+  pod 'jail-monkey', :path => '../node_modules/jail-monkey'
+
 end
