@@ -10,6 +10,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import NetInfo from '@react-native-community/netinfo';
+import firebase from "react-native-firebase";
+
 const prefix = 'hexa://'
 export default () => {
   console.disableYellowBox = true;
@@ -50,8 +52,71 @@ export default () => {
         setInternet(false); 
       }
     });
+    componentDidMount();
+    
   },[]);
 
+  const componentDidMount=async() =>{
+		const enabled = await firebase.messaging().hasPermission();
+        console.log('enabled', enabled)
+        if (!enabled) {
+            await firebase.messaging().requestPermission();
+        }
+		createNotificationListeners();
+		const channel = new firebase.notifications.Android.Channel(
+			"foregroundNotification", // channelId
+			"ForegroundNotification", // channel name
+			firebase.notifications.Android.Importance.High // channel importance
+		).setDescription("Used for getting foreground notification"); // channel description
+		firebase.notifications().android.createChannel(channel);
+	}
+
+	const createNotificationListeners = async () => {
+		/*
+		 * Triggered when a particular notification has been received in foreground
+		 * */
+		let notificationListener = firebase
+			.notifications()
+			.onNotification(notification => {
+				const { title, body } = notification;
+				const deviceTrayNotification = new firebase.notifications.Notification()
+					.setTitle(title)
+					.setBody(body)
+					.setNotificationId(notification.notificationId)
+					.setSound("default")
+					.setData(notification._android._notification._data)
+					.android.setPriority(firebase.notifications.Android.Priority.High)
+					.android.setChannelId("foregroundNotification") // previously created
+					.android.setAutoCancel(true); // To remove notification when tapped on it
+
+				firebase.notifications().displayNotification(deviceTrayNotification);
+			});
+
+		/*
+		 * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+		 * */
+		let notificationOpenedListener = firebase
+			.notifications()
+			.onNotificationOpened(notificationOpen => {
+				const { title, body } = notificationOpen.notification;
+			});
+
+		/*
+		 * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+		 * */
+		const notificationOpen = await firebase
+			.notifications()
+			.getInitialNotification();
+		if (notificationOpen) {
+			const { title, body } = notificationOpen.notification;
+		}
+		/*
+		 * Triggered for data only payload in foreground
+		 * */
+		let messageListener = firebase.messaging().onMessage(message => {
+			//process data message
+		});
+	};
   
   return (
     <Provider store={store} uriPrefix={prefix}>
