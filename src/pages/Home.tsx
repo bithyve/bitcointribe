@@ -2512,7 +2512,7 @@ export default function Home(props) {
                               </Text>
                               <Text
                                 style={{
-                                  fontFamily: Fonts.firasonsRegular,
+                                  fontFamily: Fonts.FiraSansRegular,
                                   color: Colors.textColorGrey,
                                   fontSize: RFValue(11),
                                 }}
@@ -3263,7 +3263,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   cardTitle: {
-    fontFamily: Fonts.firasonsRegular,
+    fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,
     fontSize: RFValue(10),
   },
@@ -3280,7 +3280,7 @@ const styles = StyleSheet.create({
   activeTabTextStyle: {
     marginLeft: 8,
     color: Colors.blue,
-    fontFamily: Fonts.firasonsRegular,
+    fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(12),
   },
   bottomTabBarContainer: {
