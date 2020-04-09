@@ -84,6 +84,7 @@ import {
   fetchBalance,
   fetchTransactions,
   runTest,
+  fetchGetBittrDetails,
 } from '../store/actions/accounts';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
@@ -104,7 +105,9 @@ import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
-  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(React.createRef());
+  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(
+    React.createRef(),
+  );
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -1450,7 +1453,7 @@ export default function Home(props) {
 
   const onPressElement = (item) => {
     if (item.title == 'Backup Health') {
-     props.navigation.navigate('ManageBackup');
+      props.navigation.navigate('ManageBackup');
     }
     if (item.title == 'Address Book') {
       (addressBookBottomSheet as any).current.snapTo(1);
@@ -1649,7 +1652,7 @@ export default function Home(props) {
         onPressHeader={() => {
           setTimeout(() => {
             setAddSubBottomSheetsFlag(false);
-            setTabBarZIndex(999)
+            setTabBarZIndex(999);
           }, 2);
           (GetBittrRecurringBuy as any).current.snapTo(0);
         }}
@@ -1663,23 +1666,22 @@ export default function Home(props) {
         onPressBack={() => {
           (AddBottomSheet as any).current.snapTo(0);
         }}
-        onPressElements={(type)=>onPressSaveBitcoinElements(type)}
+        onPressElements={(type) => onPressSaveBitcoinElements(type)}
       />
     );
   };
 
-  const onPressSaveBitcoinElements = (type) =>{
-    if(type=="recurringBuy"){
-      (GetBittrRecurringBuy as any).current.snapTo(1)
+  const onPressSaveBitcoinElements = (type) => {
+    if (type == 'recurringBuy') {
+      (GetBittrRecurringBuy as any).current.snapTo(1);
+    } else if (type == 'existingSavingMethods') {
+      props.navigation.navigate('ExistingSavingMethods');
     }
-    else if(type=="existingSavingMethods"){
-      props.navigation.navigate("ExistingSavingMethods");
-    }
-  }
+  };
 
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
-      return renderGetBittrSaveBitcoinContents()
+      return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'Fastbitcoins') {
       return (
         <FastBitcoinModalContents
@@ -1992,9 +1994,9 @@ export default function Home(props) {
         const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
-    } else{
+    } else {
       const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-    console.log("EmailToken",EmailToken);
+      console.log('EmailToken', EmailToken);
       props.navigation.navigate('SignUpDetails', { EmailToken });
     }
   }, []);
@@ -2049,18 +2051,7 @@ export default function Home(props) {
       );
       console.log({ getBittrDetails });
       if (!getBittrDetails) {
-        const service: RegularAccount = accounts[REGULAR_ACCOUNT].service;
-        const res = await service.getBittrDetails();
-        if (res.status === 200) {
-          const { details } = res.data;
-          console.log({ details });
-          await AsyncStorage.setItem(
-            'getBittrDetails',
-            JSON.stringify(details),
-          );
-        } else {
-          console.log('Failed to fetch GetBittr Details');
-        }
+        dispatch(fetchGetBittrDetails());
       }
     })();
   }, []);
@@ -2947,7 +2938,12 @@ export default function Home(props) {
           }}
           enabledInnerScrolling={true}
           ref={AddBottomSheet as any}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%')]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('64%'),
+          ]}
           renderContent={renderAddModalContents}
           renderHeader={renderAddModalHeader}
         />
@@ -2989,12 +2985,9 @@ export default function Home(props) {
         />
       ) : null}
       <BottomSheet
-        onOpenEnd={() => {
-        }}
-        onCloseEnd={() => {
-        }}
-        onCloseStart={() => {
-        }}
+        onOpenEnd={() => {}}
+        onCloseEnd={() => {}}
+        onCloseStart={() => {}}
         enabledInnerScrolling={true}
         ref={GetBittrRecurringBuy as any}
         snapPoints={[

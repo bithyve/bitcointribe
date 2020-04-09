@@ -1,5 +1,8 @@
 package io.hexawallet.hexa;
 
+import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;

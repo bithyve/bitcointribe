@@ -46,6 +46,7 @@ import {
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
+  fetchGetBittrDetailsWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -74,7 +75,11 @@ import {
 } from './sagas/manageBackup';
 
 import {
-  sendEmailWatcher, createUserWatcher, sendSmsWatcher, verifyEmailWatcher, verifyXpubWatcher,
+  sendEmailWatcher,
+  createUserWatcher,
+  sendSmsWatcher,
+  verifyEmailWatcher,
+  verifyXpubWatcher,
 } from './sagas/bittr';
 
 // const rootSaga = function*() {
@@ -94,7 +99,7 @@ import {
 //   ]);
 // };
 
-const rootSaga = function*() {
+const rootSaga = function* () {
   const sagas = [
     // database watchers
     initDBWatcher,
@@ -131,6 +136,7 @@ const rootSaga = function*() {
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     testWatcher,
+    fetchGetBittrDetailsWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -161,12 +167,12 @@ const rootSaga = function*() {
     createUserWatcher,
     sendSmsWatcher,
     verifyEmailWatcher,
-    verifyXpubWatcher
+    verifyXpubWatcher,
   ];
 
   yield all(
-    sagas.map(saga =>
-      spawn(function*() {
+    sagas.map((saga) =>
+      spawn(function* () {
         while (true) {
           try {
             yield call(saga);
