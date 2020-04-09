@@ -37,6 +37,7 @@ import {
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
+  FETCH_GET_BITTR_DETAILS,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -52,7 +53,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
   const service = yield select(
-    state => state.accounts[payload.serviceType].service,
+    (state) => state.accounts[payload.serviceType].service,
   );
   const preFetchAddress =
     payload.serviceType === SECURE_ACCOUNT
@@ -78,7 +79,7 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
   const serivceType = REGULAR_ACCOUNT;
   const service: RegularAccount = yield select(
-    state => state.accounts[serivceType].service,
+    (state) => state.accounts[serivceType].service,
   );
 
   const { derivativeAccount } = service.hdWallet;
@@ -91,7 +92,7 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
   );
 
   if (res.status === 200) {
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [serivceType]: JSON.stringify(service),
@@ -113,7 +114,7 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
 
   const serviceType = SECURE_ACCOUNT;
   const service: SecureAccount = yield select(
-    state => state.accounts[serviceType].service,
+    (state) => state.accounts[serviceType].service,
   );
 
   const { derivativeAccount } = service.secureHDWallet;
@@ -129,7 +130,7 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
   console.log({ res });
 
   if (res.status === 200) {
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [serviceType]: JSON.stringify(service),
@@ -150,7 +151,7 @@ function* fetchBalanceWorker({ payload }) {
   if (payload.options && payload.options.loader)
     yield put(switchLoader(payload.serviceType, 'balances'));
   const service = yield select(
-    state => state.accounts[payload.serviceType].service,
+    (state) => state.accounts[payload.serviceType].service,
   );
 
   const preFetchBalances =
@@ -177,7 +178,7 @@ function* fetchBalanceWorker({ payload }) {
     res.status === 200 &&
     JSON.stringify(preFetchBalances) !== JSON.stringify(postFetchBalances)
   ) {
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
@@ -200,7 +201,7 @@ function* fetchTransactionsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transactions'));
   const service = payload.service
     ? payload.service
-    : yield select(state => state.accounts[payload.serviceType].service);
+    : yield select((state) => state.accounts[payload.serviceType].service);
 
   const preFetchTransactions =
     payload.serviceType === SECURE_ACCOUNT
@@ -216,7 +217,7 @@ function* fetchTransactionsWorker({ payload }) {
       JSON.stringify(postFetchTransactions)
   ) {
     yield put(transactionsFetched(payload.serviceType, postFetchTransactions));
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
@@ -238,7 +239,7 @@ function* fetchBalanceTxWorker({ payload }) {
   const service =
     payload.options && payload.options.service
       ? payload.options.service
-      : yield select(state => state.accounts[payload.serviceType].service);
+      : yield select((state) => state.accounts[payload.serviceType].service);
 
   const preFetchBalances =
     payload.serviceType === SECURE_ACCOUNT
@@ -264,7 +265,7 @@ function* fetchBalanceTxWorker({ payload }) {
       JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
     if (!payload.options.shouldNotInsert) {
-      const { SERVICES } = yield select(state => state.storage.database);
+      const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
         [payload.serviceType]: JSON.stringify(service),
@@ -290,7 +291,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 function* fetchDerivativeAccBalanceTxWorker({ payload }) {
   let { serviceType, accountNumber, accountType } = payload;
 
-  const service = yield select(state => state.accounts[serviceType].service);
+  const service = yield select((state) => state.accounts[serviceType].service);
 
   if (!accountNumber) accountNumber = 0;
 
@@ -324,7 +325,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
       JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [serviceType]: JSON.stringify(service),
@@ -350,7 +351,7 @@ function* transferST1Worker({ payload }) {
     averageTxFees,
   } = payload.transferInfo;
   const service = yield select(
-    state => state.accounts[payload.serviceType].service,
+    (state) => state.accounts[payload.serviceType].service,
   );
   const res = yield call(
     service.transferST1,
@@ -375,7 +376,7 @@ export const transferST1Watcher = createWatcher(
 function* transferST2Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
   const { service, transfer } = yield select(
-    state => state.accounts[payload.serviceType],
+    (state) => state.accounts[payload.serviceType],
   );
 
   const { inputs, txb } = transfer.stage1;
@@ -403,7 +404,7 @@ export const transferST2Watcher = createWatcher(
 
 function* generateSecondaryXprivWorker({ payload }) {
   const service = yield select(
-    state => state.accounts[payload.serviceType].service,
+    (state) => state.accounts[payload.serviceType].service,
   );
 
   const { generated } = service.generateSecondaryXpriv(
@@ -411,7 +412,7 @@ function* generateSecondaryXprivWorker({ payload }) {
   );
 
   if (generated) {
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
@@ -433,7 +434,7 @@ function* alternateTransferST2Worker({ payload }) {
 
   yield put(switchLoader(payload.serviceType, 'transfer'));
   const { service, transfer } = yield select(
-    state => state.accounts[payload.serviceType],
+    (state) => state.accounts[payload.serviceType],
   );
 
   const { inputs, txb } = transfer.stage1;
@@ -463,7 +464,7 @@ function* transferST3Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
   const { token } = payload;
   const { service, transfer } = yield select(
-    state => state.accounts[payload.serviceType],
+    (state) => state.accounts[payload.serviceType],
   );
 
   const { txHex, childIndexArray } = transfer.stage2;
@@ -490,7 +491,7 @@ function* testcoinsWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'testcoins'));
 
   const service = yield select(
-    state => state.accounts[payload.serviceType].service,
+    (state) => state.accounts[payload.serviceType].service,
   );
   const res = yield call(service.getTestcoins);
   console.log({ res });
@@ -502,7 +503,7 @@ function* testcoinsWorker({ payload }) {
     // yield put(fetchTransactions(payload.serviceType, service));
     yield put(testcoinsReceived(payload.serviceType, service));
 
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
@@ -518,7 +519,7 @@ function* testcoinsWorker({ payload }) {
 export const testcoinsWatcher = createWatcher(testcoinsWorker, GET_TESTCOINS);
 
 function* accumulativeTxAndBalWorker() {
-  const accounts = yield select(state => state.accounts);
+  const accounts = yield select((state) => state.accounts);
   console.log({ accounts });
 
   const testBalance = accounts[TEST_ACCOUNT].service
@@ -561,7 +562,7 @@ export const accumulativeTxAndBalWatcher = createWatcher(
 
 function* accountsSyncWorker({ payload }) {
   try {
-    const accounts = yield select(state => state.accounts);
+    const accounts = yield select((state) => state.accounts);
 
     const testService = accounts[TEST_ACCOUNT].service;
     const regularService = accounts[REGULAR_ACCOUNT].service;
@@ -600,7 +601,7 @@ function* accountsSyncWorker({ payload }) {
       }),
     ]);
 
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       [TEST_ACCOUNT]: JSON.stringify(testService),
@@ -664,7 +665,9 @@ export const exchangeRateWatcher = createWatcher(
 );
 
 function* resetTwoFAWorker({ payload }) {
-  const service = yield select(state => state.accounts[SECURE_ACCOUNT].service);
+  const service = yield select(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
 
   const res = yield call(service.resetTwoFA, payload.secondaryMnemonic);
 
@@ -683,7 +686,7 @@ function* testWorker({ payload }) {
   console.log('---------Executing Test Saga---------');
 
   const service: RegularAccount = yield select(
-    state => state.accounts[REGULAR_ACCOUNT].service,
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
   const res = yield call(service.getDerivativeAccXpub, 'GET_BITTR');
@@ -698,3 +701,26 @@ function* testWorker({ payload }) {
 }
 
 export const testWatcher = createWatcher(testWorker, RUN_TEST);
+
+function* fetchGetBittrDetailsWorker({ payload }) {
+  const service: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const res = yield call(service.getBittrDetails);
+  if (res.status === 200) {
+    const { details } = res.data;
+    console.log({ details });
+    yield call(
+      AsyncStorage.setItem,
+      'getBittrDetails',
+      JSON.stringify(details),
+    );
+  } else {
+    console.log('Failed to fetch GetBittr Details');
+  }
+}
+
+export const fetchGetBittrDetailsWatcher = createWatcher(
+  fetchGetBittrDetailsWorker,
+  FETCH_GET_BITTR_DETAILS,
+);

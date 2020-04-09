@@ -605,7 +605,6 @@ export default class HDSegwitWallet extends Bitcoin {
       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
     }
 
-
     const {
       balances,
       transactions,
