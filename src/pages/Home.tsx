@@ -2521,6 +2521,7 @@ export default function Home(props) {
                               </Text>
                               <Text
                                 style={{
+                                  fontFamily: Fonts.firasonsRegular,
                                   color: Colors.textColorGrey,
                                   fontSize: RFValue(11),
                                 }}
@@ -3269,6 +3270,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   cardTitle: {
+    fontFamily: Fonts.firasonsRegular,
     color: Colors.blue,
     fontSize: RFValue(10),
   },
@@ -3403,7 +3405,7 @@ const styles = StyleSheet.create({
   },
   cardAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.OpenSans,
     fontSize: RFValue(17),
     marginRight: 5,
     marginTop: 'auto',
@@ -3411,7 +3413,7 @@ const styles = StyleSheet.create({
   },
   cardAmountTextGrey: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.OpenSans,
     fontSize: RFValue(17),
     marginRight: 5,
     marginTop: 'auto',
