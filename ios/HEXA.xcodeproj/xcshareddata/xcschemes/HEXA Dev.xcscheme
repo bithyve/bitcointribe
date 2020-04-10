@@ -24,7 +24,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4D437D4B2440796600A43169"
-               BuildableName = "HEXA Dev.app"
+               BuildableName = "Hexa Dev.app"
                BlueprintName = "HEXA Dev"
                ReferencedContainer = "container:HEXA.xcodeproj">
             </BuildableReference>
@@ -42,7 +42,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4D437D4B2440796600A43169"
-            BuildableName = "HEXA Dev.app"
+            BuildableName = "Hexa Dev.app"
             BlueprintName = "HEXA Dev"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
@@ -65,7 +65,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4D437D4B2440796600A43169"
-            BuildableName = "HEXA Dev.app"
+            BuildableName = "Hexa Dev.app"
             BlueprintName = "HEXA Dev"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>
@@ -84,7 +84,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4D437D4B2440796600A43169"
-            BuildableName = "HEXA Dev.app"
+            BuildableName = "Hexa Dev.app"
             BlueprintName = "HEXA Dev"
             ReferencedContainer = "container:HEXA.xcodeproj">
          </BuildableReference>

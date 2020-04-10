@@ -5,8 +5,26 @@
     "android": "react-native run-android",
     "android-release": "cd android && ./gradlew app:assembleRelease",
     "ios": "react-native run-ios",
-    "start": "react-native start"
+    "start": "react-native start",
+    "androidStagingDebug": "ENVFILE=.env.staging react-native run-android --variant=stagingDebug --appIdSuffix=staging",
+    "androidStagingRelease": "ENVFILE=.env.staging react-native run-android --variant=stagingRelease --appIdSuffix=staging",
+    "androidDevelopmentDebug": "ENVFILE=.env.development react-native run-android --variant=developmentDebug --appIdSuffix=development",
+    "androidDevelopmentRelease": "ENVFILE=.env.development react-native run-android --variant=developmentRelease --appIdSuffix=development",
+    "androidProductionDebug": "ENVFILE=.env.production react-native run-android --variant=productionDebug",
+    "androidProductionRelease": "ENVFILE=.env.production react-native run-android --variant=productionRelease"
   },
+  "xcodeSchemes": {
+    "Debug": [
+      "HEXA Stage",
+      "HEXA Dev"
+    ],
+    "Release": [
+      "HEXA Stage",
+      "HEXA Dev"
+    ],
+    "projectDirectory": "iOS"
+  },
+  "projectDirectory": "iOS",
   "dependencies": {
     "@react-native-community/netinfo": "^5.0.0",
     "@tradle/react-native-http": "^2.0.0",
