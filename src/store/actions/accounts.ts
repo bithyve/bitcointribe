@@ -18,6 +18,7 @@ export const RUN_TEST = 'RUN_TEST';
 export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
 export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
 export const FETCH_GET_BITTR_DETAILS = 'FETCH_GET_BITTR_DETAILS';
+export const UPDATE_FCM_TOKENS = 'UPDATE_FCM_TOKENS';
 
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
@@ -128,6 +129,13 @@ export const fetchDerivativeAccBalTx = (
 export const fetchGetBittrDetails = () => {
   return {
     type: FETCH_GET_BITTR_DETAILS,
+  };
+};
+
+export const updateFCMTokens = (FCMs: string[]) => {
+  return {
+    type: UPDATE_FCM_TOKENS,
+    payload: { FCMs },
   };
 };
 
