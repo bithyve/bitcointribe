@@ -2,7 +2,7 @@ apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
 apply plugin: 'io.fabric'      
-        
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"     
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -156,6 +156,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-config')
     implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
     implementation project(':react-native-mail')
