@@ -96,7 +96,7 @@ import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
-import firebase from "react-native-firebase";
+// import firebase from "react-native-firebase";
 import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
@@ -106,8 +106,13 @@ import NotificationListContent from '../components/NotificationListContent';
 // const height = snapPoints[ 0 ]
 
 export default function Home(props) {
-  const [notificationsListBottomSheet, setNotificationsListBottomSheet] = useState(React.createRef());
-  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(React.createRef());
+  const [
+    notificationsListBottomSheet,
+    setNotificationsListBottomSheet,
+  ] = useState(React.createRef());
+  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(
+    React.createRef(),
+  );
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -513,8 +518,8 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function() {
-    getFCMToken();
+  useEffect(function () {
+    // getFCMToken();
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
@@ -541,12 +546,12 @@ export default function Home(props) {
       focusListener.remove();
     };
   }, []);
-  
-  const getFCMToken = async() =>{
-    const fcmToken = await firebase.messaging().getToken();
-    console.log("fcmToken", fcmToken);
-    return fcmToken;
-  }
+
+  // const getFCMToken = async() =>{
+  //   const fcmToken = await firebase.messaging().getToken();
+  //   console.log("fcmToken", fcmToken);
+  //   return fcmToken;
+  // }
 
   const setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
@@ -585,7 +590,7 @@ export default function Home(props) {
   const messageAsPerHealth = (health) => {
     if (health == 0) {
       return (
-        <Text numberOfLines={1} style={{...styles.headerInfoText, }}>
+        <Text numberOfLines={1} style={{ ...styles.headerInfoText }}>
           The wallet backup is not secure.{'\n'}Please visit the health section
           to{'\n'}improve the health of your backup
         </Text>
@@ -2312,24 +2317,28 @@ export default function Home(props) {
   //   );
   // };
 
-  const onPressNotifications = () =>{
-    (notificationsListBottomSheet as any).current.snapTo(1)
-  }
+  const onPressNotifications = () => {
+    (notificationsListBottomSheet as any).current.snapTo(1);
+  };
 
   const renderNotificationsContent = useCallback(() => {
-    return <NotificationListContent
-            onPressBack={()=>{
-              (notificationsListBottomSheet as any).current.snapTo(0);
-            }}
-          />
+    return (
+      <NotificationListContent
+        onPressBack={() => {
+          (notificationsListBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   }, []);
 
   const renderNotificationsHeader = useCallback(() => {
-    return <ModalHeader
-              onPressHeader={() => {
-              (notificationsListBottomSheet as any).current.snapTo(0);
-              }}
-            />
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (notificationsListBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   }, []);
 
   return (
@@ -2347,61 +2356,88 @@ export default function Home(props) {
             Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('5%') : 0,
         }}
       >
-        <View style={{...styles.headerViewContainer, flex:1}}>
-          <View style={{ flexDirection: 'row', height:'100%' }}>
-            <View style={{...styles.headerTitleViewContainer, }}>
-              <TouchableOpacity onPress={()=>onPressNotifications()} style={{ height:wp('10%'), width:wp('10%'), justifyContent:'center'}}>
-                <ImageBackground source={require("../assets/images/icons/icon_notification.png")} style={{width:wp('6%'), height:wp('6%'),}} resizeMode={"contain"}>
-                  <View style={{backgroundColor:Colors.red, height:wp('2.5%'), width:wp('2.5%'), borderRadius:wp('2.5%')/2, alignSelf:'flex-end'}} />
+        <View style={{ ...styles.headerViewContainer, flex: 1 }}>
+          <View style={{ flexDirection: 'row', height: '100%' }}>
+            <View style={{ ...styles.headerTitleViewContainer }}>
+              <TouchableOpacity
+                onPress={() => onPressNotifications()}
+                style={{
+                  height: wp('10%'),
+                  width: wp('10%'),
+                  justifyContent: 'center',
+                }}
+              >
+                <ImageBackground
+                  source={require('../assets/images/icons/icon_notification.png')}
+                  style={{ width: wp('6%'), height: wp('6%') }}
+                  resizeMode={'contain'}
+                >
+                  <View
+                    style={{
+                      backgroundColor: Colors.red,
+                      height: wp('2.5%'),
+                      width: wp('2.5%'),
+                      borderRadius: wp('2.5%') / 2,
+                      alignSelf: 'flex-end',
+                    }}
+                  />
                 </ImageBackground>
               </TouchableOpacity>
-              <View style={{marginBottom: wp('2%')}}>
-              <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginBottom:wp('3%') }}>
-                {switchOn ? (
-                  <Image
+              <View style={{ marginBottom: wp('2%') }}>
+                <Text
+                  style={styles.headerTitleText}
+                >{`${walletName}’s Wallet`}</Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    marginBottom: wp('3%'),
+                  }}
+                >
+                  {switchOn ? (
+                    <Image
+                      style={{
+                        ...CommonStyles.homepageAmountImage,
+                        marginBottom: wp('1.5%'),
+                      }}
+                      source={require('../assets/images/icons/icon_bitcoin_light.png')}
+                    />
+                  ) : (
+                    <Image
+                      style={{
+                        ...styles.cardBitCoinImage,
+                        marginBottom: wp('1.5%'),
+                      }}
+                      source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                    />
+                  )}
+                  <Text
                     style={{
-                      ...CommonStyles.homepageAmountImage,
-                      marginBottom: wp('1.5%'),
+                      ...CommonStyles.homepageAmountText,
+                      color: Colors.white,
                     }}
-                    source={require('../assets/images/icons/icon_bitcoin_light.png')}
-                  />
-                ) : (
-                  <Image
+                  >
+                    {switchOn
+                      ? UsNumberFormat(balances.accumulativeBalance)
+                      : exchangeRates
+                      ? (
+                          (balances.accumulativeBalance / 1e8) *
+                          exchangeRates[CurrencyCode].last
+                        ).toFixed(2)
+                      : 0}
+                  </Text>
+                  <Text
                     style={{
-                      ...styles.cardBitCoinImage,
-                      marginBottom: wp('1.5%'),
+                      ...CommonStyles.homepageAmountUnitText,
+                      color: Colors.white,
                     }}
-                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-                  />
+                  >
+                    {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+                  </Text>
+                </View>
+                {messageAsPerHealth(
+                  overallHealth ? overallHealth.overallStatus : 0,
                 )}
-                <Text
-                  style={{
-                    ...CommonStyles.homepageAmountText,
-                    color: Colors.white,
-                  }}
-                >
-                  {switchOn
-                    ? UsNumberFormat(balances.accumulativeBalance)
-                    : exchangeRates
-                    ? (
-                        (balances.accumulativeBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                    : 0}
-                </Text>
-                <Text
-                  style={{
-                    ...CommonStyles.homepageAmountUnitText,
-                    color: Colors.white,
-                  }}
-                >
-                  {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
-                </Text>
-              </View>
-              {messageAsPerHealth(
-                overallHealth ? overallHealth.overallStatus : 0,
-              )}
               </View>
               <TouchableOpacity
                 onPress={() => {
