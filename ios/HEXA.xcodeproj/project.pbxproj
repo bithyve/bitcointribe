@@ -151,9 +151,9 @@
 		2FB9F98AA281430D89E114A8 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-BoldItalic.ttf"; path = "../src/assets/fonts/OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		340715C7D2234FB3BA9916F6 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../src/assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
 		4A42DFFF10444D74862B92DE /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
-		4D437D7E2440796600A43169 /* HEXA Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HEXA Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D437D7E2440796600A43169 /* Hexa Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hexa Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D437D7F2440796600A43169 /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "/Users/nikhitagawande/workspace/hexa/ios/HEXA.Dev-Info.plist"; sourceTree = "<absolute>"; };
-		4D437DD02440811F00A43169 /* HEXA Stage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "HEXA Stage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D437DD02440811F00A43169 /* Hexa Stage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hexa Stage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D437DD12440812000A43169 /* HEXA.Stage-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Stage-Info.plist"; path = "/Users/nikhitagawande/workspace/hexa/ios/HEXA.Stage-Info.plist"; sourceTree = "<absolute>"; };
 		4FB7E5E1464C4A29B912C84B /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Italic.ttf"; path = "../src/assets/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
 		5058E4CA8421493CB58EF2D7 /* FiraSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Bold.ttf"; path = "../src/assets/fonts/FiraSans-Bold.ttf"; sourceTree = "<group>"; };
@@ -303,8 +303,8 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* Hexa.app */,
-				4D437D7E2440796600A43169 /* HEXA Dev.app */,
-				4D437DD02440811F00A43169 /* HEXA Stage.app */,
+				4D437D7E2440796600A43169 /* Hexa Dev.app */,
+				4D437DD02440811F00A43169 /* Hexa Stage.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -398,7 +398,7 @@
 			);
 			name = "HEXA Dev";
 			productName = "Hello World";
-			productReference = 4D437D7E2440796600A43169 /* HEXA Dev.app */;
+			productReference = 4D437D7E2440796600A43169 /* Hexa Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4D437D9D2440811F00A43169 /* HEXA Stage */ = {
@@ -419,7 +419,7 @@
 			);
 			name = "HEXA Stage";
 			productName = "Hello World";
-			productReference = 4D437DD02440811F00A43169 /* HEXA Stage.app */;
+			productReference = 4D437DD02440811F00A43169 /* Hexa Stage.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -878,6 +878,9 @@
 					"$(SRCROOT)/../node_modules/react-native-cloud-fs/ios",
 				);
 				INFOPLIST_FILE = HEXA/Info.plist;
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "";
+				INFOPLIST_PREFIX_HEADER = "";
+				INFOPLIST_PREPROCESS = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -916,6 +919,9 @@
 					"$(SRCROOT)/../node_modules/react-native-cloud-fs/ios",
 				);
 				INFOPLIST_FILE = HEXA/Info.plist;
+				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "";
+				INFOPLIST_PREFIX_HEADER = "";
+				INFOPLIST_PREPROCESS = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -941,7 +947,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FB914658CF4D184F1617BD58 /* Pods-HEXA Dev.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Development";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -971,7 +977,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_MODULE_NAME = Hexa;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Hexa Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -984,7 +990,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EEEA8944B500BFD906A85496 /* Pods-HEXA Dev.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Development";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
@@ -1013,7 +1019,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_MODULE_NAME = Hexa;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Hexa Dev";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1025,7 +1031,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 69AEFA29CCB91D48DEF6E741 /* Pods-HEXA Stage.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Staging";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1055,7 +1061,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
 				PRODUCT_MODULE_NAME = Hexa;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Hexa Stage";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1068,7 +1074,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1FA0D3C2EBD7429ADCB4E870 /* Pods-HEXA Stage.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Staging";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
@@ -1097,7 +1103,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
 				PRODUCT_MODULE_NAME = Hexa;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "Hexa Stage";
 				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
