@@ -68,7 +68,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),
-            new JailMonkeyPackage(), new ReactNativeContacts(), new RNMail(),
+            new JailMonkeyPackage(),
             new RNFirebasePackage(), new RNFirebaseMessagingPackage(),
           new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
           new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),

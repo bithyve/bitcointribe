@@ -61,6 +61,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ResetTwoFASuccess from './ResetTwoFASuccess';
 import NewTwoFASecret from './NewTwoFASecret';
 import ServerErrorModal from './ServerErrorModal';
+import TwoFASweepFunds from './TwoFASweepFunds';
 
 export default function Send(props) {
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
@@ -113,6 +114,7 @@ export default function Send(props) {
   const [successMessageHeader, setSuccessMessageHeader] = useState('');
   const [QRModalHeader, setQRModalHeader] = useState('');
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+  const [TwoFAsweepFundsBottomSheet, setTwoFAsweepFundsBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
@@ -497,7 +499,7 @@ export default function Send(props) {
         >
           <View style={{ ...styles.otpRequestHeaderView }}>
             <Text style={styles.modalTitleText}>
-              {'Enter OTP to authenticate'}
+              {'Enter OTP to\nauthenticate'}
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
               {
@@ -732,12 +734,15 @@ export default function Send(props) {
     return (
       <ResetTwoFAHelp
         onClickResetTwoFA={() => {
-          setQRModalHeader('Reset 2FA')
+          setTimeout(() => {
+            setQRModalHeader('Reset 2FA')
+          }, 2);
           if (QrBottomSheet.current)
           (QrBottomSheet as any).current.snapTo(1);
         }}
         onClickServerIsNotResponding={() => {
           (ServerNotRespondingBottomSheet as any).current.snapTo(1);
+          ResetTwoFAHelpBottomSheet.current.snapTo(0);
         }}
       />
     );
@@ -758,12 +763,16 @@ export default function Send(props) {
   function renderQrContent() {
     return (
       <QRModal
-      title={'Scan the Secondary Mnemonic'}
-      infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'}
-      noteText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'} 
-      modalRef={QrBottomSheet}
+        QRModalHeader={QRModalHeader}
+        title={'Scan the Secondary Mnemonic'}
+        infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'}
+        noteText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'} 
+        modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => getQrCodeData(qrData)}
+        onQrScan={(qrData) => {if(QRModalHeader=="Sweep Funds"){
+          TwoFAsweepFundsBottomSheet.current.snapTo(1);
+          QrBottomSheet.current.snapTo(0);
+        } getQrCodeData(qrData)}}
         onPressQrScanner={() => {
           props.navigation.navigate('QrScanner', {
             scanedCode: getQrCodeData,
@@ -774,26 +783,43 @@ export default function Send(props) {
   }
 
   function renderQrHeader() {
+    return <ModalHeader 
+            onPressHeader={()=>{
+              setTimeout(() => {
+                setQrBottomSheetsFlag(false);
+              }, 2);
+              (QrBottomSheet as any).current.snapTo(0)
+            }}
+          />
+  }
+
+  function renderTwoFASweepFundsContent() {
     return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet as any).current.snapTo(0)
+      <TwoFASweepFunds
+        averageTxFees={averageTxFees}
+        modalRef={TwoFAsweepFundsBottomSheet}
+        onPressCancel={()=>{
+          // dispatch(clearTransfer(serviceType));
+          TwoFAsweepFundsBottomSheet.current.snapTo(0);
         }}
-        style={styles.modalHeaderContainer}
-      >
-        <View style={styles.modalHeaderHandle} />
-        <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-                {/* <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, justifyContent: 'center', }}>
-                    <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-                </AppBottomSheetTouchableWrapper> */}
-                <Text style={{...styles.modalHeaderTitleText}}>{QRModalHeader}</Text>
-            </View>
-       </View>
-      </TouchableOpacity>
+        onPressQrScan={()=>{
+          if (bottomSheet.current)
+          (bottomSheet as any).current.snapTo(1);
+        }}
+        onPressConfirmSweep={()=>checkBalance()}
+      />
     );
+  }
+
+  function renderTwoFASweepFundsHeader() {
+    return <ModalHeader 
+            onPressHeader={()=>{
+              setTimeout(() => {
+                setQrBottomSheetsFlag(false);
+              }, 2);
+              (QrBottomSheet as any).current.snapTo(0)
+            }}
+          />
   }
 
   const renderErrorModalContent = useCallback(() => {
@@ -829,10 +855,11 @@ export default function Send(props) {
       <NewTwoFASecret
         modalRef={NewTwoFASecretBottomSheet}
         title={'Scan in Authenticator'}
-      infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'}
-      onPressDone={()=>{
-        (NewTwoFASecretBottomSheet as any).current.snapTo(0);
-      }}/>
+        infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'}
+        onPressDone={()=>{
+          (NewTwoFASecretBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   }, []);
 
@@ -1603,6 +1630,24 @@ export default function Send(props) {
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (TwoFAsweepFundsBottomSheet as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {}}
+        enabledInnerScrolling={true}
+        ref={TwoFAsweepFundsBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+        ]}
+        renderContent={renderTwoFASweepFundsContent}
+        renderHeader={renderTwoFASweepFundsHeader}
       />
        <BottomSheet
         enabledInnerScrolling={true}

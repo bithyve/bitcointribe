@@ -96,7 +96,7 @@ import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
-// import firebase from "react-native-firebase";
+import firebase from "react-native-firebase";
 import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
@@ -519,7 +519,7 @@ export default function Home(props) {
   }
 
   useEffect(function () {
-    // getFCMToken();
+    getFCMToken();
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
@@ -547,11 +547,11 @@ export default function Home(props) {
     };
   }, []);
 
-  // const getFCMToken = async() =>{
-  //   const fcmToken = await firebase.messaging().getToken();
-  //   console.log("fcmToken", fcmToken);
-  //   return fcmToken;
-  // }
+  const getFCMToken = async() =>{
+    const fcmToken = await firebase.messaging().getToken();
+    console.log("fcmToken", fcmToken);
+    return fcmToken;
+  }
 
   const setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');

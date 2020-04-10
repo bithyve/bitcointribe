@@ -3,9 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  KeyboardAvoidingView,
-  TextInput,
-  Platform,
   AsyncStorage,
   ImageBackground,
 } from 'react-native';
@@ -16,20 +13,21 @@ import {
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function QrCodeModalContents(props) {
+export default function QRModal(props) {
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const barcodeRecognized = async (barcodes) => {
-    if (barcodes.data) {
-      setOpenCameraFlag(false);
-      props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
-      props.onQrScan(getFormattedString(barcodes.data));
-    }
+    // Uncomment this changes and comment or remove line 34
+    // if (barcodes.data) {
+    //   setOpenCameraFlag(false);
+    //   props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
+    //   props.onQrScan(getFormattedString(barcodes.data));
+    // }
+    props.onQrScan('test');
   };
 
   useEffect(() => {
@@ -63,6 +61,11 @@ export default function QrCodeModalContents(props) {
   return (
     <View style={styles.modalContentContainer}>
         <ScrollView style={styles.qrModalScrollView}>
+          <View style={styles.modalHeaderTitleView}>
+            <View style={{ flexDirection: 'row', alignItems:'center'}}>
+              <Text style={styles.modalHeaderTitleText}>{props.QRModalHeader}</Text>
+            </View>
+          </View>
           <View style={styles.qrModalImageNTextInputView}>
             {props.isOpenedFlag && openCameraFlag ? (
               <View
@@ -151,7 +154,10 @@ export default function QrCodeModalContents(props) {
               </View>
             ) : (
               <AppBottomSheetTouchableWrapper
-                onPress={() => setOpenCameraFlag(true)}
+                onPress={() => {
+                  setOpenCameraFlag(true); 
+                  // remove line 164 => props.onQrScan('test');
+                   props.onQrScan('test');}}
               >
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
@@ -292,11 +298,11 @@ export default function QrCodeModalContents(props) {
   );
 }
 const styles = StyleSheet.create({
-    bottomNoteInfoText: {
-        color: Colors.textColorGrey,
-        fontSize: RFValue(11),
-        fontFamily: Fonts.FiraSansRegular,
-      },
+  bottomNoteInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansRegular,
+  },
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -304,47 +310,27 @@ const styles = StyleSheet.create({
   qrModalScrollView: {
     display: 'flex',
     backgroundColor: Colors.white,
-    marginTop: hp('4%'),
   },
   qrModalImageNTextInputView: {
+    marginTop: hp('2%'),
     marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  qrModalImage: {
-    width: wp('72%'),
-    height: wp('72%'),
-    borderRadius: 20,
-    borderWidth: 2.5,
-    borderColor: Colors.backgroundColor,
-  },
-  qrModalTextInput: {
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: Colors.backgroundColor,
-    width: wp('72%'),
-    height: 60,
-    marginTop: 20,
-    marginBottom: 20,
-    paddingLeft: 15,
-    paddingRight: 15,
-    fontSize: RFValue(11, 812),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  qrModalInfoView: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingLeft: 30,
-    paddingRight: 30,
+  modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
     flexDirection: 'row',
-    alignSelf: 'center',
+    paddingRight: 10,
+    paddingBottom: hp('2%'),
+    paddingTop: hp('2%'),
+    marginLeft: wp('4%'),
+    marginRight: wp('4%'),
   },
-  qrModalInfoTitleText: {
+  modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18, 812),
-  },
-  qrModalInfoInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12, 812),
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansRegular
   },
 });
