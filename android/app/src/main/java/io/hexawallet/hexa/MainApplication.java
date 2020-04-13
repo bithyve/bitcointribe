@@ -46,6 +46,10 @@ import io.fabric.sdk.android.Fabric;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
 
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
+
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
       new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
@@ -64,7 +68,9 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),
-            new JailMonkeyPackage(), new ReactNativeContacts(), new RNMail(),
+            new JailMonkeyPackage(),
+            new RNFirebasePackage(), new RNFirebaseMessagingPackage(),
+          new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
           new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
           new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
           new RNHTMLtoPDFPackage(), new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
