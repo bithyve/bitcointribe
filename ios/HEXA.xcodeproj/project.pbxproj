@@ -103,6 +103,9 @@
 		4D437DC82440811F00A43169 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8CFFF238310D47B189028824 /* Octicons.ttf */; };
 		4D437DC92440811F00A43169 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9F1E7BAA23A48C4B4842E2B /* SimpleLineIcons.ttf */; };
 		4D437DCA2440811F00A43169 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 16C5F73D29C84B0596334466 /* Zocial.ttf */; };
+		4DFB8673244440500098B4BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB8672244440500098B4BF /* GoogleService-Info.plist */; };
+		4DFB8674244440500098B4BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB8672244440500098B4BF /* GoogleService-Info.plist */; };
+		4DFB8675244440500098B4BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB8672244440500098B4BF /* GoogleService-Info.plist */; };
 		571B9E719CC5434CBB0CE06E /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 64120BA926AA4A109016FF90 /* FiraSans-Medium.ttf */; };
 		58C9D94C238CF52100111659 /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C9D94B238CF52100111659 /* PdfPassword.m */; };
 		5CFC5206068C46378A91D4B5 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9F1E7BAA23A48C4B4842E2B /* SimpleLineIcons.ttf */; };
@@ -157,9 +160,9 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = HEXA/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = HEXA/main.m; sourceTree = "<group>"; };
 		16C5F73D29C84B0596334466 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		191859AC77A04FD8A30F1453 /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
 		1B9E6637799AEF496501376D /* Pods-HEXA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.debug.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.debug.xcconfig"; sourceTree = "<group>"; };
 		1FA0D3C2EBD7429ADCB4E870 /* Pods-HEXA Stage.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA Stage.release.xcconfig"; path = "Target Support Files/Pods-HEXA Stage/Pods-HEXA Stage.release.xcconfig"; sourceTree = "<group>"; };
-		191859AC77A04FD8A30F1453 /* RNFirebase.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNFirebase.xcodeproj; path = "../node_modules/react-native-firebase/ios/RNFirebase.xcodeproj"; sourceTree = "<group>"; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2FB9F98AA281430D89E114A8 /* OpenSans-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-BoldItalic.ttf"; path = "../src/assets/fonts/OpenSans-BoldItalic.ttf"; sourceTree = "<group>"; };
 		340715C7D2234FB3BA9916F6 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Regular.ttf"; path = "../src/assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
@@ -168,6 +171,7 @@
 		4D437D7F2440796600A43169 /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "/Users/nikhitagawande/workspace/hexa/ios/HEXA.Dev-Info.plist"; sourceTree = "<absolute>"; };
 		4D437DD02440811F00A43169 /* Hexa Stage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hexa Stage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D437DD12440812000A43169 /* HEXA.Stage-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Stage-Info.plist"; path = "/Users/nikhitagawande/workspace/hexa/ios/HEXA.Stage-Info.plist"; sourceTree = "<absolute>"; };
+		4DFB8672244440500098B4BF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4FB7E5E1464C4A29B912C84B /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Italic.ttf"; path = "../src/assets/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
 		5058E4CA8421493CB58EF2D7 /* FiraSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Bold.ttf"; path = "../src/assets/fonts/FiraSans-Bold.ttf"; sourceTree = "<group>"; };
 		58332C592397B07A00E2831D /* Hexa.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Hexa.entitlements; path = HEXA/Hexa.entitlements; sourceTree = "<group>"; };
@@ -260,7 +264,7 @@
 		13B07FAE1A68108700A75B9A /* HEXA */ = {
 			isa = PBXGroup;
 			children = (
-				CC478A8B2444466A00D91F15 /* GoogleService-Info.plist */,
+				4DFB8672244440500098B4BF /* GoogleService-Info.plist */,
 				58332C592397B07A00E2831D /* Hexa.entitlements */,
 				58C9D94A238CF52100111659 /* PdfPassword.h */,
 				58C9D94B238CF52100111659 /* PdfPassword.m */,
@@ -543,7 +547,7 @@
 				25297E7362264FC69767DBC0 /* FontAwesome5_Regular.ttf in Resources */,
 				E0E6316DF7CF4B2781DBF663 /* FontAwesome5_Solid.ttf in Resources */,
 				30C866A40CE54E57B8D9F7C9 /* Fontisto.ttf in Resources */,
-				CC478A8C2444466A00D91F15 /* GoogleService-Info.plist in Resources */,
+				4DFB8673244440500098B4BF /* GoogleService-Info.plist in Resources */,
 				987409B39E3B4AF080C94D3A /* Foundation.ttf in Resources */,
 				CF23FB49EAA74086B9B1F418 /* Ionicons.ttf in Resources */,
 				D0D2EE533E3147F6B8C096DE /* MaterialCommunityIcons.ttf in Resources */,
@@ -585,6 +589,7 @@
 				4D437D6F2440796600A43169 /* FontAwesome5_Regular.ttf in Resources */,
 				4D437D702440796600A43169 /* FontAwesome5_Solid.ttf in Resources */,
 				4D437D712440796600A43169 /* Fontisto.ttf in Resources */,
+				4DFB8674244440500098B4BF /* GoogleService-Info.plist in Resources */,
 				4D437D722440796600A43169 /* Foundation.ttf in Resources */,
 				4D437D732440796600A43169 /* Ionicons.ttf in Resources */,
 				4D437D742440796600A43169 /* MaterialCommunityIcons.ttf in Resources */,
@@ -626,6 +631,7 @@
 				4D437DC12440811F00A43169 /* FontAwesome5_Regular.ttf in Resources */,
 				4D437DC22440811F00A43169 /* FontAwesome5_Solid.ttf in Resources */,
 				4D437DC32440811F00A43169 /* Fontisto.ttf in Resources */,
+				4DFB8675244440500098B4BF /* GoogleService-Info.plist in Resources */,
 				4D437DC42440811F00A43169 /* Foundation.ttf in Resources */,
 				4D437DC52440811F00A43169 /* Ionicons.ttf in Resources */,
 				4D437DC62440811F00A43169 /* MaterialCommunityIcons.ttf in Resources */,

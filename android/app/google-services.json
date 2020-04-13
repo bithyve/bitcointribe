@@ -32,10 +32,82 @@
               "client_type": 3
             },
             {
-              "client_id": "813799407825-43doq8j5b766r656vlarhunjr4l95if8.apps.googleusercontent.com",
+              "client_id": "813799407825-tiogfc65iakumj8aih6aismajmjntqdl.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "io.hexawallet.hexa"
+                "bundle_id": "io.hexawallet.hexa.development"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813799407825:android:0796a6441cf5035fd845f0",
+        "android_client_info": {
+          "package_name": "io.hexawallet.hexa.development"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813799407825-02s4t9t7f9ckaa4kfo8ue1g2reo97o7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7uKoQ1zmxZKf3uRNH1q5bsC-KBeyTY0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813799407825-02s4t9t7f9ckaa4kfo8ue1g2reo97o7c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "813799407825-tiogfc65iakumj8aih6aismajmjntqdl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.hexawallet.hexa.development"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813799407825:android:88243b2230382f55d845f0",
+        "android_client_info": {
+          "package_name": "io.hexawallet.hexa.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813799407825-02s4t9t7f9ckaa4kfo8ue1g2reo97o7c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7uKoQ1zmxZKf3uRNH1q5bsC-KBeyTY0E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813799407825-02s4t9t7f9ckaa4kfo8ue1g2reo97o7c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "813799407825-tiogfc65iakumj8aih6aismajmjntqdl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.hexawallet.hexa.development"
               }
             }
           ]
