@@ -41,7 +41,7 @@
 		C12552E990024618BB99A94D /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5912C0B72794236AAB85774 /* FiraSans-Regular.ttf */; };
 		C4915AF51E7946E191605AA9 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B31385DB589942E69DE293D3 /* FontAwesome5_Brands.ttf */; };
 		C9C37EECA5C44212AD8FA26A /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65988274BA62488F8301AA33 /* OpenSans-Light.ttf */; };
-		CCDB1D4E243EFEDA00C6CF3E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CCDB1D4D243EFEDA00C6CF3E /* GoogleService-Info.plist */; };
+		CC478A8C2444466A00D91F15 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CC478A8B2444466A00D91F15 /* GoogleService-Info.plist */; };
 		CF23FB49EAA74086B9B1F418 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F49BCA1A6E264D1393B0F552 /* Ionicons.ttf */; };
 		D0D2EE533E3147F6B8C096DE /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4A42DFFF10444D74862B92DE /* MaterialCommunityIcons.ttf */; };
 		D3B61288D703465FA578996F /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5058E4CA8421493CB58EF2D7 /* FiraSans-Bold.ttf */; };
@@ -108,7 +108,7 @@
 		BC2E713B33C44296BAE6D3B4 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
 		C166F50B6D93637BE883FA59 /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8E80D7B5CE14ACB8ECC8581 /* libRNCloudFs.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCloudFs.a; sourceTree = "<group>"; };
-		CCDB1D4D243EFEDA00C6CF3E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		CC478A8B2444466A00D91F15 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		DE14EAFB84DD51B7F6C2EF59 /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
 		DF2B97BB7D324112916957EE /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		E3391ED6C5244DC8A6D509A1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -146,6 +146,7 @@
 		13B07FAE1A68108700A75B9A /* HEXA */ = {
 			isa = PBXGroup;
 			children = (
+				CC478A8B2444466A00D91F15 /* GoogleService-Info.plist */,
 				58332C592397B07A00E2831D /* Hexa.entitlements */,
 				58C9D94A238CF52100111659 /* PdfPassword.h */,
 				58C9D94B238CF52100111659 /* PdfPassword.m */,
@@ -160,7 +161,8 @@
 				8B9A0F2723AB4F3F00E80325 /* HEXA-Bridging-Header.h */,
 			);
 			name = HEXA;
-			sourceTree = "<group>";
+			path = ../../../../../../../../workspace/hexa/ios;
+			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
@@ -185,7 +187,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				CCDB1D4D243EFEDA00C6CF3E /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* HEXA */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -370,7 +371,7 @@
 				25297E7362264FC69767DBC0 /* FontAwesome5_Regular.ttf in Resources */,
 				E0E6316DF7CF4B2781DBF663 /* FontAwesome5_Solid.ttf in Resources */,
 				30C866A40CE54E57B8D9F7C9 /* Fontisto.ttf in Resources */,
-				CCDB1D4E243EFEDA00C6CF3E /* GoogleService-Info.plist in Resources */,
+				CC478A8C2444466A00D91F15 /* GoogleService-Info.plist in Resources */,
 				987409B39E3B4AF080C94D3A /* Foundation.ttf in Resources */,
 				CF23FB49EAA74086B9B1F418 /* Ionicons.ttf in Resources */,
 				D0D2EE533E3147F6B8C096DE /* MaterialCommunityIcons.ttf in Resources */,
