@@ -28,12 +28,16 @@ require_relative '../node_modules/react-native-unimodules/cocoapods'
   pod 'RNGestureHandler', :podspec => '../node_modules/react-native-gesture-handler/RNGestureHandler.podspec'
   pod 'RNReanimated', :podspec => '../node_modules/react-native-reanimated/RNReanimated.podspec'
   pod 'RNScreens', :path => '../node_modules/react-native-screens'
-
+  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios/RNFirebase.podspec'
+  # # Required by RNFirebase
+  pod 'Firebase/Core', '~> 5.20.1'
+  pod 'Firebase/Messaging', '~> 5.20.1'
+  
   use_unimodules!
   pod 'Fabric'
   pod 'Crashlytics'
   pod 'PDFGenerator'
-   pod 'QRCoder'
+  pod 'QRCoder'
 
 
   pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'

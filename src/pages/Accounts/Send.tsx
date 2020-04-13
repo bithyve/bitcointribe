@@ -53,9 +53,25 @@ import QrCodeModalContents from '../../components/QrCodeModalContents';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
+import LostTwoFA from './LostTwoFA';
+import ResetTwoFAHelp from './ResetTwoFAHelp';
+import QRModal from './QRModal';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import ResetTwoFASuccess from './ResetTwoFASuccess';
+import NewTwoFASecret from './NewTwoFASecret';
+import ServerErrorModal from './ServerErrorModal';
+import TwoFASweepFunds from './TwoFASweepFunds';
 
 export default function Send(props) {
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
+  const [ResetTwoFAHelpBottomSheet, setResetTwoFAHelpBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [
+    OTPAuthenticationBottomSheet,
+    setOTPAuthenticationBottomSheet,
+  ] = useState(React.createRef());
   const [
     SendConfirmationBottomSheet,
     setSendConfirmationBottomSheet,
@@ -89,9 +105,16 @@ export default function Send(props) {
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const { transfer, loading, service } = useSelector(
-    state => state.accounts[serviceType],
+    (state) => state.accounts[serviceType],
   );
-
+  const [ServerNotRespondingBottomSheet, setServerNotRespondingBottomSheet] = useState(React.createRef());
+  const [NewTwoFASecretBottomSheet, setNewTwoFASecretBottomSheet] = useState(React.createRef());
+  const [ResetTwoFASuccessBottomSheet, setResetTwoFASuccessBottomSheet] = useState(React.createRef());
+  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessageHeader, setSuccessMessageHeader] = useState('');
+  const [QRModalHeader, setQRModalHeader] = useState('');
+  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+  const [TwoFAsweepFundsBottomSheet, setTwoFAsweepFundsBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.state.params.getServiceType
@@ -112,7 +135,15 @@ export default function Send(props) {
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
     React.createRef(),
   );
+
   const [isEditable, setIsEditable] = useState(true);
+  function onPressNumber(text) {
+    let tmpToken = token;
+    if (token.length < 6) {
+      tmpToken += text;
+      setToken(tmpToken);
+    }
+  }
 
   let userInfo = {
     to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
@@ -144,7 +175,7 @@ export default function Send(props) {
   };
   const [openmodal, setOpenmodal] = useState('closed');
   const viewRef = useRef(null);
-  const tapSliderHandler = evt => {
+  const tapSliderHandler = (evt) => {
     if (viewRef.current) {
       viewRef.current.measure((fx, fy, width, height, px) => {
         const location = (evt.nativeEvent.locationX - px) / width;
@@ -197,7 +228,8 @@ export default function Send(props) {
         setAmount(`0`);
       } else {
         setAmount(
-          `${netBalance -
+          `${
+            netBalance -
             Number(
               averageTxFees[
                 sliderValueText === 'Low Fee'
@@ -206,7 +238,8 @@ export default function Send(props) {
                   ? 'medium'
                   : 'high'
               ].averageTxFee,
-            )}`,
+            )
+          }`,
         );
       }
     }
@@ -275,19 +308,49 @@ export default function Send(props) {
 
   const dispatch = useDispatch();
 
+  const renderSuccessStatusContents = () => (
+    <SendStatusModalContents
+      title1stLine={'Sent Successfully'}
+      title2ndLine={''}
+      info1stLine={'Bitcoins successfully sent to'}
+      info2ndLine={''}
+      userName={recipientAddress}
+      // modalRef={SendSuccessBottomSheet}
+      isSuccess={true}
+      onPressViewAccount={() => {
+        dispatch(clearTransfer(serviceType));
+        // dispatch(fetchTransactions(serviceType));
+        dispatch(
+          fetchBalanceTx(serviceType, {
+            loader: true,
+          }),
+        );
+        props.navigation.navigate('Accounts');
+      }}
+      transactionId={transfer.txid}
+      transactionDateTime={Date()}
+    />
+  );
+
+  if (transfer.txid) {
+    if (OTPAuthenticationBottomSheet.current)
+      OTPAuthenticationBottomSheet.current.snapTo(0);
+    return renderSuccessStatusContents();
+  }
+
   useEffect(() => {
     if (
       transfer.stage1.failed ||
       transfer.stage2.failed ||
       transfer.stage3.failed
     ) {
-      if (SendConfirmationBottomSheet.current){
+      if (SendConfirmationBottomSheet.current) {
         setTimeout(() => {
           setIsConfirmDisabled(false);
         }, 10);
         SendConfirmationBottomSheet.current.snapTo(0);
       }
-      if (SendUnSuccessWithAddressBottomSheet.current){
+      if (SendUnSuccessWithAddressBottomSheet.current) {
         setTimeout(() => {
           setIsConfirmDisabled(false);
         }, 10);
@@ -298,13 +361,13 @@ export default function Send(props) {
       if (description) {
         updateDescription(transfer.txid, description);
       }
-      if (SendConfirmationBottomSheet.current){
+      if (SendConfirmationBottomSheet.current) {
         setTimeout(() => {
           setIsConfirmDisabled(false);
         }, 10);
         SendConfirmationBottomSheet.current.snapTo(0);
       }
-      if (SendSuccessWithAddressBottomSheet.current){
+      if (SendSuccessWithAddressBottomSheet.current) {
         setTimeout(() => {
           setIsConfirmDisabled(false);
         }, 10);
@@ -318,10 +381,12 @@ export default function Send(props) {
       }, 10);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       setIsConfirmDisabled(false);
-      props.navigation.navigate('TwoFAToken', {
-        serviceType,
-        recipientAddress,
-      });
+      if (OTPAuthenticationBottomSheet.current)
+        OTPAuthenticationBottomSheet.current.snapTo(1);
+      // props.navigation.navigate('TwoFAToken', {
+      //   serviceType,
+      //   recipientAddress,
+      // });
     }
   }, [transfer]);
 
@@ -360,7 +425,7 @@ export default function Send(props) {
     );
   };
 
-  const getQrCodeData = qrData => {
+  const getQrCodeData = (qrData) => {
     setTimeout(() => {
       setQrBottomSheetsFlag(false);
       setRecipientAddress(qrData);
@@ -376,7 +441,7 @@ export default function Send(props) {
         flag={true}
         modalRef={bottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={qrData => getQrCodeData(qrData)}
+        onQrScan={(qrData) => getQrCodeData(qrData)}
       />
     );
   };
@@ -421,6 +486,428 @@ export default function Send(props) {
   //     />
   //   );
   // }, []);
+
+  const renderOTPAuthenticationContents = () => {
+    return (
+      <View style={{ ...styles.modalContentContainer, height: '100%' }}>
+        <View
+          style={{
+            marginRight: wp('8%'),
+            marginLeft: wp('8%'),
+            marginBottom: hp('3%'),
+          }}
+        >
+          <View style={{ ...styles.otpRequestHeaderView }}>
+            <Text style={styles.modalTitleText}>
+              {'Enter OTP to\nauthenticate'}
+            </Text>
+            <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
+              {
+                'Please enter the OTP from the authenticator that you have set up'
+              }
+            </Text>
+          </View>
+          <View style={{ marginBottom: hp('2%') }}>
+            <View style={styles.passcodeTextInputView}>
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  this.textInput = input;
+                }}
+                style={[
+                  this.textInput && this.textInput.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                  if (value) this.textInput2.focus();
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput.focus();
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  this.textInput2 = input;
+                }}
+                style={[
+                  this.textInput2 && this.textInput2.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                  if (value) this.textInput3.focus();
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput.focus();
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  this.textInput3 = input;
+                }}
+                style={[
+                  this.textInput3 && this.textInput3.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                  if (value) this.textInput4.focus();
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput2.focus();
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  this.textInput4 = input;
+                }}
+                style={[
+                  this.textInput3 && this.textInput3.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                  if (value) this.textInput5.focus();
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput3.focus();
+                  }
+                }}
+              />
+
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  this.textInput5 = input;
+                }}
+                style={[
+                  this.textInput3 && this.textInput3.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                  if (value) this.textInput6.focus();
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput4.focus();
+                  }
+                }}
+              />
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  this.textInput6 = input;
+                }}
+                style={[
+                  this.textInput3 && this.textInput3.isFocused()
+                    ? styles.textBoxActive
+                    : styles.textBoxStyles,
+                ]}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace') {
+                    this.textInput5.focus();
+                  }
+                }}
+              />
+            </View>
+          </View>
+          <View
+            style={{
+              marginBottom: hp('8%'),
+              marginLeft: wp('2%'),
+              marginRight: wp('2%'),
+            }}
+          >
+            <Text style={{ ...styles.modalInfoText }}>
+              {
+                'If you have not set up the authenticator yet, please see our FAQ section to see how to do it'
+              }
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(transferST3(serviceType, token));
+              }}
+              style={{ ...styles.confirmModalButtonView }}
+            >
+              {loading.transfer ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={styles.confirmButtonText}>Confirm</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                // setTimeout(() => {
+                //   setSuccessMessageHeader('2FA Reset Successful');
+                //   setSuccessMessage('Lorem ipsum dolor sit amet, consectetur');
+                // }, 2);
+                // (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
+                if (OTPAuthenticationBottomSheet.current) {
+                  OTPAuthenticationBottomSheet.current.snapTo(0);
+                }
+                ResetTwoFAHelpBottomSheet.current.snapTo(1);
+                
+                //props.navigation.navigate('LostTwoFA');
+              }}
+              style={{
+                width: wp('30%'),
+                height: wp('13%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                marginLeft: 15,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Need Help?
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderOTPAuthenticationHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (OTPAuthenticationBottomSheet.current) {
+            OTPAuthenticationBottomSheet.current.snapTo(0);
+          }
+        }}
+      />
+    );
+  };
+
+  const renderResetTwoFAHelpContents = () => {
+    return (
+      <ResetTwoFAHelp
+        onClickResetTwoFA={() => {
+          setTimeout(() => {
+            setQRModalHeader('Reset 2FA')
+          }, 2);
+          if (QrBottomSheet.current)
+          (QrBottomSheet as any).current.snapTo(1);
+        }}
+        onClickServerIsNotResponding={() => {
+          (ServerNotRespondingBottomSheet as any).current.snapTo(1);
+          ResetTwoFAHelpBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderResetTwoFAHelpHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (ResetTwoFAHelpBottomSheet.current) {
+            ResetTwoFAHelpBottomSheet.current.snapTo(0);
+          }
+        }}
+      />
+    );
+  };
+
+  function renderQrContent() {
+    return (
+      <QRModal
+        QRModalHeader={QRModalHeader}
+        title={'Scan the Secondary Mnemonic'}
+        infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'}
+        noteText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'} 
+        modalRef={QrBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={(qrData) => {if(QRModalHeader=="Sweep Funds"){
+          TwoFAsweepFundsBottomSheet.current.snapTo(1);
+          QrBottomSheet.current.snapTo(0);
+        } getQrCodeData(qrData)}}
+        onPressQrScanner={() => {
+          props.navigation.navigate('QrScanner', {
+            scanedCode: getQrCodeData,
+          });
+        }}
+      />
+    );
+  }
+
+  function renderQrHeader() {
+    return <ModalHeader 
+            onPressHeader={()=>{
+              setTimeout(() => {
+                setQrBottomSheetsFlag(false);
+              }, 2);
+              (QrBottomSheet as any).current.snapTo(0)
+            }}
+          />
+  }
+
+  function renderTwoFASweepFundsContent() {
+    return (
+      <TwoFASweepFunds
+        averageTxFees={averageTxFees}
+        modalRef={TwoFAsweepFundsBottomSheet}
+        onPressCancel={()=>{
+          // dispatch(clearTransfer(serviceType));
+          TwoFAsweepFundsBottomSheet.current.snapTo(0);
+        }}
+        onPressQrScan={()=>{
+          if (bottomSheet.current)
+          (bottomSheet as any).current.snapTo(1);
+        }}
+        onPressConfirmSweep={()=>checkBalance()}
+      />
+    );
+  }
+
+  function renderTwoFASweepFundsHeader() {
+    return <ModalHeader 
+            onPressHeader={()=>{
+              setTimeout(() => {
+                setQrBottomSheetsFlag(false);
+              }, 2);
+              (QrBottomSheet as any).current.snapTo(0)
+            }}
+          />
+  }
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ResetTwoFASuccess
+        modalRef={ResetTwoFASuccessBottomSheet}
+        title={successMessageHeader}
+        note={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'}
+        info={successMessage}
+        proceedButtonText={'Proceed'}
+        onPressProceed={() => {
+          (ResetTwoFASuccessBottomSheet as any).current.snapTo(0);
+          (NewTwoFASecretBottomSheet as any).current.snapTo(1);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/icon_twoFASuccess.png')}
+      />
+    );
+  }, [successMessage, successMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ResetTwoFASuccessBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderNewTwoFASecretContent = useCallback(() => {
+    return (
+      <NewTwoFASecret
+        modalRef={NewTwoFASecretBottomSheet}
+        title={'Scan in Authenticator'}
+        infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'}
+        onPressDone={()=>{
+          (NewTwoFASecretBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderNewTwoFASecretHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (NewTwoFASecretBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderServerNotRespondingContent = useCallback(() => {
+    return (
+      <ServerErrorModal
+        modalRef={ServerNotRespondingBottomSheet}
+        title={'Oops! The server\nis not responding'}
+        note={'Lorem ipsum dolor sit amet, consectetur'}
+        info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'}
+        proceedButtonText={'Try Again'}
+        onPressProceed={() => {
+          (ServerNotRespondingBottomSheet as any).current.snapTo(0);
+        }}
+        isIgnoreButton={true}
+        cancelButtonText={'Sweep Funds'}
+        onPressIgnore={()=>{
+          setTimeout(() => {
+            setQRModalHeader('Sweep Funds')
+          }, 2);
+          if (QrBottomSheet.current)
+          (QrBottomSheet as any).current.snapTo(1);
+          (ServerNotRespondingBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderServerNotRespondingHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ServerNotRespondingBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
 
   const renderSendConfirmationContents = () => {
     if (transfer) {
@@ -737,7 +1224,7 @@ export default function Send(props) {
                       value={recipientAddress}
                       onChangeText={setRecipientAddress}
                       placeholderTextColor={Colors.borderColor}
-                      onKeyPress={e => {
+                      onKeyPress={(e) => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
                             setIsInvalidAddress(true);
@@ -813,9 +1300,9 @@ export default function Send(props) {
                       returnKeyLabel="Done"
                       returnKeyType="done"
                       keyboardType={'numeric'}
-                      onChangeText={value => setAmount(value)}
+                      onChangeText={(value) => setAmount(value)}
                       placeholderTextColor={Colors.borderColor}
-                      onKeyPress={e => {
+                      onKeyPress={(e) => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
                             setIsInvalidBalance(false);
@@ -947,10 +1434,10 @@ export default function Send(props) {
                             backgroundColor: 'blue',
                           }}
                           value={sliderValue}
-                          onValueChange={value => {
+                          onValueChange={(value) => {
                             setSliderValue(value);
                           }}
-                          onSlidingComplete={value => {
+                          onSlidingComplete={(value) => {
                             value == 0
                               ? setSliderValueText('Low Fee')
                               : value == 5
@@ -1112,6 +1599,87 @@ export default function Send(props) {
         renderHeader={renderSendConfirmationHeader}
       />
       <BottomSheet
+        enabledInnerScrolling={true}
+        ref={OTPAuthenticationBottomSheet}
+        snapPoints={[-50, hp('50%')]}
+        renderContent={renderOTPAuthenticationContents}
+        renderHeader={renderOTPAuthenticationHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ResetTwoFAHelpBottomSheet}
+        snapPoints={[-50, hp('60%')]}
+        renderContent={renderResetTwoFAHelpContents}
+        renderHeader={renderResetTwoFAHelpHeader}
+      />
+
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {}}
+        enabledInnerScrolling={true}
+        ref={QrBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (TwoFAsweepFundsBottomSheet as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {}}
+        enabledInnerScrolling={true}
+        ref={TwoFAsweepFundsBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+        ]}
+        renderContent={renderTwoFASweepFundsContent}
+        renderHeader={renderTwoFASweepFundsHeader}
+      />
+       <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ResetTwoFASuccessBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={NewTwoFASecretBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+        ]}
+        renderContent={renderNewTwoFASecretContent}
+        renderHeader={renderNewTwoFASecretHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ServerNotRespondingBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderServerNotRespondingContent}
+        renderHeader={renderServerNotRespondingHeader}
+      />
+      <BottomSheet
         onCloseStart={() => {
           {
             dispatch(clearTransfer(serviceType));
@@ -1147,6 +1715,7 @@ export default function Send(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
+    backgroundColor: Colors.white,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -1242,5 +1811,94 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  passcodeTextInputText: {
+    color: Colors.blue,
+    fontWeight: 'bold',
+    fontSize: RFValue(13),
+  },
+  textBoxStyles: {
+    borderWidth: 0.5,
+    height: wp('12%'),
+    width: wp('12%'),
+    borderRadius: 7,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    marginLeft: 8,
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textBoxActive: {
+    borderWidth: 0.5,
+    height: wp('12%'),
+    width: wp('12%'),
+    borderRadius: 7,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 3 },
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    marginLeft: 8,
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textStyles: {
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textFocused: {
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  otpRequestHeaderView: {
+    marginTop: hp('4%'),
+    marginBottom: hp('2%'),
+  },
+  modalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  modalInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  confirmModalButtonView: {
+    height: wp('13%'),
+    width: wp('35%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    alignSelf: 'center',
+  },
+  confirmButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  passcodeTextInputView: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: hp('2.5%'),
+    marginBottom: hp('2.5%'),
   },
 });

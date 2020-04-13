@@ -280,9 +280,33 @@ export default function TwoFAToken(props) {
                 <Text style={styles.confirmButtonText}>Confirm</Text>
               )}
             </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => {
+                  props.navigation.navigate('LostTwoFA');
+                }}
+                style={{
+                  width: wp('30%'),
+                  height: wp('13%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderRadius: 10,
+                  marginLeft: 5
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Need Help?
+                </Text>
+              </TouchableOpacity>
           </View>
         </View>
-        <View
+        {/* <View
           style={{
             alignItems: 'center',
             marginBottom: 200,
@@ -296,7 +320,7 @@ export default function TwoFAToken(props) {
           >
             <Text>I am having problems with my 2FA</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );
