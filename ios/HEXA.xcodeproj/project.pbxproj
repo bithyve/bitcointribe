@@ -103,9 +103,9 @@
 		4D437DC82440811F00A43169 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8CFFF238310D47B189028824 /* Octicons.ttf */; };
 		4D437DC92440811F00A43169 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9F1E7BAA23A48C4B4842E2B /* SimpleLineIcons.ttf */; };
 		4D437DCA2440811F00A43169 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 16C5F73D29C84B0596334466 /* Zocial.ttf */; };
-		4DFB8673244440500098B4BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB8672244440500098B4BF /* GoogleService-Info.plist */; };
-		4DFB8674244440500098B4BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB8672244440500098B4BF /* GoogleService-Info.plist */; };
-		4DFB8675244440500098B4BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DFB8672244440500098B4BF /* GoogleService-Info.plist */; };
+		4DB01208244494720026330B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DB01207244494720026330B /* GoogleService-Info.plist */; };
+		4DB01209244494720026330B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DB01207244494720026330B /* GoogleService-Info.plist */; };
+		4DB0120A244494720026330B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DB01207244494720026330B /* GoogleService-Info.plist */; };
 		571B9E719CC5434CBB0CE06E /* FiraSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 64120BA926AA4A109016FF90 /* FiraSans-Medium.ttf */; };
 		58C9D94C238CF52100111659 /* PdfPassword.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C9D94B238CF52100111659 /* PdfPassword.m */; };
 		5CFC5206068C46378A91D4B5 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A9F1E7BAA23A48C4B4842E2B /* SimpleLineIcons.ttf */; };
@@ -170,7 +170,7 @@
 		4D437D7F2440796600A43169 /* HEXA.Dev-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Dev-Info.plist"; path = "/Users/nikhitagawande/workspace/hexa/ios/HEXA.Dev-Info.plist"; sourceTree = "<absolute>"; };
 		4D437DD02440811F00A43169 /* Hexa Stage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hexa Stage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D437DD12440812000A43169 /* HEXA.Stage-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "HEXA.Stage-Info.plist"; path = "/Users/nikhitagawande/workspace/hexa/ios/HEXA.Stage-Info.plist"; sourceTree = "<absolute>"; };
-		4DFB8672244440500098B4BF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4DB01207244494720026330B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
 		4FB7E5E1464C4A29B912C84B /* OpenSans-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "OpenSans-Italic.ttf"; path = "../src/assets/fonts/OpenSans-Italic.ttf"; sourceTree = "<group>"; };
 		5058E4CA8421493CB58EF2D7 /* FiraSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "FiraSans-Bold.ttf"; path = "../src/assets/fonts/FiraSans-Bold.ttf"; sourceTree = "<group>"; };
 		58332C592397B07A00E2831D /* Hexa.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Hexa.entitlements; path = HEXA/Hexa.entitlements; sourceTree = "<group>"; };
@@ -261,7 +261,7 @@
 		13B07FAE1A68108700A75B9A /* HEXA */ = {
 			isa = PBXGroup;
 			children = (
-				4DFB8672244440500098B4BF /* GoogleService-Info.plist */,
+				4DB01207244494720026330B /* GoogleService-Info.plist */,
 				58332C592397B07A00E2831D /* Hexa.entitlements */,
 				58C9D94A238CF52100111659 /* PdfPassword.h */,
 				58C9D94B238CF52100111659 /* PdfPassword.m */,
@@ -543,7 +543,7 @@
 				25297E7362264FC69767DBC0 /* FontAwesome5_Regular.ttf in Resources */,
 				E0E6316DF7CF4B2781DBF663 /* FontAwesome5_Solid.ttf in Resources */,
 				30C866A40CE54E57B8D9F7C9 /* Fontisto.ttf in Resources */,
-				4DFB8673244440500098B4BF /* GoogleService-Info.plist in Resources */,
+				4DB01208244494720026330B /* GoogleService-Info.plist in Resources */,
 				987409B39E3B4AF080C94D3A /* Foundation.ttf in Resources */,
 				CF23FB49EAA74086B9B1F418 /* Ionicons.ttf in Resources */,
 				D0D2EE533E3147F6B8C096DE /* MaterialCommunityIcons.ttf in Resources */,
@@ -585,7 +585,7 @@
 				4D437D6F2440796600A43169 /* FontAwesome5_Regular.ttf in Resources */,
 				4D437D702440796600A43169 /* FontAwesome5_Solid.ttf in Resources */,
 				4D437D712440796600A43169 /* Fontisto.ttf in Resources */,
-				4DFB8674244440500098B4BF /* GoogleService-Info.plist in Resources */,
+				4DB01209244494720026330B /* GoogleService-Info.plist in Resources */,
 				4D437D722440796600A43169 /* Foundation.ttf in Resources */,
 				4D437D732440796600A43169 /* Ionicons.ttf in Resources */,
 				4D437D742440796600A43169 /* MaterialCommunityIcons.ttf in Resources */,
@@ -627,7 +627,7 @@
 				4D437DC12440811F00A43169 /* FontAwesome5_Regular.ttf in Resources */,
 				4D437DC22440811F00A43169 /* FontAwesome5_Solid.ttf in Resources */,
 				4D437DC32440811F00A43169 /* Fontisto.ttf in Resources */,
-				4DFB8675244440500098B4BF /* GoogleService-Info.plist in Resources */,
+				4DB0120A244494720026330B /* GoogleService-Info.plist in Resources */,
 				4D437DC42440811F00A43169 /* Foundation.ttf in Resources */,
 				4D437DC52440811F00A43169 /* Ionicons.ttf in Resources */,
 				4D437DC62440811F00A43169 /* MaterialCommunityIcons.ttf in Resources */,
@@ -915,7 +915,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 19;
 				DEAD_CODE_STRIPPING = NO;
@@ -944,7 +944,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa;
 				PRODUCT_NAME = Hexa;
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
