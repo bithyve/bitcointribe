@@ -161,8 +161,7 @@
 				8B9A0F2723AB4F3F00E80325 /* HEXA-Bridging-Header.h */,
 			);
 			name = HEXA;
-			path = ../../../../../../../../workspace/hexa/ios;
-			sourceTree = BUILT_PRODUCTS_DIR;
+			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
