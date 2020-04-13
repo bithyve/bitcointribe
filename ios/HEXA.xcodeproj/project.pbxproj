@@ -124,7 +124,6 @@
 		C12552E990024618BB99A94D /* FiraSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F5912C0B72794236AAB85774 /* FiraSans-Regular.ttf */; };
 		C4915AF51E7946E191605AA9 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B31385DB589942E69DE293D3 /* FontAwesome5_Brands.ttf */; };
 		C9C37EECA5C44212AD8FA26A /* OpenSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65988274BA62488F8301AA33 /* OpenSans-Light.ttf */; };
-		CC478A8C2444466A00D91F15 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CC478A8B2444466A00D91F15 /* GoogleService-Info.plist */; };
 		CF23FB49EAA74086B9B1F418 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F49BCA1A6E264D1393B0F552 /* Ionicons.ttf */; };
 		D0D2EE533E3147F6B8C096DE /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4A42DFFF10444D74862B92DE /* MaterialCommunityIcons.ttf */; };
 		D3B61288D703465FA578996F /* FiraSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5058E4CA8421493CB58EF2D7 /* FiraSans-Bold.ttf */; };
@@ -132,7 +131,7 @@
 		DE3ABA70715041CA976FD812 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0B2239255C294279969D8F06 /* OpenSans-Bold.ttf */; };
 		E0E6316DF7CF4B2781DBF663 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF2B97BB7D324112916957EE /* FontAwesome5_Solid.ttf */; };
 		F37784E6F88E43E98ED2D478 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 074A53823B4542088F1A334F /* FiraSans-SemiBold.ttf */; };
-		FC3DCDC102E27616EBACF2B3 /* libPods-HEXA Stage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D6D35DCA3EA80B6E70641788 /* libPods-HEXA Stage.a */; };
+		FC3DCDC102E27616EBACF2B3 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -201,8 +200,6 @@
 		C166F50B6D93637BE883FA59 /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C284012473E358EE6284258A /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
 		C8E80D7B5CE14ACB8ECC8581 /* libRNCloudFs.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCloudFs.a; sourceTree = "<group>"; };
-		CC478A8B2444466A00D91F15 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = SOURCE_ROOT; };
-		DE14EAFB84DD51B7F6C2EF59 /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
 		DF2B97BB7D324112916957EE /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		E3391ED6C5244DC8A6D509A1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -240,7 +237,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D437DA62440811F00A43169 /* CloudKit.framework in Frameworks */,
-				FC3DCDC102E27616EBACF2B3 /* libPods-HEXA Stage.a in Frameworks */,
+				FC3DCDC102E27616EBACF2B3 /* (null) in Frameworks */,
 				BCDAAF9D11C64CB5AFC3A9CF /* libRNFirebase.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -291,7 +288,6 @@
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				C166F50B6D93637BE883FA59 /* libPods-HEXA.a */,
 				BC3B066FFAAAFBAC02160BAB /* libPods-HEXA Dev.a */,
-				D6D35DCA3EA80B6E70641788 /* libPods-HEXA Stage.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -948,7 +944,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa;
 				PRODUCT_NAME = Hexa;
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -991,7 +987,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa;
 				PRODUCT_NAME = Hexa;
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dist";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Production Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1033,7 +1029,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_MODULE_NAME = Hexa;
 				PRODUCT_NAME = "Hexa Dev";
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Development Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1075,7 +1071,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_MODULE_NAME = Hexa;
 				PRODUCT_NAME = "Hexa Dev";
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dist";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Development Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1117,7 +1113,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
 				PRODUCT_MODULE_NAME = Hexa;
 				PRODUCT_NAME = "Hexa Stage";
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dev";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Staging Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1159,7 +1155,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.staging;
 				PRODUCT_MODULE_NAME = Hexa;
 				PRODUCT_NAME = "Hexa Stage";
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Dist";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Staging Dist";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
