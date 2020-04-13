@@ -2,7 +2,6 @@ platform :ios, '10.0'
 
 require_relative '../node_modules/react-native-unimodules/cocoapods'
 
-target 'HEXA' do
   # Pods for HEXA
   pod 'React', :path => '../node_modules/react-native', :subspecs => [
     'Core',
@@ -67,5 +66,11 @@ target 'HEXA' do
   pod 'react-native-in-app-utils', :path => '../node_modules/react-native-in-app-utils'
 
   pod 'jail-monkey', :path => '../node_modules/jail-monkey'
+target 'HEXA' do
+end
 
+target 'HEXA Dev' do
+end
+
+target 'HEXA Stage' do
 end

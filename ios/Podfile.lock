@@ -297,6 +297,9 @@ SPEC REPOS:
     - boost-for-react-native
     - Crashlytics
     - Fabric
+    - PDFGenerator
+    - QRCoder
+  trunk:
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -306,9 +309,7 @@ SPEC REPOS:
     - GoogleAppMeasurement
     - GoogleUtilities
     - nanopb
-    - PDFGenerator
     - Protobuf
-    - QRCoder
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -495,6 +496,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: b805956352536982a341b755c6c0a81e3f01819d
+PODFILE CHECKSUM: 72a69c1abfd08bb9e0510ae62933a89eb15fdc0a
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4

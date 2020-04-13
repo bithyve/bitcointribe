@@ -2,7 +2,7 @@ apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
 apply plugin: 'io.fabric'      
-        
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"     
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -100,7 +100,8 @@ def enableProguardInReleaseBuilds = false
 android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-                                                
+    flavorDimensions "default"
+
     defaultConfig {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -109,6 +110,7 @@ android {
         versionName "0.7"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
+        resValue "string", "build_config_package", "io.hexawallet.hexa"
     }                         
                                  
      signingConfigs {      
@@ -137,6 +139,26 @@ android {
 
         }
     }
+    productFlavors {
+        production {
+            minSdkVersion rootProject.ext.minSdkVersion
+            applicationId "io.hexawallet.hexa"
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            resValue "string", "build_config_package", "io.hexawallet.hexa"
+        }
+        staging {
+            minSdkVersion rootProject.ext.minSdkVersion
+            applicationId "io.hexawallet.hexa.staging"
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            resValue "string", "build_config_package", "io.hexawallet.hexa"
+        }
+        development {
+            minSdkVersion rootProject.ext.minSdkVersion
+            applicationId "io.hexawallet.hexa.development"
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            resValue "string", "build_config_package", "io.hexawallet.hexa"
+        }
+    }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -157,6 +179,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-config')
     implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
     implementation project(':react-native-mail')

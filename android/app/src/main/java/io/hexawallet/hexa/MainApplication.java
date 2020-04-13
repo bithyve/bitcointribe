@@ -3,6 +3,7 @@ package io.hexawallet.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
 import com.gantix.JailMonkey.JailMonkeyPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.chirag.RNMail.*;
@@ -68,8 +69,8 @@ public class MainApplication extends Application implements ShareApplication, Re
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),
-            new JailMonkeyPackage(),
-            new RNFirebasePackage(), new RNFirebaseMessagingPackage(),
+            new ReactNativeConfigPackage(),
+            new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),
           new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
           new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
           new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
