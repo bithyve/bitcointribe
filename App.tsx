@@ -56,7 +56,12 @@ export default () => {
     
   },[]);
 
-  const componentDidMount =()=> {
+  const componentDidMount = async()=> {
+    const enabled = await firebase.messaging().hasPermission();
+    console.log('enabled', enabled)
+    if (!enabled) {
+        await firebase.messaging().requestPermission();
+    }
     createNotificationListeners();
 
     const channel = new firebase.notifications.Android.Channel(
@@ -74,6 +79,7 @@ export default () => {
     let notificationListener = firebase
       .notifications()
       .onNotification(notification => {
+        console.log("notification", notification)
         const { title, body } = notification;
         const deviceTrayNotification = new firebase.notifications.Notification()
           .setTitle(title)

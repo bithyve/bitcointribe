@@ -812,24 +812,6 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public getBittrDetails = async () => {
-    try {
-      let res: AxiosResponse;
-      try {
-        res = await BH_AXIOS.post('getBittrDetails', {
-          HEXA_ID,
-        });
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
-      }
-      const { details } = res.data;
-      return { details };
-    } catch (err) {
-      throw new Error('Failed to fetch GetBittr Details');
-    }
-  };
-
   private getChangeAddress = async (): Promise<{ address: string }> => {
     try {
       // looking for free internal address
@@ -1042,6 +1024,45 @@ export default class HDSegwitWallet extends Bitcoin {
       const ypub = this.xpubToYpub(xpub, null, this.network);
       this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
       return xpub;
+    }
+  };
+
+  public getBittrDetails = async () => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('getBittrDetails', {
+          HEXA_ID,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { details } = res.data;
+      return { details };
+    } catch (err) {
+      throw new Error('Failed to fetch GetBittr Details');
+    }
+  };
+
+  public updateFCMTokens = async (FCMs: string[]) => {
+    try {
+      let res: AxiosResponse;
+      const { walletId } = this.getWalletId();
+      try {
+        res = await BH_AXIOS.post('updateFCMTokens', {
+          HEXA_ID,
+          walletID: walletId,
+          FCMs,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { updated } = res.data;
+      return { updated };
+    } catch (err) {
+      throw new Error('Failed to fetch GetBittr Details');
     }
   };
 }
