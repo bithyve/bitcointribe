@@ -30,14 +30,18 @@ import {
 import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Getting the latest details');
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
+  const [JailBrokenTitle, setJailBrokenTitle] = useState("");
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const onPressNumber = useCallback(
     text => {
       let tmpPasscode = passcode;
@@ -138,16 +142,23 @@ export default function Login(props) {
 
   useEffect(()=>{
     if(JailMonkey.isJailBroken()){
-      Alert.alert(Platform.OS == "ios" ? "Your device is Jail Broken" : "Your device is Rooted");
+      ErrorBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        setJailBrokenTitle(Platform.OS == "ios" ? "Your device is Jail Broken" : "Your device is Rooted");
+        setElevation(0);
+      }, 2);
     }
-    console.log("JailMonkey.isJailBroken()",JailMonkey.isJailBroken());
     DeviceInfo.isPinOrFingerprintSet().then(isPinOrFingerprintSet => {
       if (!isPinOrFingerprintSet) {
-        Alert.alert("Your Phone don't have any Secure entry like Pin or Biometric");
+        ErrorBottomSheet.current.snapTo(1);
+        setTimeout(() => {
+          setJailBrokenTitle("Your Phone don't have any Secure entry like Pin or Biometric");
+          setElevation(0);
+        }, 2);
       }
-      console.log("isPinOrFingerprintSet",isPinOrFingerprintSet);
     });
   }, []);
+  
   // useEffect(() => {
   //   (async () => {
   //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
@@ -240,6 +251,32 @@ export default function Login(props) {
       setCheckAuth(false);
     }
   }, [authenticationFailed]);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={JailBrokenTitle}
+        info={''}
+        proceedButtonText={'Ok'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [JailBrokenTitle]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -551,6 +588,22 @@ export default function Login(props) {
           renderHeader={renderLoaderModalHeader}
         />
       </View>
+      <BottomSheet
+        onCloseEnd={()=>{
+          setElevation(10);
+        }}
+        onOpenEnd={()=>{
+          setElevation(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('25%') : hp('30%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }

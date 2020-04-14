@@ -64,23 +64,6 @@ export default function Login(props) {
     return true;
   }; // returning true disables the hardware back button
 
-  useEffect(() => {
-    if(JailMonkey.isJailBroken()){
-      Alert.alert(Platform.OS == "ios" ? "Your device is Jail Broken" : "Your device is Rooted");
-    }
-    console.log("JailMonkey.isJailBroken()",JailMonkey.isJailBroken());
-    DeviceInfo.isPinOrFingerprintSet().then(isPinOrFingerprintSet => {
-      if (!isPinOrFingerprintSet) {
-        Alert.alert("Your Phone don't have any Secure entry like Pin or Biometric");
-      }
-      console.log("isPinOrFingerprintSet",isPinOrFingerprintSet);
-    });
-    BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
-
-    return () =>
-      BackHandler.removeEventListener('hardwareBackPress', hardwareBackHandler);
-  }, []);
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar />
