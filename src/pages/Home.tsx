@@ -85,7 +85,8 @@ import {
   fetchTransactions,
   runTest,
   fetchGetBittrDetails,
-  updateFCMTokens
+  updateFCMTokens,
+  deliverNotification,
 } from '../store/actions/accounts';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
@@ -97,7 +98,7 @@ import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
-import firebase from "react-native-firebase";
+import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
@@ -548,14 +549,27 @@ export default function Home(props) {
     };
   }, []);
 
-  const storeFCMToken = async() =>{
+  // useEffect(() => {
+  //   const unsubscribe = firebase
+  //     .messaging()
+  //     .onMessage(async (remoteMessage) => {
+  //       Alert.alert(
+  //         'A new FCM message arrived!',
+  //         JSON.stringify(remoteMessage),
+  //       );
+  //     });
+
+  //   return unsubscribe;
+  // }, []);
+
+  const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
-    console.log("fcmToken", fcmToken);
-    if(fcmToken){
+    console.log('fcmToken', fcmToken);
+    if (fcmToken) {
       let fcmArray = [fcmToken];
       dispatch(updateFCMTokens(fcmArray));
     }
-  }
+  };
 
   const setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');

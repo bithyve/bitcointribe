@@ -39,6 +39,7 @@ import {
   FETCH_DERIVATIVE_ACC_ADDRESS,
   FETCH_GET_BITTR_DETAILS,
   UPDATE_FCM_TOKENS,
+  DELIVER_NOTIFICATIONS,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -748,4 +749,24 @@ function* updateFCMTokensWorker({ payload }) {
 export const updateFCMTokensWatcher = createWatcher(
   updateFCMTokensWorker,
   UPDATE_FCM_TOKENS,
+);
+
+function* deliverNotificationWorker({ payload }) {
+  const { walletId, message } = payload;
+  const service: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const res = yield call(service.deliverNotifications, walletId, message);
+  if (res.status === 200) {
+    const { delivered } = res.data;
+    console.log({ delivered });
+  } else {
+    console.log('Failed to deliver notification');
+  }
+}
+
+export const deliverNotificationWatcher = createWatcher(
+  deliverNotificationWorker,
+  DELIVER_NOTIFICATIONS,
 );
