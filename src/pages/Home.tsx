@@ -521,6 +521,19 @@ export default function Home(props) {
 
   useEffect(function () {
     storeFCMToken();
+    (async () => {
+    const enabled = await firebase.messaging().hasPermission();
+    if(enabled){
+      schduleNofitication();
+      // console.log("moment(new Date()).valueOf()", moment(new Date()).valueOf());
+      // firebase.notifications().scheduleNotification(buildNotification(), {
+      //   fireDate: moment(new Date()).valueOf(),
+      //   repeatInterval: 'minute',
+      // });
+    }
+  })();
+    
+
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
@@ -548,7 +561,58 @@ export default function Home(props) {
     };
   }, []);
 
-  const storeFCMToken = async() =>{
+  const schduleNofitication = () => {
+    let notification = new firebase.notifications.Notification();
+    notification
+      .setSound("default")
+      .setNotificationId("1")
+      .setTitle("Test")
+      .setBody("Testing")
+      .setData({
+        title: "Test",
+        body: "Testing"
+      });
+
+    if (Platform.OS === "android") {
+      notification.android
+        .setChannelId("reminder")
+        .android.setPriority(firebase.notifications.Android.Priority.Max);
+    } 
+
+    const date = new Date();
+    date.setSeconds(date.getSeconds() + 5);
+    // date.setMinutes(date.getMinutes() + 1);
+
+    firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        repeatInterval: 'minute',
+      })
+      .catch(err => console.error(err));
+
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then(notifications => {
+        console.log("logging notifications", notifications);
+        let notification = notifications;
+       });
+  }
+
+const buildNotification = () => {
+      const title = Platform.OS === "android" ? "Daily Reminder" : "";
+      const notification = new firebase.notifications.Notification()
+        .setNotificationId("1") // Any random ID
+        .setTitle(title) // Title of the notification
+        .setBody("This is a notification") // body of notification
+        .android.setPriority(firebase.notifications.Android.Priority.High) // set priority in Android
+        .android.setChannelId("reminder") // should be the same when creating channel for Android
+        .android.setAutoCancel(true); // To remove notification when tapped on it
+        return notification;
+    };
+
+    const storeFCMToken = async() =>{
     const fcmToken = await firebase.messaging().getToken();
     console.log("fcmToken", fcmToken);
     if(fcmToken){

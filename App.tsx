@@ -76,10 +76,9 @@ export default () => {
     /*
      * Triggered when a particular notification has been received in foreground
      * */
-    let notificationListener = firebase
+    this.notificationListener = firebase
       .notifications()
       .onNotification(notification => {
-        console.log("notification", notification)
         const { title, body } = notification;
         const deviceTrayNotification = new firebase.notifications.Notification()
           .setTitle(title)
@@ -96,7 +95,7 @@ export default () => {
     /*
      * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
      * */
-    let notificationOpenedListener = firebase
+    this.notificationOpenedListener = firebase
       .notifications()
       .onNotificationOpened(notificationOpen => {
         const { title, body } = notificationOpen.notification;
@@ -114,10 +113,11 @@ export default () => {
     /*
      * Triggered for data only payload in foreground
      * */
-    let messageListener = firebase.messaging().onMessage(message => {
+    this.messageListener = firebase.messaging().onMessage(message => {
       //process data message
     });
   };
+
   
   return (
     <Provider store={store} uriPrefix={prefix}>
