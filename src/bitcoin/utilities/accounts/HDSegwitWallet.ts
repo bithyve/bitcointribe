@@ -1045,7 +1045,11 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public updateFCMTokens = async (FCMs: string[]) => {
+  public updateFCMTokens = async (
+    FCMs: string[],
+  ): Promise<{
+    updated: Boolean;
+  }> => {
     try {
       let res: AxiosResponse;
       const { walletId } = this.getWalletId();
@@ -1063,6 +1067,33 @@ export default class HDSegwitWallet extends Bitcoin {
       return { updated };
     } catch (err) {
       throw new Error('Failed to fetch GetBittr Details');
+    }
+  };
+
+  public deliverNotification = async (
+    walletId: string,
+    message: string,
+  ): Promise<{
+    delivered: Boolean;
+  }> => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('deliverNotification', {
+          HEXA_ID,
+          walletID: walletId, // walletId to which notification needs to be delivered
+          message,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { delivered } = res.data;
+      if (!delivered) throw new Error();
+
+      return { delivered };
+    } catch (err) {
+      throw new Error('Failed to deliver notifications');
     }
   };
 }
