@@ -85,6 +85,7 @@ import {
   fetchTransactions,
   runTest,
   fetchGetBittrDetails,
+  updateFCMTokens
 } from '../store/actions/accounts';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
@@ -519,7 +520,7 @@ export default function Home(props) {
   }
 
   useEffect(function () {
-    getFCMToken();
+    storeFCMToken();
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
@@ -547,10 +548,13 @@ export default function Home(props) {
     };
   }, []);
 
-  const getFCMToken = async() =>{
+  const storeFCMToken = async() =>{
     const fcmToken = await firebase.messaging().getToken();
     console.log("fcmToken", fcmToken);
-    return fcmToken;
+    if(fcmToken){
+      let fcmArray = [fcmToken];
+      dispatch(updateFCMTokens(fcmArray));
+    }
   }
 
   const setCurrencyCodeFromAsync = async () => {
