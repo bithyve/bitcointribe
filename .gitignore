@@ -62,3 +62,6 @@ buck-out/
 # environment variables
 #
 .env
+.env.production
+.env.staging
+.env.development

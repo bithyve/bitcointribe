@@ -130,8 +130,9 @@
 		DA2104615AE5442093278C92 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8CFFF238310D47B189028824 /* Octicons.ttf */; };
 		DE3ABA70715041CA976FD812 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0B2239255C294279969D8F06 /* OpenSans-Bold.ttf */; };
 		E0E6316DF7CF4B2781DBF663 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DF2B97BB7D324112916957EE /* FontAwesome5_Solid.ttf */; };
+		E3042C6CA79F1A3DD97A52D9 /* libPods-HEXA Stage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C29EB2DE001529843B2F3E22 /* libPods-HEXA Stage.a */; };
 		F37784E6F88E43E98ED2D478 /* FiraSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 074A53823B4542088F1A334F /* FiraSans-SemiBold.ttf */; };
-		FC3DCDC102E27616EBACF2B3 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		FC3DCDC102E27616EBACF2B3 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -199,6 +200,7 @@
 		BC3B066FFAAAFBAC02160BAB /* libPods-HEXA Dev.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Dev.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C166F50B6D93637BE883FA59 /* libPods-HEXA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C284012473E358EE6284258A /* Pods-HEXA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HEXA.release.xcconfig"; path = "Target Support Files/Pods-HEXA/Pods-HEXA.release.xcconfig"; sourceTree = "<group>"; };
+		C29EB2DE001529843B2F3E22 /* libPods-HEXA Stage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-HEXA Stage.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8E80D7B5CE14ACB8ECC8581 /* libRNCloudFs.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNCloudFs.a; sourceTree = "<group>"; };
 		DF2B97BB7D324112916957EE /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
 		E3391ED6C5244DC8A6D509A1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -237,8 +239,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D437DA62440811F00A43169 /* CloudKit.framework in Frameworks */,
-				FC3DCDC102E27616EBACF2B3 /* (null) in Frameworks */,
+				FC3DCDC102E27616EBACF2B3 /* BuildFile in Frameworks */,
 				BCDAAF9D11C64CB5AFC3A9CF /* libRNFirebase.a in Frameworks */,
+				E3042C6CA79F1A3DD97A52D9 /* libPods-HEXA Stage.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,6 +290,7 @@
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 				C166F50B6D93637BE883FA59 /* libPods-HEXA.a */,
 				BC3B066FFAAAFBAC02160BAB /* libPods-HEXA Dev.a */,
+				C29EB2DE001529843B2F3E22 /* libPods-HEXA Stage.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

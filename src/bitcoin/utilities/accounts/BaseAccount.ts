@@ -679,4 +679,37 @@ export default class BaseAccount {
       };
     }
   };
+
+  public deliverNotifications = async (
+    walletId: string,
+    message: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          delivered: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.deliverNotification(walletId, message),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to deliver notifications',
+      };
+    }
+  };
 }

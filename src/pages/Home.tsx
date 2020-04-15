@@ -85,7 +85,8 @@ import {
   fetchTransactions,
   runTest,
   fetchGetBittrDetails,
-  updateFCMTokens
+  updateFCMTokens,
+  deliverNotification,
 } from '../store/actions/accounts';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
@@ -97,7 +98,7 @@ import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
-import firebase from "react-native-firebase";
+import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
@@ -561,65 +562,27 @@ export default function Home(props) {
     };
   }, []);
 
-  const schduleNofitication = () => {
-    let notification = new firebase.notifications.Notification();
-    notification
-      .setSound("default")
-      .setNotificationId("1")
-      .setTitle("Test")
-      .setBody("Testing")
-      .setData({
-        title: "Test",
-        body: "Testing"
-      });
+  // useEffect(() => {
+  //   const unsubscribe = firebase
+  //     .messaging()
+  //     .onMessage(async (remoteMessage) => {
+  //       Alert.alert(
+  //         'A new FCM message arrived!',
+  //         JSON.stringify(remoteMessage),
+  //       );
+  //     });
 
-    if (Platform.OS === "android") {
-      notification.android
-        .setChannelId("reminder")
-        .android.setPriority(firebase.notifications.Android.Priority.Max);
-    } 
+  //   return unsubscribe;
+  // }, []);
 
-    const date = new Date();
-    date.setSeconds(date.getSeconds() + 5);
-    // date.setMinutes(date.getMinutes() + 1);
-
-    firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-        repeatInterval: 'minute',
-      })
-      .catch(err => console.error(err));
-
-    firebase
-      .notifications()
-      .getScheduledNotifications()
-      .then(notifications => {
-        console.log("logging notifications", notifications);
-        let notification = notifications;
-       });
-  }
-
-const buildNotification = () => {
-      const title = Platform.OS === "android" ? "Daily Reminder" : "";
-      const notification = new firebase.notifications.Notification()
-        .setNotificationId("1") // Any random ID
-        .setTitle(title) // Title of the notification
-        .setBody("This is a notification") // body of notification
-        .android.setPriority(firebase.notifications.Android.Priority.High) // set priority in Android
-        .android.setChannelId("reminder") // should be the same when creating channel for Android
-        .android.setAutoCancel(true); // To remove notification when tapped on it
-        return notification;
-    };
-
-    const storeFCMToken = async() =>{
+  const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
-    console.log("fcmToken", fcmToken);
-    if(fcmToken){
+    console.log('fcmToken', fcmToken);
+    if (fcmToken) {
       let fcmArray = [fcmToken];
       dispatch(updateFCMTokens(fcmArray));
     }
-  }
+  };
 
   const setCurrencyCodeFromAsync = async () => {
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
