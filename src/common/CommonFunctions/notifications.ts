@@ -1,21 +1,41 @@
 import firebase from "react-native-firebase";
-
+import { NOTIFICATION_HOUR } from 'react-native-dotenv';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateFCMTokens,
+} from '../../store/actions/accounts';
 export const firebaseNotificationListener = async()=> {
-    const enabled = await firebase.messaging().hasPermission();
+  const enabled = await firebase.messaging().hasPermission();
     console.log('enabledqqq', enabled)
     if (!enabled) {
-        await firebase.messaging().requestPermission();
+        await firebase
+        .messaging()
+        .requestPermission()
+        .then(() => {
+          // User has authorized
+          scheduleNotification();
+        })
+        .catch(error => {
+          // User has rejected permissions
+          console.log(
+            'PERMISSION REQUEST :: notification permission rejected', error
+          );
+        });
+    } else {
+      scheduleNotification();
     }
     createNotificationListeners();
 
-    const channel = new firebase.notifications.Android.Channel(
-      "foregroundNotification", // channelId
-      "ForegroundNotification", // channel name
-      firebase.notifications.Android.Importance.High // channel importance
-    ).setDescription("Used for getting foreground notification"); // channel description
-    firebase.notifications().android.createChannel(channel);
-  }
 
+  
+    // const channel = new firebase.notifications.Android.Channel(
+    //   "foregroundNotification", // channelId
+    //   "ForegroundNotification", // channel name
+    //   firebase.notifications.Android.Importance.High // channel importance
+    // ).setDescription("Used for getting foreground notification"); // channel description
+    // firebase.notifications().android.createChannel(channel);
+  }
+  
   const createNotificationListeners = async () => {
     /*
      * Triggered when a particular notification has been received in foreground
@@ -63,4 +83,36 @@ export const firebaseNotificationListener = async()=> {
     this.messageListener = firebase.messaging().onMessage(message => {
       //process data message
     });
+  };
+
+
+  const scheduleNotification = async () => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle('We have not seen you in a while!')
+      .setBody('Opening your app regularly ensures you get all the notifications and security updates')
+      .setNotificationId('1')
+      .setSound('default')
+      .setData({ title: 'We have not seen you in a while!', body: 'Opening your app regularly ensures you get all the notifications and security updates' })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
+  
+    console.log("DATE", date, NOTIFICATION_HOUR, date.getTime());
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        repeatInterval: 'hour'
+      })
+      .then(() => {})
+      .catch((err) => console.log('err', err));
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
+        console.log('logging notifications', notifications);
+      });
   };
