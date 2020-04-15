@@ -100,6 +100,7 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
+import {firebaseNotificationListener} from "../common/CommonFunctions/notifications";
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -521,16 +522,12 @@ export default function Home(props) {
   }
 
   useEffect(function () {
+    firebaseNotificationListener();
     storeFCMToken();
     (async () => {
     const enabled = await firebase.messaging().hasPermission();
     if(enabled){
-      schduleNofitication();
-      // console.log("moment(new Date()).valueOf()", moment(new Date()).valueOf());
-      // firebase.notifications().scheduleNotification(buildNotification(), {
-      //   fireDate: moment(new Date()).valueOf(),
-      //   repeatInterval: 'minute',
-      // });
+      scheduleNotification();
     }
   })();
     
@@ -574,6 +571,28 @@ export default function Home(props) {
 
   //   return unsubscribe;
   // }, []);
+
+  const scheduleNotification = async () => {
+    const notification = new firebase.notifications.Notification().setTitle('abcd').setBody('xyz').setNotificationId('1').setSound('default').setSubtitle('www').setData({title:"qqq", body:'rrrr'}).android.setChannelId("reminder").android.setPriority(firebase.notifications.Android.Priority.High);
+
+    // Schedule the notification for 1 minute in the future
+    const date = new Date();
+    date.setSeconds(date.getSeconds() + 20);
+    // date.setMinutes(date.getMinutes() + 1);
+
+    await firebase.notifications().scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        repeatInterval: 'minute'
+    }).then(()=>{
+
+    }).catch(err => console.log('err', err));
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then(notifications => {
+        console.log("logging notifications", notifications);
+      });
+  }
 
   const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
