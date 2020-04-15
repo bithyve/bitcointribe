@@ -23,7 +23,7 @@ export const firebaseNotificationListener = async()=> {
     this.notificationListener = firebase
       .notifications()
       .onNotification(notification => {
-        console.log("notificationsss", notification)
+        console.log("notificationsss", notification, notification.android.channelId)
         const { title, body } = notification;
         const deviceTrayNotification = new firebase.notifications.Notification()
           .setTitle(title)
@@ -33,8 +33,10 @@ export const firebaseNotificationListener = async()=> {
           .android.setPriority(firebase.notifications.Android.Priority.High)
           .android.setChannelId(notification.android.channelId ? notification.android.channelId : "foregroundNotification" ) // previously created
           .android.setAutoCancel(true); // To remove notification when tapped on it
-
-        firebase.notifications().displayNotification(deviceTrayNotification);
+          const channelId = new firebase.notifications.Android.Channel(notification.android.channelId, notification.android.channelId ? "Reminder" : "ForegroundNotification", firebase.notifications.Android.Importance.High);
+          firebase.notifications().android.createChannel(channelId);
+          console.log("deviceTrayNotification", deviceTrayNotification);
+          firebase.notifications().displayNotification(deviceTrayNotification);
       });
 
     /*
