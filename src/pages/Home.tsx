@@ -526,11 +526,11 @@ export default function Home(props) {
     storeFCMToken();
     
     let focusListener = props.navigation.addListener('didFocus', () => {
-      setCurrencyCodeFromAsync();
+      // setCurrencyCodeFromAsync();
       getAssociatedContact();
     });
     getAssociatedContact();
-    setCurrencyCodeFromAsync();
+    // setCurrencyCodeFromAsync();
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);

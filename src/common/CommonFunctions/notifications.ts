@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   updateFCMTokens,
 } from '../../store/actions/accounts';
+import { AsyncStorage } from "react-native";
+
 export const firebaseNotificationListener = async()=> {
   const enabled = await firebase.messaging().hasPermission();
     console.log('enabledqqq', enabled)
@@ -43,20 +45,7 @@ export const firebaseNotificationListener = async()=> {
     this.notificationListener = firebase
       .notifications()
       .onNotification(notification => {
-        console.log("notificationsss", notification, notification.android.channelId)
-        const { title, body } = notification;
-        const deviceTrayNotification = new firebase.notifications.Notification()
-          .setTitle(title)
-          .setBody(body)
-          .setNotificationId(notification.notificationId)
-          .setSound("default")
-          .android.setPriority(firebase.notifications.Android.Priority.High)
-          .android.setChannelId(notification.android.channelId ? notification.android.channelId : "foregroundNotification" ) // previously created
-          .android.setAutoCancel(true); // To remove notification when tapped on it
-          const channelId = new firebase.notifications.Android.Channel(notification.android.channelId, notification.android.channelId ? "Reminder" : "ForegroundNotification", firebase.notifications.Android.Importance.High);
-          firebase.notifications().android.createChannel(channelId);
-          console.log("deviceTrayNotification", deviceTrayNotification);
-          firebase.notifications().displayNotification(deviceTrayNotification);
+        onNotificationArrives(notification);
       });
 
     /*
@@ -84,8 +73,7 @@ export const firebaseNotificationListener = async()=> {
       //process data message
     });
   };
-
-
+  
   const scheduleNotification = async () => {
     const notification = new firebase.notifications.Notification()
       .setTitle('We have not seen you in a while!')
@@ -116,3 +104,48 @@ export const firebaseNotificationListener = async()=> {
         console.log('logging notifications', notifications);
       });
   };
+
+  const onNotificationArrives = async(notification) =>{
+    // let objTemp = {
+    //   android: notification.android,
+    //   body: notification.body,
+    //   title: notification.title,
+    //   sound: notification.sound,
+    //   notificationId: notification.notificationId,
+    //   ios: notification.ios,
+    //   data: notification.data,
+    //   subtitle: notification.subtitle
+    // }
+    // let notificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    // if(!notificationList){
+    //   notificationList = [];
+    // }
+    // let notificationObject = {
+    //   type: 'update',
+    //   isMandatory: true,
+    //   read: false,
+    //   title: notification.title,
+    //   time: '2h ago',
+    //   info: notification.body,
+    //   data: objTemp,
+    //   notificationId: notification.notificationId
+    // }
+    // notificationList.push(notificationObject);
+    // await AsyncStorage.setItem("notificationList", JSON.stringify(notificationList));
+    // console.log("notificationList", notificationList)
+    console.log("notificationsss", notification, notification.android.channelId)
+    const { title, body } = notification;
+    const deviceTrayNotification = new firebase.notifications.Notification()
+      .setTitle(title)
+      .setBody(body)
+      .setNotificationId(notification.notificationId)
+      .setSound("default")
+      .android.setPriority(firebase.notifications.Android.Priority.High)
+      .android.setChannelId(notification.android.channelId ? notification.android.channelId : "foregroundNotification" ) // previously created
+      .android.setAutoCancel(true); // To remove notification when tapped on it
+      
+    const channelId = new firebase.notifications.Android.Channel(notification.android.channelId, notification.android.channelId ? "Reminder" : "ForegroundNotification", firebase.notifications.Android.Importance.High);
+    firebase.notifications().android.createChannel(channelId);
+    console.log("deviceTrayNotification", deviceTrayNotification);
+    firebase.notifications().displayNotification(deviceTrayNotification);
+  }
