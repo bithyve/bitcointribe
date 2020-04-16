@@ -332,12 +332,6 @@ export default function Send(props) {
     />
   );
 
-  if (transfer.txid) {
-    if (OTPAuthenticationBottomSheet.current)
-      OTPAuthenticationBottomSheet.current.snapTo(0);
-    return renderSuccessStatusContents();
-  }
-
   useEffect(() => {
     if (
       transfer.stage1.failed ||
@@ -368,6 +362,9 @@ export default function Send(props) {
         SendConfirmationBottomSheet.current.snapTo(0);
       }
       if (SendSuccessWithAddressBottomSheet.current) {
+        if(serviceType==SECURE_ACCOUNT && OTPAuthenticationBottomSheet.current){
+          OTPAuthenticationBottomSheet.current.snapTo(0);
+        }
         setTimeout(() => {
           setIsConfirmDisabled(false);
         }, 10);
@@ -806,7 +803,7 @@ export default function Send(props) {
           if (bottomSheet.current)
           (bottomSheet as any).current.snapTo(1);
         }}
-        onPressConfirmSweep={()=>checkBalance()}
+        onPressConfirmSweep={()=>{}}
       />
     );
   }
