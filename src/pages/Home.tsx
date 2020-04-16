@@ -100,7 +100,7 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-import { firebaseNotificationListener, scheduleNotification } from '../common/CommonFunctions/notifications';
+import { createNotificationListeners, scheduleNotification } from '../common/CommonFunctions/notifications';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -522,15 +522,38 @@ export default function Home(props) {
   }
 
   useEffect(function () {
-    firebaseNotificationListener();
-    storeFCMToken();
+    (async () => {
+     console.log("DeviceInfo.getVersion(), DeviceInfo.getBuildNumber()", DeviceInfo.getVersion(),DeviceInfo.getBuildNumber())
+    const enabled = await firebase.messaging().hasPermission();
+      console.log('enabledqqq', enabled);
+      if (!enabled) {
+        await firebase
+          .messaging()
+          .requestPermission()
+          .then(() => {
+            // User has authorized
+            createNotificationListeners();
+            storeFCMToken();
+            scheduleNotification();
+          })
+          .catch((error) => {
+            // User has rejected permissions
+            console.log(
+              'PERMISSION REQUEST :: notification permission rejected',
+              error,
+            );
+          });
+      } else {
+        scheduleNotification();
+      }
+    })();
     
     let focusListener = props.navigation.addListener('didFocus', () => {
-      // setCurrencyCodeFromAsync();
+      setCurrencyCodeFromAsync();
       getAssociatedContact();
     });
     getAssociatedContact();
-    // setCurrencyCodeFromAsync();
+    setCurrencyCodeFromAsync();
     updateAccountCardData();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
