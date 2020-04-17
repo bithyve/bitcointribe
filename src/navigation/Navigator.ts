@@ -67,6 +67,9 @@ import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
 import SignUpDetails from '../pages/GetBittr/SignUpDetails';
 import ExistingSavingMethods from "../pages/GetBittr/ExistingSavingMethods";
 import ExistingSavingMethodDetails from "../pages/GetBittr/ExistingSavingMethodDetails";
+import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
+import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
+import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -170,6 +173,9 @@ const HomeNavigator = createStackNavigator(
     SignUpDetails,
     ExistingSavingMethods,
     ExistingSavingMethodDetails,
+    ResetTwoFAHelp,
+    NewTwoFASecret,
+    TwoFASweepFunds,
     PasscodeChangeSuccessPage: {
       screen: PasscodeChangeSuccessPage,
       navigationOptions: {

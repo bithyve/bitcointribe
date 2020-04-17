@@ -21,13 +21,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 export default function QRModal(props) {
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const barcodeRecognized = async (barcodes) => {
-    // Uncomment this changes and comment or remove line 34
-    // if (barcodes.data) {
-    //   setOpenCameraFlag(false);
-    //   props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
-    //   props.onQrScan(getFormattedString(barcodes.data));
-    // }
-    props.onQrScan('test');
+    if (barcodes.data) {
+      setOpenCameraFlag(false);
+      props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
+      props.onQrScan(getFormattedString(barcodes.data));
+    }
   };
 
   useEffect(() => {
@@ -155,9 +153,10 @@ export default function QRModal(props) {
             ) : (
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
-                  setOpenCameraFlag(true); 
-                  // remove line 164 => props.onQrScan('test');
-                   props.onQrScan('test');}}
+                  setTimeout(() => {
+                    setOpenCameraFlag(true); 
+                  }, 2);
+                  }}
               >
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
