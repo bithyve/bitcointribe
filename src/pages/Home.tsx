@@ -523,8 +523,7 @@ export default function Home(props) {
 
   useEffect(function () {
     (async () => {
-     console.log("DeviceInfo.getVersion(), DeviceInfo.getBuildNumber()", DeviceInfo.getVersion(),DeviceInfo.getBuildNumber())
-    const enabled = await firebase.messaging().hasPermission();
+     const enabled = await firebase.messaging().hasPermission();
       console.log('enabledqqq', enabled);
       if (!enabled) {
         await firebase
