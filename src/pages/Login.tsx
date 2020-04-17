@@ -9,6 +9,7 @@ import {
   AsyncStorage,
   Alert,
   Platform,
+  Linking,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -23,27 +24,27 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import {
-  syncAccounts,
-  calculateExchangeRate,
-} from '../store/actions/accounts';
+import { syncAccounts, calculateExchangeRate } from '../store/actions/accounts';
 import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
+import Relay from '../bitcoin/services/Relay';
+import { APP_ID } from 'react-native-dotenv';
+import { exit } from 'process';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Getting the latest details');
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
-  const [JailBrokenTitle, setJailBrokenTitle] = useState("");
+  const [JailBrokenTitle, setJailBrokenTitle] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const onPressNumber = useCallback(
-    text => {
+    (text) => {
       let tmpPasscode = passcode;
       if (passcode.length < 4) {
         if (text != 'x') {
@@ -60,15 +61,15 @@ export default function Login(props) {
   );
 
   const DECENTRALIZED_BACKUP = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
   // const testAccService = accounts[TEST_ACCOUNT].service;
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
-    state => state.setupAndAuth,
+    (state) => state.setupAndAuth,
   );
-  const { dbFetched } = useSelector(state => state.storage);
+  const { dbFetched } = useSelector((state) => state.storage);
   // const [balances, setBalances] = useState({
   //   testBalance: 0,
   //   regularBalance: 0,
@@ -120,7 +121,7 @@ export default function Login(props) {
   //   setTransactions(accumulativeTransactions);
   // }, [accounts]);
 
-  const s3Service = useSelector(state => state.sss.service);
+  const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     // HC init and down-streaming
     if (s3Service) {
@@ -140,25 +141,92 @@ export default function Login(props) {
     }
   }, [DECENTRALIZED_BACKUP]);
 
-  useEffect(()=>{
-    if(JailMonkey.isJailBroken()){
+  useEffect(() => {
+    if (JailMonkey.isJailBroken()) {
       ErrorBottomSheet.current.snapTo(1);
       setTimeout(() => {
-        setJailBrokenTitle(Platform.OS == "ios" ? "Your device is Jail Broken" : "Your device is Rooted");
+        setJailBrokenTitle(
+          Platform.OS == 'ios'
+            ? 'Your device is Jail Broken'
+            : 'Your device is Rooted',
+        );
         setElevation(0);
       }, 2);
     }
-    DeviceInfo.isPinOrFingerprintSet().then(isPinOrFingerprintSet => {
+    DeviceInfo.isPinOrFingerprintSet().then((isPinOrFingerprintSet) => {
       if (!isPinOrFingerprintSet) {
         ErrorBottomSheet.current.snapTo(1);
         setTimeout(() => {
-          setJailBrokenTitle("Your Phone don't have any Secure entry like Pin or Biometric");
+          setJailBrokenTitle(
+            "Your Phone don't have any Secure entry like Pin or Biometric",
+          );
           setElevation(0);
         }, 2);
       }
     });
+    console.log(
+      'DeviceInfo.getVersion(), DeviceInfo.getBuildNumber()',
+      DeviceInfo.getVersion(),
+      DeviceInfo.getBuildNumber(),
+    );
+    Relay.fetchReleaseNotes(DeviceInfo.getBuildNumber())
+      .then((val) => {
+        const ReleaseNoteType = 'mandatory'; // 'optional'
+        const ReleaseNote =
+          Platform.OS == 'ios'
+            ? val.releaseNotes.ios
+            : val.releaseNotes.android;
+        console.log('ReleaseNote', val.releaseNotes, ReleaseNote);
+      //   ReleaseNoteType == 'mandatory'
+      //     ? Alert.alert(
+      //         ReleaseNote,
+      //         '',
+      //         [
+      //           {
+      //             text: 'Upgrade Now',
+      //             onPress: () => upgradeNow(),
+      //           },
+      //           { text: 'Cancel'},
+      //         ],
+      //         { cancelable: false },
+      //       )
+      //     : Alert.alert(
+      //         ReleaseNote,
+      //         '',
+      //         [
+      //           {
+      //             text: 'Upgrade Now',
+      //             onPress: () => upgradeNow(),
+      //           },
+      //           {
+      //             text: 'Remind me later',
+      //             onPress: () => upgradeNow(),
+      //           },
+
+      //           { text: 'Ignore', onPress: () => upgradeNow(),},
+      //         ],
+      //         { cancelable: false },
+      //       );
+       })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
-  
+
+  const upgradeNow = () => {
+    const url =
+      Platform.OS == 'ios'
+        ? 'itms://itunes.apple.com/us/app/apple-store/' + APP_ID + '?mt=8'
+        : 'market://details?id=' + APP_ID;
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  }
+
   // useEffect(() => {
   //   (async () => {
   //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
@@ -189,7 +257,7 @@ export default function Login(props) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      AsyncStorage.getItem('walletExists').then(exists => {
+      AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
             // calculate the exchangeRate
@@ -215,8 +283,8 @@ export default function Login(props) {
         messageText={'This may take a few seconds'}
       />
     );
-  },[ message]);
-  
+  }, [message]);
+
   const renderLoaderModalHeader = () => {
     return (
       <View
@@ -589,10 +657,10 @@ export default function Login(props) {
         />
       </View>
       <BottomSheet
-        onCloseEnd={()=>{
+        onCloseEnd={() => {
           setElevation(10);
         }}
-        onOpenEnd={()=>{
+        onOpenEnd={() => {
           setElevation(0);
         }}
         enabledInnerScrolling={true}
