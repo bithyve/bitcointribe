@@ -283,7 +283,7 @@ export default function TwoFAToken(props) {
 
             <TouchableOpacity
                 onPress={() => {
-                  props.navigation.navigate('LostTwoFA');
+                  props.navigation.navigate('ResetTwoFAHelp');
                 }}
                 style={{
                   width: wp('30%'),
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   otpRequestHeaderView: {
-    marginTop: hp('5%'),
+    marginTop: hp('2%'),
     marginBottom: hp('2%'),
   },
   modalTitleText: {

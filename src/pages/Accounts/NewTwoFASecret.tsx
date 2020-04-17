@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   ScrollView,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -25,7 +27,10 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 const NewTwoFASecret = props => {
     const [receivingAddress, setReceivingAddress] = useState('2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g');
   return (
-   <View style={{...BackupStyles.modalContainer, backgroundColor:Colors.white}}>
+    <SafeAreaView style={{ flex: 1 }}>
+    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+    
+   <View style={{...BackupStyles.modalContainer, backgroundColor:Colors.white, marginTop: 10}}>
           <ScrollView style={styles.qrModalScrollView}>
           <View style={BackupStyles.modalHeaderTitleView}>
             <View
@@ -59,12 +64,12 @@ const NewTwoFASecret = props => {
                 paddingBottom:5
               }}
               onPress={() => {
-                props.onPressDone()
+                props.navigation.pop(1);
               }}
               >
               <Text
                   onPress={() => {
-                    props.onPressDone()
+                   props.navigation.pop(1);
                   }}
                   style={{
                     color: Colors.white,
@@ -105,10 +110,10 @@ const NewTwoFASecret = props => {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                {props.title}
+                Scan in Authenticator
               </Text>
               <Text style={styles.bottomNoteInfoText}>
-                {props.infoText}
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
               </Text>
             </View>
           
@@ -128,6 +133,7 @@ const NewTwoFASecret = props => {
             />
           </View>
       </View>
+      </SafeAreaView>
   );
 };
 

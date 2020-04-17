@@ -11,7 +11,9 @@ import {
   TouchableWithoutFeedback,
   Image,
   Keyboard,
-  ActivityIndicator
+  ActivityIndicator,
+  SafeAreaView,
+  StatusBar
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -125,11 +127,26 @@ export default function TwoFASweepFunds(props) {
       };
 
   return (
-    <View style={styles.modalContentContainer}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      
+    <View style={{...styles.modalContentContainer, marginTop: 10}}>
         <ScrollView style={styles.qrModalScrollView}>
           <View style={styles.modalHeaderTitleView}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <AppBottomSheetTouchableWrapper
+              onPress={() => props.navigation.goBack()}
+              style={{ height: 30, width: 30, justifyContent: 'center', }}
+            >
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </AppBottomSheetTouchableWrapper>
             <View style={{ flexDirection: 'row', alignItems:'center'}}>
               <Text style={styles.modalHeaderTitleText}>{'Sweep Funds'}</Text>
+            </View>
             </View>
             </View>
             <View style={{flex:1, marginTop:wp('2%')}}>
@@ -449,6 +466,7 @@ export default function TwoFASweepFunds(props) {
             </View>
         </ScrollView>
     </View>
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
