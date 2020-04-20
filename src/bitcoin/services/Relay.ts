@@ -22,8 +22,8 @@ export default class Relay {
         build,
       });
     } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      if (err.response) console.log(err.response.data.err);
+      if (err.code) console.log(err.code);
     }
     console.log({ res });
     const { releaseNotes } = res.data;

@@ -190,9 +190,86 @@ export default function Home(props) {
   });
   // const transactionsParam = props.navigation.getParam('transactions');
   const [transactions, setTransactions] = useState([]);
-
+  const [NotificationDataChange, setNotificationDataChange] = useState(false)
+  const [NotificationData, setNotificationData] = useState([
+      {
+          type: 'update',
+          isMandatory:true,
+          read:true,
+          title:'Update Available',
+          time:'2h ago',
+          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
+          notificationId : 1
+      },
+      {
+          type: 'receive',
+          isMandatory:true,
+          read:false,
+          title:'Bitcoins Received',
+          time:'9.30 am',
+          info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur",
+          notificationId : 2
+      },
+      {
+          type: 'update',
+          isMandatory:true,
+          read:true,
+          title:'Update Available',
+          time:'Yesterday, 5:00pm',
+          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
+          notificationId : 3
+      },
+      {
+          type: 'receive',
+          isMandatory:false,
+          read:true,
+          title:'Bitcoins Received',
+          time:'Thursday, 9:00pm',
+          info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur",
+          notificationId : 4
+      },
+      {
+          type: 'update',
+          isMandatory:false,
+          read:true,
+          title:'Update Available',
+          time:'11 March, 5:00pm',
+          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
+          notificationId : 5
+      },
+      {
+          type: 'receive',
+          isMandatory:false,
+          read:false,
+          title:'Bitcoins Received',
+          time:'1 Feb, 7:00pm',
+          info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur",
+          notificationId : 6
+      },
+      {
+          type: 'update',
+          isMandatory:false,
+          read:true,
+          title:'Update Available',
+          time:'11 March, 5:00pm',
+          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
+          notificationId : 7
+      }
+  ]);
   const [qrData, setqrData] = useState('');
 
+  const onNotificationClicked = (value) =>{
+    let tempNotificationData = NotificationData;
+    for (let i = 0; i < tempNotificationData.length; i++) {
+      const element = tempNotificationData[i];
+      if(element.notificationId==value.notificationId){
+        tempNotificationData[i].read = true;
+      }
+    }
+    setNotificationData(tempNotificationData);
+    setNotificationDataChange(!NotificationDataChange);
+  }
+  
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -228,12 +305,6 @@ export default function Home(props) {
     ];
     if (accumulativeTransactions.length) {
       accumulativeTransactions.sort(function (left, right) {
-        console.log(
-          'moment.utc(right.date),moment.utc(left.date)',
-          moment.utc(right.date).unix(),
-          moment.utc(left.date).unix(),
-          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
-        );
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
@@ -543,6 +614,8 @@ export default function Home(props) {
             );
           });
       } else {
+        createNotificationListeners();
+        storeFCMToken();
         scheduleNotification();
       }
     })();
@@ -2367,12 +2440,14 @@ export default function Home(props) {
   const renderNotificationsContent = useCallback(() => {
     return (
       <NotificationListContent
+        NotificationData={NotificationData}
+        onNotificationClicked={(value)=>onNotificationClicked(value)}
         onPressBack={() => {
           (notificationsListBottomSheet as any).current.snapTo(0);
         }}
       />
     );
-  }, []);
+  }, [NotificationData, NotificationDataChange]);
 
   const renderNotificationsHeader = useCallback(() => {
     return (
@@ -2382,7 +2457,7 @@ export default function Home(props) {
         }}
       />
     );
-  }, []);
+  }, [NotificationData, NotificationDataChange]);
 
   return (
     <ImageBackground
@@ -2415,15 +2490,19 @@ export default function Home(props) {
                   style={{ width: wp('6%'), height: wp('6%') }}
                   resizeMode={'contain'}
                 >
-                  <View
-                    style={{
-                      backgroundColor: Colors.red,
-                      height: wp('2.5%'),
-                      width: wp('2.5%'),
-                      borderRadius: wp('2.5%') / 2,
-                      alignSelf: 'flex-end',
-                    }}
-                  />
+                  {NotificationData.findIndex((value)=>value.read==false) > -1 ? 
+                    <View
+                      style={{
+                        backgroundColor: Colors.red,
+                        height: wp('2.5%'),
+                        width: wp('2.5%'),
+                        borderRadius: wp('2.5%') / 2,
+                        alignSelf: 'flex-end',
+                      }}
+                    />
+                    :
+                    null
+                  }
                 </ImageBackground>
               </TouchableOpacity>
               <View style={{ marginBottom: wp('2%') }}>

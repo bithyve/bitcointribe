@@ -197,12 +197,6 @@ export default function Accounts(props) {
     checkGetBittrAccount();
     if (wallet.transactions.transactionDetails.length) {
       wallet.transactions.transactionDetails.sort(function(left, right) {
-        console.log(
-          'moment.utc(right.date),moment.utc(left.date)',
-          moment.utc(right.date).unix(),
-          moment.utc(left.date).unix(),
-          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
-        );
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
