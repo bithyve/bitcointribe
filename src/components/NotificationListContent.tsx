@@ -18,64 +18,7 @@ import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 
 export default function NotificationListContent(props) {
-    const data = [
-        {
-            type: 'update',
-            isMandatory:true,
-            read:true,
-            title:'Update Available',
-            time:'2h ago',
-            info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-        },
-        {
-            type: 'receive',
-            isMandatory:true,
-            read:false,
-            title:'Bitcoins Received',
-            time:'9.30 am',
-            info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur"
-        },
-        {
-            type: 'update',
-            isMandatory:true,
-            read:true,
-            title:'Update Available',
-            time:'Yesterday, 5:00pm',
-            info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-        },
-        {
-            type: 'receive',
-            isMandatory:false,
-            read:true,
-            title:'Bitcoins Received',
-            time:'Thursday, 9:00pm',
-            info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur"
-        },
-        {
-            type: 'update',
-            isMandatory:false,
-            read:true,
-            title:'Update Available',
-            time:'11 March, 5:00pm',
-            info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-        },
-        {
-            type: 'receive',
-            isMandatory:false,
-            read:false,
-            title:'Bitcoins Received',
-            time:'1 Feb, 7:00pm',
-            info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur"
-        },
-        {
-            type: 'update',
-            isMandatory:false,
-            read:true,
-            title:'Update Available',
-            time:'11 March, 5:00pm',
-            info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-        }
-    ];
+
     return (<ScrollView style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
             <View style={{ flexDirection: 'row', }}>
@@ -87,21 +30,21 @@ export default function NotificationListContent(props) {
                 </View>
             </View>
         </View>
-        <View style={{ flex: 1, }}>
-            {data.map((value)=>{
-                return <View style={{paddingLeft:wp('7%'), paddingRight:wp('4%'), borderBottomWidth:1, borderBottomColor:Colors.borderColor, paddingBottom:wp('4%'), paddingTop:wp('4%'), backgroundColor: value.read ? Colors.white : Colors.lightBlue}}>
-                <View style={{ flexDirection: 'row', }}>
-                    <View style={{ flexDirection: 'row', alignItems:'center'}}>
-                        <Image source={value.type=="update" ? require("../assets/images/icons/icon_hexa.png") : require("../assets/images/icons/recieve.png")} style={{width:wp('8%'), height:wp('8%'), marginRight:wp('2%')}} />
-                        <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular}}>{value.title}</Text>
+        <View style={{ flex: 1 }}>
+            {props.NotificationData.map((value, index)=>{
+                return <AppBottomSheetTouchableWrapper onPress={()=>props.onNotificationClicked(value)} style={{paddingLeft:wp('7%'), paddingRight:wp('4%'), borderBottomWidth:1, borderBottomColor:Colors.borderColor, paddingBottom:wp('4%'), paddingTop:wp('4%'), backgroundColor: value.read ? Colors.white : Colors.lightBlue}}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flexDirection: 'row', alignItems:'center'}}>
+                            <Image source={value.type=="update" ? require("../assets/images/icons/icon_hexa.png") : require("../assets/images/icons/recieve.png")} style={{width:wp('8%'), height:wp('8%'), marginRight:wp('2%')}} />
+                            <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular}}>{value.title}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginLeft:'auto', alignItems:'center'}}>
+                            <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginRight:wp('5%')}}>{value.time}</Text>
+                            {value.isMandatory ?<FontAwesome name="star" color={Colors.blue} size={17} /> : <View style={{width:17}} />}
+                        </View>
                     </View>
-                    <View style={{ flexDirection: 'row', marginLeft:'auto', alignItems:'center'}}>
-                        <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginRight:wp('5%')}}>{value.time}</Text>
-                        {value.isMandatory ?<FontAwesome name="star" color={Colors.blue} size={17} /> : <View style={{width:17}} />}
-                    </View>
-                </View>
-                <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, paddingTop:wp('2%'), marginLeft:3}}>{value.info}</Text>
-            </View>
+                    <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, paddingTop:wp('2%'), marginLeft:3}}>{value.info}</Text>
+                </AppBottomSheetTouchableWrapper>
             })}
         </View>
     </ScrollView>

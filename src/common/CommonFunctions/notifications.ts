@@ -2,8 +2,6 @@ import firebase from 'react-native-firebase';
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import { AsyncStorage } from 'react-native';
 
-
-
 export const createNotificationListeners = async () => {
   /*
    * Triggered when a particular notification has been received in foreground
