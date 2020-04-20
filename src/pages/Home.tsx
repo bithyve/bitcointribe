@@ -614,6 +614,8 @@ export default function Home(props) {
             );
           });
       } else {
+        createNotificationListeners();
+        storeFCMToken();
         scheduleNotification();
       }
     })();
