@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "clear": "rm -rf $TMPDIR/react-native-packager-cache-* && rm -rf $TMPDIR/metro-bundler-cache-*",
     "prepare": "chmod +x setup.sh && ./setup.sh",
     "postinstall": "jetify",
     "android": "react-native run-android",
