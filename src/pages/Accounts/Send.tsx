@@ -55,7 +55,7 @@ import SendConfirmationContent from './SendConfirmationContent';
 import ModalHeader from '../../components/ModalHeader';
 import LostTwoFA from './LostTwoFA';
 import ResetTwoFAHelp from './ResetTwoFAHelp';
-
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ResetTwoFASuccess from './ResetTwoFASuccess';
@@ -94,7 +94,7 @@ export default function Send(props) {
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
   );
-  const serviceType = props.navigation.getParam('serviceType');
+  const [serviceType, setServiceType] = useState(props.navigation.getParam('serviceType') ? props.navigation.getParam('serviceType') : REGULAR_ACCOUNT);
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const { transfer, loading, service } = useSelector(
@@ -102,8 +102,8 @@ export default function Send(props) {
   );
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [bottomSheet, setBottomSheet] = useState(React.createRef());
-  const getServiceType = props.navigation.state.params.getServiceType
-    ? props.navigation.state.params.getServiceType
+  const getServiceType = props.navigation.getParam('getServiceType')
+    ? props.navigation.getParam('getServiceType')
     : null;
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
@@ -130,6 +130,26 @@ export default function Send(props) {
     }
   }
 
+  const [dropdownBoxValue, setDropdownBoxValue] = useState({
+    id: '',
+    account_name: '',
+  });
+  const [dropdownBoxList, setDropdownBoxList] = useState([
+    {
+      id: '1',
+      account_name: TEST_ACCOUNT,
+    },
+    {
+      id: '2',
+      account_name: REGULAR_ACCOUNT,
+    },
+    {
+      id: '3',
+      account_name: SECURE_ACCOUNT,
+    },
+  ]);
+
+  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   let userInfo = {
     to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
     from: 'Secure Account',
@@ -463,7 +483,7 @@ export default function Send(props) {
   //     />
   //   );
   // }, []);
-  
+
   const renderSendConfirmationContents = () => {
     if (transfer) {
       userInfo = {
@@ -834,6 +854,77 @@ export default function Send(props) {
                       Send it to a sample address
                     </Text>
                   ) : null}
+                    <TouchableOpacity
+                      activeOpacity={10}
+                      style={[
+                        dropdownBoxOpenClose
+                          ? styles.dropdownBoxOpened
+                          : styles.dropdownBox,
+                      ]}
+                      onPress={() => {
+                        setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                      }}
+                    >
+                      <Text
+                        style={{
+                          ...styles.dropdownBoxText,
+                          color: Colors.textColorGrey
+                           
+                        }}
+                      >
+                        {dropdownBoxValue.account_name
+                          ? dropdownBoxValue.account_name
+                          : serviceType}
+                      </Text>
+                      <Ionicons
+                        style={{ marginLeft: 'auto' }}
+                        name={
+                          dropdownBoxOpenClose
+                            ? 'ios-arrow-up'
+                            : 'ios-arrow-down'
+                        }
+                        size={15}
+                        color={Colors.borderColor}
+                      />
+                    </TouchableOpacity>
+                    
+                    <View style={{ position: 'relative' }}>
+                      {dropdownBoxOpenClose && (
+                        <View style={styles.dropdownBoxModal}>
+                          <ScrollView>
+                            {dropdownBoxList.map((value, index) => (
+                              <TouchableOpacity
+                                onPress={() => {
+                                  setServiceType(value.account_name);
+                                  setDropdownBoxOpenClose(false); 
+                                }}
+                                style={{
+                                  ...styles.dropdownBoxModalElementView,
+                                  backgroundColor:
+                                    dropdownBoxValue.id == value.id
+                                      ? Colors.lightBlue
+                                      : Colors.white,
+                                }}
+                              >
+                                <Text
+                                  style={{
+                                    color:
+                                      dropdownBoxValue.id == value.id
+                                        ? Colors.blue
+                                        : Colors.black,
+                                    fontFamily: Fonts.FiraSansRegular,
+                                    fontSize: RFValue(12),
+                                  }}
+                                >
+                                  {value.account_name}
+                                </Text>
+                              </TouchableOpacity>
+                            ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    
+                  
                   <View style={styles.textBoxView}>
                     <View style={styles.amountInputImage}>
                       <Image
@@ -888,6 +979,8 @@ export default function Send(props) {
                     />
                   </View>
                 </View>
+                </View>
+
                 <View
                   style={{
                     height: 1,
@@ -898,6 +991,7 @@ export default function Send(props) {
                     marginBottom: hp('3%'),
                   }}
                 />
+                
                 <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                   <Text
                     style={{
@@ -1028,6 +1122,7 @@ export default function Send(props) {
                     </View>
                   </View>
                 </View>
+                
                 <View
                   style={{
                     paddingLeft: 20,
@@ -1342,5 +1437,61 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     marginTop: hp('2.5%'),
     marginBottom: hp('2.5%'),
+  },
+  dropdownBox: {
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: Colors.borderColor,
+    height: 50,
+    paddingLeft: 15,
+    paddingRight: 15,
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+  },
+  dropdownBoxOpened: {
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: Colors.borderColor,
+    height: 50,
+    paddingLeft: 15,
+    paddingRight: 15,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: { width: 2, height: 2 },
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+  },
+  dropdownBoxText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(13),
+  },
+  dropdownBoxModal: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1%'),
+    width: wp('90%'),
+    height: hp('18%'),
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    zIndex: 9999,
+    overflow: 'hidden',
+  },
+  dropdownBoxModalElementView: {
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 });
