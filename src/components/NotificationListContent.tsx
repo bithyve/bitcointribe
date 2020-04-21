@@ -4,7 +4,6 @@ import {
     Image,
     Text,
     StyleSheet,
-    ScrollView
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
@@ -16,6 +15,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome"
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function NotificationListContent(props) {
 
