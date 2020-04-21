@@ -26,29 +26,25 @@ export default function AddressBookContents(props) {
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   let [TrustedContact, setTrustedContact] = useState([
     {
-      name: 'abcd qwert',
-      phoneNumber: '7894561230',
+      name: 'Uraiah Cabe',
+      phoneNumber: '+1 000 000 0000',
     },
     {
-      name: 'abcd qwert',
-      phoneNumber: '7894561230',
+      name: 'Mike Ross',
+      phoneNumber: 'miker@bithyve.com',
     },
     {
-      name: 'abcd qwert',
-      phoneNumber: '7894561230',
+      name: 'Donna Paulsen',
+      phoneNumber: '+966 0 00 000 0000',
     },
     {
-      name: 'abcd qwert',
-      phoneNumber: '7894561230',
+      name: 'Rachel Zane',
+      phoneNumber: 'zanerachel@bithyve.com',
     },
     {
-      name: 'abcd qwert',
-      phoneNumber: '7894561230',
-    },
-    {
-      name: 'abcd qwert',
-      phoneNumber: '7894561230',
-    },
+      name: 'Louis Litt',
+      phoneNumber: '+1 000 000 0000',
+    }
   ]);
   useEffect(() => {
     getAssociatedContact();
@@ -68,6 +64,69 @@ export default function AddressBookContents(props) {
     );
     setSecondaryDeviceAddress(SecondaryDeviceAddress);
   };
+
+  const getElement = (item, index) =>{
+    return (
+      <View style={styles.selectedContactsView}>
+        <View>
+          <Text style={styles.contactText}>
+            {item.name && item.name.split(' ')[0]
+              ? item.name.split(' ')[0]
+              : ''}{' '}
+            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+              {item.name && item.name.split(' ')[1]
+                ? item.name.split(' ')[1]
+                : ''}
+            </Text>
+          </Text>
+          {item.phoneNumber ? (
+            <Text style={styles.phoneText}>
+              {item.phoneNumber}
+            </Text>
+          ) : null}
+        </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: 'auto',
+          }}
+        >
+          <TouchableOpacity style={styles.shareButtonView}>
+            <Text style={styles.shareButtonText}>Send</Text>
+            <Image
+              style={{
+                width: wp('3%'),
+                height: wp('3%'),
+                resizeMode: 'contain',
+              }}
+              source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
+            />
+          </TouchableOpacity>
+          <View
+            style={{
+              width: 10,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 'auto',
+              marginRight: 10,
+            }}
+          >
+            <Ionicons
+              name="ios-arrow-forward"
+              color={Colors.borderColor}
+              size={RFValue(15)}
+              style={{
+                marginLeft: 'auto',
+                alignSelf: 'center',
+              }}
+            />
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -138,68 +197,7 @@ export default function AddressBookContents(props) {
                   data={TrustedContact}
                   extraData={TrustedContact}
                   showsVerticalScrollIndicator={true}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <View style={styles.selectedContactsView}>
-                        <View>
-                          <Text style={styles.contactText}>
-                            {item.name && item.name.split(' ')[0]
-                              ? item.name.split(' ')[0]
-                              : ''}{' '}
-                            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                              {item.name && item.name.split(' ')[1]
-                                ? item.name.split(' ')[1]
-                                : ''}
-                            </Text>
-                          </Text>
-                          {item.phoneNumber ? (
-                            <Text style={styles.phoneText}>
-                              {item.phoneNumber}
-                            </Text>
-                          ) : null}
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginLeft: 'auto',
-                          }}
-                        >
-                          <TouchableOpacity style={styles.shareButtonView}>
-                            <Text style={styles.shareButtonText}>Send</Text>
-                            <Image
-                              style={{
-                                width: 12,
-                                height: 12,
-                                resizeMode: 'contain',
-                              }}
-                              source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
-                            />
-                          </TouchableOpacity>
-                          <View
-                            style={{
-                              width: 10,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              marginLeft: 'auto',
-                              marginRight: 10,
-                            }}
-                          >
-                            <Ionicons
-                              name="ios-arrow-forward"
-                              color={Colors.textColorGrey}
-                              size={15}
-                              style={{
-                                marginLeft: 'auto',
-                                alignSelf: 'center',
-                              }}
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  }}
+                  renderItem={({ item, index }) => getElement(item, index)}
                 />
               </View>
             ) : null}
@@ -247,68 +245,7 @@ export default function AddressBookContents(props) {
                   data={AssociatedContact}
                   extraData={AssociatedContact}
                   showsVerticalScrollIndicator={false}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <View style={styles.selectedContactsView}>
-                        <View>
-                          <Text style={styles.contactText}>
-                            {item.name && item.name.split(' ')[0]
-                              ? item.name.split(' ')[0]
-                              : ''}{' '}
-                            <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                              {item.name && item.name.split(' ')[1]
-                                ? item.name.split(' ')[1]
-                                : ''}
-                            </Text>
-                          </Text>
-                          {item.phoneNumber ? (
-                            <Text style={styles.phoneText}>
-                              {item.phoneNumber}
-                            </Text>
-                          ) : null}
-                        </View>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginLeft: 'auto',
-                          }}
-                        >
-                          <TouchableOpacity style={styles.shareButtonView}>
-                            <Text style={styles.shareButtonText}>Send</Text>
-                            <Image
-                              style={{
-                                width: 12,
-                                height: 12,
-                                resizeMode: 'contain',
-                              }}
-                              source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
-                            />
-                          </TouchableOpacity>
-                          <View
-                            style={{
-                              width: 10,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              marginLeft: 'auto',
-                              marginRight: 10,
-                            }}
-                          >
-                            <Ionicons
-                              name="ios-arrow-forward"
-                              color={Colors.textColorGrey}
-                              size={15}
-                              style={{
-                                marginLeft: 'auto',
-                                alignSelf: 'center',
-                              }}
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    );
-                  }}
+                  renderItem={({ item, index }) => getElement(item, index)}
                 />
               </View>
             ) : null}
@@ -372,63 +309,7 @@ export default function AddressBookContents(props) {
               data={SelectedContacts}
               extraData={SelectedContacts}
               showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => {
-                return (
-                  <View style={styles.selectedContactsView}>
-                    <View>
-                      <Text style={styles.contactText}>
-                        {item.name && item.name.split(' ')[0]
-                          ? item.name.split(' ')[0]
-                          : ''}{' '}
-                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {item.name && item.name.split(' ')[1]
-                            ? item.name.split(' ')[1]
-                            : ''}
-                        </Text>
-                      </Text>
-                      {item.phoneNumber ? (
-                        <Text style={styles.phoneText}>{item.phoneNumber}</Text>
-                      ) : null}
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 'auto',
-                      }}
-                    >
-                      <TouchableOpacity style={styles.shareButtonView}>
-                        <Text style={styles.shareButtonText}>Send</Text>
-                        <Image
-                          style={{
-                            width: 12,
-                            height: 12,
-                            resizeMode: 'contain',
-                          }}
-                          source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
-                        />
-                      </TouchableOpacity>
-                      <View
-                        style={{
-                          width: 10,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          marginLeft: 'auto',
-                          marginRight: 10,
-                        }}
-                      >
-                        <Ionicons
-                          name="ios-arrow-forward"
-                          color={Colors.textColorGrey}
-                          size={15}
-                          style={{ marginLeft: 'auto', alignSelf: 'center' }}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                );
-              }}
+              renderItem={({ item, index }) => getElement(item, index)}
             />
           </View>
         ) : (
@@ -493,7 +374,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
   },
   phoneText: {
-    marginTop: 5,
+    marginTop: 3,
     marginLeft: 10,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
@@ -511,8 +392,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
   },
   shareButtonView: {
-    height: wp('8%'),
-    width: wp('15%'),
+    height: wp('7%'),
+    width: wp('18%'),
     backgroundColor: Colors.backgroundColor,
     borderWidth: 1,
     borderColor: Colors.borderColor,
