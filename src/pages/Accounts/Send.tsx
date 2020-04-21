@@ -767,7 +767,6 @@ export default function Send(props) {
                 <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                   <View style={styles.textBoxView}>
                     <TextInput
-                      // ref={refs => setTextContactNameRef(refs)}
                       editable={isEditable}
                       style={styles.textBox}
                       placeholder={'Address'}
@@ -844,7 +843,6 @@ export default function Send(props) {
                     </View>
                     <TextInput
                       editable={sweepSecure ? false : isEditable}
-                      // ref={refs => setTextAmountRef(refs)}
                       style={{ ...styles.textBox, paddingLeft: 10 }}
                       placeholder={
                         serviceType === TEST_ACCOUNT
@@ -864,17 +862,6 @@ export default function Send(props) {
                           }, 10);
                         }
                       }}
-                      // onFocus={() => {
-                      //   props.modalRef.current.snapTo(2);
-                      // }}
-                      // onBlur={() => {
-                      //   if (
-                      //     !descriptionRef.isFocused() &&
-                      //     !textContactNameRef.isFocused()
-                      //   ) {
-                      //     props.modalRef.current.snapTo(1);
-                      //   }
-                      // }}
                     />
                   </View>
                   {isInvalidBalance ? (
@@ -884,16 +871,8 @@ export default function Send(props) {
                   ) : null}
                   <View style={{ ...styles.textBoxView }}>
                     <TextInput
-                      // ref={refs => setDescriptionRef(refs)}
                       editable={isEditable}
-                      // multiline={true}
-                      // numberOfLines={4}
-                      style={{
-                        ...styles.textBox,
-                        paddingRight: 20,
-                        marginTop: 10,
-                        marginBottom: 10,
-                      }}
+                      style={styles.textBox}
                       returnKeyLabel="Done"
                       returnKeyType="done"
                       onSubmitEditing={Keyboard.dismiss}
@@ -906,17 +885,6 @@ export default function Send(props) {
                       value={description}
                       onChangeText={setDescription}
                       placeholderTextColor={Colors.borderColor}
-                      // onFocus={() => {
-                      //   props.modalRef.current.snapTo(2);
-                      // }}
-                      // onBlur={() => {
-                      //   if (
-                      //     !textAmountRef.isFocused() &&
-                      //     !textContactNameRef.isFocused()
-                      //   ) {
-                      //     props.modalRef.current.snapTo(1);
-                      //   }
-                      // }}
                     />
                   </View>
                 </View>
