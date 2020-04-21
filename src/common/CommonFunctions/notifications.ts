@@ -19,6 +19,7 @@ export const createNotificationListeners = async () => {
     .notifications()
     .onNotificationOpened((notificationOpen) => {
       const { title, body } = notificationOpen.notification;
+      console.log("notificationOpen.notification onNotificationOpened", notificationOpen.notification);
     });
 
   /*
@@ -29,6 +30,7 @@ export const createNotificationListeners = async () => {
     .getInitialNotification();
   if (notificationOpen) {
     const { title, body } = notificationOpen.notification;
+    console.log("notificationOpen.notification getInitialNotification", notificationOpen.notification);
   }
   /*
    * Triggered for data only payload in foreground

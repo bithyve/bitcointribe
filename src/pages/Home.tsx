@@ -37,7 +37,7 @@ import CustodianRequestRejectedModalContents from '../components/CustodianReques
 import CustodianRequestOtpModalContents from '../components/CustodianRequestOtpModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import AddressBookContents from '../components/AddressBookContents';
+import AddressBookContents from './AddressBookContents';
 import SaveBitcoinModalContents from './GetBittr/SaveBitcoinModalContents';
 import CustodianRequestAcceptModalContents from '../components/CustodianRequestAcceptModalContents';
 import HomePageShield from '../components/HomePageShield';
@@ -404,11 +404,7 @@ export default function Home(props) {
   const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
     React.createRef(),
   );
-  const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
-    React.createRef(),
-  );
-
-  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
+ const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
     React.createRef(),
   );
   // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -1584,7 +1580,7 @@ export default function Home(props) {
       props.navigation.navigate('ManageBackup');
     }
     if (item.title == 'Address Book') {
-      (addressBookBottomSheet as any).current.snapTo(1);
+      props.navigation.navigate('AddressBookContents');
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
@@ -1692,37 +1688,6 @@ export default function Home(props) {
       await AsyncStorage.getItem('secondaryDeviceAddress'),
     );
     setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  };
-
-  const renderAddressBookContents = () => {
-    return (
-      <AddressBookContents
-        SecondaryDeviceAddress={SecondaryDeviceAddress}
-        AssociatedContact={AssociatedContact}
-        SelectedContacts={SelectedContacts}
-        onPressBack={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (addressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderAddressBookHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (addressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
   };
 
   // const renderCustodianRequestOtpModalHeader = () => {
@@ -2139,11 +2104,9 @@ export default function Home(props) {
       }
       setTimeout(() => {
         if (
-          addressBookBottomSheet.current &&
           AllAccountsBottomSheet.current &&
           settingsBottomSheet.current
         ) {
-          (addressBookBottomSheet as any).current.snapTo(0);
           (AllAccountsBottomSheet as any).current.snapTo(0);
           (settingsBottomSheet.current as any).snapTo(0);
         }
@@ -2978,30 +2941,6 @@ export default function Home(props) {
         renderContent={renderCustodianRequestRejectedModalContent}
         renderHeader={renderCustodianRequestRejectedModalHeader}
       />
-      {KnowMoreBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(0);
-            }
-          }}
-          onCloseEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(999);
-            }
-          }}
-          enabledInnerScrolling={true}
-          ref={addressBookBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
-          ]}
-          renderContent={renderAddressBookContents}
-          renderHeader={renderAddressBookHeader}
-        />
-      ) : null}
       {KnowMoreBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {

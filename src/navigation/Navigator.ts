@@ -70,6 +70,7 @@ import ExistingSavingMethodDetails from "../pages/GetBittr/ExistingSavingMethodD
 import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
+import AddressBookContents from '../pages/AddressBookContents';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -176,6 +177,7 @@ const HomeNavigator = createStackNavigator(
     ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
+    AddressBookContents,
     PasscodeChangeSuccessPage: {
       screen: PasscodeChangeSuccessPage,
       navigationOptions: {
