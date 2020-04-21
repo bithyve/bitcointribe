@@ -659,9 +659,14 @@ export default function Home(props) {
   
   const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
-    console.log('fcmToken', fcmToken);
-    if (fcmToken) {
-      let fcmArray = [fcmToken];
+    let fcmArray = [fcmToken];
+    let fcmTokenFromAsync = await AsyncStorage.getItem("fcmToken");
+    if(fcmTokenFromAsync!=fcmToken && fcmTokenFromAsync){
+      await AsyncStorage.setItem("fcmToken", fcmToken);
+      dispatch(updateFCMTokens(fcmArray));
+    }
+    else if(!fcmTokenFromAsync){
+      await AsyncStorage.setItem("fcmToken", fcmToken);
       dispatch(updateFCMTokens(fcmArray));
     }
   };
