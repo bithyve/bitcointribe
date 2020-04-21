@@ -72,9 +72,9 @@ export default function SignUpDetails(props) {
   const [InstructionsBottomSheet, setInstructionsBottomSheet] = useState(
     React.createRef(),
   );
-  const [bitcoinAddress, setBitcoinAddress] = props.navigation.state.params
+  const [bitcoinAddress, setBitcoinAddress] = useState(props.navigation.state.params
     ? props.navigation.state.params.address
-    : '';
+    : '');
   const selectedAccount = props.navigation.state.params
     ? props.navigation.state.params.selectedAccount
     : '';
@@ -153,20 +153,14 @@ export default function SignUpDetails(props) {
             );
           }
         } else {
-          Toast('Getbittr Account creation limit exeeded');
+          Toast('Getbittr Account creation limit exceeded');
         }
       }
       if (serviceType === SECURE_ACCOUNT) {
             if (!derivativeAccount[derivativeAccountType][accountNumber])
               dispatch(fetchDerivativeAccAddress(derivativeAccountType));
             else {
-              console.log({
-                getBittrAddress:
-                  derivativeAccount[derivativeAccountType][accountNumber]
-                    .receivingAddress,
-              });
-              setBitcoinAddress(derivativeAccount[derivativeAccountType][accountNumber]
-                .receivingAddress);
+              setBitcoinAddress(derivativeAccount[derivativeAccountType][accountNumber].receivingAddress);
             }
           }
     }
@@ -588,12 +582,7 @@ export default function SignUpDetails(props) {
         >
           <View style={{ ...styles.textBoxView }}>
             <TextInput
-              style={{
-                ...styles.textBox,
-                paddingRight: 10,
-                marginTop: 10,
-                marginBottom: 10,
-              }}
+              style={styles.textBox}
               autoCapitalize="none"
               returnKeyLabel="Done"
               returnKeyType="done"
