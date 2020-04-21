@@ -9,6 +9,7 @@ import {
   StatusBar,
   AsyncStorage,
   Image,
+  Platform
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -19,8 +20,13 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ModalHeader from '../components/ModalHeader';
+import AddressBookFilterModalContent from './Contacts/AddressBookFilterModalContent';
+import DeviceInfo from 'react-native-device-info';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 export default function AddressBookContents(props) {
+  let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(React.createRef());
   let [AssociatedContact, setAssociatedContact] = useState([]);
   let [SelectedContacts, setSelectedContacts] = useState([]);
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
@@ -64,6 +70,25 @@ export default function AddressBookContents(props) {
     );
     setSecondaryDeviceAddress(SecondaryDeviceAddress);
   };
+
+  function renderFilterModalContent() {
+    return (
+      <AddressBookFilterModalContent
+        modalRef={FilterModalBottomSheet}
+        onPressBack={()=>{
+          FilterModalBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const renderFilterModalHeader =()=>{
+    return <ModalHeader onPressHeader={()=>{
+            FilterModalBottomSheet.current.snapTo(0);
+          }}
+          backgroundColor={Colors.backgroundColor1}
+        />
+  }
 
   const getElement = (item, index) =>{
     return (
@@ -150,17 +175,17 @@ export default function AddressBookContents(props) {
             <TouchableOpacity
               style={{
                 height: wp('8%'),
-                width: wp('15%'),
+                width: wp('20%'),
                 backgroundColor: Colors.lightBlue,
                 borderWidth: 1,
                 borderColor: Colors.borderColor,
-                borderRadius: 5,
+                borderRadius: 7,
                 marginLeft: 'auto',
                 justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'row',
               }}
-              onPress={() => {}}
+              onPress={() => {FilterModalBottomSheet.current.snapTo(1)}}
             >
               <Text
                 onPress={() => {}}
@@ -177,6 +202,7 @@ export default function AddressBookContents(props) {
                   width: 12,
                   height: 12,
                   resizeMode: 'contain',
+                  marginLeft:5
                 }}
                 source={require('../assets/images/icons/filter.png')}
               />
@@ -341,6 +367,16 @@ export default function AddressBookContents(props) {
             </Text>
           </View>
         )}
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={FilterModalBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          ]}
+          renderContent={renderFilterModalContent}
+          renderHeader={renderFilterModalHeader}
+        />
       </View>
     </SafeAreaView>
   );
