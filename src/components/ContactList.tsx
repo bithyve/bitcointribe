@@ -187,7 +187,7 @@ export default function ContactList(props) {
     }
   };
 
-  function onContactSelect(index) {
+  async function onContactSelect(index) {
     if(selectedContacts.length==2 && !props.isTrustedContact){
       Toast("Please remove one or more selected contacts to select a new one.");
       return;
@@ -206,6 +206,14 @@ export default function ContactList(props) {
           selectedContacts.findIndex(temp => temp.id == contacts[index].id),
           1
         );
+        let selectedContactsTemp = JSON.parse(await AsyncStorage.getItem("selectedContacts"));
+        if(!selectedContactsTemp){
+          selectedContactsTemp = [];
+        }
+        if(selectedContactsTemp.findIndex((item)=>item.id ==contacts[index].id)>-1){
+          selectedContactsTemp.splice(selectedContactsTemp.findIndex(temp => temp.id == contacts[index].id),1);
+        }
+        await AsyncStorage.setItem("selectedContacts", JSON.stringify(selectedContactsTemp));
       } else {
         if (selectedContacts.length === 2) {
           selectedContacts.pop();
@@ -228,7 +236,7 @@ export default function ContactList(props) {
     props.onSelectContact(selectedContacts);
   }
 
-  function onCancel(value) {
+  async function onCancel(value) {
     if (filterContactData.findIndex(tmp => tmp.id == value.id) > -1) {
       filterContactData[
         filterContactData.findIndex(tmp => tmp.id == value.id)
@@ -238,6 +246,16 @@ export default function ContactList(props) {
       selectedContacts.findIndex(temp => temp.id == value.id),
       1,
     );
+    if(!props.isTrustedContact){
+      let selectedContacts = JSON.parse(await AsyncStorage.getItem("selectedContacts"));
+      if(!selectedContacts){
+        selectedContacts = [];
+      }
+      if(selectedContacts.findIndex((item)=>item.id ==value.id)>-1){
+        selectedContacts.splice(selectedContacts.findIndex(temp => temp.id == value.id),1);
+      }
+      await AsyncStorage.setItem("selectedContacts", JSON.stringify(selectedContacts));
+    }
     setSelectedContacts(selectedContacts);
     setRadioOnOff(!radioOnOff);
     props.onSelectContact(selectedContacts);
