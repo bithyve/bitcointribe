@@ -1586,9 +1586,6 @@ export default function Home(props) {
     }
     if (item.title == 'Address Book') {
       props.navigation.navigate('AddressBookContents');
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
     } else if (item.title == 'Settings') {
       (settingsBottomSheet as any).current.snapTo(1);
       setTimeout(() => {
