@@ -79,7 +79,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
   }, []);
 
   if (META_SHARE) {
-    Toast('Downloaded');
+    Toast('Received');
   }
   if (isErrorReceivingFailed) {
     setTimeout(() => {
