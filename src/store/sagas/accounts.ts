@@ -37,7 +37,6 @@ import {
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
-  FETCH_GET_BITTR_DETAILS,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -701,26 +700,3 @@ function* testWorker({ payload }) {
 }
 
 export const testWatcher = createWatcher(testWorker, RUN_TEST);
-
-function* fetchGetBittrDetailsWorker({ payload }) {
-  const service: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  const res = yield call(service.getBittrDetails);
-  if (res.status === 200) {
-    const { details } = res.data;
-    console.log({ details });
-    yield call(
-      AsyncStorage.setItem,
-      'getBittrDetails',
-      JSON.stringify(details),
-    );
-  } else {
-    console.log('Failed to fetch GetBittr Details');
-  }
-}
-
-export const fetchGetBittrDetailsWatcher = createWatcher(
-  fetchGetBittrDetailsWorker,
-  FETCH_GET_BITTR_DETAILS,
-);

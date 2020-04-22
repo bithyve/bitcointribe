@@ -46,7 +46,6 @@ import {
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
-  fetchGetBittrDetailsWatcher,
 } from './sagas/accounts';
 import {
   initHCWatcher,
@@ -84,6 +83,8 @@ import {
 import {
   updateFCMTokensWatcher,
   sendNotificationWatcher,
+  fetchNotificationsWatcher,
+  fetchGetBittrDetailsWatcher,
 } from './sagas/notifications';
 
 // const rootSaga = function*() {
@@ -142,6 +143,7 @@ const rootSaga = function* () {
     testWatcher,
     fetchGetBittrDetailsWatcher,
     updateFCMTokensWatcher,
+    fetchNotificationsWatcher,
     sendNotificationWatcher,
 
     // sss watchers
