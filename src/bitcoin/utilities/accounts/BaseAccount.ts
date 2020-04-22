@@ -3,7 +3,7 @@ import { Network, TransactionBuilder } from 'bitcoinjs-lib';
 import config from '../../Config';
 import { ErrMap } from '../ErrMap';
 import HDSegwitWallet from './HDSegwitWallet';
-import { Transactions } from '../Interface';
+import { Transactions, INotification } from '../Interface';
 
 export default class BaseAccount {
   public hdWallet: HDSegwitWallet;
@@ -680,9 +680,9 @@ export default class BaseAccount {
     }
   };
 
-  public deliverNotifications = async (
-    walletId: string,
-    message: string,
+  public sendNotification = async (
+    receiverWalletID: string,
+    notification: INotification,
   ): Promise<
     | {
         status: number;
@@ -702,7 +702,10 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.deliverNotification(walletId, message),
+        data: await this.hdWallet.sendNotification(
+          receiverWalletID,
+          notification,
+        ),
       };
     } catch (err) {
       return {
