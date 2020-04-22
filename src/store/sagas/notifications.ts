@@ -104,6 +104,7 @@ function* fetchNotificationsWorker() {
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
   const { data } = yield call(service.getWalletId);
+  console.log({ walletId: data.walletId });
 
   const res = yield call(RelayServices.fetchNotifications, data.walletId);
   if (res.status === 200) {

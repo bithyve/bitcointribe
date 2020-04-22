@@ -10,6 +10,7 @@ import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
 import manageBackupReducer from './reducers/manageBackup';
 import GetBittrReducer from './reducers/bittr';
+import notificationsReducer from './reducers/notifications';
 
 import {
   initDBWatcher,
@@ -201,6 +202,7 @@ const rootReducer = combineReducers({
   sss: sssReducer,
   manageBackup: manageBackupReducer,
   bittr: GetBittrReducer,
+  notifications: notificationsReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
