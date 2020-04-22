@@ -78,4 +78,6 @@ export interface INotification {
   body: string;
   data: Object;
   tag: notificationTag;
+  status?: string;
+  date?: Date;
 } // corresponds to the notification schema

@@ -30,9 +30,9 @@ import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
-import Relay from '../bitcoin/services/Relay';
 import { APP_ID } from 'react-native-dotenv';
 import { exit } from 'process';
+import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Getting the latest details');
@@ -169,45 +169,46 @@ export default function Login(props) {
       DeviceInfo.getVersion(),
       DeviceInfo.getBuildNumber(),
     );
-    Relay.fetchReleaseNotes(DeviceInfo.getBuildNumber())
-      .then((val) => {
+    RelayServices.fetchReleaseNotes(DeviceInfo.getBuildNumber())
+      .then((res) => {
+        const val = res.data;
         const ReleaseNoteType = 'mandatory'; // 'optional'
         const ReleaseNote =
           Platform.OS == 'ios'
             ? val.releaseNotes.ios
             : val.releaseNotes.android;
         console.log('ReleaseNote', val.releaseNotes, ReleaseNote);
-      //   ReleaseNoteType == 'mandatory'
-      //     ? Alert.alert(
-      //         ReleaseNote,
-      //         '',
-      //         [
-      //           {
-      //             text: 'Upgrade Now',
-      //             onPress: () => upgradeNow(),
-      //           },
-      //           { text: 'Cancel'},
-      //         ],
-      //         { cancelable: false },
-      //       )
-      //     : Alert.alert(
-      //         ReleaseNote,
-      //         '',
-      //         [
-      //           {
-      //             text: 'Upgrade Now',
-      //             onPress: () => upgradeNow(),
-      //           },
-      //           {
-      //             text: 'Remind me later',
-      //             onPress: () => upgradeNow(),
-      //           },
+        //   ReleaseNoteType == 'mandatory'
+        //     ? Alert.alert(
+        //         ReleaseNote,
+        //         '',
+        //         [
+        //           {
+        //             text: 'Upgrade Now',
+        //             onPress: () => upgradeNow(),
+        //           },
+        //           { text: 'Cancel'},
+        //         ],
+        //         { cancelable: false },
+        //       )
+        //     : Alert.alert(
+        //         ReleaseNote,
+        //         '',
+        //         [
+        //           {
+        //             text: 'Upgrade Now',
+        //             onPress: () => upgradeNow(),
+        //           },
+        //           {
+        //             text: 'Remind me later',
+        //             onPress: () => upgradeNow(),
+        //           },
 
-      //           { text: 'Ignore', onPress: () => upgradeNow(),},
-      //         ],
-      //         { cancelable: false },
-      //       );
-       })
+        //           { text: 'Ignore', onPress: () => upgradeNow(),},
+        //         ],
+        //         { cancelable: false },
+        //       );
+      })
       .catch((error) => {
         console.error(error);
       });
@@ -225,7 +226,7 @@ export default function Login(props) {
         console.log("Don't know how to open URI: " + url);
       }
     });
-  }
+  };
 
   // useEffect(() => {
   //   (async () => {
