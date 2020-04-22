@@ -601,6 +601,7 @@ export default function Home(props) {
   }
 
   useEffect(function () {
+    AppState.addEventListener('change', onAppStateChange);
     (async () => {
       const enabled = await firebase.messaging().hasPermission();
       console.log('enabledqqq', enabled);
@@ -655,6 +656,16 @@ export default function Home(props) {
     };
   }, []);
 
+  const onAppStateChange = async (nextAppState) => {
+    try {
+      if (this.appState == nextAppState) return;
+      this.appState = nextAppState;
+      if (this.appState == 'active') {
+        scheduleNotification();
+      }
+  }catch (error) {
+  }
+}
   // useEffect(() => {
   //   const unsubscribe = firebase
   //     .messaging()
