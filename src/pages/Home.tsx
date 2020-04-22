@@ -86,7 +86,10 @@ import {
   runTest,
   fetchGetBittrDetails,
 } from '../store/actions/accounts';
-import { updateFCMTokens } from '../store/actions/notifications';
+import {
+  updateFCMTokens,
+  fetchNotifications,
+} from '../store/actions/notifications';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
@@ -656,13 +659,18 @@ export default function Home(props) {
   //   const unsubscribe = firebase
   //     .messaging()
   //     .onMessage(async (remoteMessage) => {
-  //       Alert.alert(
-  //         'A new FCM message arrived!',
-  //         JSON.stringify(remoteMessage),
-  //       );
+  //       console.log('A new FCM message arrived!', remoteMessage);
   //     });
 
   //   return unsubscribe;
+  // }, []);
+
+  // const notifications = useSelector(
+  //   (state) => state.notifications.notifications,
+  // );
+  // console.log({ notifications });
+  // useEffect(() => {
+  //   dispatch(fetchNotifications());
   // }, []);
 
   const storeFCMToken = async () => {
