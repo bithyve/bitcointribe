@@ -1160,6 +1160,9 @@ export default function Send(props) {
                     }}
                     onPress={() => {
                       dispatch(clearTransfer(serviceType));
+                      if (getServiceType) {
+                        getServiceType(serviceType);
+                      }
                       props.navigation.goBack();
                     }}
                   >

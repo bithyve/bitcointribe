@@ -205,21 +205,7 @@ export default function Accounts(props) {
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
     });
-
-    setTimeout(() => {
-      if (carousel.current) {
-        if (props.navigation.state.params) {
-          carousel.current.snapToItem(
-            props.navigation.getParam('index'),
-            true,
-            true,
-          );
-        } else {
-          carousel.current.snapToItem(1, true, true);
-        }
-      }
-    }, 2000);
-
+    
     getServiceType(serviceType);
   }, []);
 
@@ -334,9 +320,19 @@ export default function Accounts(props) {
   const getServiceType = useCallback(
     serviceType => {
       if (!serviceType) return;
-      //setTimeout(() => {
       setServiceType(serviceType);
-      //}, 10);
+      setTimeout(() => {
+        if (carousel.current) {
+         if(serviceType == TEST_ACCOUNT) {
+                    carousel.current.snapToItem(0, true, true);
+                  } else if(serviceType == REGULAR_ACCOUNT) {
+                    carousel.current.snapToItem(1, true, true);
+                  } else if(serviceType == SECURE_ACCOUNT){
+                    carousel.current.snapToItem(2, true, true);
+                  }
+          }
+      }, 2000);
+      
       if (serviceType == TEST_ACCOUNT) checkNHighlight();
     },
     [serviceType],
