@@ -85,9 +85,8 @@ import {
   fetchTransactions,
   runTest,
   fetchGetBittrDetails,
-  updateFCMTokens,
-  deliverNotification,
 } from '../store/actions/accounts';
+import { updateFCMTokens } from '../store/actions/notifications';
 import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
@@ -100,7 +99,10 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-import { createNotificationListeners, scheduleNotification } from '../common/CommonFunctions/notifications';
+import {
+  createNotificationListeners,
+  scheduleNotification,
+} from '../common/CommonFunctions/notifications';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -190,86 +192,93 @@ export default function Home(props) {
   });
   // const transactionsParam = props.navigation.getParam('transactions');
   const [transactions, setTransactions] = useState([]);
-  const [NotificationDataChange, setNotificationDataChange] = useState(false)
+  const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([
-      {
-          type: 'update',
-          isMandatory:true,
-          read:true,
-          title:'Update Available',
-          time:'2h ago',
-          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
-          notificationId : 1
-      },
-      {
-          type: 'receive',
-          isMandatory:true,
-          read:false,
-          title:'Bitcoins Received',
-          time:'9.30 am',
-          info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur",
-          notificationId : 2
-      },
-      {
-          type: 'update',
-          isMandatory:true,
-          read:true,
-          title:'Update Available',
-          time:'Yesterday, 5:00pm',
-          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
-          notificationId : 3
-      },
-      {
-          type: 'receive',
-          isMandatory:false,
-          read:true,
-          title:'Bitcoins Received',
-          time:'Thursday, 9:00pm',
-          info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur",
-          notificationId : 4
-      },
-      {
-          type: 'update',
-          isMandatory:false,
-          read:true,
-          title:'Update Available',
-          time:'11 March, 5:00pm',
-          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
-          notificationId : 5
-      },
-      {
-          type: 'receive',
-          isMandatory:false,
-          read:false,
-          title:'Bitcoins Received',
-          time:'1 Feb, 7:00pm',
-          info:"0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur",
-          notificationId : 6
-      },
-      {
-          type: 'update',
-          isMandatory:false,
-          read:true,
-          title:'Update Available',
-          time:'11 March, 5:00pm',
-          info:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna",
-          notificationId : 7
-      }
+    {
+      type: 'update',
+      isMandatory: true,
+      read: true,
+      title: 'Update Available',
+      time: '2h ago',
+      info:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
+      notificationId: 1,
+    },
+    {
+      type: 'receive',
+      isMandatory: true,
+      read: false,
+      title: 'Bitcoins Received',
+      time: '9.30 am',
+      info:
+        '0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur',
+      notificationId: 2,
+    },
+    {
+      type: 'update',
+      isMandatory: true,
+      read: true,
+      title: 'Update Available',
+      time: 'Yesterday, 5:00pm',
+      info:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
+      notificationId: 3,
+    },
+    {
+      type: 'receive',
+      isMandatory: false,
+      read: true,
+      title: 'Bitcoins Received',
+      time: 'Thursday, 9:00pm',
+      info:
+        '0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur',
+      notificationId: 4,
+    },
+    {
+      type: 'update',
+      isMandatory: false,
+      read: true,
+      title: 'Update Available',
+      time: '11 March, 5:00pm',
+      info:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
+      notificationId: 5,
+    },
+    {
+      type: 'receive',
+      isMandatory: false,
+      read: false,
+      title: 'Bitcoins Received',
+      time: '1 Feb, 7:00pm',
+      info:
+        '0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur',
+      notificationId: 6,
+    },
+    {
+      type: 'update',
+      isMandatory: false,
+      read: true,
+      title: 'Update Available',
+      time: '11 March, 5:00pm',
+      info:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
+      notificationId: 7,
+    },
   ]);
   const [qrData, setqrData] = useState('');
 
-  const onNotificationClicked = (value) =>{
+  const onNotificationClicked = (value) => {
     let tempNotificationData = NotificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
       const element = tempNotificationData[i];
-      if(element.notificationId==value.notificationId){
+      if (element.notificationId == value.notificationId) {
         tempNotificationData[i].read = true;
       }
     }
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
-  }
-  
+  };
+
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -404,7 +413,7 @@ export default function Home(props) {
   const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
     React.createRef(),
   );
- const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
+  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
     React.createRef(),
   );
   // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -590,7 +599,7 @@ export default function Home(props) {
 
   useEffect(function () {
     (async () => {
-     const enabled = await firebase.messaging().hasPermission();
+      const enabled = await firebase.messaging().hasPermission();
       console.log('enabledqqq', enabled);
       if (!enabled) {
         await firebase
@@ -615,7 +624,7 @@ export default function Home(props) {
         scheduleNotification();
       }
     })();
-    
+
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
@@ -656,17 +665,15 @@ export default function Home(props) {
   //   return unsubscribe;
   // }, []);
 
-  
   const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    let fcmTokenFromAsync = await AsyncStorage.getItem("fcmToken");
-    if(fcmTokenFromAsync!=fcmToken && fcmTokenFromAsync){
-      await AsyncStorage.setItem("fcmToken", fcmToken);
+    let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
+    if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
+      await AsyncStorage.setItem('fcmToken', fcmToken);
       dispatch(updateFCMTokens(fcmArray));
-    }
-    else if(!fcmTokenFromAsync){
-      await AsyncStorage.setItem("fcmToken", fcmToken);
+    } else if (!fcmTokenFromAsync) {
+      await AsyncStorage.setItem('fcmToken', fcmToken);
       dispatch(updateFCMTokens(fcmArray));
     }
   };
@@ -2105,10 +2112,7 @@ export default function Home(props) {
         }, 2);
       }
       setTimeout(() => {
-        if (
-          AllAccountsBottomSheet.current &&
-          settingsBottomSheet.current
-        ) {
+        if (AllAccountsBottomSheet.current && settingsBottomSheet.current) {
           (AllAccountsBottomSheet as any).current.snapTo(0);
           (settingsBottomSheet.current as any).snapTo(0);
         }
@@ -2406,7 +2410,7 @@ export default function Home(props) {
     return (
       <NotificationListContent
         NotificationData={NotificationData}
-        onNotificationClicked={(value)=>onNotificationClicked(value)}
+        onNotificationClicked={(value) => onNotificationClicked(value)}
         onPressBack={() => {
           (notificationsListBottomSheet as any).current.snapTo(0);
         }}
@@ -2455,7 +2459,8 @@ export default function Home(props) {
                   style={{ width: wp('6%'), height: wp('6%') }}
                   resizeMode={'contain'}
                 >
-                  {NotificationData.findIndex((value)=>value.read==false) > -1 ? 
+                  {NotificationData.findIndex((value) => value.read == false) >
+                  -1 ? (
                     <View
                       style={{
                         backgroundColor: Colors.red,
@@ -2465,9 +2470,7 @@ export default function Home(props) {
                         alignSelf: 'flex-end',
                       }}
                     />
-                    :
-                    null
-                  }
+                  ) : null}
                 </ImageBackground>
               </TouchableOpacity>
               <View style={{ marginBottom: wp('2%') }}>
@@ -3184,7 +3187,7 @@ export default function Home(props) {
           setTabBarZIndex(999);
         }}
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),

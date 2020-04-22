@@ -5,7 +5,7 @@ import coinselect from 'coinselect';
 import crypto from 'crypto';
 import config from '../../Config';
 import Bitcoin from './Bitcoin';
-import { Transactions } from '../Interface';
+import { Transactions, INotification } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
 
@@ -1070,19 +1070,19 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public deliverNotification = async (
-    walletId: string,
-    message: string,
+  public sendNotification = async (
+    receiverWalletID: string,
+    notification: INotification,
   ): Promise<{
     delivered: Boolean;
   }> => {
     try {
       let res: AxiosResponse;
       try {
-        res = await BH_AXIOS.post('deliverNotification', {
+        res = await BH_AXIOS.post('sendNotification', {
           HEXA_ID,
-          walletID: walletId, // walletId to which notification needs to be delivered
-          message,
+          receiverWalletID, // walletId to which notification needs to be delivered
+          notification,
         });
       } catch (err) {
         if (err.response) throw new Error(err.response.data.err);
