@@ -31,6 +31,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import { fetchAddress } from '../../store/actions/accounts';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Entypo from "react-native-vector-icons/Entypo";
 import Colors from '../../common/Colors';
 import BottomSheet from 'reanimated-bottom-sheet';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
@@ -39,6 +40,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 const ReceivingAddress = props => {
+  const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
@@ -303,7 +305,7 @@ const ReceivingAddress = props => {
               ) : null}
             </View>
           </View>
-          <View style={BackupStyles.modalContentView}>
+          <View style={{flex: 1, display: "flex", alignItems: "center", justifyContent: "center",  marginTop: 20}}>
             {!receivingAddress ? (
               <View style={styles.loader}>
                 <ActivityIndicator size="large" />
@@ -312,7 +314,16 @@ const ReceivingAddress = props => {
               <QRCode value={receivingAddress} size={hp('27%')} />
             )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
+            <TouchableOpacity activeOpacity={10} onPress={()=>{setAsTrustedContact(!AsTrustedContact)}} style={{flexDirection:'row', borderRadius:8, backgroundColor:Colors.backgroundColor,  alignItems:'center', marginLeft:15, marginRight:15, paddingLeft: 20, paddingRight: 15, marginTop: 30, width:wp('86%'), height:wp('13%')}}>
+              <Text style={{color: Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Add sender as Trusted Contact</Text>
+              <View style={{ width:wp('7%'), height: wp('7%'), borderRadius:7, backgroundColor:Colors.white, borderColor:Colors.borderColor, borderWidth:1, marginLeft:'auto', alignItems:'center', justifyContent:'center'}} >
+                {AsTrustedContact && 
+                  <Entypo name="check" size={RFValue(17)} color={Colors.green} />
+                }
+              </View>
+          </TouchableOpacity>
           </View>
+          
           <View
             style={{
               marginBottom: hp('5%'),

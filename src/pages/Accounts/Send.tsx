@@ -130,22 +130,21 @@ export default function Send(props) {
     }
   }
 
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
-    id: '',
-    account_name: '',
-  });
   const [dropdownBoxList, setDropdownBoxList] = useState([
     {
       id: '1',
-      account_name: TEST_ACCOUNT,
+      account_name: "Test Account",
+      type: TEST_ACCOUNT,
     },
     {
       id: '2',
-      account_name: REGULAR_ACCOUNT,
+      account_name: 'Checking Account',
+      type: REGULAR_ACCOUNT,
     },
     {
       id: '3',
-      account_name: SECURE_ACCOUNT,
+      account_name: 'Saving Account',
+      type: SECURE_ACCOUNT,
     },
   ]);
 
@@ -872,9 +871,7 @@ export default function Send(props) {
                            
                         }}
                       >
-                        {dropdownBoxValue.account_name
-                          ? dropdownBoxValue.account_name
-                          : serviceType}
+                        {serviceType==TEST_ACCOUNT ? "Test Account" : serviceType == REGULAR_ACCOUNT ? "Checking Account" : "Saving Account"}
                       </Text>
                       <Ionicons
                         style={{ marginLeft: 'auto' }}
@@ -895,13 +892,14 @@ export default function Send(props) {
                             {dropdownBoxList.map((value, index) => (
                               <TouchableOpacity
                                 onPress={() => {
-                                  setServiceType(value.account_name);
+                                  setServiceType(value.type);
+
                                   setDropdownBoxOpenClose(false); 
                                 }}
                                 style={{
                                   ...styles.dropdownBoxModalElementView,
                                   backgroundColor:
-                                    dropdownBoxValue.id == value.id
+                                    serviceType == value.type
                                       ? Colors.lightBlue
                                       : Colors.white,
                                 }}
@@ -909,7 +907,7 @@ export default function Send(props) {
                                 <Text
                                   style={{
                                     color:
-                                      dropdownBoxValue.id == value.id
+                                    serviceType == value.type
                                         ? Colors.blue
                                         : Colors.black,
                                     fontFamily: Fonts.FiraSansRegular,
@@ -1160,6 +1158,9 @@ export default function Send(props) {
                     }}
                     onPress={() => {
                       dispatch(clearTransfer(serviceType));
+                      if (getServiceType) {
+                        getServiceType(serviceType);
+                      }
                       props.navigation.goBack();
                     }}
                   >
@@ -1489,9 +1490,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   dropdownBoxModalElementView: {
-    height: 40,
-    justifyContent: 'center',
+    height: 50,
     alignItems: 'center',
     flexDirection: 'row',
+    paddingLeft: 15
   },
 });
