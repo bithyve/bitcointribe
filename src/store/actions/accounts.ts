@@ -20,8 +20,6 @@ export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
 export const FETCH_GET_BITTR_DETAILS = 'FETCH_GET_BITTR_DETAILS';
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
-export const UPDATE_FCM_TOKENS = 'UPDATE_FCM_TOKENS';
-export const DELIVER_NOTIFICATIONS = 'DELIVER_NOTIFICATIONS';
 
 export const fetchAddress = (serviceType) => {
   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -129,20 +127,6 @@ export const fetchDerivativeAccBalTx = (
 export const fetchGetBittrDetails = () => {
   return {
     type: FETCH_GET_BITTR_DETAILS,
-  };
-};
-
-export const updateFCMTokens = (FCMs: string[]) => {
-  return {
-    type: UPDATE_FCM_TOKENS,
-    payload: { FCMs },
-  };
-};
-
-export const deliverNotification = (walletId: string, message: string) => {
-  return {
-    type: DELIVER_NOTIFICATIONS,
-    payload: { walletId, message },
   };
 };
 
