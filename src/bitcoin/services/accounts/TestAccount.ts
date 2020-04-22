@@ -19,6 +19,7 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      derivativeAccount,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -33,6 +34,7 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      derivativeAccount: any;
     } = hdWallet;
 
     return new TestAccount(mnemonic, passphrase, purpose, {
@@ -46,6 +48,7 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      derivativeAccount,
     });
   };
 
@@ -64,6 +67,7 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      derivativeAccount: {};
     },
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet;
