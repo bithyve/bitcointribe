@@ -13,7 +13,8 @@ export default class Relay {
   public static fetchReleaseNotes = async (
     build: string,
   ): Promise<{
-    releaseNotes: { ios: string; android: string };
+    releaseNotes: { ios: String; android: String };
+    mandatory: String;
   }> => {
     let res: AxiosResponse;
     try {
@@ -26,7 +27,7 @@ export default class Relay {
       if (err.code) console.log(err.code);
     }
     console.log({ res });
-    const { releaseNotes } = res.data;
-    return { releaseNotes };
+    const { releaseNotes, mandatory } = res.data;
+    return { releaseNotes, mandatory };
   };
 }

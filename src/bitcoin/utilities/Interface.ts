@@ -1,5 +1,3 @@
-import accounts from '../../store/reducers/accounts';
-
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
@@ -66,3 +64,18 @@ export interface DerivativeAccount {
     transactions?: Transactions;
   };
 }
+
+export enum notificationType {
+  contact = 'contact',
+}
+export enum notificationTag {
+  IMP = 'IMP',
+  notIMP = 'not-IMP',
+}
+export interface INotification {
+  notificationType: notificationType;
+  title: string;
+  body: string;
+  data: Object;
+  tag: notificationTag;
+} // corresponds to the notification schema
