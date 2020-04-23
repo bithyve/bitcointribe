@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-
+import { useDispatch, useSelector } from 'react-redux';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -28,6 +28,13 @@ import QrCodeModalContents from '../../components/QrCodeModalContents';
 import QRModal from './QRModal';
 import ResetTwoFASuccess from './ResetTwoFASuccess';
 import ServerErrorModal from './ServerErrorModal';
+import {
+  resetTwoFA,
+  generateSecondaryXpriv,
+  clearTransfer,
+  twoFAResetted,
+} from '../../store/actions/accounts';
+import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
 const ResetTwoFAHelp = (props) => {
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
@@ -44,6 +51,44 @@ const ResetTwoFAHelp = (props) => {
     setServerNotRespondingBottomSheet,
   ] = useState(React.createRef());
 
+  const additional = useSelector((state) => state.accounts.additional);
+  const service = useSelector(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
+
+  let generatedSecureXPriv;
+  let resettedTwoFA;
+
+  if (additional && additional.secure) {
+    generatedSecureXPriv = additional.secure.xprivGenerated;
+    resettedTwoFA = additional.secure.twoFAResetted;
+  }
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (resettedTwoFA) {
+      props.navigation.navigate('TwoFASetup', {
+        twoFASetup: service.secureHDWallet.twoFASetup,
+        onPressBack: () => {
+          dispatch(clearTransfer(SECURE_ACCOUNT));
+          props.navigation.navigate('Accounts', {
+            serviceType: SECURE_ACCOUNT,
+            index: 2,
+          });
+        },
+      });
+      dispatch(twoFAResetted(null)); //resetting to monitor consecutive change
+    } else if (resettedTwoFA === false) {
+      setTimeout(() => {
+        setSuccessMessageHeader('Failed to reset 2FA');
+        setSuccessMessage(
+          'The QR you have scanned seems to be invalid, pls try again',
+        );
+      }, 2);
+      dispatch(twoFAResetted(null));
+    }
+  }, [resettedTwoFA]);
+
   const getQrCodeData = (qrData) => {
     setTimeout(() => {
       setQrBottomSheetsFlag(false);
@@ -56,6 +101,11 @@ const ResetTwoFAHelp = (props) => {
     // (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
 
     //props.navigation.navigate('TwoFASweepFunds');
+    if (QRModalHeader === 'Reset 2FA') {
+      dispatch(resetTwoFA(qrData));
+    } else if (QRModalHeader === 'Sweep Funds') {
+      dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
+    }
   };
 
   const renderQrContent = useCallback(() => {
@@ -77,12 +127,6 @@ const ResetTwoFAHelp = (props) => {
             QrBottomSheet.current.snapTo(0);
           }
           getQrCodeData(qrData);
-        }}
-        onPressQrScanner={() => {
-          console.log("on onPressQrScanner")
-          props.navigation.navigate('QrScanner', {
-            scanedCode: getQrCodeData,
-          });
         }}
       />
     );
