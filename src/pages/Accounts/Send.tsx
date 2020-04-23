@@ -94,7 +94,11 @@ export default function Send(props) {
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
   );
-  const [serviceType, setServiceType] = useState(props.navigation.getParam('serviceType') ? props.navigation.getParam('serviceType') : REGULAR_ACCOUNT);
+  const [serviceType, setServiceType] = useState(
+    props.navigation.getParam('serviceType')
+      ? props.navigation.getParam('serviceType')
+      : REGULAR_ACCOUNT,
+  );
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const { transfer, loading, service } = useSelector(
@@ -133,7 +137,7 @@ export default function Send(props) {
   const [dropdownBoxList, setDropdownBoxList] = useState([
     {
       id: '1',
-      account_name: "Test Account",
+      account_name: 'Test Account',
       type: TEST_ACCOUNT,
     },
     {
@@ -379,6 +383,8 @@ export default function Send(props) {
       }, 10);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       setIsConfirmDisabled(false);
+      if (SendConfirmationBottomSheet.current)
+        SendConfirmationBottomSheet.current.snapTo(0);
       props.navigation.navigate('TwoFAToken', {
         serviceType,
         recipientAddress,
@@ -853,130 +859,132 @@ export default function Send(props) {
                       Send it to a sample address
                     </Text>
                   ) : null}
-                    <TouchableOpacity
-                      activeOpacity={10}
-                      style={[
-                        dropdownBoxOpenClose
-                          ? styles.dropdownBoxOpened
-                          : styles.dropdownBox,
-                      ]}
-                      onPress={() => {
-                        setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                  <TouchableOpacity
+                    activeOpacity={10}
+                    style={[
+                      dropdownBoxOpenClose
+                        ? styles.dropdownBoxOpened
+                        : styles.dropdownBox,
+                    ]}
+                    onPress={() => {
+                      setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        ...styles.dropdownBoxText,
+                        color: Colors.textColorGrey,
                       }}
                     >
-                      <Text
-                        style={{
-                          ...styles.dropdownBoxText,
-                          color: Colors.textColorGrey
-                           
-                        }}
-                      >
-                        {serviceType==TEST_ACCOUNT ? "Test Account" : serviceType == REGULAR_ACCOUNT ? "Checking Account" : "Saving Account"}
-                      </Text>
-                      <Ionicons
-                        style={{ marginLeft: 'auto' }}
-                        name={
-                          dropdownBoxOpenClose
-                            ? 'ios-arrow-up'
-                            : 'ios-arrow-down'
-                        }
-                        size={15}
-                        color={Colors.borderColor}
-                      />
-                    </TouchableOpacity>
-                    
-                    <View style={{ position: 'relative' }}>
-                      {dropdownBoxOpenClose && (
-                        <View style={styles.dropdownBoxModal}>
-                          <ScrollView>
-                            {dropdownBoxList.map((value, index) => (
-                              <TouchableOpacity
-                                onPress={() => {
-                                  setServiceType(value.type);
+                      {serviceType == TEST_ACCOUNT
+                        ? 'Test Account'
+                        : serviceType == REGULAR_ACCOUNT
+                        ? 'Checking Account'
+                        : 'Saving Account'}
+                    </Text>
+                    <Ionicons
+                      style={{ marginLeft: 'auto' }}
+                      name={
+                        dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
+                      }
+                      size={15}
+                      color={Colors.borderColor}
+                    />
+                  </TouchableOpacity>
 
-                                  setDropdownBoxOpenClose(false); 
-                                }}
+                  <View style={{ position: 'relative' }}>
+                    {dropdownBoxOpenClose && (
+                      <View style={styles.dropdownBoxModal}>
+                        <ScrollView>
+                          {dropdownBoxList.map((value, index) => (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setServiceType(value.type);
+
+                                setDropdownBoxOpenClose(false);
+                              }}
+                              style={{
+                                ...styles.dropdownBoxModalElementView,
+                                backgroundColor:
+                                  serviceType == value.type
+                                    ? Colors.lightBlue
+                                    : Colors.white,
+                              }}
+                            >
+                              <Text
                                 style={{
-                                  ...styles.dropdownBoxModalElementView,
-                                  backgroundColor:
+                                  color:
                                     serviceType == value.type
-                                      ? Colors.lightBlue
-                                      : Colors.white,
+                                      ? Colors.blue
+                                      : Colors.black,
+                                  fontFamily: Fonts.FiraSansRegular,
+                                  fontSize: RFValue(12),
                                 }}
                               >
-                                <Text
-                                  style={{
-                                    color:
-                                    serviceType == value.type
-                                        ? Colors.blue
-                                        : Colors.black,
-                                    fontFamily: Fonts.FiraSansRegular,
-                                    fontSize: RFValue(12),
-                                  }}
-                                >
-                                  {value.account_name}
-                                </Text>
-                              </TouchableOpacity>
-                            ))}
-                          </ScrollView>
-                        </View>
-                      )}
-                    
-                  
-                  <View style={styles.textBoxView}>
-                    <View style={styles.amountInputImage}>
-                      <Image
-                        style={styles.textBoxImage}
-                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                                {value.account_name}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
+
+                    <View style={styles.textBoxView}>
+                      <View style={styles.amountInputImage}>
+                        <Image
+                          style={styles.textBoxImage}
+                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        />
+                      </View>
+                      <TextInput
+                        editable={sweepSecure ? false : isEditable}
+                        style={{ ...styles.textBox, paddingLeft: 10 }}
+                        placeholder={
+                          serviceType === TEST_ACCOUNT
+                            ? 'Enter Amount in t-sats'
+                            : 'Enter Amount in sats'
+                        }
+                        value={amount}
+                        returnKeyLabel="Done"
+                        returnKeyType="done"
+                        keyboardType={'numeric'}
+                        onChangeText={(value) => setAmount(value)}
+                        placeholderTextColor={Colors.borderColor}
+                        onKeyPress={(e) => {
+                          if (e.nativeEvent.key === 'Backspace') {
+                            setTimeout(() => {
+                              setIsInvalidBalance(false);
+                            }, 10);
+                          }
+                        }}
                       />
                     </View>
-                    <TextInput
-                      editable={sweepSecure ? false : isEditable}
-                      style={{ ...styles.textBox, paddingLeft: 10 }}
-                      placeholder={
-                        serviceType === TEST_ACCOUNT
-                          ? 'Enter Amount in t-sats'
-                          : 'Enter Amount in sats'
-                      }
-                      value={amount}
-                      returnKeyLabel="Done"
-                      returnKeyType="done"
-                      keyboardType={'numeric'}
-                      onChangeText={(value) => setAmount(value)}
-                      placeholderTextColor={Colors.borderColor}
-                      onKeyPress={(e) => {
-                        if (e.nativeEvent.key === 'Backspace') {
-                          setTimeout(() => {
-                            setIsInvalidBalance(false);
-                          }, 10);
+                    {isInvalidBalance ? (
+                      <View style={{ marginLeft: 'auto' }}>
+                        <Text style={styles.errorText}>
+                          Insufficient balance
+                        </Text>
+                      </View>
+                    ) : null}
+                    <View style={{ ...styles.textBoxView }}>
+                      <TextInput
+                        editable={isEditable}
+                        style={styles.textBox}
+                        returnKeyLabel="Done"
+                        returnKeyType="done"
+                        onSubmitEditing={Keyboard.dismiss}
+                        keyboardType={
+                          Platform.OS == 'ios'
+                            ? 'ascii-capable'
+                            : 'visible-password'
                         }
-                      }}
-                    />
-                  </View>
-                  {isInvalidBalance ? (
-                    <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>Insufficient balance</Text>
+                        placeholder={'Description (Optional)'}
+                        value={description}
+                        onChangeText={setDescription}
+                        placeholderTextColor={Colors.borderColor}
+                      />
                     </View>
-                  ) : null}
-                  <View style={{ ...styles.textBoxView }}>
-                    <TextInput
-                      editable={isEditable}
-                      style={styles.textBox}
-                      returnKeyLabel="Done"
-                      returnKeyType="done"
-                      onSubmitEditing={Keyboard.dismiss}
-                      keyboardType={
-                        Platform.OS == 'ios'
-                          ? 'ascii-capable'
-                          : 'visible-password'
-                      }
-                      placeholder={'Description (Optional)'}
-                      value={description}
-                      onChangeText={setDescription}
-                      placeholderTextColor={Colors.borderColor}
-                    />
                   </View>
-                </View>
                 </View>
 
                 <View
@@ -989,7 +997,7 @@ export default function Send(props) {
                     marginBottom: hp('3%'),
                   }}
                 />
-                
+
                 <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                   <Text
                     style={{
@@ -1120,7 +1128,7 @@ export default function Send(props) {
                     </View>
                   </View>
                 </View>
-                
+
                 <View
                   style={{
                     paddingLeft: 20,
@@ -1493,6 +1501,6 @@ const styles = StyleSheet.create({
     height: 50,
     alignItems: 'center',
     flexDirection: 'row',
-    paddingLeft: 15
+    paddingLeft: 15,
   },
 });

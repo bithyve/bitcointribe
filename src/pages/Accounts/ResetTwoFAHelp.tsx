@@ -7,6 +7,7 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
+  AsyncStorage,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -33,6 +34,7 @@ import {
   generateSecondaryXpriv,
   clearTransfer,
   twoFAResetted,
+  secondaryXprivGenerated,
 } from '../../store/actions/accounts';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
@@ -85,9 +87,35 @@ const ResetTwoFAHelp = (props) => {
           'The QR you have scanned seems to be invalid, pls try again',
         );
       }, 2);
+      (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
       dispatch(twoFAResetted(null));
     }
   }, [resettedTwoFA]);
+
+  useEffect(() => {
+    (async () => {
+      if (generatedSecureXPriv) {
+        dispatch(clearTransfer(SECURE_ACCOUNT));
+        setTimeout(() => {
+          props.navigation.navigate('Send', {
+            serviceType: SECURE_ACCOUNT,
+            netBalance:
+              service.secureHDWallet.balances.balance +
+              service.secureHDWallet.balances.unconfirmedBalance,
+            sweepSecure: true,
+          });
+          dispatch(secondaryXprivGenerated(null));
+        }, 1000);
+      } else if (generatedSecureXPriv === false) {
+        setTimeout(() => {
+          setSuccessMessageHeader('Invalid Secondary Mnemonic');
+          setSuccessMessage('Invalid Secondary Mnemonic, please try again');
+        }, 2);
+        (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
+        dispatch(secondaryXprivGenerated(null));
+      }
+    })();
+  }, [generatedSecureXPriv]);
 
   const getQrCodeData = (qrData) => {
     setTimeout(() => {
