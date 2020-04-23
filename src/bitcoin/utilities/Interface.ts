@@ -71,7 +71,9 @@ export enum notificationType {
 export enum notificationTag {
   IMP = 'IMP',
   notIMP = 'not-IMP',
-}
+  mandatory = 'mandatory',
+  notMandatory = 'not-mandatory',
+} // IMP/notIMP for directed notifications & mandatory/notMandatory for release notifications
 export interface INotification {
   notificationType: notificationType;
   title: string;
