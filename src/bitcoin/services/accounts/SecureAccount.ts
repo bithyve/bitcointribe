@@ -784,6 +784,8 @@ export default class SecureAccount {
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {
       return { status: 107, err: err.message, message: ErrMap[107] };
+    } finally {
+      this.secureHDWallet.removeSecondaryXpriv();
     }
   };
 

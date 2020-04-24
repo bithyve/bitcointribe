@@ -94,7 +94,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.initializeStateVars(stateVars);
   }
 
-  public initializeStateVars = stateVars => {
+  public initializeStateVars = (stateVars) => {
     this.secondaryMnemonic =
       stateVars && stateVars.secondaryMnemonic
         ? stateVars.secondaryMnemonic
@@ -197,10 +197,7 @@ export default class SecureHDWallet extends Bitcoin {
     const mutliSig = this.createSecureMultiSig(0);
     const { address } = mutliSig; // getting the first receiving address
     return {
-      accountId: crypto
-        .createHash('sha256')
-        .update(address)
-        .digest('hex'),
+      accountId: crypto.createHash('sha256').update(address).digest('hex'),
     };
   };
 
@@ -714,7 +711,7 @@ export default class SecureHDWallet extends Bitcoin {
       console.log({ averageTxFee, feePerByte, estimatedBlocks });
 
       let balance: number = 0;
-      inputUTXOs.forEach(utxo => {
+      inputUTXOs.forEach((utxo) => {
         balance += utxo.value;
       });
       const { inputs, outputs, fee } = coinselect(
@@ -743,15 +740,17 @@ export default class SecureHDWallet extends Bitcoin {
         this.network,
       );
 
-      inputs.forEach(input => txb.addInput(input.txId, input.vout, nSequence));
+      inputs.forEach((input) =>
+        txb.addInput(input.txId, input.vout, nSequence),
+      );
 
-      outputs.forEach(output => {
+      outputs.forEach((output) => {
         if (!output.address) {
           output.value = output.value + fee - averageTxFee; // applying static fee (averageTxFee)
         }
       });
       const sortedOuts = await this.sortOutputs(outputs);
-      sortedOuts.forEach(output => {
+      sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
         txb.addOutput(output.address, output.value);
       });
@@ -786,7 +785,7 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
       const childIndexArray = [];
-      inputs.forEach(input => {
+      inputs.forEach((input) => {
         console.log('Signing Input:', input);
         const { multiSig, primaryPriv, childIndex } = this.getSigningEssentials(
           input.address,
@@ -864,7 +863,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       console.log('------ Transaction Signing ----------');
       let vin = 0;
-      inputs.forEach(input => {
+      inputs.forEach((input) => {
         console.log('Signing Input:', input);
         const {
           multiSig,
@@ -953,10 +952,17 @@ export default class SecureHDWallet extends Bitcoin {
     return true;
   };
 
+  public removeSecondaryXpriv = () => {
+    this.secondaryXpriv = null;
+  };
+
   private getSigningEssentials = (address: string) => {
-    if (this.signingEssentialsCache[address]) {
-      return this.signingEssentialsCache[address];
-    } // cache hit
+    if (!this.secondaryXpriv) {
+      // refresh if secondaryXpriv is present: sweeping
+      if (this.signingEssentialsCache[address]) {
+        return this.signingEssentialsCache[address];
+      } // cache hit
+    }
 
     for (let itr = 0; itr <= this.nextFreeChildIndex + this.gapLimit; itr++) {
       const multiSig = this.createSecureMultiSig(itr);

@@ -169,6 +169,7 @@ export default function Login(props) {
       DeviceInfo.getVersion(),
       DeviceInfo.getBuildNumber(),
     );
+    console.log(DeviceInfo.getBuildNumber());
     RelayServices.fetchReleaseNotes(DeviceInfo.getBuildNumber())
       .then((res) => {
         const val = res.data;
