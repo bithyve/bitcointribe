@@ -119,7 +119,7 @@ export default function AddressBookContents(props) {
           }}
         >
           <TouchableOpacity style={styles.shareButtonView}
-          onPress={()=>props.navigation.navigate('Send')}
+          onPress={()=>props.navigation.navigate('Send',{isFromAddressBook: true})}
           >
             <Text style={styles.shareButtonText}>Send</Text>
             <Image

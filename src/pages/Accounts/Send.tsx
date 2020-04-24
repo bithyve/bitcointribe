@@ -109,6 +109,7 @@ export default function Send(props) {
   const getServiceType = props.navigation.getParam('getServiceType')
     ? props.navigation.getParam('getServiceType')
     : null;
+  const isFromAddressBook = props.navigation.getParam('isFromAddressBook') ? props.navigation.getParam('isFromAddressBook') : false;
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState('');
@@ -569,7 +570,7 @@ export default function Send(props) {
           );
           if (SendSuccessWithAddressBottomSheet.current)
             SendSuccessWithAddressBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts');
+          props.navigation.replace('Accounts', {serviceType: serviceType});
         }}
         isSuccess={true}
       />
@@ -819,6 +820,18 @@ export default function Send(props) {
                         setIsInvalidAddress(isAddressValid);
                       }}
                     />
+                    {isFromAddressBook ? 
+                    <TouchableOpacity
+                      style={styles.contactNameInputImageView}
+                      onPress={() => {
+                        props.navigation.navigate('AddressBookContents');
+                      }}
+                    >
+                      <Image
+                        style={styles.textBoxImage}
+                        source={require('../../assets/images/icons/icon_phonebook.png')}
+                      />
+                    </TouchableOpacity> : 
                     <TouchableOpacity
                       style={styles.contactNameInputImageView}
                       onPress={() => {
@@ -834,6 +847,7 @@ export default function Send(props) {
                         source={require('../../assets/images/icons/qr-code.png')}
                       />
                     </TouchableOpacity>
+                    }
                   </View>
                   {!isInvalidAddress ? (
                     <View style={{ marginLeft: 'auto' }}>
@@ -859,6 +873,7 @@ export default function Send(props) {
                       Send it to a sample address
                     </Text>
                   ) : null}
+                  {isFromAddressBook ? 
                   <TouchableOpacity
                     activeOpacity={10}
                     style={[
@@ -890,8 +905,8 @@ export default function Send(props) {
                       size={15}
                       color={Colors.borderColor}
                     />
-                  </TouchableOpacity>
-
+                  </TouchableOpacity> : null
+}
                   <View style={{ position: 'relative' }}>
                     {dropdownBoxOpenClose && (
                       <View style={styles.dropdownBoxModal}>
