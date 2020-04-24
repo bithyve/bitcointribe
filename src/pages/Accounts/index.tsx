@@ -317,16 +317,16 @@ export default function Accounts(props) {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
 
-  const getServiceType = useCallback(
-    serviceType => {
+  const getServiceType =  (serviceType) => {
       if (!serviceType) return;
       setServiceType(serviceType);
+      console.log("Service type", serviceType);
       setTimeout(() => {
         if (carousel.current) {
          if(serviceType == TEST_ACCOUNT) {
-                    carousel.current.snapToItem(0, true, true);
+          carousel.current.snapToItem(0, true, true);
                   } else if(serviceType == REGULAR_ACCOUNT) {
-                    carousel.current.snapToItem(1, true, true);
+                   carousel.current.snapToItem(1, true, true);
                   } else if(serviceType == SECURE_ACCOUNT){
                     carousel.current.snapToItem(2, true, true);
                   }
@@ -334,10 +334,8 @@ export default function Accounts(props) {
       }, 2000);
       
       if (serviceType == TEST_ACCOUNT) checkNHighlight();
-    },
-    [serviceType],
-  );
-
+    }
+  
   const renderItem = ({ item, index }) => {
     return (
       <ImageBackground
@@ -1278,6 +1276,7 @@ export default function Accounts(props) {
                 data={carouselData}
                 firstItem={carouselInitIndex}
                 onBeforeSnapToItem={index => {
+                  console.log("onBeforeSnapToItem", index);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
@@ -1293,6 +1292,7 @@ export default function Accounts(props) {
                   setTimeout(() => {
                     setCarouselInitIndex(index);
                   }, 2000);
+          
                 }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}
