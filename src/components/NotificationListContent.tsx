@@ -35,7 +35,7 @@ export default function NotificationListContent(props) {
                 return <AppBottomSheetTouchableWrapper onPress={()=>props.onNotificationClicked(value)} style={{paddingLeft:wp('7%'), paddingRight:wp('4%'), borderBottomWidth:1, borderBottomColor:Colors.borderColor, paddingBottom:wp('4%'), paddingTop:wp('4%'), backgroundColor: value.read ? Colors.white : Colors.lightBlue}}>
                     <View style={{ flexDirection: 'row' }}>
                         <View style={{ flexDirection: 'row', alignItems:'center'}}>
-                            <Image source={value.type=="update" ? require("../assets/images/icons/icon_hexa.png") : require("../assets/images/icons/recieve.png")} style={{width:wp('8%'), height:wp('8%'), marginRight:wp('2%')}} />
+                            <Image source={value.type=="release" ? require("../assets/images/icons/icon_hexa.png") : require("../assets/images/icons/recieve.png")} style={{width:wp('8%'), height:wp('8%'), marginRight:wp('2%')}} />
                             <Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular}}>{value.title}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', marginLeft:'auto', alignItems:'center'}}>

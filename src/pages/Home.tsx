@@ -102,18 +102,18 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-import {
-  createNotificationListeners,
-  scheduleNotification,
-} from '../common/CommonFunctions/notifications';
+import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
 // const opacity = min( abs( sub( position, 1 ) ), 0.8 )
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
+import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
 
 export default function Home(props) {
+  const notificationList = useSelector((state)=>state.notifications);
+  const [NotificationList, setNotificationList] = useState([]);
   const [
     notificationsListBottomSheet,
     setNotificationsListBottomSheet,
@@ -196,88 +196,22 @@ export default function Home(props) {
   // const transactionsParam = props.navigation.getParam('transactions');
   const [transactions, setTransactions] = useState([]);
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
-  const [NotificationData, setNotificationData] = useState([
-    {
-      type: 'update',
-      isMandatory: true,
-      read: true,
-      title: 'Update Available',
-      time: '2h ago',
-      info:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
-      notificationId: 1,
-    },
-    {
-      type: 'receive',
-      isMandatory: true,
-      read: false,
-      title: 'Bitcoins Received',
-      time: '9.30 am',
-      info:
-        '0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur',
-      notificationId: 2,
-    },
-    {
-      type: 'update',
-      isMandatory: true,
-      read: true,
-      title: 'Update Available',
-      time: 'Yesterday, 5:00pm',
-      info:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
-      notificationId: 3,
-    },
-    {
-      type: 'receive',
-      isMandatory: false,
-      read: true,
-      title: 'Bitcoins Received',
-      time: 'Thursday, 9:00pm',
-      info:
-        '0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur',
-      notificationId: 4,
-    },
-    {
-      type: 'update',
-      isMandatory: false,
-      read: true,
-      title: 'Update Available',
-      time: '11 March, 5:00pm',
-      info:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
-      notificationId: 5,
-    },
-    {
-      type: 'receive',
-      isMandatory: false,
-      read: false,
-      title: 'Bitcoins Received',
-      time: '1 Feb, 7:00pm',
-      info:
-        '0.0005 btc received in Savings Account from contact Pamela Alto Lorem ipsum dolor sit amet, consectetur',
-      notificationId: 6,
-    },
-    {
-      type: 'update',
-      isMandatory: false,
-      read: true,
-      title: 'Update Available',
-      time: '11 March, 5:00pm',
-      info:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna',
-      notificationId: 7,
-    },
-  ]);
+  const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
 
-  const onNotificationClicked = (value) => {
+  const onNotificationClicked = async(value) => {
+    let asyncNotifications = JSON.parse(await AsyncStorage.getItem("notificationList"));
     let tempNotificationData = NotificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
       const element = tempNotificationData[i];
       if (element.notificationId == value.notificationId) {
+        if(asyncNotifications && asyncNotifications.length && asyncNotifications.findIndex((item)=>item.notificationId == value.notificationId)>-1){
+          asyncNotifications[asyncNotifications.findIndex((item)=>item.notificationId == value.notificationId)].read = true;
+        }
         tempNotificationData[i].read = true;
       }
     }
+    await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotifications));
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
   };
@@ -599,6 +533,181 @@ export default function Home(props) {
       return require('../assets/images/icons/icon_test.png');
     }
   }
+
+  useEffect(()=>{
+    getNotificationList();
+    let notificationOnFocusListener = props.navigation.addListener("didFocus", ()=>{
+      getNotificationList();
+    });
+    return () => {
+      notificationOnFocusListener.remove();
+    };
+  }, []);
+
+  const getNotificationList = () =>{
+    console.log("testing...")
+    dispatch(fetchNotifications());
+  }
+
+  useEffect(()=>{
+    setupNotificationList();
+  },[notificationList]);
+
+  const onNotificationListOpen = async() =>{
+    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    if(asyncNotificationList){
+      for (let i = 0; i < asyncNotificationList.length; i++) {
+        if(asyncNotificationList[i]){
+          asyncNotificationList[i].time = timeFormatter(moment(new Date()), moment(asyncNotificationList[i].date).valueOf());
+        }
+      }
+      await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotificationList));
+      asyncNotificationList.sort(function(left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setNotificationData(asyncNotificationList);
+      setNotificationDataChange(!NotificationDataChange);
+    }
+  }
+
+  const setupNotificationList = async() =>{
+    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    if(!asyncNotificationList){
+      asyncNotificationList=[];
+    }
+    let tmpList = asyncNotificationList;
+    if(notificationList){
+      for (let i = 0; i < notificationList["notifications"].length; i++) {
+        const element = notificationList["notifications"][i];
+        if(tmpList[i]){
+          tmpList[i].time = timeFormatter(moment(new Date()), moment(element.date).valueOf());
+        }
+        else{
+          let obj = {
+            type: element.notificationType,
+            isMandatory: element.tag=="mandatory" ? true : false,
+            read: false,
+            title: element.title,
+            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            date: element.date,
+            info: element.body,
+            notificationId: element._id,
+          }
+          tmpList[i] = obj;
+        }
+      }
+      let notifications = [...tmpList];
+      await AsyncStorage.setItem("notificationList", JSON.stringify(notifications));
+      notifications.sort(function(left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setNotificationData(notifications);
+      setNotificationDataChange(!NotificationDataChange);
+    }
+  }
+
+  const scheduleNotification = async () => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle('We have not seen you in a while!')
+      .setBody(
+        'Opening your app regularly ensures you get all the notifications and security updates',
+      )
+      .setNotificationId('1')
+      .setSound('default')
+      .setData({
+        title: 'We have not seen you in a while!',
+        body:
+          'Opening your app regularly ensures you get all the notifications and security updates',
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+  
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
+  
+    console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        //repeatInterval: 'hour',
+      })
+      .then(() => {})
+      .catch((err) => console.log('err', err));
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
+        console.log('logging notifications', notifications);
+      });
+  };
+  
+  const onNotificationArrives = async (notification) => {
+    getNotificationList();
+    console.log('notificationsss', notification, notification.android.channelId);
+    const { title, body } = notification;
+    const deviceTrayNotification = new firebase.notifications.Notification()
+      .setTitle(title)
+      .setBody(body)
+      .setNotificationId(notification.notificationId)
+      .setSound('default')
+      .android.setPriority(firebase.notifications.Android.Priority.High)
+      .android.setChannelId(
+        notification.android.channelId
+          ? notification.android.channelId
+          : 'foregroundNotification',
+      ) // previously created
+      .android.setAutoCancel(true); // To remove notification when tapped on it
+  
+    const channelId = new firebase.notifications.Android.Channel(
+      notification.android.channelId,
+      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+      firebase.notifications.Android.Importance.High,
+    );
+    firebase.notifications().android.createChannel(channelId);
+    console.log('deviceTrayNotification', deviceTrayNotification);
+    firebase.notifications().displayNotification(deviceTrayNotification);
+  };
+  
+
+  const createNotificationListeners = async () => {
+    /*
+     * Triggered when a particular notification has been received in foreground
+     * */
+    this.notificationListener = firebase
+      .notifications()
+      .onNotification((notification) => {
+        onNotificationArrives(notification);
+      });
+  
+    /*
+     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+     * */
+    this.notificationOpenedListener = firebase
+      .notifications()
+      .onNotificationOpened((notificationOpen) => {
+        const { title, body } = notificationOpen.notification;
+        console.log("notificationOpen.notification onNotificationOpened", notificationOpen.notification);
+      });
+  
+    /*
+     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+     * */
+    const notificationOpen = await firebase
+      .notifications()
+      .getInitialNotification();
+    if (notificationOpen) {
+      const { title, body } = notificationOpen.notification;
+      console.log("notificationOpen.notification getInitialNotification", notificationOpen.notification);
+    }
+    /*
+     * Triggered for data only payload in foreground
+     * */
+    this.messageListener = firebase.messaging().onMessage((message) => {
+      //process data message
+    });
+  };
 
   useEffect(function () {
     AppState.addEventListener('change', onAppStateChange);
@@ -3217,6 +3326,7 @@ export default function Home(props) {
       />
       <BottomSheet
         onOpenEnd={() => {
+          onNotificationListOpen();
           setTabBarZIndex(0);
         }}
         onCloseEnd={() => {
