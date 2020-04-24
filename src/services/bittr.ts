@@ -1,7 +1,7 @@
 import axios from 'axios'
-
+import { GETBITTR_URL } from 'react-native-dotenv';
 //const PROXY_URL = 'https://cors-anywhere.herokuapp.com/'
-const URL = 'https://beta.getbittr.com/api'
+const URL = GETBITTR_URL;
 
 export const createService = data =>
   axios({
