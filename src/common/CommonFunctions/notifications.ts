@@ -65,7 +65,7 @@ export const scheduleNotification = async () => {
     .notifications()
     .scheduleNotification(notification, {
       fireDate: date.getTime(),
-      repeatInterval: 'hour',
+      //repeatInterval: 'hour',
     })
     .then(() => {})
     .catch((err) => console.log('err', err));
