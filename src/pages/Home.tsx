@@ -1748,9 +1748,14 @@ export default function Home(props) {
       return props.navigation.navigate('SettingManagePin', {
         managePinSuccessProceed: (pin) => managePinSuccessProceed(pin),
       });
-    } else if (type == 'ManageCurrency') {
-      setCurrencyCode(currencycode);
+    } else if (type == 'ChangeCurrency') {
+      let currency =  await AsyncStorage.getItem("currencyCode");
+      props.navigation.navigate("ChangeCurrency");
+      setCurrencyCode(currency);
+    } else if (type == 'ChangeWalletName') {
+      // Change Wallet Name
     }
+    
   };
 
   const renderSettingsContents = () => {
