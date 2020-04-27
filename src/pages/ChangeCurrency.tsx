@@ -3,13 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
-  Image,
-  Platform
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -20,11 +17,7 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import ModalHeader from '../components/ModalHeader';
-import AddressBookFilterModalContent from './Contacts/AddressBookFilterModalContent';
-import DeviceInfo from 'react-native-device-info';
 import BottomInfoBox from '../components/BottomInfoBox';
-
 
 export default function ChangeCurrency(props) {
   const [currencyList, setCurrencyList] = useState([
@@ -146,59 +139,5 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
-  },
-  contactText: {
-    marginLeft: 10,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
-  },
-  phoneText: {
-    marginTop: 3,
-    marginLeft: 10,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
-  },
-  selectedContactsView: {
-    marginLeft: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 20,
-    marginTop: 5,
-    paddingBottom: 15,
-    paddingTop: 10,
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-  },
-  shareButtonView: {
-    height: wp('7%'),
-    width: wp('18%'),
-    backgroundColor: Colors.backgroundColor,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 5,
-    marginLeft: 'auto',
-    marginRight: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  shareButtonText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
-  },
-  pageTitle: {
-    marginLeft: 30,
-    color: Colors.blue,
-    fontSize: RFValue(14),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  pageInfoText: {
-    marginLeft: 30,
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
   },
 });
