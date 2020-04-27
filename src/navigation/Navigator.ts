@@ -71,6 +71,7 @@ import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
 import AddressBookContents from '../pages/AddressBookContents';
+import ChangeCurrency from '../pages/ChangeCurrency';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -178,6 +179,7 @@ const HomeNavigator = createStackNavigator(
     NewTwoFASecret,
     TwoFASweepFunds,
     AddressBookContents,
+    ChangeCurrency,
     PasscodeChangeSuccessPage: {
       screen: PasscodeChangeSuccessPage,
       navigationOptions: {
