@@ -170,15 +170,16 @@ export default function Login(props) {
       DeviceInfo.getBuildNumber(),
     );
     console.log(DeviceInfo.getBuildNumber());
-    RelayServices.fetchReleaseNotes(DeviceInfo.getBuildNumber())
+    RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then((res) => {
-        const val = res.data;
+        const releases = res.data;
+        console.log({ releases });
         const ReleaseNoteType = 'mandatory'; // 'optional'
-        const ReleaseNote =
-          Platform.OS == 'ios'
-            ? val.releaseNotes.ios
-            : val.releaseNotes.android;
-        console.log('ReleaseNote', val.releaseNotes, ReleaseNote);
+        // const ReleaseNote =
+        //   Platform.OS == 'ios'
+        //     ? val.releaseNotes.ios
+        //     : val.releaseNotes.android;
+        // console.log('ReleaseNote', val.releaseNotes, ReleaseNote);
         //   ReleaseNoteType == 'mandatory'
         //     ? Alert.alert(
         //         ReleaseNote,

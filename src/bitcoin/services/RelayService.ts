@@ -33,17 +33,13 @@ export default class RelayServices {
     }
   };
 
-  public static fetchReleaseNotes = async (
+  public static fetchReleases = async (
     build: string,
   ): Promise<
     | {
         status: number;
         data: {
-          releaseNotes: {
-            ios: String;
-            android: String;
-          };
-          mandatory: String;
+          releases: any[];
         };
         err?: undefined;
         message?: undefined;
@@ -58,7 +54,7 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.fetchReleaseNotes(build),
+        data: await Relay.fetchReleases(build),
       };
     } catch (err) {
       return {

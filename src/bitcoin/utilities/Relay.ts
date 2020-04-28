@@ -27,15 +27,14 @@ export default class Relay {
     }
   };
 
-  public static fetchReleaseNotes = async (
+  public static fetchReleases = async (
     build: string,
   ): Promise<{
-    releaseNotes: { ios: String; android: String };
-    mandatory: String;
+    releases: any[];
   }> => {
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('fetchReleaseNotes', {
+      res = await BH_AXIOS.post('fetchReleases', {
         HEXA_ID,
         build,
       });
@@ -44,8 +43,8 @@ export default class Relay {
       if (err.code) console.log(err.code);
     }
     console.log({ res });
-    const { releaseNotes, mandatory } = res.data;
-    return { releaseNotes, mandatory };
+    const { releases } = res.data;
+    return { releases };
   };
 
   public static updateFCMTokens = async (
