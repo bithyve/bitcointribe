@@ -72,6 +72,7 @@ import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
 import AddressBookContents from '../pages/AddressBookContents';
 import ChangeCurrency from '../pages/ChangeCurrency';
+import UpdateApp from '../pages/UpdateApp';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -89,6 +90,12 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     ShareRecoveryOTP,
+    UpdateApp: {
+      screen: UpdateApp,
+      navigationOptions: {
+        //gesturesEnabled: false,
+      },
+    },
   },
   {
     initialRouteName: 'Launch',
@@ -180,6 +187,12 @@ const HomeNavigator = createStackNavigator(
     TwoFASweepFunds,
     AddressBookContents,
     ChangeCurrency,
+    UpdateApp: {
+      screen: UpdateApp,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     PasscodeChangeSuccessPage: {
       screen: PasscodeChangeSuccessPage,
       navigationOptions: {

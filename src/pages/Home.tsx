@@ -102,7 +102,6 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -110,6 +109,7 @@ import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 
 export default function Home(props) {
   const notificationList = useSelector((state)=>state.notifications);
@@ -606,109 +606,7 @@ export default function Home(props) {
     }
   }
 
-  const scheduleNotification = async () => {
-    const notification = new firebase.notifications.Notification()
-      .setTitle('We have not seen you in a while!')
-      .setBody(
-        'Opening your app regularly ensures you get all the notifications and security updates',
-      )
-      .setNotificationId('1')
-      .setSound('default')
-      .setData({
-        title: 'We have not seen you in a while!',
-        body:
-          'Opening your app regularly ensures you get all the notifications and security updates',
-      })
-      .android.setChannelId('reminder')
-      .android.setPriority(firebase.notifications.Android.Priority.High);
   
-    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
-    const date = new Date();
-    date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
-  
-    console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-        //repeatInterval: 'hour',
-      })
-      .then(() => {})
-      .catch((err) => console.log('err', err));
-    firebase
-      .notifications()
-      .getScheduledNotifications()
-      .then((notifications) => {
-        console.log('logging notifications', notifications);
-      });
-  };
-  
-  const onNotificationArrives = async (notification) => {
-    getNotificationList();
-    console.log('notificationsss', notification, notification.android.channelId);
-    const { title, body } = notification;
-    const deviceTrayNotification = new firebase.notifications.Notification()
-      .setTitle(title)
-      .setBody(body)
-      .setNotificationId(notification.notificationId)
-      .setSound('default')
-      .android.setPriority(firebase.notifications.Android.Priority.High)
-      .android.setChannelId(
-        notification.android.channelId
-          ? notification.android.channelId
-          : 'foregroundNotification',
-      ) // previously created
-      .android.setAutoCancel(true); // To remove notification when tapped on it
-  
-    const channelId = new firebase.notifications.Android.Channel(
-      notification.android.channelId,
-      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
-      firebase.notifications.Android.Importance.High,
-    );
-    firebase.notifications().android.createChannel(channelId);
-    console.log('deviceTrayNotification', deviceTrayNotification);
-    firebase.notifications().displayNotification(deviceTrayNotification);
-  };
-  
-
-  const createNotificationListeners = async () => {
-    /*
-     * Triggered when a particular notification has been received in foreground
-     * */
-    this.notificationListener = firebase
-      .notifications()
-      .onNotification((notification) => {
-        onNotificationArrives(notification);
-      });
-  
-    /*
-     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-     * */
-    this.notificationOpenedListener = firebase
-      .notifications()
-      .onNotificationOpened((notificationOpen) => {
-        const { title, body } = notificationOpen.notification;
-        console.log("notificationOpen.notification onNotificationOpened", notificationOpen.notification);
-      });
-  
-    /*
-     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
-     * */
-    const notificationOpen = await firebase
-      .notifications()
-      .getInitialNotification();
-    if (notificationOpen) {
-      const { title, body } = notificationOpen.notification;
-      console.log("notificationOpen.notification getInitialNotification", notificationOpen.notification);
-    }
-    /*
-     * Triggered for data only payload in foreground
-     * */
-    this.messageListener = firebase.messaging().onMessage((message) => {
-      //process data message
-    });
-  };
-
   useEffect(function () {
     AppState.addEventListener('change', onAppStateChange);
     (async () => {
@@ -775,6 +673,124 @@ export default function Home(props) {
   }catch (error) {
   }
 }
+
+const createNotificationListeners = async () => {
+  /*
+   * Triggered when a particular notification has been received in foreground
+   * */
+  this.notificationListener = firebase
+    .notifications()
+    .onNotification((notification) => {
+      onNotificationArrives(notification);
+    });
+
+  /*
+   * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+   * */
+  this.notificationOpenedListener = firebase
+    .notifications()
+    .onNotificationOpened((notificationOpen) => {
+      const { title, body } = notificationOpen.notification;
+      console.log("notificationOpen.notification onNotificationOpened", notificationOpen.notification);
+      console.log("notification.data", JSON.parse(notificationOpen.notification.data.content));
+      let data = JSON.parse(notificationOpen.notification.data.content);
+      if(data.notificationType == "release"){
+        props.navigation.navigate('UpdateApp', {releaseData: data})
+      }
+    });
+
+  /*
+   * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+   * */
+  const notificationOpen = await firebase
+    .notifications()
+    .getInitialNotification();
+  if (notificationOpen) {
+    const { title, body } = notificationOpen.notification;
+    console.log("notificationOpen.notification getInitialNotification", notificationOpen.notification);
+    console.log("notification.data", JSON.parse(notificationOpen.notification.data.content));
+    let data = JSON.parse(notificationOpen.notification.data.content);
+    if(data.notificationType == "release"){
+      props.navigation.navigate('UpdateApp', {releaseData: data})
+    }
+  }
+  /*
+   * Triggered for data only payload in foreground
+   * */
+  this.messageListener = firebase.messaging().onMessage((message) => {
+    //process data message
+  });
+};
+
+const scheduleNotification = async () => {
+  const notification = new firebase.notifications.Notification()
+    .setTitle('We have not seen you in a while!')
+    .setBody(
+      'Opening your app regularly ensures you get all the notifications and security updates',
+    )
+    .setNotificationId('1')
+    .setSound('default')
+    .setData({
+      title: 'We have not seen you in a while!',
+      body:
+        'Opening your app regularly ensures you get all the notifications and security updates',
+    })
+    .android.setChannelId('reminder')
+    .android.setPriority(firebase.notifications.Android.Priority.High);
+
+  // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+  const date = new Date();
+  date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
+
+  console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
+  await firebase
+    .notifications()
+    .scheduleNotification(notification, {
+      fireDate: date.getTime(),
+      //repeatInterval: 'hour',
+    })
+    .then(() => {})
+    .catch((err) => console.log('err', err));
+  firebase
+    .notifications()
+    .getScheduledNotifications()
+    .then((notifications) => {
+      console.log('logging notifications', notifications);
+    });
+};
+
+const onNotificationArrives = async (notification) => {
+  getNotificationList();
+  console.log('notificationsss', notification, notification.android.channelId);
+  const { title, body } = notification;
+  const deviceTrayNotification = new firebase.notifications.Notification()
+    .setTitle(title)
+    .setBody(body)
+    .setNotificationId(notification.notificationId)
+    .setSound('default')
+    .android.setPriority(firebase.notifications.Android.Priority.High)
+    .android.setChannelId(
+      notification.android.channelId
+        ? notification.android.channelId
+        : 'foregroundNotification',
+    ) // previously created
+    .android.setAutoCancel(true); // To remove notification when tapped on it
+
+  const channelId = new firebase.notifications.Android.Channel(
+    notification.android.channelId,
+    notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+    firebase.notifications.Android.Importance.High,
+  );
+  firebase.notifications().android.createChannel(channelId);
+  console.log('deviceTrayNotification', deviceTrayNotification);
+  firebase.notifications().displayNotification(deviceTrayNotification);
+};
+
+// console.log("notification.data", JSON.parse(notification.data.content));
+//   let data = JSON.parse(notification.data.content);
+//   if(data.notificationType == "release"){
+//     props.navigation.navigate('UpdateApp', {releaseData: data})
+//   }
   // useEffect(() => {
   //   const unsubscribe = firebase
   //     .messaging()
