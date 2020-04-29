@@ -110,6 +110,7 @@ import NotificationListContent from '../components/NotificationListContent';
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
+import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Home(props) {
   const notificationList = useSelector((state)=>state.notifications);
@@ -200,6 +201,7 @@ export default function Home(props) {
   const [qrData, setqrData] = useState('');
 
   const onNotificationClicked = async(value) => {
+    console.log("onNotificationClicked", value)
     let asyncNotifications = JSON.parse(await AsyncStorage.getItem("notificationList"));
     let tempNotificationData = NotificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
@@ -214,6 +216,26 @@ export default function Home(props) {
     await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotifications));
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
+
+    if(value.type == 'release'){
+      RelayServices.fetchReleases(value.info.split(' ')[1])
+      .then(async (res) => {
+        console.log("Release note", res.data.releases);
+        if(res.data.releases.length){
+          let releaseNotes = res.data.releases.length
+          ? res.data.releases.find((el) => {
+              return el.build === value.info.split(' ')[1];
+            })
+          : '';
+        console.log('RELEASENOTE', releaseNotes);
+      props.navigation.navigate('UpdateApp', {releaseData: [releaseNotes], isOpenFromNotificationList: true, releaseNumber: value.info.split(' ')[1]})
+       } 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    }
+    
   };
 
   useEffect(() => {

@@ -23,73 +23,118 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { APP_ID } from 'react-native-dotenv';
 import Octicons from 'react-native-vector-icons/Octicons';
+import DeviceInfo from 'react-native-device-info';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function UpdateApp(props) {
+
   const releaseDataObj = props.navigation.state.params.releaseData
     ? props.navigation.state.params.releaseData
     : [];
-    console.log("releaseDataObj", releaseDataObj);
-    const [releaseNotes, setReleaseNotes] = useState([]);
-    const [isUpdateMandotary, setIsUpdateMandotary] = useState(false);
-    const [releaseData, setReleaseData] = useState({});
+  const isOpenFromNotificationList = props.navigation.state.params
+    .isOpenFromNotificationList
+    ? props.navigation.state.params.isOpenFromNotificationList
+    : false;
+  const releaseNumber = props.navigation.state.params.releaseNumber
+    ? props.navigation.state.params.releaseNumber
+    : '';
+  console.log('releaseDataObj', releaseDataObj);
+  const [releaseNotes, setReleaseNotes] = useState([]);
+  const [isUpdateMandotary, setIsUpdateMandotary] = useState(false);
+  const [releaseData, setReleaseData] = useState({});
+  const [isUpdateInValid, setIsUpdateInValid] = useState(false);
 
   useEffect(() => {
-    (async()=>{
-      await AsyncStorage.setItem(
-        'releaseCases','',
-      );
-      
-      let releaseData;
-      let releaseDataOld = JSON.parse(await AsyncStorage.getItem("releaseData"));
-      console.log("releaseDataOld", releaseDataOld);
-      if(releaseDataObj[0] && releaseDataObj[0].reminderLimit > 0){
-      if(!releaseDataOld){
-        releaseData = {
-          reminderLimit: releaseDataObj[0].reminderLimit - 1,
-          build: releaseDataObj[0].build
+    /**
+     * Following if condition is for when this page is open from Home page Notification list
+     */
+    if (
+      isOpenFromNotificationList &&
+      releaseNumber
+    ) {
+      console.log("releaseDataObj[0]",releaseDataObj[0])
+      if(DeviceInfo.getBuildNumber() >= releaseNumber)
+      setIsUpdateInValid(true);
+      else
+      setIsUpdateInValid(false);
+      if (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) {
+          setIsUpdateMandotary(true);
         }
-      } else {
-        releaseData = {
-          reminderLimit: releaseDataOld.reminderLimit - 1,
-          build: releaseDataOld.build
+     setReleaseData(releaseDataObj[0]);
+     }
+
+     /**
+     * Following code is for when this page is open from Login and check for update
+     */
+    (async () => {
+      if (!isOpenFromNotificationList) {
+        await AsyncStorage.setItem('releaseCases', '');
+        let releaseData;
+        let releaseDataOld = JSON.parse(
+          await AsyncStorage.getItem('releaseData'),
+        );
+        console.log('releaseDataOld', releaseDataOld);
+        if (releaseDataObj[0] && releaseDataObj[0].reminderLimit > 0) {
+          if (!releaseDataOld) {
+            releaseData = {
+              reminderLimit: releaseDataObj[0].reminderLimit - 1,
+              build: releaseDataObj[0].build,
+            };
+          } else {
+            releaseData = {
+              reminderLimit: releaseDataOld.reminderLimit - 1,
+              build: releaseDataOld.build,
+            };
+          }
+          await AsyncStorage.setItem(
+            'releaseData',
+            JSON.stringify(releaseData),
+          );
         }
+
+        let releaseNotes = releaseDataObj.length
+          ? releaseDataObj.find((el) => {
+              return el.reminderLimit === 0;
+            })
+          : '';
+        console.log('RELEASENOTE', releaseNotes);
+        if (
+          releaseNotes ||
+          (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) ||
+          (releaseDataOld && releaseDataOld.reminderLimit == 0)
+        ) {
+          setIsUpdateMandotary(true);
+        }
+        setReleaseData(releaseDataObj[0]);
+
+        if (releaseDataOld && releaseDataOld.reminderLimit == 0) {
+          await AsyncStorage.setItem('releaseData', '');
+        }
+
+        BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
+        return () =>
+          BackHandler.removeEventListener(
+            'hardwareBackPress',
+            hardwareBackHandler,
+          );
       }
-      await AsyncStorage.setItem(
-        'releaseData',
-        JSON.stringify(releaseData),
-      );
-    }
-
-    let releaseNotes = releaseDataObj.length ? releaseDataObj.find(el => {
-        return el.reminderLimit === 0
-       }) : '';
-       console.log("RELEASENOTE", releaseNotes);
-    if(releaseNotes || (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) || (releaseDataOld && releaseDataOld.reminderLimit == 0)){
-      setIsUpdateMandotary(true);
-    } 
-    setReleaseData(releaseDataObj[0])
-
-    if(releaseDataOld && releaseDataOld.reminderLimit == 0){
-      await AsyncStorage.setItem(
-        'releaseData',''
-      );
-    }
-BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
-    return () =>
-      BackHandler.removeEventListener('hardwareBackPress', hardwareBackHandler);
-  })();
+    })();
   }, []);
 
-  useEffect(() => { 
-    if(releaseData){
-    let tempReleaseNote = releaseData.releaseNotes ? Platform.OS == 'ios'
-    ? releaseData.releaseNotes.ios
-    : releaseData.releaseNotes.android :
-    releaseData.notes ? Platform.OS == 'ios'
-    ? releaseData.notes.ios
-    : releaseData.notes.android : ''; 
-    setReleaseNotes(tempReleaseNote.split('-'));
-  }
+  useEffect(() => {
+    if (releaseData) {
+      console.log("ReleaseData",releaseData);
+      let tempReleaseNote = releaseData.releaseNotes
+        ? Platform.OS == 'ios'
+          ? releaseData.releaseNotes.ios
+          : releaseData.releaseNotes.android
+        : releaseData.notes
+        ? Platform.OS == 'ios'
+          ? releaseData.notes.ios
+          : releaseData.notes.android
+        : '';
+      setReleaseNotes(tempReleaseNote.split('-'));
+    }
   }, [releaseData]);
 
   const hardwareBackHandler = () => {
@@ -112,27 +157,19 @@ BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
 
   const onClick = async (_ignoreClick, _remindMeLaterClick) => {
     let releaseCasesData;
-    let releaseCases = JSON.parse(await AsyncStorage.getItem("releaseCases"));
-      console.log("releaseCases", releaseCases);
-      if(!releaseCases){
-        releaseCasesData = {
-          ...releaseData,
-          ignoreClick: _ignoreClick,
-          remindMeLaterClick: _remindMeLaterClick
-        }
-      } else{
-        releaseCasesData = {
-          ...releaseData,
-          ignoreClick: _ignoreClick,
-          remindMeLaterClick: _remindMeLaterClick
-        }
-      }
-      await AsyncStorage.setItem(
-        'releaseCases',
-        JSON.stringify(releaseCasesData),
-      );
-      props.navigation.goBack();
-  }
+    let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+    console.log('releaseCases', releaseCases);
+    releaseCasesData = {
+        ...releaseData,
+        ignoreClick: _ignoreClick,
+        remindMeLaterClick: _remindMeLaterClick,
+      };
+    await AsyncStorage.setItem(
+      'releaseCases',
+      JSON.stringify(releaseCasesData),
+    );
+    props.navigation.goBack();
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -142,15 +179,27 @@ BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
         <View
           style={{
             ...styles.successModalHeaderView,
-            marginRight: wp('8%'),
-            marginLeft: wp('8%'),
+            
           }}
         >
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: wp('4%'),
+            marginLeft: wp('4%'), }}>
+            {isOpenFromNotificationList ? (
+          <TouchableOpacity
+              onPress={() => props.navigation.goBack()}
+              style={{ height: 30, width: 30, justifyContent: 'center' }}
+            >
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </TouchableOpacity> ) : null}
             <Text style={styles.modalTitleText}>
-              We’re better than ever{'\n'}Time to update
+              {isUpdateInValid ? 'Your app is already updated' :
+              'We’re better than ever\nTime to update' }
             </Text>
-            {!isUpdateMandotary ? (
+            {!isUpdateMandotary && !isUpdateInValid ? (
               <TouchableOpacity
                 style={{
                   height: wp('8%'),
@@ -165,7 +214,9 @@ BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
                   flexDirection: 'row',
                 }}
                 onPress={() => {
-                  onClick(true, false)
+                  if(isOpenFromNotificationList) props.navigation.goBack();
+                  else
+                  onClick(true, false);
                 }}
               >
                 <Text
@@ -191,30 +242,39 @@ BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
             ) : null}
           </View>
 
-          <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
+          <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%'), marginRight: wp('8%'),
+            marginLeft: wp('8%'), }}>
             Lorem ipsum dolor sit amet, consectetur{'\n'}adipiscing elit, sed do
             eiusmod
           </Text>
         </View>
-        { releaseNotes.map((value)=>{
-          return <View style={{ flexDirection: 'row', alignItems: 'center',marginLeft: wp('8%'), }}>
-          <Octicons
-            name={'primitive-dot'}
-            size={RFValue(10)}
-            color={Colors.blue}
-          />
-          <Text
-            style={{
-              marginLeft: wp('2%'),
-              color: Colors.blue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            {value}
-          </Text>
-        </View>
-         })}
+        {releaseNotes.map((value) => {
+          return (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginLeft: wp('8%'),
+              }}
+            >
+              <Octicons
+                name={'primitive-dot'}
+                size={RFValue(10)}
+                color={Colors.blue}
+              />
+              <Text
+                style={{
+                  marginLeft: wp('2%'),
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {value}
+              </Text>
+            </View>
+          );
+        })}
         <View
           style={{
             marginTop: 'auto',
@@ -234,6 +294,7 @@ BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
               alignItems: 'center',
             }}
           >
+            {!isUpdateInValid ? (
             <TouchableOpacity
               disabled={false}
               onPress={() => {
@@ -242,12 +303,15 @@ BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
               style={{ ...styles.successModalButtonView }}
             >
               <Text style={styles.proceedButtonText}>Update Now</Text>
-            </TouchableOpacity>
-            {!isUpdateMandotary ? (
+            </TouchableOpacity>) : null }
+
+            {!isUpdateMandotary && !isUpdateInValid ? (
               <TouchableOpacity
-              onPress={() => {
-                onClick(false, true)
-              }}
+                onPress={() => {
+                  if(isOpenFromNotificationList) props.navigation.goBack();
+                  else
+                  onClick(false, true);
+                }}
                 style={{
                   height: wp('13%'),
                   width: wp('35%'),
