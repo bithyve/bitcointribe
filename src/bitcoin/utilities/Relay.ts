@@ -42,8 +42,9 @@ export default class Relay {
       if (err.response) console.log(err.response.data.err);
       if (err.code) console.log(err.code);
     }
-    console.log({ res });
+   
     const { releases } = res.data;
+    console.log({ releases });
     return { releases };
   };
 
