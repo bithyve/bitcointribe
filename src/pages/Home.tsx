@@ -1769,7 +1769,7 @@ const onNotificationArrives = async (notification) => {
       props.navigation.navigate("ChangeCurrency");
       setCurrencyCode(currency);
     } else if (type == 'ChangeWalletName') {
-      // Change Wallet Name
+      props.navigation.navigate("SettingWalletNameChange");
     }
     
   };

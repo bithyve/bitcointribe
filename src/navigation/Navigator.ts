@@ -73,6 +73,8 @@ import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
 import AddressBookContents from '../pages/AddressBookContents';
 import ChangeCurrency from '../pages/ChangeCurrency';
 import UpdateApp from '../pages/UpdateApp';
+import SettingWalletNameChange from '../pages/SettingWalletNameChange';
+import SettingNewWalletName from '../pages/SettingNewWalletName';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -187,6 +189,8 @@ const HomeNavigator = createStackNavigator(
     TwoFASweepFunds,
     AddressBookContents,
     ChangeCurrency,
+    SettingWalletNameChange,
+    SettingNewWalletName,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
