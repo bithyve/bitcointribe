@@ -12,7 +12,7 @@ export default class TrustedContacts {
     return keyPair.getPublic();
   };
 
-  public initializeContact = (contactName: string) => {
+  public initializeContact = (contactName: string): { publicKey: string } => {
     if (this.trustedContacts[contactName]) {
       throw new Error(
         'TC Init failed: initialization already exists against the supplied',
@@ -25,31 +25,38 @@ export default class TrustedContacts {
       keyPair,
     };
 
-    return publicKey;
+    return { publicKey };
   };
 
-  public finalizeContact = (contactName: string, encodedPublicKey: string) => {
-    if (this.trustedContacts[contactName]) {
-      if (this.trustedContacts[contactName].channelAddress) {
-        throw new Error(
-          'TC finalize failed: channel already exists with this contact',
-        );
-      }
-      const { keyPair } = this.trustedContacts[contactName];
-      const contactsPublicKey = this.decodePublicKey(encodedPublicKey);
-      const symmetricKey = keyPair.derive(contactsPublicKey);
-      const channelAddress = crypto
-        .createHash('sha256')
-        .update(symmetricKey)
-        .digest('hex');
-
-      this.trustedContacts[contactName] = {
-        ...this.trustedContacts[contactName],
-        symmetricKey,
-        channelAddress,
-      };
-      console.log({ contactName: this.trustedContacts[contactName] });
-    } else {
+  public finalizeContact = (
+    contactName: string,
+    encodedPublicKey: string,
+  ): { channelAddress: string } => {
+    if (!this.trustedContacts[contactName]) {
+      this.initializeContact(contactName); // case: trusted contact setup has been requested
     }
+
+    if (this.trustedContacts[contactName].channelAddress) {
+      throw new Error(
+        'TC finalize failed: channel already exists with this contact',
+      );
+    }
+
+    const { keyPair } = this.trustedContacts[contactName];
+    const symmetricKey = keyPair.derive(this.decodePublicKey(encodedPublicKey)); // ECDH
+
+    const channelAddress = crypto
+      .createHash('sha256')
+      .update(symmetricKey)
+      .digest('hex');
+
+    this.trustedContacts[contactName] = {
+      ...this.trustedContacts[contactName],
+      symmetricKey,
+      channelAddress,
+      contactsPubKey: encodedPublicKey,
+    };
+    console.log({ contactName: this.trustedContacts[contactName] });
+    return { channelAddress };
   };
 }

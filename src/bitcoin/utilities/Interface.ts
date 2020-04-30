@@ -89,5 +89,6 @@ export interface Contacts {
     keyPair: any;
     symmetricKey?: string;
     channelAddress?: string;
+    contactsPubKey?: string;
   };
 }
