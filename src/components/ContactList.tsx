@@ -6,7 +6,6 @@ import {
   AsyncStorage,
   PermissionsAndroid,
   Platform,
-  Alert,
   TextInput,
   SafeAreaView,
 } from 'react-native';
@@ -33,15 +32,13 @@ import Toast from "../components/Toast";
 
 export default function ContactList(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
-  const [scrollViewRef, setScrollViewRef] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
-  const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
-  const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
+  const [setContactPermissionAndroid] = useState(false);
+  const [setContactPermissionIOS] = useState(false);
   const [
-    contactListErrorBottomSheet,
-    setcontactListErrorBottomSheet,
+    contactListErrorBottomSheet
   ] = useState(React.createRef());
   const selectectcontactlist = props.selectedContacts ? props.selectedContacts : [];
   const [contactData, setContactData] = useState([]);

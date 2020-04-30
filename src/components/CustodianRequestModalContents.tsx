@@ -2,10 +2,8 @@ import React from "react";
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  Platform,
   ActivityIndicator
 } from "react-native";
 import Colors from "../common/Colors";
