@@ -201,7 +201,6 @@ export default function Home(props) {
   const [qrData, setqrData] = useState('');
 
   const onNotificationClicked = async(value) => {
-    console.log("onNotificationClicked", value)
     let asyncNotifications = JSON.parse(await AsyncStorage.getItem("notificationList"));
     let tempNotificationData = NotificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
@@ -220,14 +219,12 @@ export default function Home(props) {
     if(value.type == 'release'){
       RelayServices.fetchReleases(value.info.split(' ')[1])
       .then(async (res) => {
-        console.log("Release note", res.data.releases);
         if(res.data.releases.length){
           let releaseNotes = res.data.releases.length
           ? res.data.releases.find((el) => {
               return el.build === value.info.split(' ')[1];
             })
           : '';
-        console.log('RELEASENOTE', releaseNotes);
       props.navigation.navigate('UpdateApp', {releaseData: [releaseNotes], isOpenFromNotificationList: true, releaseNumber: value.info.split(' ')[1]})
        } 
       })
@@ -566,8 +563,7 @@ export default function Home(props) {
     };
   }, []);
 
-  const getNotificationList = () =>{
-    console.log("testing...")
+  const getNotificationList = async() =>{
     dispatch(fetchNotifications());
   }
 
@@ -593,39 +589,112 @@ export default function Home(props) {
   }
 
   const setupNotificationList = async() =>{
-    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
-    if(!asyncNotificationList){
-      asyncNotificationList=[];
+    let asyncNotification = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    let asyncNotificationList = [];
+    if(asyncNotification){
+      asyncNotificationList = [];
+      for (let i = 0; i < asyncNotification.length; i++) {
+        asyncNotificationList.push(asyncNotification[i]);
+      }
     }
     let tmpList = asyncNotificationList;
     if(notificationList){
       for (let i = 0; i < notificationList["notifications"].length; i++) {
         const element = notificationList["notifications"][i];
-        if(tmpList[i]){
-          tmpList[i].time = timeFormatter(moment(new Date()), moment(element.date).valueOf());
+        let readStatus = false;
+        if(element.notificationType == "release"){
+          let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+          if(element.body.split(" ")[1] == releaseCases.build){
+            if(releaseCases.remindMeLaterClick){
+              readStatus = false;
+            }
+            if(releaseCases.ignoreClick){
+              readStatus = true;
+            }  
+          }
+          else{
+            readStatus = true;
+          }
+        }
+        if(asyncNotificationList.findIndex(value=>value.notificationId == element.notificationId)>-1){
+          let temp = asyncNotificationList[asyncNotificationList.findIndex(value=>value.notificationId == element.notificationId)];
+          if(element.notificationType == "release"){
+            readStatus = readStatus;
+          }
+          else{
+            readStatus = temp.read;
+          }
+          let obj = {
+            ...temp,
+            read: readStatus,
+            type: element.notificationType,
+            title: element.title,
+            info: element.body,
+            isMandatory: element.tag=="mandatory" ? true : false,
+            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            date: new Date(element.date),
+          }
+          tmpList[tmpList.findIndex(value=>value.notificationId == element.notificationId)] = obj;
         }
         else{
           let obj = {
             type: element.notificationType,
             isMandatory: element.tag=="mandatory" ? true : false,
-            read: false,
+            read: readStatus,
             title: element.title,
             time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
-            date: element.date,
+            date: new Date(element.date),
             info: element.body,
-            notificationId: element._id,
+            notificationId: element.notificationId,
           }
-          tmpList[i] = obj;
+          tmpList.push(obj);
         }
       }
-      let notifications = [...tmpList];
-      await AsyncStorage.setItem("notificationList", JSON.stringify(notifications));
-      notifications.sort(function(left, right) {
+      await AsyncStorage.setItem("notificationList", JSON.stringify(tmpList));
+      tmpList.sort(function(left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
-      setNotificationData(notifications);
+      setNotificationData(tmpList);
       setNotificationDataChange(!NotificationDataChange);
     }
+  }
+
+  const onNotificationOpen = async(item) =>{
+    let content = JSON.parse(item._data.content);
+    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    if(!asyncNotificationList){
+      asyncNotificationList=[];
+    }
+    let readStatus = true;
+    if(content.notificationType == "release"){
+      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      if(releaseCases.ignoreClick){
+        readStatus = true
+      }
+      else if(releaseCases.remindMeLaterClick){
+        readStatus = false;
+      }
+      else{
+        readStatus = false;
+      }
+    }
+    let obj = {
+      type: content.notificationType,
+      isMandatory: false,
+      read: readStatus,
+      title: item.title,
+      time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+      date: new Date(),
+      info: item.body,
+      notificationId: content.notificationId,
+    }
+    asyncNotificationList.push(obj);
+    await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotificationList));
+    asyncNotificationList.sort(function(left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+    });
+    setNotificationData(asyncNotificationList);
+    setNotificationDataChange(!NotificationDataChange);
   }
 
   
@@ -633,7 +702,6 @@ export default function Home(props) {
     AppState.addEventListener('change', onAppStateChange);
     (async () => {
       const enabled = await firebase.messaging().hasPermission();
-      console.log('enabledqqq', enabled);
       if (!enabled) {
         await firebase
           .messaging()
@@ -711,14 +779,14 @@ const createNotificationListeners = async () => {
    * */
   this.notificationOpenedListener = firebase
     .notifications()
-    .onNotificationOpened((notificationOpen) => {
+    .onNotificationOpened(async(notificationOpen) => {
       const { title, body } = notificationOpen.notification;
-      console.log("notificationOpen.notification onNotificationOpened", notificationOpen.notification);
-      console.log("notification.data", JSON.parse(notificationOpen.notification.data.content));
       let data = JSON.parse(notificationOpen.notification.data.content);
       if(data.notificationType == "release"){
         props.navigation.navigate('UpdateApp', {releaseData: data})
       }
+      getNotificationList();
+      onNotificationOpen(notificationOpen.notification);
     });
 
   /*
@@ -729,12 +797,8 @@ const createNotificationListeners = async () => {
     .getInitialNotification();
   if (notificationOpen) {
     const { title, body } = notificationOpen.notification;
-    console.log("notificationOpen.notification getInitialNotification", notificationOpen.notification);
-    console.log("notification.data", JSON.parse(notificationOpen.notification.data.content));
-    let data = JSON.parse(notificationOpen.notification.data.content);
-    if(data.notificationType == "release"){
-      props.navigation.navigate('UpdateApp', {releaseData: data})
-    }
+    getNotificationList();
+    onNotificationOpen(notificationOpen.notification);
   }
   /*
    * Triggered for data only payload in foreground
@@ -764,7 +828,7 @@ const scheduleNotification = async () => {
   const date = new Date();
   date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
 
-  console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
+  // console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
   await firebase
     .notifications()
     .scheduleNotification(notification, {
@@ -777,13 +841,12 @@ const scheduleNotification = async () => {
     .notifications()
     .getScheduledNotifications()
     .then((notifications) => {
-      console.log('logging notifications', notifications);
+      // console.log('logging notifications', notifications);
     });
 };
 
 const onNotificationArrives = async (notification) => {
   getNotificationList();
-  console.log('notificationsss', notification, notification.android.channelId);
   const { title, body } = notification;
   const deviceTrayNotification = new firebase.notifications.Notification()
     .setTitle(title)
@@ -804,7 +867,6 @@ const onNotificationArrives = async (notification) => {
     firebase.notifications.Android.Importance.High,
   );
   firebase.notifications().android.createChannel(channelId);
-  console.log('deviceTrayNotification', deviceTrayNotification);
   firebase.notifications().displayNotification(deviceTrayNotification);
 };
 
@@ -834,7 +896,6 @@ const onNotificationArrives = async (notification) => {
   const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    console.log("FCM Token: ",fcmToken)
     let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
     if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
       await AsyncStorage.setItem('fcmToken', fcmToken);
@@ -2270,7 +2331,6 @@ const onNotificationArrives = async (notification) => {
       }
     } else {
       const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-      console.log('EmailToken', EmailToken);
       props.navigation.navigate('SignUpDetails', { EmailToken });
     }
   }, []);
@@ -2318,7 +2378,6 @@ const onNotificationArrives = async (notification) => {
       const getBittrDetails = JSON.parse(
         await AsyncStorage.getItem('getBittrDetails'),
       );
-      console.log({ getBittrDetails });
       if (!getBittrDetails) {
         dispatch(fetchGetBittrDetails());
       }
