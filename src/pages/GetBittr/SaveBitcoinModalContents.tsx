@@ -19,26 +19,26 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 
 export default function SaveBitcoinModalContents(props) {
     const [ addData, setAddData ] = useState( [
-		{
-      title: 'Recurring Buy',
-      image: require('../../assets/images/icons/icon_getbitter.png'), info: 'Setup a recurring payment to stack sats',
-      type: "recurringBuy"
-		},
-		{
-      title: `Credit Card`,
-      image: require( '../../assets/images/icons/icon_fastbicoin.png' ), info: 'Buy bitcoins using credit card',
-      type: "creditCard"
-		},
-		{
-      title: 'Voucher',
-      image: require( '../../assets/images/icons/icon_addcontact.png' ), info: 'Purchase a voucher or use a voucher you own',
-      type: "voucher"
-		},
-		{
-      title: 'Existing Saving Methods',
-      image: require( '../../assets/images/icons/icon_addaccount.png' ), info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
-      type: "existingSavingMethods"
-		},
+      {
+        title: 'Recurring Buy',
+        image: require('../../assets/images/icons/recurring_buy.png'),
+        info: 'Set up a recurring payment to Stack Sats',
+      },
+      {
+        title: `Credit Card`,
+        image: require('../../assets/images/icons/credit_card.png'),
+        info: 'Buy bitcoins using a credit card',
+      },
+      {
+        title: 'Voucher',
+        image: require('../../assets/images/icons/voucher.png'),
+        info: 'Purchase a voucher or use a voucher you own',
+      },
+      {
+        title: 'Existing Saving Methods',
+        image: require('../../assets/images/icons/existing_saving_method.png'),
+        info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
+      },
 	] )
   return (
     <View style={styles.modalContainer}>

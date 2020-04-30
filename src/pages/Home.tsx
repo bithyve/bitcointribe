@@ -781,10 +781,10 @@ const createNotificationListeners = async () => {
     .notifications()
     .onNotificationOpened(async(notificationOpen) => {
       const { title, body } = notificationOpen.notification;
-      let data = JSON.parse(notificationOpen.notification.data.content);
-      if(data.notificationType == "release"){
-        props.navigation.navigate('UpdateApp', {releaseData: data})
-      }
+      // let data = JSON.parse(notificationOpen.notification.data.content);
+      // if(data.notificationType == "release"){
+      //   props.navigation.navigate('UpdateApp', {releaseData: data})
+      // }
       getNotificationList();
       onNotificationOpen(notificationOpen.notification);
     });
@@ -1162,7 +1162,7 @@ const onNotificationArrives = async (notification) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              You don't have any transactions yet
+             View your transactions here
             </Text>
             <Text
               style={{
@@ -1171,7 +1171,7 @@ const onNotificationArrives = async (notification) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Start using your accounts to make transactions
+              All your recent transactions across the accounts appear here
             </Text>
           </View>
         ) : null}
@@ -1270,7 +1270,7 @@ const onNotificationArrives = async (notification) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              You don't have any transactions yet
+              View your transactions here
             </Text>
             <Text
               style={{
@@ -1279,7 +1279,7 @@ const onNotificationArrives = async (notification) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Start using your accounts to make transactions
+              All your recent transactions across the accounts appear here
             </Text>
           </View>
         </View>
@@ -3010,7 +3010,7 @@ const onNotificationArrives = async (notification) => {
             ? hp('19%')
             : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -3066,7 +3066,7 @@ const onNotificationArrives = async (notification) => {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
@@ -3277,7 +3277,7 @@ const onNotificationArrives = async (notification) => {
         ref={TransactionDetailsBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
@@ -3352,7 +3352,7 @@ const onNotificationArrives = async (notification) => {
         ref={GetBittrRecurringBuy as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderGetBittrRecurringBuyContents}
         renderHeader={renderGetBittrRecurringBuyHeader}
@@ -3438,7 +3438,7 @@ const onNotificationArrives = async (notification) => {
         ref={notificationsListBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderNotificationsContent}
         renderHeader={renderNotificationsHeader}

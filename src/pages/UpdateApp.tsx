@@ -220,7 +220,11 @@ export default function UpdateApp(props) {
                 }}
               >
                 <Text
-                  onPress={() => {}}
+                  onPress={() => {
+                    if(isOpenFromNotificationList) props.navigation.goBack();
+                  else
+                  onClick(true, false);
+                  }}
                   style={{
                     color: Colors.white,
                     fontSize: RFValue(12),
