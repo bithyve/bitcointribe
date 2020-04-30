@@ -3,13 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
   Image,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -24,6 +24,7 @@ import ModalHeader from '../components/ModalHeader';
 import AddressBookFilterModalContent from './Contacts/AddressBookFilterModalContent';
 import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function AddressBookContents(props) {
   let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(React.createRef());
@@ -52,6 +53,10 @@ export default function AddressBookContents(props) {
       phoneNumber: '+1 000 000 0000',
     }
   ]);
+
+  const trustedContactWatermarkMessage = 'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
+  const GuardianOfWatermarkMessage = 'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
+  const YourGuardianWatermarkMessage = 'Contacts or devices who are guarding your\nRecovery Secret will appear here';
   useEffect(() => {
     getAssociatedContact();
   }, []);
@@ -155,6 +160,42 @@ export default function AddressBookContents(props) {
     );
   }
 
+  const getWaterMark = (message) =>{
+    return <View
+      style={{
+        marginBottom: 15, marginLeft:wp('5%'), marginRight: wp('5%') 
+      }}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'center', padding:15, }}>
+        <View>
+          <View style={styles.watermarkViewBigText}/>
+          <View style={styles.watermarkViewSmallText}/>
+        </View>
+        <View style={styles.watermarkViewButton}/>
+        <View style={styles.watermarkViewArrow}/>
+      </View>
+      <View style={{ borderTopWidth:1, borderTopColor:Colors.borderColor, flexDirection: 'row', alignItems: 'center', padding:15, }}>
+        <View>
+          <View style={styles.watermarkViewBigText}/>
+          <View style={styles.watermarkViewSmallText}/>
+        </View>
+        <View style={styles.watermarkViewButton}/>
+        <View style={styles.watermarkViewArrow}/>
+      </View>
+      {/* <View style={{backgroundColor:Colors.backgroundColor, margin:10, padding:10, borderRadius:10, marginTop:0}}>
+        <Text
+          style={{
+            color: Colors.black,
+            fontSize: RFValue(13),
+            fontFamily: Fonts.textColorGrey,
+          }}
+        >
+          {message}
+        </Text>
+      </View> */}
+    </View>
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -209,164 +250,71 @@ export default function AddressBookContents(props) {
             </TouchableOpacity>
           </View>
         </View>
-
-        <View>
-          <Text style={styles.pageTitle}>Trusted Contacts</Text>
-          <Text style={styles.pageInfoText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing
-          </Text>
-        </View>
-
-        {TrustedContact ? (
-          <View style={{ flex: 1, marginBottom: 15 }}>
+        <ScrollView style={{flex:1}}>
+          <View style={{}}>
+            <Text style={styles.pageTitle}>Trusted Contacts</Text>
+            <Text style={styles.pageInfoText}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing
+            </Text>
             {TrustedContact && TrustedContact.length ? (
-              <View style={{ height: 'auto' }}>
-                <FlatList
-                  data={TrustedContact}
-                  extraData={TrustedContact}
-                  showsVerticalScrollIndicator={true}
-                  renderItem={({ item, index }) => getElement(item, index)}
-                />
+              <View style={{  marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                    {TrustedContact.map(( item, index )=>{
+                      return getElement(item, index)
+                    })}
+                </View>
               </View>
-            ) : null}
+            ) : 
+              getWaterMark(trustedContactWatermarkMessage)
+            }
           </View>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              marginBottom: 15,
-              justifyContent: 'center',
-              alignItems: 'center',
-              opacity: 0.5,
-            }}
-          >
-            <Text
-              style={{
-                marginLeft: 15,
-                marginRight: 15,
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontSize: RFValue(15),
-                textAlign: 'center',
-              }}
-            >
-              {
-                'Contacts or devices for whom you are guarding\nthe Recovery Secret will appear here'
-              }
+          <View style={{marginTop:wp('5%')}}>
+            <Text style={styles.pageTitle}>You are the Guardian of</Text>
+            <Text style={styles.pageInfoText}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-          </View>
-        )}
-
-        <View>
-          <Text style={styles.pageTitle}>You are the Guardian of</Text>
-          <Text style={styles.pageInfoText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing
-          </Text>
-        </View>
-
-        {AssociatedContact || SecondaryDeviceAddress ? (
-          <View style={{ flex: 1, marginBottom: 15 }}>
-            {AssociatedContact && AssociatedContact.length ? (
-              <View style={{ height: 'auto' }}>
-                <FlatList
-                  data={AssociatedContact}
-                  extraData={AssociatedContact}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item, index }) => getElement(item, index)}
-                />
+            {(AssociatedContact && AssociatedContact.length) || (SecondaryDeviceAddress && SecondaryDeviceAddress.length) ? (
+              <View style={{  marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                    {AssociatedContact.map(( item, index )=>{
+                      return getElement(item, index)
+                    })}
+                    {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
+                      <View>
+                        {SecondaryDeviceAddress.map( (item, index )=>{
+                          return (
+                            <View style={styles.selectedContactsView}>
+                              <Text style={styles.contactText}>{item.requester}</Text>
+                            </View>
+                          );
+                        })}
+                    </View>
+                    ) : null}
+                </View>
               </View>
-            ) : null}
-            {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
-              <View style={{ height: 'auto' }}>
-                <FlatList
-                  data={SecondaryDeviceAddress}
-                  extraData={SecondaryDeviceAddress}
-                  showsVerticalScrollIndicator={false}
-                  renderItem={({ item, index }) => {
-                    return (
-                      <View style={styles.selectedContactsView}>
-                        <Text style={styles.contactText}>{item.requester}</Text>
-                      </View>
-                    );
-                  }}
-                />
+            ) : 
+              getWaterMark(GuardianOfWatermarkMessage)
+            }
+          </View>
+          <View style={{marginTop:wp('5%')}}>
+            <Text style={styles.pageTitle}>Guardians of your Recovery Secret</Text>
+            <Text style={styles.pageInfoText}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing
+            </Text>
+            {SelectedContacts && SelectedContacts.length ? (
+              <View style={{  marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                    {SelectedContacts.map(( item, index )=>{
+                      return getElement(item, index)
+                    })}
+                </View>
               </View>
-            ) : null}
+            ) : 
+              getWaterMark(YourGuardianWatermarkMessage)
+            }
           </View>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              marginBottom: 15,
-              justifyContent: 'center',
-              alignItems: 'center',
-              opacity: 0.5,
-            }}
-          >
-            <Text
-              style={{
-                marginLeft: 15,
-                marginRight: 15,
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontSize: RFValue(15),
-                textAlign: 'center',
-              }}
-            >
-              {
-                'Contacts or devices for whom you are guarding\nthe Recovery Secret will appear here'
-              }
-            </Text>
-          </View>
-        )}
-
-        <View>
-          <Text style={styles.pageTitle}>
-            Guardians of your Recovery Secret
-          </Text>
-          <Text style={styles.pageInfoText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing
-          </Text>
-        </View>
-
-        {SelectedContacts && SelectedContacts.length ? (
-          <View style={{ flex: 1, flexDirection: 'row', marginBottom: 15 }}>
-            <FlatList
-              data={SelectedContacts}
-              extraData={SelectedContacts}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => getElement(item, index)}
-            />
-          </View>
-        ) : (
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              marginBottom: 15,
-              justifyContent: 'center',
-              alignItems: 'center',
-              opacity: 0.5,
-            }}
-          >
-            <Text
-              style={{
-                marginLeft: 15,
-                marginRight: 15,
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontSize: RFValue(15),
-                textAlign: 'center',
-              }}
-            >
-              {
-                'Contacts or devices who are guarding your\nRecovery Secret will appear here'
-              }
-            </Text>
-          </View>
-        )}
+        </ScrollView>
+        <BottomInfoBox title={'Note'} infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'} />
         <BottomSheet
           enabledInnerScrolling={true}
           ref={FilterModalBottomSheet as any}
@@ -425,7 +373,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginTop: 5,
     paddingBottom: 15,
-    paddingTop: 10,
+    paddingTop: 15,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
   },
@@ -459,4 +407,31 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
   },
+  watermarkViewBigText:{
+    backgroundColor: Colors.backgroundColor,
+    height: wp('5%'),
+    width: wp('35%'),
+    borderRadius: 10,
+  },
+  watermarkViewSmallText:{
+    backgroundColor: Colors.backgroundColor,
+    height: wp('3%'),
+    width: wp('25%'),
+    marginTop: 3,
+    borderRadius: 10,
+  },
+  watermarkViewButton:{
+    marginLeft:'auto',
+    backgroundColor: Colors.backgroundColor,
+    height: wp('7%'),
+    width: wp('18%'),
+    borderRadius: 10,
+  },
+  watermarkViewArrow:{
+    marginLeft:20,
+    backgroundColor: Colors.backgroundColor,
+    height: wp('3%'),
+    width: wp('3%'),
+    borderRadius: wp('3%')/2,
+  }
 });
