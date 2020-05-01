@@ -95,7 +95,7 @@ const SetupNavigator = createStackNavigator(
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
-        //gesturesEnabled: false,
+        gesturesEnabled: false,
       },
     },
   },
