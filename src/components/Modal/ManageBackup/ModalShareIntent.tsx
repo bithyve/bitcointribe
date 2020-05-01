@@ -15,7 +15,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../../../../src/common/Colors';
 import Fonts from '../../../../src/common/Fonts';
 import Icons from '../../../../src/common/Icons';
-import Singleton from '../../../common/Singleton';
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import { requestSharePdf,PDFSharingFailed } from '../../../store/actions/manageBackup';
@@ -34,7 +33,7 @@ export default function ModalShareIntent(props) {
   const isPDFSharedFailed = useSelector(state => state.manageBackup.pdfSharingFailed);
   console.log("isPDFSharedFailed", isPDFSharedFailed);
   // const [flagRefreshing, setFagRefreshing] = useState(false);
-  const [arrShareOption, setArrShareOption] = useState([
+  const [arrShareOption] = useState([
     {
       id: 1,
       title: 'Send pdf on email',

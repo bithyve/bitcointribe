@@ -1,12 +1,6 @@
 import React from "react";
 import { View, Image, TouchableOpacity, Text, Clipboard } from "react-native";
 import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
 import { RFValue } from "react-native-responsive-fontsize";
 import Toast from "../components/Toast";
 export default function CopyThisText(props) {

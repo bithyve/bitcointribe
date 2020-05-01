@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { View, Text, StyleSheet } from 'react-native';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import CommonStyles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 export default function BottomInfoBox(props) {

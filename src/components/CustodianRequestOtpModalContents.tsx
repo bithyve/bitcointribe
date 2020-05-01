@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import {
   View,
-  Image,
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
@@ -21,7 +20,7 @@ import CommonStyle from "../common/Styles";
 export default function CustodianRequestOtpModalContents(props) {
   const [passcode, setPasscode] = useState("");
   const inputRef = useRef(null);
-  const [scrollViewRef, setscrollViewRef] = useState(React.createRef());
+  const [scrollViewRef] = useState(React.createRef());
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Image,
@@ -17,9 +17,7 @@ import {
 import Colors from "../common/Colors";
 import QuestionList from '../common/QuestionList';
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import BottomInfoBox from "../components/BottomInfoBox";
 // import Fontisto from "react-native-vector-icons/Fontisto";
@@ -34,7 +32,7 @@ export default function FastBitcoinCalculationModalContents(props) {
   });
   const [VoucherCodeRef, setVoucherCodeRef] = useState(React.createRef());
   const [BitcoinAddressRef, setBitcoinAddressRef] = useState(React.createRef());
-  const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
+  const [dropdownBoxList] = useState(QuestionList);
   const [VoucherCode, setVoucherCode] = useState("");
   const [BitcoinAddress, setBitcoinAddress] = useState("");
 

@@ -3,18 +3,12 @@ import {
 	View,
 	Image,
 	Text,
-	StyleSheet,
-	ScrollView,
+	StyleSheet
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Entypo from "react-native-vector-icons/Entypo";
 import { FlatList } from "react-native-gesture-handler"; 
 
 export default function AddModalContents( props ) {
