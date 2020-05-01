@@ -1,10 +1,22 @@
 import TrustedContacts from '../utilities/TrustedContacts';
 import config from '../Config';
+import { Contacts } from '../utilities/Interface';
 
 export default class TrustedContactsService {
-  public trustedContacts: TrustedContacts;
-  constructor() {
-    this.trustedContacts = new TrustedContacts();
+  public static fromJSON = (json: string) => {
+    const { tc } = JSON.parse(json);
+    const {
+      trustedContacts,
+    }: {
+      trustedContacts: Contacts;
+    } = tc;
+
+    return new TrustedContactsService({ trustedContacts });
+  };
+
+  public tc: TrustedContacts;
+  constructor(stateVars?) {
+    this.tc = new TrustedContacts(stateVars);
   }
 
   public initializeContact = (
@@ -27,7 +39,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.trustedContacts.initializeContact(contactName),
+        data: this.tc.initializeContact(contactName),
       };
     } catch (err) {
       return {
@@ -59,10 +71,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.trustedContacts.finalizeContact(
-          contactName,
-          encodedPublicKey,
-        ),
+        data: this.tc.finalizeContact(contactName, encodedPublicKey),
       };
     } catch (err) {
       return {

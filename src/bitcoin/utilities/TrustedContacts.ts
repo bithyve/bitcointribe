@@ -5,7 +5,14 @@ import crypto from 'crypto';
 
 export default class TrustedContacts {
   public trustedContacts: Contacts = {};
-  constructor() {}
+  constructor(stateVars) {
+    this.initializeStateVars(stateVars);
+  }
+
+  public initializeStateVars = (stateVars) => {
+    this.trustedContacts =
+      stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {};
+  };
 
   public decodePublicKey = (publicKey: string) => {
     const keyPair = ec.keyFromPublic(publicKey, 'hex');
