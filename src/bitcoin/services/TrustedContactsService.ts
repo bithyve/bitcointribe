@@ -58,6 +58,8 @@ export default class TrustedContactsService {
         status: number;
         data: {
           channelAddress: string;
+          ephemeralAddress: string;
+          publicKey: string;
         };
         err?: undefined;
         message?: undefined;

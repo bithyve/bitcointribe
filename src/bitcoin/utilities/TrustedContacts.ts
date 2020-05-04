@@ -38,7 +38,11 @@ export default class TrustedContacts {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
-  ): { channelAddress: string } => {
+  ): {
+    channelAddress: string;
+    ephemeralAddress: string;
+    publicKey: string;
+  } => {
     if (!this.trustedContacts[contactName]) {
       this.initializeContact(contactName); // case: trusted contact setup has been requested
     }
@@ -57,6 +61,11 @@ export default class TrustedContacts {
       .update(symmetricKey)
       .digest('hex');
 
+    const ephemeralAddress = crypto
+      .createHash('sha256')
+      .update(encodedPublicKey)
+      .digest('hex');
+
     this.trustedContacts[contactName] = {
       ...this.trustedContacts[contactName],
       symmetricKey,
@@ -64,6 +73,10 @@ export default class TrustedContacts {
       contactsPubKey: encodedPublicKey,
     };
     console.log({ contactName: this.trustedContacts[contactName] });
-    return { channelAddress };
+    return {
+      channelAddress,
+      ephemeralAddress,
+      publicKey: keyPair.getPublic('hex'),
+    };
   };
 }
