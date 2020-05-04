@@ -75,6 +75,7 @@ import ChangeCurrency from '../pages/ChangeCurrency';
 import UpdateApp from '../pages/UpdateApp';
 import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
+import SendRequest from "../pages/Contacts/SendRequest";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -191,6 +192,7 @@ const HomeNavigator = createStackNavigator(
     ChangeCurrency,
     SettingWalletNameChange,
     SettingNewWalletName,
+    SendRequest,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
