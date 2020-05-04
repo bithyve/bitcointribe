@@ -40,6 +40,7 @@ export interface Database {
     TEST_ACCOUNT: string;
     SECURE_ACCOUNT: string;
     S3_SERVICE: string;
+    TRUSTED_CONTACTS: string;
   };
 }
 

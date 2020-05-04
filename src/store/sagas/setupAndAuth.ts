@@ -16,20 +16,22 @@ import {
   INIT_RECOVERY,
   CHANGE_AUTH_CRED,
   credsChanged,
-  pinChangedFailed
+  pinChangedFailed,
 } from '../actions/setupAndAuth';
 import { insertIntoDB, keyFetched, fetchFromDB } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
-import { Alert } from 'react-native';
 
 function* initSetupWorker({ payload }) {
   yield put(switchSetupLoader('initializing'));
 
   const { walletName, security } = payload;
-  const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
-    serviceGenerator,
-    security.answer,
-  );
+  const {
+    regularAcc,
+    testAcc,
+    secureAcc,
+    s3Service,
+    trustedContacts,
+  } = yield call(serviceGenerator, security.answer);
 
   const initialDatabase: Database = {
     WALLET_SETUP: { walletName, security },
@@ -44,6 +46,7 @@ function* initSetupWorker({ payload }) {
       TEST_ACCOUNT: JSON.stringify(testAcc),
       SECURE_ACCOUNT: JSON.stringify(secureAcc),
       S3_SERVICE: JSON.stringify(s3Service),
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     },
   };
 
@@ -141,7 +144,7 @@ function* changeAuthCredWorker({ payload }) {
     const oldHash = yield call(Cipher.hash, oldPasscode);
     const oldEncryptedKey = yield call(SecureStore.fetch, oldHash);
     const oldKey = yield call(Cipher.decrypt, oldEncryptedKey, oldHash);
-    const key = yield select(state => state.storage.key);
+    const key = yield select((state) => state.storage.key);
     if (oldKey !== key) {
       throw new Error('Incorrect Pin');
     }
@@ -157,8 +160,8 @@ function* changeAuthCredWorker({ payload }) {
     yield put(credsChanged('changed'));
   } catch (err) {
     console.log({ err });
-    yield put( pinChangedFailed(true) );
-   // Alert.alert('Pin change failed!', err.message);
+    yield put(pinChangedFailed(true));
+    // Alert.alert('Pin change failed!', err.message);
     yield put(credsChanged('not-changed'));
   }
 }
