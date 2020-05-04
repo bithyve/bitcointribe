@@ -88,7 +88,10 @@ import {
   fetchNotificationsWatcher,
   fetchGetBittrDetailsWatcher,
 } from './sagas/notifications';
-import { initializedTrustedContactWatcher } from './sagas/trustedContacts';
+import {
+  initializedTrustedContactWatcher,
+  approveTrustedContactWatcher,
+} from './sagas/trustedContacts';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -184,6 +187,7 @@ const rootSaga = function* () {
 
     // Trusted Contacts
     initializedTrustedContactWatcher,
+    approveTrustedContactWatcher,
   ];
 
   yield all(

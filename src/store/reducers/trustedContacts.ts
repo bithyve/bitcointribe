@@ -2,18 +2,24 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { SERVICES_ENRICHED } from '../actions/storage';
 import { TRUSTED_CONTACTS } from '../../common/constants/serviceTypes';
 import {
-  INITIALIZE_TRUSTED_CONTACT,
   TRUSTED_CONTACT_INITIALIZED,
+  TRUSTED_CONTACT_APPROVED,
 } from '../actions/trustedContacts';
 
 const initialState: {
   service: TrustedContactsService;
   serviceEnriched: Boolean;
-  shareablePubKey: string;
+  initializedTrustedContacts: { [contactName: string]: { publicKey: string } }; //contact name to pubkey mapping
+  approvedTrustedContacts: {
+    [contactName: string]: {
+      approved: Boolean;
+    };
+  };
 } = {
   service: null,
   serviceEnriched: false,
-  shareablePubKey: null,
+  initializedTrustedContacts: null,
+  approvedTrustedContacts: null,
 };
 
 export default (state = initialState, action) => {
@@ -25,16 +31,24 @@ export default (state = initialState, action) => {
         serviceEnriched: true,
       };
 
-    case INITIALIZE_TRUSTED_CONTACT:
-      return {
-        ...state,
-        shareablePubKey: null,
-      };
-
     case TRUSTED_CONTACT_INITIALIZED:
       return {
         ...state,
-        shareablePubKey: action.payload.publicKey,
+        initializedTrustedContacts: {
+          ...state.initializedTrustedContacts,
+          [action.payload.contactName]: { publicKey: action.payload.publicKey },
+        },
+      };
+
+    case TRUSTED_CONTACT_APPROVED:
+      return {
+        ...state,
+        approvedTrustedContacts: {
+          ...state.approvedTrustedContacts,
+          [action.payload.contactName]: {
+            approved: action.payload.approved,
+          },
+        },
       };
   }
 
