@@ -4,6 +4,7 @@ import S3Service from '../../bitcoin/services/sss/S3Service';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { take, fork } from 'redux-saga/effects';
 import { AsyncStorage, Alert } from 'react-native';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -14,6 +15,7 @@ export const serviceGenerator = async (
   testAcc: TestAccount;
   secureAcc: SecureAccount;
   s3Service: S3Service;
+  trustedContacts: TrustedContactsService;
 }> => {
   // Regular account
   let primaryMnemonic = mnemonic ? mnemonic : undefined;
@@ -104,16 +106,20 @@ export const serviceGenerator = async (
     throw new Error('Secure account setup/import failed');
   }
 
+  // Trusted Contacts Service
+  const trustedContacts = new TrustedContactsService();
+
   return {
     regularAcc,
     testAcc,
     secureAcc,
     s3Service,
+    trustedContacts,
   };
 };
 
 export const createWatcher = (worker, type) => {
-  return function*() {
+  return function* () {
     while (true) {
       const action = yield take(type);
       yield fork(worker, action);
