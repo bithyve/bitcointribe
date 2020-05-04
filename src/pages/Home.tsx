@@ -1417,7 +1417,8 @@ const onNotificationArrives = async (notification) => {
           if (
             type == 'Fastbitcoins' ||
             type == 'Getbittr' ||
-            type == 'Add Contact'
+            type == 'addContact' ||
+            type == "buyBitcoins"
           ) {
             setTimeout(() => {
               setAddSubBottomSheetsFlag(true);
@@ -2017,6 +2018,8 @@ const onNotificationArrives = async (notification) => {
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
       return renderGetBittrSaveBitcoinContents();
+    }else if (selectToAdd == 'buyBitcoins') {
+      return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'Fastbitcoins') {
       return (
         <FastBitcoinModalContents
@@ -2041,7 +2044,7 @@ const onNotificationArrives = async (notification) => {
           }}
         />
       );
-    } else if (selectToAdd == 'Add Contact') {
+    } else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
