@@ -752,17 +752,17 @@ export default function Accounts(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                You don't have any transactions yet
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Start using your accounts to make transactions
-              </Text>
+                View your transactions here
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              All your recent transactions across the accounts appear here
+            </Text>
             </View>
           </View>
         ) : null}
@@ -862,7 +862,7 @@ export default function Accounts(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              You don't have any transactions yet
+              View your transactions here
             </Text>
             <Text
               style={{
@@ -871,7 +871,7 @@ export default function Accounts(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Start using your accounts to make transactions
+              All your recent transactions across the accounts appear here
             </Text>
           </View>
         </View>

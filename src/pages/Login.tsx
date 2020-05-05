@@ -30,8 +30,6 @@ import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
-import { APP_ID } from 'react-native-dotenv';
-import { exit } from 'process';
 import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
@@ -43,6 +41,53 @@ export default function Login(props) {
   const [checkAuth, setCheckAuth] = useState(false);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  // const releases =[
+  //       {
+  //           "build": "40",
+  //           "version": "0.8",
+  //           "releaseNotes": {
+  //               "ios": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented",
+  //               "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //           },
+  //           "reminderLimit": 2
+  //       },
+  //       {
+  //         "build": "39",
+  //         "version": "0.8",
+  //         "releaseNotes": {
+  //             "ios": "dfsdg",
+  //             "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //         },
+  //         "reminderLimit": -1
+  //     },
+  //     {
+  //       "build": "38",
+  //       "version": "0.8",
+  //       "releaseNotes": {
+  //           "ios": "64356354",
+  //           "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //       },
+  //       "reminderLimit": -1
+  //   },
+  //   {
+  //     "build": "37",
+  //     "version": "0.8",
+  //     "releaseNotes": {
+  //         "ios": "dfgdgdg",
+  //         "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //     },
+  //     "reminderLimit": -1
+  // },
+  //       {
+  //           "build": "35",
+  //           "version": "3.40",
+  //           "releaseNotes": {
+  //               "ios": "ios notes for release 319",
+  //               "android": "android notes for release 319"
+  //           },
+  //           "reminderLimit": -1
+  //       }
+  //   ];
   const onPressNumber = useCallback(
     (text) => {
       let tmpPasscode = passcode;
@@ -169,66 +214,24 @@ export default function Login(props) {
       DeviceInfo.getVersion(),
       DeviceInfo.getBuildNumber(),
     );
-    console.log(DeviceInfo.getBuildNumber());
+     
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
-      .then((res) => {
-        const releases = res.data;
-        console.log({ releases });
-        const ReleaseNoteType = 'mandatory'; // 'optional'
-        // const ReleaseNote =
-        //   Platform.OS == 'ios'
-        //     ? val.releaseNotes.ios
-        //     : val.releaseNotes.android;
-        // console.log('ReleaseNote', val.releaseNotes, ReleaseNote);
-        //   ReleaseNoteType == 'mandatory'
-        //     ? Alert.alert(
-        //         ReleaseNote,
-        //         '',
-        //         [
-        //           {
-        //             text: 'Upgrade Now',
-        //             onPress: () => upgradeNow(),
-        //           },
-        //           { text: 'Cancel'},
-        //         ],
-        //         { cancelable: false },
-        //       )
-        //     : Alert.alert(
-        //         ReleaseNote,
-        //         '',
-        //         [
-        //           {
-        //             text: 'Upgrade Now',
-        //             onPress: () => upgradeNow(),
-        //           },
-        //           {
-        //             text: 'Remind me later',
-        //             onPress: () => upgradeNow(),
-        //           },
-
-        //           { text: 'Ignore', onPress: () => upgradeNow(),},
-        //         ],
-        //         { cancelable: false },
-        //       );
+      .then(async (res) => {
+        console.log("Release note", res.data.releases);
+        let releaseCases = JSON.parse(await AsyncStorage.getItem("releaseCases"));
+        console.log("releaseCases Login", releaseCases);
+        if(res.data.releases.length && res.data.releases[0].build != DeviceInfo.getBuildNumber()){
+      if(releaseCases && releaseCases.build == res.data.releases[0].build && releaseCases.ignoreClick) return;
+      props.navigation.navigate('UpdateApp', {releaseData: res.data.releases})
+       } 
       })
       .catch((error) => {
         console.error(error);
       });
+    
   }, []);
 
-  const upgradeNow = () => {
-    const url =
-      Platform.OS == 'ios'
-        ? 'itms://itunes.apple.com/us/app/apple-store/' + APP_ID + '?mt=8'
-        : 'market://details?id=' + APP_ID;
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
-      } else {
-        console.log("Don't know how to open URI: " + url);
-      }
-    });
-  };
+  
 
   // useEffect(() => {
   //   (async () => {

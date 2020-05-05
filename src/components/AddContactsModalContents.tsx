@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     Image,
     Text,
     StyleSheet,
-    ScrollView
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "../components/ContactList";
 import FontAwesome from "react-native-vector-icons/FontAwesome"
 import Ionicons from "react-native-vector-icons/Ionicons";
 import BottomInfoBox from './BottomInfoBox';
@@ -68,12 +65,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.borderColor,
         alignSelf: 'center',
         width: '100%'
     },
@@ -126,11 +117,4 @@ const styles = StyleSheet.create({
         fontSize: RFValue(12),
         marginTop: hp('0.5%')
     },
-    infoView: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 10
-    }
-
 })

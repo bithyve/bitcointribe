@@ -102,7 +102,6 @@ import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
@@ -110,14 +109,20 @@ import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import {
   initializeTrustedContact,
   approveTrustedContact,
 } from '../store/actions/trustedContacts';
 
+import { NOTIFICATION_HOUR } from 'react-native-dotenv';
+import RelayServices from '../bitcoin/services/RelayService';
+import AddContactAddressBook from './Contacts/AddContactAddressBook';
+
 export default function Home(props) {
-  // const trustedContacts: TrustedContactsService = useSelector(
+  
+   // const trustedContacts: TrustedContactsService = useSelector(
   //   (state) => state.trustedContacts.service,
   // );
   // useEffect(() => {
@@ -126,8 +131,9 @@ export default function Home(props) {
   //   }, 4000); // letting other db insertion happen
   // }, []);
   // console.log(trustedContacts.tc.trustedContacts['Blake']);
-
-  const notificationList = useSelector((state) => state.notifications);
+  
+  const [SelectedContact, setSelectedContact] =useState([]);
+  const notificationList = useSelector((state)=>state.notifications);
   const [NotificationList, setNotificationList] = useState([]);
   const [
     notificationsListBottomSheet,
@@ -244,6 +250,24 @@ export default function Home(props) {
     );
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
+
+    if(value.type == 'release'){
+      RelayServices.fetchReleases(value.info.split(' ')[1])
+      .then(async (res) => {
+        if(res.data.releases.length){
+          let releaseNotes = res.data.releases.length
+          ? res.data.releases.find((el) => {
+              return el.build === value.info.split(' ')[1];
+            })
+          : '';
+      props.navigation.navigate('UpdateApp', {releaseData: [releaseNotes], isOpenFromNotificationList: true, releaseNumber: value.info.split(' ')[1]})
+       } 
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    }
+    
   };
 
   useEffect(() => {
@@ -365,8 +389,8 @@ export default function Home(props) {
     setContactSelectedFromAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [
-    FamilyAndFriendAddressBookBottomSheet,
-    setFamilyAndFriendAddressBookBottomSheet,
+    AddContactAddressBookBookBottomSheet,
+    setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
   const [
@@ -577,8 +601,8 @@ export default function Home(props) {
     };
   }, []);
 
-  const getNotificationList = () => {
-    console.log('testing...');
+
+  const getNotificationList = async() =>{
     dispatch(fetchNotifications());
   };
 
@@ -611,169 +635,120 @@ export default function Home(props) {
     }
   };
 
-  const setupNotificationList = async () => {
-    let asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem('notificationList'),
-    );
-    if (!asyncNotificationList) {
+  const setupNotificationList = async() =>{
+    let asyncNotification = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    let asyncNotificationList = [];
+    if(asyncNotification){
       asyncNotificationList = [];
+      for (let i = 0; i < asyncNotification.length; i++) {
+        asyncNotificationList.push(asyncNotification[i]);
+      }
     }
     let tmpList = asyncNotificationList;
-    if (notificationList) {
-      for (let i = 0; i < notificationList['notifications'].length; i++) {
-        const element = notificationList['notifications'][i];
-        if (tmpList[i]) {
-          tmpList[i].time = timeFormatter(
-            moment(new Date()),
-            moment(element.date).valueOf(),
-          );
-        } else {
+    if(notificationList){
+      for (let i = 0; i < notificationList["notifications"].length; i++) {
+        const element = notificationList["notifications"][i];
+        let readStatus = false;
+        if(element.notificationType == "release"){
+          let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+          if(element.body.split(" ")[1] == releaseCases.build){
+            if(releaseCases.remindMeLaterClick){
+              readStatus = false;
+            }
+            if(releaseCases.ignoreClick){
+              readStatus = true;
+            }  
+          }
+          else{
+            readStatus = true;
+          }
+        }
+        if(asyncNotificationList.findIndex(value=>value.notificationId == element.notificationId)>-1){
+          let temp = asyncNotificationList[asyncNotificationList.findIndex(value=>value.notificationId == element.notificationId)];
+          if(element.notificationType == "release"){
+            readStatus = readStatus;
+          }
+          else{
+            readStatus = temp.read;
+          }
+          let obj = {
+            ...temp,
+            read: readStatus,
+            type: element.notificationType,
+            title: element.title,
+            info: element.body,
+            isMandatory: element.tag=="mandatory" ? true : false,
+            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            date: new Date(element.date),
+          }
+          tmpList[tmpList.findIndex(value=>value.notificationId == element.notificationId)] = obj;
+        }
+        else{
           let obj = {
             type: element.notificationType,
-            isMandatory: element.tag == 'mandatory' ? true : false,
-            read: false,
+            isMandatory: element.tag=="mandatory" ? true : false,
+            read: readStatus,
             title: element.title,
-            time: timeFormatter(
-              moment(new Date()),
-              moment(element.date).valueOf(),
-            ),
-            date: element.date,
+            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            date: new Date(element.date),
             info: element.body,
-            notificationId: element._id,
-          };
-          tmpList[i] = obj;
+            notificationId: element.notificationId,
+          }
+          tmpList.push(obj);
         }
       }
-      let notifications = [...tmpList];
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify(notifications),
-      );
-      notifications.sort(function (left, right) {
+      await AsyncStorage.setItem("notificationList", JSON.stringify(tmpList));
+      tmpList.sort(function(left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
-      setNotificationData(notifications);
+      setNotificationData(tmpList);
       setNotificationDataChange(!NotificationDataChange);
     }
   };
 
-  const scheduleNotification = async () => {
-    const notification = new firebase.notifications.Notification()
-      .setTitle('We have not seen you in a while!')
-      .setBody(
-        'Opening your app regularly ensures you get all the notifications and security updates',
-      )
-      .setNotificationId('1')
-      .setSound('default')
-      .setData({
-        title: 'We have not seen you in a while!',
-        body:
-          'Opening your app regularly ensures you get all the notifications and security updates',
-      })
-      .android.setChannelId('reminder')
-      .android.setPriority(firebase.notifications.Android.Priority.High);
-
-    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
-    const date = new Date();
-    date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
-
-    console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
-    await firebase
-      .notifications()
-      .scheduleNotification(notification, {
-        fireDate: date.getTime(),
-        //repeatInterval: 'hour',
-      })
-      .then(() => {})
-      .catch((err) => console.log('err', err));
-    firebase
-      .notifications()
-      .getScheduledNotifications()
-      .then((notifications) => {
-        console.log('logging notifications', notifications);
-      });
-  };
-
-  const onNotificationArrives = async (notification) => {
-    getNotificationList();
-    console.log(
-      'notificationsss',
-      notification,
-      notification.android.channelId,
-    );
-    const { title, body } = notification;
-    const deviceTrayNotification = new firebase.notifications.Notification()
-      .setTitle(title)
-      .setBody(body)
-      .setNotificationId(notification.notificationId)
-      .setSound('default')
-      .android.setPriority(firebase.notifications.Android.Priority.High)
-      .android.setChannelId(
-        notification.android.channelId
-          ? notification.android.channelId
-          : 'foregroundNotification',
-      ) // previously created
-      .android.setAutoCancel(true); // To remove notification when tapped on it
-
-    const channelId = new firebase.notifications.Android.Channel(
-      notification.android.channelId,
-      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
-      firebase.notifications.Android.Importance.High,
-    );
-    firebase.notifications().android.createChannel(channelId);
-    console.log('deviceTrayNotification', deviceTrayNotification);
-    firebase.notifications().displayNotification(deviceTrayNotification);
-  };
-
-  const createNotificationListeners = async () => {
-    /*
-     * Triggered when a particular notification has been received in foreground
-     * */
-    this.notificationListener = firebase
-      .notifications()
-      .onNotification((notification) => {
-        onNotificationArrives(notification);
-      });
-
-    /*
-     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-     * */
-    this.notificationOpenedListener = firebase
-      .notifications()
-      .onNotificationOpened((notificationOpen) => {
-        const { title, body } = notificationOpen.notification;
-        console.log(
-          'notificationOpen.notification onNotificationOpened',
-          notificationOpen.notification,
-        );
-      });
-
-    /*
-     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
-     * */
-    const notificationOpen = await firebase
-      .notifications()
-      .getInitialNotification();
-    if (notificationOpen) {
-      const { title, body } = notificationOpen.notification;
-      console.log(
-        'notificationOpen.notification getInitialNotification',
-        notificationOpen.notification,
-      );
+  const onNotificationOpen = async(item) =>{
+    let content = JSON.parse(item._data.content);
+    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
+    if(!asyncNotificationList){
+      asyncNotificationList=[];
     }
-    /*
-     * Triggered for data only payload in foreground
-     * */
-    this.messageListener = firebase.messaging().onMessage((message) => {
-      //process data message
+    let readStatus = true;
+    if(content.notificationType == "release"){
+      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      if(releaseCases.ignoreClick){
+        readStatus = true
+      }
+      else if(releaseCases.remindMeLaterClick){
+        readStatus = false;
+      }
+      else{
+        readStatus = false;
+      }
+    }
+    let obj = {
+      type: content.notificationType,
+      isMandatory: false,
+      read: readStatus,
+      title: item.title,
+      time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+      date: new Date(),
+      info: item.body,
+      notificationId: content.notificationId,
+    }
+    asyncNotificationList.push(obj);
+    await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotificationList));
+    asyncNotificationList.sort(function(left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
     });
-  };
+    setNotificationData(asyncNotificationList);
+    setNotificationDataChange(!NotificationDataChange);
+  }
 
+  
   useEffect(function () {
     AppState.addEventListener('change', onAppStateChange);
     (async () => {
       const enabled = await firebase.messaging().hasPermission();
-      console.log('enabledqqq', enabled);
       if (!enabled) {
         await firebase
           .messaging()
@@ -832,8 +807,122 @@ export default function Home(props) {
       if (this.appState == 'active') {
         scheduleNotification();
       }
-    } catch (error) {}
-  };
+  }catch (error) {
+  }
+}
+
+const createNotificationListeners = async () => {
+  /*
+   * Triggered when a particular notification has been received in foreground
+   * */
+  this.notificationListener = firebase
+    .notifications()
+    .onNotification((notification) => {
+      onNotificationArrives(notification);
+    });
+
+  /*
+   * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+   * */
+  this.notificationOpenedListener = firebase
+    .notifications()
+    .onNotificationOpened(async(notificationOpen) => {
+      const { title, body } = notificationOpen.notification;
+      // let data = JSON.parse(notificationOpen.notification.data.content);
+      // if(data.notificationType == "release"){
+      //   props.navigation.navigate('UpdateApp', {releaseData: data})
+      // }
+      getNotificationList();
+      onNotificationOpen(notificationOpen.notification);
+    });
+
+  /*
+   * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+   * */
+  const notificationOpen = await firebase
+    .notifications()
+    .getInitialNotification();
+  if (notificationOpen) {
+    const { title, body } = notificationOpen.notification;
+    getNotificationList();
+    onNotificationOpen(notificationOpen.notification);
+  }
+  /*
+   * Triggered for data only payload in foreground
+   * */
+  this.messageListener = firebase.messaging().onMessage((message) => {
+    //process data message
+  });
+};
+
+const scheduleNotification = async () => {
+  const notification = new firebase.notifications.Notification()
+    .setTitle('We have not seen you in a while!')
+    .setBody(
+      'Opening your app regularly ensures you get all the notifications and security updates',
+    )
+    .setNotificationId('1')
+    .setSound('default')
+    .setData({
+      title: 'We have not seen you in a while!',
+      body:
+        'Opening your app regularly ensures you get all the notifications and security updates',
+    })
+    .android.setChannelId('reminder')
+    .android.setPriority(firebase.notifications.Android.Priority.High);
+
+  // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+  const date = new Date();
+  date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
+
+  // console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
+  await firebase
+    .notifications()
+    .scheduleNotification(notification, {
+      fireDate: date.getTime(),
+      //repeatInterval: 'hour',
+    })
+    .then(() => {})
+    .catch((err) => console.log('err', err));
+  firebase
+    .notifications()
+    .getScheduledNotifications()
+    .then((notifications) => {
+      // console.log('logging notifications', notifications);
+    });
+};
+
+const onNotificationArrives = async (notification) => {
+  getNotificationList();
+  const { title, body } = notification;
+  const deviceTrayNotification = new firebase.notifications.Notification()
+    .setTitle(title)
+    .setBody(body)
+    .setNotificationId(notification.notificationId)
+    .setSound('default')
+    .android.setPriority(firebase.notifications.Android.Priority.High)
+    .android.setChannelId(
+      notification.android.channelId
+        ? notification.android.channelId
+        : 'foregroundNotification',
+    ) // previously created
+    .android.setAutoCancel(true); // To remove notification when tapped on it
+
+  const channelId = new firebase.notifications.Android.Channel(
+    notification.android.channelId,
+    notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+    firebase.notifications.Android.Importance.High,
+  );
+  firebase.notifications().android.createChannel(channelId);
+  firebase.notifications().displayNotification(deviceTrayNotification);
+};
+
+// console.log("notification.data", JSON.parse(notification.data.content));
+//   let data = JSON.parse(notification.data.content);
+//   if(data.notificationType == "release"){
+//     props.navigation.navigate('UpdateApp', {releaseData: data})
+//   }
+
   // useEffect(() => {
   //   const unsubscribe = firebase
   //     .messaging()
@@ -855,7 +944,6 @@ export default function Home(props) {
   const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    console.log('FCM Token: ', fcmToken);
     let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
     if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
       await AsyncStorage.setItem('fcmToken', fcmToken);
@@ -1122,7 +1210,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              You don't have any transactions yet
+             View your transactions here
             </Text>
             <Text
               style={{
@@ -1131,7 +1219,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Start using your accounts to make transactions
+              All your recent transactions across the accounts appear here
             </Text>
           </View>
         ) : null}
@@ -1230,7 +1318,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              You don't have any transactions yet
+              View your transactions here
             </Text>
             <Text
               style={{
@@ -1239,7 +1327,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              Start using your accounts to make transactions
+              All your recent transactions across the accounts appear here
             </Text>
           </View>
         </View>
@@ -1377,7 +1465,7 @@ export default function Home(props) {
           if (
             type == 'Fastbitcoins' ||
             type == 'Getbittr' ||
-            type == 'Add Contact'
+            type == "buyBitcoins"
           ) {
             setTimeout(() => {
               setAddSubBottomSheetsFlag(true);
@@ -1385,6 +1473,16 @@ export default function Home(props) {
               setSelectToAdd(type);
             }, 2);
             (AddBottomSheet as any).current.snapTo(1);
+          } else if (
+            type == 'addContact'
+          ) {
+            setTimeout(() => {
+              setAddSubBottomSheetsFlag(true);
+              setAddBottomSheetsFlag(true);
+              setTabBarZIndex(0);
+              setSelectToAdd(type);
+            }, 2);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }
         }}
         addData={modaldata}
@@ -1812,7 +1910,7 @@ export default function Home(props) {
       props.navigation.navigate('ChangeCurrency');
       setCurrencyCode(currency);
     } else if (type == 'ChangeWalletName') {
-      // Change Wallet Name
+      props.navigation.navigate("SettingWalletNameChange");
     }
   };
 
@@ -1976,6 +2074,8 @@ export default function Home(props) {
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
       return renderGetBittrSaveBitcoinContents();
+    }else if (selectToAdd == 'buyBitcoins') {
+      return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'Fastbitcoins') {
       return (
         <FastBitcoinModalContents
@@ -2000,20 +2100,20 @@ export default function Home(props) {
           }}
         />
       );
-    } else if (selectToAdd == 'Add Contact') {
+    } else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
             setTimeout(() => {
               setFamilyAndFriendsBookBottomSheetsFlag(true);
             }, 2);
-            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
             setTimeout(() => {
               setFamilyAndFriendsBookBottomSheetsFlag(true);
             }, 2);
-            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
@@ -2166,25 +2266,27 @@ export default function Home(props) {
     );
   };
 
-  const renderFamilyAndFriendAddressBookContents = () => {
+  const renderAddContactAddressBookContents = () => {
     return (
-      <FamilyandFriendsAddressBookModalContents
-        modalRef={FamilyAndFriendAddressBookBottomSheet}
+      <AddContactAddressBook
+        modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(1);
+        onPressContinue={() => {
+          props.navigation.navigate("SendRequest");
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
+        onSelectContact={(selectedContact)=>{ setSelectedContact(selectedContact)}}
         onPressBack={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);
-          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
-  const renderFamilyAndFriendAddressBookHeader = () => {
+  const renderAddContactAddressBookHeader = () => {
     return (
       <SmallHeaderModal
         borderColor={Colors.white}
@@ -2193,7 +2295,7 @@ export default function Home(props) {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);
-          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -2290,7 +2392,6 @@ export default function Home(props) {
       }
     } else {
       const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-      console.log('EmailToken', EmailToken);
       props.navigation.navigate('SignUpDetails', { EmailToken });
     }
   }, []);
@@ -2338,7 +2439,6 @@ export default function Home(props) {
       const getBittrDetails = JSON.parse(
         await AsyncStorage.getItem('getBittrDetails'),
       );
-      console.log({ getBittrDetails });
       if (!getBittrDetails) {
         dispatch(fetchGetBittrDetails());
       }
@@ -2971,7 +3071,7 @@ export default function Home(props) {
             ? hp('19%')
             : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderTransactionContent}
         renderHeader={renderTransactionHeader}
@@ -3027,7 +3127,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
@@ -3238,7 +3338,7 @@ export default function Home(props) {
         ref={TransactionDetailsBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
@@ -3313,33 +3413,30 @@ export default function Home(props) {
         ref={GetBittrRecurringBuy as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderGetBittrRecurringBuyContents}
         renderHeader={renderGetBittrRecurringBuyHeader}
       />
-      {addSubBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
             setTabBarZIndex(0);
             setFamilyAndFriendsBookBottomSheetsFlag(true);
           }}
+          onOpenStart={()=>{setTabBarZIndex(0);}}
           onCloseStart={() => {
             setTabBarZIndex(999);
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
-          ref={FamilyAndFriendAddressBookBottomSheet as any}
+          ref={AddContactAddressBookBookBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
           ]}
-          renderContent={renderFamilyAndFriendAddressBookContents}
-          renderHeader={renderFamilyAndFriendAddressBookHeader}
+          renderContent={renderAddContactAddressBookContents}
+          renderHeader={renderAddContactAddressBookHeader}
         />
-      ) : null}
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {}}
@@ -3399,7 +3496,7 @@ export default function Home(props) {
         ref={notificationsListBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderNotificationsContent}
         renderHeader={renderNotificationsHeader}

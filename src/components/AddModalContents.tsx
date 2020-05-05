@@ -3,28 +3,23 @@ import {
 	View,
 	Image,
 	Text,
-	StyleSheet,
-	ScrollView,
+	StyleSheet
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Entypo from "react-native-vector-icons/Entypo";
 import { FlatList } from "react-native-gesture-handler"; 
 
 export default function AddModalContents( props ) {
 	const [ addData, setAddData ] = useState( [
-		{
-			title: 'Getbittr', 
-			image: require('../assets/images/icons/icon_getbitter.png'), 
-			info: 'GetBittr gives you an easy way to stack sats',
-			type:'getBittr'
-		},
+		// {
+		// 	title: 'Getbittr', 
+		// 	image: require('../assets/images/icons/icon_getbitter.png'), 
+		// 	info: 'GetBittr gives you an easy way to stack sats',
+		// 	type:'getBittr'
+		// },
 		{
 			title: `Buy Bitcoins`, 
 			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
@@ -37,18 +32,18 @@ export default function AddModalContents( props ) {
 			info: 'Add contacts from your address book',
 			type:'addContact'
 		},
-		{
-			title: 'Add Account', 
-			image: require( '../assets/images/icons/icon_addaccount.png' ), 
-			info: 'Add an account to your wallet, Select from options',
-			type:'addAccount'
-		},
-		{
-			title: 'Import Wallet', 
-			image: require( '../assets/images/icons/icon_importwallet.png' ), 
-			info: 'Import a non-Hexa wallet as an account',
-			type:'importWallet'
-		},
+		// {
+		// 	title: 'Add Account', 
+		// 	image: require( '../assets/images/icons/icon_addaccount.png' ), 
+		// 	info: 'Add an account to your wallet, Select from options',
+		// 	type:'addAccount'
+		// },
+		// {
+		// 	title: 'Import Wallet', 
+		// 	image: require( '../assets/images/icons/icon_importwallet.png' ), 
+		// 	info: 'Import a non-Hexa wallet as an account',
+		// 	type:'importWallet'
+		// },
 	] )
 	return ( <View style={ styles.modalContentContainer }>
 		<View style={{marginBottom: hp('13%')}}>
@@ -56,7 +51,7 @@ export default function AddModalContents( props ) {
 				data={ addData }
 				ItemSeparatorComponent={ () => <View style={ { backgroundColor: Colors.white } }><View style={ styles.separatorView } /></View> }
 				renderItem={ ( { item } ) =>
-					<AppBottomSheetTouchableWrapper disabled={item.type == "getBittr" ? false : true} onPress={ () => props.onPressElements( item.title ) } style={ {...styles.addModalView, opacity:item.title=='Getbittr'? 1 : 0.3, backgroundColor: item.title=='Getbittr' ? Colors.white : Colors.borderColor}} >
+					<AppBottomSheetTouchableWrapper onPress={ () => props.onPressElements( item.type ) } style={ {...styles.addModalView, backgroundColor: Colors.white }} >
 						<View style={ styles.modalElementInfoView }>
 							<View style={ { justifyContent: "center", } }>
 								<Image source={ item.image } style={ { width: 25, height: 25 } } />
@@ -87,11 +82,13 @@ const styles = StyleSheet.create( {
 	},
 	addModalTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue( 14 ),
+		fontSize: RFValue( 13 ),
+		fontFamily: Fonts.FiraSansRegular
 	},
 	addModalInfoText: {
 		color: Colors.textColorGrey,
 		fontSize: RFValue( 11 ),
+		fontFamily: Fonts.FiraSansRegular
 	},
 	modalElementInfoView: {
 		padding: 10,
