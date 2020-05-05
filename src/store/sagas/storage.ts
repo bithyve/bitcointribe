@@ -88,6 +88,7 @@ function* insertDBWorker({ payload }) {
       console.log('Key missing');
       return;
     }
+
     const updatedDB = {
       ...database,
       ...payload,

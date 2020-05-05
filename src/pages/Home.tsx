@@ -110,9 +110,24 @@ import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
+import {
+  initializeTrustedContact,
+  approveTrustedContact,
+} from '../store/actions/trustedContacts';
 
 export default function Home(props) {
-  const notificationList = useSelector((state)=>state.notifications);
+  // const trustedContacts: TrustedContactsService = useSelector(
+  //   (state) => state.trustedContacts.service,
+  // );
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     dispatch(initializeTrustedContact('Blake'));
+  //   }, 4000); // letting other db insertion happen
+  // }, []);
+  // console.log(trustedContacts.tc.trustedContacts['Blake']);
+
+  const notificationList = useSelector((state) => state.notifications);
   const [NotificationList, setNotificationList] = useState([]);
   const [
     notificationsListBottomSheet,
@@ -199,19 +214,34 @@ export default function Home(props) {
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
 
-  const onNotificationClicked = async(value) => {
-    let asyncNotifications = JSON.parse(await AsyncStorage.getItem("notificationList"));
+  const onNotificationClicked = async (value) => {
+    let asyncNotifications = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
     let tempNotificationData = NotificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
       const element = tempNotificationData[i];
       if (element.notificationId == value.notificationId) {
-        if(asyncNotifications && asyncNotifications.length && asyncNotifications.findIndex((item)=>item.notificationId == value.notificationId)>-1){
-          asyncNotifications[asyncNotifications.findIndex((item)=>item.notificationId == value.notificationId)].read = true;
+        if (
+          asyncNotifications &&
+          asyncNotifications.length &&
+          asyncNotifications.findIndex(
+            (item) => item.notificationId == value.notificationId,
+          ) > -1
+        ) {
+          asyncNotifications[
+            asyncNotifications.findIndex(
+              (item) => item.notificationId == value.notificationId,
+            )
+          ].read = true;
         }
         tempNotificationData[i].read = true;
       }
     }
-    await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotifications));
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotifications),
+    );
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
   };
@@ -534,77 +564,98 @@ export default function Home(props) {
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getNotificationList();
-    let notificationOnFocusListener = props.navigation.addListener("didFocus", ()=>{
-      getNotificationList();
-    });
+    let notificationOnFocusListener = props.navigation.addListener(
+      'didFocus',
+      () => {
+        getNotificationList();
+      },
+    );
     return () => {
       notificationOnFocusListener.remove();
     };
   }, []);
 
-  const getNotificationList = () =>{
-    console.log("testing...")
+  const getNotificationList = () => {
+    console.log('testing...');
     dispatch(fetchNotifications());
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     setupNotificationList();
-  },[notificationList]);
+  }, [notificationList]);
 
-  const onNotificationListOpen = async() =>{
-    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
-    if(asyncNotificationList){
+  const onNotificationListOpen = async () => {
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (asyncNotificationList) {
       for (let i = 0; i < asyncNotificationList.length; i++) {
-        if(asyncNotificationList[i]){
-          asyncNotificationList[i].time = timeFormatter(moment(new Date()), moment(asyncNotificationList[i].date).valueOf());
+        if (asyncNotificationList[i]) {
+          asyncNotificationList[i].time = timeFormatter(
+            moment(new Date()),
+            moment(asyncNotificationList[i].date).valueOf(),
+          );
         }
       }
-      await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotificationList));
-      asyncNotificationList.sort(function(left, right) {
+      await AsyncStorage.setItem(
+        'notificationList',
+        JSON.stringify(asyncNotificationList),
+      );
+      asyncNotificationList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNotificationData(asyncNotificationList);
       setNotificationDataChange(!NotificationDataChange);
     }
-  }
+  };
 
-  const setupNotificationList = async() =>{
-    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
-    if(!asyncNotificationList){
-      asyncNotificationList=[];
+  const setupNotificationList = async () => {
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (!asyncNotificationList) {
+      asyncNotificationList = [];
     }
     let tmpList = asyncNotificationList;
-    if(notificationList){
-      for (let i = 0; i < notificationList["notifications"].length; i++) {
-        const element = notificationList["notifications"][i];
-        if(tmpList[i]){
-          tmpList[i].time = timeFormatter(moment(new Date()), moment(element.date).valueOf());
-        }
-        else{
+    if (notificationList) {
+      for (let i = 0; i < notificationList['notifications'].length; i++) {
+        const element = notificationList['notifications'][i];
+        if (tmpList[i]) {
+          tmpList[i].time = timeFormatter(
+            moment(new Date()),
+            moment(element.date).valueOf(),
+          );
+        } else {
           let obj = {
             type: element.notificationType,
-            isMandatory: element.tag=="mandatory" ? true : false,
+            isMandatory: element.tag == 'mandatory' ? true : false,
             read: false,
             title: element.title,
-            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            time: timeFormatter(
+              moment(new Date()),
+              moment(element.date).valueOf(),
+            ),
             date: element.date,
             info: element.body,
             notificationId: element._id,
-          }
+          };
           tmpList[i] = obj;
         }
       }
       let notifications = [...tmpList];
-      await AsyncStorage.setItem("notificationList", JSON.stringify(notifications));
-      notifications.sort(function(left, right) {
+      await AsyncStorage.setItem(
+        'notificationList',
+        JSON.stringify(notifications),
+      );
+      notifications.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNotificationData(notifications);
       setNotificationDataChange(!NotificationDataChange);
     }
-  }
+  };
 
   const scheduleNotification = async () => {
     const notification = new firebase.notifications.Notification()
@@ -621,11 +672,11 @@ export default function Home(props) {
       })
       .android.setChannelId('reminder')
       .android.setPriority(firebase.notifications.Android.Priority.High);
-  
+
     // Schedule the notification for 2hours on development and 2 weeks on Production in the future
     const date = new Date();
     date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
-  
+
     console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
     await firebase
       .notifications()
@@ -642,10 +693,14 @@ export default function Home(props) {
         console.log('logging notifications', notifications);
       });
   };
-  
+
   const onNotificationArrives = async (notification) => {
     getNotificationList();
-    console.log('notificationsss', notification, notification.android.channelId);
+    console.log(
+      'notificationsss',
+      notification,
+      notification.android.channelId,
+    );
     const { title, body } = notification;
     const deviceTrayNotification = new firebase.notifications.Notification()
       .setTitle(title)
@@ -659,7 +714,7 @@ export default function Home(props) {
           : 'foregroundNotification',
       ) // previously created
       .android.setAutoCancel(true); // To remove notification when tapped on it
-  
+
     const channelId = new firebase.notifications.Android.Channel(
       notification.android.channelId,
       notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
@@ -669,7 +724,6 @@ export default function Home(props) {
     console.log('deviceTrayNotification', deviceTrayNotification);
     firebase.notifications().displayNotification(deviceTrayNotification);
   };
-  
 
   const createNotificationListeners = async () => {
     /*
@@ -680,7 +734,7 @@ export default function Home(props) {
       .onNotification((notification) => {
         onNotificationArrives(notification);
       });
-  
+
     /*
      * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
      * */
@@ -688,9 +742,12 @@ export default function Home(props) {
       .notifications()
       .onNotificationOpened((notificationOpen) => {
         const { title, body } = notificationOpen.notification;
-        console.log("notificationOpen.notification onNotificationOpened", notificationOpen.notification);
+        console.log(
+          'notificationOpen.notification onNotificationOpened',
+          notificationOpen.notification,
+        );
       });
-  
+
     /*
      * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
      * */
@@ -699,7 +756,10 @@ export default function Home(props) {
       .getInitialNotification();
     if (notificationOpen) {
       const { title, body } = notificationOpen.notification;
-      console.log("notificationOpen.notification getInitialNotification", notificationOpen.notification);
+      console.log(
+        'notificationOpen.notification getInitialNotification',
+        notificationOpen.notification,
+      );
     }
     /*
      * Triggered for data only payload in foreground
@@ -772,9 +832,8 @@ export default function Home(props) {
       if (this.appState == 'active') {
         scheduleNotification();
       }
-  }catch (error) {
-  }
-}
+    } catch (error) {}
+  };
   // useEffect(() => {
   //   const unsubscribe = firebase
   //     .messaging()
@@ -796,7 +855,7 @@ export default function Home(props) {
   const storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    console.log("FCM Token: ",fcmToken)
+    console.log('FCM Token: ', fcmToken);
     let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
     if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
       await AsyncStorage.setItem('fcmToken', fcmToken);
@@ -1749,13 +1808,12 @@ export default function Home(props) {
         managePinSuccessProceed: (pin) => managePinSuccessProceed(pin),
       });
     } else if (type == 'ChangeCurrency') {
-      let currency =  await AsyncStorage.getItem("currencyCode");
-      props.navigation.navigate("ChangeCurrency");
+      let currency = await AsyncStorage.getItem('currencyCode');
+      props.navigation.navigate('ChangeCurrency');
       setCurrencyCode(currency);
     } else if (type == 'ChangeWalletName') {
       // Change Wallet Name
     }
-    
   };
 
   const renderSettingsContents = () => {
