@@ -86,7 +86,7 @@ export interface INotification {
 
 export interface Contacts {
   [contactName: string]: {
-    keyPair: any;
+    privateKey: string;
     symmetricKey?: string;
     channelAddress?: string;
     contactsPubKey?: string;

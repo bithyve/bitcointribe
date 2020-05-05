@@ -28,8 +28,9 @@ export default class TrustedContacts {
 
     const keyPair = ec.genKeyPair();
     const publicKey = keyPair.getPublic('hex');
+    const privateKey = keyPair.getPrivate('hex');
     this.trustedContacts[contactName] = {
-      keyPair,
+      privateKey,
     };
 
     return { publicKey };
@@ -53,8 +54,11 @@ export default class TrustedContacts {
       );
     }
 
-    const { keyPair } = this.trustedContacts[contactName];
-    const symmetricKey = keyPair.derive(this.decodePublicKey(encodedPublicKey)); // ECDH
+    const { privateKey } = this.trustedContacts[contactName];
+    const keyPair = ec.keyFromPrivate(privateKey, 'hex');
+    const symmetricKey = keyPair
+      .derive(this.decodePublicKey(encodedPublicKey))
+      .toString(16); // ECDH
 
     const channelAddress = crypto
       .createHash('sha256')
