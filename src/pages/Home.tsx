@@ -109,11 +109,29 @@ import NotificationListContent from '../components/NotificationListContent';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+
+import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
+import {
+  initializeTrustedContact,
+  approveTrustedContact,
+} from '../store/actions/trustedContacts';
+
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 
 export default function Home(props) {
+  
+   // const trustedContacts: TrustedContactsService = useSelector(
+  //   (state) => state.trustedContacts.service,
+  // );
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     dispatch(initializeTrustedContact('Blake'));
+  //   }, 4000); // letting other db insertion happen
+  // }, []);
+  // console.log(trustedContacts.tc.trustedContacts['Blake']);
+  
   const [SelectedContact, setSelectedContact] =useState([]);
   const notificationList = useSelector((state)=>state.notifications);
   const [NotificationList, setNotificationList] = useState([]);
@@ -202,19 +220,34 @@ export default function Home(props) {
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
 
-  const onNotificationClicked = async(value) => {
-    let asyncNotifications = JSON.parse(await AsyncStorage.getItem("notificationList"));
+  const onNotificationClicked = async (value) => {
+    let asyncNotifications = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
     let tempNotificationData = NotificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
       const element = tempNotificationData[i];
       if (element.notificationId == value.notificationId) {
-        if(asyncNotifications && asyncNotifications.length && asyncNotifications.findIndex((item)=>item.notificationId == value.notificationId)>-1){
-          asyncNotifications[asyncNotifications.findIndex((item)=>item.notificationId == value.notificationId)].read = true;
+        if (
+          asyncNotifications &&
+          asyncNotifications.length &&
+          asyncNotifications.findIndex(
+            (item) => item.notificationId == value.notificationId,
+          ) > -1
+        ) {
+          asyncNotifications[
+            asyncNotifications.findIndex(
+              (item) => item.notificationId == value.notificationId,
+            )
+          ].read = true;
         }
         tempNotificationData[i].read = true;
       }
     }
-    await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotifications));
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotifications),
+    );
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
 
@@ -555,40 +588,52 @@ export default function Home(props) {
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getNotificationList();
-    let notificationOnFocusListener = props.navigation.addListener("didFocus", ()=>{
-      getNotificationList();
-    });
+    let notificationOnFocusListener = props.navigation.addListener(
+      'didFocus',
+      () => {
+        getNotificationList();
+      },
+    );
     return () => {
       notificationOnFocusListener.remove();
     };
   }, []);
 
+
   const getNotificationList = async() =>{
     dispatch(fetchNotifications());
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     setupNotificationList();
-  },[notificationList]);
+  }, [notificationList]);
 
-  const onNotificationListOpen = async() =>{
-    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
-    if(asyncNotificationList){
+  const onNotificationListOpen = async () => {
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (asyncNotificationList) {
       for (let i = 0; i < asyncNotificationList.length; i++) {
-        if(asyncNotificationList[i]){
-          asyncNotificationList[i].time = timeFormatter(moment(new Date()), moment(asyncNotificationList[i].date).valueOf());
+        if (asyncNotificationList[i]) {
+          asyncNotificationList[i].time = timeFormatter(
+            moment(new Date()),
+            moment(asyncNotificationList[i].date).valueOf(),
+          );
         }
       }
-      await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotificationList));
-      asyncNotificationList.sort(function(left, right) {
+      await AsyncStorage.setItem(
+        'notificationList',
+        JSON.stringify(asyncNotificationList),
+      );
+      asyncNotificationList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNotificationData(asyncNotificationList);
       setNotificationDataChange(!NotificationDataChange);
     }
-  }
+  };
 
   const setupNotificationList = async() =>{
     let asyncNotification = JSON.parse(await AsyncStorage.getItem("notificationList"));
@@ -659,7 +704,7 @@ export default function Home(props) {
       setNotificationData(tmpList);
       setNotificationDataChange(!NotificationDataChange);
     }
-  }
+  };
 
   const onNotificationOpen = async(item) =>{
     let content = JSON.parse(item._data.content);
@@ -877,6 +922,7 @@ const onNotificationArrives = async (notification) => {
 //   if(data.notificationType == "release"){
 //     props.navigation.navigate('UpdateApp', {releaseData: data})
 //   }
+
   // useEffect(() => {
   //   const unsubscribe = firebase
   //     .messaging()
@@ -1860,13 +1906,12 @@ const onNotificationArrives = async (notification) => {
         managePinSuccessProceed: (pin) => managePinSuccessProceed(pin),
       });
     } else if (type == 'ChangeCurrency') {
-      let currency =  await AsyncStorage.getItem("currencyCode");
-      props.navigation.navigate("ChangeCurrency");
+      let currency = await AsyncStorage.getItem('currencyCode');
+      props.navigation.navigate('ChangeCurrency');
       setCurrencyCode(currency);
     } else if (type == 'ChangeWalletName') {
       props.navigation.navigate("SettingWalletNameChange");
     }
-    
   };
 
   const renderSettingsContents = () => {

@@ -83,3 +83,12 @@ export interface INotification {
   status?: string;
   date?: Date;
 } // corresponds to the notification schema
+
+export interface Contacts {
+  [contactName: string]: {
+    privateKey: string;
+    symmetricKey?: string;
+    channelAddress?: string;
+    contactsPubKey?: string;
+  };
+}

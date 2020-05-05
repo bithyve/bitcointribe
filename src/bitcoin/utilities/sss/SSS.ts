@@ -332,10 +332,7 @@ export default class SSS {
   };
 
   public static getMessageId = (key: string, length: number): string => {
-    const messageId = crypto
-      .createHash('sha256')
-      .update(key)
-      .digest('hex');
+    const messageId = crypto.createHash('sha256').update(key).digest('hex');
     return messageId.slice(0, length);
   };
 
@@ -612,7 +609,7 @@ export default class SSS {
 
     const shareIDs = this.metaShares
       .slice(0, 3)
-      .map(metaShare => metaShare.shareId);
+      .map((metaShare) => metaShare.shareId);
 
     let res: AxiosResponse;
     try {
@@ -835,9 +832,7 @@ export default class SSS {
       })
       .pop();
 
-    const { decryptedDynamicNonPMDD } = this.decryptDynamicNonPMDD(
-      latestDNP.encryptedDynamicNonPMDD,
-    );
+    const { decryptedDynamicNonPMDD } = this.decryptDynamicNonPMDD(latestDNP);
     return { decryptedDynamicNonPMDD };
   };
 

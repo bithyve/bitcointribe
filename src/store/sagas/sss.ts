@@ -56,12 +56,12 @@ import { AsyncStorage } from 'react-native';
 import { Alert } from 'react-native';
 
 function* generateMetaSharesWorker() {
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
   const { walletName } = yield select(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
   );
   const secureAccount: SecureAccount = yield select(
-    state => state.accounts[SECURE_ACCOUNT].service,
+    (state) => state.accounts[SECURE_ACCOUNT].service,
   );
 
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
@@ -97,7 +97,7 @@ export const generateMetaSharesWatcher = createWatcher(
 );
 
 function* initHCWorker() {
-  let s3Service: S3Service = yield select(state => state.sss.service);
+  let s3Service: S3Service = yield select((state) => state.sss.service);
   const initialized = s3Service.sss.healthCheckInitialized;
   if (initialized) return;
 
@@ -109,7 +109,7 @@ function* initHCWorker() {
   const res = yield call(s3Service.initializeHealthcheck);
   if (res.status === 200) {
     yield put(healthCheckInitialized());
-    const { SERVICES } = yield select(state => state.storage.database);
+    const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       S3_SERVICE: JSON.stringify(s3Service),
@@ -127,11 +127,11 @@ export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
 
 function* uploadEncMetaShareWorker({ payload }) {
   // Transfer: User >>> Guardian
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
 
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
 
   let updatedSERVICES = SERVICES;
@@ -209,7 +209,7 @@ export const uploadEncMetaShareWatcher = createWatcher(
 
 function* requestShareWorker({ payload }) {
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
 
   if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
@@ -245,7 +245,7 @@ function* uploadRequestedShareWorker({ payload }) {
   // Transfer: Guardian >>> User
   const { tag, encryptedKey, otp } = payload;
   const { UNDER_CUSTODY } = yield select(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
 
   if (!UNDER_CUSTODY[tag]) {
@@ -292,7 +292,7 @@ function* downloadMetaShareWorker({ payload }) {
 
   const { otp, encryptedKey } = payload;
   const { DECENTRALIZED_BACKUP } = yield select(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
@@ -302,7 +302,7 @@ function* downloadMetaShareWorker({ payload }) {
     let existingShares = [];
     if (Object.keys(UNDER_CUSTODY).length) {
       existingShares = Object.keys(UNDER_CUSTODY).map(
-        tag => UNDER_CUSTODY[tag].META_SHARE,
+        (tag) => UNDER_CUSTODY[tag].META_SHARE,
       );
     }
 
@@ -348,7 +348,7 @@ function* downloadMetaShareWorker({ payload }) {
       yield put(updateMSharesHealth(updatedBackup));
     } else {
       const updatedRecoveryShares = {};
-      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(key => {
+      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((key) => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
         if (!recoveryShare.REQUEST_DETAILS) {
           updatedRecoveryShares[key] = recoveryShare;
@@ -394,7 +394,7 @@ export const downloadMetaShareWatcher = createWatcher(
 
 function* generatePDFWorker({ payload }) {
   // yield put(switchS3Loader('generatePDF'));
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
   const resQRPersonalCopy1 = yield call(
     s3Service.createQR,
     payload.personalcopy1 - 1,
@@ -412,7 +412,7 @@ function* generatePDFWorker({ payload }) {
     return;
   }
 
-  const { SERVICES } = yield select(state => state.storage.database);
+  const { SERVICES } = yield select((state) => state.storage.database);
   const updatedSERVICES = {
     ...SERVICES,
     S3_SERVICE: JSON.stringify(s3Service),
@@ -421,7 +421,7 @@ function* generatePDFWorker({ payload }) {
   yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
 
   const secureAccount: SecureAccount = yield select(
-    state => state.accounts[SECURE_ACCOUNT].service,
+    (state) => state.accounts[SECURE_ACCOUNT].service,
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
@@ -442,7 +442,7 @@ function* generatePDFWorker({ payload }) {
     ...secureAssets,
   };
   const { security, walletName } = yield select(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
   );
   try {
     const personalCopy1PdfPath = yield call(
@@ -483,13 +483,13 @@ function* updateMSharesHealthWorker({ payload }) {
   let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
   if (!DECENTRALIZED_BACKUP) {
     DECENTRALIZED_BACKUP = yield select(
-      state => state.storage.database.DECENTRALIZED_BACKUP,
+      (state) => state.storage.database.DECENTRALIZED_BACKUP,
     );
   }
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
   const metaShares = Object.keys(UNDER_CUSTODY).map(
-    tag => UNDER_CUSTODY[tag].META_SHARE,
+    (tag) => UNDER_CUSTODY[tag].META_SHARE,
   );
 
   if (!metaShares.length) return;
@@ -498,7 +498,7 @@ function* updateMSharesHealthWorker({ payload }) {
     // TODO: Use during selective updation
     const { updationInfo } = res.data;
     console.log({ updationInfo });
-    Object.keys(UNDER_CUSTODY).forEach(tag => {
+    Object.keys(UNDER_CUSTODY).forEach((tag) => {
       for (let info of updationInfo) {
         if (info.updated) {
           if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
@@ -535,7 +535,7 @@ export const updateMSharesHealthWatcher = createWatcher(
 
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
 
   // const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
@@ -564,7 +564,7 @@ export const checkMSharesHealthWatcher = createWatcher(
 );
 
 function* checkPDFHealthWorker({ payload }) {
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
   const { pdfHealth } = s3Service.sss;
   const { scannedQR, index } = payload;
 
@@ -689,11 +689,11 @@ export const shareHistoryUpdateWatcher = createWatcher(
 function* overallHealthWorker({ payload }) {
   const service = payload.s3Service
     ? payload.s3Service
-    : yield select(state => state.sss.service);
+    : yield select((state) => state.sss.service);
 
   const { healthCheckStatus } = service.sss;
   let shareStatus = new Array(5);
-  Object.keys(healthCheckStatus).map(key => {
+  Object.keys(healthCheckStatus).map((key) => {
     shareStatus[key] = {
       shareId: healthCheckStatus[key].shareId,
       updatedAt: healthCheckStatus[key].updatedAt,
@@ -755,14 +755,14 @@ function* updateDynamicNonPMDDWorker({ payload }) {
 
   if (!dynamicNonPMDD) {
     const { DYNAMIC_NONPMDD } = yield select(
-      state => state.storage.database.DECENTRALIZED_BACKUP,
+      (state) => state.storage.database.DECENTRALIZED_BACKUP,
     );
 
     if (!Object.keys(DYNAMIC_NONPMDD).length) return; // Nothing in DNP
     dynamicNonPMDD = DYNAMIC_NONPMDD;
   }
 
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.updateDynamicNonPMDD, dynamicNonPMDD);
   console.log({ res });
   if (res.status === 200) {
@@ -805,12 +805,12 @@ function* restoreDynamicNonPMDDWorker() {
   yield put(switchS3Loader('restoreDynamicNonPMDD'));
 
   const { DECENTRALIZED_BACKUP } = yield select(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
 
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
   const dynamicNonPMDDs: EncDynamicNonPMDD[] = Object.keys(RECOVERY_SHARES).map(
-    key => {
+    (key) => {
       if (RECOVERY_SHARES.ENC_DYNAMIC_NONPMDD)
         return RECOVERY_SHARES[key].ENC_DYNAMIC_NONPMDD;
     },
@@ -820,7 +820,7 @@ function* restoreDynamicNonPMDDWorker() {
     console.log('DynamicNonPMDD not available');
     return;
   }
-  const s3Service: S3Service = yield select(state => state.sss.service);
+  const s3Service: S3Service = yield select((state) => state.sss.service);
   const res = yield call(s3Service.restoreDynamicNonPMDD, dynamicNonPMDDs);
 
   if (res.status === 200) {
@@ -850,7 +850,7 @@ function* recoverMnemonicWorker({ payload }) {
   if (metaShares.length !== 3) return;
 
   const encryptedSecrets: string[] = metaShares.map(
-    metaShare => metaShare.encryptedSecret,
+    (metaShare) => metaShare.encryptedSecret,
   );
 
   const res = yield call(
@@ -878,7 +878,7 @@ function* restoreShareFromQRWorker({ payload }) {
     throw new Error('QR array is not of appropriate length');
   }
   const { DECENTRALIZED_BACKUP } = yield select(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
 
   const res = yield call(S3Service.recoverMetaShareFromQR, qrArray);
@@ -913,7 +913,7 @@ function* recoverWalletWorker({ payload }) {
 
   try {
     const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
-      state => state.storage.database,
+      (state) => state.storage.database,
     );
 
     const { security } = WALLET_SETUP;
@@ -921,7 +921,7 @@ function* recoverWalletWorker({ payload }) {
 
     let encDynamicNonPMDD;
     const metaShares = Array(5);
-    Object.keys(RECOVERY_SHARES).forEach(key => {
+    Object.keys(RECOVERY_SHARES).forEach((key) => {
       const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[key];
       if (META_SHARE) metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
       if (!encDynamicNonPMDD) {
@@ -935,13 +935,14 @@ function* recoverWalletWorker({ payload }) {
 
     if (Object.keys(metaShares).length !== 3) {
       throw new Error(
-        `Insufficient number of shares to recover the wallet, ${3 -
-          metaShares.length} more required`,
+        `Insufficient number of shares to recover the wallet, ${
+          3 - metaShares.length
+        } more required`,
       );
     }
 
     const encryptedSecrets: string[] = Object.keys(metaShares).map(
-      key => metaShares[key].encryptedSecret,
+      (key) => metaShares[key].encryptedSecret,
     );
 
     const res = yield call(
@@ -952,12 +953,13 @@ function* recoverWalletWorker({ payload }) {
 
     if (res.status === 200) {
       const { mnemonic } = res.data;
-      const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
-        serviceGenerator,
-        security.answer,
-        mnemonic,
-        metaShares,
-      );
+      const {
+        regularAcc,
+        testAcc,
+        secureAcc,
+        s3Service,
+        trustedContacts,
+      } = yield call(serviceGenerator, security.answer, mnemonic, metaShares);
 
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};
@@ -967,7 +969,7 @@ function* recoverWalletWorker({ payload }) {
         if (res.status !== 200)
           console.log('Failed to decrypt dynamic nonPMDD');
         const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
-        dynamicNonPMDD.META_SHARES.forEach(metaShare => {
+        dynamicNonPMDD.META_SHARES.forEach((metaShare) => {
           UNDER_CUSTODY[metaShare.meta.tag] = {
             META_SHARE: metaShare,
           };
@@ -988,6 +990,7 @@ function* recoverWalletWorker({ payload }) {
         TEST_ACCOUNT: JSON.stringify(testAcc),
         SECURE_ACCOUNT: JSON.stringify(secureAcc),
         S3_SERVICE: JSON.stringify(s3Service),
+        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
       yield put(insertIntoDB({ SERVICES, DECENTRALIZED_BACKUP }));
 

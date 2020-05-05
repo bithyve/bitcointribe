@@ -21,6 +21,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 function* initDBWorker() {
   try {
@@ -36,7 +37,7 @@ export const initDBWatcher = createWatcher(initDBWorker, INIT_DB);
 
 function* fetchDBWorker() {
   try {
-    const key = yield select(state => state.storage.key);
+    const key = yield select((state) => state.storage.key);
     const database = yield call(dataManager.fetch, key);
     if (key && database) {
       yield put(dbFetched(database));
@@ -55,7 +56,7 @@ export const fetchDBWatcher = createWatcher(fetchDBWorker, FETCH_FROM_DB);
 
 function* fetchSSSDBWorker() {
   try {
-    const key = yield select(state => state.storage.key);
+    const key = yield select((state) => state.storage.key);
     const database = yield call(dataManager.fetchSSS, key);
     if (key && database == undefined) {
       yield put(generatePDF({ personalcopy1: 4, personalcopy2: 5 }));
@@ -80,13 +81,14 @@ export const fetchSSSDBWatcher = createWatcher(
 
 function* insertDBWorker({ payload }) {
   try {
-    const storage = yield select(state => state.storage);
+    const storage = yield select((state) => state.storage);
     const { database, insertedIntoDB, key } = storage;
     if (!key) {
       // dispatch failure
       console.log('Key missing');
       return;
     }
+
     const updatedDB = {
       ...database,
       ...payload,
@@ -114,7 +116,7 @@ export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
 
 function* insertSSSDBWorker({ payload }) {
   try {
-    const storage = yield select(state => state.storage);
+    const storage = yield select((state) => state.storage);
     const { key } = storage;
     const updatedDB = {
       insertedIntoDB: true,
@@ -134,7 +136,7 @@ export const insertSSSDBWatcher = createWatcher(
 
 function* updateSSSDBWorder({ payload }) {
   let { updatedEntity } = payload;
-  const storage = yield select(state => state.storage);
+  const storage = yield select((state) => state.storage);
   const { key } = storage;
   try {
     const inserted = yield call(
@@ -156,7 +158,7 @@ export const updateSSSDBWatcher = createWatcher(
 
 function* servicesEnricherWorker() {
   try {
-    const { database } = yield select(state => state.storage);
+    const { database } = yield select((state) => state.storage);
     if (!database) {
       console.log('Database missing; services encrichment failed');
       return;
@@ -167,6 +169,7 @@ function* servicesEnricherWorker() {
       TEST_ACCOUNT,
       SECURE_ACCOUNT,
       S3_SERVICE,
+      TRUSTED_CONTACTS,
     } = database.SERVICES;
 
     const services = {
@@ -174,6 +177,7 @@ function* servicesEnricherWorker() {
       TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
       SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
       S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+      TRUSTED_CONTACTS: TrustedContactsService.fromJSON(TRUSTED_CONTACTS),
     };
 
     yield put(servicesEnriched(services));

@@ -11,6 +11,7 @@ import sssReducer from './reducers/sss';
 import manageBackupReducer from './reducers/manageBackup';
 import GetBittrReducer from './reducers/bittr';
 import notificationsReducer from './reducers/notifications';
+import trustedContactsReducer from './reducers/trustedContacts';
 
 import {
   initDBWatcher,
@@ -87,6 +88,10 @@ import {
   fetchNotificationsWatcher,
   fetchGetBittrDetailsWatcher,
 } from './sagas/notifications';
+import {
+  initializedTrustedContactWatcher,
+  approveTrustedContactWatcher,
+} from './sagas/trustedContacts';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -142,10 +147,6 @@ const rootSaga = function* () {
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     testWatcher,
-    fetchGetBittrDetailsWatcher,
-    updateFCMTokensWatcher,
-    fetchNotificationsWatcher,
-    sendNotificationWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -177,6 +178,16 @@ const rootSaga = function* () {
     sendSmsWatcher,
     verifyEmailWatcher,
     verifyXpubWatcher,
+
+    // Notifications
+    fetchGetBittrDetailsWatcher,
+    updateFCMTokensWatcher,
+    fetchNotificationsWatcher,
+    sendNotificationWatcher,
+
+    // Trusted Contacts
+    initializedTrustedContactWatcher,
+    approveTrustedContactWatcher,
   ];
 
   yield all(
@@ -203,6 +214,7 @@ const rootReducer = combineReducers({
   manageBackup: manageBackupReducer,
   bittr: GetBittrReducer,
   notifications: notificationsReducer,
+  trustedContacts: trustedContactsReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
