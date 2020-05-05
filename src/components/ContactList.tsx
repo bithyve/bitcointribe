@@ -35,10 +35,11 @@ export default function ContactList(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
-  const [setContactPermissionAndroid] = useState(false);
-  const [setContactPermissionIOS] = useState(false);
+  const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
+  const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
   const [
-    contactListErrorBottomSheet
+    contactListErrorBottomSheet,
+    setContactListErrorBottomSheet,
   ] = useState(React.createRef());
   const selectectcontactlist = props.selectedContacts ? props.selectedContacts : [];
   const [contactData, setContactData] = useState([]);

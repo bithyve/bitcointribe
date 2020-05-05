@@ -7,10 +7,6 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -19,25 +15,27 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 
 export default function SaveBitcoinModalContents(props) {
     const [ addData, setAddData ] = useState( [
+      // {
+      //   title: 'Recurring Buy',
+      //   image: require('../../assets/images/icons/recurring_buy.png'),
+      //   info: 'Set up a recurring payment to Stack Sats',
+      // },
+      // {
+      //   title: `Credit Card`,
+      //   image: require('../../assets/images/icons/credit_card.png'),
+      //   info: 'Buy bitcoins using a credit card',
+      // },
       {
-        title: 'Recurring Buy',
-        image: require('../../assets/images/icons/recurring_buy.png'),
-        info: 'Set up a recurring payment to Stack Sats',
-      },
-      {
-        title: `Credit Card`,
-        image: require('../../assets/images/icons/credit_card.png'),
-        info: 'Buy bitcoins using a credit card',
-      },
-      {
-        title: 'Voucher',
+        title: 'Use a Voucher',
         image: require('../../assets/images/icons/voucher.png'),
         info: 'Purchase a voucher or use a voucher you own',
+        type: 'voucher'
       },
       {
         title: 'Existing Saving Methods',
         image: require('../../assets/images/icons/existing_saving_method.png'),
         info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
+        type: 'ExistingSavingMethods'
       },
 	] )
   return (
@@ -51,11 +49,9 @@ export default function SaveBitcoinModalContents(props) {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
           <View style={{ flex: 1 }}>
-            <Text style={styles.modalHeaderTitleText}>Save Bitcoins</Text>
+            <Text style={styles.modalHeaderTitleText}>Buy Bitcoin</Text>
             <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae rem
-              porro ducimus repudiandae alias optio accusantium numquam illum
-              autem
+              Get bitcoins directly into your Hexa wallet
             </Text>
           </View>
         </View>
@@ -74,7 +70,7 @@ export default function SaveBitcoinModalContents(props) {
           >
             <View style={styles.modalElementInfoView}>
               <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                <Image source={item.image} style={{ width: 25, height: 25 }} resizeMode='contain'  />
+                <Image source={item.image} style={{ width: 25, height: item.title=='Use a Voucher'?  30: 25 }} resizeMode='contain'  />
               </View>
               <View style={{ justifyContent: 'center', marginLeft: 10 }}>
                 <Text style={styles.addModalTitleText}>{item.title} </Text>

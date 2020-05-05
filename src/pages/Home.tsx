@@ -111,8 +111,10 @@ import NotificationListContent from '../components/NotificationListContent';
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import RelayServices from '../bitcoin/services/RelayService';
+import AddContactAddressBook from './Contacts/AddContactAddressBook';
 
 export default function Home(props) {
+  const [SelectedContact, setSelectedContact] =useState([]);
   const notificationList = useSelector((state)=>state.notifications);
   const [NotificationList, setNotificationList] = useState([]);
   const [
@@ -354,8 +356,8 @@ export default function Home(props) {
     setContactSelectedFromAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [
-    FamilyAndFriendAddressBookBottomSheet,
-    setFamilyAndFriendAddressBookBottomSheet,
+    AddContactAddressBookBookBottomSheet,
+    setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
   const [
@@ -1417,7 +1419,7 @@ const onNotificationArrives = async (notification) => {
           if (
             type == 'Fastbitcoins' ||
             type == 'Getbittr' ||
-            type == 'Add Contact'
+            type == "buyBitcoins"
           ) {
             setTimeout(() => {
               setAddSubBottomSheetsFlag(true);
@@ -1425,6 +1427,16 @@ const onNotificationArrives = async (notification) => {
               setSelectToAdd(type);
             }, 2);
             (AddBottomSheet as any).current.snapTo(1);
+          } else if (
+            type == 'addContact'
+          ) {
+            setTimeout(() => {
+              setAddSubBottomSheetsFlag(true);
+              setAddBottomSheetsFlag(true);
+              setTabBarZIndex(0);
+              setSelectToAdd(type);
+            }, 2);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }
         }}
         addData={modaldata}
@@ -2017,6 +2029,8 @@ const onNotificationArrives = async (notification) => {
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
       return renderGetBittrSaveBitcoinContents();
+    }else if (selectToAdd == 'buyBitcoins') {
+      return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'Fastbitcoins') {
       return (
         <FastBitcoinModalContents
@@ -2041,20 +2055,20 @@ const onNotificationArrives = async (notification) => {
           }}
         />
       );
-    } else if (selectToAdd == 'Add Contact') {
+    } else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
             setTimeout(() => {
               setFamilyAndFriendsBookBottomSheetsFlag(true);
             }, 2);
-            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
             setTimeout(() => {
               setFamilyAndFriendsBookBottomSheetsFlag(true);
             }, 2);
-            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
             setTimeout(() => {
@@ -2207,25 +2221,27 @@ const onNotificationArrives = async (notification) => {
     );
   };
 
-  const renderFamilyAndFriendAddressBookContents = () => {
+  const renderAddContactAddressBookContents = () => {
     return (
-      <FamilyandFriendsAddressBookModalContents
-        modalRef={FamilyAndFriendAddressBookBottomSheet}
+      <AddContactAddressBook
+        modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(1);
+        onPressContinue={() => {
+          props.navigation.navigate("SendRequest");
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
+        onSelectContact={(selectedContact)=>{ setSelectedContact(selectedContact)}}
         onPressBack={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);
-          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
-  const renderFamilyAndFriendAddressBookHeader = () => {
+  const renderAddContactAddressBookHeader = () => {
     return (
       <SmallHeaderModal
         borderColor={Colors.white}
@@ -2234,7 +2250,7 @@ const onNotificationArrives = async (notification) => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);
-          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -3357,28 +3373,25 @@ const onNotificationArrives = async (notification) => {
         renderContent={renderGetBittrRecurringBuyContents}
         renderHeader={renderGetBittrRecurringBuyHeader}
       />
-      {addSubBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {
             setTabBarZIndex(0);
             setFamilyAndFriendsBookBottomSheetsFlag(true);
           }}
+          onOpenStart={()=>{setTabBarZIndex(0);}}
           onCloseStart={() => {
             setTabBarZIndex(999);
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }}
           enabledInnerScrolling={true}
-          ref={FamilyAndFriendAddressBookBottomSheet as any}
+          ref={AddContactAddressBookBookBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
           ]}
-          renderContent={renderFamilyAndFriendAddressBookContents}
-          renderHeader={renderFamilyAndFriendAddressBookHeader}
+          renderContent={renderAddContactAddressBookContents}
+          renderHeader={renderAddContactAddressBookHeader}
         />
-      ) : null}
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {}}

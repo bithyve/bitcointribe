@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     Image,
@@ -65,12 +65,6 @@ const styles = StyleSheet.create({
     modalContainer: {
         height: '100%',
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        borderLeftWidth: 1,
-        borderRightWidth: 1,
-        borderTopWidth: 1,
-        borderColor: Colors.borderColor,
         alignSelf: 'center',
         width: '100%'
     },
@@ -123,11 +117,4 @@ const styles = StyleSheet.create({
         fontSize: RFValue(12),
         marginTop: hp('0.5%')
     },
-    infoView: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginLeft: 10
-    }
-
 })
