@@ -136,6 +136,7 @@ export default class TrustedContacts {
   public updateEphemeralChannel = async (
     contactName: string,
     dataPacket: any,
+    fetch?: Boolean,
   ): Promise<{
     updated: Boolean;
     data: any;
@@ -154,6 +155,7 @@ export default class TrustedContacts {
         HEXA_ID,
         ephemeralAddress,
         data: encryptedDataPacket,
+        fetch,
       });
 
       const { updated, data } = res.data;

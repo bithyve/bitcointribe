@@ -90,6 +90,7 @@ export default class TrustedContactsService {
   public updateEphemeralChannel = async (
     contactName: string,
     dataPacket: any,
+    fetch?: Boolean,
   ): Promise<
     | {
         status: number;
@@ -113,6 +114,7 @@ export default class TrustedContactsService {
         data: await this.tc.updateEphemeralChannel(
           contactName.toLowerCase(),
           dataPacket,
+          fetch,
         ),
       };
     } catch (err) {
