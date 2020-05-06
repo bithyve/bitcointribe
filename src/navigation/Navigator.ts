@@ -76,6 +76,7 @@ import UpdateApp from '../pages/UpdateApp';
 import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from "../pages/Contacts/SendRequest";
+import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -193,6 +194,7 @@ const HomeNavigator = createStackNavigator(
     SettingWalletNameChange,
     SettingNewWalletName,
     SendRequest,
+    VoucherScanner,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

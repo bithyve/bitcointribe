@@ -2066,6 +2066,8 @@ const onNotificationArrives = async (notification) => {
   const onPressSaveBitcoinElements = (type) => {
     if (type == 'recurringBuy') {
       (GetBittrRecurringBuy as any).current.snapTo(1);
+    } else if (type == 'voucher') {
+      props.navigation.navigate("VoucherScanner");
     } else if (type == 'existingSavingMethods') {
       props.navigation.navigate('ExistingSavingMethods');
     }
