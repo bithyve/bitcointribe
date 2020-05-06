@@ -123,4 +123,36 @@ export default class TrustedContactsService {
       };
     }
   };
+
+  public fetchEphemeralChannel = async (
+    contactName: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.fetchEphemeralChannel(contactName.toLowerCase()),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update ephemeral channel',
+      };
+    }
+  };
 }

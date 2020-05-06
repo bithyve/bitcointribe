@@ -135,4 +135,33 @@ export default class TrustedContacts {
       throw new Error(err.message);
     }
   };
+
+  public fetchEphemeralChannel = async (
+    contactName: string,
+  ): Promise<{
+    data: any;
+  }> => {
+    try {
+      if (!this.trustedContacts[contactName]) {
+        throw new Error(
+          `No trusted contact exist with contact name: ${contactName}`,
+        );
+      }
+
+      const { ephemeralAddress } = this.trustedContacts[contactName];
+
+      const res = await BH_AXIOS.post('fetchEphemeralChannel', {
+        HEXA_ID,
+        ephemeralAddress,
+      });
+
+      const { data } = res.data;
+
+      return { data };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
+  };
 }
