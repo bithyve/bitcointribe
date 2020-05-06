@@ -12,10 +12,41 @@ const BH_AXIOS: AxiosInstance = axios.create({
 });
 
 export default class TrustedContacts {
+  public static cipherSpec: {
+    algorithm: string;
+    salt: string;
+    iv: Buffer;
+    keyLength: number;
+  } = config.CIPHER_SPEC;
   public trustedContacts: Contacts = {};
   constructor(stateVars) {
     this.initializeStateVars(stateVars);
   }
+
+  public encryptDataPacket = (key: string, dataPacket: any) => {
+    const cipher = crypto.createCipheriv(
+      TrustedContacts.cipherSpec.algorithm,
+      key,
+      TrustedContacts.cipherSpec.iv,
+    );
+
+    let encrypted = cipher.update(JSON.stringify(dataPacket), 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return { encryptedDataPacket: encrypted };
+  };
+
+  public decryptDataPacket = (key: string, encryptedDataPacket: string) => {
+    const decipher = crypto.createDecipheriv(
+      TrustedContacts.cipherSpec.algorithm,
+      key,
+      TrustedContacts.cipherSpec.iv,
+    );
+    let decrypted = decipher.update(encryptedDataPacket, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    const dataPacket = JSON.parse(decrypted);
+    return { dataPacket };
+  };
 
   public initializeStateVars = (stateVars) => {
     this.trustedContacts =
@@ -184,8 +215,13 @@ export default class TrustedContacts {
         );
       }
 
-      const { channelAddress } = this.trustedContacts[contactName];
-      const encryptedDataPacket = dataPacket;
+      const { channelAddress, symmetricKey } = this.trustedContacts[
+        contactName
+      ];
+      const encryptedDataPacket = this.encryptDataPacket(
+        symmetricKey,
+        dataPacket,
+      );
 
       const res = await BH_AXIOS.post('updateTrustedChannel', {
         HEXA_ID,
@@ -193,9 +229,12 @@ export default class TrustedContacts {
         data: encryptedDataPacket,
       });
 
-      const { updated, data } = res.data;
+      let { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
 
+      if (data) {
+        data = this.decryptDataPacket(symmetricKey, data);
+      }
       return { updated, data };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
@@ -222,7 +261,9 @@ export default class TrustedContacts {
         );
       }
 
-      const { channelAddress } = this.trustedContacts[contactName];
+      const { channelAddress, symmetricKey } = this.trustedContacts[
+        contactName
+      ];
 
       const res = await BH_AXIOS.post('fetchTrustedChannel', {
         HEXA_ID,
@@ -231,7 +272,9 @@ export default class TrustedContacts {
 
       const { data } = res.data;
 
-      return { data };
+      return {
+        data: this.decryptDataPacket(symmetricKey, data),
+      };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
