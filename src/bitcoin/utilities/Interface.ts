@@ -88,6 +88,7 @@ export interface Contacts {
   [contactName: string]: {
     privateKey: string;
     symmetricKey?: string;
+    ephemeralAddress?: string;
     channelAddress?: string;
     contactsPubKey?: string;
   };

@@ -1,7 +1,15 @@
 import { Contacts } from './Interface';
+import crypto from 'crypto';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import config from '../Config';
 import { ec as EC } from 'elliptic';
 var ec = new EC('curve25519');
-import crypto from 'crypto';
+
+const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
+const BH_AXIOS: AxiosInstance = axios.create({
+  baseURL: RELAY,
+  timeout: REQUEST_TIMEOUT,
+});
 
 export default class TrustedContacts {
   public trustedContacts: Contacts = {};
@@ -19,7 +27,9 @@ export default class TrustedContacts {
     return keyPair.getPublic();
   };
 
-  public initializeContact = (contactName: string): { publicKey: string } => {
+  public initializeContact = (
+    contactName: string,
+  ): { publicKey: string; ephemeralAddress: string } => {
     if (this.trustedContacts[contactName]) {
       throw new Error(
         'TC Init failed: initialization already exists against the supplied',
@@ -29,11 +39,18 @@ export default class TrustedContacts {
     const keyPair = ec.genKeyPair();
     const publicKey = keyPair.getPublic('hex');
     const privateKey = keyPair.getPrivate('hex');
+
+    const ephemeralAddress = crypto
+      .createHash('sha256')
+      .update(publicKey)
+      .digest('hex');
+
     this.trustedContacts[contactName] = {
       privateKey,
+      ephemeralAddress,
     };
 
-    return { publicKey };
+    return { publicKey, ephemeralAddress };
   };
 
   public finalizeContact = (
@@ -73,6 +90,7 @@ export default class TrustedContacts {
     this.trustedContacts[contactName] = {
       ...this.trustedContacts[contactName],
       symmetricKey,
+      ephemeralAddress,
       channelAddress,
       contactsPubKey: encodedPublicKey,
     };
@@ -82,5 +100,39 @@ export default class TrustedContacts {
       ephemeralAddress,
       publicKey: keyPair.getPublic('hex'),
     };
+  };
+
+  public updateEphemeralChannel = async (
+    contactName: string,
+    dataPacket: any,
+  ): Promise<{
+    updated: Boolean;
+    data: any;
+  }> => {
+    try {
+      if (!this.trustedContacts[contactName]) {
+        throw new Error(
+          `No trusted contact exist with contact name: ${contactName}`,
+        );
+      }
+
+      const { ephemeralAddress } = this.trustedContacts[contactName];
+      const encryptedDataPacket = dataPacket;
+
+      const res = await BH_AXIOS.post('updateEphemeralChannel', {
+        HEXA_ID,
+        ephemeralAddress,
+        data: encryptedDataPacket,
+      });
+
+      const { updated, data } = res.data;
+      if (!updated) throw new Error('Failed to update ephemeral space');
+
+      return { updated, data };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
   };
 }

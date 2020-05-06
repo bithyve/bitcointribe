@@ -39,7 +39,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.initializeContact(contactName),
+        data: this.tc.initializeContact(contactName.toLowerCase()),
       };
     } catch (err) {
       return {
@@ -73,13 +73,53 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.finalizeContact(contactName, encodedPublicKey),
+        data: this.tc.finalizeContact(
+          contactName.toLowerCase(),
+          encodedPublicKey,
+        ),
       };
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to finalize trusted contact',
+      };
+    }
+  };
+
+  public updateEphemeralChannel = async (
+    contactName: string,
+    dataPacket: any,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.updateEphemeralChannel(
+          contactName.toLowerCase(),
+          dataPacket,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update ephemeral channel',
       };
     }
   };
