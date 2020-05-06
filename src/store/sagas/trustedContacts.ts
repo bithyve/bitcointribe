@@ -7,6 +7,10 @@ import {
   UPDATE_EPHEMERAL_CHANNEL,
   ephemeralChannelFetched,
   ephemeralChannelUpdated,
+  UPDATE_TRUSTED_CHANNEL,
+  FETCH_TRUSTED_CHANNEL,
+  trustedChannelUpdated,
+  trustedChannelFetched,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -115,4 +119,51 @@ function* fetchEphemeralChannelWorker({ payload }) {
 export const fetchEphemeralChannelWatcher = createWatcher(
   fetchEphemeralChannelWorker,
   UPDATE_EPHEMERAL_CHANNEL,
+);
+
+function* updateTrustedChannelWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const { contactName, data, fetch } = payload;
+
+  const res = yield call(
+    trustedContacts.updateTrustedChannel,
+    contactName,
+    data,
+    fetch,
+  );
+  if (res.status === 200) {
+    const { updated, data } = res.data;
+    yield put(trustedChannelUpdated(contactName, updated, data));
+  } else {
+    console.log(res.err);
+  }
+}
+
+export const updateTrustedChannelWatcher = createWatcher(
+  updateTrustedChannelWorker,
+  UPDATE_TRUSTED_CHANNEL,
+);
+
+function* fetchTrustedChannelWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const { contactName } = payload;
+
+  const res = yield call(trustedContacts.fetchEphemeralChannel, contactName);
+  if (res.status === 200) {
+    const { data } = res.data;
+    yield put(trustedChannelFetched(contactName, data));
+  } else {
+    console.log(res.err);
+  }
+}
+
+export const fetchTrustedChannelWatcher = createWatcher(
+  fetchTrustedChannelWorker,
+  FETCH_TRUSTED_CHANNEL,
 );

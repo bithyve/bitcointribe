@@ -6,6 +6,8 @@ import {
   TRUSTED_CONTACT_APPROVED,
   EPHEMERAL_CHANNEL_FETCHED,
   EPHEMERAL_CHANNEL_UPDATED,
+  TRUSTED_CHANNEL_UPDATED,
+  TRUSTED_CHANNEL_FETCHED,
 } from '../actions/trustedContacts';
 
 const initialState: {
@@ -18,12 +20,14 @@ const initialState: {
     };
   };
   ephemeralChannel: { [contactName: string]: { updated: Boolean; data?: any } };
+  trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
 } = {
   service: null,
   serviceEnriched: false,
   initializedTrustedContacts: null,
   approvedTrustedContacts: null,
   ephemeralChannel: null,
+  trustedChannel: null,
 };
 
 export default (state = initialState, action) => {
@@ -74,6 +78,31 @@ export default (state = initialState, action) => {
         ...state,
         ephemeralChannel: {
           ...state.ephemeralChannel,
+          [action.payload.contactName]: {
+            data: action.payload.data,
+          },
+        },
+      };
+
+    case TRUSTED_CHANNEL_UPDATED:
+      return {
+        ...state,
+        trustedChannel: {
+          ...state.trustedChannel,
+          [action.payload.contactName]: {
+            updated: action.payload.updated,
+            data: action.payload.data
+              ? action.payload.data
+              : state.trustedChannel[action.payload.contactName].data,
+          },
+        },
+      };
+
+    case TRUSTED_CHANNEL_FETCHED:
+      return {
+        ...state,
+        trustedChannel: {
+          ...state.trustedChannel,
           [action.payload.contactName]: {
             data: action.payload.data,
           },

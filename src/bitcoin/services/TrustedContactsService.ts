@@ -161,6 +161,7 @@ export default class TrustedContactsService {
   public updateTrustedChannel = async (
     contactName: string,
     dataPacket: any,
+    fetch?: Boolean,
   ): Promise<
     | {
         status: number;
@@ -184,6 +185,7 @@ export default class TrustedContactsService {
         data: await this.tc.updateTrustedChannel(
           contactName.toLowerCase(),
           dataPacket,
+          fetch,
         ),
       };
     } catch (err) {

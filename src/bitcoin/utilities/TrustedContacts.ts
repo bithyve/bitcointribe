@@ -200,6 +200,7 @@ export default class TrustedContacts {
   public updateTrustedChannel = async (
     contactName: string,
     dataPacket: any,
+    fetch?: Boolean,
   ): Promise<{
     updated: Boolean;
     data: any;
@@ -229,6 +230,7 @@ export default class TrustedContacts {
         HEXA_ID,
         channelAddress,
         data: encryptedDataPacket,
+        fetch,
       });
 
       let { updated, data } = res.data;
