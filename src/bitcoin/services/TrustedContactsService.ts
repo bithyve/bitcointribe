@@ -151,7 +151,76 @@ export default class TrustedContactsService {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to update ephemeral channel',
+        message: 'Failed to fetch from ephemeral channel',
+      };
+    }
+  };
+
+  public updateTrustedChannel = async (
+    contactName: string,
+    dataPacket: any,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.updateTrustedChannel(
+          contactName.toLowerCase(),
+          dataPacket,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update trusted channel',
+      };
+    }
+  };
+
+  public fetchTrustedChannel = async (
+    contactName: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.fetchTrustedChannel(contactName.toLowerCase()),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch from trusted channel',
       };
     }
   };

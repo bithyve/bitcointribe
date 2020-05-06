@@ -156,6 +156,80 @@ export default class TrustedContacts {
       });
 
       const { data } = res.data;
+      return { data };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
+  };
+
+  public updateTrustedChannel = async (
+    contactName: string,
+    dataPacket: any,
+  ): Promise<{
+    updated: Boolean;
+    data: any;
+  }> => {
+    try {
+      if (!this.trustedContacts[contactName]) {
+        throw new Error(
+          `No trusted contact exist with contact name: ${contactName}`,
+        );
+      }
+
+      if (!this.trustedContacts[contactName].channelAddress) {
+        throw new Error(
+          `Trusted channel not formed with the following contact: ${contactName}`,
+        );
+      }
+
+      const { channelAddress } = this.trustedContacts[contactName];
+      const encryptedDataPacket = dataPacket;
+
+      const res = await BH_AXIOS.post('updateTrustedChannel', {
+        HEXA_ID,
+        channelAddress,
+        data: encryptedDataPacket,
+      });
+
+      const { updated, data } = res.data;
+      if (!updated) throw new Error('Failed to update ephemeral space');
+
+      return { updated, data };
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+      throw new Error(err.message);
+    }
+  };
+
+  public fetchTrustedChannel = async (
+    contactName: string,
+  ): Promise<{
+    data: any;
+  }> => {
+    try {
+      if (!this.trustedContacts[contactName]) {
+        throw new Error(
+          `No trusted contact exist with contact name: ${contactName}`,
+        );
+      }
+
+      if (!this.trustedContacts[contactName].channelAddress) {
+        throw new Error(
+          `Trusted channel not formed with the following contact: ${contactName}`,
+        );
+      }
+
+      const { channelAddress } = this.trustedContacts[contactName];
+
+      const res = await BH_AXIOS.post('fetchTrustedChannel', {
+        HEXA_ID,
+        channelAddress,
+      });
+
+      const { data } = res.data;
 
       return { data };
     } catch (err) {
