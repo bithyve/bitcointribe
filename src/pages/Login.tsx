@@ -7,9 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
-  Alert,
   Platform,
-  Linking,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -383,14 +381,14 @@ export default function Login(props) {
                     {passcode.length >= 1 ? (
                       <Text
                         style={{
-                          fontSize: RFValue(10, 812),
+                          fontSize: RFValue(10),
                           textAlignVertical: 'center',
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}
                       >
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -417,9 +415,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 2 ? (
-                      <Text style={{ fontSize: RFValue(10, 812) }}>
+                      <Text style={{ fontSize: RFValue(10) }}>
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -446,9 +444,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 3 ? (
-                      <Text style={{ fontSize: RFValue(10, 812) }}>
+                      <Text style={{ fontSize: RFValue(10) }}>
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -475,9 +473,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 4 ? (
-                      <Text style={{ fontSize: RFValue(10, 812) }}>
+                      <Text style={{ fontSize: RFValue(10) }}>
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -695,29 +693,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   textBoxActive: {
-    borderWidth: 0.5,
     height: wp('13%'),
     width: wp('13%'),
     borderRadius: 7,
     marginLeft: 20,
     elevation: 10,
     shadowColor: Colors.borderColor,
-    shadowOpacity: 0.35,
+    shadowOpacity: 1,
     shadowOffset: { width: 0, height: 3 },
-    borderColor: Colors.borderColor,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: 'center',
     lineHeight: 18,
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -728,13 +724,13 @@ const styles = StyleSheet.create({
   keyPadElementTouchable: {
     flex: 1,
     height: hp('8%'),
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     justifyContent: 'center',
     alignItems: 'center',
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
   },

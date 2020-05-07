@@ -33,7 +33,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import SmallHeaderModal from '../components/SmallHeaderModal';
 import {
   getTestcoins,
   calculateExchangeRate,
@@ -44,13 +43,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../common/constants/serviceTypes';
-import axios from 'axios';
-import {
-  checkMSharesHealth,
-  updateMSharesHealth,
-  downloadMShare,
-  initHealthCheck,
-} from '../store/actions/sss';
+
 import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
@@ -71,9 +64,10 @@ export default function NewWalletQuestion(props) {
   const [answer, setAnswer] = useState('');
   const [answerMasked, setAnswerMasked] = useState('');
   const [confirmAnswerMasked, setConfirmAnswerMasked] = useState('');
+  const [showIconAnswer, setShowIconAnswer] = useState(false);
+  const [showIconConfirmAnswer, setShowIconConfirmAnswer] = useState(false);
   const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
   const [hideShowAnswer, setHdeShowAnswer] = useState(true);
-  let [counter, setCounter] = useState(0);
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam('walletName');
   const [ansError, setAnsError] = useState('');
@@ -253,6 +247,7 @@ export default function NewWalletQuestion(props) {
         setAnsError('');
         setConfirmAnswer('');
         setConfirmAnswerMasked('');
+        setShowIconConfirmAnswer(false);
       }, 70);
     }
   };
@@ -379,7 +374,7 @@ export default function NewWalletQuestion(props) {
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'secret question and answer'}
-                infoTextNormal1={'(this is a very important step)'}
+                infoTextNormal1={'\n(this is a very important step)'}
               />
 
               <TouchableOpacity
@@ -486,6 +481,7 @@ export default function NewWalletQuestion(props) {
                         text = text.replace(/[^a-z]/g, '');
                         setAnswer(text);
                         setAnswerMasked(text);
+                        setShowIconAnswer(true);
                       }}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
@@ -493,6 +489,7 @@ export default function NewWalletQuestion(props) {
                         if (answer.length > 0) {
                           setAnswer('');
                           setAnswerMasked('');
+                          setShowIconAnswer(false);
                         }
                       }}
                       onBlur={() => {
@@ -521,10 +518,12 @@ export default function NewWalletQuestion(props) {
                           setTimeout(() => {
                             setAnswer('');
                             setAnswerMasked('');
+                            setShowIconAnswer(false);
                           }, 70);
                         }
                       }}
                     />
+                    {showIconAnswer ? 
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setHdeShowAnswer(!hideShowAnswer);
@@ -536,7 +535,7 @@ export default function NewWalletQuestion(props) {
                         color={Colors.blue}
                         name={hideShowAnswer ? 'eye-off' : 'eye'}
                       />
-                    </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback> : null}
                   </View>
                   <View
                     style={{
@@ -575,6 +574,7 @@ export default function NewWalletQuestion(props) {
                         text = text.replace(/[^a-z]/g, '');
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
+                        setShowIconConfirmAnswer(true);
                       }}
                       onSubmitEditing={event => setConfirm()}
                       onFocus={() => {
@@ -585,6 +585,7 @@ export default function NewWalletQuestion(props) {
                           setAnsError('');
                           setConfirmAnswer('');
                           setConfirmAnswerMasked('');
+                          setShowIconConfirmAnswer(false);
                         }
                       }}
                       onBlur={() => {
@@ -599,6 +600,7 @@ export default function NewWalletQuestion(props) {
                         setConfirm();
                       }}
                     />
+                    {showIconConfirmAnswer ? 
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setHideShowConfirmAnswer(!hideShowConfirmAnswer);
@@ -611,7 +613,7 @@ export default function NewWalletQuestion(props) {
                         color={Colors.blue}
                         name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
                       />
-                    </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback> : null }
                   </View>
                 </View>
               ) : (
@@ -645,8 +647,8 @@ export default function NewWalletQuestion(props) {
             ? setButtonVisible()
             : null}
           <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorActiveView} />
-            <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
           </View>
         </View>
         {!visibleButton ? (
