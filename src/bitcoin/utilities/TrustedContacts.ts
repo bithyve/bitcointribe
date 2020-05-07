@@ -175,7 +175,7 @@ export default class TrustedContacts {
 
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,
-        ephemeralAddress: ephemeralChannel.address,
+        address: ephemeralChannel.address,
         data: dataPacket,
         identifier: publicKey,
         fetch,
@@ -214,7 +214,7 @@ export default class TrustedContacts {
 
       const res = await BH_AXIOS.post('fetchEphemeralChannel', {
         HEXA_ID,
-        ephemeralAddress: ephemeralChannel.address,
+        address: ephemeralChannel.address,
         identifier: publicKey,
       });
 
@@ -271,7 +271,7 @@ export default class TrustedContacts {
 
       const res = await BH_AXIOS.post('updateTrustedChannel', {
         HEXA_ID,
-        channelAddress: trustedChannel.address,
+        address: trustedChannel.address,
         data: dataPacket,
         identifier: publicKey,
         fetch,
@@ -322,7 +322,7 @@ export default class TrustedContacts {
 
       const res = await BH_AXIOS.post('fetchTrustedChannel', {
         HEXA_ID,
-        channelAddress: trustedChannel.address,
+        address: trustedChannel.address,
         identifier: publicKey,
       });
 

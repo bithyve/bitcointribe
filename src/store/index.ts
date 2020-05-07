@@ -91,6 +91,10 @@ import {
 import {
   initializedTrustedContactWatcher,
   approveTrustedContactWatcher,
+  fetchTrustedChannelWatcher,
+  fetchEphemeralChannelWatcher,
+  updateEphemeralChannelWatcher,
+  updateTrustedChannelWatcher,
 } from './sagas/trustedContacts';
 
 // const rootSaga = function*() {
@@ -188,6 +192,10 @@ const rootSaga = function* () {
     // Trusted Contacts
     initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
+    updateEphemeralChannelWatcher,
+    fetchEphemeralChannelWatcher,
+    updateTrustedChannelWatcher,
+    fetchTrustedChannelWatcher,
   ];
 
   yield all(

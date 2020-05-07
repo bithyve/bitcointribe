@@ -1,5 +1,10 @@
 // types and action creators: dispatched by components and sagas
 
+import {
+  EphemeralDataElements,
+  TrustedDataElements,
+} from '../../bitcoin/utilities/Interface';
+
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
@@ -26,37 +31,37 @@ export const approveTrustedContact = (
 
 export const updateEphemeralChannel = (
   contactName: string,
-  data: any,
+  data: EphemeralDataElements,
   fetch?: Boolean,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payloaod: { contactName, data, fetch },
+    payload: { contactName, data, fetch },
   };
 };
 
 export const fetchEphemeralChannel = (contactName: string) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payloaod: { contactName },
+    payload: { contactName },
   };
 };
 
 export const updateTrustedChannel = (
   contactName: string,
-  data: any,
+  data: TrustedDataElements,
   fetch?: Boolean,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payloaod: { contactName, data, fetch },
+    payload: { contactName, data, fetch },
   };
 };
 
 export const fetchTrustedChannel = (contactName: string) => {
   return {
     type: FETCH_TRUSTED_CHANNEL,
-    payloaod: { contactName },
+    payload: { contactName },
   };
 };
 
@@ -95,14 +100,14 @@ export const ephemeralChannelUpdated = (
 ) => {
   return {
     type: EPHEMERAL_CHANNEL_UPDATED,
-    payloaod: { contactName, updated, data },
+    payload: { contactName, updated, data },
   };
 };
 
 export const ephemeralChannelFetched = (contactName: string, data: any) => {
   return {
     type: EPHEMERAL_CHANNEL_FETCHED,
-    payloaod: { contactName, data },
+    payload: { contactName, data },
   };
 };
 
@@ -113,13 +118,13 @@ export const trustedChannelUpdated = (
 ) => {
   return {
     type: TRUSTED_CHANNEL_UPDATED,
-    payloaod: { contactName, updated, data },
+    payload: { contactName, updated, data },
   };
 };
 
 export const trustedChannelFetched = (contactName: string, data: any) => {
   return {
     type: TRUSTED_CHANNEL_FETCHED,
-    payloaod: { contactName, data },
+    payload: { contactName, data },
   };
 };

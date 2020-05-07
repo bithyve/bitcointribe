@@ -66,9 +66,7 @@ export default (state = initialState, action) => {
           ...state.ephemeralChannel,
           [action.payload.contactName]: {
             updated: action.payload.updated,
-            data: action.payload.data
-              ? action.payload.data
-              : state.ephemeralChannel[action.payload.contactName].data,
+            data: action.payload.data,
           },
         },
       };
@@ -91,9 +89,7 @@ export default (state = initialState, action) => {
           ...state.trustedChannel,
           [action.payload.contactName]: {
             updated: action.payload.updated,
-            data: action.payload.data
-              ? action.payload.data
-              : state.trustedChannel[action.payload.contactName].data,
+            data: action.payload.data,
           },
         },
       };
