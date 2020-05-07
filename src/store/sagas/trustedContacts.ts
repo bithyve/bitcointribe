@@ -120,6 +120,12 @@ function* fetchEphemeralChannelWorker({ payload }) {
   if (res.status === 200) {
     const { data } = res.data;
     yield put(ephemeralChannelFetched(contactName, data));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log(res.err);
   }
@@ -146,6 +152,12 @@ function* updateTrustedChannelWorker({ payload }) {
   if (res.status === 200) {
     const { updated, data } = res.data;
     yield put(trustedChannelUpdated(contactName, updated, data));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log(res.err);
   }
@@ -167,6 +179,12 @@ function* fetchTrustedChannelWorker({ payload }) {
   if (res.status === 200) {
     const { data } = res.data;
     yield put(trustedChannelFetched(contactName, data));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } else {
     console.log(res.err);
   }

@@ -114,7 +114,7 @@ export interface Contacts {
     contactsPubKey?: string;
     ephemeralChannel?: {
       address: string;
-      data?: EphemeralDataPacket;
+      data?: EphemeralDataElements;
     };
     trustedChannel?: {
       address: string;
