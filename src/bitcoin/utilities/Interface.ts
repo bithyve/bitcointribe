@@ -84,12 +84,41 @@ export interface INotification {
   date?: Date;
 } // corresponds to the notification schema
 
+// TRUSTED CONTACTS
+export interface EphemeralDataElements {
+  publicKey?: string;
+  walletID?: string;
+  FCM?: string;
+  metaShare?: MetaShare;
+}
+
+export interface EphemeralDataPacket {
+  [publicKey: string]: EphemeralDataElements; // pubKeys serves as the identifier as it can be public
+}
+
+export interface TrustedDataElements {}
+
+export interface TrustedDataPacket {
+  [publicKey: string]: TrustedDataElements;
+}
+
+export interface EncryptedTrustedDataPacket {
+  [publicKey: string]: string; // encrypted TrustedDataElements
+}
+
 export interface Contacts {
   [contactName: string]: {
     privateKey: string;
+    publicKey: string;
     symmetricKey?: string;
-    ephemeralAddress?: string;
-    channelAddress?: string;
     contactsPubKey?: string;
+    ephemeralChannel?: {
+      address: string;
+      data?: EphemeralDataPacket;
+    };
+    trustedChannel?: {
+      address: string;
+      data?: TrustedDataPacket;
+    };
   };
 }

@@ -1,4 +1,10 @@
-import { Contacts } from './Interface';
+import {
+  Contacts,
+  EphemeralDataPacket,
+  EphemeralDataElements,
+  TrustedDataElements,
+  TrustedDataPacket,
+} from './Interface';
 import crypto from 'crypto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import config from '../Config';
@@ -29,7 +35,7 @@ export default class TrustedContacts {
       key,
       TrustedContacts.cipherSpec.iv,
     );
-
+    dataPacket.validator = config.HEXA_ID;
     let encrypted = cipher.update(JSON.stringify(dataPacket), 'utf8', 'hex');
     encrypted += cipher.final('hex');
     return { encryptedDataPacket: encrypted };
@@ -45,6 +51,11 @@ export default class TrustedContacts {
     decrypted += decipher.final('utf8');
 
     const dataPacket = JSON.parse(decrypted);
+    if (dataPacket.validator !== config.HEXA_ID) {
+      throw new Error(
+        'Decryption failed, invalid validator for the following data packet',
+      );
+    }
     return { dataPacket };
   };
 
@@ -78,7 +89,8 @@ export default class TrustedContacts {
 
     this.trustedContacts[contactName] = {
       privateKey,
-      ephemeralAddress,
+      publicKey,
+      ephemeralChannel: { address: ephemeralAddress },
     };
 
     return { publicKey, ephemeralAddress };
@@ -96,7 +108,10 @@ export default class TrustedContacts {
       this.initializeContact(contactName); // case: trusted contact setup has been requested
     }
 
-    if (this.trustedContacts[contactName].channelAddress) {
+    if (
+      this.trustedContacts[contactName].trustedChannel &&
+      this.trustedContacts[contactName].trustedChannel.address
+    ) {
       throw new Error(
         'TC finalize failed: channel already exists with this contact',
       );
@@ -121,8 +136,12 @@ export default class TrustedContacts {
     this.trustedContacts[contactName] = {
       ...this.trustedContacts[contactName],
       symmetricKey,
-      ephemeralAddress,
-      channelAddress,
+      ephemeralChannel: {
+        address: ephemeralAddress,
+      },
+      trustedChannel: {
+        address: channelAddress,
+      },
       contactsPubKey: encodedPublicKey,
     };
     console.log({ contactName: this.trustedContacts[contactName] });
@@ -135,33 +154,43 @@ export default class TrustedContacts {
 
   public updateEphemeralChannel = async (
     contactName: string,
-    dataPacket: any,
+    dataElements: EphemeralDataElements,
     fetch?: Boolean,
   ): Promise<{
     updated: Boolean;
+    publicKey: string;
     data: any;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
-        throw new Error(
-          `No trusted contact exist with contact name: ${contactName}`,
-        );
+        this.initializeContact(contactName);
       }
 
-      const { ephemeralAddress } = this.trustedContacts[contactName];
-      const encryptedDataPacket = dataPacket;
+      const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
+      const dataPacket: EphemeralDataPacket = {
+        [publicKey]: {
+          ...dataElements,
+        },
+      };
 
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,
-        ephemeralAddress,
-        data: encryptedDataPacket,
+        ephemeralAddress: ephemeralChannel.address,
+        data: dataPacket,
+        identifier: publicKey,
         fetch,
       });
 
       const { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
+      if (data) {
+        ephemeralChannel.data = {
+          ...ephemeralChannel.data,
+          ...data,
+        };
+      }
 
-      return { updated, data };
+      return { updated, publicKey, data };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -181,14 +210,22 @@ export default class TrustedContacts {
         );
       }
 
-      const { ephemeralAddress } = this.trustedContacts[contactName];
+      const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
 
       const res = await BH_AXIOS.post('fetchEphemeralChannel', {
         HEXA_ID,
-        ephemeralAddress,
+        ephemeralAddress: ephemeralChannel.address,
+        identifier: publicKey,
       });
 
       const { data } = res.data;
+      if (data) {
+        ephemeralChannel.data = {
+          ...ephemeralChannel.data,
+          ...data,
+        };
+      }
+
       return { data };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
@@ -199,7 +236,7 @@ export default class TrustedContacts {
 
   public updateTrustedChannel = async (
     contactName: string,
-    dataPacket: any,
+    dataElements: TrustedDataElements,
     fetch?: Boolean,
   ): Promise<{
     updated: Boolean;
@@ -212,24 +249,31 @@ export default class TrustedContacts {
         );
       }
 
-      if (!this.trustedContacts[contactName].channelAddress) {
+      if (
+        !this.trustedContacts[contactName].trustedChannel &&
+        !this.trustedContacts[contactName].trustedChannel.address
+      ) {
         throw new Error(
           `Trusted channel not formed with the following contact: ${contactName}`,
         );
       }
 
-      const { channelAddress, symmetricKey } = this.trustedContacts[
+      const { trustedChannel, symmetricKey, publicKey } = this.trustedContacts[
         contactName
       ];
-      const encryptedDataPacket = this.encryptDataPacket(
-        symmetricKey,
-        dataPacket,
-      );
+
+      const { encryptedDataPacket } = this.encryptDataPacket(symmetricKey, {
+        ...dataElements,
+      });
+      const dataPacket: TrustedDataPacket = {
+        [publicKey]: encryptedDataPacket,
+      };
 
       const res = await BH_AXIOS.post('updateTrustedChannel', {
         HEXA_ID,
-        channelAddress,
-        data: encryptedDataPacket,
+        channelAddress: trustedChannel.address,
+        data: dataPacket,
+        identifier: publicKey,
         fetch,
       });
 
@@ -238,6 +282,10 @@ export default class TrustedContacts {
 
       if (data) {
         data = this.decryptDataPacket(symmetricKey, data);
+        trustedChannel.data = {
+          ...trustedChannel.data,
+          ...data,
+        };
       }
       return { updated, data };
     } catch (err) {
@@ -259,25 +307,36 @@ export default class TrustedContacts {
         );
       }
 
-      if (!this.trustedContacts[contactName].channelAddress) {
+      if (
+        !this.trustedContacts[contactName].trustedChannel &&
+        !this.trustedContacts[contactName].trustedChannel.address
+      ) {
         throw new Error(
           `Trusted channel not formed with the following contact: ${contactName}`,
         );
       }
 
-      const { channelAddress, symmetricKey } = this.trustedContacts[
+      const { trustedChannel, symmetricKey, publicKey } = this.trustedContacts[
         contactName
       ];
 
       const res = await BH_AXIOS.post('fetchTrustedChannel', {
         HEXA_ID,
-        channelAddress,
+        channelAddress: trustedChannel.address,
+        identifier: publicKey,
       });
 
-      const { data } = res.data;
+      let { data } = res.data;
+      if (data) {
+        data = this.decryptDataPacket(symmetricKey, data);
+        trustedChannel.data = {
+          ...trustedChannel.data,
+          ...data,
+        };
+      }
 
       return {
-        data: this.decryptDataPacket(symmetricKey, data),
+        data,
       };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);

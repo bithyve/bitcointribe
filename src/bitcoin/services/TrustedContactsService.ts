@@ -96,6 +96,7 @@ export default class TrustedContactsService {
         status: number;
         data: {
           updated: Boolean;
+          publicKey: String;
           data: any;
         };
         err?: undefined;
