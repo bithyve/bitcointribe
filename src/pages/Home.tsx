@@ -119,6 +119,7 @@ import {
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
+import TrustedContactRequest from './Contacts/TrustedContactRequest';
 
 export default function Home(props) {
   
@@ -131,6 +132,7 @@ export default function Home(props) {
   //   }, 4000); // letting other db insertion happen
   // }, []);
   // console.log(trustedContacts.tc.trustedContacts['Blake']);
+  const [TrustedContactRequestBottomSheet, setTrustedContactRequestBottomSheet] = useState(React.createRef<BottomSheet>())
   
   const [SelectedContact, setSelectedContact] =useState([]);
   const notificationList = useSelector((state)=>state.notifications);
@@ -589,6 +591,13 @@ export default function Home(props) {
   }
 
   useEffect(() => {
+    if (tabBarZIndex == 999) {
+      setTimeout(() => {
+        setTabBarZIndex(0);
+        setDeepLinkModalOpen(true);
+      }, 2);
+    }
+    TrustedContactRequestBottomSheet.current.snapTo(1)
     getNotificationList();
     let notificationOnFocusListener = props.navigation.addListener(
       'didFocus',
@@ -2722,6 +2731,31 @@ const onNotificationArrives = async (notification) => {
     );
   }, [NotificationData, NotificationDataChange]);
 
+  const renderTrustedContactRequestContent = useCallback(()=>{
+    return <TrustedContactRequest 
+      trustedContactName={'Arpan Jain'}
+      onPressAccept={()=>{setTimeout(() => {
+        setTabBarZIndex(999);
+        setDeepLinkModalOpen(false);
+      }, 2);TrustedContactRequestBottomSheet.current.snapTo(0)}}
+      onPressReject={()=>{setTimeout(() => {
+        setTabBarZIndex(999);
+        setDeepLinkModalOpen(false);
+      }, 2);TrustedContactRequestBottomSheet.current.snapTo(0)}}
+    />
+  },[]);
+
+  const renderTrustedContactRequestHeader = useCallback(()=>{
+    return <ModalHeader 
+      onPressHeader={()=>{
+        setTimeout(() => {
+          setTabBarZIndex(999);
+          setDeepLinkModalOpen(false);
+        }, 2);
+        TrustedContactRequestBottomSheet.current.snapTo(0);
+      }} />
+  },[])
+
   return (
     <ImageBackground
       source={require('../assets/images/home-bg.png')}
@@ -3201,6 +3235,24 @@ const onNotificationArrives = async (notification) => {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
+      />
+      <BottomSheet
+        onCloseEnd={() => {
+          if (tabBarZIndex == 0 && !deepLinkModalOpen) {
+            setTabBarZIndex(999);
+          }
+        }}
+        onOpenEnd={() => {
+          if (tabBarZIndex == 999) {
+            setTabBarZIndex(0);
+          }
+          setDeepLinkModalOpen(true);
+        }}
+        enabledInnerScrolling={true}
+        ref={TrustedContactRequestBottomSheet as any}
+        snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),]}
+        renderContent={renderTrustedContactRequestContent}
+        renderHeader={renderTrustedContactRequestHeader}
       />
       {/* <BottomSheet
         onCloseEnd={() => {

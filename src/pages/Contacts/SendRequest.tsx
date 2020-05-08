@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,7 +22,6 @@ import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 
 const SendRequest = (props) => {
-  const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const [receivingAddress, setReceivingAddress] = useState('test');
 
   useEffect(() => {}, []);
@@ -132,13 +131,6 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
-  },
-  confirmButtonView: {
-    width: wp('40%'),
-    height: wp('13%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
   },
 });
 

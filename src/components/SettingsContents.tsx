@@ -1,22 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Image,
     Text,
     StyleSheet,
-    AsyncStorage
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
-import ContactList from "../components/ContactList";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import ToggleSwitch from './ToggleSwitch';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
-import { FlatList } from 'react-native-gesture-handler';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function SettingsContents(props) {
@@ -26,13 +21,13 @@ export default function SettingsContents(props) {
         {
             title:"Jumble Keyboard",
             info:"Lorem ipsum dolor sit amet, consectetur",
-            image:require("../assets/images/icons/existing_saving_method.png"),
+            image:require("../assets/images/icons/jumble.png"),
             type:"JumbleKeyboard"
         },
         {
             title:"Manage Pin",
             info:"Change your passcode",
-            image:require("../assets/images/icons/existing_saving_method.png"),
+            image:require("../assets/images/icons/managepin.png"),
             type:"ManagePin"
         },
         {
@@ -44,7 +39,7 @@ export default function SettingsContents(props) {
         {
             title:"Change Currency",
             info:"Choose your Currency",
-            image:require("../assets/images/icons/existing_saving_method.png"),
+            image:require("../assets/images/icons/country.png"),
             type:"ChangeCurrency"
         }
     ]);

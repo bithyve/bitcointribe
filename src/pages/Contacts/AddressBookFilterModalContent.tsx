@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	View,
 	Text,
 	StyleSheet,
-	KeyboardAvoidingView,
-	TextInput,
-	Platform,
-	AsyncStorage,
-	ImageBackground
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../../common/Colors";
@@ -15,9 +10,6 @@ import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { RNCamera } from 'react-native-camera';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import RadioButton from "../../components/RadioButton";
 
