@@ -3,11 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  KeyboardAvoidingView,
   TextInput,
   Platform,
   AsyncStorage,
-  ImageBackground,
   PermissionsAndroid
 } from 'react-native';
 import {
@@ -17,20 +15,15 @@ import {
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { RNCamera } from 'react-native-camera';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import { ScrollView, FlatList } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import RadioButton from '../../components/RadioButton';
-import ContactList from '../../components/ContactList';
 import * as ExpoContacts from 'expo-contacts';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import Contacts from 'react-native-contacts';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
-import Toast from '../../components/Toast';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
@@ -512,24 +505,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
-  infoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
-    marginTop: 5,
-  },
-  subTitleText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  subInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    marginTop: 5,
-  },
-
   buttonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
@@ -581,15 +556,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
-  },
-  contactIndexText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  contactIndexView: {
-    flex: 0.5,
-    height: '100%',
-    justifyContent: 'space-evenly',
   },
   searchBoxContainer: {
     flexDirection: 'row',

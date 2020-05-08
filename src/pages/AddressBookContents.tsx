@@ -197,7 +197,8 @@ export default function AddressBookContents(props) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor:'white',  }}>	
+    <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
@@ -315,7 +316,8 @@ export default function AddressBookContents(props) {
           </View>
         </ScrollView>
         <BottomInfoBox title={'Note'} infoText={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'} />
-        <BottomSheet
+      </View>
+      <BottomSheet
           enabledInnerScrolling={true}
           ref={FilterModalBottomSheet as any}
           snapPoints={[
@@ -325,8 +327,7 @@ export default function AddressBookContents(props) {
           renderContent={renderFilterModalContent}
           renderHeader={renderFilterModalHeader}
         />
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -335,6 +336,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
+    paddingBottom: wp('15%')
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

@@ -4,7 +4,6 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   StatusBar
 } from "react-native";
@@ -116,14 +115,14 @@ export default function PasscodeConfirm( props ) {
                     { passcode.length >= 1 ? (
                       <Text
                         style={ {
-                          fontSize: RFValue( 10, 812 ),
+                          fontSize: RFValue( 10 ),
                           textAlignVertical: "center",
                           justifyContent: "center",
                           alignItems: "center"
                         } }
                       >
                         <FontAwesome
-                          size={ 8 }
+                          size={ 10 }
                           name={ "circle" }
                           color={ Colors.black }
                         />
@@ -150,9 +149,9 @@ export default function PasscodeConfirm( props ) {
                     ] }
                   >
                     { passcode.length >= 2 ? (
-                      <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                      <Text style={ { fontSize: RFValue( 10 ) } }>
                         <FontAwesome
-                          size={ 8 }
+                          size={ 10 }
                           name={ "circle" }
                           color={ Colors.black }
                         />
@@ -179,9 +178,9 @@ export default function PasscodeConfirm( props ) {
                     ] }
                   >
                     { passcode.length >= 3 ? (
-                      <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                      <Text style={ { fontSize: RFValue( 10 ) } }>
                         <FontAwesome
-                          size={ 8 }
+                          size={ 10 }
                           name={ "circle" }
                           color={ Colors.black }
                         />
@@ -208,9 +207,9 @@ export default function PasscodeConfirm( props ) {
                     ] }
                   >
                     { passcode.length >= 4 ? (
-                      <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                      <Text style={ { fontSize: RFValue( 10 ) } }>
                         <FontAwesome
-                          size={ 8 }
+                          size={ 10 }
                           name={ "circle" }
                           color={ Colors.black }
                         />
@@ -254,9 +253,9 @@ export default function PasscodeConfirm( props ) {
                       ] }
                     >
                       { confirmPasscode.length >= 1 ? (
-                        <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                        <Text style={ { fontSize: RFValue( 10 ) } }>
                           <FontAwesome
-                            size={ 8 }
+                            size={ 10 }
                             name={ "circle" }
                             color={ Colors.black }
                           />
@@ -301,9 +300,9 @@ export default function PasscodeConfirm( props ) {
                       ] }
                     >
                       { confirmPasscode.length >= 2 ? (
-                        <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                        <Text style={ { fontSize: RFValue( 10 ) } }>
                           <FontAwesome
-                            size={ 8 }
+                            size={ 10 }
                             name={ "circle" }
                             color={ Colors.black }
                           />
@@ -347,9 +346,9 @@ export default function PasscodeConfirm( props ) {
                       ] }
                     >
                       { confirmPasscode.length >= 3 ? (
-                        <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                        <Text style={ { fontSize: RFValue( 10 ) } }>
                           <FontAwesome
-                            size={ 8 }
+                            size={ 10 }
                             name={ "circle" }
                             color={ Colors.black }
                           />
@@ -393,9 +392,9 @@ export default function PasscodeConfirm( props ) {
                       ] }
                     >
                       { confirmPasscode.length >= 4 ? (
-                        <Text style={ { fontSize: RFValue( 10, 812 ) } }>
+                        <Text style={ { fontSize: RFValue( 10 ) } }>
                           <FontAwesome
-                            size={ 8 }
+                            size={ 10 }
                             name={ "circle" }
                             color={ Colors.black }
                           />
@@ -575,19 +574,17 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white
   },
   textBoxActive: {
-    borderWidth: 0.5,
-    height: wp( "13%" ),
-    width: wp( "13%" ),
+    height: wp('13%'),
+    width: wp('13%'),
     borderRadius: 7,
     marginLeft: 20,
     elevation: 10,
     shadowColor: Colors.borderColor,
-    shadowOpacity: 0.35,
+    shadowOpacity: 1,
     shadowOffset: { width: 0, height: 3 },
-    borderColor: Colors.borderColor,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Colors.white
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
   },
   textStyles: {
     color: Colors.black,
