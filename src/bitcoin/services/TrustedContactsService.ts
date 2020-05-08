@@ -39,7 +39,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.initializeContact(contactName),
+        data: this.tc.initializeContact(contactName.toLowerCase()),
       };
     } catch (err) {
       return {
@@ -73,13 +73,159 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.finalizeContact(contactName, encodedPublicKey),
+        data: this.tc.finalizeContact(
+          contactName.toLowerCase(),
+          encodedPublicKey,
+        ),
       };
     } catch (err) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to finalize trusted contact',
+      };
+    }
+  };
+
+  public updateEphemeralChannel = async (
+    contactName: string,
+    dataPacket: any,
+    fetch?: Boolean,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+          publicKey: String;
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.updateEphemeralChannel(
+          contactName.toLowerCase(),
+          dataPacket,
+          fetch,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update ephemeral channel',
+      };
+    }
+  };
+
+  public fetchEphemeralChannel = async (
+    contactName: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.fetchEphemeralChannel(contactName.toLowerCase()),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch from ephemeral channel',
+      };
+    }
+  };
+
+  public updateTrustedChannel = async (
+    contactName: string,
+    dataPacket: any,
+    fetch?: Boolean,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.updateTrustedChannel(
+          contactName.toLowerCase(),
+          dataPacket,
+          fetch,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update trusted channel',
+      };
+    }
+  };
+
+  public fetchTrustedChannel = async (
+    contactName: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          data: any;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.fetchTrustedChannel(contactName.toLowerCase()),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch from trusted channel',
       };
     }
   };

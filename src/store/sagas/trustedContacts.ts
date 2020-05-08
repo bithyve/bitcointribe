@@ -4,6 +4,14 @@ import {
   trustedContactInitialized,
   APPROVE_TRUSTED_CONTACT,
   trustedContactApproved,
+  UPDATE_EPHEMERAL_CHANNEL,
+  ephemeralChannelFetched,
+  ephemeralChannelUpdated,
+  UPDATE_TRUSTED_CHANNEL,
+  FETCH_TRUSTED_CHANNEL,
+  trustedChannelUpdated,
+  trustedChannelFetched,
+  FETCH_EPHEMERAL_CHANNEL,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -65,4 +73,124 @@ function* approveTrustedContactWorker({ payload }) {
 export const approveTrustedContactWatcher = createWatcher(
   approveTrustedContactWorker,
   APPROVE_TRUSTED_CONTACT,
+);
+
+function* updateEphemeralChannelWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  console.log({ payload });
+  const { contactName, data, fetch } = payload;
+
+  const res = yield call(
+    trustedContacts.updateEphemeralChannel,
+    contactName,
+    data,
+    fetch,
+  );
+  if (res.status === 200) {
+    const { updated, data } = res.data;
+    yield put(ephemeralChannelUpdated(contactName, updated, data));
+
+    console.log({ trustedContacts });
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    console.log(res.err);
+  }
+}
+
+export const updateEphemeralChannelWatcher = createWatcher(
+  updateEphemeralChannelWorker,
+  UPDATE_EPHEMERAL_CHANNEL,
+);
+
+function* fetchEphemeralChannelWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const { contactName } = payload;
+
+  const res = yield call(trustedContacts.fetchEphemeralChannel, contactName);
+  if (res.status === 200) {
+    const { data } = res.data;
+    yield put(ephemeralChannelFetched(contactName, data));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    console.log(res.err);
+  }
+}
+
+export const fetchEphemeralChannelWatcher = createWatcher(
+  fetchEphemeralChannelWorker,
+  FETCH_EPHEMERAL_CHANNEL,
+);
+
+function* updateTrustedChannelWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const { contactName, data, fetch } = payload;
+
+  const res = yield call(
+    trustedContacts.updateTrustedChannel,
+    contactName,
+    data,
+    fetch,
+  );
+  if (res.status === 200) {
+    const { updated, data } = res.data;
+    yield put(trustedChannelUpdated(contactName, updated, data));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    console.log(res.err);
+  }
+}
+
+export const updateTrustedChannelWatcher = createWatcher(
+  updateTrustedChannelWorker,
+  UPDATE_TRUSTED_CHANNEL,
+);
+
+function* fetchTrustedChannelWorker({ payload }) {
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
+  const { contactName } = payload;
+
+  const res = yield call(trustedContacts.fetchEphemeralChannel, contactName);
+  if (res.status === 200) {
+    const { data } = res.data;
+    yield put(trustedChannelFetched(contactName, data));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+  } else {
+    console.log(res.err);
+  }
+}
+
+export const fetchTrustedChannelWatcher = createWatcher(
+  fetchTrustedChannelWorker,
+  FETCH_TRUSTED_CHANNEL,
 );

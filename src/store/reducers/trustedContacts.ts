@@ -4,6 +4,10 @@ import { TRUSTED_CONTACTS } from '../../common/constants/serviceTypes';
 import {
   TRUSTED_CONTACT_INITIALIZED,
   TRUSTED_CONTACT_APPROVED,
+  EPHEMERAL_CHANNEL_FETCHED,
+  EPHEMERAL_CHANNEL_UPDATED,
+  TRUSTED_CHANNEL_UPDATED,
+  TRUSTED_CHANNEL_FETCHED,
 } from '../actions/trustedContacts';
 
 const initialState: {
@@ -15,11 +19,15 @@ const initialState: {
       approved: Boolean;
     };
   };
+  ephemeralChannel: { [contactName: string]: { updated: Boolean; data?: any } };
+  trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
 } = {
   service: null,
   serviceEnriched: false,
   initializedTrustedContacts: null,
   approvedTrustedContacts: null,
+  ephemeralChannel: null,
+  trustedChannel: null,
 };
 
 export default (state = initialState, action) => {
@@ -47,6 +55,52 @@ export default (state = initialState, action) => {
           ...state.approvedTrustedContacts,
           [action.payload.contactName]: {
             approved: action.payload.approved,
+          },
+        },
+      };
+
+    case EPHEMERAL_CHANNEL_UPDATED:
+      return {
+        ...state,
+        ephemeralChannel: {
+          ...state.ephemeralChannel,
+          [action.payload.contactName]: {
+            updated: action.payload.updated,
+            data: action.payload.data,
+          },
+        },
+      };
+
+    case EPHEMERAL_CHANNEL_FETCHED:
+      return {
+        ...state,
+        ephemeralChannel: {
+          ...state.ephemeralChannel,
+          [action.payload.contactName]: {
+            data: action.payload.data,
+          },
+        },
+      };
+
+    case TRUSTED_CHANNEL_UPDATED:
+      return {
+        ...state,
+        trustedChannel: {
+          ...state.trustedChannel,
+          [action.payload.contactName]: {
+            updated: action.payload.updated,
+            data: action.payload.data,
+          },
+        },
+      };
+
+    case TRUSTED_CHANNEL_FETCHED:
+      return {
+        ...state,
+        trustedChannel: {
+          ...state.trustedChannel,
+          [action.payload.contactName]: {
+            data: action.payload.data,
           },
         },
       };
