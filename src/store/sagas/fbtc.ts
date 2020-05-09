@@ -12,8 +12,7 @@ import {
 	getBalancesFail	
 } from "../actions/fbtc"
 
-import fbcApiService from "../../services/fbc_api.tsx";
-import stringToJson from "../../utils/string_to_json.tsx"
+import fbcApiService from "../../services/fbtc";
 
 
 export function* accountSyncSaga({ params }) {
@@ -21,9 +20,8 @@ export function* accountSyncSaga({ params }) {
 	if (!result || result.status !== 200) {
 		yield put(accountSyncFail());
 	} else {
-		console.log("1Result", result)
 		if (typeof(result.data) == "string") {
-			result.data = stringToJson(result.data)
+			result.data = string2Json(result.data)
 		}
 		yield put(accountSyncSuccess(result.data));
 	}
@@ -31,11 +29,9 @@ export function* accountSyncSaga({ params }) {
 
 export function* getQuoteSaga({ params }) {
 	const result = yield call(fbcApiService, 'getQuote', params);
-	console.log("RESULT", result)
 	if (!result || result.status !== 200) {
 		yield put(getQuoteFail());
 	} else {
-		console.log("2Result", result)
 		yield put(getQuoteSuccess(result.data));
 	}
 }
@@ -45,7 +41,6 @@ export function* executeOrderSaga({ params }) {
 	if (!result || result.status !== 200) {
 		yield put(executeOrderFail());
 	} else {
-		console.log('3RESULT', result)
 		yield put(executeOrderSuccess(result.data));
 	}
 }
@@ -55,7 +50,6 @@ export function* getBalancesSaga({ params }) {
 	if (!result || result.status !== 200) {
 		yield put(getBalancesFail());
 	} else {
-		console.log("4RESULT", result.data)
 		yield put(getBalancesSuccess(result.data));
 	}
 }
@@ -67,4 +61,27 @@ export default function* rootSaga() {
 		takeLatest(types.EXECUTE_ORDER, executeOrderSaga),
 		takeLatest(types.GET_BALANCES, getBalancesSaga)
 	])
+}
+
+
+// temperory utility functiom
+
+const string2Json = (string) => {
+	console.log(' I am being used!!!!!')
+	if (!string) {
+		return null;
+	}
+	let json = {};
+
+	string = string.replace("}", "").replace("{", "");
+	string = string.split(",").filter(a => a && a.trim());
+
+	for (let i of string) {
+		let x = i.split(":").map(a => a.replace(/\"/g, "").trim())
+		if (x[1] == "true" || x[1] == "false") {
+			x[1] = (x[1] === "true");
+		}
+		json[x[0]] = x[1]
+	}
+	return json;
 }
