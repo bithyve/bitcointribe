@@ -1,4 +1,4 @@
-import { all, call, takeLatest, put } from 'redux-saga/effects';
+import { call, put } from 'redux-saga/effects';
 
 import {
   accountSyncSuccess,
@@ -35,9 +35,12 @@ function* accountSyncWorker({ payload }) {
   }
 }
 
-export const accountSyncWatcher = createWatcher(accountSyncWorker, ACCOUNT_SYNC);
+export const accountSyncWatcher = createWatcher(
+  accountSyncWorker,
+  ACCOUNT_SYNC,
+);
 
-export function* getQuoteSaga({ params }) {
+function* getQuoteWorker({ params }) {
   const result = yield call(fbcApiService, 'getQuote', params);
   if (!result || result.status !== 200) {
     yield put(getQuoteFail());
@@ -46,8 +49,10 @@ export function* getQuoteSaga({ params }) {
   }
 }
 
-export function* executeOrderSaga({ params }) {
-  const result = yield call(fbcApiService, 'executeOrder', params);
+export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
+
+function* executeOrderWorker({ payload }) {
+  const result = yield call(fbcApiService, 'executeOrder', payload);
   if (!result || result.status !== 200) {
     yield put(executeOrderFail());
   } else {
@@ -55,8 +60,13 @@ export function* executeOrderSaga({ params }) {
   }
 }
 
-export function* getBalancesSaga({ params }) {
-  const result = yield call(fbcApiService, 'getBalances', params);
+export const executeOrderWatcher = createWatcher(
+  executeOrderWorker,
+  EXECUTE_ORDER,
+);
+
+function* getBalancesWorker({ payload }) {
+  const result = yield call(fbcApiService, 'getBalances', payload);
   if (!result || result.status !== 200) {
     yield put(getBalancesFail());
   } else {
@@ -64,7 +74,12 @@ export function* getBalancesSaga({ params }) {
   }
 }
 
-// temperory utility function
+export const getBalancesWatcher = createWatcher(
+  executeOrderWatcher,
+  GET_BALANCES,
+);
+
+// temperory utility function may be removed later
 
 const string2Json = (string) => {
   console.log(' I am being used!!!!!');

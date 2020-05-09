@@ -10,6 +10,7 @@ import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
 import manageBackupReducer from './reducers/manageBackup';
 import GetBittrReducer from './reducers/bittr';
+import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 
@@ -22,6 +23,7 @@ import {
   servicesEnricherWatcher,
   updateSSSDBWatcher,
 } from './sagas/storage';
+
 import {
   initSetupWatcher,
   initRecoveryWatcher,
@@ -29,6 +31,7 @@ import {
   credentialsAuthWatcher,
   changeAuthCredWatcher,
 } from './sagas/setupAndAuth';
+
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -49,6 +52,7 @@ import {
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
 } from './sagas/accounts';
+
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
@@ -82,12 +86,21 @@ import {
   verifyEmailWatcher,
   verifyXpubWatcher,
 } from './sagas/bittr';
+
+import {
+  accountSyncWatcher,
+  getQuoteWatcher,
+  executeOrderWatcher,
+  getBalancesWatcher,
+} from './sagas/fbtc'
+
 import {
   updateFCMTokensWatcher,
   sendNotificationWatcher,
   fetchNotificationsWatcher,
   fetchGetBittrDetailsWatcher,
 } from './sagas/notifications';
+
 import {
   initializedTrustedContactWatcher,
   approveTrustedContactWatcher,
@@ -96,6 +109,8 @@ import {
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
 } from './sagas/trustedContacts';
+
+import { fromPrivateKey } from 'bip32';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -183,6 +198,12 @@ const rootSaga = function* () {
     verifyEmailWatcher,
     verifyXpubWatcher,
 
+    //fBTC
+    accountSyncWatcher,
+    getQuoteWatcher,
+    executeOrderWatcher,
+    getBalancesWatcher,
+
     // Notifications
     fetchGetBittrDetailsWatcher,
     updateFCMTokensWatcher,
@@ -221,6 +242,7 @@ const rootReducer = combineReducers({
   sss: sssReducer,
   manageBackup: manageBackupReducer,
   bittr: GetBittrReducer,
+  fBTC: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
 });
