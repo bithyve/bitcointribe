@@ -44,6 +44,8 @@ export default class SecureHDWallet extends Bitcoin {
     transactionDetails: [],
   };
   public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
+  public newTransactions: Array<TransactionDetails> = [];
+
   private lastBalTxSync: number = 0;
 
   private primaryMnemonic: string;
@@ -324,6 +326,24 @@ export default class SecureHDWallet extends Bitcoin {
     return { transactions };
   };
 
+  public setNewTransactions = (transactions: Transactions) => {
+    // delta transactions setter
+    const lastSyncTime = this.lastBalTxSync;
+    let latestSyncTime = this.lastBalTxSync;
+    this.newTransactions = []; // delta transactions
+    for (const tx of transactions.transactionDetails) {
+      if (tx.status === 'Confirmed') {
+        if (tx.blockTime > lastSyncTime) {
+          this.newTransactions.push(tx);
+        }
+        if (tx.blockTime > latestSyncTime) {
+          latestSyncTime = tx.blockTime;
+        }
+      }
+    }
+    this.lastBalTxSync = latestSyncTime;
+  };
+
   public fetchBalanceTransaction = async (options?: {
     restore?;
   }): Promise<{
@@ -358,6 +378,9 @@ export default class SecureHDWallet extends Bitcoin {
       this.consumedAddresses,
       'Savings Account',
     );
+
+    this.setNewTransactions(transactions);
+
     this.balances = balances;
     this.transactions = transactions;
     return { balances, transactions };

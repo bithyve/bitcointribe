@@ -86,7 +86,7 @@ import {
   BIT_SHARE_HEALTH_TIME_SLOT2_PROD,
   BIT_FAST_BITCOINS_SERIES,
 } from 'react-native-dotenv';
-import { DerivativeAccount } from './utilities/Interface';
+import { DerivativeAccount, DerivativeAccounts } from './utilities/Interface';
 
 class Config {
   public ENVIRONMENT: string;
@@ -232,7 +232,8 @@ class Config {
   FAST_BITCOINS: DerivativeAccount = {
     series: parseInt(BIT_FAST_BITCOINS_SERIES, 10),
   };
-  public DERIVATIVE_ACC = {
+
+  public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
   };
 

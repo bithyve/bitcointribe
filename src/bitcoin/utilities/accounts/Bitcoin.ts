@@ -306,6 +306,7 @@ export default class Bitcoin {
         transactions.unconfirmedTransactions +=
           addressInfo.UnconfirmedTransactions;
 
+        console.log({ addressInfo });
         addressInfo.Transactions.forEach((tx) => {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
@@ -314,7 +315,7 @@ export default class Bitcoin {
             transactions.transactionDetails.push({
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,
-              status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
+              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
               date: tx.Status.block_time
                 ? new Date(tx.Status.block_time * 1000).toUTCString()
@@ -324,9 +325,7 @@ export default class Bitcoin {
               accountType: tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
-              blockTime: tx.Status.block_time
-                ? tx.Status.block_time * 1000
-                : Date.now(),
+              blockTime: tx.Status.block_time, // only available when tx is confirmed
             });
           }
         });
@@ -452,7 +451,7 @@ export default class Bitcoin {
             transactions.transactionDetails.push({
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,
-              status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
+              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
               date: tx.Status.block_time
                 ? new Date(tx.Status.block_time * 1000).toUTCString()

@@ -47,6 +47,7 @@ export default class HDSegwitWallet extends Bitcoin {
     transactionDetails: [],
   };
   public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
+  public newTransactions: Array<TransactionDetails> = [];
 
   constructor(
     mnemonic?: string,
@@ -679,6 +680,24 @@ export default class HDSegwitWallet extends Bitcoin {
     return { transactions };
   };
 
+  public setNewTransactions = (transactions: Transactions) => {
+    // delta transactions setter
+    const lastSyncTime = this.lastBalTxSync;
+    let latestSyncTime = this.lastBalTxSync;
+    this.newTransactions = []; // delta transactions
+    for (const tx of transactions.transactionDetails) {
+      if (tx.status === 'Confirmed') {
+        if (tx.blockTime > lastSyncTime) {
+          this.newTransactions.push(tx);
+        }
+        if (tx.blockTime > latestSyncTime) {
+          latestSyncTime = tx.blockTime;
+        }
+      }
+    }
+    this.lastBalTxSync = latestSyncTime;
+  };
+
   public fetchBalanceTransaction = async (options?: {
     restore?;
   }): Promise<{
@@ -722,6 +741,9 @@ export default class HDSegwitWallet extends Bitcoin {
       this.usedAddresses,
       this.isTest ? 'Test Account' : 'Checking Account',
     );
+
+    this.setNewTransactions(transactions);
+
     this.balances = balances;
     this.transactions = transactions;
     return { balances, transactions };

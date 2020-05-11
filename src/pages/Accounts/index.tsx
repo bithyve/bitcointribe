@@ -216,36 +216,20 @@ export default function Accounts(props) {
     );
     setGetBittrAccount(getBittrAccount ? getBittrAccount : []);
   };
-  // useEffect(() => {
-  //   if (serviceType === REGULAR_ACCOUNT) {
-  //     const derivativeAccountType = FAST_BITCOINS;
-  //     const accountNumber = 0;
-  //     const { derivativeAccount } = service.hdWallet;
-
-  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
-  //       dispatch(fetchDerivativeAccXpub(derivativeAccountType));
-  //     else {
-  //       console.log({
-  //         getBittrYpub:
-  //           derivativeAccount[derivativeAccountType][accountNumber].ypub,
-  //       });
-  //     }
-  //   }
-  // }, [service]);
 
   // useEffect(() => {
   //   const accountNumber = 0;
-  //   const { derivativeAccount } =
+  //   const { derivativeAccounts } =
   //     serviceType === SECURE_ACCOUNT
   //       ? service.secureHDWallet
   //       : service.hdWallet;
 
-  //   if (!derivativeAccount[FAST_BITCOINS][accountNumber])
+  //   if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
   //     dispatch(fetchDerivativeAccAddress(serviceType, FAST_BITCOINS));
   //   else {
   //     console.log({
   //       FBAddress:
-  //         derivativeAccount[FAST_BITCOINS][accountNumber].receivingAddress,
+  //         derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
   //     });
   //   }
   // }, [service]);
@@ -254,17 +238,17 @@ export default function Accounts(props) {
   //   if (serviceType === REGULAR_ACCOUNT || SECURE_ACCOUNT) {
   //     const derivativeAccountType = 'FAST_BITCOINS';
   //     const accountNumber = 0;
-  //     const { derivativeAccount } =
+  //     const { derivativeAccounts } =
   //       serviceType === REGULAR_ACCOUNT
   //         ? service.hdWallet
   //         : service.secureHDWallet;
   //     console.log({
   //       balances:
-  //         derivativeAccount[derivativeAccountType][accountNumber].balances,
+  //         derivativeAccounts[derivativeAccountType][accountNumber].balances,
   //       transactions:
-  //         derivativeAccount[derivativeAccountType][accountNumber].transactions,
+  //         derivativeAccounts[derivativeAccountType][accountNumber].transactions,
   //     });
-  //     if (derivativeAccount[derivativeAccountType][accountNumber].xpub)
+  //     if (derivativeAccounts[derivativeAccountType][accountNumber].xpub)
   //       dispatch(fetchDerivativeAccBalTx(serviceType, derivativeAccountType));
   //   }
   // }, []);
