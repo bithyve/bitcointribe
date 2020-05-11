@@ -237,6 +237,40 @@ export default class BaseAccount {
     }
   };
 
+  public getDerivativeAccAddress = async (
+    accountType: string,
+    accountNumber?: number,
+  ): Promise<
+    | {
+        status: number;
+        data: { address: string };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.getDerivativeAccReceivingAddress(
+          accountType,
+          accountNumber,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: "Failed to generate derivative account's address",
+      };
+    }
+  };
+
   public getDerivativeAccBalanceTransactions = async (
     accountType: string,
     accountNumber?: number,

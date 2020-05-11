@@ -326,6 +326,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
       JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
+    console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,

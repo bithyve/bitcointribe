@@ -80,12 +80,6 @@ import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretM
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
-  getTestcoins,
-  fetchBalance,
-  fetchTransactions,
-  runTest,
-} from '../store/actions/accounts';
-import {
   updateFCMTokens,
   fetchNotifications,
 } from '../store/actions/notifications';
@@ -108,13 +102,6 @@ import NotificationListContent from '../components/NotificationListContent';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
-
-import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import {
-  initializeTrustedContact,
-  approveTrustedContact,
-} from '../store/actions/trustedContacts';
-
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
@@ -2470,17 +2457,6 @@ export default function Home(props) {
   }, [health]);
 
   // useEffect(() => {
-  //   (async () => {
-  //     const getBittrDetails = JSON.parse(
-  //       await AsyncStorage.getItem('getBittrDetails'),
-  //     );
-  //     if (!getBittrDetails) {
-  //       dispatch(fetchGetBittrDetails());
-  //     }
-  //   })();
-  // }, []);
-
-  // useEffect(() => {
   //   dispatch(runTest());
   // }, []);
 
@@ -2497,71 +2473,6 @@ export default function Home(props) {
   //   });
 
   //   // return unsubscribe; // unsubscribing
-  // }, []);
-
-  // const s3Service = useSelector(state => state.sss.service);
-  // useEffect(() => {
-  //   if (s3Service)
-  //     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  // }, [s3Service]);
-
-  // const testAccService = accounts[TEST_ACCOUNT].service;
-  // useEffect(() => {
-  //   (async () => {
-  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-  //         const { balances } = testAccService.hdWallet;
-  //         const netBalance = testAccService
-  //           ? balances.balance + balances.unconfirmedBalance
-  //           : 0;
-  //         if (!netBalance) {
-  //           console.log('Getting Testcoins');
-  //           dispatch(getTestcoins(TEST_ACCOUNT));
-  //         }
-  //       }
-  //   })();
-  // }, [testAccService]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining a half an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
-  // }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (await AsyncStorage.getItem('walletRecovered')) {
-  //       dispatch(fetchBalance(TEST_ACCOUNT));
-  //       dispatch(fetchBalance(REGULAR_ACCOUNT));
-  //       dispatch(fetchBalance(SECURE_ACCOUNT));
-  //       dispatch(fetchTransactions(TEST_ACCOUNT));
-  //       dispatch(fetchTransactions(REGULAR_ACCOUNT));
-  //       dispatch(fetchTransactions(SECURE_ACCOUNT));
-
-  //       setTimeout(() => {
-  //         AsyncStorage.removeItem('walletRecovered');
-  //       }, 3000);
-  //     }
-  //   })();
   // }, []);
 
   const renderRecoverySecretRequestModalContent = useCallback(() => {

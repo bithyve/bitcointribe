@@ -140,7 +140,6 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.derivativeAccount
         ? stateVars.derivativeAccount
         : this.derivativeAccount;
-    console.log({ derivativeAcc: this.derivativeAccount });
   };
 
   public importBHXpub = async (

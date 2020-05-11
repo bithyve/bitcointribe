@@ -234,20 +234,19 @@ export default function Accounts(props) {
   // }, [service]);
 
   // useEffect(() => {
-  //   if (serviceType === SECURE_ACCOUNT) {
-  //     const derivativeAccountType = 'FAST_BITCOINS';
-  //     const accountNumber = 0;
-  //     const { derivativeAccount } = service.secureHDWallet;
+  //   const accountNumber = 0;
+  //   const { derivativeAccount } =
+  //     serviceType === SECURE_ACCOUNT
+  //       ? service.secureHDWallet
+  //       : service.hdWallet;
 
-  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
-  //       dispatch(fetchDerivativeAccAddress(derivativeAccountType));
-  //     else {
-  //       console.log({
-  //         getBittrAddress:
-  //           derivativeAccount[derivativeAccountType][accountNumber]
-  //             .receivingAddress,
-  //       });
-  //     }
+  //   if (!derivativeAccount[FAST_BITCOINS][accountNumber])
+  //     dispatch(fetchDerivativeAccAddress(serviceType, FAST_BITCOINS));
+  //   else {
+  //     console.log({
+  //       FBAddress:
+  //         derivativeAccount[FAST_BITCOINS][accountNumber].receivingAddress,
+  //     });
   //   }
   // }, [service]);
 
