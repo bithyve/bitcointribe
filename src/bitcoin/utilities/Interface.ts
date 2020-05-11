@@ -1,19 +1,22 @@
+export interface TransactionDetails {
+  txid: string;
+  status: string;
+  confirmations: number;
+  fee: string;
+  date: string;
+  transactionType: string;
+  amount: number;
+  accountType: string;
+  recipientAddresses?: string[];
+  senderAddresses?: string[];
+  blockTime?: number;
+}
+
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
   unconfirmedTransactions: number;
-  transactionDetails: Array<{
-    txid: string;
-    status: string;
-    confirmations: number;
-    fee: string;
-    date: string;
-    transactionType: string;
-    amount: number;
-    accountType: string;
-    recipientAddresses?: string[];
-    senderAddresses?: string[];
-  }>;
+  transactionDetails: Array<TransactionDetails>;
 }
 
 export interface MetaShare {
@@ -54,6 +57,7 @@ export interface DerivativeAccount {
   series: number;
   [accounts: number]: {
     xpub: string;
+    ypub?: string;
     usedAddresses?: string[];
     nextFreeAddressIndex?: number;
     receivingAddress?: string;
@@ -62,7 +66,13 @@ export interface DerivativeAccount {
       unconfirmedBalance: number;
     };
     transactions?: Transactions;
+    lastBalTxSync?: number;
+    newTransactions?: TransactionDetails[];
   };
+}
+
+export interface DerivativeAccounts {
+  [accountType: string]: DerivativeAccount;
 }
 
 export enum notificationType {

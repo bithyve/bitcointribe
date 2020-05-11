@@ -1,5 +1,5 @@
 import BaseAccount from '../../utilities/accounts/BaseAccount';
-import { Transactions } from '../../utilities/Interface';
+import { Transactions, DerivativeAccounts } from '../../utilities/Interface';
 
 export default class RegularAccount extends BaseAccount {
   public static fromJSON = (json: string) => {
@@ -18,7 +18,8 @@ export default class RegularAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
-      derivativeAccount,
+      derivativeAccounts,
+      lastBalTxSync,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -33,7 +34,8 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress;
       transactions: Transactions;
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
     } = hdWallet;
 
     return new RegularAccount(mnemonic, passphrase, purpose, {
@@ -47,7 +49,8 @@ export default class RegularAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
-      derivativeAccount,
+      derivativeAccounts,
+      lastBalTxSync,
     });
   };
 
@@ -66,7 +69,8 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      derivativeAccount: {};
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
     },
   ) {
     super(mnemonic, passphrase, dPathPurpose, stateVars);

@@ -5,7 +5,12 @@ import coinselect from 'coinselect';
 import crypto from 'crypto';
 import config from '../../Config';
 import Bitcoin from './Bitcoin';
-import { Transactions, INotification } from '../Interface';
+import {
+  Transactions,
+  INotification,
+  DerivativeAccounts,
+  TransactionDetails,
+} from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
 const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -28,6 +33,7 @@ export default class HDSegwitWallet extends Bitcoin {
   private internalAddresssesCache: {};
   private externalAddressesCache: {};
   private addressToWIFCache: {};
+  private lastBalTxSync: number = 0;
 
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -40,7 +46,7 @@ export default class HDSegwitWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
-  public derivativeAccount = config.DERIVATIVE_ACC;
+  public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
 
   constructor(
     mnemonic?: string,
@@ -57,7 +63,8 @@ export default class HDSegwitWallet extends Bitcoin {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -112,10 +119,14 @@ export default class HDSegwitWallet extends Bitcoin {
       stateVars && stateVars.transactions
         ? stateVars.transactions
         : this.transactions;
-    this.derivativeAccount =
-      stateVars && stateVars.derivativeAccount
-        ? stateVars.derivativeAccount
-        : this.derivativeAccount;
+    this.derivativeAccounts =
+      stateVars && stateVars.derivativeAccounts
+        ? stateVars.derivativeAccounts
+        : this.derivativeAccounts;
+    this.lastBalTxSync =
+      stateVars && stateVars.lastBalTxSync
+        ? stateVars.lastBalTxSync
+        : this.lastBalTxSync;
   };
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -162,10 +173,10 @@ export default class HDSegwitWallet extends Bitcoin {
     accountNumber: number = 0,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
-    if (!this.derivativeAccount[accountType])
+    if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (!this.derivativeAccount[accountType][accountNumber]) {
+    if (!this.derivativeAccounts[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
@@ -174,17 +185,17 @@ export default class HDSegwitWallet extends Bitcoin {
       let freeAddress = '';
       let itr;
 
-      const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
         accountNumber
       ];
       if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-        this.derivativeAccount[accountType][
+        this.derivativeAccounts[accountType][
           accountNumber
         ].nextFreeAddressIndex = 0;
 
       for (itr = 0; itr < this.gapLimit + 1; itr++) {
         if (
-          this.derivativeAccount[accountType][accountNumber]
+          this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
             itr <
           0
@@ -194,14 +205,14 @@ export default class HDSegwitWallet extends Bitcoin {
 
         const address = this.getExternalAddressByIndex(
           itr,
-          this.derivativeAccount[accountType][accountNumber].xpub,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
         );
 
         const txCounts = await this.getTxCounts([address]);
         if (txCounts[address] === 0) {
           // free address found
           freeAddress = address;
-          this.derivativeAccount[accountType][
+          this.derivativeAccounts[accountType][
             accountNumber
           ].nextFreeAddressIndex += itr;
           break;
@@ -216,15 +227,15 @@ export default class HDSegwitWallet extends Bitcoin {
         );
         const address = this.getExternalAddressByIndex(
           itr,
-          this.derivativeAccount[accountType][accountNumber].xpub,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
         );
         freeAddress = address; // not checking this one, it might be free
-        this.derivativeAccount[accountType][
+        this.derivativeAccounts[accountType][
           accountNumber
         ].nextFreeAddressIndex += itr + 1;
       }
 
-      this.derivativeAccount[accountType][
+      this.derivativeAccounts[accountType][
         accountNumber
       ].receivingAddress = freeAddress;
       return { address: freeAddress };
@@ -243,16 +254,16 @@ export default class HDSegwitWallet extends Bitcoin {
     };
     transactions: Transactions;
   }> => {
-    if (!this.derivativeAccount[accountType])
+    if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (!this.derivativeAccount[accountType][accountNumber]) {
+    if (!this.derivativeAccounts[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
     await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
-    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
 
@@ -261,12 +272,12 @@ export default class HDSegwitWallet extends Bitcoin {
       usedAddresses.push(
         this.getExternalAddressByIndex(
           itr,
-          this.derivativeAccount[accountType][accountNumber].xpub,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
         ),
       );
     }
 
-    this.derivativeAccount[accountType][accountNumber][
+    this.derivativeAccounts[accountType][accountNumber][
       'usedAddresses'
     ] = usedAddresses;
     console.log({ derivativeAccUsedAddresses: usedAddresses });
@@ -279,8 +290,30 @@ export default class HDSegwitWallet extends Bitcoin {
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
     );
 
-    this.derivativeAccount[accountType][accountNumber].balances = balances;
-    this.derivativeAccount[accountType][
+    const lastSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    let latestSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    const newTransactions: Array<TransactionDetails> = []; // delta transactions
+    for (const tx of transactions.transactionDetails) {
+      if (tx.status === 'Confirmed') {
+        if (tx.blockTime > lastSyncTime) {
+          newTransactions.push(tx);
+        }
+        if (tx.blockTime > latestSyncTime) {
+          latestSyncTime = tx.blockTime;
+        }
+      }
+    }
+
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].lastBalTxSync = latestSyncTime;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].newTransactions = newTransactions;
+    this.derivativeAccounts[accountType][accountNumber].balances = balances;
+    this.derivativeAccounts[accountType][
       accountNumber
     ].transactions = transactions;
 
@@ -454,25 +487,25 @@ export default class HDSegwitWallet extends Bitcoin {
   private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
     // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
-    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
     if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-      this.derivativeAccount[accountType][
+      this.derivativeAccounts[accountType][
         accountNumber
       ].nextFreeAddressIndex = 0;
 
     const externalAddress = this.getExternalAddressByIndex(
-      this.derivativeAccount[accountType][accountNumber].nextFreeAddressIndex +
+      this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
         this.gapLimit -
         1,
-      this.derivativeAccount[accountType][accountNumber].xpub,
+      this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
     const txCounts = await this.getTxCounts([externalAddress]);
 
     if (txCounts[externalAddress] > 0) {
-      this.derivativeAccount[accountType][
+      this.derivativeAccounts[accountType][
         accountNumber
       ].nextFreeAddressIndex += this.gapLimit;
       tryAgain = true;
@@ -1081,25 +1114,25 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountNumber: number = 0,
   ) => {
-    if (!this.derivativeAccount[accountType])
+    if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
     if (accountNumber > 9)
       throw Error(
         `Cannot create more than 10 ${accountType} derivative accounts`,
       );
-    if (this.derivativeAccount[accountType][accountNumber]) {
-      return this.derivativeAccount[accountType][accountNumber]['xpub'];
+    if (this.derivativeAccounts[accountType][accountNumber]) {
+      return this.derivativeAccounts[accountType][accountNumber]['xpub'];
     } else {
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-      }'/${this.derivativeAccount[accountType]['series'] + accountNumber}'`;
+      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
       const ypub = this.xpubToYpub(xpub, null, this.network);
-      this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
+      this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
       return xpub;
     }
   };

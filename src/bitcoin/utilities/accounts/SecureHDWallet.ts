@@ -5,7 +5,12 @@ import * as bitcoinJS from 'bitcoinjs-lib';
 import coinselect from 'coinselect';
 import crypto from 'crypto';
 import config from '../../Config';
-import { Transactions, DerivativeAccount } from '../Interface';
+import {
+  Transactions,
+  DerivativeAccount,
+  DerivativeAccounts,
+  TransactionDetails,
+} from '../Interface';
 import Bitcoin from './Bitcoin';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
 
@@ -38,7 +43,8 @@ export default class SecureHDWallet extends Bitcoin {
     unconfirmedTransactions: 0,
     transactionDetails: [],
   };
-  public derivativeAccount = config.DERIVATIVE_ACC;
+  public derivativeAccounts: DerivativeAccounts = config.DERIVATIVE_ACC;
+  private lastBalTxSync: number = 0;
 
   private primaryMnemonic: string;
   private walletID: string;
@@ -84,7 +90,8 @@ export default class SecureHDWallet extends Bitcoin {
         qrData: string;
         secret: string;
       };
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
     },
     network?: bitcoinJS.Network,
   ) {
@@ -136,10 +143,14 @@ export default class SecureHDWallet extends Bitcoin {
         : this.transactions;
     this.twoFASetup =
       stateVars && stateVars.twoFASetup ? stateVars.twoFASetup : undefined;
-    this.derivativeAccount =
-      stateVars && stateVars.derivativeAccount
-        ? stateVars.derivativeAccount
-        : this.derivativeAccount;
+    this.derivativeAccounts =
+      stateVars && stateVars.derivativeAccounts
+        ? stateVars.derivativeAccounts
+        : this.derivativeAccounts;
+    this.lastBalTxSync =
+      stateVars && stateVars.lastBalTxSync
+        ? stateVars.lastBalTxSync
+        : this.lastBalTxSync;
   };
 
   public importBHXpub = async (
@@ -399,10 +410,10 @@ export default class SecureHDWallet extends Bitcoin {
     accountNumber: number = 0,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
-    if (!this.derivativeAccount[accountType])
+    if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (!this.derivativeAccount[accountType][accountNumber]) {
+    if (!this.derivativeAccounts[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
@@ -411,17 +422,17 @@ export default class SecureHDWallet extends Bitcoin {
       let freeAddress = '';
       let itr;
 
-      const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+      const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
         accountNumber
       ];
       if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-        this.derivativeAccount[accountType][
+        this.derivativeAccounts[accountType][
           accountNumber
         ].nextFreeAddressIndex = 0;
 
       for (itr = 0; itr < this.gapLimit + 1; itr++) {
         if (
-          this.derivativeAccount[accountType][accountNumber]
+          this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
             itr <
           0
@@ -430,16 +441,16 @@ export default class SecureHDWallet extends Bitcoin {
         }
 
         const { address } = this.createSecureMultiSig(
-          this.derivativeAccount[accountType][accountNumber]
+          this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex + itr,
-          this.derivativeAccount[accountType][accountNumber].xpub,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
         );
 
         const txCounts = await this.getTxCounts([address]);
         if (txCounts[address] === 0) {
           // free address found
           freeAddress = address;
-          this.derivativeAccount[accountType][
+          this.derivativeAccounts[accountType][
             accountNumber
           ].nextFreeAddressIndex += itr;
           break;
@@ -453,17 +464,17 @@ export default class SecureHDWallet extends Bitcoin {
           'Failed to find a free address in the above cycle, using the next address without checking',
         );
         const multiSig = this.createSecureMultiSig(
-          this.derivativeAccount[accountType][accountNumber]
+          this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex + itr,
-          this.derivativeAccount[accountType][accountNumber].xpub,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
         );
         freeAddress = multiSig.address; // not checking this one, it might be free
-        this.derivativeAccount[accountType][
+        this.derivativeAccounts[accountType][
           accountNumber
         ].nextFreeAddressIndex += itr + 1;
       }
 
-      this.derivativeAccount[accountType][
+      this.derivativeAccounts[accountType][
         accountNumber
       ].receivingAddress = freeAddress;
       return { address: freeAddress };
@@ -482,16 +493,16 @@ export default class SecureHDWallet extends Bitcoin {
     };
     transactions: Transactions;
   }> => {
-    if (!this.derivativeAccount[accountType])
+    if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (!this.derivativeAccount[accountType][accountNumber]) {
+    if (!this.derivativeAccounts[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
     await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
-    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
 
@@ -500,12 +511,12 @@ export default class SecureHDWallet extends Bitcoin {
       consumedAddresses.push(
         this.createSecureMultiSig(
           itr,
-          this.derivativeAccount[accountType][accountNumber].xpub,
+          this.derivativeAccounts[accountType][accountNumber].xpub,
         ).address,
       );
     }
 
-    this.derivativeAccount[accountType][accountNumber][
+    this.derivativeAccounts[accountType][accountNumber][
       'consumedAddresses'
     ] = consumedAddresses;
     console.log({ derivativeAccConsumedAddresses: consumedAddresses });
@@ -518,8 +529,30 @@ export default class SecureHDWallet extends Bitcoin {
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
     );
 
-    this.derivativeAccount[accountType][accountNumber].balances = balances;
-    this.derivativeAccount[accountType][
+    const lastSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    let latestSyncTime =
+      this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
+    const newTransactions: Array<TransactionDetails> = []; // delta transactions
+    for (const tx of transactions.transactionDetails) {
+      if (tx.status === 'Confirmed') {
+        if (tx.blockTime > lastSyncTime) {
+          newTransactions.push(tx);
+        }
+        if (tx.blockTime > latestSyncTime) {
+          latestSyncTime = tx.blockTime;
+        }
+      }
+    }
+
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].lastBalTxSync = latestSyncTime;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].newTransactions = newTransactions;
+    this.derivativeAccounts[accountType][accountNumber].balances = balances;
+    this.derivativeAccounts[accountType][
       accountNumber
     ].transactions = transactions;
 
@@ -1211,25 +1244,25 @@ export default class SecureHDWallet extends Bitcoin {
   private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
     // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
-    const { nextFreeAddressIndex } = this.derivativeAccount[accountType][
+    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
     if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
-      this.derivativeAccount[accountType][
+      this.derivativeAccounts[accountType][
         accountNumber
       ].nextFreeAddressIndex = 0;
 
     const multiSig = this.createSecureMultiSig(
-      this.derivativeAccount[accountType][accountNumber].nextFreeAddressIndex +
+      this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
         this.gapLimit -
         1,
-      this.derivativeAccount[accountType][accountNumber].xpub,
+      this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
     const txCounts = await this.getTxCounts([multiSig.address]);
 
     if (txCounts[multiSig.address] > 0) {
-      this.derivativeAccount[accountType][
+      this.derivativeAccounts[accountType][
         accountNumber
       ].nextFreeAddressIndex += this.gapLimit;
       tryAgain = true;
@@ -1244,25 +1277,25 @@ export default class SecureHDWallet extends Bitcoin {
     accountType: string,
     accountNumber: number = 0,
   ) => {
-    if (!this.derivativeAccount[accountType])
+    if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
     if (accountNumber > 9)
       throw Error(
         `Cannot create more than 10 ${accountType} derivative accounts`,
       );
-    if (this.derivativeAccount[accountType][accountNumber]) {
-      return this.derivativeAccount[accountType][accountNumber]['xpub'];
+    if (this.derivativeAccounts[accountType][accountNumber]) {
+      return this.derivativeAccounts[accountType][accountNumber]['xpub'];
     } else {
       const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic);
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${config.DPATH_PURPOSE}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-      }'/${this.derivativeAccount[accountType]['series'] + accountNumber}'`;
+      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
       const ypub = this.xpubToYpub(xpub, null, this.network);
-      this.derivativeAccount[accountType][accountNumber] = { xpub, ypub };
+      this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
       return xpub;
     }
   };

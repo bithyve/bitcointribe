@@ -3,7 +3,7 @@ import { Network, TransactionBuilder } from 'bitcoinjs-lib';
 import config from '../../Config';
 import { ErrMap } from '../ErrMap';
 import HDSegwitWallet from './HDSegwitWallet';
-import { Transactions, INotification } from '../Interface';
+import { Transactions, INotification, DerivativeAccounts } from '../Interface';
 
 export default class BaseAccount {
   public hdWallet: HDSegwitWallet;
@@ -23,7 +23,8 @@ export default class BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
     },
     network?: Network,
   ) {

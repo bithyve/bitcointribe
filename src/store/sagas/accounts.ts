@@ -82,8 +82,8 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
     (state) => state.accounts[serivceType].service,
   );
 
-  const { derivativeAccount } = service.hdWallet;
-  if (derivativeAccount[accountType][accountNumber]) return; // xpub already exists
+  const { derivativeAccounts } = service.hdWallet;
+  if (derivativeAccounts[accountType][accountNumber]) return; // xpub already exists
 
   const res = yield call(
     service.getDerivativeAccXpub,
@@ -114,15 +114,15 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
 
   const service = yield select((state) => state.accounts[serviceType].service);
 
-  const { derivativeAccount } =
+  const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
 
-  if (!derivativeAccount[accountType])
+  if (!derivativeAccounts[accountType])
     throw new Error(
       `Invalid derivative account: ${accountType} does not exists`,
     );
 
-  console.log({ derivativeAccount });
+  console.log({ derivativeAccounts });
   const res = yield call(
     service.getDerivativeAccAddress,
     accountType,
@@ -296,19 +296,19 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
 
   if (!accountNumber) accountNumber = 0;
 
-  const { derivativeAccount } =
+  const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   if (
-    !derivativeAccount[accountType] ||
-    !derivativeAccount[accountType][accountNumber].xpub
+    !derivativeAccounts[accountType] ||
+    !derivativeAccounts[accountType][accountNumber].xpub
   ) {
     throw new Error('Following derivative account does not exists');
   }
 
   const preFetchBalances =
-    derivativeAccount[accountType][accountNumber].balances;
+    derivativeAccounts[accountType][accountNumber].balances;
   const preFetchTransactions =
-    derivativeAccount[accountType][accountNumber].transactions;
+    derivativeAccounts[accountType][accountNumber].transactions;
 
   const res = yield call(
     service.getDerivativeAccBalanceTransactions,
