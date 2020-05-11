@@ -19,8 +19,10 @@ import fbcApiService from '../../services/fbtc';
 
 import { createWatcher } from '../utils/utilities';
 
-function* accountSyncWorker({ payload }) {
-  const result = yield call(fbcApiService, 'accountSync', payload);
+export function* accountSyncWorker({ payload }) {
+  console.log("payload",payload.data)
+  const result = yield call(fbcApiService, 'accountSync', payload.data);
+  console.log("result", result);
   if (!result || result.status !== 200) {
     yield put(accountSyncFail());
   } else {
@@ -28,6 +30,7 @@ function* accountSyncWorker({ payload }) {
     // has a trailing comma.
     // probably a bug but for now will use a simple method to parse it
     // this can be removed once this is verified by fast Bitcoins
+    console.log("result.data", result.data);
     if (typeof result.data == 'string') {
       result.data = string2Json(result.data);
     }
@@ -40,7 +43,7 @@ export const accountSyncWatcher = createWatcher(
   ACCOUNT_SYNC,
 );
 
-function* getQuoteWorker({ params }) {
+export function* getQuoteWorker({ params }) {
   const result = yield call(fbcApiService, 'getQuote', params);
   if (!result || result.status !== 200) {
     yield put(getQuoteFail());
@@ -51,7 +54,7 @@ function* getQuoteWorker({ params }) {
 
 export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
 
-function* executeOrderWorker({ payload }) {
+export function* executeOrderWorker({ payload }) {
   const result = yield call(fbcApiService, 'executeOrder', payload);
   if (!result || result.status !== 200) {
     yield put(executeOrderFail());
@@ -65,7 +68,7 @@ export const executeOrderWatcher = createWatcher(
   EXECUTE_ORDER,
 );
 
-function* getBalancesWorker({ payload }) {
+export function* getBalancesWorker({ payload }) {
   const result = yield call(fbcApiService, 'getBalances', payload);
   if (!result || result.status !== 200) {
     yield put(getBalancesFail());

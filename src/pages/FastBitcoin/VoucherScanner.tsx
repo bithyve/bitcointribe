@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   ImageBackground,
+  AsyncStorage,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -34,15 +35,28 @@ import ModalHeader from '../../components/ModalHeader';
 import QuoteConfirmation from './QuoteConfirmation';
 import VoucherRedeemSuccess from './VoucherRedeemSuccess';
 import AccountVerification from './AccountVerification';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useDispatch, useSelector } from 'react-redux';
+import { UsNumberFormat } from '../../common/utilities';
+import { accountSync } from '../../store/actions/fbtc';
 
 const VoucherScanner = (props) => {
   const [hideShow, setHideShow] = useState(false);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
-  const barcodeRecognized = async (barcodes) => {
-    if (barcodes.data) {
-      setOpenCameraFlag(false);
-    }
-  };
+  const [voucherCode, setVoucherCode] = useState('FMB8M733U3EE');
+  const [userKey, setUserKey] = useState('17734b0c-6139-48fc-8f17-23fbb5df3287');
+  const accounts1 = useSelector((state) => state.accounts);
+  const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
+  }, [accounts1.exchangeRates]);
+  const [balances, setBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+    accumulativeBalance: 0,
+  });
   const [
     RegistrationSuccessBottomSheet,
     setRegistrationSuccessBottomSheet,
@@ -83,6 +97,116 @@ const VoucherScanner = (props) => {
     amount: '5,000',
     image: require('../../assets/images/icons/icon_regular.png'),
   });
+
+  useEffect(() => {
+    const testBalance = accounts1[TEST_ACCOUNT].service
+      ? accounts1[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts1[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const regularBalance = accounts1[REGULAR_ACCOUNT].service
+      ? accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+        accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
+    const secureBalance = accounts1[SECURE_ACCOUNT].service
+      ? accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+        accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0;
+    const accumulativeBalance = regularBalance + secureBalance;
+
+    setBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+      accumulativeBalance,
+    });
+  }, [accounts1]);
+
+  useEffect(() => {
+    (async () => {
+      let voucherDataTemp = JSON.parse(
+        await AsyncStorage.getItem('voucherData'),
+      );
+      console.log('voucherData', voucherDataTemp);
+      if (voucherDataTemp) {
+        voucherDataTemp = {};
+      }
+      voucherDataTemp = {
+        voucher_code: voucherCode,
+        selectedAccount: selectedAccount,
+      };
+      await AsyncStorage.setItem(
+        'voucherData',
+        JSON.stringify(voucherDataTemp),
+      );
+      let voucherDataafterAdding = JSON.parse(
+        await AsyncStorage.getItem('voucherData'),
+      );
+      console.log('voucherDataafterAdding', voucherDataafterAdding);
+    })();
+  }, [selectedAccount, voucherCode]);
+
+  const barcodeRecognized = async (barcodes) => {
+    setVoucherCode('FMB8M733U3EE');
+
+    if (barcodes.data) {
+      setOpenCameraFlag(false);
+    }
+  };
+
+  useEffect(() => {
+    if(userKey)
+    createFBTCAccount();
+  }, [userKey]);
+
+  const createFBTCAccount = async () => {
+    let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    console.log('FBTCAccountData', FBTCAccountData);
+    let voucherData = JSON.parse(await AsyncStorage.getItem('voucherData'));
+    let obj;
+    if (!FBTCAccountData) {
+      obj = {
+        user_key: userKey,
+        redeem_vouchers: false,
+        exchange_balances: false,
+        sell_bitcoins: false,
+        test_account: {
+          voucher: [],
+        },
+        checking_account: {
+          voucher: [],
+        },
+        saving_account: {
+          voucher: [],
+        },
+      };
+      
+    } else{
+      obj = FBTCAccountData;
+    }
+    if (voucherData.selectedAccount.accountType == TEST_ACCOUNT) {
+      obj.test_account.voucher.push({
+        voucherCode: voucherCode,
+      });
+    } else if (voucherData.selectedAccount.accountType == REGULAR_ACCOUNT) {
+      obj.checking_account.voucher.push({
+        voucherCode: voucherCode,
+      });
+    } else {
+      obj.saving_account.voucher.push({
+        voucherCode: voucherCode,
+      });
+    }
+
+    checkAuth();
+  };
+
+  const checkAuth = () =>{
+    let data = {
+      userKey: userKey
+    }
+    dispatch(accountSync(data));
+  }
 
   const renderRegistrationSuccessModalContent = useCallback(() => {
     return (
@@ -200,109 +324,117 @@ const VoucherScanner = (props) => {
           <Text style={BackupStyles.modalHeaderTitleText}>Voucher</Text>
         </View>
       </View>
-      <View style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}>
-        {hideShow ? (
-          <View style={styles.dropDownView}>
-            {accounts.map((value) => {
-              return (
-                <TouchableOpacity
-                  activeOpacity={10}
-                  onPress={() => {
-                    setHideShow(false);
-                    setSelectedAccount(value);
-                  }}
-                  style={styles.dropDownElement}
-                >
-                  <Image
-                    source={value.image}
-                    style={{ width: wp('8%'), height: wp('8%') }}
-                  />
-                  <View style={{ flex: 1, marginLeft: 10 }}>
-                    <Text style={styles.dropDownElementTitleText}>
-                      {value.accountName}
-                    </Text>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                      }}
-                    >
-                      <Image
-                        style={styles.cardBitCoinImage}
-                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                      />
-                      <Text style={styles.cardAmountText}>{value.amount}</Text>
-                      <Text style={styles.cardAmountUnitText}>sats</Text>
-                    </View>
-                  </View>
-                  <View
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
+      <ScrollView>
+        <View style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}>
+          {hideShow ? (
+            <View style={styles.dropDownView}>
+              {accounts.map((value) => {
+                return (
+                  <TouchableOpacity
+                    activeOpacity={10}
+                    onPress={() => {
+                      setHideShow(false);
+                      setSelectedAccount(value);
+                    }}
+                    style={styles.dropDownElement}
                   >
-                    <Entypo
-                      name={'dots-three-horizontal'}
-                      color={Colors.borderColor}
-                      size={RFValue(13)}
+                    <Image
+                      source={value.image}
+                      style={{ width: wp('8%'), height: wp('8%') }}
                     />
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                      <Text style={styles.dropDownElementTitleText}>
+                        {value.accountName}
+                      </Text>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'flex-end',
+                        }}
+                      >
+                        <Image
+                          style={styles.cardBitCoinImage}
+                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        />
+                        <Text style={styles.cardAmountText}>
+                          {value.accountType === TEST_ACCOUNT
+                            ? UsNumberFormat(balances.testBalance)
+                            : value.accountType === REGULAR_ACCOUNT
+                            ? UsNumberFormat(balances.regularBalance)
+                            : UsNumberFormat(balances.secureBalance)}
+                        </Text>
+                        <Text style={styles.cardAmountUnitText}>sats</Text>
+                      </View>
+                    </View>
+                    <View
+                      style={{ justifyContent: 'center', alignItems: 'center' }}
+                    >
+                      <Entypo
+                        name={'dots-three-horizontal'}
+                        color={Colors.borderColor}
+                        size={RFValue(13)}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ) : null}
+          {openCameraFlag ? (
+            <View style={styles.cameraView}>
+              <RNCamera
+                ref={(ref) => {
+                  this.cameraRef = ref;
+                }}
+                style={styles.camera}
+                onBarCodeRead={barcodeRecognized}
+                captureAudio={false}
+              >
+                <View style={{ flex: 1 }}>
+                  <View style={styles.topCornerView}>
+                    <View style={styles.topLeftCornerView} />
+                    <View style={styles.topRightCornerView} />
                   </View>
-                </TouchableOpacity>
-              );
-            })}
+                  <View style={styles.bottomCornerView}>
+                    <View style={styles.bottomLeftCornerView} />
+                    <View style={styles.bottomRightCornerView} />
+                  </View>
+                </View>
+              </RNCamera>
+            </View>
+          ) : (
+            <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
+              <ImageBackground
+                source={require('../../assets/images/icons/iPhone-QR.png')}
+                style={styles.cameraImage}
+              >
+                <View style={{ flex: 1 }}>
+                  <View style={styles.topCornerView}>
+                    <View style={styles.topLeftCornerView} />
+                    <View style={styles.topRightCornerView} />
+                  </View>
+                  <View style={styles.bottomCornerView}>
+                    <View style={styles.bottomLeftCornerView} />
+                    <View style={styles.bottomRightCornerView} />
+                  </View>
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          )}
+          <View style={{ marginTop: 5 }}>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+              }
+            />
           </View>
-        ) : null}
-        {openCameraFlag ? (
-          <View style={styles.cameraView}>
-            <RNCamera
-              ref={(ref) => {
-                this.cameraRef = ref;
-              }}
-              style={styles.camera}
-              onBarCodeRead={barcodeRecognized}
-              captureAudio={false}
-            >
-              <View style={{ flex: 1 }}>
-                <View style={styles.topCornerView}>
-                  <View style={styles.topLeftCornerView} />
-                  <View style={styles.topRightCornerView} />
-                </View>
-                <View style={styles.bottomCornerView}>
-                  <View style={styles.bottomLeftCornerView} />
-                  <View style={styles.bottomRightCornerView} />
-                </View>
-              </View>
-            </RNCamera>
-          </View>
-        ) : (
-          <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
-            <ImageBackground
-              source={require('../../assets/images/icons/iPhone-QR.png')}
-              style={styles.cameraImage}
-            >
-              <View style={{ flex: 1 }}>
-                <View style={styles.topCornerView}>
-                  <View style={styles.topLeftCornerView} />
-                  <View style={styles.topRightCornerView} />
-                </View>
-                <View style={styles.bottomCornerView}>
-                  <View style={styles.bottomLeftCornerView} />
-                  <View style={styles.bottomRightCornerView} />
-                </View>
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
-        )}
-        <View style={{ marginTop: 5 }}>
-          <BottomInfoBox
-            backgroundColor={Colors.white}
-            title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-            }
-          />
         </View>
-      </View>
+      </ScrollView>
       <View
         style={{
-          marginBottom: wp('5%'),
+          marginBottom: hp('2%'),
         }}
       >
         <TouchableOpacity
@@ -331,7 +463,11 @@ const VoucherScanner = (props) => {
                 source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
               />
               <Text style={styles.cardAmountText}>
-                {selectedAccount.amount}
+                {selectedAccount.accountType === TEST_ACCOUNT
+                  ? UsNumberFormat(balances.testBalance)
+                  : selectedAccount.accountType === REGULAR_ACCOUNT
+                  ? UsNumberFormat(balances.regularBalance)
+                  : UsNumberFormat(balances.secureBalance)}
               </Text>
               <Text style={styles.cardAmountUnitText}>sats</Text>
             </View>

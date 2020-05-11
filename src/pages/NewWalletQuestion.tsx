@@ -64,8 +64,6 @@ export default function NewWalletQuestion(props) {
   const [answer, setAnswer] = useState('');
   const [answerMasked, setAnswerMasked] = useState('');
   const [confirmAnswerMasked, setConfirmAnswerMasked] = useState('');
-  const [showIconAnswer, setShowIconAnswer] = useState(false);
-  const [showIconConfirmAnswer, setShowIconConfirmAnswer] = useState(false);
   const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
   const [hideShowAnswer, setHdeShowAnswer] = useState(true);
   const dispatch = useDispatch();
@@ -247,7 +245,6 @@ export default function NewWalletQuestion(props) {
         setAnsError('');
         setConfirmAnswer('');
         setConfirmAnswerMasked('');
-        setShowIconConfirmAnswer(false);
       }, 70);
     }
   };
@@ -481,7 +478,7 @@ export default function NewWalletQuestion(props) {
                         text = text.replace(/[^a-z]/g, '');
                         setAnswer(text);
                         setAnswerMasked(text);
-                        setShowIconAnswer(true);
+                        
                       }}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
@@ -489,7 +486,7 @@ export default function NewWalletQuestion(props) {
                         if (answer.length > 0) {
                           setAnswer('');
                           setAnswerMasked('');
-                          setShowIconAnswer(false);
+                          
                         }
                       }}
                       onBlur={() => {
@@ -518,12 +515,11 @@ export default function NewWalletQuestion(props) {
                           setTimeout(() => {
                             setAnswer('');
                             setAnswerMasked('');
-                            setShowIconAnswer(false);
                           }, 70);
                         }
                       }}
                     />
-                    {showIconAnswer ? 
+                    {answer ? 
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setHdeShowAnswer(!hideShowAnswer);
@@ -535,7 +531,8 @@ export default function NewWalletQuestion(props) {
                         color={Colors.blue}
                         name={hideShowAnswer ? 'eye-off' : 'eye'}
                       />
-                    </TouchableWithoutFeedback> : null}
+                    </TouchableWithoutFeedback> 
+                     : null}
                   </View>
                   <View
                     style={{
@@ -574,7 +571,6 @@ export default function NewWalletQuestion(props) {
                         text = text.replace(/[^a-z]/g, '');
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
-                        setShowIconConfirmAnswer(true);
                       }}
                       onSubmitEditing={event => setConfirm()}
                       onFocus={() => {
@@ -585,13 +581,11 @@ export default function NewWalletQuestion(props) {
                           setAnsError('');
                           setConfirmAnswer('');
                           setConfirmAnswerMasked('');
-                          setShowIconConfirmAnswer(false);
                         }
                       }}
                       onBlur={() => {
                         setConfirmAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
-
                         let temp = '';
                         for (let i = 0; i < tempAns.length; i++) {
                           temp += '*';
@@ -600,7 +594,7 @@ export default function NewWalletQuestion(props) {
                         setConfirm();
                       }}
                     />
-                    {showIconConfirmAnswer ? 
+                    {confirmAnswer ? 
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setHideShowConfirmAnswer(!hideShowConfirmAnswer);
@@ -613,7 +607,8 @@ export default function NewWalletQuestion(props) {
                         color={Colors.blue}
                         name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
                       />
-                    </TouchableWithoutFeedback> : null }
+                    </TouchableWithoutFeedback>
+                     : null }
                   </View>
                 </View>
               ) : (

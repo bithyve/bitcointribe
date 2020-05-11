@@ -189,15 +189,7 @@ export default function Home(props) {
       if (!healthCheckInitialized) dispatch(initHealthCheck());
     }
   }, [s3Service]);
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
 
-  // const balancesParam = props.navigation.getParam('balances');
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -582,13 +574,6 @@ export default function Home(props) {
   }
 
   useEffect(() => {
-    if (tabBarZIndex == 999) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-        setDeepLinkModalOpen(true);
-      }, 2);
-    }
-    TrustedContactRequestBottomSheet.current.snapTo(1);
     getNotificationList();
     let notificationOnFocusListener = props.navigation.addListener(
       'didFocus',
