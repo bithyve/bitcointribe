@@ -43,6 +43,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
@@ -109,16 +110,17 @@ export const fetchDerivativeAccXpubWatcher = createWatcher(
 );
 
 function* fetchDerivativeAccAddressWorker({ payload }) {
-  const { accountType, accountNumber } = payload;
+  const { serviceType, accountType, accountNumber } = payload;
 
-  const serviceType = SECURE_ACCOUNT;
-  const service: SecureAccount = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
-  const { derivativeAccount } = service.secureHDWallet;
+  const { derivativeAccount } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
+
   if (!derivativeAccount[accountType])
-    throw new Error('Invalid derivative account type');
+    throw new Error(
+      `Invalid derivative account: ${accountType} does not exists`,
+    );
 
   console.log({ derivativeAccount });
   const res = yield call(
@@ -688,14 +690,11 @@ function* testWorker({ payload }) {
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
-  const res = yield call(service.getDerivativeAccXpub, 'GET_BITTR');
-  console.log({ res });
-
-  const res2 = yield call(
+  const res = yield call(
     service.getDerivativeAccBalanceTransactions,
-    'GET_BITTR',
+    FAST_BITCOINS,
   );
-  console.log({ res2 });
+  console.log({ res });
   console.log('---------Executed Test Saga---------');
 }
 
