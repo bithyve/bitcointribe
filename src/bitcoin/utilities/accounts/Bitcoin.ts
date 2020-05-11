@@ -306,7 +306,8 @@ export default class Bitcoin {
         transactions.unconfirmedTransactions +=
           addressInfo.UnconfirmedTransactions;
 
-        addressInfo.Transactions.forEach(tx => {
+        console.log({ addressInfo });
+        addressInfo.Transactions.forEach((tx) => {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
@@ -314,7 +315,7 @@ export default class Bitcoin {
             transactions.transactionDetails.push({
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,
-              status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
+              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
               date: tx.Status.block_time
                 ? new Date(tx.Status.block_time * 1000).toUTCString()
@@ -324,6 +325,7 @@ export default class Bitcoin {
               accountType: tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
+              blockTime: tx.Status.block_time, // only available when tx is confirmed
             });
           }
         });
@@ -441,7 +443,7 @@ export default class Bitcoin {
           transactions.totalTransactions += addressInfo.TotalTransactions;
         }
 
-        addressInfo.Transactions.forEach(tx => {
+        addressInfo.Transactions.forEach((tx) => {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
@@ -449,7 +451,7 @@ export default class Bitcoin {
             transactions.transactionDetails.push({
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,
-              status: tx.NumberofConfirmations ? 'Confirmed' : 'Unconfirmed',
+              status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
               date: tx.Status.block_time
                 ? new Date(tx.Status.block_time * 1000).toUTCString()
@@ -459,6 +461,7 @@ export default class Bitcoin {
               accountType: tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
+              blockTime: tx.Status.block_time, // only available when tx is confirmed
             });
           }
         });
@@ -483,7 +486,7 @@ export default class Bitcoin {
           transactions.unconfirmedTransactions +=
             txns.transactions.unconfirmedTransactions;
 
-          txns.transactions.transactionDetails.forEach(tx => {
+          txns.transactions.transactionDetails.forEach((tx) => {
             if (!txMap.has(tx.hash)) {
               // check for duplicate tx (fetched against sending and  then again for change address)
               txMap.set(tx.hash, true);
@@ -616,7 +619,7 @@ export default class Bitcoin {
       throw new Error('Inappropriate value for required param');
     }
     // if (!network) network = bitcoinJS.networks.bitcoin;
-    const pubkeys = pubKeys.map(hex => Buffer.from(hex, 'hex'));
+    const pubkeys = pubKeys.map((hex) => Buffer.from(hex, 'hex'));
 
     const p2ms = bitcoinJS.payments.p2ms({
       m: required,
@@ -694,7 +697,7 @@ export default class Bitcoin {
       return [];
     }
 
-    unspentOutputs = unspentOutputs.map(unspent => ({
+    unspentOutputs = unspentOutputs.map((unspent) => ({
       txId: unspent.tx_hash,
       vout: unspent.tx_output_n,
       value: unspent.value,
@@ -1018,9 +1021,9 @@ export default class Bitcoin {
   ): bitcoinJS.TransactionBuilder => {
     console.log('------ Transaction Signing ----------');
     let vin = 0;
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
       console.log('Signing Input:', input);
-      keyPairs.forEach(keyPair => {
+      keyPairs.forEach((keyPair) => {
         txb.sign(
           vin,
           keyPair,
@@ -1044,8 +1047,8 @@ export default class Bitcoin {
     witnessScript?: any,
   ): bitcoinJS.Transaction => {
     let vin = 0;
-    inputs.forEach(input => {
-      keyPairs.forEach(keyPair => {
+    inputs.forEach((input) => {
+      keyPairs.forEach((keyPair) => {
         txb.sign(
           vin,
           keyPair,
@@ -1141,12 +1144,8 @@ export default class Bitcoin {
     const regenTx: bitcoinJS.Transaction = bitcoinJS.Transaction.fromHex(txHex);
     const recoveredInputs = [];
     await Promise.all(
-      regenTx.ins.map(async inp => {
-        const txId = inp.hash
-          .toString('hex')
-          .match(/.{2}/g)
-          .reverse()
-          .join('');
+      regenTx.ins.map(async (inp) => {
+        const txId = inp.hash.toString('hex').match(/.{2}/g).reverse().join('');
         const vout = inp.index;
         const data = await this.fetchTransactionDetails(txId);
         const value = data.outputs[vout].value;
@@ -1244,7 +1243,7 @@ export default class Bitcoin {
     const probableRecipientList: string[] = [];
     const probableSenderList: string[] = [];
 
-    inputs.forEach(input => {
+    inputs.forEach((input) => {
       if (!input.addresses && !input.prevout) {
         // skip it (quirks from blockcypher)
       } else {
@@ -1260,7 +1259,7 @@ export default class Bitcoin {
       }
     });
 
-    outputs.forEach(output => {
+    outputs.forEach((output) => {
       if (!output.addresses && !output.scriptpubkey_address) {
       } else {
         const address = output.addresses

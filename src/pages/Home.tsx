@@ -80,13 +80,6 @@ import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretM
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
-  getTestcoins,
-  fetchBalance,
-  fetchTransactions,
-  runTest,
-  fetchGetBittrDetails,
-} from '../store/actions/accounts';
-import {
   updateFCMTokens,
   fetchNotifications,
 } from '../store/actions/notifications';
@@ -109,21 +102,13 @@ import NotificationListContent from '../components/NotificationListContent';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
-
-import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import {
-  initializeTrustedContact,
-  approveTrustedContact,
-} from '../store/actions/trustedContacts';
-
 import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 
 export default function Home(props) {
-  
-   // const trustedContacts: TrustedContactsService = useSelector(
+  // const trustedContacts: TrustedContactsService = useSelector(
   //   (state) => state.trustedContacts.service,
   // );
   // useEffect(() => {
@@ -132,10 +117,13 @@ export default function Home(props) {
   //   }, 4000); // letting other db insertion happen
   // }, []);
   // console.log(trustedContacts.tc.trustedContacts['Blake']);
-  const [TrustedContactRequestBottomSheet, setTrustedContactRequestBottomSheet] = useState(React.createRef<BottomSheet>())
-  
-  const [SelectedContact, setSelectedContact] =useState([]);
-  const notificationList = useSelector((state)=>state.notifications);
+  const [
+    TrustedContactRequestBottomSheet,
+    setTrustedContactRequestBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+
+  const [SelectedContact, setSelectedContact] = useState([]);
+  const notificationList = useSelector((state) => state.notifications);
   const [NotificationList, setNotificationList] = useState([]);
   const [
     notificationsListBottomSheet,
@@ -253,23 +241,26 @@ export default function Home(props) {
     setNotificationData(tempNotificationData);
     setNotificationDataChange(!NotificationDataChange);
 
-    if(value.type == 'release'){
+    if (value.type == 'release') {
       RelayServices.fetchReleases(value.info.split(' ')[1])
-      .then(async (res) => {
-        if(res.data.releases.length){
-          let releaseNotes = res.data.releases.length
-          ? res.data.releases.find((el) => {
-              return el.build === value.info.split(' ')[1];
-            })
-          : '';
-      props.navigation.navigate('UpdateApp', {releaseData: [releaseNotes], isOpenFromNotificationList: true, releaseNumber: value.info.split(' ')[1]})
-       } 
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        .then(async (res) => {
+          if (res.data.releases.length) {
+            let releaseNotes = res.data.releases.length
+              ? res.data.releases.find((el) => {
+                  return el.build === value.info.split(' ')[1];
+                })
+              : '';
+            props.navigation.navigate('UpdateApp', {
+              releaseData: [releaseNotes],
+              isOpenFromNotificationList: true,
+              releaseNumber: value.info.split(' ')[1],
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
-    
   };
 
   useEffect(() => {
@@ -597,7 +588,7 @@ export default function Home(props) {
         setDeepLinkModalOpen(true);
       }, 2);
     }
-    TrustedContactRequestBottomSheet.current.snapTo(1)
+    TrustedContactRequestBottomSheet.current.snapTo(1);
     getNotificationList();
     let notificationOnFocusListener = props.navigation.addListener(
       'didFocus',
@@ -610,8 +601,7 @@ export default function Home(props) {
     };
   }, []);
 
-
-  const getNotificationList = async() =>{
+  const getNotificationList = async () => {
     dispatch(fetchNotifications());
   };
 
@@ -644,40 +634,51 @@ export default function Home(props) {
     }
   };
 
-  const setupNotificationList = async() =>{
-    let asyncNotification = JSON.parse(await AsyncStorage.getItem("notificationList"));
+  const setupNotificationList = async () => {
+    let asyncNotification = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
     let asyncNotificationList = [];
-    if(asyncNotification){
+    if (asyncNotification) {
       asyncNotificationList = [];
       for (let i = 0; i < asyncNotification.length; i++) {
         asyncNotificationList.push(asyncNotification[i]);
       }
     }
     let tmpList = asyncNotificationList;
-    if(notificationList){
-      for (let i = 0; i < notificationList["notifications"].length; i++) {
-        const element = notificationList["notifications"][i];
+    if (notificationList) {
+      for (let i = 0; i < notificationList['notifications'].length; i++) {
+        const element = notificationList['notifications'][i];
         let readStatus = false;
-        if(element.notificationType == "release"){
-          let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
-          if(element.body.split(" ")[1] == releaseCases.build){
-            if(releaseCases.remindMeLaterClick){
+        if (element.notificationType == 'release') {
+          let releaseCases = JSON.parse(
+            await AsyncStorage.getItem('releaseCases'),
+          );
+          if (element.body.split(' ')[1] == releaseCases.build) {
+            if (releaseCases.remindMeLaterClick) {
               readStatus = false;
             }
-            if(releaseCases.ignoreClick){
+            if (releaseCases.ignoreClick) {
               readStatus = true;
-            }  
-          }
-          else{
+            }
+          } else {
             readStatus = true;
           }
         }
-        if(asyncNotificationList.findIndex(value=>value.notificationId == element.notificationId)>-1){
-          let temp = asyncNotificationList[asyncNotificationList.findIndex(value=>value.notificationId == element.notificationId)];
-          if(element.notificationType == "release"){
+        if (
+          asyncNotificationList.findIndex(
+            (value) => value.notificationId == element.notificationId,
+          ) > -1
+        ) {
+          let temp =
+            asyncNotificationList[
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
+            ];
+          if (element.notificationType == 'release') {
             readStatus = readStatus;
-          }
-          else{
+          } else {
             readStatus = temp.read;
           }
           let obj = {
@@ -686,28 +687,37 @@ export default function Home(props) {
             type: element.notificationType,
             title: element.title,
             info: element.body,
-            isMandatory: element.tag=="mandatory" ? true : false,
-            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            isMandatory: element.tag == 'mandatory' ? true : false,
+            time: timeFormatter(
+              moment(new Date()),
+              moment(element.date).valueOf(),
+            ),
             date: new Date(element.date),
-          }
-          tmpList[tmpList.findIndex(value=>value.notificationId == element.notificationId)] = obj;
-        }
-        else{
+          };
+          tmpList[
+            tmpList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
+          ] = obj;
+        } else {
           let obj = {
             type: element.notificationType,
-            isMandatory: element.tag=="mandatory" ? true : false,
+            isMandatory: element.tag == 'mandatory' ? true : false,
             read: readStatus,
             title: element.title,
-            time: timeFormatter(moment(new Date()), moment(element.date).valueOf()),
+            time: timeFormatter(
+              moment(new Date()),
+              moment(element.date).valueOf(),
+            ),
             date: new Date(element.date),
             info: element.body,
             notificationId: element.notificationId,
-          }
+          };
           tmpList.push(obj);
         }
       }
-      await AsyncStorage.setItem("notificationList", JSON.stringify(tmpList));
-      tmpList.sort(function(left, right) {
+      await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+      tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNotificationData(tmpList);
@@ -715,22 +725,22 @@ export default function Home(props) {
     }
   };
 
-  const onNotificationOpen = async(item) =>{
+  const onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
-    let asyncNotificationList = JSON.parse(await AsyncStorage.getItem("notificationList"));
-    if(!asyncNotificationList){
-      asyncNotificationList=[];
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (!asyncNotificationList) {
+      asyncNotificationList = [];
     }
     let readStatus = true;
-    if(content.notificationType == "release"){
+    if (content.notificationType == 'release') {
       let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
-      if(releaseCases.ignoreClick){
-        readStatus = true
-      }
-      else if(releaseCases.remindMeLaterClick){
+      if (releaseCases.ignoreClick) {
+        readStatus = true;
+      } else if (releaseCases.remindMeLaterClick) {
         readStatus = false;
-      }
-      else{
+      } else {
         readStatus = false;
       }
     }
@@ -743,17 +753,19 @@ export default function Home(props) {
       date: new Date(),
       info: item.body,
       notificationId: content.notificationId,
-    }
+    };
     asyncNotificationList.push(obj);
-    await AsyncStorage.setItem("notificationList", JSON.stringify(asyncNotificationList));
-    asyncNotificationList.sort(function(left, right) {
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotificationList),
+    );
+    asyncNotificationList.sort(function (left, right) {
       return moment.utc(right.date).unix() - moment.utc(left.date).unix();
     });
     setNotificationData(asyncNotificationList);
     setNotificationDataChange(!NotificationDataChange);
-  }
+  };
 
-  
   useEffect(function () {
     AppState.addEventListener('change', onAppStateChange);
     (async () => {
@@ -816,121 +828,120 @@ export default function Home(props) {
       if (this.appState == 'active') {
         scheduleNotification();
       }
-  }catch (error) {
-  }
-}
+    } catch (error) {}
+  };
 
-const createNotificationListeners = async () => {
-  /*
-   * Triggered when a particular notification has been received in foreground
-   * */
-  this.notificationListener = firebase
-    .notifications()
-    .onNotification((notification) => {
-      onNotificationArrives(notification);
-    });
+  const createNotificationListeners = async () => {
+    /*
+     * Triggered when a particular notification has been received in foreground
+     * */
+    this.notificationListener = firebase
+      .notifications()
+      .onNotification((notification) => {
+        onNotificationArrives(notification);
+      });
 
-  /*
-   * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-   * */
-  this.notificationOpenedListener = firebase
-    .notifications()
-    .onNotificationOpened(async(notificationOpen) => {
+    /*
+     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+     * */
+    this.notificationOpenedListener = firebase
+      .notifications()
+      .onNotificationOpened(async (notificationOpen) => {
+        const { title, body } = notificationOpen.notification;
+        // let data = JSON.parse(notificationOpen.notification.data.content);
+        // if(data.notificationType == "release"){
+        //   props.navigation.navigate('UpdateApp', {releaseData: data})
+        // }
+        getNotificationList();
+        onNotificationOpen(notificationOpen.notification);
+      });
+
+    /*
+     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+     * */
+    const notificationOpen = await firebase
+      .notifications()
+      .getInitialNotification();
+    if (notificationOpen) {
       const { title, body } = notificationOpen.notification;
-      // let data = JSON.parse(notificationOpen.notification.data.content);
-      // if(data.notificationType == "release"){
-      //   props.navigation.navigate('UpdateApp', {releaseData: data})
-      // }
       getNotificationList();
       onNotificationOpen(notificationOpen.notification);
+    }
+    /*
+     * Triggered for data only payload in foreground
+     * */
+    this.messageListener = firebase.messaging().onMessage((message) => {
+      //process data message
     });
+  };
 
-  /*
-   * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
-   * */
-  const notificationOpen = await firebase
-    .notifications()
-    .getInitialNotification();
-  if (notificationOpen) {
-    const { title, body } = notificationOpen.notification;
-    getNotificationList();
-    onNotificationOpen(notificationOpen.notification);
-  }
-  /*
-   * Triggered for data only payload in foreground
-   * */
-  this.messageListener = firebase.messaging().onMessage((message) => {
-    //process data message
-  });
-};
-
-const scheduleNotification = async () => {
-  const notification = new firebase.notifications.Notification()
-    .setTitle('We have not seen you in a while!')
-    .setBody(
-      'Opening your app regularly ensures you get all the notifications and security updates',
-    )
-    .setNotificationId('1')
-    .setSound('default')
-    .setData({
-      title: 'We have not seen you in a while!',
-      body:
+  const scheduleNotification = async () => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle('We have not seen you in a while!')
+      .setBody(
         'Opening your app regularly ensures you get all the notifications and security updates',
-    })
-    .android.setChannelId('reminder')
-    .android.setPriority(firebase.notifications.Android.Priority.High);
+      )
+      .setNotificationId('1')
+      .setSound('default')
+      .setData({
+        title: 'We have not seen you in a while!',
+        body:
+          'Opening your app regularly ensures you get all the notifications and security updates',
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
 
-  // Schedule the notification for 2hours on development and 2 weeks on Production in the future
-  const date = new Date();
-  date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
 
-  // console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
-  await firebase
-    .notifications()
-    .scheduleNotification(notification, {
-      fireDate: date.getTime(),
-      //repeatInterval: 'hour',
-    })
-    .then(() => {})
-    .catch((err) => console.log('err', err));
-  firebase
-    .notifications()
-    .getScheduledNotifications()
-    .then((notifications) => {
-      // console.log('logging notifications', notifications);
-    });
-};
+    // console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        //repeatInterval: 'hour',
+      })
+      .then(() => {})
+      .catch((err) => console.log('err', err));
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
+        // console.log('logging notifications', notifications);
+      });
+  };
 
-const onNotificationArrives = async (notification) => {
-  getNotificationList();
-  const { title, body } = notification;
-  const deviceTrayNotification = new firebase.notifications.Notification()
-    .setTitle(title)
-    .setBody(body)
-    .setNotificationId(notification.notificationId)
-    .setSound('default')
-    .android.setPriority(firebase.notifications.Android.Priority.High)
-    .android.setChannelId(
-      notification.android.channelId
-        ? notification.android.channelId
-        : 'foregroundNotification',
-    ) // previously created
-    .android.setAutoCancel(true); // To remove notification when tapped on it
+  const onNotificationArrives = async (notification) => {
+    getNotificationList();
+    const { title, body } = notification;
+    const deviceTrayNotification = new firebase.notifications.Notification()
+      .setTitle(title)
+      .setBody(body)
+      .setNotificationId(notification.notificationId)
+      .setSound('default')
+      .android.setPriority(firebase.notifications.Android.Priority.High)
+      .android.setChannelId(
+        notification.android.channelId
+          ? notification.android.channelId
+          : 'foregroundNotification',
+      ) // previously created
+      .android.setAutoCancel(true); // To remove notification when tapped on it
 
-  const channelId = new firebase.notifications.Android.Channel(
-    notification.android.channelId,
-    notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
-    firebase.notifications.Android.Importance.High,
-  );
-  firebase.notifications().android.createChannel(channelId);
-  firebase.notifications().displayNotification(deviceTrayNotification);
-};
+    const channelId = new firebase.notifications.Android.Channel(
+      notification.android.channelId,
+      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+      firebase.notifications.Android.Importance.High,
+    );
+    firebase.notifications().android.createChannel(channelId);
+    firebase.notifications().displayNotification(deviceTrayNotification);
+  };
 
-// console.log("notification.data", JSON.parse(notification.data.content));
-//   let data = JSON.parse(notification.data.content);
-//   if(data.notificationType == "release"){
-//     props.navigation.navigate('UpdateApp', {releaseData: data})
-//   }
+  // console.log("notification.data", JSON.parse(notification.data.content));
+  //   let data = JSON.parse(notification.data.content);
+  //   if(data.notificationType == "release"){
+  //     props.navigation.navigate('UpdateApp', {releaseData: data})
+  //   }
 
   // useEffect(() => {
   //   const unsubscribe = firebase
@@ -1219,7 +1230,7 @@ const onNotificationArrives = async (notification) => {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-             View your transactions here
+              View your transactions here
             </Text>
             <Text
               style={{
@@ -1474,7 +1485,7 @@ const onNotificationArrives = async (notification) => {
           if (
             type == 'Fastbitcoins' ||
             type == 'Getbittr' ||
-            type == "buyBitcoins"
+            type == 'buyBitcoins'
           ) {
             setTimeout(() => {
               setAddSubBottomSheetsFlag(true);
@@ -1482,9 +1493,7 @@ const onNotificationArrives = async (notification) => {
               setSelectToAdd(type);
             }, 2);
             (AddBottomSheet as any).current.snapTo(1);
-          } else if (
-            type == 'addContact'
-          ) {
+          } else if (type == 'addContact') {
             setTimeout(() => {
               setAddSubBottomSheetsFlag(true);
               setAddBottomSheetsFlag(true);
@@ -1919,7 +1928,7 @@ const onNotificationArrives = async (notification) => {
       props.navigation.navigate('ChangeCurrency');
       setCurrencyCode(currency);
     } else if (type == 'ChangeWalletName') {
-      props.navigation.navigate("SettingWalletNameChange");
+      props.navigation.navigate('SettingWalletNameChange');
     }
   };
 
@@ -2076,7 +2085,7 @@ const onNotificationArrives = async (notification) => {
     if (type == 'recurringBuy') {
       (GetBittrRecurringBuy as any).current.snapTo(1);
     } else if (type == 'voucher') {
-      props.navigation.navigate("VoucherScanner");
+      props.navigation.navigate('VoucherScanner');
     } else if (type == 'existingSavingMethods') {
       props.navigation.navigate('ExistingSavingMethods');
     }
@@ -2085,7 +2094,7 @@ const onNotificationArrives = async (notification) => {
   const renderAddModalContents = () => {
     if (selectToAdd == 'Getbittr') {
       return renderGetBittrSaveBitcoinContents();
-    }else if (selectToAdd == 'buyBitcoins') {
+    } else if (selectToAdd == 'buyBitcoins') {
       return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'Fastbitcoins') {
       return (
@@ -2283,10 +2292,12 @@ const onNotificationArrives = async (notification) => {
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          props.navigation.navigate("SendRequest");
+          props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
-        onSelectContact={(selectedContact)=>{ setSelectedContact(selectedContact)}}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
+        }}
         onPressBack={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
@@ -2445,17 +2456,6 @@ const onNotificationArrives = async (notification) => {
     if (health) setOverallHealth(health);
   }, [health]);
 
-  useEffect(() => {
-    (async () => {
-      const getBittrDetails = JSON.parse(
-        await AsyncStorage.getItem('getBittrDetails'),
-      );
-      if (!getBittrDetails) {
-        dispatch(fetchGetBittrDetails());
-      }
-    })();
-  }, []);
-
   // useEffect(() => {
   //   dispatch(runTest());
   // }, []);
@@ -2473,71 +2473,6 @@ const onNotificationArrives = async (notification) => {
   //   });
 
   //   // return unsubscribe; // unsubscribing
-  // }, []);
-
-  // const s3Service = useSelector(state => state.sss.service);
-  // useEffect(() => {
-  //   if (s3Service)
-  //     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  // }, [s3Service]);
-
-  // const testAccService = accounts[TEST_ACCOUNT].service;
-  // useEffect(() => {
-  //   (async () => {
-  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-  //         const { balances } = testAccService.hdWallet;
-  //         const netBalance = testAccService
-  //           ? balances.balance + balances.unconfirmedBalance
-  //           : 0;
-  //         if (!netBalance) {
-  //           console.log('Getting Testcoins');
-  //           dispatch(getTestcoins(TEST_ACCOUNT));
-  //         }
-  //       }
-  //   })();
-  // }, [testAccService]);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining a half an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
-  // }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (await AsyncStorage.getItem('walletRecovered')) {
-  //       dispatch(fetchBalance(TEST_ACCOUNT));
-  //       dispatch(fetchBalance(REGULAR_ACCOUNT));
-  //       dispatch(fetchBalance(SECURE_ACCOUNT));
-  //       dispatch(fetchTransactions(TEST_ACCOUNT));
-  //       dispatch(fetchTransactions(REGULAR_ACCOUNT));
-  //       dispatch(fetchTransactions(SECURE_ACCOUNT));
-
-  //       setTimeout(() => {
-  //         AsyncStorage.removeItem('walletRecovered');
-  //       }, 3000);
-  //     }
-  //   })();
   // }, []);
 
   const renderRecoverySecretRequestModalContent = useCallback(() => {
@@ -2731,30 +2666,41 @@ const onNotificationArrives = async (notification) => {
     );
   }, [NotificationData, NotificationDataChange]);
 
-  const renderTrustedContactRequestContent = useCallback(()=>{
-    return <TrustedContactRequest 
-      trustedContactName={'Arpan Jain'}
-      onPressAccept={()=>{setTimeout(() => {
-        setTabBarZIndex(999);
-        setDeepLinkModalOpen(false);
-      }, 2);TrustedContactRequestBottomSheet.current.snapTo(0)}}
-      onPressReject={()=>{setTimeout(() => {
-        setTabBarZIndex(999);
-        setDeepLinkModalOpen(false);
-      }, 2);TrustedContactRequestBottomSheet.current.snapTo(0)}}
-    />
-  },[]);
+  const renderTrustedContactRequestContent = useCallback(() => {
+    return (
+      <TrustedContactRequest
+        trustedContactName={'Arpan Jain'}
+        onPressAccept={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
+          }, 2);
+          TrustedContactRequestBottomSheet.current.snapTo(0);
+        }}
+        onPressReject={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
+          }, 2);
+          TrustedContactRequestBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
-  const renderTrustedContactRequestHeader = useCallback(()=>{
-    return <ModalHeader 
-      onPressHeader={()=>{
-        setTimeout(() => {
-          setTabBarZIndex(999);
-          setDeepLinkModalOpen(false);
-        }, 2);
-        TrustedContactRequestBottomSheet.current.snapTo(0);
-      }} />
-  },[])
+  const renderTrustedContactRequestHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
+          }, 2);
+          TrustedContactRequestBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <ImageBackground
@@ -3250,7 +3196,10 @@ const onNotificationArrives = async (notification) => {
         }}
         enabledInnerScrolling={true}
         ref={TrustedContactRequestBottomSheet as any}
-        snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),]}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
         renderContent={renderTrustedContactRequestContent}
         renderHeader={renderTrustedContactRequestHeader}
       />
@@ -3472,25 +3421,27 @@ const onNotificationArrives = async (notification) => {
         renderContent={renderGetBittrRecurringBuyContents}
         renderHeader={renderGetBittrRecurringBuyHeader}
       />
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-            setFamilyAndFriendsBookBottomSheetsFlag(true);
-          }}
-          onOpenStart={()=>{setTabBarZIndex(0);}}
-          onCloseStart={() => {
-            setTabBarZIndex(999);
-            setFamilyAndFriendsBookBottomSheetsFlag(false);
-          }}
-          enabledInnerScrolling={true}
-          ref={AddContactAddressBookBookBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-          ]}
-          renderContent={renderAddContactAddressBookContents}
-          renderHeader={renderAddContactAddressBookHeader}
-        />
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+          setFamilyAndFriendsBookBottomSheetsFlag(true);
+        }}
+        onOpenStart={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseStart={() => {
+          setTabBarZIndex(999);
+          setFamilyAndFriendsBookBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={AddContactAddressBookBookBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+        ]}
+        renderContent={renderAddContactAddressBookContents}
+        renderHeader={renderAddContactAddressBookHeader}
+      />
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {}}

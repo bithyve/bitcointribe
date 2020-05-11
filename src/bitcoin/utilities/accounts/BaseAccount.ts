@@ -3,7 +3,12 @@ import { Network, TransactionBuilder } from 'bitcoinjs-lib';
 import config from '../../Config';
 import { ErrMap } from '../ErrMap';
 import HDSegwitWallet from './HDSegwitWallet';
-import { Transactions, INotification } from '../Interface';
+import {
+  Transactions,
+  INotification,
+  DerivativeAccounts,
+  TransactionDetails,
+} from '../Interface';
 
 export default class BaseAccount {
   public hdWallet: HDSegwitWallet;
@@ -23,7 +28,9 @@ export default class BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
     },
     network?: Network,
   ) {
@@ -233,6 +240,40 @@ export default class BaseAccount {
         status: 0o1,
         err: err.message,
         message: "Failed to generate derivative account's xpub",
+      };
+    }
+  };
+
+  public getDerivativeAccAddress = async (
+    accountType: string,
+    accountNumber?: number,
+  ): Promise<
+    | {
+        status: number;
+        data: { address: string };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.getDerivativeAccReceivingAddress(
+          accountType,
+          accountNumber,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: "Failed to generate derivative account's address",
       };
     }
   };

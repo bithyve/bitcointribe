@@ -2,7 +2,11 @@ import { TransactionBuilder } from 'bitcoinjs-lib';
 import config from '../../Config';
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
 import { ErrMap } from '../../utilities/ErrMap';
-import { Transactions } from '../../utilities/Interface';
+import {
+  Transactions,
+  DerivativeAccounts,
+  TransactionDetails,
+} from '../../utilities/Interface';
 
 export default class SecureAccount {
   public static fromJSON = (json: string) => {
@@ -22,7 +26,9 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       twoFASetup,
-      derivativeAccount,
+      derivativeAccounts,
+      lastBalTxSync,
+      newTransactions,
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
@@ -45,7 +51,9 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
     } = secureHDWallet;
 
     return new SecureAccount(primaryMnemonic, {
@@ -62,7 +70,9 @@ export default class SecureAccount {
       receivingAddress,
       transactions,
       twoFASetup,
-      derivativeAccount,
+      derivativeAccounts,
+      lastBalTxSync,
+      newTransactions,
     });
   };
 
@@ -91,7 +101,9 @@ export default class SecureAccount {
         qrData: string;
         secret: string;
       };
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
     },
   ) {
     this.secureHDWallet = new SecureHDWallet(primaryMnemonic, stateVars);

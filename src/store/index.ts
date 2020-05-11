@@ -98,7 +98,6 @@ import {
   updateFCMTokensWatcher,
   sendNotificationWatcher,
   fetchNotificationsWatcher,
-  fetchGetBittrDetailsWatcher,
 } from './sagas/notifications';
 
 import {
@@ -205,7 +204,6 @@ const rootSaga = function* () {
     getBalancesWatcher,
 
     // Notifications
-    fetchGetBittrDetailsWatcher,
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
     sendNotificationWatcher,

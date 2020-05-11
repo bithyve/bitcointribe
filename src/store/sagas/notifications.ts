@@ -11,27 +11,6 @@ import {
 import { INotification } from '../../bitcoin/utilities/Interface';
 import { AsyncStorage, Alert } from 'react-native';
 import RelayServices from '../../bitcoin/services/RelayService';
-import { FETCH_GET_BITTR_DETAILS } from '../actions/accounts';
-
-function* fetchGetBittrDetailsWorker({ payload }) {
-  const res = yield call(RelayServices.getBittrDetails);
-  if (res.status === 200) {
-    const { details } = res.data;
-    console.log({ details });
-    yield call(
-      AsyncStorage.setItem,
-      'getBittrDetails',
-      JSON.stringify(details),
-    );
-  } else {
-    console.log('Failed to fetch GetBittr Details');
-  }
-}
-
-export const fetchGetBittrDetailsWatcher = createWatcher(
-  fetchGetBittrDetailsWorker,
-  FETCH_GET_BITTR_DETAILS,
-);
 
 function* updateFCMTokensWorker({ payload }) {
   const { FCMs } = payload;

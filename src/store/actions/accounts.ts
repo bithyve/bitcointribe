@@ -17,7 +17,6 @@ export const RESET_TWO_FA = 'RESET_TWO_FA';
 export const RUN_TEST = 'RUN_TEST';
 export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
 export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
-export const FETCH_GET_BITTR_DETAILS = 'FETCH_GET_BITTR_DETAILS';
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 
@@ -106,10 +105,14 @@ export const fetchDerivativeAccXpub = (accountType, accountNumber?) => {
   };
 };
 
-export const fetchDerivativeAccAddress = (accountType, accountNumber?) => {
+export const fetchDerivativeAccAddress = (
+  serviceType,
+  accountType,
+  accountNumber?,
+) => {
   return {
     type: FETCH_DERIVATIVE_ACC_ADDRESS,
-    payload: { accountType, accountNumber },
+    payload: { serviceType, accountType, accountNumber },
   };
 };
 
@@ -121,12 +124,6 @@ export const fetchDerivativeAccBalTx = (
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: { serviceType, accountType, accountNumber },
-  };
-};
-
-export const fetchGetBittrDetails = () => {
-  return {
-    type: FETCH_GET_BITTR_DETAILS,
   };
 };
 

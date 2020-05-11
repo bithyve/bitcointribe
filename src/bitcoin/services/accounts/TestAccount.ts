@@ -1,6 +1,10 @@
 import * as bitcoinJS from 'bitcoinjs-lib';
 import BaseAccount from '../../utilities/accounts/BaseAccount';
-import { Transactions } from '../../utilities/Interface';
+import {
+  Transactions,
+  DerivativeAccounts,
+  TransactionDetails,
+} from '../../utilities/Interface';
 
 export default class TestAccount extends BaseAccount {
   public static fromJSON = (json: string) => {
@@ -19,7 +23,9 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
-      derivativeAccount,
+      derivativeAccounts,
+      lastBalTxSync,
+      newTransactions,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -34,7 +40,9 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      derivativeAccount: any;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
     } = hdWallet;
 
     return new TestAccount(mnemonic, passphrase, purpose, {
@@ -48,7 +56,9 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
-      derivativeAccount,
+      derivativeAccounts,
+      lastBalTxSync,
+      newTransactions,
     });
   };
 
@@ -67,7 +77,9 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-      derivativeAccount: {};
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
     },
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet;

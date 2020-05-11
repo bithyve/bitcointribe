@@ -9,24 +9,6 @@ const BH_AXIOS: AxiosInstance = axios.create({
 });
 
 export default class Relay {
-  public static getBittrDetails = async () => {
-    try {
-      let res: AxiosResponse;
-      try {
-        res = await BH_AXIOS.post('getBittrDetails', {
-          HEXA_ID,
-        });
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
-      }
-      const { details } = res.data;
-      return { details };
-    } catch (err) {
-      throw new Error('Failed to fetch GetBittr Details');
-    }
-  };
-
   public static fetchReleases = async (
     build: string,
   ): Promise<{
@@ -42,7 +24,7 @@ export default class Relay {
       if (err.response) console.log(err.response.data.err);
       if (err.code) console.log(err.code);
     }
-   
+
     const { releases } = res.data;
     console.log({ releases });
     return { releases };

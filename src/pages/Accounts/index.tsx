@@ -37,6 +37,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
 import {
   fetchBalance,
@@ -99,21 +100,21 @@ export default function Accounts(props) {
       accountInfo: 'Learn Bitcoin',
       backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
-      type: TEST_ACCOUNT
+      type: TEST_ACCOUNT,
     },
     {
       accountType: 'Checking Account',
       accountInfo: 'Fast and easy',
       backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
-      type: REGULAR_ACCOUNT
+      type: REGULAR_ACCOUNT,
     },
     {
       accountType: 'Savings Account',
       accountInfo: 'Multi-factor security',
       backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
-      type: SECURE_ACCOUNT
+      type: SECURE_ACCOUNT,
     },
   ]);
 
@@ -135,9 +136,9 @@ export default function Accounts(props) {
   const [isSecureAccountHelperDone, setIsSecureAccountHelperDone] = useState(
     true,
   );
-  const service = useSelector(state => state.accounts[serviceType].service);
+  const service = useSelector((state) => state.accounts[serviceType].service);
   const loader = useSelector(
-    state => state.accounts[serviceType].loading.balanceTx,
+    (state) => state.accounts[serviceType].loading.balanceTx,
   );
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
@@ -147,7 +148,7 @@ export default function Accounts(props) {
   const [transactions, setTransactions] = useState(wallet.transactions);
   const [averageTxFees, setAverageTxFees] = useState();
 
-  const accounts = useSelector(state => state.accounts);
+  const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
   const [transactionItem, setTransactionItem] = useState({});
   const [
@@ -196,7 +197,7 @@ export default function Accounts(props) {
   useEffect(() => {
     checkGetBittrAccount();
     if (wallet.transactions.transactionDetails.length) {
-      wallet.transactions.transactionDetails.sort(function(left, right) {
+      wallet.transactions.transactionDetails.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
@@ -205,64 +206,49 @@ export default function Accounts(props) {
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
     });
-    
+
     getServiceType(serviceType);
   }, []);
 
-  const checkGetBittrAccount = async() =>{
-    let getBittrAccount = JSON.parse(await AsyncStorage.getItem("getBittrAccounts"));
+  const checkGetBittrAccount = async () => {
+    let getBittrAccount = JSON.parse(
+      await AsyncStorage.getItem('getBittrAccounts'),
+    );
     setGetBittrAccount(getBittrAccount ? getBittrAccount : []);
-  }
-  // useEffect(() => {
-  //   if (serviceType === REGULAR_ACCOUNT) {
-  //     const derivativeAccountType = 'GET_BITTR';
-  //     const accountNumber = 0;
-  //     const { derivativeAccount } = service.hdWallet;
-
-  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
-  //       dispatch(fetchDerivativeAccXpub(derivativeAccountType));
-  //     else {
-  //       console.log({
-  //         getBittrYpub:
-  //           derivativeAccount[derivativeAccountType][accountNumber].ypub,
-  //       });
-  //     }
-  //   }
-  // }, [service]);
+  };
 
   // useEffect(() => {
-  //   if (serviceType === SECURE_ACCOUNT) {
-  //     const derivativeAccountType = 'GET_BITTR';
-  //     const accountNumber = 0;
-  //     const { derivativeAccount } = service.secureHDWallet;
+  //   const accountNumber = 0;
+  //   const { derivativeAccounts } =
+  //     serviceType === SECURE_ACCOUNT
+  //       ? service.secureHDWallet
+  //       : service.hdWallet;
 
-  //     if (!derivativeAccount[derivativeAccountType][accountNumber])
-  //       dispatch(fetchDerivativeAccAddress(derivativeAccountType));
-  //     else {
-  //       console.log({
-  //         getBittrAddress:
-  //           derivativeAccount[derivativeAccountType][accountNumber]
-  //             .receivingAddress,
-  //       });
-  //     }
+  //   if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
+  //     dispatch(fetchDerivativeAccAddress(serviceType, FAST_BITCOINS));
+  //   else {
+  //     console.log({
+  //       FBAddress:
+  //         derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
+  //     });
   //   }
   // }, [service]);
 
   // useEffect(() => {
   //   if (serviceType === REGULAR_ACCOUNT || SECURE_ACCOUNT) {
-  //     const derivativeAccountType = 'GET_BITTR';
+  //     const derivativeAccountType = 'FAST_BITCOINS';
   //     const accountNumber = 0;
-  //     const { derivativeAccount } =
+  //     const { derivativeAccounts } =
   //       serviceType === REGULAR_ACCOUNT
   //         ? service.hdWallet
   //         : service.secureHDWallet;
   //     console.log({
   //       balances:
-  //         derivativeAccount[derivativeAccountType][accountNumber].balances,
+  //         derivativeAccounts[derivativeAccountType][accountNumber].balances,
   //       transactions:
-  //         derivativeAccount[derivativeAccountType][accountNumber].transactions,
+  //         derivativeAccounts[derivativeAccountType][accountNumber].transactions,
   //     });
-  //     if (derivativeAccount[derivativeAccountType][accountNumber].xpub)
+  //     if (derivativeAccounts[derivativeAccountType][accountNumber].xpub)
   //       dispatch(fetchDerivativeAccBalTx(serviceType, derivativeAccountType));
   //   }
   // }, []);
@@ -317,25 +303,25 @@ export default function Accounts(props) {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
 
-  const getServiceType =  (serviceType) => {
-      if (!serviceType) return;
-      setServiceType(serviceType);
-      console.log("Service type", serviceType);
-      setTimeout(() => {
-        if (carousel.current) {
-         if(serviceType == TEST_ACCOUNT) {
+  const getServiceType = (serviceType) => {
+    if (!serviceType) return;
+    setServiceType(serviceType);
+    console.log('Service type', serviceType);
+    setTimeout(() => {
+      if (carousel.current) {
+        if (serviceType == TEST_ACCOUNT) {
           carousel.current.snapToItem(0, true, true);
-                  } else if(serviceType == REGULAR_ACCOUNT) {
-                   carousel.current.snapToItem(1, true, true);
-                  } else if(serviceType == SECURE_ACCOUNT){
-                    carousel.current.snapToItem(2, true, true);
-                  }
-          }
-      }, 2000);
-      
-      if (serviceType == TEST_ACCOUNT) checkNHighlight();
-    }
-  
+        } else if (serviceType == REGULAR_ACCOUNT) {
+          carousel.current.snapToItem(1, true, true);
+        } else if (serviceType == SECURE_ACCOUNT) {
+          carousel.current.snapToItem(2, true, true);
+        }
+      }
+    }, 2000);
+
+    if (serviceType == TEST_ACCOUNT) checkNHighlight();
+  };
+
   const renderItem = ({ item, index }) => {
     return (
       <ImageBackground
@@ -446,8 +432,10 @@ export default function Accounts(props) {
               marginLeft: 'auto',
             }}
           >
-            { (GetBittrAccount.findIndex((value)=>value.accountType == item.type) >-1) ?
-              (<View
+            {GetBittrAccount.findIndex(
+              (value) => value.accountType == item.type,
+            ) > -1 ? (
+              <View
                 style={{
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -466,9 +454,8 @@ export default function Accounts(props) {
                   }}
                   source={require('../../assets/images/icons/icon_getbitter.png')}
                 />
-              </View>)
-              : null
-            }
+              </View>
+            ) : null}
             {item.accountType == 'Savings Account' && (
               <TouchableOpacity
                 style={{
@@ -636,9 +623,7 @@ export default function Accounts(props) {
                           {item.accountType}{' '}
                         </Text>
                         <Text style={styles.transactionModalDateText}>
-                          {moment(item.date)
-                            .utc()
-                            .format('DD MMMM YYYY')}{' '}
+                          {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
                           {/* <Entypo
                       size={10}
                       name={"dot-single"}
@@ -753,16 +738,16 @@ export default function Accounts(props) {
                 }}
               >
                 View your transactions here
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              All your recent transactions across the accounts appear here
-            </Text>
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                All your recent transactions across the accounts appear here
+              </Text>
             </View>
           </View>
         ) : null}
@@ -774,7 +759,7 @@ export default function Accounts(props) {
             flex: 1,
           }}
         >
-          {[1, 2, 3, 4, 5].map(value => {
+          {[1, 2, 3, 4, 5].map((value) => {
             return (
               <View
                 style={{
@@ -1124,7 +1109,7 @@ export default function Accounts(props) {
         setNetBalance(currentBalance);
       }
       if (transactions !== wallet.transactions) {
-        wallet.transactions.transactionDetails.sort(function(left, right) {
+        wallet.transactions.transactionDetails.sort(function (left, right) {
           console.log(
             'moment.utc(right.date),moment.utc(left.date)',
             moment.utc(right.date).unix(),
@@ -1146,7 +1131,7 @@ export default function Accounts(props) {
     //   // dispatch(fetchTransactions(serviceType));
     // }
     if (serviceType === SECURE_ACCOUNT) {
-      AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
+      AsyncStorage.getItem('isSecureAccountHelperDone').then((done) => {
         if (!done) {
           AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
           setTimeout(() => {
@@ -1165,7 +1150,7 @@ export default function Accounts(props) {
       });
     }
     if (serviceType === REGULAR_ACCOUNT) {
-      AsyncStorage.getItem('isRegularAccountHelperDone').then(done => {
+      AsyncStorage.getItem('isRegularAccountHelperDone').then((done) => {
         if (!done) {
           AsyncStorage.setItem('isRegularAccountHelperDone', 'true');
           setTimeout(() => {
@@ -1275,8 +1260,8 @@ export default function Accounts(props) {
                 ref={carousel}
                 data={carouselData}
                 firstItem={carouselInitIndex}
-                onBeforeSnapToItem={index => {
-                  console.log("onBeforeSnapToItem", index);
+                onBeforeSnapToItem={(index) => {
+                  console.log('onBeforeSnapToItem', index);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
@@ -1287,12 +1272,11 @@ export default function Accounts(props) {
                 renderItem={renderItem}
                 sliderWidth={sliderWidth}
                 itemWidth={sliderWidth * 0.95}
-                onSnapToItem={index => {
+                onSnapToItem={(index) => {
                   //console.log('INDEX', index, carouselInitIndex);
                   setTimeout(() => {
                     setCarouselInitIndex(index);
                   }, 2000);
-          
                 }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}

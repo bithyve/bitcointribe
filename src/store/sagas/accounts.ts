@@ -43,6 +43,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
@@ -81,8 +82,8 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
     (state) => state.accounts[serivceType].service,
   );
 
-  const { derivativeAccount } = service.hdWallet;
-  if (derivativeAccount[accountType][accountNumber]) return; // xpub already exists
+  const { derivativeAccounts } = service.hdWallet;
+  if (derivativeAccounts[accountType][accountNumber]) return; // xpub already exists
 
   const res = yield call(
     service.getDerivativeAccXpub,
@@ -109,18 +110,19 @@ export const fetchDerivativeAccXpubWatcher = createWatcher(
 );
 
 function* fetchDerivativeAccAddressWorker({ payload }) {
-  const { accountType, accountNumber } = payload;
+  const { serviceType, accountType, accountNumber } = payload;
 
-  const serviceType = SECURE_ACCOUNT;
-  const service: SecureAccount = yield select(
-    (state) => state.accounts[serviceType].service,
-  );
+  const service = yield select((state) => state.accounts[serviceType].service);
 
-  const { derivativeAccount } = service.secureHDWallet;
-  if (!derivativeAccount[accountType])
-    throw new Error('Invalid derivative account type');
+  const { derivativeAccounts } =
+    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
 
-  console.log({ derivativeAccount });
+  if (!derivativeAccounts[accountType])
+    throw new Error(
+      `Invalid derivative account: ${accountType} does not exists`,
+    );
+
+  console.log({ derivativeAccounts });
   const res = yield call(
     service.getDerivativeAccAddress,
     accountType,
@@ -294,19 +296,19 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
 
   if (!accountNumber) accountNumber = 0;
 
-  const { derivativeAccount } =
+  const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   if (
-    !derivativeAccount[accountType] ||
-    !derivativeAccount[accountType][accountNumber].xpub
+    !derivativeAccounts[accountType] ||
+    !derivativeAccounts[accountType][accountNumber].xpub
   ) {
     throw new Error('Following derivative account does not exists');
   }
 
   const preFetchBalances =
-    derivativeAccount[accountType][accountNumber].balances;
+    derivativeAccounts[accountType][accountNumber].balances;
   const preFetchTransactions =
-    derivativeAccount[accountType][accountNumber].transactions;
+    derivativeAccounts[accountType][accountNumber].transactions;
 
   const res = yield call(
     service.getDerivativeAccBalanceTransactions,
@@ -324,6 +326,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
       JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
+    console.log({ balanceTx: res.data });
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -688,14 +691,11 @@ function* testWorker({ payload }) {
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
-  const res = yield call(service.getDerivativeAccXpub, 'GET_BITTR');
-  console.log({ res });
-
-  const res2 = yield call(
+  const res = yield call(
     service.getDerivativeAccBalanceTransactions,
-    'GET_BITTR',
+    FAST_BITCOINS,
   );
-  console.log({ res2 });
+  console.log({ res });
   console.log('---------Executed Test Saga---------');
 }
 
