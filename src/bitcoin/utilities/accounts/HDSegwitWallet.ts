@@ -7,6 +7,7 @@ import config from '../../Config';
 import Bitcoin from './Bitcoin';
 import { Transactions, INotification } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
+import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
 const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
 
 const BH_AXIOS: AxiosInstance = axios.create({
@@ -199,7 +200,7 @@ export default class HDSegwitWallet extends Bitcoin {
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
       usedAddresses,
-      accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
+      accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
     );
 
     this.derivativeAccount[accountType][accountNumber].balances = balances;

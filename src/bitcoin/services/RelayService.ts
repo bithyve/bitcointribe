@@ -3,36 +3,6 @@ import config from '../Config';
 import { INotification } from '../utilities/Interface';
 
 export default class RelayServices {
-  public static getBittrDetails = async (): Promise<
-    | {
-        status: number;
-        data: {
-          details: any;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await Relay.getBittrDetails(),
-      };
-    } catch (err) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to fetch Get Bittr details',
-      };
-    }
-  };
-
   public static fetchReleases = async (
     build: string,
   ): Promise<

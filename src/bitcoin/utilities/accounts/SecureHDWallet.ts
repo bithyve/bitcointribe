@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import config from '../../Config';
 import { Transactions, DerivativeAccount } from '../Interface';
 import Bitcoin from './Bitcoin';
+import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
 
@@ -515,7 +516,7 @@ export default class SecureHDWallet extends Bitcoin {
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
       consumedAddresses,
-      accountType === 'GET_BITTR' ? 'Get Bittr' : accountType,
+      accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
     );
 
     this.derivativeAccount[accountType][accountNumber].balances = balances;

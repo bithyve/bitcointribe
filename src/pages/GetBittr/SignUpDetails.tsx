@@ -47,8 +47,12 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
+  FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
-import { fetchDerivativeAccXpub, fetchDerivativeAccAddress } from '../../store/actions/accounts';
+import {
+  fetchDerivativeAccXpub,
+  fetchDerivativeAccAddress,
+} from '../../store/actions/accounts';
 import Toast from '../../components/Toast';
 import CountryCode from '../../common/CountryCode';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -72,9 +76,9 @@ export default function SignUpDetails(props) {
   const [InstructionsBottomSheet, setInstructionsBottomSheet] = useState(
     React.createRef(),
   );
-  const [bitcoinAddress, setBitcoinAddress] = useState(props.navigation.state.params
-    ? props.navigation.state.params.address
-    : '');
+  const [bitcoinAddress, setBitcoinAddress] = useState(
+    props.navigation.state.params ? props.navigation.state.params.address : '',
+  );
   const selectedAccount = props.navigation.state.params
     ? props.navigation.state.params.selectedAccount
     : '';
@@ -90,24 +94,24 @@ export default function SignUpDetails(props) {
   const [buttonDisable, setButtonDisable] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [accountNumber, setAccountNumber] = useState(0);
-  const dataGetBittr = useSelector(state => state.bittr);
+  const dataGetBittr = useSelector((state) => state.bittr);
   const [getBittrXpub, setGetBittrXpub] = useState('');
-  const userDetails = useSelector(state => state.bittr.userDetails);
+  const userDetails = useSelector((state) => state.bittr.userDetails);
   const emailVerifiedDetails = useSelector(
-    state => state.bittr.emailVerifiedDetails,
+    (state) => state.bittr.emailVerifiedDetails,
   );
-  const smsSentDetails = useSelector(state => state.bittr.smsSentDetails);
-  const emailSentDetails = useSelector(state => state.bittr.emailSentDetails);
+  const smsSentDetails = useSelector((state) => state.bittr.smsSentDetails);
+  const emailSentDetails = useSelector((state) => state.bittr.emailSentDetails);
 
-  const loading = useSelector(state => state.bittr.loading);
+  const loading = useSelector((state) => state.bittr.loading);
   const dispatch = useDispatch();
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
       ? props.navigation.state.params.selectedAccount.type
       : REGULAR_ACCOUNT,
   );
-  const service = useSelector(state => state.accounts[serviceType].service);
-  const derivativeAccountType = 'GET_BITTR';
+  const service = useSelector((state) => state.accounts[serviceType].service);
+  const derivativeAccountType = FAST_BITCOINS;
   const { derivativeAccount } =
     serviceType === REGULAR_ACCOUNT ? service.hdWallet : service.secureHDWallet;
   // const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -157,16 +161,21 @@ export default function SignUpDetails(props) {
         }
       }
       if (serviceType === SECURE_ACCOUNT) {
-            if (!derivativeAccount[derivativeAccountType][accountNumber])
-              dispatch(fetchDerivativeAccAddress(derivativeAccountType));
-            else {
-              setBitcoinAddress(derivativeAccount[derivativeAccountType][accountNumber].receivingAddress);
-            }
-          }
+        if (!derivativeAccount[derivativeAccountType][accountNumber])
+          dispatch(
+            fetchDerivativeAccAddress(SECURE_ACCOUNT, derivativeAccountType),
+          );
+        else {
+          setBitcoinAddress(
+            derivativeAccount[derivativeAccountType][accountNumber]
+              .receivingAddress,
+          );
+        }
+      }
     }
   }, [service, accountNumber]);
 
-  const handleDeepLink = useCallback(async event => {
+  const handleDeepLink = useCallback(async (event) => {
     const EmailToken1 = event.url.substr(event.url.lastIndexOf('/') + 1);
     await AsyncStorage.setItem(
       'emailToken',
@@ -425,7 +434,7 @@ export default function SignUpDetails(props) {
           getBittrAccounts.push(obj);
         } else {
           let index = getBittrAccounts.findIndex(
-            value => value.accountType == selectedAccount.type,
+            (value) => value.accountType == selectedAccount.type,
           );
           if (index == -1) {
             getBittrAccounts.push(obj);
@@ -592,7 +601,7 @@ export default function SignUpDetails(props) {
               }
               placeholder={'Enter email address'}
               value={emailAddress}
-              onChangeText={value => {
+              onChangeText={(value) => {
                 setEmailAddress(value);
               }}
               placeholderTextColor={Colors.borderColor}
@@ -677,9 +686,9 @@ export default function SignUpDetails(props) {
               </View>
             )}
             </View> */}
-         </View>
+        </View>
       </View>
-      
+
       <View style={{ marginTop: 'auto', marginBottom: hp('4%') }}>
         <BottomInfoBox
           backgroundColor={Colors.white}
@@ -872,8 +881,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     marginTop: hp('1%'),
-    width: wp("23%"),
-    height: hp("30%"),
+    width: wp('23%'),
+    height: hp('30%'),
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
@@ -888,7 +897,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 15,
     paddingRight: 15,
-    flexDirection:'row'
+    flexDirection: 'row',
   },
   dropdownBox: {
     flexDirection: 'row',
