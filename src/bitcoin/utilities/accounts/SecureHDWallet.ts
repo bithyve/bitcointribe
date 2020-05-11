@@ -94,6 +94,7 @@ export default class SecureHDWallet extends Bitcoin {
       };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
     },
     network?: bitcoinJS.Network,
   ) {
@@ -153,6 +154,10 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.lastBalTxSync
         ? stateVars.lastBalTxSync
         : this.lastBalTxSync;
+    this.newTransactions =
+      stateVars && stateVars.newTransactions
+        ? stateVars.newTransactions
+        : this.newTransactions;
   };
 
   public importBHXpub = async (
