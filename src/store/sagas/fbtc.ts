@@ -20,9 +20,9 @@ import fbcApiService from '../../services/fbtc';
 import { createWatcher } from '../utils/utilities';
 
 export function* accountSyncWorker({ payload }) {
-  console.log("payload",payload.data)
+  console.log('payload', payload.data);
   const result = yield call(fbcApiService, 'accountSync', payload.data);
-  console.log("result", result);
+  console.log('result', result);
   if (!result || result.status !== 200) {
     yield put(accountSyncFail());
   } else {
@@ -30,7 +30,7 @@ export function* accountSyncWorker({ payload }) {
     // has a trailing comma.
     // probably a bug but for now will use a simple method to parse it
     // this can be removed once this is verified by fast Bitcoins
-    console.log("result.data", result.data);
+    console.log('result.data', result.data);
     if (typeof result.data == 'string') {
       result.data = string2Json(result.data);
     }
@@ -43,11 +43,25 @@ export const accountSyncWatcher = createWatcher(
   ACCOUNT_SYNC,
 );
 
-export function* getQuoteWorker({ params }) {
-  const result = yield call(fbcApiService, 'getQuote', params);
+function* getQuoteWorker({ payload }) {
+  console.log('payload.data', payload.data);
+  const result = yield call(fbcApiService, 'getQuote', payload.data);
+  result.status = 200;
+  console.log('result getQuoteWorker', result);
   if (!result || result.status !== 200) {
     yield put(getQuoteFail());
   } else {
+    result.data = {
+      amount: 100,
+      bitcoin_amount: 1234567890,
+      commission_amount: 100,
+      commission_rate: 2,
+      currency: 'USD',
+      exchange_rate: 100,
+      expiry_time: 1586698948,
+      quote_token: 'string',
+      verified_account_required: false,
+    };
     yield put(getQuoteSuccess(result.data));
   }
 }
@@ -55,7 +69,7 @@ export function* getQuoteWorker({ params }) {
 export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
 
 export function* executeOrderWorker({ payload }) {
-  const result = yield call(fbcApiService, 'executeOrder', payload);
+  const result = yield call(fbcApiService, 'executeOrder', payload.data);
   if (!result || result.status !== 200) {
     yield put(executeOrderFail());
   } else {

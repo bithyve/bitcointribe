@@ -17,9 +17,9 @@ export const GET_BALANCES_SUCCESS = 'GET_BALANCES_SUCCESS';
 export const accountSync = (data) => {
   return {
     type: ACCOUNT_SYNC,
-    payload: {data}
+    payload: { data },
   };
-}
+};
 
 export const accountSyncSuccess = (data) => {
   return {
@@ -28,7 +28,7 @@ export const accountSyncSuccess = (data) => {
       accountSyncDetails: data,
     },
   };
-}
+};
 
 export const accountSyncFail = () => {
   return {
@@ -37,9 +37,17 @@ export const accountSyncFail = () => {
       accountSyncDetails: null,
     },
   };
+};
+
+export function getQuote(data) {
+  console.log('data getQuote', data);
+  return {
+    type: GET_QUOTE,
+    payload: { data },
+  };
 }
 
-export const getQuoteSuccess = (data) => {
+export function getQuoteSuccess(data) {
   return {
     type: GET_QUOTE_SUCCESS,
     payload: {
@@ -55,16 +63,24 @@ export const getQuoteFail = () => {
       getQuoteDetails: null,
     },
   };
-}
+};
 
-export const executeOrderSuccess = (data) =>{
+export const executeOrder = (data) => {
+  console.log('data getQuote', data);
+  return {
+    type: EXECUTE_ORDER,
+    payload: { data },
+  };
+};
+
+export const executeOrderSuccess = (data) => {
   return {
     type: EXECUTE_ORDER_SUCCESS,
     payload: {
       executeOrderDetails: data,
     },
   };
-}
+};
 
 export const executeOrderFail = () => {
   return {
@@ -73,22 +89,22 @@ export const executeOrderFail = () => {
       executeOrderDetails: null,
     },
   };
-}
+};
 
-export const getBalancesSuccess = (data)=> {
+export const getBalancesSuccess = (data) => {
   return {
     type: GET_BALANCES_SUCCESS,
     payload: {
       getBalancesDetails: data,
     },
   };
-}
+};
 
-export const getBalancesFail = ()=> {
+export const getBalancesFail = () => {
   return {
     type: GET_BALANCES_FAIL,
     payload: {
       getBalancesDetails: null,
     },
   };
-}
+};
