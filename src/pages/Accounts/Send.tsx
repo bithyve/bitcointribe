@@ -109,7 +109,9 @@ export default function Send(props) {
   const getServiceType = props.navigation.getParam('getServiceType')
     ? props.navigation.getParam('getServiceType')
     : null;
-  const isFromAddressBook = props.navigation.getParam('isFromAddressBook') ? props.navigation.getParam('isFromAddressBook') : false;
+  const isFromAddressBook = props.navigation.getParam('isFromAddressBook')
+    ? props.navigation.getParam('isFromAddressBook')
+    : false;
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState('');
@@ -570,7 +572,7 @@ export default function Send(props) {
           );
           if (SendSuccessWithAddressBottomSheet.current)
             SendSuccessWithAddressBottomSheet.current.snapTo(0);
-          props.navigation.replace('Accounts', {serviceType: serviceType});
+          props.navigation.replace('Accounts', { serviceType: serviceType });
         }}
         isSuccess={true}
       />
@@ -701,14 +703,10 @@ export default function Send(props) {
           : sliderValueText === 'In the middle'
           ? 'medium'
           : 'high';
-      dispatch(
-        transferST1(serviceType, {
-          recipientAddress,
-          amount: parseInt(amount),
-          priority,
-          averageTxFees,
-        }),
-      );
+      const recipients = [
+        { address: recipientAddress, amount: parseInt(amount) },
+      ];
+      dispatch(transferST1(serviceType, recipients, priority, averageTxFees));
     }
   };
 
@@ -820,34 +818,35 @@ export default function Send(props) {
                         setIsInvalidAddress(isAddressValid);
                       }}
                     />
-                    {isFromAddressBook ? 
-                    <TouchableOpacity
-                      style={styles.contactNameInputImageView}
-                      onPress={() => {
-                        props.navigation.navigate('AddressBookContents');
-                      }}
-                    >
-                      <Image
-                        style={styles.textBoxImage}
-                        source={require('../../assets/images/icons/icon_phonebook.png')}
-                      />
-                    </TouchableOpacity> : 
-                    <TouchableOpacity
-                      style={styles.contactNameInputImageView}
-                      onPress={() => {
-                        if (bottomSheet.current)
-                          (bottomSheet as any).current.snapTo(1);
-                        // props.navigation.navigate('QrScanner', {
-                        //   scanedCode: getQrCodeData,
-                        // });
-                      }}
-                    >
-                      <Image
-                        style={styles.textBoxImage}
-                        source={require('../../assets/images/icons/qr-code.png')}
-                      />
-                    </TouchableOpacity>
-                    }
+                    {isFromAddressBook ? (
+                      <TouchableOpacity
+                        style={styles.contactNameInputImageView}
+                        onPress={() => {
+                          props.navigation.navigate('AddressBookContents');
+                        }}
+                      >
+                        <Image
+                          style={styles.textBoxImage}
+                          source={require('../../assets/images/icons/icon_phonebook.png')}
+                        />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.contactNameInputImageView}
+                        onPress={() => {
+                          if (bottomSheet.current)
+                            (bottomSheet as any).current.snapTo(1);
+                          // props.navigation.navigate('QrScanner', {
+                          //   scanedCode: getQrCodeData,
+                          // });
+                        }}
+                      >
+                        <Image
+                          style={styles.textBoxImage}
+                          source={require('../../assets/images/icons/qr-code.png')}
+                        />
+                      </TouchableOpacity>
+                    )}
                   </View>
                   {!isInvalidAddress ? (
                     <View style={{ marginLeft: 'auto' }}>
@@ -873,40 +872,42 @@ export default function Send(props) {
                       Send it to a sample address
                     </Text>
                   ) : null}
-                  {isFromAddressBook ? 
-                  <TouchableOpacity
-                    activeOpacity={10}
-                    style={[
-                      dropdownBoxOpenClose
-                        ? styles.dropdownBoxOpened
-                        : styles.dropdownBox,
-                    ]}
-                    onPress={() => {
-                      setDropdownBoxOpenClose(!dropdownBoxOpenClose);
-                    }}
-                  >
-                    <Text
-                      style={{
-                        ...styles.dropdownBoxText,
-                        color: Colors.textColorGrey,
+                  {isFromAddressBook ? (
+                    <TouchableOpacity
+                      activeOpacity={10}
+                      style={[
+                        dropdownBoxOpenClose
+                          ? styles.dropdownBoxOpened
+                          : styles.dropdownBox,
+                      ]}
+                      onPress={() => {
+                        setDropdownBoxOpenClose(!dropdownBoxOpenClose);
                       }}
                     >
-                      {serviceType == TEST_ACCOUNT
-                        ? 'Test Account'
-                        : serviceType == REGULAR_ACCOUNT
-                        ? 'Checking Account'
-                        : 'Saving Account'}
-                    </Text>
-                    <Ionicons
-                      style={{ marginLeft: 'auto' }}
-                      name={
-                        dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
-                      }
-                      size={15}
-                      color={Colors.borderColor}
-                    />
-                  </TouchableOpacity> : null
-}
+                      <Text
+                        style={{
+                          ...styles.dropdownBoxText,
+                          color: Colors.textColorGrey,
+                        }}
+                      >
+                        {serviceType == TEST_ACCOUNT
+                          ? 'Test Account'
+                          : serviceType == REGULAR_ACCOUNT
+                          ? 'Checking Account'
+                          : 'Saving Account'}
+                      </Text>
+                      <Ionicons
+                        style={{ marginLeft: 'auto' }}
+                        name={
+                          dropdownBoxOpenClose
+                            ? 'ios-arrow-up'
+                            : 'ios-arrow-down'
+                        }
+                        size={15}
+                        color={Colors.borderColor}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
                   <View style={{ position: 'relative' }}>
                     {dropdownBoxOpenClose && (
                       <View style={styles.dropdownBoxModal}>
