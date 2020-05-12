@@ -725,7 +725,7 @@ export default class SecureHDWallet extends Bitcoin {
     recipientAddress: string,
     amount: number,
     txnPriority: string,
-    feeRates?: any,
+    averageTxFees?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -756,13 +756,13 @@ export default class SecureHDWallet extends Bitcoin {
       // const txnFee = await this.feeRatesPerByte(txnPriority);
 
       let feePerByte, estimatedBlocks;
-      if (feeRates) {
-        feePerByte = feeRates[txnPriority].feePerByte;
-        estimatedBlocks = feeRates[txnPriority].estimatedBlocks;
+      if (averageTxFees) {
+        feePerByte = averageTxFees[txnPriority].feePerByte;
+        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
       } else {
-        const feeRatesByPriority = await this.feeRatesPerByte();
-        feePerByte = feeRatesByPriority[txnPriority].feePerByte;
-        estimatedBlocks = feeRatesByPriority[txnPriority].estimatedBlocks;
+        const averageTxFees = await this.averageTransactionFee();
+        feePerByte = averageTxFees[txnPriority].feePerByte;
+        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
       }
 
       let balance: number = 0;

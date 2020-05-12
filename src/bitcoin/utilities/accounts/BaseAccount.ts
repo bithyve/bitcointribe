@@ -542,7 +542,7 @@ export default class BaseAccount {
     recipientAddress: string,
     amount: number,
     priority: string = 'high',
-    feeRates?: any,
+    averageTxFees?: any,
   ): Promise<
     | {
         status: number;
@@ -588,7 +588,7 @@ export default class BaseAccount {
           recipientAddress,
           amount,
           priority.toLowerCase(),
-          feeRates,
+          averageTxFees,
         );
 
         if (balance < amount + fee) {

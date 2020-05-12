@@ -587,7 +587,7 @@ export default class SecureAccount {
     recipientAddress: string,
     amount: number,
     priority: string = 'high',
-    feeRates?: any,
+    averageTxFees?: any,
   ): Promise<
     | {
         status: number;
@@ -634,7 +634,7 @@ export default class SecureAccount {
           recipientAddress,
           amount,
           priority,
-          feeRates,
+          averageTxFees,
         );
 
         if (balance < amount + fee) {

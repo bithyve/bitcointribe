@@ -758,7 +758,7 @@ export default class HDSegwitWallet extends Bitcoin {
     recipientAddress: string,
     amount: number,
     txnPriority: string,
-    feeRates?: any,
+    averageTxFees?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -792,13 +792,14 @@ export default class HDSegwitWallet extends Bitcoin {
       });
 
       let feePerByte, estimatedBlocks;
-      if (feeRates) {
-        feePerByte = feeRates[txnPriority].feePerByte;
-        estimatedBlocks = feeRates[txnPriority].estimatedBlocks;
+      console.log({ averageTxFees });
+      if (averageTxFees) {
+        feePerByte = averageTxFees[txnPriority].feePerByte;
+        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
       } else {
-        const feeRatesByPriority = await this.feeRatesPerByte();
-        feePerByte = feeRatesByPriority[txnPriority].feePerByte;
-        estimatedBlocks = feeRatesByPriority[txnPriority].estimatedBlocks;
+        const averageTxFees = await this.averageTransactionFee();
+        feePerByte = averageTxFees[txnPriority].feePerByte;
+        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
       }
 
       const { inputs, outputs, fee } = coinselect(

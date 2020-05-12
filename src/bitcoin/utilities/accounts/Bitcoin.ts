@@ -900,32 +900,29 @@ export default class Bitcoin {
   };
 
   public averageTransactionFee = async () => {
-    const averageTxSize = 250; // the average Bitcoin transaction is about 250 bytes big (1 Inp; 2 Out)
-    const inputUTXOSize = 147; // in bytes
+    const averageTxSize = 225; // the average Bitcoin transaction is about 225 bytes in size (1 Inp; 2 Out)
+    // const inputUTXOSize = 147; // in bytes
 
     const feeRatesByPriority = await this.feeRatesPerByte();
 
     return {
       high: {
         averageTxFee: Math.round(
-          (averageTxSize + inputUTXOSize) *
-            feeRatesByPriority['high'].feePerByte,
+          averageTxSize * feeRatesByPriority['high'].feePerByte,
         ),
         feePerByte: feeRatesByPriority['high'].feePerByte,
         estimatedBlocks: feeRatesByPriority['high'].estimatedBlocks,
       },
       medium: {
         averageTxFee: Math.round(
-          (averageTxSize + inputUTXOSize) *
-            feeRatesByPriority['medium'].feePerByte,
+          averageTxSize * feeRatesByPriority['medium'].feePerByte,
         ),
         feePerByte: feeRatesByPriority['medium'].feePerByte,
         estimatedBlocks: feeRatesByPriority['medium'].estimatedBlocks,
       },
       low: {
         averageTxFee: Math.round(
-          (averageTxSize + inputUTXOSize) *
-            feeRatesByPriority['low'].feePerByte,
+          averageTxSize * feeRatesByPriority['low'].feePerByte,
         ),
         feePerByte: feeRatesByPriority['low'].feePerByte,
         estimatedBlocks: feeRatesByPriority['low'].estimatedBlocks,
