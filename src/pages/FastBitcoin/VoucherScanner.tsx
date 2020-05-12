@@ -10,7 +10,7 @@ import {
   Image,
   ImageBackground,
   AsyncStorage,
-  Linking
+  Linking,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -24,7 +24,7 @@ import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
-  FAST_BITCOINS
+  FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -40,23 +40,34 @@ import AccountVerification from './AccountVerification';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { UsNumberFormat } from '../../common/utilities';
-import { accountSync, getQuote, executeOrder,ClearAccountSyncData } from '../../store/actions/fbtc';
+import {
+  accountSync,
+  getQuote,
+  executeOrder,
+  ClearAccountSyncData,
+} from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 
 const VoucherScanner = (props) => {
   const [bitcoinAddress, setBitcoinAddress] = useState('');
-  const QuoteDetails = useSelector(state=>state.fbtc.getQuoteDetails);
-   const executeOrderDetails = useSelector(state=>state.fbtc.executeOrderDetails);
+  const QuoteDetails = useSelector((state) => state.fbtc.getQuoteDetails);
+  const executeOrderDetails = useSelector(
+    (state) => state.fbtc.executeOrderDetails,
+  );
   const [hideShow, setHideShow] = useState(false);
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [voucherCode, setVoucherCode] = useState('FMB8M733U3EE');
-  const [userKey, setUserKey] = useState('17734b0c-6139-48fc-8f17-23fbb5df3287');
+  const [userKey, setUserKey] = useState(
+    '17734b0c-6139-48fc-8f17-23fbb5df3287',
+  );
   const accounts1 = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
   const dispatch = useDispatch();
-  const accountSyncDetails = useSelector(state => state.fbtc.accountSyncDetails);
-  console.log("accountSyncDetails", accountSyncDetails);
+  const accountSyncDetails = useSelector(
+    (state) => state.fbtc.accountSyncDetails,
+  );
+  console.log('accountSyncDetails', accountSyncDetails);
   useEffect(() => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
   }, [accounts1.exchangeRates]);
@@ -70,7 +81,9 @@ const VoucherScanner = (props) => {
     RegistrationSuccessBottomSheet,
     setRegistrationSuccessBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
-  const [QuoteBottomSheet, setQuoteBottomSheet] = useState(React.createRef<BottomSheet>());
+  const [QuoteBottomSheet, setQuoteBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
   const [
     VoucherRedeemSuccessBottomSheet,
     setVoucherRedeemSuccessBottomSheet,
@@ -106,35 +119,44 @@ const VoucherScanner = (props) => {
     amount: '5,000',
     image: require('../../assets/images/icons/icon_regular.png'),
   });
-  const service = useSelector((state) => state.accounts[selectedAccount.accountType].service);
+  const service = useSelector(
+    (state) => state.accounts[selectedAccount.accountType].service,
+  );
 
   useEffect(() => {
     (async () => {
-      let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount')); 
-    if(FBTCAccountData.user_key){
-      setIsUserRegistered(true);
-    }
+      let FBTCAccountData = JSON.parse(
+        await AsyncStorage.getItem('FBTCAccount'),
+      );
+      if (FBTCAccountData.user_key) {
+        setIsUserRegistered(true);
+      }
     })();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const accountNumber = 0;
-    const { derivativeAccounts } = selectedAccount.accountType === SECURE_ACCOUNT
+    const { derivativeAccounts } =
+      selectedAccount.accountType === SECURE_ACCOUNT
         ? service.secureHDWallet
         : service.hdWallet;
 
     if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
-      dispatch(fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS));
+      dispatch(
+        fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
+      );
     else {
-      if(derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress){
-        setBitcoinAddress(derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress);
+      if (derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress) {
+        setBitcoinAddress(
+          derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
+        );
       }
       console.log({
         FBAddress:
           derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
       });
     }
-  },[selectedAccount])
+  }, [selectedAccount]);
 
   useEffect(() => {
     const testBalance = accounts1[TEST_ACCOUNT].service
@@ -177,40 +199,71 @@ const VoucherScanner = (props) => {
         'voucherData',
         JSON.stringify(voucherDataTemp),
       );
-      let voucherDataafterAdding = JSON.parse(
-        await AsyncStorage.getItem('voucherData'),
-      );
-      console.log('voucherDataafterAdding', voucherDataafterAdding);
     })();
-    if(isUserRegistered) createFBTCAccount();
+    if (isUserRegistered) createFBTCAccount();
   }, [selectedAccount, voucherCode]);
 
   const barcodeRecognized = async (barcodes) => {
-    alert("test")
-    setVoucherCode('FMB8M733U3EE');
-    if(!isUserRegistered){
-      Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
-    }
-    // let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount')); 
-    // if(FBTCAccountData.user_key){
-    //   getQuoteDetailsMethod();
-    // }
-    // else{
-    //   Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
-    // }
     if (barcodes.data) {
+      if (barcodes.data.includes('fastbitcoins.com')) {
+        let tempData = barcodes.data.split('/');
+        setVoucherCode(tempData[tempData.length - 1]);
+        if (!isUserRegistered) {
+          Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
+        }
+      }
       setOpenCameraFlag(false);
     }
   };
 
+  const saveVoucherCodeToAccount = async (selectedAccount, voucherCode) => {
+    let fBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    let temp = true;
+    for (let i = 0; i < fBTCAccount.test_account.voucher.length; i++) {
+      const element = fBTCAccount.test_account.voucher[i];
+      if (voucherCode == element.voucherCode) {
+        temp = false;
+        break;
+      }
+    }
+    if (temp) {
+      for (let i = 0; i < fBTCAccount.checking_account.voucher.length; i++) {
+        const element = fBTCAccount.checking_account.voucher[i];
+        if (voucherCode == element.voucherCode) {
+          temp = false;
+          break;
+        }
+      }
+    }
+    if (temp) {
+      for (let i = 0; i < fBTCAccount.saving_account.voucher.length; i++) {
+        const element = fBTCAccount.saving_account.voucher[i];
+        if (voucherCode == element.voucherCode) {
+          temp = false;
+          break;
+        }
+      }
+    }
+    if (temp) {
+      let accountType = 'saving_account';
+      if (selectedAccount.accountType == TEST_ACCOUNT) {
+        accountType = 'test_account';
+      } else if (selectedAccount.accountType == REGULAR_ACCOUNT) {
+        accountType = 'checking_account';
+      }
+      fBTCAccount[accountType].voucher.push({
+        voucherCode: voucherCode,
+      });
+      await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
+    }
+  };
+
   useEffect(() => {
-    if(userKey)
-    createFBTCAccount();
+    if (userKey) createFBTCAccount();
   }, [userKey]);
 
   const createFBTCAccount = async () => {
     let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    console.log('FBTCAccountData', FBTCAccountData);
     let voucherData = JSON.parse(await AsyncStorage.getItem('voucherData'));
     let obj;
     if (!FBTCAccountData) {
@@ -226,138 +279,126 @@ const VoucherScanner = (props) => {
           voucher: [],
         },
       };
-    } else{
+    } else {
       obj = FBTCAccountData;
     }
-    if (voucherData.selectedAccount.accountType == TEST_ACCOUNT) {
-      obj.test_account.voucher.push({
-        voucherCode: voucherCode,
-      });
-    } else if (voucherData.selectedAccount.accountType == REGULAR_ACCOUNT) {
-      obj.checking_account.voucher.push({
-        voucherCode: voucherCode,
-      });
-    } else {
-      obj.saving_account.voucher.push({
-        voucherCode: voucherCode,
-      });
-    }
-    await AsyncStorage.setItem(
-      'FBTCAccount',
-      JSON.stringify(obj),
+    await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
+    saveVoucherCodeToAccount(
+      voucherData.selectedAccount,
+      voucherData.voucher_code,
     );
-    if(obj.hasOwnProperty('redeem_vouchers') && obj.hasOwnProperty('exchange_balances') && obj.hasOwnProperty('sell_bitcoins')) {
-      if(obj.redeem_vouchers) getQuoteDetailsMethod();
-      return;
-    }
-    else checkAuth();
+    if (
+      obj.hasOwnProperty('redeem_vouchers') &&
+      obj.hasOwnProperty('exchange_balances') &&
+      obj.hasOwnProperty('sell_bitcoins')
+    ) {
+      if (obj.redeem_vouchers) getQuoteDetailsMethod();
+    } else checkAuth();
   };
 
-  const checkAuth = () =>{
+  const checkAuth = () => {
     let data = {
-      userKey: userKey
-    }
+      userKey: userKey,
+    };
     dispatch(accountSync(data));
-  }
+  };
 
   useEffect(() => {
-    if(accountSyncDetails){
-      console.log("accountSyncDetails in if", accountSyncDetails);
+    if (accountSyncDetails) {
+      console.log('accountSyncDetails in if', accountSyncDetails);
       (async () => {
-      let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-      console.log('FBTCAccountData', FBTCAccountData);
-      let obj;
-      if(FBTCAccountData){
-        obj = {
-          ...FBTCAccountData,
-          redeem_vouchers: accountSyncDetails.redeem_vouchers,
-          exchange_balances: accountSyncDetails.exchange_balances,
-          sell_bitcoins: accountSyncDetails.sell_bitcoins,
-        }
-        await AsyncStorage.setItem(
-          'FBTCAccount',
-          JSON.stringify(obj),
+        let FBTCAccountData = JSON.parse(
+          await AsyncStorage.getItem('FBTCAccount'),
         );
-      }
-      if(accountSyncDetails.redeem_vouchers){
-        (RegistrationSuccessBottomSheet as any).current.snapTo(1);
-      }
-      ClearAccountSyncData();
-    })();
+        console.log('FBTCAccountData', FBTCAccountData);
+        let obj;
+        if (FBTCAccountData) {
+          obj = {
+            ...FBTCAccountData,
+            redeem_vouchers: accountSyncDetails.redeem_vouchers,
+            exchange_balances: accountSyncDetails.exchange_balances,
+            sell_bitcoins: accountSyncDetails.sell_bitcoins,
+          };
+          await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
+        }
+        if (accountSyncDetails.redeem_vouchers) {
+          (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+        }
+        ClearAccountSyncData();
+      })();
     }
   }, [accountSyncDetails]);
-  
-  
-  const getQuoteDetailsMethod = async() => {
-    let voucherData = JSON.parse(await AsyncStorage.getItem("voucherData"));
+
+  const getQuoteDetailsMethod = async () => {
+    let voucherData = JSON.parse(await AsyncStorage.getItem('voucherData'));
     let data = {
-      user_key: "17734b0c-6139-48fc-8f17-23fbb5df3287",
-      quote_type: "voucher",
-      currency: "USD",
-      amount: 100.00,
-      voucher_code: voucherData ? voucherData.voucher_code : ""
+      user_key: '17734b0c-6139-48fc-8f17-23fbb5df3287',
+      quote_type: 'voucher',
+      currency: 'USD',
+      amount: 100.0,
+      voucher_code: voucherData ? voucherData.voucher_code : '',
     };
     dispatch(getQuote(data));
-  }
+  };
 
-  useEffect(()=>{
-    if(QuoteDetails){
-    console.log("QuoteDetails", QuoteDetails)
-    QuoteBottomSheet.current.snapTo(1);
-    setTimeout(() => {
-      setQuote(QuoteDetails);
-    }, 2);
-    
+  useEffect(() => {
+    if (QuoteDetails) {
+      console.log('QuoteDetails', QuoteDetails);
+      QuoteBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        setQuote(QuoteDetails);
+      }, 2);
     }
-  },[QuoteDetails]);
+  }, [QuoteDetails]);
 
-  const storeQuotesDetails = async() =>{
-    
-    let voucherFromAsync = JSON.parse(await AsyncStorage.getItem("voucherData"));
-    let fBTCAccountData = JSON.parse(await AsyncStorage.getItem("FBTCAccount"));
-    if(voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT){
+  const storeQuotesDetails = async () => {
+    let voucherFromAsync = JSON.parse(
+      await AsyncStorage.getItem('voucherData'),
+    );
+    let fBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    if (voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT) {
       for (let i = 0; i < fBTCAccountData.test_account.voucher.length; i++) {
         const element = fBTCAccountData.test_account.voucher[i];
-        if(element.voucherCode == voucherFromAsync.voucher_code){
+        if (element.voucherCode == voucherFromAsync.voucher_code) {
           fBTCAccountData.test_account.voucher[i].quotes = QuoteDetails;
-        }
-        else{
+        } else {
           fBTCAccountData.test_account.voucher[i].quotes = QuoteDetails;
-          fBTCAccountData.test_account.voucher[i].voucherCode = voucherFromAsync.voucher_code;
+          fBTCAccountData.test_account.voucher[i].voucherCode =
+            voucherFromAsync.voucher_code;
         }
       }
     }
-    if(voucherFromAsync.selectedAccount.accountType == SECURE_ACCOUNT){
+    if (voucherFromAsync.selectedAccount.accountType == SECURE_ACCOUNT) {
       for (let i = 0; i < fBTCAccountData.saving_account.voucher.length; i++) {
         const element = fBTCAccountData.saving_account.voucher[i];
-        if(element.voucherCode == voucherFromAsync.voucher_code){
+        if (element.voucherCode == voucherFromAsync.voucher_code) {
           fBTCAccountData.saving_account.voucher[i].quotes = QuoteDetails;
-        }
-        else{
+        } else {
           fBTCAccountData.saving_account.voucher[i].quotes = QuoteDetails;
-          fBTCAccountData.saving_account.voucher[i].voucherCode = voucherFromAsync.voucher_code;
+          fBTCAccountData.saving_account.voucher[i].voucherCode =
+            voucherFromAsync.voucher_code;
         }
       }
     }
-    if(voucherFromAsync.selectedAccount.accountType == REGULAR_ACCOUNT){
-      for (let i = 0; i < fBTCAccountData.checking_account.voucher.length; i++) {
+    if (voucherFromAsync.selectedAccount.accountType == REGULAR_ACCOUNT) {
+      for (
+        let i = 0;
+        i < fBTCAccountData.checking_account.voucher.length;
+        i++
+      ) {
         const element = fBTCAccountData.checking_account.voucher[i];
-        if(element.voucherCode == voucherFromAsync.voucher_code){
+        if (element.voucherCode == voucherFromAsync.voucher_code) {
           fBTCAccountData.checking_account.voucher[i].quotes = QuoteDetails;
-        }
-        else{
+        } else {
           fBTCAccountData.checking_account.voucher[i].quotes = QuoteDetails;
-          fBTCAccountData.checking_account.voucher[i].voucherCode = voucherFromAsync.voucher_code;
+          fBTCAccountData.checking_account.voucher[i].voucherCode =
+            voucherFromAsync.voucher_code;
         }
       }
     }
-    await AsyncStorage.setItem(
-      'FBTCAccount',
-      JSON.stringify(fBTCAccountData),
-    );
+    await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccountData));
     executeOrderMethod();
-  }
-  
+  };
 
   const renderRegistrationSuccessModalContent = useCallback(() => {
     return (
@@ -369,12 +410,14 @@ const VoucherScanner = (props) => {
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
         }
         proceedButtonText={'Redeem Voucher'}
-        onPressProceed={async() => {
-          let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-          if(FBTCAccountData.redeem_vouchers){
+        onPressProceed={async () => {
+          let FBTCAccountData = JSON.parse(
+            await AsyncStorage.getItem('FBTCAccount'),
+          );
+          if (FBTCAccountData.redeem_vouchers) {
             getQuoteDetailsMethod();
             (RegistrationSuccessBottomSheet as any).current.snapTo(0);
-          }        
+          }
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
@@ -394,39 +437,55 @@ const VoucherScanner = (props) => {
     );
   }, []);
 
-  useEffect(()=>{
-    if(executeOrderDetails){
+  useEffect(() => {
+    if (executeOrderDetails) {
       storeOrderResponse();
     }
   }, [executeOrderDetails]);
 
-  const storeOrderResponse = async() =>{
-    let fBTCAccountData = JSON.parse(await AsyncStorage.getItem("FBTCAccount"));
-    let voucherFromAsync = JSON.parse(await AsyncStorage.getItem("voucherData"));
-    if(fBTCAccountData){
-      if(voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT){
+  const storeOrderResponse = async () => {
+    let fBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    let voucherFromAsync = JSON.parse(
+      await AsyncStorage.getItem('voucherData'),
+    );
+    if (fBTCAccountData) {
+      if (voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT) {
         for (let i = 0; i < fBTCAccountData.test_account.voucher.length; i++) {
           const element = fBTCAccountData.test_account.voucher[i];
-          if(element.quotes.quote_token == executeOrderDetails.quote_token){
-            fBTCAccountData.test_account.voucher[i].orderData = executeOrderDetails;
+          if (element.quotes.quote_token == executeOrderDetails.quote_token) {
+            fBTCAccountData.test_account.voucher[
+              i
+            ].orderData = executeOrderDetails;
             break;
           }
         }
       }
-      if(voucherFromAsync.selectedAccount.accountType == SECURE_ACCOUNT){
-        for (let i = 0; i < fBTCAccountData.saving_account.voucher.length; i++) {
+      if (voucherFromAsync.selectedAccount.accountType == SECURE_ACCOUNT) {
+        for (
+          let i = 0;
+          i < fBTCAccountData.saving_account.voucher.length;
+          i++
+        ) {
           const element = fBTCAccountData.saving_account.voucher[i];
-          if(element.quotes.quote_token == executeOrderDetails.quote_token){
-            fBTCAccountData.saving_account.voucher[i].orderData = executeOrderDetails;
+          if (element.quotes.quote_token == executeOrderDetails.quote_token) {
+            fBTCAccountData.saving_account.voucher[
+              i
+            ].orderData = executeOrderDetails;
             break;
           }
         }
       }
-      if(voucherFromAsync.selectedAccount.accountType == REGULAR_ACCOUNT){
-        for (let i = 0; i < fBTCAccountData.checking_account.voucher.length; i++) {
+      if (voucherFromAsync.selectedAccount.accountType == REGULAR_ACCOUNT) {
+        for (
+          let i = 0;
+          i < fBTCAccountData.checking_account.voucher.length;
+          i++
+        ) {
           const element = fBTCAccountData.checking_account.voucher[i];
-          if(element.quotes.quote_token == executeOrderDetails.quote_token){
-            fBTCAccountData.checking_account.voucher[i].orderData = executeOrderDetails;
+          if (element.quotes.quote_token == executeOrderDetails.quote_token) {
+            fBTCAccountData.checking_account.voucher[
+              i
+            ].orderData = executeOrderDetails;
             break;
           }
         }
@@ -437,30 +496,34 @@ const VoucherScanner = (props) => {
       );
     }
     VoucherRedeemSuccessBottomSheet.current.snapTo(1);
-  }
+  };
 
-  const executeOrderMethod = async() =>{
-    let fBTCAccountData = JSON.parse(await AsyncStorage.getItem("FBTCAccount"));
-    let voucherFromAsync = JSON.parse(await AsyncStorage.getItem("voucherData"));
-    console.log("Quote.quote_token", Quote, fBTCAccountData)
-    if(fBTCAccountData && fBTCAccountData.user_key){
+  const executeOrderMethod = async () => {
+    let fBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    let voucherFromAsync = JSON.parse(
+      await AsyncStorage.getItem('voucherData'),
+    );
+    console.log('Quote.quote_token', Quote, fBTCAccountData);
+    if (fBTCAccountData && fBTCAccountData.user_key) {
       let data = {
         user_key: fBTCAccountData.user_key,
-        wallet_slug: "bithyve",
-        quote_type: "voucher",
+        wallet_slug: 'bithyve',
+        quote_type: 'voucher',
         quote_token: Quote.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
-        delivery_type: "1",
-        delivery_destination: bitcoinAddress
-      }
+        delivery_type: '1',
+        delivery_destination: bitcoinAddress,
+      };
       dispatch(executeOrder(data));
     }
-  }
+  };
 
   const renderQuoteModalContent = useCallback(() => {
     return (
       <QuoteConfirmation
-        onPressRedeem={() => {storeQuotesDetails()}}
+        onPressRedeem={() => {
+          storeQuotesDetails();
+        }}
         onPressBack={() => {
           QuoteBottomSheet.current.snapTo(0);
         }}
@@ -707,18 +770,20 @@ const VoucherScanner = (props) => {
         renderContent={renderRegistrationSuccessModalContent}
         renderHeader={renderRegistrationSuccessModalHeader}
       />
-      {QuoteDetails &&
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={QuoteBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
-        ]}
-        renderContent={renderQuoteModalContent}
-        renderHeader={renderQuoteModalHeader}
-      />
-      }
+      {QuoteDetails && (
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={QuoteBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('55%')
+              : hp('60%'),
+          ]}
+          renderContent={renderQuoteModalContent}
+          renderHeader={renderQuoteModalHeader}
+        />
+      )}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={VoucherRedeemSuccessBottomSheet as any}
