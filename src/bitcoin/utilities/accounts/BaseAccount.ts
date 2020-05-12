@@ -539,10 +539,12 @@ export default class BaseAccount {
   };
 
   public transferST1 = async (
-    recipientAddress: string,
-    amount: number,
-    priority: string = 'high',
-    feeRates?: any,
+    recipients: {
+      address: string;
+      amount: number;
+    }[],
+    priority,
+    averageTxFees?: any,
   ): Promise<
     | {
         status: number;
@@ -574,47 +576,51 @@ export default class BaseAccount {
     | { status: number; err: string; message: string; data?: undefined }
   > => {
     try {
-      if (this.hdWallet.isValidAddress(recipientAddress)) {
-        // amount = Math.round(amount * 1e8); // converting into sats
-        amount = Math.round(amount);
+      // if (this.hdWallet.isValidAddress(recipientAddress)) {
+      // amount = Math.round(amount * 1e8); // converting into sats
+      // amount = Math.round(amount);
 
-        const {
-          inputs,
-          txb,
-          fee,
-          balance,
-          estimatedBlocks,
-        } = await this.hdWallet.createHDTransaction(
-          recipientAddress,
-          amount,
-          priority.toLowerCase(),
-          feeRates,
-        );
+      const {
+        inputs,
+        txb,
+        fee,
+        balance,
+        estimatedBlocks,
+      } = await this.hdWallet.createHDTransaction(
+        recipients,
+        priority.toLowerCase(),
+        averageTxFees,
+      );
 
-        if (balance < amount + fee) {
-          return {
-            status: 0o6,
-            err:
-              'Insufficient balance to compensate for transfer amount and the txn fee',
-            message: ErrMap[0o6],
-            data: { fee },
-          };
-        }
+      let netAmount = 0;
+      recipients.forEach((recipient) => {
+        netAmount += recipient.amount;
+      });
 
-        if (inputs && txb) {
-          console.log('---- Transaction Created ----');
-          return {
-            status: config.STATUS.SUCCESS,
-            data: { inputs, txb, fee, estimatedBlocks },
-          };
-        } else {
-          throw new Error(
-            'Unable to create transaction: inputs failed at coinselect',
-          );
-        }
-      } else {
-        throw new Error('Recipient address is wrong');
+      if (balance < netAmount + fee) {
+        return {
+          status: 0o6,
+          err:
+            'Insufficient balance to compensate for transfer amount and the txn fee',
+          message: ErrMap[0o6],
+          data: { fee },
+        };
       }
+
+      if (inputs && txb) {
+        console.log('---- Transaction Created ----');
+        return {
+          status: config.STATUS.SUCCESS,
+          data: { inputs, txb, fee, estimatedBlocks },
+        };
+      } else {
+        throw new Error(
+          'Unable to create transaction: inputs failed at coinselect',
+        );
+      }
+      // } else {
+      //   throw new Error('Recipient address is wrong');
+      // }
     } catch (err) {
       return { status: 106, err: err.message, message: ErrMap[106] };
     }
@@ -652,6 +658,7 @@ export default class BaseAccount {
       console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction(txHex);
       console.log('---- Transaction Broadcasted ----');
+      console.log({ txid });
 
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {

@@ -755,10 +755,12 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public createHDTransaction = async (
-    recipientAddress: string,
-    amount: number,
+    recipients: {
+      address: string;
+      amount: number;
+    }[],
     txnPriority: string,
-    feeRates?: any,
+    averageTxFees?: any,
     nSequence?: number,
   ): Promise<
     | {
@@ -784,29 +786,30 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
       console.log('Input UTXOs:', inputUTXOs);
-      const outputUTXOs = [{ address: recipientAddress, value: amount }];
+
+      const outputUTXOs = [];
+      for (const recipient of recipients) {
+        outputUTXOs.push({
+          address: recipient.address,
+          value: recipient.amount,
+        });
+      }
       console.log('Output UTXOs:', outputUTXOs);
       let balance: number = 0;
       inputUTXOs.forEach((utxo) => {
         balance += utxo.value;
       });
 
-      let averageTxFee;
-      let feePerByte;
-      let estimatedBlocks;
-
-      if (feeRates) {
-        averageTxFee = feeRates[txnPriority].averageTxFee;
-        feePerByte = feeRates[txnPriority].feePerByte;
-        estimatedBlocks = feeRates[txnPriority].estimatedBlocks;
+      let feePerByte, estimatedBlocks;
+      console.log({ averageTxFees });
+      if (averageTxFees) {
+        feePerByte = averageTxFees[txnPriority].feePerByte;
+        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
       } else {
-        const feeRatesByPriority = await this.averageTransactionFee();
-        averageTxFee = feeRatesByPriority[txnPriority].averageTxFee;
-        feePerByte = feeRatesByPriority[txnPriority].feePerByte;
-        estimatedBlocks = feeRatesByPriority[txnPriority].estimatedBlocks;
+        const averageTxFees = await this.averageTransactionFee();
+        feePerByte = averageTxFees[txnPriority].feePerByte;
+        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
       }
-
-      console.log({ averageTxFee, feePerByte, estimatedBlocks });
 
       const { inputs, outputs, fee } = coinselect(
         inputUTXOs,
@@ -818,20 +821,10 @@ export default class HDSegwitWallet extends Bitcoin {
       console.log('\tDynamic Fee', fee);
       console.log('\tInputs:', inputs);
       console.log('\tOutputs:', outputs);
-      console.log('Fee diff (static vs dynamic): ', averageTxFee - fee);
 
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
-        return { fee: averageTxFee, balance };
-      }
-
-      // re-estimating number of blocks to confirm based on static vs actual fee
-      let reestimatedBlocks;
-
-      if (averageTxFee - fee >= 0) reestimatedBlocks = estimatedBlocks;
-      else {
-        // TODO: clever estimation mech
-        reestimatedBlocks = estimatedBlocks + 2; // effective priority: medium
+        return { fee, balance };
       }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
@@ -842,11 +835,6 @@ export default class HDSegwitWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
-      outputs.forEach((output) => {
-        if (!output.address) {
-          output.value = output.value + fee - averageTxFee; // applying static fee (averageTxFee)
-        }
-      });
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
@@ -856,9 +844,9 @@ export default class HDSegwitWallet extends Bitcoin {
       return {
         inputs,
         txb,
-        fee: averageTxFee,
+        fee,
         balance,
-        estimatedBlocks: reestimatedBlocks,
+        estimatedBlocks,
       };
     } catch (err) {
       throw new Error(`Transaction creation failed: ${err.message}`);
@@ -906,9 +894,9 @@ export default class HDSegwitWallet extends Bitcoin {
         amount = amount * 1e8; // converting into sats
         const { balance } = await this.fetchBalance();
 
+        const recipients = [{ address: recipientAddress, amount }];
         const { inputs, txb, fee } = await this.createHDTransaction(
-          recipientAddress,
-          amount,
+          recipients,
           'high',
         );
         console.log('---- Transaction Created ----');
