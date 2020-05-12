@@ -177,13 +177,13 @@ const VoucherScanner = (props) => {
   const barcodeRecognized = async (barcodes) => {
     alert("test")
     setVoucherCode('FMB8M733U3EE');
-    let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount')); 
-    if(FBTCAccountData.user_key){
-      getQuoteDetailsMethod();
-    }
-    else{
-      Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
-    }
+    // let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount')); 
+    // if(FBTCAccountData.user_key){
+    //   getQuoteDetailsMethod();
+    // }
+    // else{
+    //   Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
+    // }
     if (barcodes.data) {
       setOpenCameraFlag(false);
     }
@@ -194,12 +194,6 @@ const VoucherScanner = (props) => {
     createFBTCAccount();
   }, [userKey]);
 
-  useEffect(()=>{
-    if(accountSyncDetails && accountSyncDetails.redeem_vouchers){
-      getQuoteDetailsMethod();
-    }
-  }, [accountSyncDetails])
-
   const createFBTCAccount = async () => {
     let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     console.log('FBTCAccountData', FBTCAccountData);
@@ -208,9 +202,6 @@ const VoucherScanner = (props) => {
     if (!FBTCAccountData) {
       obj = {
         user_key: userKey,
-        // redeem_vouchers: false,
-        // exchange_balances: false,
-        // sell_bitcoins: false,
         test_account: {
           voucher: [],
         },
@@ -253,6 +244,34 @@ const VoucherScanner = (props) => {
     dispatch(accountSync(data));
   }
 
+  useEffect(() => {
+    if(accountSyncDetails){
+      console.log("accountSyncDetails in if", accountSyncDetails);
+      (async () => {
+      let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+      console.log('FBTCAccountData', FBTCAccountData);
+      let obj;
+      if(FBTCAccountData){
+        obj = {
+          ...FBTCAccountData,
+          redeem_vouchers: accountSyncDetails.redeem_vouchers,
+          exchange_balances: accountSyncDetails.exchange_balances,
+          sell_bitcoins: accountSyncDetails.sell_bitcoins,
+        }
+        await AsyncStorage.setItem(
+          'FBTCAccount',
+          JSON.stringify(obj),
+        );
+      }
+      if(accountSyncDetails.redeem_vouchers){
+        (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+      }
+      ClearAccountSyncData();
+    })();
+    }
+  }, [accountSyncDetails]);
+  
+  
   const getQuoteDetailsMethod = async() => {
     let voucherData = JSON.parse(await AsyncStorage.getItem("voucherData"));
     let data = {
@@ -311,33 +330,6 @@ const VoucherScanner = (props) => {
       }
     }
   }
-  useEffect(() => {
-    if(accountSyncDetails){
-      console.log("accountSyncDetails in if", accountSyncDetails);
-      (async () => {
-      let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-      console.log('FBTCAccountData', FBTCAccountData);
-      let obj;
-      if(FBTCAccountData){
-        obj = {
-          ...FBTCAccountData,
-          redeem_vouchers: accountSyncDetails.redeem_vouchers,
-          exchange_balances: accountSyncDetails.exchange_balances,
-          sell_bitcoins: accountSyncDetails.sell_bitcoins,
-        }
-        await AsyncStorage.setItem(
-          'FBTCAccount',
-          JSON.stringify(obj),
-        );
-      }
-      if(accountSyncDetails.redeem_vouchers){
-        (RegistrationSuccessBottomSheet as any).current.snapTo(1);
-      }
-      ClearAccountSyncData();
-    })();
-    }
-  }, [accountSyncDetails]);
-  
   
 
   const renderRegistrationSuccessModalContent = useCallback(() => {
@@ -350,8 +342,12 @@ const VoucherScanner = (props) => {
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
         }
         proceedButtonText={'Redeem Voucher'}
-        onPressProceed={() => {
-          (RegistrationSuccessBottomSheet as any).current.snapTo(0);
+        onPressProceed={async() => {
+          let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+          if(FBTCAccountData.redeem_vouchers){
+            getQuoteDetailsMethod();
+            (RegistrationSuccessBottomSheet as any).current.snapTo(0);
+          }        
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
