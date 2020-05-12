@@ -209,7 +209,8 @@ const VoucherScanner = (props) => {
         let tempData = barcodes.data.split('/');
         setVoucherCode(tempData[tempData.length - 1]);
         if (!isUserRegistered) {
-          Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
+          AccountVerificationBottomSheet.current.snapTo(1);
+          //Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
         }
       }
       setOpenCameraFlag(false);
@@ -221,7 +222,7 @@ const VoucherScanner = (props) => {
     let temp = true;
     for (let i = 0; i < fBTCAccount.test_account.voucher.length; i++) {
       const element = fBTCAccount.test_account.voucher[i];
-      if (voucherCode == element.voucherCode) {
+      if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
         temp = false;
         break;
       }
@@ -229,7 +230,7 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.checking_account.voucher.length; i++) {
         const element = fBTCAccount.checking_account.voucher[i];
-        if (voucherCode == element.voucherCode) {
+        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
           temp = false;
           break;
         }
@@ -238,7 +239,7 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.saving_account.voucher.length; i++) {
         const element = fBTCAccount.saving_account.voucher[i];
-        if (voucherCode == element.voucherCode) {
+        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
           temp = false;
           break;
         }
@@ -549,7 +550,9 @@ const VoucherScanner = (props) => {
   const renderVoucherRedeemSuccessModalContent = useCallback(() => {
     return (
       <VoucherRedeemSuccess
-        onPressRedeem={() => {}}
+        onPressRedeem={() => {
+          props.navigation.navigate("Account");
+        }}
         onPressBack={() => {
           VoucherRedeemSuccessBottomSheet.current.snapTo(0);
         }}
@@ -572,7 +575,7 @@ const VoucherScanner = (props) => {
 
   const renderAccountVerificationModalContent = useCallback(() => {
     return (
-      <AccountVerification link={'http://fastbitcoin/accountverificat…'} />
+      <AccountVerification link={'https://fb-web-dev.aao-tech.com/bithyve'} />
     );
   }, []);
 
