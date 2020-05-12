@@ -755,21 +755,15 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('Output UTXOs:', outputUTXOs);
       // const txnFee = await this.feeRatesPerByte(txnPriority);
 
-      let averageTxFee;
-      let feePerByte;
-      let estimatedBlocks;
-
+      let feePerByte, estimatedBlocks;
       if (feeRates) {
-        averageTxFee = feeRates[txnPriority].averageTxFee;
         feePerByte = feeRates[txnPriority].feePerByte;
         estimatedBlocks = feeRates[txnPriority].estimatedBlocks;
       } else {
-        const feeRatesByPriority = await this.averageTransactionFee();
-        averageTxFee = feeRatesByPriority[txnPriority].averageTxFee;
+        const feeRatesByPriority = await this.feeRatesPerByte();
         feePerByte = feeRatesByPriority[txnPriority].feePerByte;
         estimatedBlocks = feeRatesByPriority[txnPriority].estimatedBlocks;
       }
-      console.log({ averageTxFee, feePerByte, estimatedBlocks });
 
       let balance: number = 0;
       inputUTXOs.forEach((utxo) => {
@@ -787,14 +781,7 @@ export default class SecureHDWallet extends Bitcoin {
 
       if (!inputs) {
         // insufficient input utxos to compensate for output utxos + fee
-        return { fee: averageTxFee, balance };
-      }
-
-      let reestimatedBlocks;
-      if (averageTxFee - fee >= 0) reestimatedBlocks = estimatedBlocks;
-      else {
-        // TODO: clever estimation mech
-        reestimatedBlocks = estimatedBlocks + 2; // effective priority: medium
+        return { fee, balance };
       }
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
@@ -805,11 +792,6 @@ export default class SecureHDWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
-      outputs.forEach((output) => {
-        if (!output.address) {
-          output.value = output.value + fee - averageTxFee; // applying static fee (averageTxFee)
-        }
-      });
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
@@ -819,9 +801,9 @@ export default class SecureHDWallet extends Bitcoin {
       return {
         inputs,
         txb,
-        fee: averageTxFee,
+        fee,
         balance,
-        estimatedBlocks: reestimatedBlocks,
+        estimatedBlocks,
       };
     } catch (err) {
       throw new Error(`Transaction creation failed: ${err.message}`);
