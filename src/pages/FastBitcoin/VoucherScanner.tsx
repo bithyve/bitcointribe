@@ -40,21 +40,22 @@ import AccountVerification from './AccountVerification';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { UsNumberFormat } from '../../common/utilities';
-import { accountSync, getQuote, executeOrder } from '../../store/actions/fbtc';
+import { accountSync, getQuote, executeOrder,ClearAccountSyncData } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 
 const VoucherScanner = (props) => {
   const [bitcoinAddress, setBitcoinAddress] = useState('');
-  const dispatch = useDispatch();
-  const QuoteDetails = useSelector(state=>state.fBTC.getQuoteDetails);
-  const accountSyncDetails = useSelector(state=>state.fBTC.accountSyncDetails);
-  const executeOrderDetails = useSelector(state=>state.fBTC.executeOrderDetails);
+  const QuoteDetails = useSelector(state=>state.fbtc.getQuoteDetails);
+   const executeOrderDetails = useSelector(state=>state.fbtc.executeOrderDetails);
   const [hideShow, setHideShow] = useState(false);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [voucherCode, setVoucherCode] = useState('FMB8M733U3EE');
   const [userKey, setUserKey] = useState('17734b0c-6139-48fc-8f17-23fbb5df3287');
   const accounts1 = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
+  const dispatch = useDispatch();
+  const accountSyncDetails = useSelector(state => state.fbtc.accountSyncDetails);
+  console.log("accountSyncDetails", accountSyncDetails);
   useEffect(() => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
   }, [accounts1.exchangeRates]);
@@ -207,9 +208,9 @@ const VoucherScanner = (props) => {
     if (!FBTCAccountData) {
       obj = {
         user_key: userKey,
-        redeem_vouchers: false,
-        exchange_balances: false,
-        sell_bitcoins: false,
+        // redeem_vouchers: false,
+        // exchange_balances: false,
+        // sell_bitcoins: false,
         test_account: {
           voucher: [],
         },
@@ -236,11 +237,12 @@ const VoucherScanner = (props) => {
         voucherCode: voucherCode,
       });
     }
-   
     await AsyncStorage.setItem(
       'FBTCAccount',
-      JSON.stringify(obj)
+      JSON.stringify(obj),
     );
+    if(obj.hasOwnProperty('redeem_vouchers') && obj.hasOwnProperty('exchange_balances') && obj.hasOwnProperty('sell_bitcoins')) return;
+    else
     checkAuth();
   };
 
@@ -309,6 +311,34 @@ const VoucherScanner = (props) => {
       }
     }
   }
+  useEffect(() => {
+    if(accountSyncDetails){
+      console.log("accountSyncDetails in if", accountSyncDetails);
+      (async () => {
+      let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+      console.log('FBTCAccountData', FBTCAccountData);
+      let obj;
+      if(FBTCAccountData){
+        obj = {
+          ...FBTCAccountData,
+          redeem_vouchers: accountSyncDetails.redeem_vouchers,
+          exchange_balances: accountSyncDetails.exchange_balances,
+          sell_bitcoins: accountSyncDetails.sell_bitcoins,
+        }
+        await AsyncStorage.setItem(
+          'FBTCAccount',
+          JSON.stringify(obj),
+        );
+      }
+      if(accountSyncDetails.redeem_vouchers){
+        (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+      }
+      ClearAccountSyncData();
+    })();
+    }
+  }, [accountSyncDetails]);
+  
+  
 
   const renderRegistrationSuccessModalContent = useCallback(() => {
     return (

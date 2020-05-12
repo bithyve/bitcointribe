@@ -20,22 +20,29 @@ import fbcApiService from '../../services/fbtc';
 import { createWatcher } from '../utils/utilities';
 
 export function* accountSyncWorker({ payload }) {
-  console.log('payload', payload.data);
-  const result = yield call(fbcApiService, 'accountSync', payload.data);
-  console.log('result', result);
-  if (!result || result.status !== 200) {
-    yield put(accountSyncFail());
-  } else {
-    // the return type is not json in this instance and
-    // has a trailing comma.
-    // probably a bug but for now will use a simple method to parse it
-    // this can be removed once this is verified by fast Bitcoins
-    console.log('result.data', result.data);
-    if (typeof result.data == 'string') {
-      result.data = string2Json(result.data);
+  console.log("payload",payload.data)
+  //let result = yield call(fbcApiService, 'accountSync', payload.data);
+  let result = {
+    "data":{
+    "redeem_vouchers": true,
+      "exchange_balances": true,
+      "sell_bitcoins": true
     }
+}
+console.log("result", result.data);
+  // if (!result || result.status !== 200) {
+  //   yield put(accountSyncFail());
+  // } else {
+  //   // the return type is not json in this instance and
+  //   // has a trailing comma.
+  //   // probably a bug but for now will use a simple method to parse it
+  //   // this can be removed once this is verified by fast Bitcoins
+  //   console.log("result.data", result.data);
+  //   if (typeof result.data == 'string') {
+  //     result.data = string2Json(result.data);
+  //   }
     yield put(accountSyncSuccess(result.data));
-  }
+  //}
 }
 
 export const accountSyncWatcher = createWatcher(

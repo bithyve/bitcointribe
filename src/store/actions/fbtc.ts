@@ -1,6 +1,7 @@
 export const ACCOUNT_SYNC = 'ACCOUNT_SYNC';
 export const ACCOUNT_SYNC_FAIL = 'ACCOUNT_SYNC_FAIL';
 export const ACCOUNT_SYNC_SUCCESS = 'ACCOUNT_SYNC_SUCCESS';
+export const ACCOUNT_SYNC_CLEAR = 'ACCOUNT_SYNC_CLEAR';
 
 export const GET_QUOTE = 'GET_QUOTE';
 export const GET_QUOTE_FAIL = 'GET_QUOTE_FAIL';
@@ -21,21 +22,21 @@ export const accountSync = (data) => {
   };
 };
 
-export const accountSyncSuccess = (data) => {
+export const ClearAccountSyncData = () => {
+  return { type: ACCOUNT_SYNC_CLEAR };
+};
+
+export const accountSyncSuccess = data => {
   return {
     type: ACCOUNT_SYNC_SUCCESS,
-    payload: {
-      accountSyncDetails: data,
-    },
+    payload: { accountSyncDetails: data },
   };
 };
 
 export const accountSyncFail = () => {
   return {
     type: ACCOUNT_SYNC_FAIL,
-    payload: {
-      accountSyncDetails: null,
-    },
+    payload: { accountSyncDetails: null },
   };
 };
 
@@ -50,11 +51,9 @@ export function getQuote(data) {
 export function getQuoteSuccess(data) {
   return {
     type: GET_QUOTE_SUCCESS,
-    payload: {
-      getQuoteDetails: data,
-    },
+    payload: { getQuoteDetails: data },
   };
-}
+};
 
 export const getQuoteFail = () => {
   return {
