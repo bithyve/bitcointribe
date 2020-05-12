@@ -48,6 +48,7 @@ const VoucherScanner = (props) => {
   const QuoteDetails = useSelector(state=>state.fbtc.getQuoteDetails);
    const executeOrderDetails = useSelector(state=>state.fbtc.executeOrderDetails);
   const [hideShow, setHideShow] = useState(false);
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [voucherCode, setVoucherCode] = useState('FMB8M733U3EE');
   const [userKey, setUserKey] = useState('17734b0c-6139-48fc-8f17-23fbb5df3287');
@@ -78,7 +79,7 @@ const VoucherScanner = (props) => {
     AccountVerificationBottomSheet,
     setAccountVerificationBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
-  const [Quote, setQuote ] = useState(null);
+  const [Quote, setQuote] = useState({});
   const accounts = [
     {
       accountType: REGULAR_ACCOUNT,
@@ -106,6 +107,15 @@ const VoucherScanner = (props) => {
     image: require('../../assets/images/icons/icon_regular.png'),
   });
   const service = useSelector((state) => state.accounts[selectedAccount.accountType].service);
+
+  useEffect(() => {
+    (async () => {
+      let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount')); 
+    if(FBTCAccountData.user_key){
+      setIsUserRegistered(true);
+    }
+    })();
+  }, []);
 
   useEffect(()=>{
     const accountNumber = 0;
@@ -172,11 +182,15 @@ const VoucherScanner = (props) => {
       );
       console.log('voucherDataafterAdding', voucherDataafterAdding);
     })();
+    if(isUserRegistered) createFBTCAccount();
   }, [selectedAccount, voucherCode]);
 
   const barcodeRecognized = async (barcodes) => {
     alert("test")
     setVoucherCode('FMB8M733U3EE');
+    if(!isUserRegistered){
+      Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
+    }
     // let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount')); 
     // if(FBTCAccountData.user_key){
     //   getQuoteDetailsMethod();
@@ -232,9 +246,11 @@ const VoucherScanner = (props) => {
       'FBTCAccount',
       JSON.stringify(obj),
     );
-    if(obj.hasOwnProperty('redeem_vouchers') && obj.hasOwnProperty('exchange_balances') && obj.hasOwnProperty('sell_bitcoins')) return;
-    else
-    checkAuth();
+    if(obj.hasOwnProperty('redeem_vouchers') && obj.hasOwnProperty('exchange_balances') && obj.hasOwnProperty('sell_bitcoins')) {
+      if(obj.redeem_vouchers) getQuoteDetailsMethod();
+      return;
+    }
+    else checkAuth();
   };
 
   const checkAuth = () =>{
@@ -285,12 +301,18 @@ const VoucherScanner = (props) => {
   }
 
   useEffect(()=>{
+    if(QuoteDetails){
     console.log("QuoteDetails", QuoteDetails)
-    setQuote(QuoteDetails);
+    QuoteBottomSheet.current.snapTo(1);
+    setTimeout(() => {
+      setQuote(QuoteDetails);
+    }, 2);
+    
+    }
   },[QuoteDetails]);
 
   const storeQuotesDetails = async() =>{
-    QuoteBottomSheet.current.snapTo(1);
+    
     let voucherFromAsync = JSON.parse(await AsyncStorage.getItem("voucherData"));
     let fBTCAccountData = JSON.parse(await AsyncStorage.getItem("FBTCAccount"));
     if(voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT){
@@ -329,6 +351,11 @@ const VoucherScanner = (props) => {
         }
       }
     }
+    await AsyncStorage.setItem(
+      'FBTCAccount',
+      JSON.stringify(fBTCAccountData),
+    );
+    executeOrderMethod();
   }
   
 
@@ -404,18 +431,25 @@ const VoucherScanner = (props) => {
           }
         }
       }
+      await AsyncStorage.setItem(
+        'FBTCAccount',
+        JSON.stringify(fBTCAccountData),
+      );
     }
+    VoucherRedeemSuccessBottomSheet.current.snapTo(1);
   }
 
   const executeOrderMethod = async() =>{
     let fBTCAccountData = JSON.parse(await AsyncStorage.getItem("FBTCAccount"));
+    let voucherFromAsync = JSON.parse(await AsyncStorage.getItem("voucherData"));
+    console.log("Quote.quote_token", Quote, fBTCAccountData)
     if(fBTCAccountData && fBTCAccountData.user_key){
       let data = {
         user_key: fBTCAccountData.user_key,
         wallet_slug: "bithyve",
         quote_type: "voucher",
         quote_token: Quote.quote_token,
-        voucher_code: fBTCAccountData.voucher_code,
+        voucher_code: voucherFromAsync.voucher_code,
         delivery_type: "1",
         delivery_destination: bitcoinAddress
       }
@@ -426,7 +460,7 @@ const VoucherScanner = (props) => {
   const renderQuoteModalContent = useCallback(() => {
     return (
       <QuoteConfirmation
-        onPressRedeem={() => {storeQuotesDetails(); executeOrderMethod();}}
+        onPressRedeem={() => {storeQuotesDetails()}}
         onPressBack={() => {
           QuoteBottomSheet.current.snapTo(0);
         }}
@@ -457,9 +491,7 @@ const VoucherScanner = (props) => {
           VoucherRedeemSuccessBottomSheet.current.snapTo(0);
         }}
         accountName={selectedAccount.accountName}
-        purchasedFor={'17,000'}
-        redeemAmount={'2,065,000'}
-        bitcoinRate={'8,687.70'}
+        redeemAmount={'17,000'}
         loading={false}
       />
     );

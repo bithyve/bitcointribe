@@ -52,13 +52,14 @@ export const accountSyncWatcher = createWatcher(
 
 function* getQuoteWorker({ payload }) {
   console.log('payload.data', payload.data);
-  const result = yield call(fbcApiService, 'getQuote', payload.data);
-  result.status = 200;
-  console.log('result getQuoteWorker', result);
-  if (!result || result.status !== 200) {
-    yield put(getQuoteFail());
-  } else {
-    result.data = {
+  //const result = yield call(fbcApiService, 'getQuote', payload.data);
+  // result.status = 200;
+  // console.log('result getQuoteWorker', result);
+  // if (!result || result.status !== 200) {
+  //   yield put(getQuoteFail());
+  // } else {
+   let result = {
+     "data":{
       amount: 100,
       bitcoin_amount: 1234567890,
       commission_amount: 100,
@@ -66,22 +67,31 @@ function* getQuoteWorker({ payload }) {
       currency: 'USD',
       exchange_rate: 100,
       expiry_time: 1586698948,
-      quote_token: 'string',
+      quote_token: 'qwertyu',
       verified_account_required: false,
-    };
-    yield put(getQuoteSuccess(result.data));
+    }
   }
+    yield put(getQuoteSuccess(result.data));
+ // }
 }
 
 export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
 
 export function* executeOrderWorker({ payload }) {
-  const result = yield call(fbcApiService, 'executeOrder', payload.data);
-  if (!result || result.status !== 200) {
-    yield put(executeOrderFail());
-  } else {
-    yield put(executeOrderSuccess(result.data));
+  // const result = yield call(fbcApiService, 'executeOrder', payload.data);
+  // if (!result || result.status !== 200) {
+  //   yield put(executeOrderFail());
+  // } else {
+  let result = {
+    'data': {
+      "quote_token": "qwertyu",
+      "estimated_delivery": 1586698948,
+      "login_required": false
+    }
   }
+     yield put(executeOrderSuccess(result.data));
+  // }
+  
 }
 
 export const executeOrderWatcher = createWatcher(
