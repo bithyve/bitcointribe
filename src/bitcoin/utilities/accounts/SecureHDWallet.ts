@@ -722,8 +722,10 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public createHDTransaction = async (
-    recipientAddress: string,
-    amount: number,
+    recipients: {
+      address: string;
+      amount: number;
+    }[],
     txnPriority: string,
     averageTxFees?: any,
     nSequence?: number,
@@ -751,7 +753,14 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       const inputUTXOs = await this.fetchUtxo();
       console.log('Input UTXOs:', inputUTXOs);
-      const outputUTXOs = [{ address: recipientAddress, value: amount }];
+
+      const outputUTXOs = [];
+      for (const recipient of recipients) {
+        outputUTXOs.push({
+          address: recipient.address,
+          value: recipient.amount,
+        });
+      }
       console.log('Output UTXOs:', outputUTXOs);
       // const txnFee = await this.feeRatesPerByte(txnPriority);
 
@@ -890,6 +899,8 @@ export default class SecureHDWallet extends Bitcoin {
       console.log('------ Broadcasting Transaction --------');
 
       const { txid } = await this.broadcastTransaction(res.data.txHex);
+      console.log({ txid });
+
       return { txid };
     } catch (err) {
       throw new Error(`Unable to transfer: ${err.message}`);

@@ -755,8 +755,10 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public createHDTransaction = async (
-    recipientAddress: string,
-    amount: number,
+    recipients: {
+      address: string;
+      amount: number;
+    }[],
     txnPriority: string,
     averageTxFees?: any,
     nSequence?: number,
@@ -784,7 +786,14 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
       console.log('Input UTXOs:', inputUTXOs);
-      const outputUTXOs = [{ address: recipientAddress, value: amount }];
+
+      const outputUTXOs = [];
+      for (const recipient of recipients) {
+        outputUTXOs.push({
+          address: recipient.address,
+          value: recipient.amount,
+        });
+      }
       console.log('Output UTXOs:', outputUTXOs);
       let balance: number = 0;
       inputUTXOs.forEach((utxo) => {
@@ -885,9 +894,9 @@ export default class HDSegwitWallet extends Bitcoin {
         amount = amount * 1e8; // converting into sats
         const { balance } = await this.fetchBalance();
 
+        const recipients = [{ address: recipientAddress, amount }];
         const { inputs, txb, fee } = await this.createHDTransaction(
-          recipientAddress,
-          amount,
+          recipients,
           'high',
         );
         console.log('---- Transaction Created ----');
