@@ -45,6 +45,8 @@ import {
   getQuote,
   executeOrder,
   ClearAccountSyncData,
+  ClearQuoteDetails,
+  ClearOrderDetails,
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 
@@ -504,6 +506,7 @@ const VoucherScanner = (props) => {
       );
     }
     VoucherRedeemSuccessBottomSheet.current.snapTo(1);
+    dispatch(ClearOrderDetails());
   };
 
   const executeOrderMethod = async () => {
@@ -523,6 +526,7 @@ const VoucherScanner = (props) => {
         delivery_destination: bitcoinAddress,
       };
       dispatch(executeOrder(data));
+      dispatch(ClearQuoteDetails());
     }
   };
 

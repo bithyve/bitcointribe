@@ -2081,31 +2081,33 @@ export default function Home(props) {
       return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'buyBitcoins') {
       return renderGetBittrSaveBitcoinContents();
-    } else if (selectToAdd == 'Fastbitcoins') {
-      return (
-        <FastBitcoinModalContents
-          onPressSellTab={() => {
-            setTimeout(() => {
-              setTabSelected('sell');
-            }, 2);
-            (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
-          }}
-          onPressRedeemTab={() => {
-            setTimeout(() => {
-              setTabSelected('redeem');
-            }, 2);
-            (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    } else if (selectToAdd == 'addContact') {
+     } 
+    //else if (selectToAdd == 'Fastbitcoins') {
+    //   return (
+    //     <FastBitcoinModalContents
+    //       onPressSellTab={() => {
+    //         setTimeout(() => {
+    //           setTabSelected('sell');
+    //         }, 2);
+    //         (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
+    //       }}
+    //       onPressRedeemTab={() => {
+    //         setTimeout(() => {
+    //           setTabSelected('redeem');
+    //         }, 2);
+    //         (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
+    //       }}
+    //       onPressBack={() => {
+    //         setTimeout(() => {
+    //           setAddSubBottomSheetsFlag(false);
+    //           setTabBarZIndex(999);
+    //         }, 2);
+    //         (AddBottomSheet as any).current.snapTo(0);
+    //       }}
+    //     />
+    //   );
+    //} 
+    else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
@@ -2129,7 +2131,8 @@ export default function Home(props) {
           }}
         />
       );
-    } else {
+    } 
+    else {
       return null;
     }
   };

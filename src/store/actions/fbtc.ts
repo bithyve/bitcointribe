@@ -6,10 +6,12 @@ export const ACCOUNT_SYNC_CLEAR = 'ACCOUNT_SYNC_CLEAR';
 export const GET_QUOTE = 'GET_QUOTE';
 export const GET_QUOTE_FAIL = 'GET_QUOTE_FAIL';
 export const GET_QUOTE_SUCCESS = 'GET_QUOTE_SUCCESS';
+export const CLEAR_QUOTE_DETAILS = 'CLEAR_QUOTE_DETAILS';
 
 export const EXECUTE_ORDER = 'EXECUTE_ORDER';
 export const EXECUTE_ORDER_FAIL = 'EXECUTE_ORDER_FAIL';
 export const EXECUTE_ORDER_SUCCESS = 'EXECUTE_ORDER_SUCCESS';
+export const CLEAR_ORDER_DETAILS = 'CLEAR_ORDER_DETAILS';
 
 export const GET_BALANCES = 'GET_BALANCES';
 export const GET_BALANCES_FAIL = 'GET_BALANCES_FAIL';
@@ -34,10 +36,7 @@ export const accountSyncSuccess = data => {
 };
 
 export const accountSyncFail = () => {
-  return {
-    type: ACCOUNT_SYNC_FAIL,
-    payload: { accountSyncDetails: null },
-  };
+  return {type: ACCOUNT_SYNC_FAIL};
 };
 
 export function getQuote(data) {
@@ -55,6 +54,13 @@ export function getQuoteSuccess(data) {
   };
 };
 
+export function ClearQuoteDetails() {
+  return {
+    type: CLEAR_QUOTE_DETAILS,
+    payload: { getQuoteDetails: null },
+  };
+};
+
 export const getQuoteFail = () => {
   return {
     type: GET_QUOTE_FAIL,
@@ -69,6 +75,12 @@ export const executeOrder = (data) => {
   return {
     type: EXECUTE_ORDER,
     payload: { data },
+  };
+};
+
+export const ClearOrderDetails = () => {
+  return {
+    type: CLEAR_ORDER_DETAILS,
   };
 };
 

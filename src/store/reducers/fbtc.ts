@@ -8,6 +8,8 @@ import {
   EXECUTE_ORDER_SUCCESS,
   GET_BALANCES_FAIL,
   GET_BALANCES_SUCCESS,
+  CLEAR_QUOTE_DETAILS,
+  CLEAR_ORDER_DETAILS,
 } from '../actions/fbtc';
 
 const INITIAL_STATE = {
@@ -53,6 +55,12 @@ const reducer = (state = INITIAL_STATE, action) => {
         getQuoteRequest: false,
         getQuoteDetails: action.payload.getQuoteDetails,
       };
+      case CLEAR_QUOTE_DETAILS:
+      return {
+        ...state,
+        getQuoteRequest: false,
+        getQuoteDetails: null,
+      };
     case EXECUTE_ORDER_FAIL:
       return {
         ...state,
@@ -63,6 +71,12 @@ const reducer = (state = INITIAL_STATE, action) => {
         ...state,
         executeOrderRequest: false,
         executeOrderDetails: action.payload.executeOrderDetails,
+      };
+      case CLEAR_ORDER_DETAILS:
+      return {
+        ...state,
+        executeOrderRequest: false,
+        executeOrderDetails: null,
       };
     case GET_BALANCES_FAIL:
       return {
