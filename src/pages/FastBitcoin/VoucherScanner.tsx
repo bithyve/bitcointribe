@@ -232,7 +232,7 @@ const VoucherScanner = (props) => {
     let temp = true;
     for (let i = 0; i < fBTCAccount.test_account.voucher.length; i++) {
       const element = fBTCAccount.test_account.voucher[i];
-      if (voucherCode == element.voucherCode || element.hasOwnProperty('quotes')) {
+      if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
         console.log("test voucherCode, element.voucherCode , element.hasOwnProperty('quotes')", voucherCode, element.voucherCode, element.hasOwnProperty('quotes'))
         temp = false;
         break;
@@ -241,7 +241,7 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.checking_account.voucher.length; i++) {
         const element = fBTCAccount.checking_account.voucher[i];
-        if (voucherCode == element.voucherCode || element.hasOwnProperty('quotes')) {
+        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
           console.log("checking voucherCode, element.voucherCode , element.hasOwnProperty('quotes')", voucherCode, element.voucherCode, element.hasOwnProperty('quotes'))
           temp = false;
           break;
@@ -251,7 +251,7 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.saving_account.voucher.length; i++) {
         const element = fBTCAccount.saving_account.voucher[i];
-        if (voucherCode == element.voucherCode || element.hasOwnProperty('quotes')) {
+        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
           console.log("saving voucherCode, element.voucherCode , element.hasOwnProperty('quotes')", voucherCode, element.voucherCode, element.hasOwnProperty('quotes'))
           temp = false;
           break;
@@ -375,30 +375,43 @@ const VoucherScanner = (props) => {
     );
     let fBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     if (voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT) {
+      let tmp = true;
       for (let i = 0; i < fBTCAccountData.test_account.voucher.length; i++) {
         const element = fBTCAccountData.test_account.voucher[i];
         if (element.voucherCode == voucherFromAsync.voucher_code) {
+          tmp = false;
           fBTCAccountData.test_account.voucher[i].quotes = QuoteDetails;
-        } else {
-          fBTCAccountData.test_account.voucher[i].quotes = QuoteDetails;
-          fBTCAccountData.test_account.voucher[i].voucherCode =
-            voucherFromAsync.voucher_code;
+          break;
         }
+      }    
+      if(tmp){
+        let obj = {
+          quotes: QuoteDetails,
+          voucherCode: voucherFromAsync.voucher_code
+        }
+        fBTCAccountData.test_account.voucher.push(obj);
       }
     }
     if (voucherFromAsync.selectedAccount.accountType == SECURE_ACCOUNT) {
+      let tmp = true;
       for (let i = 0; i < fBTCAccountData.saving_account.voucher.length; i++) {
         const element = fBTCAccountData.saving_account.voucher[i];
         if (element.voucherCode == voucherFromAsync.voucher_code) {
           fBTCAccountData.saving_account.voucher[i].quotes = QuoteDetails;
-        } else {
-          fBTCAccountData.saving_account.voucher[i].quotes = QuoteDetails;
-          fBTCAccountData.saving_account.voucher[i].voucherCode =
-            voucherFromAsync.voucher_code;
+          tmp = false;
+          break;
         }
+      }
+      if(tmp){
+        let obj = {
+          quotes: QuoteDetails,
+          voucherCode: voucherFromAsync.voucher_code
+        }
+        fBTCAccountData.saving_account.voucher.push(obj);
       }
     }
     if (voucherFromAsync.selectedAccount.accountType == REGULAR_ACCOUNT) {
+      let tmp = true;
       for (
         let i = 0;
         i < fBTCAccountData.checking_account.voucher.length;
@@ -406,14 +419,20 @@ const VoucherScanner = (props) => {
       ) {
         const element = fBTCAccountData.checking_account.voucher[i];
         if (element.voucherCode == voucherFromAsync.voucher_code) {
+          tmp = false;
           fBTCAccountData.checking_account.voucher[i].quotes = QuoteDetails;
-        } else {
-          fBTCAccountData.checking_account.voucher[i].quotes = QuoteDetails;
-          fBTCAccountData.checking_account.voucher[i].voucherCode =
-            voucherFromAsync.voucher_code;
+          break;
         }
       }
+      if(tmp){
+        let obj = {
+          quotes: QuoteDetails,
+          voucherCode: voucherFromAsync.voucher_code
+        }
+        fBTCAccountData.checking_account.voucher.push(obj);
+      }
     }
+    console.log("FBTCAccount after quotes", fBTCAccountData)
     await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccountData));
     executeOrderMethod();
   };
@@ -470,7 +489,7 @@ const VoucherScanner = (props) => {
       if (voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT) {
         for (let i = 0; i < fBTCAccountData.test_account.voucher.length; i++) {
           const element = fBTCAccountData.test_account.voucher[i];
-          if (element.quotes.quote_token == executeOrderDetails.quote_token) {
+          if (element.voucherCode == voucherFromAsync.voucher_code) {
             fBTCAccountData.test_account.voucher[
               i
             ].orderData = executeOrderDetails;
@@ -485,7 +504,7 @@ const VoucherScanner = (props) => {
           i++
         ) {
           const element = fBTCAccountData.saving_account.voucher[i];
-          if (element.quotes.quote_token == executeOrderDetails.quote_token) {
+          if (element.voucherCode == voucherFromAsync.voucher_code) {
             fBTCAccountData.saving_account.voucher[
               i
             ].orderData = executeOrderDetails;
@@ -500,7 +519,8 @@ const VoucherScanner = (props) => {
           i++
         ) {
           const element = fBTCAccountData.checking_account.voucher[i];
-          if (element.quotes.quote_token == executeOrderDetails.quote_token) {
+          if (element.voucherCode == voucherFromAsync.voucher_code) {
+            console.log("element.voucherCode == voucherFromAsync.voucher_code", element.voucherCode, voucherFromAsync.voucher_code)
             fBTCAccountData.checking_account.voucher[
               i
             ].orderData = executeOrderDetails;
@@ -508,11 +528,12 @@ const VoucherScanner = (props) => {
           }
         }
       }
-      VoucherRedeemSuccessBottomSheet.current.snapTo(1);
+      console.log("fBTCAccountData after order", fBTCAccountData)
       await AsyncStorage.setItem(
         'FBTCAccount',
         JSON.stringify(fBTCAccountData),
       );
+      VoucherRedeemSuccessBottomSheet.current.snapTo(1);
       await AsyncStorage.setItem("quoteData", '');
       await AsyncStorage.setItem('voucherData', '')
     }
