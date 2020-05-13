@@ -126,10 +126,13 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     (async () => {
-      let voucherCodeTemp = await AsyncStorage.getItem("voucherData");
-      if(voucherCodeTemp){
-        console.log("voucherCodeTemp 1", voucherCodeTemp);
-        setVoucherCode(voucherCodeTemp.voucher_code);
+      if(userKey1){
+        let voucherCodeTemp = JSON.parse(await AsyncStorage.getItem("voucherData"));
+        console.log("voucherCodeTemp", voucherCodeTemp);
+        if(voucherCodeTemp){
+          console.log("voucherCodeTemp 1", voucherCodeTemp);
+          setVoucherCode(voucherCodeTemp.voucher_code);
+        }
       }
       let FBTCAccountData = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
@@ -353,12 +356,17 @@ const VoucherScanner = (props) => {
   };
 
   useEffect(() => {
-    if (QuoteDetails) {
-      QuoteBottomSheet.current.snapTo(1);
-      setTimeout(() => {
-        setQuote(QuoteDetails);
-      }, 2);
-    }
+    (async()=>{
+      if (QuoteDetails) {
+        console.log("[QuoteDetails]", QuoteDetails)
+        QuoteBottomSheet.current.snapTo(1);
+        setTimeout(() => {
+          setQuote(QuoteDetails);
+        }, 2);
+        await AsyncStorage.setItem("quoteData", JSON.stringify(QuoteDetails));
+      }
+    })();
+    
   }, [QuoteDetails]);
 
   const storeQuotesDetails = async () => {
@@ -500,28 +508,30 @@ const VoucherScanner = (props) => {
           }
         }
       }
+      VoucherRedeemSuccessBottomSheet.current.snapTo(1);
       await AsyncStorage.setItem(
         'FBTCAccount',
         JSON.stringify(fBTCAccountData),
       );
-      await AsyncStorage.setItem('voucherData', JSON.stringify({}))
+      await AsyncStorage.setItem("quoteData", '');
+      await AsyncStorage.setItem('voucherData', '')
     }
-    VoucherRedeemSuccessBottomSheet.current.snapTo(1);
     dispatch(ClearOrderDetails());
   };
 
   const executeOrderMethod = async () => {
+    let quoteData = JSON.parse(await AsyncStorage.getItem("quoteData"));
     let fBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     let voucherFromAsync = JSON.parse(
       await AsyncStorage.getItem('voucherData'),
     );
-    console.log("Quote", Quote)
+    console.log("executeOrderMethod =>wwwQuote", Quote)
     if (fBTCAccountData && fBTCAccountData.user_key) {
       let data = {
         user_key: fBTCAccountData.user_key,
         wallet_slug: 'bithyve',
         quote_type: 'voucher',
-        quote_token: Quote.quote_token,
+        quote_token: quoteData.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
         delivery_type: '1',
         delivery_destination: bitcoinAddress,
