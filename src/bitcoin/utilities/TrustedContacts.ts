@@ -1,9 +1,9 @@
 import {
   Contacts,
-  EphemeralDataPacket,
-  EphemeralDataElements,
+  EphemeralData,
+  TrustedData,
+  EncryptedTrustedData,
   TrustedDataElements,
-  TrustedDataPacket,
 } from './Interface';
 import crypto from 'crypto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
@@ -29,7 +29,7 @@ export default class TrustedContacts {
     this.initializeStateVars(stateVars);
   }
 
-  public encryptDataPacket = (key: string, dataPacket: any) => {
+  public encryptData = (key: string, dataPacket: any) => {
     const cipher = crypto.createCipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
@@ -38,10 +38,10 @@ export default class TrustedContacts {
     dataPacket.validator = config.HEXA_ID;
     let encrypted = cipher.update(JSON.stringify(dataPacket), 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    return { encryptedDataPacket: encrypted };
+    return { encryptedData: encrypted };
   };
 
-  public decryptDataPacket = (key: string, encryptedDataPacket: string) => {
+  public decryptData = (key: string, encryptedDataPacket: string) => {
     const decipher = crypto.createDecipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
@@ -50,13 +50,13 @@ export default class TrustedContacts {
     let decrypted = decipher.update(encryptedDataPacket, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
 
-    const dataPacket = JSON.parse(decrypted);
-    if (dataPacket.validator !== config.HEXA_ID) {
+    const data = JSON.parse(decrypted);
+    if (data.validator !== config.HEXA_ID) {
       throw new Error(
         'Decryption failed, invalid validator for the following data packet',
       );
     }
-    return { dataPacket };
+    return { data };
   };
 
   public initializeStateVars = (stateVars) => {
@@ -152,9 +152,38 @@ export default class TrustedContacts {
     };
   };
 
+  public updateEphemeralChannelData = (
+    contactName: string,
+    data: EphemeralData,
+  ) => {
+    let ephemeralData = this.trustedContacts[contactName].ephemeralChannel.data;
+    if (ephemeralData) {
+      let updated = false;
+      for (let index = 0; index < ephemeralData.length; index++) {
+        if (ephemeralData[index].publicKey === data.publicKey) {
+          ephemeralData[index] = {
+            ...ephemeralData[index],
+            ...data,
+          };
+          updated = true;
+          break;
+        }
+      }
+
+      if (!updated) {
+        // 2nd party data reception for the first time
+        ephemeralData.push(data);
+      }
+    } else {
+      ephemeralData = [data];
+    }
+
+    this.trustedContacts[contactName].ephemeralChannel.data = ephemeralData;
+  };
+
   public updateEphemeralChannel = async (
     contactName: string,
-    dataElements: EphemeralDataElements,
+    dataElements: EphemeralData,
     fetch?: Boolean,
   ): Promise<{
     updated: Boolean;
@@ -167,27 +196,18 @@ export default class TrustedContacts {
       }
 
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
-      const dataPacket: EphemeralDataPacket = {
-        [publicKey]: {
-          ...dataElements,
-        },
-      };
 
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,
         address: ephemeralChannel.address,
-        data: dataPacket,
-        identifier: publicKey,
+        data: dataElements,
         fetch,
       });
 
       const { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (data) {
-        ephemeralChannel.data = {
-          ...ephemeralChannel.data,
-          ...data,
-        };
+        this.updateEphemeralChannelData(contactName, data);
       }
 
       return { updated, publicKey, data };
@@ -220,10 +240,7 @@ export default class TrustedContacts {
 
       const { data } = res.data;
       if (data) {
-        ephemeralChannel.data = {
-          ...ephemeralChannel.data,
-          ...data,
-        };
+        this.updateEphemeralChannelData(contactName, data);
       }
 
       return { data };
@@ -232,6 +249,41 @@ export default class TrustedContacts {
       if (err.code) throw new Error(err.code);
       throw new Error(err.message);
     }
+  };
+
+  public updateTrustedChannelData = (
+    contactName: string,
+    encryptedData: EncryptedTrustedData,
+    symmetricKey: string,
+  ) => {
+    const newTrustedData: TrustedData = {
+      publicKey: encryptedData.publicKey,
+      data: this.decryptData(symmetricKey, encryptedData.encryptedData).data,
+    };
+
+    let trustedData = this.trustedContacts[contactName].trustedChannel.data;
+    if (trustedData) {
+      let updated = false;
+      for (let index = 0; index < trustedData.length; index++) {
+        if (trustedData[index].publicKey === newTrustedData.publicKey) {
+          trustedData[index] = {
+            ...trustedData[index],
+            ...newTrustedData,
+          };
+          updated = true;
+          break;
+        }
+      }
+
+      if (!updated) {
+        // 2nd party data reception for the first time
+        trustedData.push(newTrustedData);
+      }
+    } else {
+      trustedData = [newTrustedData];
+    }
+
+    this.trustedContacts[contactName].trustedChannel.data = trustedData;
   };
 
   public updateTrustedChannel = async (
@@ -262,18 +314,16 @@ export default class TrustedContacts {
         contactName
       ];
 
-      const { encryptedDataPacket } = this.encryptDataPacket(symmetricKey, {
-        ...dataElements,
-      });
-      const dataPacket: TrustedDataPacket = {
-        [publicKey]: encryptedDataPacket,
+      const { encryptedData } = this.encryptData(symmetricKey, dataElements);
+      const encryptedDataPacket: EncryptedTrustedData = {
+        publicKey,
+        encryptedData,
       };
 
       const res = await BH_AXIOS.post('updateTrustedChannel', {
         HEXA_ID,
         address: trustedChannel.address,
-        data: dataPacket,
-        identifier: publicKey,
+        data: encryptedDataPacket,
         fetch,
       });
 
@@ -281,11 +331,7 @@ export default class TrustedContacts {
       if (!updated) throw new Error('Failed to update ephemeral space');
 
       if (data) {
-        data = this.decryptDataPacket(symmetricKey, data);
-        trustedChannel.data = {
-          ...trustedChannel.data,
-          ...data,
-        };
+        this.updateTrustedChannelData(contactName, data, symmetricKey);
       }
       return { updated, data };
     } catch (err) {
@@ -328,11 +374,7 @@ export default class TrustedContacts {
 
       let { data } = res.data;
       if (data) {
-        data = this.decryptDataPacket(symmetricKey, data);
-        trustedChannel.data = {
-          ...trustedChannel.data,
-          ...data,
-        };
+        this.updateTrustedChannelData(contactName, data, symmetricKey);
       }
 
       return {
