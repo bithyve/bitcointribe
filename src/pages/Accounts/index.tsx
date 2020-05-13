@@ -61,6 +61,7 @@ import TransactionDetails from './TransactionDetails';
 
 export default function Accounts(props) {
   const [GetBittrAccount, setGetBittrAccount] = useState([]);
+  const [FBTCAccount, setFBTCAccount] = useState({});
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
@@ -196,6 +197,7 @@ export default function Accounts(props) {
 
   useEffect(() => {
     checkGetBittrAccount();
+    checkFastBitcoin();
     if (wallet.transactions.transactionDetails.length) {
       wallet.transactions.transactionDetails.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -217,6 +219,11 @@ export default function Accounts(props) {
     setGetBittrAccount(getBittrAccount ? getBittrAccount : []);
   };
 
+  const checkFastBitcoin = async () => {
+    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    console.log("getFBTCAccount", getFBTCAccount);
+    setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+  };
   // useEffect(() => {
   //   const accountNumber = 0;
   //   const { derivativeAccounts } =
@@ -320,6 +327,21 @@ export default function Accounts(props) {
     }, 2000);
 
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
+  };
+  function isEmpty(obj) {
+    return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+}
+  const renderFBTC = (FBTCAccount, accountType) => {
+    console.log("FBTCAccount, renderFBTC", isEmpty(FBTCAccount), accountType);
+    if(accountType){
+    if (accountType == 'Test Account')
+     return FBTCAccount.test_account.voucher.length && FBTCAccount.test_account.voucher[0].hasOwnProperty('quotes')
+    else if (accountType == 'Checking Account')
+      return FBTCAccount.checking_account.voucher.length && FBTCAccount.checking_account.voucher[0].hasOwnProperty('quotes');
+    else if (accountType == 'Savings Account')
+      return FBTCAccount.saving_account.length && FBTCAccount.saving_account.voucher[0].hasOwnProperty('quotes');
+    }
+    return false;
   };
 
   const renderItem = ({ item, index }) => {
@@ -456,6 +478,29 @@ export default function Accounts(props) {
                 />
               </View>
             ) : null}
+
+            {!isEmpty(FBTCAccount) ? renderFBTC(FBTCAccount, item.accountType) ? (
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.white,
+                  borderRadius: 15,
+                  padding: 5,
+                }}
+              >
+                <Image
+                  style={{
+                    marginLeft: 'auto',
+                    width: wp('3%'),
+                    height: wp('3%'),
+                    resizeMode: 'contain',
+                    padding: 5,
+                  }}
+                  source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+                />
+              </View>
+            ) : null : null}
             {item.accountType == 'Savings Account' && (
               <TouchableOpacity
                 style={{
