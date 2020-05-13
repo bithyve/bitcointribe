@@ -49,6 +49,8 @@ import {
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 
 const VoucherScanner = (props) => {
+  const userKey1 = props.navigation.state.params
+  ? props.navigation.state.params.userKey : '';
   const [bitcoinAddress, setBitcoinAddress] = useState('');
   const QuoteDetails = useSelector((state) => state.fbtc.getQuoteDetails);
   const executeOrderDetails = useSelector(
@@ -57,10 +59,8 @@ const VoucherScanner = (props) => {
   const [hideShow, setHideShow] = useState(false);
   const [isUserRegistered, setIsUserRegistered] = useState(false);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
-  const [voucherCode, setVoucherCode] = useState('FMB8M733U3EE');
-  const [userKey, setUserKey] = useState(
-    '17734b0c-6139-48fc-8f17-23fbb5df3287',
-  );
+  const [voucherCode, setVoucherCode] = useState('');
+  const [userKey, setUserKey] = useState(userKey1);
   const accounts1 = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
   const dispatch = useDispatch();
@@ -128,7 +128,7 @@ const VoucherScanner = (props) => {
       let FBTCAccountData = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
       );
-      if (FBTCAccountData.user_key) {
+      if (FBTCAccountData && FBTCAccountData.user_key) {
         setIsUserRegistered(true);
       }
     })();
@@ -199,19 +199,26 @@ const VoucherScanner = (props) => {
         'voucherData',
         JSON.stringify(voucherDataTemp),
       );
+      let voucherDataAfterAdd = JSON.parse(
+        await AsyncStorage.getItem('voucherData'),
+      );
+      console.log('voucherDataAfterAdd', voucherDataAfterAdd);
     })();
-    if (isUserRegistered) createFBTCAccount();
+    if (isUserRegistered){
+      if(voucherCode && selectedAccount)
+      createFBTCAccount();
+    } else{
+      if(voucherCode && selectedAccount)
+      AccountVerificationBottomSheet.current.snapTo(1);
+    }
   }, [selectedAccount, voucherCode]);
 
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
       if (barcodes.data.includes('fastbitcoins.com')) {
         let tempData = barcodes.data.split('/');
+        console.log("tempData",tempData, tempData[tempData.length - 1]);
         setVoucherCode(tempData[tempData.length - 1]);
-        if (!isUserRegistered) {
-          AccountVerificationBottomSheet.current.snapTo(1);
-          //Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve');
-        }
       }
       setOpenCameraFlag(false);
     }
@@ -527,7 +534,10 @@ const VoucherScanner = (props) => {
         }}
         onPressBack={() => {
           QuoteBottomSheet.current.snapTo(0);
-        }}
+          setTimeout(() => {
+            setVoucherCode('');
+          }, 2);
+         }}
         voucherNumber={voucherCode ? voucherCode : '#123454567890'}
         purchasedFor={QuoteDetails ? QuoteDetails.amount : '17,000'}
         redeemAmount={QuoteDetails ? QuoteDetails.bitcoin_amount : '2,065,000'}
@@ -551,7 +561,13 @@ const VoucherScanner = (props) => {
     return (
       <VoucherRedeemSuccess
         onPressRedeem={() => {
-          props.navigation.navigate("Account");
+          props.navigation.navigate("Accounts", {
+            serviceType:
+            selectedAccount.accountName === 'Test Account'
+                ? TEST_ACCOUNT
+                : selectedAccount.accountName === 'Checking Account'
+                ? REGULAR_ACCOUNT
+                : SECURE_ACCOUNT,});
         }}
         onPressBack={() => {
           VoucherRedeemSuccessBottomSheet.current.snapTo(0);
@@ -575,7 +591,12 @@ const VoucherScanner = (props) => {
 
   const renderAccountVerificationModalContent = useCallback(() => {
     return (
-      <AccountVerification link={'https://fb-web-dev.aao-tech.com/bithyve'} />
+      <AccountVerification link={'https://fb-web-dev.aao-tech.com/'} 
+      openLinkVerification={()=> {
+        props.navigation.goBack();
+        Linking.openURL('https://fb-web-dev.aao-tech.com/')}
+      }
+       />
     );
   }, []);
 

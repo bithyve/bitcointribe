@@ -2384,7 +2384,7 @@ export default function Home(props) {
   const handleDeepLink = useCallback((event) => {
     const splits = event.url.split('/');
     const requester = splits[4];
-
+    console.log("event.url.includes", event.url.includes("fastbitcoins"));
     if (splits[5] === 'sss') {
       if (splits[6] === 'ek') {
         const custodyRequest = {
@@ -2397,10 +2397,18 @@ export default function Home(props) {
         const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
-    } else {
-      const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-      props.navigation.navigate('SignUpDetails', { EmailToken });
+    } 
+    if(event.url.includes("fastbitcoins")){
+      const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
+       props.navigation.navigate('VoucherScanner', { userKey });
     }
+    /**
+     * Below else loop is for Getbittr changes
+     */
+    // else {
+    //   const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
+    //   props.navigation.navigate('SignUpDetails', { EmailToken });
+    // }
   }, []);
 
   useEffect(() => {

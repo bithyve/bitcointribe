@@ -59,7 +59,7 @@ export default function AccountVerification(props) {
         >
           <CopyThisText text={props.link}
           openLink={() => {
-            Linking.openURL('https://fb-web-dev.aao-tech.com/bithyve')
+            props.openLinkVerification();
           }} />
         </View>
       </View>
