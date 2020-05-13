@@ -152,7 +152,7 @@ export default class TrustedContacts {
     };
   };
 
-  public updateEphemeralChannelData = (
+  public processEphemeralChannelData = (
     contactName: string,
     data: EphemeralData,
   ) => {
@@ -185,11 +185,18 @@ export default class TrustedContacts {
     contactName: string,
     dataElements: EphemeralData,
     fetch?: Boolean,
-  ): Promise<{
-    updated: Boolean;
-    publicKey: string;
-    data: any;
-  }> => {
+  ): Promise<
+    | {
+        updated: any;
+        publicKey: string;
+        data: EphemeralData;
+      }
+    | {
+        updated: any;
+        publicKey: string;
+        data?: undefined;
+      }
+  > => {
     try {
       if (!this.trustedContacts[contactName]) {
         this.initializeContact(contactName);
@@ -207,10 +214,11 @@ export default class TrustedContacts {
       const { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (data) {
-        this.updateEphemeralChannelData(contactName, data);
+        this.processEphemeralChannelData(contactName, data);
+        return { updated, publicKey, data };
       }
 
-      return { updated, publicKey, data };
+      return { updated, publicKey };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -221,7 +229,7 @@ export default class TrustedContacts {
   public fetchEphemeralChannel = async (
     contactName: string,
   ): Promise<{
-    data: any;
+    data: EphemeralData;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -240,7 +248,7 @@ export default class TrustedContacts {
 
       const { data } = res.data;
       if (data) {
-        this.updateEphemeralChannelData(contactName, data);
+        this.processEphemeralChannelData(contactName, data);
       }
 
       return { data };
@@ -251,12 +259,12 @@ export default class TrustedContacts {
     }
   };
 
-  public updateTrustedChannelData = (
+  public processTrustedChannelData = (
     contactName: string,
     encryptedData: EncryptedTrustedData,
     symmetricKey: string,
-  ) => {
-    const newTrustedData: TrustedData = {
+  ): TrustedData => {
+    const decryptedTrustedData: TrustedData = {
       publicKey: encryptedData.publicKey,
       data: this.decryptData(symmetricKey, encryptedData.encryptedData).data,
     };
@@ -265,10 +273,10 @@ export default class TrustedContacts {
     if (trustedData) {
       let updated = false;
       for (let index = 0; index < trustedData.length; index++) {
-        if (trustedData[index].publicKey === newTrustedData.publicKey) {
+        if (trustedData[index].publicKey === decryptedTrustedData.publicKey) {
           trustedData[index] = {
             ...trustedData[index],
-            ...newTrustedData,
+            ...decryptedTrustedData,
           };
           updated = true;
           break;
@@ -277,23 +285,31 @@ export default class TrustedContacts {
 
       if (!updated) {
         // 2nd party data reception for the first time
-        trustedData.push(newTrustedData);
+        trustedData.push(decryptedTrustedData);
       }
     } else {
-      trustedData = [newTrustedData];
+      trustedData = [decryptedTrustedData];
     }
 
     this.trustedContacts[contactName].trustedChannel.data = trustedData;
+
+    return decryptedTrustedData;
   };
 
   public updateTrustedChannel = async (
     contactName: string,
     dataElements: TrustedDataElements,
     fetch?: Boolean,
-  ): Promise<{
-    updated: Boolean;
-    data: any;
-  }> => {
+  ): Promise<
+    | {
+        updated: any;
+        data: TrustedData;
+      }
+    | {
+        updated: any;
+        data?: undefined;
+      }
+  > => {
     try {
       if (!this.trustedContacts[contactName]) {
         throw new Error(
@@ -331,9 +347,10 @@ export default class TrustedContacts {
       if (!updated) throw new Error('Failed to update ephemeral space');
 
       if (data) {
-        this.updateTrustedChannelData(contactName, data, symmetricKey);
+        data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        return { updated, data };
       }
-      return { updated, data };
+      return { updated };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -344,7 +361,7 @@ export default class TrustedContacts {
   public fetchTrustedChannel = async (
     contactName: string,
   ): Promise<{
-    data: any;
+    data: TrustedData;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -374,7 +391,7 @@ export default class TrustedContacts {
 
       let { data } = res.data;
       if (data) {
-        this.updateTrustedChannelData(contactName, data, symmetricKey);
+        data = this.processTrustedChannelData(contactName, data, symmetricKey);
       }
 
       return {

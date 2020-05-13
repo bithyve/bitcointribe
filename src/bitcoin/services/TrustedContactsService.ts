@@ -1,6 +1,6 @@
 import TrustedContacts from '../utilities/TrustedContacts';
 import config from '../Config';
-import { Contacts } from '../utilities/Interface';
+import { Contacts, TrustedData, EphemeralData } from '../utilities/Interface';
 
 export default class TrustedContactsService {
   public static fromJSON = (json: string) => {
@@ -94,11 +94,17 @@ export default class TrustedContactsService {
   ): Promise<
     | {
         status: number;
-        data: {
-          updated: Boolean;
-          publicKey: String;
-          data: any;
-        };
+        data:
+          | {
+              updated: any;
+              publicKey: string;
+              data: EphemeralData;
+            }
+          | {
+              updated: any;
+              publicKey: string;
+              data?: undefined;
+            };
         err?: undefined;
         message?: undefined;
       }
@@ -133,7 +139,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          data: any;
+          data: EphemeralData;
         };
         err?: undefined;
         message?: undefined;
@@ -166,10 +172,15 @@ export default class TrustedContactsService {
   ): Promise<
     | {
         status: number;
-        data: {
-          updated: Boolean;
-          data: any;
-        };
+        data:
+          | {
+              updated: any;
+              data: TrustedData;
+            }
+          | {
+              updated: any;
+              data?: undefined;
+            };
         err?: undefined;
         message?: undefined;
       }
@@ -204,7 +215,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          data: any;
+          data: TrustedData;
         };
         err?: undefined;
         message?: undefined;

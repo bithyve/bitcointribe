@@ -96,14 +96,13 @@ export interface INotification {
 
 // TRUSTED CONTACTS
 export interface EphemeralData {
-  publicKey: string; // // pubKeys serves as the identifier as it can be public
+  publicKey: string; // pubKeys serves as the identifier as it can be public
   walletID?: string;
   FCM?: string;
-  metaShare?: MetaShare;
-  // shareTransferDetails?: {
-  //   otp: string;
-  //   encryptedKey: string;
-  // };
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
 }
 
 export interface TrustedDataElements {}
