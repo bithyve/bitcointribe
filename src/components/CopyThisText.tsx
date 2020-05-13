@@ -2,10 +2,8 @@ import React from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   Clipboard,
-  Linking,
 } from 'react-native';
 import Colors from '../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
