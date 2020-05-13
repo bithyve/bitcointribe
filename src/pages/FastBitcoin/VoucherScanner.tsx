@@ -10,7 +10,7 @@ import {
   Image,
   ImageBackground,
   AsyncStorage,
-  Linking,
+  Linking
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -69,7 +69,6 @@ const VoucherScanner = (props) => {
   const accountSyncDetails = useSelector(
     (state) => state.fbtc.accountSyncDetails,
   );
-  console.log('accountSyncDetails', accountSyncDetails);
   useEffect(() => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
   }, [accounts1.exchangeRates]);
@@ -153,10 +152,6 @@ const VoucherScanner = (props) => {
           derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
         );
       }
-      console.log({
-        FBAddress:
-          derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
-      });
     }
   }, [selectedAccount]);
 
@@ -184,12 +179,11 @@ const VoucherScanner = (props) => {
     });
   }, [accounts1]);
 
-  useEffect(() => {
+  useEffect(()=>{
     (async () => {
       let voucherDataTemp = JSON.parse(
         await AsyncStorage.getItem('voucherData'),
       );
-      console.log('voucherData', voucherDataTemp);
       if (voucherDataTemp) {
         voucherDataTemp = {};
       }
@@ -204,7 +198,6 @@ const VoucherScanner = (props) => {
       let voucherDataAfterAdd = JSON.parse(
         await AsyncStorage.getItem('voucherData'),
       );
-      console.log('voucherDataAfterAdd', voucherDataAfterAdd);
     })();
     if (isUserRegistered){
       if(voucherCode && selectedAccount)
@@ -219,7 +212,6 @@ const VoucherScanner = (props) => {
     if (barcodes.data) {
       if (barcodes.data.includes('fastbitcoins.com')) {
         let tempData = barcodes.data.split('/');
-        console.log("tempData",tempData, tempData[tempData.length - 1]);
         setVoucherCode(tempData[tempData.length - 1]);
       }
       setOpenCameraFlag(false);
@@ -231,7 +223,7 @@ const VoucherScanner = (props) => {
     let temp = true;
     for (let i = 0; i < fBTCAccount.test_account.voucher.length; i++) {
       const element = fBTCAccount.test_account.voucher[i];
-      if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
+      if (voucherCode == element.voucherCode || element.hasOwnProperty('quotes')) {
         temp = false;
         break;
       }
@@ -239,7 +231,7 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.checking_account.voucher.length; i++) {
         const element = fBTCAccount.checking_account.voucher[i];
-        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
+        if (voucherCode == element.voucherCode || element.hasOwnProperty('quotes')) {
           temp = false;
           break;
         }
@@ -248,7 +240,7 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.saving_account.voucher.length; i++) {
         const element = fBTCAccount.saving_account.voucher[i];
-        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
+        if (voucherCode == element.voucherCode || element.hasOwnProperty('quotes')) {
           temp = false;
           break;
         }
@@ -315,12 +307,10 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     if (accountSyncDetails) {
-      console.log('accountSyncDetails in if', accountSyncDetails);
       (async () => {
         let FBTCAccountData = JSON.parse(
           await AsyncStorage.getItem('FBTCAccount'),
         );
-        console.log('FBTCAccountData', FBTCAccountData);
         let obj;
         if (FBTCAccountData) {
           obj = {
@@ -353,7 +343,6 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     if (QuoteDetails) {
-      console.log('QuoteDetails', QuoteDetails);
       QuoteBottomSheet.current.snapTo(1);
       setTimeout(() => {
         setQuote(QuoteDetails);
@@ -514,7 +503,7 @@ const VoucherScanner = (props) => {
     let voucherFromAsync = JSON.parse(
       await AsyncStorage.getItem('voucherData'),
     );
-    console.log('Quote.quote_token', Quote, fBTCAccountData);
+    console.log("Quote", Quote)
     if (fBTCAccountData && fBTCAccountData.user_key) {
       let data = {
         user_key: fBTCAccountData.user_key,
@@ -595,11 +584,12 @@ const VoucherScanner = (props) => {
 
   const renderAccountVerificationModalContent = useCallback(() => {
     return (
-      <AccountVerification link={'https://fb-web-dev.aao-tech.com/'} 
-      openLinkVerification={()=> {
-        props.navigation.goBack();
-        Linking.openURL('https://fb-web-dev.aao-tech.com/')}
-      }
+      <AccountVerification 
+        link={'https://fb-web-dev.aao-tech.com/'} 
+        openLinkVerification={()=> {
+          Linking.openURL('https://fb-web-dev.aao-tech.com/');
+          props.navigation.goBack();
+        }}
        />
     );
   }, []);

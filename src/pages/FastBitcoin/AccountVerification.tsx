@@ -57,10 +57,12 @@ export default function AccountVerification(props) {
             marginBottom: wp('2%')
           }}
         >
-          <CopyThisText text={props.link}
-          openLink={() => {
-            props.openLinkVerification();
-          }} />
+          <CopyThisText 
+            text={props.link}
+            openLink={() => {
+              props.openLinkVerification();
+            }} 
+          />
         </View>
       </View>
     </View>
