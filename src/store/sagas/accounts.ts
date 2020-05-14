@@ -346,19 +346,13 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  const {
-    recipientAddress,
-    amount,
-    priority,
-    averageTxFees,
-  } = payload.transferInfo;
+  const { recipients, priority, averageTxFees } = payload;
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
   const res = yield call(
     service.transferST1,
-    recipientAddress,
-    amount,
+    recipients,
     priority,
     averageTxFees,
   );

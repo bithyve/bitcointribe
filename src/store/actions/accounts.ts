@@ -42,8 +42,16 @@ export const fetchBalanceTx = (
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
 
-export const transferST1 = (serviceType, transferInfo) => {
-  return { type: TRANSFER_ST1, payload: { serviceType, transferInfo } };
+export const transferST1 = (
+  serviceType,
+  recipients,
+  priority,
+  averageTxFees?,
+) => {
+  return {
+    type: TRANSFER_ST1,
+    payload: { serviceType, recipients, priority, averageTxFees },
+  };
 };
 
 export const transferST2 = (serviceType) => {
