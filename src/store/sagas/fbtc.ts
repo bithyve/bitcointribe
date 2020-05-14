@@ -15,13 +15,13 @@ import {
   GET_BALANCES,
 } from '../actions/fbtc';
 
-import fbcApiService from '../../services/fbtc';
+import { accountSync, getQuote, executeOrder } from '../../services/fbtc';
 
 import { createWatcher } from '../utils/utilities';
 
 export function* accountSyncWorker({ payload }) {
   console.log("payload",payload.data)
-  let result = yield call(fbcApiService, 'accountSync', payload.data);
+  let result = yield call(accountSync, payload.data);
 //   let result = {
 //     "data":{
 //     "redeem_vouchers": true,
@@ -29,9 +29,13 @@ export function* accountSyncWorker({ payload }) {
 //       "sell_bitcoins": true
 //     }
 // }
-console.log("result", result.data);
+console.log("result", result);
   if (!result || result.status !== 200) {
-    yield put(accountSyncFail());
+    let data={
+      accountSyncFail: true,
+      accountSyncFailMessage: 'Account sync fail'
+    }
+    yield put(accountSyncFail(data));
   } else {
   //   // the return type is not json in this instance and
   //   // has a trailing comma.
@@ -42,6 +46,13 @@ console.log("result", result.data);
       result.data = string2Json(result.data);
     }
     yield put(accountSyncSuccess(result.data));
+    if(result.error){
+      let data={
+        accountSyncFail: true,
+        accountSyncFailMessage: result.message ? result.message : 'The wallet account does not exist'
+      }
+      yield put(accountSyncFail(data));
+    }
   }
 }
 
@@ -52,11 +63,15 @@ export const accountSyncWatcher = createWatcher(
 
 function* getQuoteWorker({ payload }) {
   console.log('payload.data', payload.data);
-  const result = yield call(fbcApiService, 'getQuote', payload.data);
+  const result = yield call(getQuote, payload.data);
   result.status = 200;
   console.log('result getQuoteWorker', result);
   if (!result || result.status !== 200) {
-    yield put(getQuoteFail());
+    let data={
+      getQuoteFail: true,
+      getQuoteFailMessage: 'Get Quote fail'
+    }
+    yield put(getQuoteFail(data));
   } else {
   //  let result = {
   //    "data":{
@@ -71,16 +86,28 @@ function* getQuoteWorker({ payload }) {
   //     verified_account_required: false,
   //   }
   // }
+  if(result.data)
     yield put(getQuoteSuccess(result.data));
+  if(result.error){
+      let data={
+        getQuoteFail: true,
+       getQuoteFailMessage: result.message ? result.message : 'Invalid voucher code'
+      }
+      yield put(getQuoteFail(data));
+    }
   }
 }
 
 export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
 
 export function* executeOrderWorker({ payload }) {
-  const result = yield call(fbcApiService, 'executeOrder', payload.data);
+  const result = yield call(executeOrder, payload.data);
   if (!result || result.status !== 200) {
-    yield put(executeOrderFail());
+    let data={
+      executeOrderFail: true,
+      executeOrderFailMessage: 'Order execution fail'
+    }
+    yield put(executeOrderFail(data));
   } else {
   // let result = {
   //   'data': {
@@ -90,6 +117,13 @@ export function* executeOrderWorker({ payload }) {
   //   }
   // }
      yield put(executeOrderSuccess(result.data));
+     if(result.error){
+      let data={
+        executeOrderFail: true,
+        executeOrderFailMessage: result.message ? result.message : 'Order execution fail'
+      }
+      yield put(executeOrderFail(data));
+    }
    }
   
 }

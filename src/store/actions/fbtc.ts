@@ -35,8 +35,11 @@ export const accountSyncSuccess = data => {
   };
 };
 
-export const accountSyncFail = () => {
-  return {type: ACCOUNT_SYNC_FAIL};
+export const accountSyncFail = (data) => {
+  console.log("Account sync fail", data);
+  return {type: ACCOUNT_SYNC_FAIL,
+    payload: { data }
+  };
 };
 
 export function getQuote(data) {
@@ -61,11 +64,12 @@ export function ClearQuoteDetails() {
   };
 };
 
-export const getQuoteFail = () => {
+export const getQuoteFail = (data) => {
   return {
     type: GET_QUOTE_FAIL,
     payload: {
       getQuoteDetails: null,
+      data
     },
   };
 };
@@ -93,11 +97,12 @@ export const executeOrderSuccess = (data) => {
   };
 };
 
-export const executeOrderFail = () => {
+export const executeOrderFail = (data) => {
   return {
     type: EXECUTE_ORDER_FAIL,
     payload: {
       executeOrderDetails: null,
+      data
     },
   };
 };

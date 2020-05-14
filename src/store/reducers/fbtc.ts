@@ -21,33 +21,52 @@ const INITIAL_STATE = {
   executeOrderDetails: null,
   getBalancesRequest: false,
   getBalancesDetails: null,
+  accountSyncFail: false,
+  accountSyncFailMessage: null,
+  getQuoteFail: false,
+  getQuoteFailMessage: null,
+  executeOrderFail: false,
+  executeOrderFailMessage: null,
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
   //const { payload } = action;
   switch (action.type) {
     case ACCOUNT_SYNC_FAIL:
+      console.log(
+        'action.payload.accountSyncFailMessage',
+        action.payload.accountSyncFail,
+        action.payload.accountSyncFailMessage,
+      );
       return {
         ...state,
         accountSyncRequest: false,
+        accountSyncFail: action.payload.data.accountSyncFail,
+        accountSyncFailMessage: action.payload.data.accountSyncFailMessage,
       };
     case ACCOUNT_SYNC_SUCCESS:
-      console.log("payload.accountSyncDetails", action.payload.accountSyncDetails);
+      console.log(
+        'payload.accountSyncDetails',
+        action.payload.accountSyncDetails,
+      );
       return {
         ...state,
         accountSyncRequest: false,
         accountSyncDetails: action.payload.accountSyncDetails,
       };
-      case ACCOUNT_SYNC_CLEAR:
-        return {
-          ...state,
-          accountSyncRequest: false,
-          accountSyncDetails: null,
-        };
+    case ACCOUNT_SYNC_CLEAR:
+      return {
+        ...state,
+        accountSyncRequest: false,
+        accountSyncDetails: null,
+      };
     case GET_QUOTE_FAIL:
       return {
         ...state,
         getQuoteRequest: false,
+        getQuoteDetails: null,
+        getQuoteFail: action.payload.data.getQuoteFail,
+        getQuoteFailMessage: action.payload.data.getQuoteFailMessage,
       };
     case GET_QUOTE_SUCCESS:
       return {
@@ -55,7 +74,7 @@ const reducer = (state = INITIAL_STATE, action) => {
         getQuoteRequest: false,
         getQuoteDetails: action.payload.getQuoteDetails,
       };
-      case CLEAR_QUOTE_DETAILS:
+    case CLEAR_QUOTE_DETAILS:
       return {
         ...state,
         getQuoteRequest: false,
@@ -65,6 +84,10 @@ const reducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         executeOrderRequest: false,
+        getQuoteDetails: null,
+        executeOrderDetails: null,
+        executeOrderFail: action.payload.data.executeOrderFail,
+        executeOrderFailMessage: action.payload.data.executeOrderFailMessage,
       };
     case EXECUTE_ORDER_SUCCESS:
       return {
@@ -72,7 +95,7 @@ const reducer = (state = INITIAL_STATE, action) => {
         executeOrderRequest: false,
         executeOrderDetails: action.payload.executeOrderDetails,
       };
-      case CLEAR_ORDER_DETAILS:
+    case CLEAR_ORDER_DETAILS:
       return {
         ...state,
         executeOrderRequest: false,
@@ -92,5 +115,5 @@ const reducer = (state = INITIAL_STATE, action) => {
     default:
       return state;
   }
-}
-export default reducer
+};
+export default reducer;
