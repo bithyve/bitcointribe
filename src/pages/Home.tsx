@@ -108,6 +108,7 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 
 export default function Home(props) {
+  const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState("");
   // const trustedContacts: TrustedContactsService = useSelector(
   //   (state) => state.trustedContacts.service,
   // );
@@ -189,15 +190,7 @@ export default function Home(props) {
       if (!healthCheckInitialized) dispatch(initHealthCheck());
     }
   }, [s3Service]);
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
 
-  // const balancesParam = props.navigation.getParam('balances');
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -582,13 +575,6 @@ export default function Home(props) {
   }
 
   useEffect(() => {
-    if (tabBarZIndex == 999) {
-      setTimeout(() => {
-        setTabBarZIndex(0);
-        setDeepLinkModalOpen(true);
-      }, 2);
-    }
-    TrustedContactRequestBottomSheet.current.snapTo(1);
     getNotificationList();
     let notificationOnFocusListener = props.navigation.addListener(
       'didFocus',
@@ -2096,31 +2082,33 @@ export default function Home(props) {
       return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'buyBitcoins') {
       return renderGetBittrSaveBitcoinContents();
-    } else if (selectToAdd == 'Fastbitcoins') {
-      return (
-        <FastBitcoinModalContents
-          onPressSellTab={() => {
-            setTimeout(() => {
-              setTabSelected('sell');
-            }, 2);
-            (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
-          }}
-          onPressRedeemTab={() => {
-            setTimeout(() => {
-              setTabSelected('redeem');
-            }, 2);
-            (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    } else if (selectToAdd == 'addContact') {
+     } 
+    //else if (selectToAdd == 'Fastbitcoins') {
+    //   return (
+    //     <FastBitcoinModalContents
+    //       onPressSellTab={() => {
+    //         setTimeout(() => {
+    //           setTabSelected('sell');
+    //         }, 2);
+    //         (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
+    //       }}
+    //       onPressRedeemTab={() => {
+    //         setTimeout(() => {
+    //           setTabSelected('redeem');
+    //         }, 2);
+    //         (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
+    //       }}
+    //       onPressBack={() => {
+    //         setTimeout(() => {
+    //           setAddSubBottomSheetsFlag(false);
+    //           setTabBarZIndex(999);
+    //         }, 2);
+    //         (AddBottomSheet as any).current.snapTo(0);
+    //       }}
+    //     />
+    //   );
+    //} 
+    else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
@@ -2144,7 +2132,8 @@ export default function Home(props) {
           }}
         />
       );
-    } else {
+    } 
+    else {
       return null;
     }
   };
@@ -2399,7 +2388,7 @@ export default function Home(props) {
   const handleDeepLink = useCallback((event) => {
     const splits = event.url.split('/');
     const requester = splits[4];
-
+    console.log("event.url.includes", event.url.includes("fastbitcoins"));
     if (splits[5] === 'sss') {
       if (splits[6] === 'ek') {
         const custodyRequest = {
@@ -2412,10 +2401,18 @@ export default function Home(props) {
         const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.replace('Home', { recoveryRequest });
       }
-    } else {
-      const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-      props.navigation.navigate('SignUpDetails', { EmailToken });
+    } 
+    if(event.url.includes("fastbitcoins")){
+      const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
+       props.navigation.navigate('VoucherScanner', { userKey });
     }
+    /**
+     * Below else loop is for Getbittr changes
+     */
+    // else {
+    //   const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
+    //   props.navigation.navigate('SignUpDetails', { EmailToken });
+    // }
   }, []);
 
   useEffect(() => {
@@ -2669,6 +2666,7 @@ export default function Home(props) {
   const renderTrustedContactRequestContent = useCallback(() => {
     return (
       <TrustedContactRequest
+        bottomSheetRef={TrustedContactRequestBottomSheet}
         trustedContactName={'Arpan Jain'}
         onPressAccept={() => {
           setTimeout(() => {
@@ -2684,6 +2682,7 @@ export default function Home(props) {
           }, 2);
           TrustedContactRequestBottomSheet.current.snapTo(0);
         }}
+        onPhoneNumberChange={(text)=>{setTrustedContactPhoneNumber(text)}}
       />
     );
   }, []);
@@ -3198,7 +3197,8 @@ export default function Home(props) {
         ref={TrustedContactRequestBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('100%'),
         ]}
         renderContent={renderTrustedContactRequestContent}
         renderHeader={renderTrustedContactRequestHeader}

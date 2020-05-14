@@ -15,7 +15,7 @@ export default function VoucherRedeemSuccess(props) {
       <View>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.modalTitleText}>
-            Confirm Fast Bitcoin{'\n'}Voucher Quote
+          Voucher redeemed successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
             Lorem ipsum dolor sit amet, consectetur

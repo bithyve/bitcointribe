@@ -240,7 +240,7 @@ const rootReducer = combineReducers({
   sss: sssReducer,
   manageBackup: manageBackupReducer,
   bittr: GetBittrReducer,
-  fBTC: fBTCReducers,
+  fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
 });

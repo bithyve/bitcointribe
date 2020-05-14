@@ -1,12 +1,15 @@
 import {
   ACCOUNT_SYNC_FAIL,
   ACCOUNT_SYNC_SUCCESS,
+  ACCOUNT_SYNC_CLEAR,
   GET_QUOTE_FAIL,
   GET_QUOTE_SUCCESS,
   EXECUTE_ORDER_FAIL,
   EXECUTE_ORDER_SUCCESS,
   GET_BALANCES_FAIL,
   GET_BALANCES_SUCCESS,
+  CLEAR_QUOTE_DETAILS,
+  CLEAR_ORDER_DETAILS,
 } from '../actions/fbtc';
 
 const INITIAL_STATE = {
@@ -20,9 +23,8 @@ const INITIAL_STATE = {
   getBalancesDetails: null,
 };
 
-export default function reducer(state = INITIAL_STATE, action) {
-  const { payload } = action;
-
+const reducer = (state = INITIAL_STATE, action) => {
+  //const { payload } = action;
   switch (action.type) {
     case ACCOUNT_SYNC_FAIL:
       return {
@@ -30,11 +32,18 @@ export default function reducer(state = INITIAL_STATE, action) {
         accountSyncRequest: false,
       };
     case ACCOUNT_SYNC_SUCCESS:
+      console.log("payload.accountSyncDetails", action.payload.accountSyncDetails);
       return {
         ...state,
         accountSyncRequest: false,
-        accountSyncDetails: payload.accountSyncDetails,
+        accountSyncDetails: action.payload.accountSyncDetails,
       };
+      case ACCOUNT_SYNC_CLEAR:
+        return {
+          ...state,
+          accountSyncRequest: false,
+          accountSyncDetails: null,
+        };
     case GET_QUOTE_FAIL:
       return {
         ...state,
@@ -44,7 +53,13 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         getQuoteRequest: false,
-        getQuoteDetails: payload.getQuoteDetails,
+        getQuoteDetails: action.payload.getQuoteDetails,
+      };
+      case CLEAR_QUOTE_DETAILS:
+      return {
+        ...state,
+        getQuoteRequest: false,
+        getQuoteDetails: null,
       };
     case EXECUTE_ORDER_FAIL:
       return {
@@ -55,7 +70,13 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         executeOrderRequest: false,
-        executeOrderDetails: payload.executeOrderDetails,
+        executeOrderDetails: action.payload.executeOrderDetails,
+      };
+      case CLEAR_ORDER_DETAILS:
+      return {
+        ...state,
+        executeOrderRequest: false,
+        executeOrderDetails: null,
       };
     case GET_BALANCES_FAIL:
       return {
@@ -66,9 +87,10 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         getBalancesRequest: false,
-        getBalancesDetails: payload.getBalancesDetails,
+        getBalancesDetails: action.payload.getBalancesDetails,
       };
     default:
       return state;
   }
 }
+export default reducer

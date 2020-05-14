@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Linking } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -57,7 +57,12 @@ export default function AccountVerification(props) {
             marginBottom: wp('2%')
           }}
         >
-          <CopyThisText text={props.link} />
+          <CopyThisText 
+            text={props.link}
+            openLink={() => {
+              props.openLinkVerification();
+            }} 
+          />
         </View>
       </View>
     </View>
