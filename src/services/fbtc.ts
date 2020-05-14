@@ -1,14 +1,13 @@
 import axios from 'axios';
-import { FBTC_URL } from 'react-native-dotenv';
+import { FBTC_URL, WALLET_SLUG } from 'react-native-dotenv';
 
 const URL = FBTC_URL;
-const wallet_slug = 'bithyve';
 
 export default (service, data) => {
   const apiInfo = {
     accountSync: {
       method: 'get',
-      url: 'account-sync/' + wallet_slug + '/' + data.userKey,
+      url: 'account-sync/' + WALLET_SLUG + '/' + data.userKey,
     },
     getQuote: {
       method: 'post',
@@ -20,7 +19,7 @@ export default (service, data) => {
     },
     getBalances: {
       method: 'get',
-      url: 'user-balances/' + wallet_slug + '/' + data.userKey,
+      url: 'user-balances/' + WALLET_SLUG + '/' + data.userKey,
     },
   };
   axios({

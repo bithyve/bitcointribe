@@ -52,7 +52,7 @@ import {
   executeOrderFail,
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
-import Toast from "../../components/Toast";
+import { FBTC_REGISTRATION_URL } from 'react-native-dotenv';
 
 const VoucherScanner = (props) => {
   const userKey1 = props.navigation.state.params
@@ -665,9 +665,9 @@ const VoucherScanner = (props) => {
   const renderAccountVerificationModalContent = useCallback(() => {
     return (
       <AccountVerification 
-        link={'https://fb-web-dev.aao-tech.com/'} 
+        link={FBTC_REGISTRATION_URL} 
         openLinkVerification={()=> {
-          Linking.openURL('https://fb-web-dev.aao-tech.com/');
+          Linking.openURL(FBTC_REGISTRATION_URL);
           props.navigation.goBack();
         }}
        />
