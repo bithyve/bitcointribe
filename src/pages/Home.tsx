@@ -2666,6 +2666,7 @@ export default function Home(props) {
   const renderTrustedContactRequestContent = useCallback(() => {
     return (
       <TrustedContactRequest
+        inputType = {'phone'}
         bottomSheetRef={TrustedContactRequestBottomSheet}
         trustedContactName={'Arpan Jain'}
         onPressAccept={() => {
@@ -3198,7 +3199,7 @@ export default function Home(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('100%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('95%'),
         ]}
         renderContent={renderTrustedContactRequestContent}
         renderHeader={renderTrustedContactRequestHeader}
