@@ -49,6 +49,7 @@ import {
   ClearOrderDetails,
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
+import Toast from "../../components/Toast";
 
 const VoucherScanner = (props) => {
   const userKey1 = props.navigation.state.params
@@ -276,6 +277,9 @@ const VoucherScanner = (props) => {
       if (fBTCAccount.redeem_vouchers) getQuoteDetailsMethod();
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
     }
+    else{
+      Toast("This voucher already scanned")
+    }
   };
 
   useEffect(() => {
@@ -340,7 +344,7 @@ const VoucherScanner = (props) => {
         if (accountSyncDetails.redeem_vouchers) {
           (RegistrationSuccessBottomSheet as any).current.snapTo(1);
         }
-        ClearAccountSyncData();
+        dispatch(ClearAccountSyncData());
       })();
     }
   }, [accountSyncDetails]);
