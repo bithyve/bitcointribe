@@ -358,6 +358,7 @@ const VoucherScanner = (props) => {
         let FBTCAccountData = JSON.parse(
           await AsyncStorage.getItem('FBTCAccount'),
         );
+        console.log("FBTCAccountData",FBTCAccountData,accountSyncDetails, typeof accountSyncDetails)
         let obj;
         if (FBTCAccountData) {
           obj = {
@@ -370,8 +371,8 @@ const VoucherScanner = (props) => {
         }
         if (accountSyncDetails.redeem_vouchers) {
           (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+          dispatch(ClearAccountSyncData());
         }
-        dispatch(ClearAccountSyncData());
       })();
     }
   }, [accountSyncDetails]);

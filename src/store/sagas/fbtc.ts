@@ -15,13 +15,13 @@ import {
   GET_BALANCES,
 } from '../actions/fbtc';
 
-import fbcApiService from '../../services/fbtc';
+import { accountSync, getQuote, executeOrder } from '../../services/fbtc';
 
 import { createWatcher } from '../utils/utilities';
 
 export function* accountSyncWorker({ payload }) {
   console.log("payload",payload.data)
-  let result = yield call(fbcApiService, 'accountSync', payload.data);
+  let result = yield call(accountSync, payload.data);
 //   let result = {
 //     "data":{
 //     "redeem_vouchers": true,
@@ -63,7 +63,7 @@ export const accountSyncWatcher = createWatcher(
 
 function* getQuoteWorker({ payload }) {
   console.log('payload.data', payload.data);
-  const result = yield call(fbcApiService, 'getQuote', payload.data);
+  const result = yield call(getQuote, payload.data);
   result.status = 200;
   console.log('result getQuoteWorker', result);
   if (!result || result.status !== 200) {
@@ -101,7 +101,7 @@ function* getQuoteWorker({ payload }) {
 export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
 
 export function* executeOrderWorker({ payload }) {
-  const result = yield call(fbcApiService, 'executeOrder', payload.data);
+  const result = yield call(executeOrder, payload.data);
   if (!result || result.status !== 200) {
     let data={
       executeOrderFail: true,
