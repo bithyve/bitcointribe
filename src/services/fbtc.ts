@@ -27,8 +27,7 @@ export default (service, data) => {
     method: apiInfo[service]['method'],
     url: URL + apiInfo[service]['url'],
     data,
-  })
-    .then((obj) => {
+  }).then((obj) => {
       console.log('result', obj);
     })
     .catch((error) => error);

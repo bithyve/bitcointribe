@@ -307,7 +307,10 @@ export default function Login(props) {
 
   const checkPasscode = () => {
     if (checkAuth) {
-      (loaderBottomSheet as any).current.snapTo(0);
+      setTimeout(() => {
+        (loaderBottomSheet as any).current.snapTo(0);
+      }, 2);
+      
       return (
         <View style={{ marginLeft: 'auto' }}>
           <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
@@ -319,6 +322,7 @@ export default function Login(props) {
   useEffect(() => {
     if (authenticationFailed) {
       setCheckAuth(true);
+      checkPasscode();
     } else {
       setCheckAuth(false);
     }

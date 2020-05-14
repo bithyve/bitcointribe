@@ -47,6 +47,9 @@ import {
   ClearAccountSyncData,
   ClearQuoteDetails,
   ClearOrderDetails,
+  accountSyncFail,
+  getQuoteFail,
+  executeOrderFail,
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import Toast from "../../components/Toast";
@@ -66,11 +69,26 @@ const VoucherScanner = (props) => {
   const [voucherCode, setVoucherCode] = useState('');
   const [userKey, setUserKey] = useState(userKey1);
   const accounts1 = useSelector((state) => state.accounts);
+  const accountsSyncFail = useSelector((state) => state.fbtc.accountSyncFail);
+  const accountSyncFailMessage = useSelector((state) => state.fbtc.accountSyncFailMessage);
+  
+  const IsGetQuoteFail = useSelector((state) => state.fbtc.getQuoteFail);
+  const getQuoteFailMessage = useSelector((state) => state.fbtc.getQuoteFailMessage);
+
+  const IsExecuteOrderFail = useSelector((state) => state.fbtc.accountSyncFail);
+  const executeOrderFailMessage = useSelector((state) => state.fbtc.accountSyncFailMessage);
+
   const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
   const dispatch = useDispatch();
   const accountSyncDetails = useSelector(
     (state) => state.fbtc.accountSyncDetails,
   );
+  
+  const [errorTitle, setErrorTitle] = useState('');
+  const [errorInfo, setErrorInfo] = useState('');
+  const [errorNote, setErrorNote] = useState('');
+  const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
+
   useEffect(() => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
   }, [accounts1.exchangeRates]);
@@ -80,6 +98,11 @@ const VoucherScanner = (props) => {
     secureBalance: 0,
     accumulativeBalance: 0,
   });
+  
+  const [
+    ErrorModalBottomSheet,
+    setErrorModalBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
   const [
     RegistrationSuccessBottomSheet,
     setRegistrationSuccessBottomSheet,
@@ -278,7 +301,11 @@ const VoucherScanner = (props) => {
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
     }
     else{
-      Toast("This voucher already scanned")
+      setTimeout(() => {
+        setErrorTitle("This voucher already redeemed");
+        setErrorProccedButtonText('Done');
+      }, 2);
+      (ErrorModalBottomSheet as any).current.snapTo(1);
     }
   };
 
@@ -444,6 +471,7 @@ const VoucherScanner = (props) => {
     executeOrderMethod();
   };
 
+  
   const renderRegistrationSuccessModalContent = useCallback(() => {
     return (
       <ErrorModalContents
@@ -465,6 +493,8 @@ const VoucherScanner = (props) => {
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
+        onPressIgnore={() => {
+        }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
       />
@@ -654,6 +684,84 @@ const VoucherScanner = (props) => {
     );
   }, []);
 
+  useEffect(() => {
+    if (accountsSyncFail && accountSyncFailMessage) {
+      setTimeout(() => {
+        setErrorTitle(accountSyncFailMessage);
+        setErrorProccedButtonText('Done');
+      }, 2);
+      (ErrorModalBottomSheet as any).current.snapTo(1);
+      let data={
+        accountSyncFail: false,
+        accountSyncFailMessage: ''
+      }
+      dispatch(accountSyncFail(data))
+    }
+  }, [accountsSyncFail,accountSyncFailMessage]);
+  
+  useEffect(() => {
+    if (IsGetQuoteFail && getQuoteFailMessage) {
+      setTimeout(() => {
+        setErrorTitle(getQuoteFailMessage);
+        setErrorProccedButtonText('Done');
+      }, 2);
+      (ErrorModalBottomSheet as any).current.snapTo(1);
+      let data={
+        getQuoteFail: false,
+        getQuoteFailMessage: ''
+      }
+      dispatch(getQuoteFail(data))
+    }
+  }, [IsGetQuoteFail,getQuoteFailMessage]);
+
+  useEffect(() => {
+    if (IsExecuteOrderFail && executeOrderFailMessage) {
+      setTimeout(() => {
+        setErrorTitle(executeOrderFailMessage);
+        setErrorProccedButtonText('Done');
+      }, 2);
+      (ErrorModalBottomSheet as any).current.snapTo(1);
+      let data={
+        executeOrderFail: false,
+        executeOrderFailMessage: ''
+      }
+      dispatch(executeOrderFail(data))
+    }
+  }, [IsExecuteOrderFail,executeOrderFailMessage]);
+
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorModalBottomSheet}
+        title={errorTitle}
+        info={errorInfo}
+        note={errorNote}
+        proceedButtonText={errorProccedButtonText}
+        onPressProceed={() => {
+            (ErrorModalBottomSheet as any).current.snapTo(0);
+        }}
+        isIgnoreButton={true}
+        cancelButtonText={'Back'}
+        onPressIgnore={() => {
+          (ErrorModalBottomSheet as any).current.snapTo(0);
+      }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/reject.png')}
+      />
+    );
+  }, [errorTitle,errorInfo,errorNote,errorProccedButtonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorModalBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -837,6 +945,16 @@ const VoucherScanner = (props) => {
         ]}
         renderContent={renderRegistrationSuccessModalContent}
         renderHeader={renderRegistrationSuccessModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorModalBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
       />
       {QuoteDetails && (
         <BottomSheet
