@@ -49,11 +49,13 @@ import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import {
   EncDynamicNonPMDD,
   MetaShare,
+  EphemeralData,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import { AsyncStorage } from 'react-native';
 import { Alert } from 'react-native';
+import { updateEphemeralChannel } from '../actions/trustedContacts';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -175,6 +177,17 @@ function* uploadEncMetaShareWorker({ payload }) {
     console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
     console.log({ otp, encryptedKey });
+
+    // adding transfer details to he ephemeral data
+    const data: EphemeralData = {
+      ...payload.data,
+      shareTransferDetails: {
+        otp,
+        encryptedKey,
+      },
+    };
+
+    yield put(updateEphemeralChannel(payload.contactName, data));
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,

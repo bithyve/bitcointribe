@@ -1,5 +1,7 @@
 // types and action creators: dispatched by components and sagas
 
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+
 export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
 export const PREPARE_MSHARES = 'PREPARE_MSHARES';
 export const UPLOAD_ENC_MSHARE = 'UPLOAD_ENC_MSHARES';
@@ -31,9 +33,19 @@ export const prepareMShares = () => {
 
 export const uploadEncMShare = (
   shareIndex: number,
+  contactName: string,
+  data: EphemeralData,
   changingGuardian?: boolean,
 ) => {
-  return { type: UPLOAD_ENC_MSHARE, payload: { shareIndex, changingGuardian } };
+  return {
+    type: UPLOAD_ENC_MSHARE,
+    payload: {
+      shareIndex,
+      contactName,
+      data,
+      changingGuardian,
+    },
+  };
 };
 
 export const uploadRequestedShare = (tag, encryptedKey, otp) => {
@@ -47,7 +59,7 @@ export const downloadMShare = (otp, encryptedKey, downloadType?) => {
   };
 };
 
-export const generatePDF = shareIndex => {
+export const generatePDF = (shareIndex) => {
   console.log({ ...shareIndex });
 
   return {
@@ -72,7 +84,7 @@ export const calculateOverallHealth = (s3Service?) => {
   return { type: OVERALL_HEALTH, payload: { s3Service } };
 };
 
-export const requestShare = shareIndex => {
+export const requestShare = (shareIndex) => {
   return { type: REQUEST_SHARE, payload: { shareIndex } };
 };
 
@@ -80,7 +92,7 @@ export const updateDynamicNonPMDD = () => {
   return { type: UPDATE_DYNAMINC_NONPMDD };
 };
 
-export const downloadDynamicNonPMDD = walletId => {
+export const downloadDynamicNonPMDD = (walletId) => {
   return { type: DOWNLOAD_DYNAMIC_NONPMDD, payload: { walletId } };
 };
 
@@ -122,11 +134,11 @@ export const requestedShareUploaded = (tag, status, err?) => {
   return { type: REQUESTED_SHARE_UPLOADED, payload: { tag, status, err } };
 };
 
-export const mnemonicRecovered = mnemonic => {
+export const mnemonicRecovered = (mnemonic) => {
   return { type: MNEMONIC_RECOVERED, payload: { mnemonic } };
 };
 
-export const switchS3Loader = beingLoaded => {
+export const switchS3Loader = (beingLoaded) => {
   return { type: S3_LOADING, payload: { beingLoaded } };
 };
 
@@ -134,42 +146,42 @@ export const downloadedMShare = (otp, status, err?) => {
   return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
 };
 
-export const updateShareHistory = overallHealth => {
+export const updateShareHistory = (overallHealth) => {
   return { type: UPDATE_SHARE_HISTORY, payload: { overallHealth } };
 };
 
-export const overallHealthCalculated = overallHealth => {
+export const overallHealthCalculated = (overallHealth) => {
   return { type: OVERALL_HEALTH_CALCULATED, payload: { overallHealth } };
 };
 
-export const restoreShareFromQR = qrArray => {
+export const restoreShareFromQR = (qrArray) => {
   return { type: RESTORE_SHARE_FROM_QR, payload: { qrArray } };
 };
 
-export const pdfHealthChecked = pdfHealthChecked => {
+export const pdfHealthChecked = (pdfHealthChecked) => {
   return { type: CHECKED_PDF_HEALTH, payload: { pdfHealthChecked } };
 };
 
-export const QRChecked = isFailed => {
+export const QRChecked = (isFailed) => {
   return { type: QR_CHECKED, payload: { isFailed } };
 };
 
-export const UnableRecoverShareFromQR = isFailed => {
+export const UnableRecoverShareFromQR = (isFailed) => {
   return { type: UNABLE_RECOVER_SHARE_FROM_QR, payload: { isFailed } };
 };
 
-export const walletRecoveryFailed = isFailed => {
+export const walletRecoveryFailed = (isFailed) => {
   return { type: WALLET_RECOVERY_FAILED, payload: { isFailed } };
 };
 
-export const ErrorSending = isFailed => {
+export const ErrorSending = (isFailed) => {
   return { type: ERROR_SENDING, payload: { isFailed } };
 };
 
-export const UploadSuccessfully = isUploaded => {
+export const UploadSuccessfully = (isUploaded) => {
   return { type: UPLOAD_SUCCEFULLY, payload: { isUploaded } };
 };
 
-export const ErrorReceiving = isFailed => {
+export const ErrorReceiving = (isFailed) => {
   return { type: ERROR_RECEIVING, payload: { isFailed } };
 };
