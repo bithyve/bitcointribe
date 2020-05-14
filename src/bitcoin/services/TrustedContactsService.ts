@@ -1,6 +1,11 @@
 import TrustedContacts from '../utilities/TrustedContacts';
 import config from '../Config';
-import { Contacts, TrustedData, EphemeralData } from '../utilities/Interface';
+import {
+  Contacts,
+  TrustedData,
+  EphemeralData,
+  TrustedDataElements,
+} from '../utilities/Interface';
 
 export default class TrustedContactsService {
   public static fromJSON = (json: string) => {
@@ -89,7 +94,7 @@ export default class TrustedContactsService {
 
   public updateEphemeralChannel = async (
     contactName: string,
-    dataPacket: any,
+    dataElements: EphemeralData,
     fetch?: Boolean,
   ): Promise<
     | {
@@ -120,7 +125,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateEphemeralChannel(
           contactName.toLowerCase(),
-          dataPacket,
+          dataElements,
           fetch,
         ),
       };
@@ -167,7 +172,7 @@ export default class TrustedContactsService {
 
   public updateTrustedChannel = async (
     contactName: string,
-    dataPacket: any,
+    dataElements: TrustedDataElements,
     fetch?: Boolean,
   ): Promise<
     | {
@@ -196,7 +201,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateTrustedChannel(
           contactName.toLowerCase(),
-          dataPacket,
+          dataElements,
           fetch,
         ),
       };

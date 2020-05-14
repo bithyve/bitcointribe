@@ -203,6 +203,7 @@ export default class TrustedContacts {
       }
 
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
+      dataElements.publicKey = publicKey;
 
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,
