@@ -21,7 +21,179 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TrustedContactRequest(props) {
   const [PhoneNumber, setPhoneNumber] = useState('');
+  const [EmailId, setEmailId] = useState('');
   const [onBlurFocus, setOnBlurFocus] = useState(false);
+  const [passcode, setPasscode] = useState('');
+  const [passcodeArray, setPasscodeArray] = useState([]);
+  function onPressNumber(text) {
+    let tmpPasscode = passcodeArray;
+    if(text){
+      tmpPasscode.push(text);
+    }
+    else{
+      tmpPasscode.pop();
+    }
+    setPasscodeArray(tmpPasscode);
+    if(tmpPasscode.length==6){
+      setPasscode(tmpPasscode.join(''));
+      props.onPhoneNumberChange(tmpPasscode.join(''));
+    }
+  }
+
+  const getStyle = (i) => {
+    if (i == 0) {
+      return this.textInput && this.textInput.isFocused()
+        ? styles.textBoxActive
+        : styles.textBoxStyles;
+    }
+    if (i == 1) {
+      return this.textInput2 && this.textInput2.isFocused()
+        ? styles.textBoxActive
+        : styles.textBoxStyles;
+    }
+    if (i == 2) {
+      return this.textInput3 && this.textInput3.isFocused()
+        ? styles.textBoxActive
+        : styles.textBoxStyles;
+    }
+    if (i == 3) {
+      return this.textInput4 && this.textInput4.isFocused()
+        ? styles.textBoxActive
+        : styles.textBoxStyles;
+    }
+    if (i == 4) {
+      return this.textInput5 && this.textInput5.isFocused()
+        ? styles.textBoxActive
+        : styles.textBoxStyles;
+    }
+    if (i == 5) {
+      return this.textInput6 && this.textInput6.isFocused()
+        ? styles.textBoxActive
+        : styles.textBoxStyles;
+    }
+  };
+  const getInputBox = () => {
+    if (props.inputType == 'email') {
+      return (
+        <View style={styles.textboxView}>
+          <TextInput
+            keyboardType={'email-address'}
+            placeholderTextColor={Colors.borderColor}
+            placeholder={'Enter email'}
+            onChangeText={(text) => {
+              setEmailId(text);
+              props.onPhoneNumberChange(text);
+            }}
+            style={{ flex: 1, fontSize: RFValue(13) }}
+            onFocus={() => {
+              setOnBlurFocus(true);
+              props.bottomSheetRef.current.snapTo(2);
+            }}
+            onBlur={() => {
+              setOnBlurFocus(false);
+              props.bottomSheetRef.current.snapTo(1);
+            }}
+          />
+          <View style={styles.seperatorView} />
+          <Text
+            style={{
+              ...styles.countryCodeText,
+              color: EmailId ? Colors.textColorGrey : Colors.borderColor,
+            }}
+          >
+            @bithyve.com
+          </Text>
+        </View>
+      );
+    } else if (props.inputType == 'phone') {
+      return (
+        <View style={styles.textboxView}>
+          <Text
+            style={{
+              ...styles.countryCodeText,
+              color: PhoneNumber ? Colors.textColorGrey : Colors.borderColor,
+            }}
+          >
+            +91
+          </Text>
+          <View style={styles.seperatorView} />
+          <TextInput
+            keyboardType={'numeric'}
+            placeholderTextColor={Colors.borderColor}
+            placeholder={'Enter Phone Number'}
+            onChangeText={(text) => {
+              setPhoneNumber(text);
+              props.onPhoneNumberChange(text);
+            }}
+            style={{ flex: 1 }}
+            onFocus={() => {
+              setOnBlurFocus(true);
+              props.bottomSheetRef.current.snapTo(2);
+            }}
+            onBlur={() => {
+              setOnBlurFocus(false);
+              props.bottomSheetRef.current.snapTo(1);
+            }}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <View style={{ flexDirection: 'row', marginBottom: wp('5%'),}}>
+          {[0, 1, 2, 3, 4, 5].map((i) => {
+            return (
+              <TextInput
+                maxLength={1}
+                returnKeyType="done"
+                returnKeyLabel="Done"
+                keyboardType="number-pad"
+                ref={(input) => {
+                  if (i == 0) this.textInput = input;
+                  if (i == 1) this.textInput2 = input;
+                  if (i == 2) this.textInput3 = input;
+                  if (i == 3) this.textInput4 = input;
+                  if (i == 4) this.textInput5 = input;
+                  if (i == 5) this.textInput6 = input;
+                }}
+                style={getStyle(i)}
+                onChangeText={(value) => {
+                  onPressNumber(value);
+                  if (value && i==0) this.textInput2.focus();
+                  if (value && i==1) this.textInput3.focus();
+                  if (value && i==2) this.textInput4.focus();
+                  if (value && i==3) this.textInput5.focus();
+                  if (value && i==4) this.textInput6.focus();
+                  if (value && i==5) this.textInput6.focus();
+                }}
+                onKeyPress={(e) => {
+                  if (e.nativeEvent.key === 'Backspace' && i==0) this.textInput.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i==1) this.textInput.focus();
+                  if (e.nativeEvent.key === "Backspace" && i==2) this.textInput2.focus();
+                  if (e.nativeEvent.key === "Backspace" && i==3) this.textInput3.focus();
+                  if (e.nativeEvent.key === "Backspace" && i==4) this.textInput4.focus();
+                  if (e.nativeEvent.key === "Backspace" && i==5) this.textInput5.focus();
+                }}
+                onFocus={() => {
+                  if (passcode.length == 0 && i == 0) {
+                    props.bottomSheetRef.current.snapTo(2);
+                  }
+                  else{
+                    props.bottomSheetRef.current.snapTo(2);
+                  }
+                }}
+                onBlur={() => {
+                  if ((passcode.length == 0 || passcode.length == 6) && i==5) {
+                    props.bottomSheetRef.current.snapTo(1);
+                  }
+                }}
+              />
+            );
+          })}
+        </View>
+      );
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={{
@@ -85,40 +257,8 @@ export default function TrustedContactRequest(props) {
             </Text>
           </Text>
           <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
-            <Text
-              style={styles.phoneNumberInfoText}
-            >
-              Enter Phone Number
-            </Text>
-            <View
-              style={styles.textboxView}
-            >
-              <Text
-                style={{...styles.countryCodeText, color: PhoneNumber
-                  ? Colors.textColorGrey
-                  : Colors.borderColor,}}
-              >
-                +91
-              </Text>
-              <View
-                style={styles.seperatorView}
-              />
-              <TextInput
-                keyboardType={'numeric'}
-                placeholderTextColor={Colors.borderColor}
-                placeholder={'Enter Phone Number'}
-                onChangeText={(text) => {setPhoneNumber(text); props.onPhoneNumberChange(text)}}
-                style={{ flex: 1 }}
-                onFocus={() => {
-                  setOnBlurFocus(true);
-                  props.bottomSheetRef.current.snapTo(2);
-                }}
-                onBlur={() => {
-                  setOnBlurFocus(false);
-                  props.bottomSheetRef.current.snapTo(1);
-                }}
-              />
-            </View>
+            <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
+            {getInputBox()}
           </View>
           <View
             style={{
@@ -220,7 +360,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     marginBottom: wp('5%'),
   },
-  textboxView:{
+  textboxView: {
     flexDirection: 'row',
     paddingLeft: 15,
     height: 50,
@@ -230,16 +370,62 @@ const styles = StyleSheet.create({
     marginBottom: wp('5%'),
     alignItems: 'center',
   },
-  countryCodeText:{
+  countryCodeText: {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(13),
     paddingRight: 15,
   },
-  seperatorView:{
+  seperatorView: {
     marginRight: 15,
     height: 25,
     width: 2,
     borderColor: Colors.borderColor,
     borderWidth: 1,
-  }
+  },
+  textBoxStyles: {
+    borderWidth: 0.5,
+    height: wp('12%'),
+    width: wp('12%'),
+    borderRadius: 7,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    marginLeft: 8,
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textBoxActive: {
+    borderWidth: 0.5,
+    height: wp('12%'),
+    width: wp('12%'),
+    borderRadius: 7,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 3 },
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    marginLeft: 8,
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textStyles: {
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  textFocused: {
+    color: Colors.black,
+    fontSize: RFValue(13),
+    textAlign: 'center',
+    lineHeight: 18,
+  },
 });
