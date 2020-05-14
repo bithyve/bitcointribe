@@ -13,21 +13,22 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
 
 export default function SecondaryDeviceModelContents(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
 
   const SHARES_TRANSFER_DETAILS = useSelector(
-    state =>
+    (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
 
   const WALLET_SETUP = useSelector(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
   );
 
   const uploadMetaShare = useSelector(
-    state => state.sss.loading.uploadMetaShare,
+    (state) => state.sss.loading.uploadMetaShare,
   );
 
   const dispatch = useDispatch();
@@ -37,26 +38,44 @@ export default function SecondaryDeviceModelContents(props) {
     if (props.changeContact) setChangeContact(true);
   }, [props.changeContact]);
 
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
   useEffect(() => {
+    const contactName = 'self';
+    const data: EphemeralData = {
+      walletID: `${contactName}-walletID`,
+      FCM: `${contactName}-FCM`,
+    };
+
     if (changeContact) {
-      dispatch(uploadEncMShare(0, true));
+      dispatch(uploadEncMShare(0, contactName, data, true));
       setChangeContact(false);
     } else {
       if (SHARES_TRANSFER_DETAILS[0]) {
         if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
-          dispatch(uploadEncMShare(0));
+          dispatch(uploadEncMShare(0, contactName, data));
         } else {
           // do nothing
         }
+        // setSecondaryQR(
+        //   JSON.stringify({
+        //     requester: WALLET_SETUP.walletName,
+        //     ...SHARES_TRANSFER_DETAILS[0],
+        //     type: 'secondaryDeviceQR',
+        //   }),
+        // );
+        const publicKey =
+          trustedContacts.tc.trustedContacts[contactName].publicKey;
         setSecondaryQR(
           JSON.stringify({
-            requester: WALLET_SETUP.walletName,
-            ...SHARES_TRANSFER_DETAILS[0],
+            publicKey,
             type: 'secondaryDeviceQR',
           }),
         );
       } else {
-        dispatch(uploadEncMShare(0));
+        dispatch(uploadEncMShare(0, contactName, data));
       }
     }
   }, [SHARES_TRANSFER_DETAILS, changeContact]);

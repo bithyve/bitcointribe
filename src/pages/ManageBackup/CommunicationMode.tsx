@@ -32,12 +32,15 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import config from '../../bitcoin/Config';
 
 export default function CommunicationMode(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   console.log('isErrorSendingFailed', isErrorSendingFailed);
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
@@ -55,7 +58,7 @@ export default function CommunicationMode(props) {
     setContact(contact);
   }, [contact]);
 
-  const getIconByStatus = status => {
+  const getIconByStatus = (status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -65,9 +68,9 @@ export default function CommunicationMode(props) {
     }
   };
 
-  const onContactSelect = index => {
+  const onContactSelect = (index) => {
     setContactInfo([
-      ...contactInfo.map(item => {
+      ...contactInfo.map((item) => {
         if (item !== contactInfo[index]) {
           return {
             ...item,
@@ -89,17 +92,21 @@ export default function CommunicationMode(props) {
   };
 
   const [changeContact, setChangeContact] = useState(false);
-  console.log({ changeContact });
+
   useEffect(() => {
     if (props.changeContact) setChangeContact(true);
   }, [props.changeContact]);
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
-  const communicate = async selectedContactMode => {
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
+  const communicate = async (selectedContactMode, contact) => {
     if (!SHARES_TRANSFER_DETAILS[index]) {
       setTimeout(() => {
         setErrorMessageHeader('Failed to share');
@@ -110,24 +117,55 @@ export default function CommunicationMode(props) {
       (ErrorBottomSheet as any).current.snapTo(1);
       return;
     }
-    const deepLink =
-      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
-      `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
-    console.log("deepLink", deepLink);
+    // const deepLink =
+    //   `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
+    //   SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
+    //   `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
 
+    const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+
+    console.log({ selectedContactMode });
     switch (selectedContactMode.type) {
       case 'number':
-        textWithoutEncoding(selectedContactMode.info, deepLink);
+        const number = selectedContactMode.info;
+        const numHintType = 'num';
+        const numHint = number.slice(number.length - 3);
+        const numberEncPubKey = TrustedContactsService.encryptPub(
+          publicKey,
+          number,
+        ).encryptedPub;
+        const numberDL =
+          `https://hexawallet.io/${config.APP_STAGE}/tck` +
+          `/${numberEncPubKey}` +
+          `/${numHintType}` +
+          `/${numHint}` +
+          `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+
+        textWithoutEncoding(number, numberDL);
         break;
 
       case 'email':
+        const emailInitials: string = selectedContactMode.info.split('@')[0];
+        const emailHintType = 'eml';
+        const emailHint = emailInitials.slice(emailInitials.length - 3);
+        const emailEncPubKey = TrustedContactsService.encryptPub(
+          publicKey,
+          emailInitials,
+        ).encryptedPub;
+        const emailDL =
+          `https://hexawallet.io/${config.APP_STAGE}/tck` +
+          `/${emailEncPubKey}` +
+          `/${emailHintType}` +
+          `/${emailHint}` +
+          `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+
         email(
           [selectedContactMode.info],
           null,
           null,
-          'Guardian request',
-          deepLink,
+          'Keeper request',
+          emailDL,
         );
         break;
     }
@@ -140,20 +178,28 @@ export default function CommunicationMode(props) {
     );
   };
 
-  const { loading } = useSelector(state => state.sss);
+  const { loading } = useSelector((state) => state.sss);
 
   useEffect(() => {
-    if (changeContact) {
-      dispatch(uploadEncMShare(index, true));
-      setChangeContact(false);
-    } else {
-      if (
-        !SHARES_TRANSFER_DETAILS[index] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-      )
-        dispatch(uploadEncMShare(index));
+    if (contact && contact.firstName) {
+      const contactName = `${contact.firstName} ${contact.lastName}`;
+      const data: EphemeralData = {
+        walletID: `${contactName}-walletID`,
+        FCM: `${contactName}-FCM`,
+      };
+      console.log({ data });
+      if (changeContact) {
+        dispatch(uploadEncMShare(index, contactName, data, true));
+        setChangeContact(false);
+      } else {
+        if (
+          !SHARES_TRANSFER_DETAILS[index] ||
+          Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+        )
+          dispatch(uploadEncMShare(index, contactName, data));
+      }
     }
-  }, [SHARES_TRANSFER_DETAILS[index], changeContact]);
+  }, [SHARES_TRANSFER_DETAILS[index], changeContact, contact]);
 
   const editContact = () => {
     var newPerson = {
@@ -421,7 +467,7 @@ export default function CommunicationMode(props) {
         {selectedContactMode ? (
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              communicate(selectedContactMode);
+              communicate(selectedContactMode, contact);
             }}
             disabled={loading.uploadMetaShare}
             style={{
