@@ -108,6 +108,7 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 
 export default function Home(props) {
+  const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState("");
   // const trustedContacts: TrustedContactsService = useSelector(
   //   (state) => state.trustedContacts.service,
   // );
@@ -2665,6 +2666,7 @@ export default function Home(props) {
   const renderTrustedContactRequestContent = useCallback(() => {
     return (
       <TrustedContactRequest
+        bottomSheetRef={TrustedContactRequestBottomSheet}
         trustedContactName={'Arpan Jain'}
         onPressAccept={() => {
           setTimeout(() => {
@@ -2680,6 +2682,7 @@ export default function Home(props) {
           }, 2);
           TrustedContactRequestBottomSheet.current.snapTo(0);
         }}
+        onPhoneNumberChange={(text)=>{setTrustedContactPhoneNumber(text)}}
       />
     );
   }, []);
@@ -3194,7 +3197,8 @@ export default function Home(props) {
         ref={TrustedContactRequestBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('100%'),
         ]}
         renderContent={renderTrustedContactRequestContent}
         renderHeader={renderTrustedContactRequestHeader}
