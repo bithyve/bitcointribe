@@ -24,6 +24,99 @@ export default class TrustedContacts {
     iv: Buffer;
     keyLength: number;
   } = config.CIPHER_SPEC;
+
+  public static generateRandomString = (length: number): string => {
+    let randomString: string = '';
+    const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    for (let itr = 0; itr < length; itr++) {
+      randomString += possibleChars.charAt(
+        Math.floor(Math.random() * possibleChars.length),
+      );
+    }
+    return randomString;
+  };
+
+  public static generateOTP = (otpLength: number): string =>
+    TrustedContacts.generateRandomString(otpLength);
+
+  private static getDerivedKey = (psuedoKey: string): string => {
+    const hashRounds = 1048;
+    let key = psuedoKey;
+    for (let itr = 0; itr < hashRounds; itr++) {
+      const hash = crypto.createHash('sha512');
+      key = hash.update(key).digest('hex');
+    }
+    return key.slice(key.length - TrustedContacts.cipherSpec.keyLength);
+  };
+
+  public static encryptPub = (
+    publicKey: string,
+    key?: string,
+  ):
+    | {
+        encryptedPub: string;
+        otp: string;
+      }
+    | {
+        encryptedPub: string;
+        otp?: undefined;
+      } => {
+    let usedOTP = false;
+    if (!key) {
+      key = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+      usedOTP = true;
+    }
+    const encryptionKey = TrustedContacts.getDerivedKey(key);
+
+    const cipher = crypto.createCipheriv(
+      TrustedContacts.cipherSpec.algorithm,
+      encryptionKey,
+      TrustedContacts.cipherSpec.iv,
+    );
+
+    const prefix = 'hexa:';
+    let encryptedPub = cipher.update(prefix + publicKey, 'utf8', 'hex');
+    encryptedPub += cipher.final('hex');
+
+    if (usedOTP) {
+      return {
+        encryptedPub,
+        otp: key,
+      };
+    } else {
+      return { encryptedPub };
+    }
+  };
+
+  public static decryptPub = (
+    encryptedPub: string,
+    key: string,
+  ): {
+    decryptedPub: string;
+  } => {
+    const decryptionKey = TrustedContacts.getDerivedKey(key);
+
+    const decipher = crypto.createDecipheriv(
+      TrustedContacts.cipherSpec.algorithm,
+      decryptionKey,
+      TrustedContacts.cipherSpec.iv,
+    );
+
+    try {
+      let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
+      decryptedPub += decipher.final('utf8');
+
+      if (decryptedPub.slice(0, 5) !== 'hexa:') {
+        throw new Error('PubKey decryption failed: invalid key');
+      }
+
+      return { decryptedPub: decryptedPub.slice(5) };
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  };
+
   public trustedContacts: Contacts = {};
   constructor(stateVars) {
     this.initializeStateVars(stateVars);

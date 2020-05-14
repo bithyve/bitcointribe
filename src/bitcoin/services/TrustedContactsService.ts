@@ -19,6 +19,26 @@ export default class TrustedContactsService {
     return new TrustedContactsService({ trustedContacts });
   };
 
+  public static encryptPub = (
+    publicKey: string,
+    key?: string,
+  ):
+    | {
+        encryptedPub: string;
+        otp: string;
+      }
+    | {
+        encryptedPub: string;
+        otp?: undefined;
+      } => TrustedContacts.encryptPub(publicKey, key);
+
+  public static decryptPub = (
+    encryptedPub: string,
+    key: string,
+  ): {
+    decryptedPub: string;
+  } => TrustedContacts.decryptPub(encryptedPub, key);
+
   public tc: TrustedContacts;
   constructor(stateVars?) {
     this.tc = new TrustedContacts(stateVars);
