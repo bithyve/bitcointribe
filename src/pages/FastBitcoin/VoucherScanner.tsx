@@ -620,7 +620,7 @@ const VoucherScanner = (props) => {
         loading={false}
       />
     );
-  }, []);
+  }, [selectedAccount]);
 
   const renderVoucherRedeemSuccessModalHeader = useCallback(() => {
     return (
