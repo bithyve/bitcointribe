@@ -198,6 +198,7 @@ class Config {
 
   public RELAY: string;
   public SIGNING_SERVER: string;
+  public APP_STAGE: string;
 
   public API_URLS = {
     TESTNET: {
@@ -273,6 +274,14 @@ class Config {
       password: BIT_RPC_PASSWORD,
       host: BIT_HOST_IP,
     });
+
+    if (BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV') {
+      this.APP_STAGE = 'dev';
+    } else if (BIT_SERVER_MODE === 'STA') {
+      this.APP_STAGE = 'sta';
+    } else {
+      this.APP_STAGE = 'app';
+    }
   }
 
   public setNetwork = (): void => {

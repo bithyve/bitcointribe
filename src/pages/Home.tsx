@@ -106,9 +106,12 @@ import { NOTIFICATION_HOUR } from 'react-native-dotenv';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
+import config from '../bitcoin/Config';
 
 export default function Home(props) {
-  const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState("");
+  const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
+    '',
+  );
   // const trustedContacts: TrustedContactsService = useSelector(
   //   (state) => state.trustedContacts.service,
   // );
@@ -436,6 +439,9 @@ export default function Home(props) {
   const [newData, setNewData] = useState([]);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
+  const trustedContactRequest = props.navigation.getParam(
+    'trustedContactRequest',
+  );
 
   const [data, setData] = useState([
     {
@@ -2082,7 +2088,7 @@ export default function Home(props) {
       return renderGetBittrSaveBitcoinContents();
     } else if (selectToAdd == 'buyBitcoins') {
       return renderGetBittrSaveBitcoinContents();
-     } 
+    }
     //else if (selectToAdd == 'Fastbitcoins') {
     //   return (
     //     <FastBitcoinModalContents
@@ -2107,7 +2113,7 @@ export default function Home(props) {
     //       }}
     //     />
     //   );
-    //} 
+    //}
     else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
@@ -2132,8 +2138,7 @@ export default function Home(props) {
           }}
         />
       );
-    } 
-    else {
+    } else {
       return null;
     }
   };
@@ -2387,9 +2392,9 @@ export default function Home(props) {
 
   const handleDeepLink = useCallback((event) => {
     const splits = event.url.split('/');
-    const requester = splits[4];
-    console.log("event.url.includes", event.url.includes("fastbitcoins"));
+
     if (splits[5] === 'sss') {
+      const requester = splits[4];
       if (splits[6] === 'ek') {
         const custodyRequest = {
           requester,
@@ -2399,12 +2404,30 @@ export default function Home(props) {
         props.navigation.navigate('Home', { custodyRequest });
       } else if (splits[6] === 'rk') {
         const recoveryRequest = { requester, rk: splits[7] };
-        props.navigation.replace('Home', { recoveryRequest });
+        props.navigation.navigate('Home', { recoveryRequest });
       }
-    } 
-    if(event.url.includes("fastbitcoins")){
+    } else if (splits[4] === 'tc' || splits[4] === 'tck') {
+      if (splits[3] !== config.APP_STAGE) {
+        Alert.alert(
+          'Invalid deeplink',
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[3]
+          }`,
+        );
+      } else {
+        const trustedContactRequest = {
+          isGuardian: splits[4] === 'tck' ? true : false,
+          encryptedKey: splits[5],
+          hintType: splits[6],
+          hint: splits[7],
+          uploadedAt: splits[8],
+        };
+        props.navigation.navigate('Home', { trustedContactRequest });
+      }
+    }
+    if (event.url.includes('fastbitcoins')) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
-       props.navigation.navigate('VoucherScanner', { userKey });
+      props.navigation.navigate('VoucherScanner', { userKey });
     }
     /**
      * Below else loop is for Getbittr changes
@@ -2682,7 +2705,9 @@ export default function Home(props) {
           }, 2);
           TrustedContactRequestBottomSheet.current.snapTo(0);
         }}
-        onPhoneNumberChange={(text)=>{setTrustedContactPhoneNumber(text)}}
+        onPhoneNumberChange={(text) => {
+          setTrustedContactPhoneNumber(text);
+        }}
       />
     );
   }, []);
@@ -3198,7 +3223,9 @@ export default function Home(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('100%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            ? hp('95%')
+            : hp('100%'),
         ]}
         renderContent={renderTrustedContactRequestContent}
         renderHeader={renderTrustedContactRequestHeader}

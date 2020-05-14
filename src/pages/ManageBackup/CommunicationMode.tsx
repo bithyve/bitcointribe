@@ -34,7 +34,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { BIT_SERVER_MODE } from 'react-native-dotenv';
+import config from '../../bitcoin/Config';
 
 export default function CommunicationMode(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -125,27 +125,20 @@ export default function CommunicationMode(props) {
     const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
 
-    let env;
-    if (BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV') {
-      env = 'dev';
-    } else if (BIT_SERVER_MODE === 'STA') {
-      env = 'sta';
-    } else {
-      env = 'app';
-    }
-
     console.log({ selectedContactMode });
     switch (selectedContactMode.type) {
       case 'number':
         const number = selectedContactMode.info;
+        const numHintType = 'num';
         const numHint = number.slice(number.length - 3);
         const numberEncPubKey = TrustedContactsService.encryptPub(
           publicKey,
           number,
         ).encryptedPub;
         const numberDL =
-          `https://hexawallet.io/${env}/tck` +
+          `https://hexawallet.io/${config.APP_STAGE}/tck` +
           `/${numberEncPubKey}` +
+          `/${numHintType}` +
           `/${numHint}` +
           `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
 
@@ -154,14 +147,16 @@ export default function CommunicationMode(props) {
 
       case 'email':
         const emailInitials: string = selectedContactMode.info.split('@')[0];
+        const emailHintType = 'eml';
         const emailHint = emailInitials.slice(emailInitials.length - 3);
         const emailEncPubKey = TrustedContactsService.encryptPub(
           publicKey,
           emailInitials,
         ).encryptedPub;
         const emailDL =
-          `https://hexawallet.io/${env}/tck` +
+          `https://hexawallet.io/${config.APP_STAGE}/tck` +
           `/${emailEncPubKey}` +
+          `/${emailHintType}` +
           `/${emailHint}` +
           `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
 
