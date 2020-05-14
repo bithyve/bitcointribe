@@ -1,9 +1,9 @@
 import {
   Contacts,
-  EphemeralDataPacket,
-  EphemeralDataElements,
+  EphemeralData,
+  TrustedData,
+  EncryptedTrustedData,
   TrustedDataElements,
-  TrustedDataPacket,
 } from './Interface';
 import crypto from 'crypto';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
@@ -24,12 +24,105 @@ export default class TrustedContacts {
     iv: Buffer;
     keyLength: number;
   } = config.CIPHER_SPEC;
+
+  public static generateRandomString = (length: number): string => {
+    let randomString: string = '';
+    const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    for (let itr = 0; itr < length; itr++) {
+      randomString += possibleChars.charAt(
+        Math.floor(Math.random() * possibleChars.length),
+      );
+    }
+    return randomString;
+  };
+
+  public static generateOTP = (otpLength: number): string =>
+    TrustedContacts.generateRandomString(otpLength);
+
+  private static getDerivedKey = (psuedoKey: string): string => {
+    const hashRounds = 1048;
+    let key = psuedoKey;
+    for (let itr = 0; itr < hashRounds; itr++) {
+      const hash = crypto.createHash('sha512');
+      key = hash.update(key).digest('hex');
+    }
+    return key.slice(key.length - TrustedContacts.cipherSpec.keyLength);
+  };
+
+  public static encryptPub = (
+    publicKey: string,
+    key?: string,
+  ):
+    | {
+        encryptedPub: string;
+        otp: string;
+      }
+    | {
+        encryptedPub: string;
+        otp?: undefined;
+      } => {
+    let usedOTP = false;
+    if (!key) {
+      key = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
+      usedOTP = true;
+    }
+    const encryptionKey = TrustedContacts.getDerivedKey(key);
+
+    const cipher = crypto.createCipheriv(
+      TrustedContacts.cipherSpec.algorithm,
+      encryptionKey,
+      TrustedContacts.cipherSpec.iv,
+    );
+
+    const prefix = 'hexa:';
+    let encryptedPub = cipher.update(prefix + publicKey, 'utf8', 'hex');
+    encryptedPub += cipher.final('hex');
+
+    if (usedOTP) {
+      return {
+        encryptedPub,
+        otp: key,
+      };
+    } else {
+      return { encryptedPub };
+    }
+  };
+
+  public static decryptPub = (
+    encryptedPub: string,
+    key: string,
+  ): {
+    decryptedPub: string;
+  } => {
+    const decryptionKey = TrustedContacts.getDerivedKey(key);
+
+    const decipher = crypto.createDecipheriv(
+      TrustedContacts.cipherSpec.algorithm,
+      decryptionKey,
+      TrustedContacts.cipherSpec.iv,
+    );
+
+    try {
+      let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
+      decryptedPub += decipher.final('utf8');
+
+      if (decryptedPub.slice(0, 5) !== 'hexa:') {
+        throw new Error('PubKey decryption failed: invalid key');
+      }
+
+      return { decryptedPub: decryptedPub.slice(5) };
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  };
+
   public trustedContacts: Contacts = {};
   constructor(stateVars) {
     this.initializeStateVars(stateVars);
   }
 
-  public encryptDataPacket = (key: string, dataPacket: any) => {
+  public encryptData = (key: string, dataPacket: any) => {
     const cipher = crypto.createCipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
@@ -38,10 +131,10 @@ export default class TrustedContacts {
     dataPacket.validator = config.HEXA_ID;
     let encrypted = cipher.update(JSON.stringify(dataPacket), 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    return { encryptedDataPacket: encrypted };
+    return { encryptedData: encrypted };
   };
 
-  public decryptDataPacket = (key: string, encryptedDataPacket: string) => {
+  public decryptData = (key: string, encryptedDataPacket: string) => {
     const decipher = crypto.createDecipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
@@ -50,13 +143,13 @@ export default class TrustedContacts {
     let decrypted = decipher.update(encryptedDataPacket, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
 
-    const dataPacket = JSON.parse(decrypted);
-    if (dataPacket.validator !== config.HEXA_ID) {
+    const data = JSON.parse(decrypted);
+    if (data.validator !== config.HEXA_ID) {
       throw new Error(
         'Decryption failed, invalid validator for the following data packet',
       );
     }
-    return { dataPacket };
+    return { data };
   };
 
   public initializeStateVars = (stateVars) => {
@@ -152,45 +245,74 @@ export default class TrustedContacts {
     };
   };
 
+  public processEphemeralChannelData = (
+    contactName: string,
+    data: EphemeralData,
+  ) => {
+    let ephemeralData = this.trustedContacts[contactName].ephemeralChannel.data;
+    if (ephemeralData) {
+      let updated = false;
+      for (let index = 0; index < ephemeralData.length; index++) {
+        if (ephemeralData[index].publicKey === data.publicKey) {
+          ephemeralData[index] = {
+            ...ephemeralData[index],
+            ...data,
+          };
+          updated = true;
+          break;
+        }
+      }
+
+      if (!updated) {
+        // 2nd party data reception for the first time
+        ephemeralData.push(data);
+      }
+    } else {
+      ephemeralData = [data];
+    }
+
+    this.trustedContacts[contactName].ephemeralChannel.data = ephemeralData;
+  };
+
   public updateEphemeralChannel = async (
     contactName: string,
-    dataElements: EphemeralDataElements,
+    dataElements: EphemeralData,
     fetch?: Boolean,
-  ): Promise<{
-    updated: Boolean;
-    publicKey: string;
-    data: any;
-  }> => {
+  ): Promise<
+    | {
+        updated: any;
+        publicKey: string;
+        data: EphemeralData;
+      }
+    | {
+        updated: any;
+        publicKey: string;
+        data?: undefined;
+      }
+  > => {
     try {
       if (!this.trustedContacts[contactName]) {
         this.initializeContact(contactName);
       }
 
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
-      const dataPacket: EphemeralDataPacket = {
-        [publicKey]: {
-          ...dataElements,
-        },
-      };
+      dataElements.publicKey = publicKey;
 
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,
         address: ephemeralChannel.address,
-        data: dataPacket,
-        identifier: publicKey,
+        data: dataElements,
         fetch,
       });
 
       const { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (data) {
-        ephemeralChannel.data = {
-          ...ephemeralChannel.data,
-          ...data,
-        };
+        this.processEphemeralChannelData(contactName, data);
+        return { updated, publicKey, data };
       }
 
-      return { updated, publicKey, data };
+      return { updated, publicKey };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -201,7 +323,7 @@ export default class TrustedContacts {
   public fetchEphemeralChannel = async (
     contactName: string,
   ): Promise<{
-    data: any;
+    data: EphemeralData;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -220,10 +342,7 @@ export default class TrustedContacts {
 
       const { data } = res.data;
       if (data) {
-        ephemeralChannel.data = {
-          ...ephemeralChannel.data,
-          ...data,
-        };
+        this.processEphemeralChannelData(contactName, data);
       }
 
       return { data };
@@ -234,14 +353,57 @@ export default class TrustedContacts {
     }
   };
 
+  public processTrustedChannelData = (
+    contactName: string,
+    encryptedData: EncryptedTrustedData,
+    symmetricKey: string,
+  ): TrustedData => {
+    const decryptedTrustedData: TrustedData = {
+      publicKey: encryptedData.publicKey,
+      data: this.decryptData(symmetricKey, encryptedData.encryptedData).data,
+    };
+
+    let trustedData = this.trustedContacts[contactName].trustedChannel.data;
+    if (trustedData) {
+      let updated = false;
+      for (let index = 0; index < trustedData.length; index++) {
+        if (trustedData[index].publicKey === decryptedTrustedData.publicKey) {
+          trustedData[index] = {
+            ...trustedData[index],
+            ...decryptedTrustedData,
+          };
+          updated = true;
+          break;
+        }
+      }
+
+      if (!updated) {
+        // 2nd party data reception for the first time
+        trustedData.push(decryptedTrustedData);
+      }
+    } else {
+      trustedData = [decryptedTrustedData];
+    }
+
+    this.trustedContacts[contactName].trustedChannel.data = trustedData;
+
+    return decryptedTrustedData;
+  };
+
   public updateTrustedChannel = async (
     contactName: string,
     dataElements: TrustedDataElements,
     fetch?: Boolean,
-  ): Promise<{
-    updated: Boolean;
-    data: any;
-  }> => {
+  ): Promise<
+    | {
+        updated: any;
+        data: TrustedData;
+      }
+    | {
+        updated: any;
+        data?: undefined;
+      }
+  > => {
     try {
       if (!this.trustedContacts[contactName]) {
         throw new Error(
@@ -262,18 +424,16 @@ export default class TrustedContacts {
         contactName
       ];
 
-      const { encryptedDataPacket } = this.encryptDataPacket(symmetricKey, {
-        ...dataElements,
-      });
-      const dataPacket: TrustedDataPacket = {
-        [publicKey]: encryptedDataPacket,
+      const { encryptedData } = this.encryptData(symmetricKey, dataElements);
+      const encryptedDataPacket: EncryptedTrustedData = {
+        publicKey,
+        encryptedData,
       };
 
       const res = await BH_AXIOS.post('updateTrustedChannel', {
         HEXA_ID,
         address: trustedChannel.address,
-        data: dataPacket,
-        identifier: publicKey,
+        data: encryptedDataPacket,
         fetch,
       });
 
@@ -281,13 +441,10 @@ export default class TrustedContacts {
       if (!updated) throw new Error('Failed to update ephemeral space');
 
       if (data) {
-        data = this.decryptDataPacket(symmetricKey, data);
-        trustedChannel.data = {
-          ...trustedChannel.data,
-          ...data,
-        };
+        data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        return { updated, data };
       }
-      return { updated, data };
+      return { updated };
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err);
       if (err.code) throw new Error(err.code);
@@ -298,7 +455,7 @@ export default class TrustedContacts {
   public fetchTrustedChannel = async (
     contactName: string,
   ): Promise<{
-    data: any;
+    data: TrustedData;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -328,11 +485,7 @@ export default class TrustedContacts {
 
       let { data } = res.data;
       if (data) {
-        data = this.decryptDataPacket(symmetricKey, data);
-        trustedChannel.data = {
-          ...trustedChannel.data,
-          ...data,
-        };
+        data = this.processTrustedChannelData(contactName, data, symmetricKey);
       }
 
       return {

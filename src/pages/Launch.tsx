@@ -21,6 +21,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import config from '../bitcoin/Config';
 
 export default function Launch(props) {
   const dispatch = useDispatch();
@@ -69,8 +70,8 @@ export default function Launch(props) {
             if (!url) props.navigation.replace('Login');
             else {
               const splits = url.split('/');
-              const requester = splits[4];
               if (splits[5] === 'sss') {
+                const requester = splits[4];
                 if (splits[6] === 'ek') {
                   const custodyRequest = {
                     requester,
@@ -82,10 +83,27 @@ export default function Launch(props) {
                   const recoveryRequest = { requester, rk: splits[7] };
                   props.navigation.replace('Login', { recoveryRequest });
                 }
-              }
-              else{
+              } else if (splits[4] === 'tc' || splits[4] === 'tck') {
+                if (splits[3] !== config.APP_STAGE) {
+                  Alert.alert(
+                    'Invalid deeplink',
+                    `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+                      splits[3]
+                    }`,
+                  );
+                } else {
+                  const trustedContactRequest = {
+                    isGuardian: splits[4] === 'tck' ? true : false,
+                    encryptedKey: splits[5],
+                    hintType: splits[6],
+                    hint: splits[7],
+                    uploadedAt: splits[8],
+                  };
+                  props.navigation.replace('Login', { trustedContactRequest });
+                }
+              } else {
                 const EmailToken = url.substr(url.lastIndexOf('/') + 1);
-              console.log("EmailToken",EmailToken);
+                console.log('EmailToken', EmailToken);
                 props.navigation.navigate('SignUpDetails', { EmailToken });
               }
             }
@@ -118,7 +136,7 @@ export default function Launch(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),

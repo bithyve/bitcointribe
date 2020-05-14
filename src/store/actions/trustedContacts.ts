@@ -1,8 +1,8 @@
 // types and action creators: dispatched by components and sagas
 
 import {
-  EphemeralDataElements,
   TrustedDataElements,
+  EphemeralData,
 } from '../../bitcoin/utilities/Interface';
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
@@ -31,7 +31,7 @@ export const approveTrustedContact = (
 
 export const updateEphemeralChannel = (
   contactName: string,
-  data: EphemeralDataElements,
+  data: EphemeralData,
   fetch?: Boolean,
 ) => {
   return {

@@ -1,6 +1,11 @@
 import TrustedContacts from '../utilities/TrustedContacts';
 import config from '../Config';
-import { Contacts } from '../utilities/Interface';
+import {
+  Contacts,
+  TrustedData,
+  EphemeralData,
+  TrustedDataElements,
+} from '../utilities/Interface';
 
 export default class TrustedContactsService {
   public static fromJSON = (json: string) => {
@@ -13,6 +18,26 @@ export default class TrustedContactsService {
 
     return new TrustedContactsService({ trustedContacts });
   };
+
+  public static encryptPub = (
+    publicKey: string,
+    key?: string,
+  ):
+    | {
+        encryptedPub: string;
+        otp: string;
+      }
+    | {
+        encryptedPub: string;
+        otp?: undefined;
+      } => TrustedContacts.encryptPub(publicKey, key);
+
+  public static decryptPub = (
+    encryptedPub: string,
+    key: string,
+  ): {
+    decryptedPub: string;
+  } => TrustedContacts.decryptPub(encryptedPub, key);
 
   public tc: TrustedContacts;
   constructor(stateVars?) {
@@ -89,16 +114,22 @@ export default class TrustedContactsService {
 
   public updateEphemeralChannel = async (
     contactName: string,
-    dataPacket: any,
+    dataElements: EphemeralData,
     fetch?: Boolean,
   ): Promise<
     | {
         status: number;
-        data: {
-          updated: Boolean;
-          publicKey: String;
-          data: any;
-        };
+        data:
+          | {
+              updated: any;
+              publicKey: string;
+              data: EphemeralData;
+            }
+          | {
+              updated: any;
+              publicKey: string;
+              data?: undefined;
+            };
         err?: undefined;
         message?: undefined;
       }
@@ -114,7 +145,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateEphemeralChannel(
           contactName.toLowerCase(),
-          dataPacket,
+          dataElements,
           fetch,
         ),
       };
@@ -133,7 +164,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          data: any;
+          data: EphemeralData;
         };
         err?: undefined;
         message?: undefined;
@@ -161,15 +192,20 @@ export default class TrustedContactsService {
 
   public updateTrustedChannel = async (
     contactName: string,
-    dataPacket: any,
+    dataElements: TrustedDataElements,
     fetch?: Boolean,
   ): Promise<
     | {
         status: number;
-        data: {
-          updated: Boolean;
-          data: any;
-        };
+        data:
+          | {
+              updated: any;
+              data: TrustedData;
+            }
+          | {
+              updated: any;
+              data?: undefined;
+            };
         err?: undefined;
         message?: undefined;
       }
@@ -185,7 +221,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateTrustedChannel(
           contactName.toLowerCase(),
-          dataPacket,
+          dataElements,
           fetch,
         ),
       };
@@ -204,7 +240,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          data: any;
+          data: TrustedData;
         };
         err?: undefined;
         message?: undefined;

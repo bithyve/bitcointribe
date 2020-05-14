@@ -16,6 +16,8 @@ import {
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { insertIntoDB } from '../actions/storage';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { downloadMShare } from '../actions/sss';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -89,8 +91,12 @@ function* updateEphemeralChannelWorker({ payload }) {
     fetch,
   );
   if (res.status === 200) {
-    const { updated, data } = res.data;
-    yield put(ephemeralChannelUpdated(contactName, updated, data));
+    const data: EphemeralData = res.data.data;
+    if (data && data.shareTransferDetails) {
+      const { otp, encryptedKey } = data.shareTransferDetails;
+      downloadMShare(otp, encryptedKey);
+    }
+    yield put(ephemeralChannelUpdated(contactName, res.updated, data));
 
     console.log({ trustedContacts });
     const { SERVICES } = yield select((state) => state.storage.database);
@@ -118,7 +124,12 @@ function* fetchEphemeralChannelWorker({ payload }) {
 
   const res = yield call(trustedContacts.fetchEphemeralChannel, contactName);
   if (res.status === 200) {
-    const { data } = res.data;
+    const data: EphemeralData = res.data.data;
+    if (data && data.shareTransferDetails) {
+      const { otp, encryptedKey } = data.shareTransferDetails;
+      downloadMShare(otp, encryptedKey);
+    }
+
     yield put(ephemeralChannelFetched(contactName, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {

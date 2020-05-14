@@ -212,24 +212,33 @@ export default function Login(props) {
       DeviceInfo.getVersion(),
       DeviceInfo.getBuildNumber(),
     );
-     
+
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
-        console.log("Release note", res.data.releases);
-        let releaseCases = JSON.parse(await AsyncStorage.getItem("releaseCases"));
-        console.log("releaseCases Login", releaseCases);
-        if(res.data.releases.length && res.data.releases[0].build != DeviceInfo.getBuildNumber()){
-      if(releaseCases && releaseCases.build == res.data.releases[0].build && releaseCases.ignoreClick) return;
-      props.navigation.navigate('UpdateApp', {releaseData: res.data.releases})
-       } 
+        console.log('Release note', res.data.releases);
+        let releaseCases = JSON.parse(
+          await AsyncStorage.getItem('releaseCases'),
+        );
+        console.log('releaseCases Login', releaseCases);
+        if (
+          res.data.releases.length &&
+          res.data.releases[0].build != DeviceInfo.getBuildNumber()
+        ) {
+          if (
+            releaseCases &&
+            releaseCases.build == res.data.releases[0].build &&
+            releaseCases.ignoreClick
+          )
+            return;
+          props.navigation.navigate('UpdateApp', {
+            releaseData: res.data.releases,
+          });
+        }
       })
       .catch((error) => {
         console.error(error);
       });
-    
   }, []);
-
-  
 
   // useEffect(() => {
   //   (async () => {
@@ -258,6 +267,9 @@ export default function Login(props) {
 
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
+  const trustedContactRequest = props.navigation.getParam(
+    'trustedContactRequest',
+  );
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -271,6 +283,7 @@ export default function Login(props) {
               props.navigation.navigate('Home', {
                 custodyRequest,
                 recoveryRequest,
+                trustedContactRequest,
               });
             }, 2500);
             dispatch(syncAccounts());
