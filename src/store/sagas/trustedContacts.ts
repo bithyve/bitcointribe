@@ -104,7 +104,7 @@ function* updateEphemeralChannelWorker({ payload }) {
   );
   console.log({ res });
   if (res.status === 200) {
-    yield put(ephemeralChannelUpdated(contactName, res.updated, data));
+    yield put(ephemeralChannelUpdated(contactName, res.updated, res.data));
 
     console.log({ trustedContacts });
     const { SERVICES } = yield select((state) => state.storage.database);

@@ -47,7 +47,6 @@ const TrustedContactHistory = (props) => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
 
   const dispatch = useDispatch();
   const [selectedContactMode, setSelectedContactMode] = useState(null);
@@ -199,6 +198,7 @@ const TrustedContactHistory = (props) => {
     );
   }, []);
 
+  const [contactForTrustedQR, setContactForTrustedQR] = useState();
   const renderCommunicationModeModalContent = useCallback(() => {
     return (
       <CommunicationMode
@@ -214,7 +214,7 @@ const TrustedContactHistory = (props) => {
         onPressBack={() => {
           (CommunicationModeBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={async (OTP, index, selectedContactMode) => {
+        onPressContinue={async (OTP, index, selectedContactMode, contact) => {
           let selectedContactModeTemp = JSON.parse(
             await AsyncStorage.getItem('selectedContactMode'),
           );
@@ -233,6 +233,7 @@ const TrustedContactHistory = (props) => {
           );
           setSelectedContactMode(selectedContactModeTemp);
           if (selectedContactMode.type == 'qrcode') {
+            setContactForTrustedQR(contact);
             (trustedContactQrBottomSheet as any).current.snapTo(1);
             (CommunicationModeBottomSheet as any).current.snapTo(0);
           } else {
@@ -242,7 +243,7 @@ const TrustedContactHistory = (props) => {
             //   setChosenContactIndex(index);
             // }, 10);
             setChosenContactIndex(index);
-            onOTPShare(index);
+            onOTPShare(index); // enables reshare
             (CommunicationModeBottomSheet as any).current.snapTo(0);
             // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
           }
@@ -573,16 +574,22 @@ const TrustedContactHistory = (props) => {
 
   const renderTrustedContactQrContents = useCallback(() => {
     const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
+    if (!contactForTrustedQR) return;
+
     return (
       <TrustedContactQr
         index={index}
-        onPressOk={() => onOTPShare(index)}
+        contact={contactForTrustedQR}
+        onPressOk={() => {
+          onOTPShare(index);
+        }}
         onPressBack={() => {
+          onOTPShare(index);
           (trustedContactQrBottomSheet as any).current.snapTo(0);
         }}
       />
     );
-  }, [selectedTitle, chosenContact]);
+  }, [selectedTitle, contactForTrustedQR]);
 
   const renderTrustedContactQrHeader = useCallback(() => {
     return (
@@ -907,6 +914,11 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderConfirmHeader}
       />
       <BottomSheet
+        onCloseEnd={() => {
+          if (Object.keys(chosenContact).length > 0) {
+            onOTPShare(index);
+          }
+        }}
         onCloseStart={() => {}}
         enabledInnerScrolling={true}
         ref={trustedContactQrBottomSheet as any}

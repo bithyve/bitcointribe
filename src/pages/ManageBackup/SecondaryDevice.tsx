@@ -14,6 +14,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export default function SecondaryDeviceModelContents(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
