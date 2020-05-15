@@ -160,6 +160,7 @@ export default class TrustedContactsService {
 
   public fetchEphemeralChannel = async (
     contactName: string,
+    approveTC?: Boolean,
   ): Promise<
     | {
         status: number;
@@ -179,7 +180,10 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.fetchEphemeralChannel(contactName.toLowerCase()),
+        data: await this.tc.fetchEphemeralChannel(
+          contactName.toLowerCase(),
+          approveTC,
+        ),
       };
     } catch (err) {
       return {

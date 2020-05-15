@@ -41,7 +41,7 @@ export default function CommunicationMode(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
+
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
@@ -124,11 +124,14 @@ export default function CommunicationMode(props) {
 
     const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const requester = WALLET_SETUP.walletName;
 
     console.log({ selectedContactMode });
     switch (selectedContactMode.type) {
       case 'number':
-        const number = selectedContactMode.info;
+        console.log({ info: selectedContactMode.info });
+        const number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        console.log({ number, info: selectedContactMode.info });
         const numHintType = 'num';
         const numHint = number.slice(number.length - 3);
         const numberEncPubKey = TrustedContactsService.encryptPub(
@@ -136,7 +139,8 @@ export default function CommunicationMode(props) {
           number,
         ).encryptedPub;
         const numberDL =
-          `https://hexawallet.io/${config.APP_STAGE}/tck` +
+          `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+          `/${requester}` +
           `/${numberEncPubKey}` +
           `/${numHintType}` +
           `/${numHint}` +
@@ -154,7 +158,8 @@ export default function CommunicationMode(props) {
           emailInitials,
         ).encryptedPub;
         const emailDL =
-          `https://hexawallet.io/${config.APP_STAGE}/tck` +
+          `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+          `/${requester}` +
           `/${emailEncPubKey}` +
           `/${emailHintType}` +
           `/${emailHint}` +
@@ -175,30 +180,37 @@ export default function CommunicationMode(props) {
         : null,
       index,
       selectedContactMode,
+      contact,
     );
   };
 
   const { loading } = useSelector((state) => state.sss);
 
   useEffect(() => {
-    if (contact && contact.firstName) {
-      const contactName = `${contact.firstName} ${contact.lastName}`;
-      const data: EphemeralData = {
-        walletID: `${contactName}-walletID`,
-        FCM: `${contactName}-FCM`,
-      };
-      console.log({ data });
-      if (changeContact) {
-        dispatch(uploadEncMShare(index, contactName, data, true));
-        setChangeContact(false);
-      } else {
-        if (
-          !SHARES_TRANSFER_DETAILS[index] ||
-          Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-        )
-          dispatch(uploadEncMShare(index, contactName, data));
+    (async () => {
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
+      console.log({ walletID, FCM });
+
+      if (contact && contact.firstName) {
+        const contactName = `${contact.firstName} ${contact.lastName}`;
+        const data: EphemeralData = {
+          walletID,
+          FCM,
+        };
+        console.log({ data });
+        if (changeContact) {
+          dispatch(uploadEncMShare(index, contactName, data, true));
+          setChangeContact(false);
+        } else {
+          if (
+            !SHARES_TRANSFER_DETAILS[index] ||
+            Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+          )
+            dispatch(uploadEncMShare(index, contactName, data));
+        }
       }
-    }
+    })();
   }, [SHARES_TRANSFER_DETAILS[index], changeContact, contact]);
 
   const editContact = () => {

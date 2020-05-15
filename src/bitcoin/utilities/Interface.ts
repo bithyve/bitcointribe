@@ -30,6 +30,7 @@ export interface MetaShare {
     tag: string;
     timestamp: string;
     reshareVersion: number;
+    guardian?: string;
   };
   encryptedStaticNonPMDD: string;
 }
