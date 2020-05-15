@@ -157,6 +157,7 @@ const VoucherScanner = (props) => {
         if(voucherCodeTemp){
           console.log("voucherCodeTemp 1", voucherCodeTemp);
           setVoucherCode(voucherCodeTemp.voucher_code);
+          setSelectedAccount(voucherCodeTemp.selectedAccount);
         }
       }
       let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
@@ -358,7 +359,7 @@ const VoucherScanner = (props) => {
         let FBTCAccountData = JSON.parse(
           await AsyncStorage.getItem('FBTCAccount'),
         );
-        console.log("FBTCAccountData",FBTCAccountData,accountSyncDetails, typeof accountSyncDetails)
+        console.log("FBTCAccountData",FBTCAccountData,accountSyncDetails, accountSyncDetails.redeem_vouchers, typeof accountSyncDetails)
         let obj;
         if (FBTCAccountData) {
           obj = {
@@ -370,7 +371,10 @@ const VoucherScanner = (props) => {
           await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
         }
         if (accountSyncDetails.redeem_vouchers) {
-          (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+          setTimeout(() => {
+            (RegistrationSuccessBottomSheet as any).current.snapTo(1);
+            
+          }, 2);
           dispatch(ClearAccountSyncData());
         }
       })();
