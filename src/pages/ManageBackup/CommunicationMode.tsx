@@ -124,6 +124,7 @@ export default function CommunicationMode(props) {
 
     const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const requester = WALLET_SETUP.walletName;
 
     console.log({ selectedContactMode });
     switch (selectedContactMode.type) {
@@ -136,7 +137,8 @@ export default function CommunicationMode(props) {
           number,
         ).encryptedPub;
         const numberDL =
-          `https://hexawallet.io/${config.APP_STAGE}/tck` +
+          `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+          `/${requester}` +
           `/${numberEncPubKey}` +
           `/${numHintType}` +
           `/${numHint}` +
@@ -154,7 +156,8 @@ export default function CommunicationMode(props) {
           emailInitials,
         ).encryptedPub;
         const emailDL =
-          `https://hexawallet.io/${config.APP_STAGE}/tck` +
+          `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+          `/${requester}` +
           `/${emailEncPubKey}` +
           `/${emailHintType}` +
           `/${emailHint}` +

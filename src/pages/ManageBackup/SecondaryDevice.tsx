@@ -70,6 +70,7 @@ export default function SecondaryDeviceModelContents(props) {
           trustedContacts.tc.trustedContacts[contactName].publicKey;
         setSecondaryQR(
           JSON.stringify({
+            requester: WALLET_SETUP.walletName,
             publicKey,
             type: 'secondaryDeviceQR',
           }),
