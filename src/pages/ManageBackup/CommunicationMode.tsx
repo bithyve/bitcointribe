@@ -129,7 +129,9 @@ export default function CommunicationMode(props) {
     console.log({ selectedContactMode });
     switch (selectedContactMode.type) {
       case 'number':
-        const number = selectedContactMode.info;
+        console.log({ info: selectedContactMode.info });
+        const number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        console.log({ number, info: selectedContactMode.info });
         const numHintType = 'num';
         const numHint = number.slice(number.length - 3);
         const numberEncPubKey = TrustedContactsService.encryptPub(

@@ -42,11 +42,11 @@ import {
 } from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
 
-const TrustedContactHistory = props => {
+const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   console.log('isErrorSendingFailed', isErrorSendingFailed);
 
   const dispatch = useDispatch();
@@ -92,7 +92,7 @@ const TrustedContactHistory = props => {
   //     securityAns: false,
   //   });
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
 
@@ -124,7 +124,7 @@ const TrustedContactHistory = props => {
     },
   ]);
 
-  const overallHealth = useSelector(state => state.sss.overallHealth);
+  const overallHealth = useSelector((state) => state.sss.overallHealth);
   const [shared, setShared] = useState(false);
   const [activateReshare, setActivateReshare] = useState(
     props.navigation.getParam('activateReshare'),
@@ -202,7 +202,7 @@ const TrustedContactHistory = props => {
   const renderCommunicationModeModalContent = useCallback(() => {
     return (
       <CommunicationMode
-        onContactUpdate={contact => {
+        onContactUpdate={(contact) => {
           setTimeout(() => {
             setChosenContact(contact);
             setTemp(!Temp);
@@ -236,13 +236,15 @@ const TrustedContactHistory = props => {
             (trustedContactQrBottomSheet as any).current.snapTo(1);
             (CommunicationModeBottomSheet as any).current.snapTo(0);
           } else {
-            setTimeout(() => {
-              setRenderTimer(true);
-              setOTP(OTP);
-              setChosenContactIndex(index);
-            }, 10);
+            // setTimeout(() => {
+            //   setRenderTimer(true);
+            //   setOTP(OTP);
+            //   setChosenContactIndex(index);
+            // }, 10);
+            setChosenContactIndex(index);
+            onOTPShare(index);
             (CommunicationModeBottomSheet as any).current.snapTo(0);
-            (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+            // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
           }
         }}
       />
@@ -260,7 +262,7 @@ const TrustedContactHistory = props => {
   }, []);
 
   const updateHistory = useCallback(
-    shareHistory => {
+    (shareHistory) => {
       const updatedTrustedContactHistory = [...trustedContactHistory];
       if (shareHistory[index].createdAt)
         updatedTrustedContactHistory[0].date = shareHistory[index].createdAt;
@@ -295,7 +297,7 @@ const TrustedContactHistory = props => {
   }, [updateHistory]);
 
   const onOTPShare = useCallback(
-    async index => {
+    async (index) => {
       (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
       (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
 
@@ -327,7 +329,7 @@ const TrustedContactHistory = props => {
     return (
       <ShareOtpWithTrustedContact
         renderTimer={renderTimer}
-        onPressOk={index => {
+        onPressOk={(index) => {
           setRenderTimer(false);
           onOTPShare(index);
           if (next) {
@@ -619,13 +621,13 @@ const TrustedContactHistory = props => {
     );
   }, []);
 
-  const sortedHistory = useCallback(history => {
-    const currentHistory = history.filter(element => {
+  const sortedHistory = useCallback((history) => {
+    const currentHistory = history.filter((element) => {
       if (element.date) return element;
     });
 
     const sortedHistory = _.sortBy(currentHistory, 'date');
-    sortedHistory.forEach(element => {
+    sortedHistory.forEach((element) => {
       element.date = moment(element.date)
         .utc()
         .local()
