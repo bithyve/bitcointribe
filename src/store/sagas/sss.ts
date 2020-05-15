@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects';
+import { call, put, select, delay } from 'redux-saga/effects';
 import {
   createWatcher,
   serviceGenerator,
@@ -140,13 +140,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     (state) => state.storage.database,
   );
 
-  let updatedSERVICES = SERVICES;
   if (payload.changingGuardian) {
     yield call(s3Service.reshareMetaShare, payload.shareIndex);
-    updatedSERVICES = {
-      ...SERVICES,
-      S3_SERVICE: JSON.stringify(s3Service),
-    };
   } else {
     // preventing re-uploads till expiry
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
@@ -179,8 +174,8 @@ function* uploadEncMetaShareWorker({ payload }) {
     s3Service.uploadShare,
     payload.shareIndex,
     payload.contactName,
-  );
-  console.log({ res });
+  ); // contact injection (requires database insertion)
+
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
@@ -196,6 +191,11 @@ function* uploadEncMetaShareWorker({ payload }) {
     };
 
     yield put(updateEphemeralChannel(payload.contactName, data));
+
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify(s3Service),
+    };
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
@@ -557,7 +557,6 @@ export const updateMSharesHealthWatcher = createWatcher(
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select((state) => state.sss.service);
-
   // const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
   // const postInstance = JSON.stringify(s3Service);
@@ -568,18 +567,33 @@ function* checkMSharesHealthWorker() {
       (state) => state.trustedContacts.service,
     );
 
+    let approvedAny = false;
     for (const index of Object.keys(shareGuardianMapping)) {
       const { updatedAt, guardian } = shareGuardianMapping[index];
-      if (updatedAt > 0) {
+
+      if (updatedAt > 0 && guardian) {
         if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
           const approveTC = true;
-          yield call(
+          const res = yield call(
             trustedContacts.fetchEphemeralChannel,
             guardian,
             approveTC,
           );
+          if (res.status === 200) {
+            approvedAny = true;
+          }
         }
       }
+    }
+
+    if (approvedAny) {
+      // yield delay(1000);
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     }
 
     // if (preInstance !== postInstance) {
