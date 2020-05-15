@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, AsyncStorage } from 'react-native';
 import BackupStyles from '../../pages/ManageBackup/Styles';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -44,44 +44,49 @@ export default function SecondaryDeviceModelContents(props) {
   );
 
   useEffect(() => {
-    const contactName = 'self';
-    const data: EphemeralData = {
-      walletID: `${contactName}-walletID`,
-      FCM: `${contactName}-FCM`,
-    };
+    (async () => {
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
 
-    if (changeContact) {
-      dispatch(uploadEncMShare(0, contactName, data, true));
-      setChangeContact(false);
-    } else {
-      if (SHARES_TRANSFER_DETAILS[0]) {
-        if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
-          dispatch(uploadEncMShare(0, contactName, data));
-        } else {
-          // do nothing
-        }
-        // setSecondaryQR(
-        //   JSON.stringify({
-        //     requester: WALLET_SETUP.walletName,
-        //     ...SHARES_TRANSFER_DETAILS[0],
-        //     type: 'secondaryDeviceQR',
-        //   }),
-        // );
-        const publicKey =
-          trustedContacts.tc.trustedContacts[contactName].publicKey;
-        setSecondaryQR(
-          JSON.stringify({
-            isGuardian: true,
-            requester: WALLET_SETUP.walletName,
-            publicKey,
-            uploadedAt: SHARES_TRANSFER_DETAILS[0].UPLOADED_AT,
-            type: 'secondaryDeviceGuardian',
-          }),
-        );
+      const contactName = 'self';
+      const data: EphemeralData = {
+        walletID,
+        FCM,
+      };
+
+      if (changeContact) {
+        dispatch(uploadEncMShare(0, contactName, data, true));
+        setChangeContact(false);
       } else {
-        dispatch(uploadEncMShare(0, contactName, data));
+        if (SHARES_TRANSFER_DETAILS[0]) {
+          if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
+            dispatch(uploadEncMShare(0, contactName, data));
+          } else {
+            // do nothing
+          }
+          // setSecondaryQR(
+          //   JSON.stringify({
+          //     requester: WALLET_SETUP.walletName,
+          //     ...SHARES_TRANSFER_DETAILS[0],
+          //     type: 'secondaryDeviceQR',
+          //   }),
+          // );
+          const publicKey =
+            trustedContacts.tc.trustedContacts[contactName].publicKey;
+          setSecondaryQR(
+            JSON.stringify({
+              isGuardian: true,
+              requester: WALLET_SETUP.walletName,
+              publicKey,
+              uploadedAt: SHARES_TRANSFER_DETAILS[0].UPLOADED_AT,
+              type: 'secondaryDeviceGuardian',
+            }),
+          );
+        } else {
+          dispatch(uploadEncMShare(0, contactName, data));
+        }
       }
-    }
+    })();
   }, [SHARES_TRANSFER_DETAILS, changeContact]);
 
   return (

@@ -111,10 +111,16 @@ function* initHCWorker() {
   if (!s3Service.sss.metaShares.length) {
     s3Service = yield call(generateMetaSharesWorker);
   }
-
   const res = yield call(s3Service.initializeHealthcheck);
   if (res.status === 200) {
     yield put(healthCheckInitialized());
+
+    // walletID globalization (in-app)
+    const walletID = yield call(AsyncStorage.getItem, 'walletID');
+    if (!walletID) {
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
+    }
+
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -190,8 +196,6 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     };
 
-    yield put(updateEphemeralChannel(payload.contactName, data));
-
     const updatedSERVICES = {
       ...SERVICES,
       S3_SERVICE: JSON.stringify(s3Service),
@@ -214,6 +218,9 @@ function* uploadEncMetaShareWorker({ payload }) {
         SERVICES: updatedSERVICES,
       }),
     );
+
+    yield delay(2000); // delaying to allow data insertion and service enrichment prior to spinning a database inserting saga (updateEphemeralChannel)
+    yield put(updateEphemeralChannel(payload.contactName, data));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
@@ -570,7 +577,7 @@ function* checkMSharesHealthWorker() {
     let approvedAny = false;
     for (const index of Object.keys(shareGuardianMapping)) {
       const { updatedAt, guardian } = shareGuardianMapping[index];
-
+      console.log({ updatedAt, guardian });
       if (updatedAt > 0 && guardian) {
         if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
           const approveTC = true;
@@ -580,6 +587,7 @@ function* checkMSharesHealthWorker() {
             approveTC,
           );
           if (res.status === 200) {
+            console.log('Trusted Channel create: ', guardian);
             approvedAny = true;
           }
         }

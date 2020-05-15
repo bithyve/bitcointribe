@@ -187,24 +187,30 @@ export default function CommunicationMode(props) {
   const { loading } = useSelector((state) => state.sss);
 
   useEffect(() => {
-    if (contact && contact.firstName) {
-      const contactName = `${contact.firstName} ${contact.lastName}`;
-      const data: EphemeralData = {
-        walletID: `${contactName}-walletID`,
-        FCM: `${contactName}-FCM`,
-      };
-      console.log({ data });
-      if (changeContact) {
-        dispatch(uploadEncMShare(index, contactName, data, true));
-        setChangeContact(false);
-      } else {
-        if (
-          !SHARES_TRANSFER_DETAILS[index] ||
-          Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-        )
-          dispatch(uploadEncMShare(index, contactName, data));
+    (async () => {
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
+      console.log({ walletID, FCM });
+
+      if (contact && contact.firstName) {
+        const contactName = `${contact.firstName} ${contact.lastName}`;
+        const data: EphemeralData = {
+          walletID,
+          FCM,
+        };
+        console.log({ data });
+        if (changeContact) {
+          dispatch(uploadEncMShare(index, contactName, data, true));
+          setChangeContact(false);
+        } else {
+          if (
+            !SHARES_TRANSFER_DETAILS[index] ||
+            Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+          )
+            dispatch(uploadEncMShare(index, contactName, data));
+        }
       }
-    }
+    })();
   }, [SHARES_TRANSFER_DETAILS[index], changeContact, contact]);
 
   const editContact = () => {
