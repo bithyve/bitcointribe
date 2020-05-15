@@ -71,9 +71,11 @@ export default function SecondaryDeviceModelContents(props) {
           trustedContacts.tc.trustedContacts[contactName].publicKey;
         setSecondaryQR(
           JSON.stringify({
+            isGuardian: true,
             requester: WALLET_SETUP.walletName,
             publicKey,
-            type: 'secondaryDeviceQR',
+            uploadedAt: SHARES_TRANSFER_DETAILS[0].UPLOADED_AT,
+            type: 'secondaryDeviceGuardian',
           }),
         );
       } else {

@@ -250,29 +250,35 @@ export default function TrustedContactRequest(props) {
               </Text>
             </View>
           </View>
-          <Text
-            style={{
-              ...styles.modalInfoText,
-              marginLeft: wp('8%'),
-              marginRight: wp('8%'),
-              marginBottom: wp('8%'),
-            }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod{' '}
-            <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-              {props.inputType === 'phone'
-                ? `+91 XXX XXX X${props.hint}`
-                : props.inputType === 'email'
-                ? `XXX${props.hint}@bithyve.com`
-                : null}
-            </Text>
-          </Text>
 
-          <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
-            <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
-            {getInputBox()}
-          </View>
+          {!props.isQR ? (
+            <Text
+              style={{
+                ...styles.modalInfoText,
+                marginLeft: wp('8%'),
+                marginRight: wp('8%'),
+                marginBottom: wp('8%'),
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod{' '}
+              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                {props.inputType === 'phone'
+                  ? `+91 XXX XXX X${props.hint}`
+                  : props.inputType === 'email'
+                  ? `XXX${props.hint}@bithyve.com`
+                  : null}
+              </Text>
+            </Text>
+          ) : null}
+
+          {!props.isQR ? (
+            <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
+              <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
+              {getInputBox()}
+            </View>
+          ) : null}
+
           <View
             style={{
               flexDirection: 'row',

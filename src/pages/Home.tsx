@@ -1391,32 +1391,39 @@ export default function Home(props) {
   const getQrCodeData = (qrData) => {
     const scannedData = JSON.parse(qrData);
     switch (scannedData.type) {
-      case 'trustedContactQR':
-        const custodyRequest1 = {
+      case 'trustedGuardian':
+        const trustedGruardianRequest = {
+          isGuardian: scannedData.isGuardian,
           requester: scannedData.requester,
-          ek: scannedData.ENCRYPTED_KEY,
-          uploadedAt: scannedData.UPLOADED_AT,
-          otp: scannedData.OTP,
-          isQR: true,
+          publicKey: scannedData.publicKey,
+          uploadedAt: scannedData.uploadedAt,
           type: scannedData.type,
+          isQR: true,
         };
         setLoading(false);
-        setSecondaryDeviceOtp(custodyRequest1);
-        props.navigation.navigate('Home', { custodyRequest: custodyRequest1 });
+        setSecondaryDeviceOtp(trustedGruardianRequest);
+        props.navigation.navigate('Home', {
+          trustedContactRequest: trustedGruardianRequest,
+        });
         break;
-      case 'secondaryDeviceQR':
-        const custodyRequest2 = {
+
+      case 'secondaryDeviceGuardian':
+        const secondaryDeviceGuardianRequest = {
+          isGuardian: scannedData.isGuardian,
           requester: scannedData.requester,
-          ek: scannedData.ENCRYPTED_KEY,
-          uploadedAt: scannedData.UPLOADED_AT,
-          otp: scannedData.OTP,
-          isQR: true,
+          publicKey: scannedData.publicKey,
+          uploadedAt: scannedData.uploadedAt,
           type: scannedData.type,
-        }; //trustedContactQR
+          isQR: true,
+        };
+
         setLoading(false);
-        setSecondaryDeviceOtp(custodyRequest2);
-        props.navigation.navigate('Home', { custodyRequest: custodyRequest2 });
+        setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
+        props.navigation.navigate('Home', {
+          trustedContactRequest: secondaryDeviceGuardianRequest,
+        });
         break;
+
       case 'recoveryQR':
         const recoveryRequest = {
           requester: scannedData.requester,
@@ -2703,19 +2710,22 @@ export default function Home(props) {
   const renderTrustedContactRequestContent = useCallback(() => {
     if (!trustedContactRequest) return;
 
-    const {
+    let {
       requester,
       hintType,
       hint,
       isGuardian,
       encryptedKey,
+      publicKey,
+      isQR,
       uploadedAt,
     } = trustedContactRequest;
 
     return (
       <TrustedContactRequest
+        isQR={isQR}
         inputType={
-          hintType === 'num' ? 'phone' : hintType === 'ema' ? 'email' : 'otp'
+          hintType === 'num' ? 'phone' : hintType === 'ema' ? 'email' : null
         }
         isGuardian={isGuardian}
         hint={hint}
@@ -2729,8 +2739,8 @@ export default function Home(props) {
 
           if (Date.now() - uploadedAt > 600000) {
             Alert.alert(
-              'Request expired!',
-              'Please ask the sender to initiate a new request',
+              `${isQR ? 'QR' : 'Link'} expired!`,
+              `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
             );
             setLoading(false);
           } else {
@@ -2741,16 +2751,18 @@ export default function Home(props) {
               );
               setLoading(false);
             } else {
-              try {
-                const pubKey = TrustedContactsService.decryptPub(
-                  encryptedKey,
-                  key,
-                ).decryptedPub;
-                dispatch(approveTrustedContact(requester, pubKey, true));
-              } catch (err) {
-                console.log({ err });
-                Alert.alert('Decryption Failed', err.message);
+              if (!publicKey) {
+                try {
+                  publicKey = TrustedContactsService.decryptPub(
+                    encryptedKey,
+                    key,
+                  ).decryptedPub;
+                } catch (err) {
+                  console.log({ err });
+                  Alert.alert('Decryption Failed', err.message);
+                }
               }
+              dispatch(approveTrustedContact(requester, publicKey, true));
             }
           }
 

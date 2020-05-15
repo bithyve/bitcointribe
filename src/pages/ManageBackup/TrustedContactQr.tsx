@@ -50,9 +50,11 @@ export default function TrustedContactQr(props) {
 
         setTrustedContactQR(
           JSON.stringify({
+            isGuardian: true,
             requester: WALLET_SETUP.walletName,
             publicKey,
-            type: 'trustedContactQR',
+            uploadedAt: SHARES_TRANSFER_DETAILS[props.index].UPLOADED_AT,
+            type: 'trustedGuardian',
           }),
         );
       }
