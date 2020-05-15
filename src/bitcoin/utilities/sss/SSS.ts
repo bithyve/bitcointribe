@@ -554,6 +554,7 @@ export default class SSS {
 
   public uploadShare = async (
     shareIndex: number,
+    contactName: string,
     dynamicNonPMDD?: MetaShare[],
   ): Promise<{
     otp: string;
@@ -564,6 +565,7 @@ export default class SSS {
     }
 
     let res: AxiosResponse;
+    this.metaShares[shareIndex].meta.guardian = contactName.toLowerCase();
     const metaShare: MetaShare = this.metaShares[shareIndex];
     const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
       metaShare,
@@ -631,7 +633,9 @@ export default class SSS {
   };
 
   public checkHealth = async (): Promise<{
-    healthCheckStatus: { [shareId: string]: number };
+    shareGuardianMapping: {
+      [index: number]: { shareId: string; updatedAt: number; guardian: string };
+    };
   }> => {
     let res: AxiosResponse;
 
@@ -654,16 +658,22 @@ export default class SSS {
     const updates: Array<{ shareId: string; updatedAt: number }> =
       res.data.lastUpdateds;
 
+    const shareGuardianMapping = {};
     for (const { shareId, updatedAt } of updates) {
       for (let index = 0; index < metaShares.length; index++) {
         if (metaShares[index] && metaShares[index].shareId === shareId) {
           this.healthCheckStatus[index] = { shareId, updatedAt };
+          shareGuardianMapping[index] = {
+            shareId,
+            updatedAt,
+            guardian: metaShares[index].meta.guardian,
+          };
         }
       }
     }
 
     return {
-      healthCheckStatus: this.healthCheckStatus,
+      shareGuardianMapping,
     };
   };
 

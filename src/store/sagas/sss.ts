@@ -55,7 +55,11 @@ import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import { AsyncStorage } from 'react-native';
 import { Alert } from 'react-native';
-import { updateEphemeralChannel } from '../actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  trustedChannelFetched,
+} from '../actions/trustedContacts';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -171,7 +175,11 @@ function* uploadEncMetaShareWorker({ payload }) {
   //   dynamicNonPMDD,
   // );
 
-  const res = yield call(s3Service.uploadShare, payload.shareIndex);
+  const res = yield call(
+    s3Service.uploadShare,
+    payload.shareIndex,
+    payload.contactName,
+  );
   console.log({ res });
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
@@ -555,6 +563,25 @@ function* checkMSharesHealthWorker() {
   // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
   if (res.status === 200) {
+    const { shareGuardianMapping } = res.data;
+    const trustedContacts: TrustedContactsService = yield select(
+      (state) => state.trustedContacts.service,
+    );
+
+    for (const index of Object.keys(shareGuardianMapping)) {
+      const { updatedAt, guardian } = shareGuardianMapping[index];
+      if (updatedAt > 0) {
+        if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
+          const approveTC = true;
+          yield call(
+            trustedContacts.fetchEphemeralChannel,
+            guardian,
+            approveTC,
+          );
+        }
+      }
+    }
+
     // if (preInstance !== postInstance) {
     //   const { SERVICES } = yield select(state => state.storage.database);
     //   const updatedSERVICES = {
