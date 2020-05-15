@@ -1,46 +1,46 @@
-import axios from 'axios'
-import { GETBITTR_URL } from 'react-native-dotenv';
+import axios from 'axios';
+
 //const PROXY_URL = 'https://cors-anywhere.herokuapp.com/'
-const URL = GETBITTR_URL;
+const URL = 'GETBITTR_URL';
 
-export const createService = data =>
+export const createService = (data) =>
   axios({
     method: 'post',
-    url:  URL + '/customer',
-    data
-  })
-
-export const sendEmailService = data =>
-  axios({
-    method: 'post',
-    url:  URL + '/verify/email',
+    url: URL + '/customer',
     data,
-  })
+  });
 
-export const emailService = data =>
+export const sendEmailService = (data) =>
   axios({
     method: 'post',
-    url:  URL + '/verify/email/check',
-    data
-  })
+    url: URL + '/verify/email',
+    data,
+  });
 
-export const verifyEmailService = data =>
+export const emailService = (data) =>
   axios({
     method: 'post',
-    url:  URL + '/verify/email/check',
-    data
-  })
+    url: URL + '/verify/email/check',
+    data,
+  });
 
-export const smsService = data =>
+export const verifyEmailService = (data) =>
   axios({
     method: 'post',
-    url:  URL + '/verify/sms',
-    data
-  })
+    url: URL + '/verify/email/check',
+    data,
+  });
 
-export const xpubService = data =>
+export const smsService = (data) =>
   axios({
     method: 'post',
-    url:  URL + '/xpub/check',
-    data
-  })
+    url: URL + '/verify/sms',
+    data,
+  });
+
+export const xpubService = (data) =>
+  axios({
+    method: 'post',
+    url: URL + '/xpub/check',
+    data,
+  });

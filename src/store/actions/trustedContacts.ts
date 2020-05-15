@@ -4,6 +4,7 @@ import {
   TrustedDataElements,
   EphemeralData,
 } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
@@ -22,10 +23,11 @@ export const initializeTrustedContact = (contactName: string) => {
 export const approveTrustedContact = (
   contactName: string,
   contactsPublicKey: string,
+  updateEphemeralChannel?: Boolean,
 ) => {
   return {
     type: APPROVE_TRUSTED_CONTACT,
-    payload: { contactName, contactsPublicKey },
+    payload: { contactName, contactsPublicKey, updateEphemeralChannel },
   };
 };
 
@@ -33,10 +35,11 @@ export const updateEphemeralChannel = (
   contactName: string,
   data: EphemeralData,
   fetch?: Boolean,
+  trustedContacts?: TrustedContactsService,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch },
+    payload: { contactName, data, fetch, trustedContacts },
   };
 };
 

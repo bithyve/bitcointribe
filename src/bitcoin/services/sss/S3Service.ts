@@ -537,7 +537,13 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          healthCheckStatus: { [shareId: string]: number };
+          shareGuardianMapping: {
+            [index: number]: {
+              shareId: string;
+              updatedAt: number;
+              guardian: string;
+            };
+          };
         };
         err?: undefined;
         message?: undefined;
@@ -784,6 +790,7 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
+    contactName: string,
     dynamicNonPMDD?: MetaShare[],
   ): Promise<
     | {
@@ -805,7 +812,11 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.uploadShare(shareIndex, dynamicNonPMDD),
+        data: await this.sss.uploadShare(
+          shareIndex,
+          contactName,
+          dynamicNonPMDD,
+        ),
       };
     } catch (err) {
       return { status: 523, err: err.message, message: ErrMap[523] };

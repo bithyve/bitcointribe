@@ -19,31 +19,49 @@ import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
 
 export default function TrustedContactQr(props) {
   const [trustedContactQR, setTrustedContactQR] = useState('');
 
   const SHARES_TRANSFER_DETAILS = useSelector(
-    state =>
+    (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
   const WALLET_SETUP = useSelector(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
   );
 
   useEffect(() => {
-    if (SHARES_TRANSFER_DETAILS[props.index]) {
-      setTrustedContactQR(
-        JSON.stringify({
-          requester: WALLET_SETUP.walletName,
-          ...SHARES_TRANSFER_DETAILS[props.index],
-          type: 'trustedContactQR',
-        }),
-      );
-    }
-  }, [SHARES_TRANSFER_DETAILS[props.index]]);
+    const { contact } = props;
+    if (contact) {
+      if (SHARES_TRANSFER_DETAILS[props.index]) {
+        // uploading of share is already done on the communication mode component
 
-  const getIconByStatus = useCallback(status => {
+        const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+        const publicKey =
+          trustedContacts.tc.trustedContacts[contactName].publicKey;
+        console.log({ contactName });
+
+        setTrustedContactQR(
+          JSON.stringify({
+            isGuardian: true,
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            uploadedAt: SHARES_TRANSFER_DETAILS[props.index].UPLOADED_AT,
+            type: 'trustedGuardian',
+          }),
+        );
+      }
+    }
+  }, [SHARES_TRANSFER_DETAILS[props.index], props.contact]);
+
+  const getIconByStatus = useCallback((status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {

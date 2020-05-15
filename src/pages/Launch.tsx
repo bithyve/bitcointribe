@@ -83,7 +83,7 @@ export default function Launch(props) {
                   const recoveryRequest = { requester, rk: splits[7] };
                   props.navigation.replace('Login', { recoveryRequest });
                 }
-              } else if (splits[4] === 'tc' || splits[4] === 'tck') {
+              } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
                 if (splits[3] !== config.APP_STAGE) {
                   Alert.alert(
                     'Invalid deeplink',
@@ -93,11 +93,12 @@ export default function Launch(props) {
                   );
                 } else {
                   const trustedContactRequest = {
-                    isGuardian: splits[4] === 'tck' ? true : false,
-                    encryptedKey: splits[5],
-                    hintType: splits[6],
-                    hint: splits[7],
-                    uploadedAt: splits[8],
+                    isGuardian: splits[4] === 'tcg' ? true : false,
+                    requester: splits[5],
+                    encryptedKey: splits[6],
+                    hintType: splits[7],
+                    hint: splits[8],
+                    uploadedAt: splits[9],
                   };
                   props.navigation.replace('Login', { trustedContactRequest });
                 }

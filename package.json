@@ -7,10 +7,10 @@
     "android-release": "cd android && ./gradlew app:assembleRelease",
     "ios": "react-native run-ios",
     "start": "react-native start",
-    "androidStagingDebug": "ENVFILE=.env.staging react-native run-android --variant=stagingDebug --appIdSuffix=staging",
-    "androidStagingRelease": "ENVFILE=.env.staging react-native run-android --variant=stagingRelease --appIdSuffix=staging",
     "androidDevelopmentDebug": "ENVFILE=.env.development react-native run-android --variant=developmentDebug --appIdSuffix=development",
     "androidDevelopmentRelease": "ENVFILE=.env.development react-native run-android --variant=developmentRelease --appIdSuffix=development",
+    "androidStagingDebug": "ENVFILE=.env.staging react-native run-android --variant=stagingDebug --appIdSuffix=staging",
+    "androidStagingRelease": "ENVFILE=.env.staging react-native run-android --variant=stagingRelease --appIdSuffix=staging",
     "androidProductionDebug": "ENVFILE=.env.production react-native run-android --variant=productionDebug",
     "androidProductionRelease": "ENVFILE=.env.production react-native run-android --variant=productionRelease"
   },

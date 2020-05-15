@@ -27,14 +27,13 @@ export default function TrustedContactRequest(props) {
   const [passcodeArray, setPasscodeArray] = useState([]);
   function onPressNumber(text) {
     let tmpPasscode = passcodeArray;
-    if(text){
+    if (text) {
       tmpPasscode.push(text);
-    }
-    else{
+    } else {
       tmpPasscode.pop();
     }
     setPasscodeArray(tmpPasscode);
-    if(tmpPasscode.length==6){
+    if (tmpPasscode.length == 6) {
       setPasscode(tmpPasscode.join(''));
       props.onPhoneNumberChange(tmpPasscode.join(''));
     }
@@ -139,7 +138,7 @@ export default function TrustedContactRequest(props) {
       );
     } else {
       return (
-        <View style={{ flexDirection: 'row', marginBottom: wp('5%'),}}>
+        <View style={{ flexDirection: 'row', marginBottom: wp('5%') }}>
           {[0, 1, 2, 3, 4, 5].map((i) => {
             return (
               <TextInput
@@ -158,31 +157,39 @@ export default function TrustedContactRequest(props) {
                 style={getStyle(i)}
                 onChangeText={(value) => {
                   onPressNumber(value);
-                  if (value && i==0) this.textInput2.focus();
-                  if (value && i==1) this.textInput3.focus();
-                  if (value && i==2) this.textInput4.focus();
-                  if (value && i==3) this.textInput5.focus();
-                  if (value && i==4) this.textInput6.focus();
-                  if (value && i==5) this.textInput6.focus();
+                  if (value && i == 0) this.textInput2.focus();
+                  if (value && i == 1) this.textInput3.focus();
+                  if (value && i == 2) this.textInput4.focus();
+                  if (value && i == 3) this.textInput5.focus();
+                  if (value && i == 4) this.textInput6.focus();
+                  if (value && i == 5) this.textInput6.focus();
                 }}
                 onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace' && i==0) this.textInput.focus();
-                  if (e.nativeEvent.key === 'Backspace' && i==1) this.textInput.focus();
-                  if (e.nativeEvent.key === "Backspace" && i==2) this.textInput2.focus();
-                  if (e.nativeEvent.key === "Backspace" && i==3) this.textInput3.focus();
-                  if (e.nativeEvent.key === "Backspace" && i==4) this.textInput4.focus();
-                  if (e.nativeEvent.key === "Backspace" && i==5) this.textInput5.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i == 0)
+                    this.textInput.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i == 1)
+                    this.textInput.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i == 2)
+                    this.textInput2.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i == 3)
+                    this.textInput3.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i == 4)
+                    this.textInput4.focus();
+                  if (e.nativeEvent.key === 'Backspace' && i == 5)
+                    this.textInput5.focus();
                 }}
                 onFocus={() => {
                   if (passcode.length == 0 && i == 0) {
                     props.bottomSheetRef.current.snapTo(2);
-                  }
-                  else{
+                  } else {
                     props.bottomSheetRef.current.snapTo(2);
                   }
                 }}
                 onBlur={() => {
-                  if ((passcode.length == 0 || passcode.length == 6) && i==5) {
+                  if (
+                    (passcode.length == 0 || passcode.length == 6) &&
+                    i == 5
+                  ) {
                     props.bottomSheetRef.current.snapTo(1);
                   }
                 }}
@@ -212,7 +219,8 @@ export default function TrustedContactRequest(props) {
         <View>
           <View style={styles.successModalHeaderView}>
             <Text style={styles.modalTitleText}>
-              Trusted Contact{'\n'}Request
+              Trusted Contact{'\n'}Request{' '}
+              {props.isGuardian ? '(Guardian)' : null}
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -242,24 +250,35 @@ export default function TrustedContactRequest(props) {
               </Text>
             </View>
           </View>
-          <Text
-            style={{
-              ...styles.modalInfoText,
-              marginLeft: wp('8%'),
-              marginRight: wp('8%'),
-              marginBottom: wp('8%'),
-            }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod{' '}
-            <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-              +91 XXX XXX X000
+
+          {!props.isQR ? (
+            <Text
+              style={{
+                ...styles.modalInfoText,
+                marginLeft: wp('8%'),
+                marginRight: wp('8%'),
+                marginBottom: wp('8%'),
+              }}
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod{' '}
+              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                {props.inputType === 'phone'
+                  ? `+91 XXX XXX X${props.hint}`
+                  : props.inputType === 'email'
+                  ? `XXX${props.hint}@bithyve.com`
+                  : null}
+              </Text>
             </Text>
-          </Text>
-          <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
-            <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
-            {getInputBox()}
-          </View>
+          ) : null}
+
+          {!props.isQR ? (
+            <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
+              <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
+              {getInputBox()}
+            </View>
+          ) : null}
+
           <View
             style={{
               flexDirection: 'row',
@@ -268,7 +287,15 @@ export default function TrustedContactRequest(props) {
             }}
           >
             <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressAccept()}
+              onPress={() => {
+                const key =
+                  props.inputType === 'phone'
+                    ? PhoneNumber
+                    : props.inputType === 'email'
+                    ? EmailId
+                    : null;
+                props.onPressAccept(key);
+              }}
               style={{ ...styles.successModalButtonView }}
             >
               {props.loading && props.loading == true ? (

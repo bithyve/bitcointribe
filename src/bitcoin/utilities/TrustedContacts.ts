@@ -102,19 +102,14 @@ export default class TrustedContacts {
       TrustedContacts.cipherSpec.iv,
     );
 
-    try {
-      let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
-      decryptedPub += decipher.final('utf8');
+    let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
+    decryptedPub += decipher.final('utf8');
 
-      if (decryptedPub.slice(0, 5) !== 'hexa:') {
-        throw new Error('PubKey decryption failed: invalid key');
-      }
-
-      return { decryptedPub: decryptedPub.slice(5) };
-    } catch (err) {
-      console.log(err);
-      return;
+    if (decryptedPub.slice(0, 5) !== 'hexa:') {
+      throw new Error('PubKey decryption failed: invalid key');
     }
+
+    return { decryptedPub: decryptedPub.slice(5) };
   };
 
   public trustedContacts: Contacts = {};
@@ -322,6 +317,7 @@ export default class TrustedContacts {
 
   public fetchEphemeralChannel = async (
     contactName: string,
+    approveTC?: Boolean,
   ): Promise<{
     data: EphemeralData;
   }> => {
@@ -343,6 +339,25 @@ export default class TrustedContacts {
       const { data } = res.data;
       if (data) {
         this.processEphemeralChannelData(contactName, data);
+      }
+
+      if (approveTC) {
+        let contactsPublicKey;
+        this.trustedContacts[contactName].ephemeralChannel.data.forEach(
+          (element: EphemeralData) => {
+            if (element.publicKey) {
+              contactsPublicKey = element.publicKey;
+            }
+          },
+        ); // only one element would contain the public key (uploaded by the counterparty)
+
+        if (!contactsPublicKey) {
+          throw new Error(
+            `Approval failed, ${contactName}'s public key missing`,
+          );
+        }
+
+        this.finalizeContact(contactName, contactsPublicKey);
       }
 
       return { data };
