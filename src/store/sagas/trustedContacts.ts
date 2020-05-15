@@ -1,4 +1,4 @@
-import { call, put, select } from 'redux-saga/effects';
+import { call, put, select, delay } from 'redux-saga/effects';
 import {
   INITIALIZE_TRUSTED_CONTACT,
   trustedContactInitialized,
@@ -12,6 +12,7 @@ import {
   trustedChannelUpdated,
   trustedChannelFetched,
   FETCH_EPHEMERAL_CHANNEL,
+  updateEphemeralChannel,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -60,13 +61,23 @@ function* approveTrustedContactWorker({ payload }) {
   );
   if (res.status === 200) {
     yield put(trustedContactApproved(contactName, true));
-
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-    };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    if (payload.updateEphemeralChannel) {
+      yield put(
+        updateEphemeralChannel(
+          contactName,
+          { publicKey: res.data.publicKey },
+          true,
+          trustedContacts,
+        ),
+      );
+    } else {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    }
   } else {
     console.log(res.err);
   }
@@ -78,10 +89,11 @@ export const approveTrustedContactWatcher = createWatcher(
 );
 
 function* updateEphemeralChannelWorker({ payload }) {
-  const trustedContacts: TrustedContactsService = yield select(
-    (state) => state.trustedContacts.service,
-  );
-  console.log({ payload });
+  let trustedContacts: TrustedContactsService = payload.trustedContacts;
+
+  if (!trustedContacts)
+    trustedContacts = yield select((state) => state.trustedContacts.service);
+
   const { contactName, data, fetch } = payload;
 
   const res = yield call(
@@ -90,12 +102,8 @@ function* updateEphemeralChannelWorker({ payload }) {
     data,
     fetch,
   );
+  console.log({ res });
   if (res.status === 200) {
-    const data: EphemeralData = res.data.data;
-    if (data && data.shareTransferDetails) {
-      const { otp, encryptedKey } = data.shareTransferDetails;
-      downloadMShare(otp, encryptedKey);
-    }
     yield put(ephemeralChannelUpdated(contactName, res.updated, data));
 
     console.log({ trustedContacts });
@@ -105,6 +113,13 @@ function* updateEphemeralChannelWorker({ payload }) {
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+
+    const data: EphemeralData = res.data.data;
+    if (data && data.shareTransferDetails) {
+      const { otp, encryptedKey } = data.shareTransferDetails;
+      yield delay(1000); // introducing delay in order to evade database insertion collision
+      yield put(downloadMShare(otp, encryptedKey));
+    }
   } else {
     console.log(res.err);
   }

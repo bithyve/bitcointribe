@@ -102,19 +102,14 @@ export default class TrustedContacts {
       TrustedContacts.cipherSpec.iv,
     );
 
-    try {
-      let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
-      decryptedPub += decipher.final('utf8');
+    let decryptedPub = decipher.update(encryptedPub, 'hex', 'utf8');
+    decryptedPub += decipher.final('utf8');
 
-      if (decryptedPub.slice(0, 5) !== 'hexa:') {
-        throw new Error('PubKey decryption failed: invalid key');
-      }
-
-      return { decryptedPub: decryptedPub.slice(5) };
-    } catch (err) {
-      console.log(err);
-      return;
+    if (decryptedPub.slice(0, 5) !== 'hexa:') {
+      throw new Error('PubKey decryption failed: invalid key');
     }
+
+    return { decryptedPub: decryptedPub.slice(5) };
   };
 
   public trustedContacts: Contacts = {};

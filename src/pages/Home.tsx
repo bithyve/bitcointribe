@@ -107,6 +107,8 @@ import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/Config';
+import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
+import { approveTrustedContact } from '../store/actions/trustedContacts';
 
 export default function Home(props) {
   const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
@@ -2406,7 +2408,7 @@ export default function Home(props) {
         const recoveryRequest = { requester, rk: splits[7] };
         props.navigation.navigate('Home', { recoveryRequest });
       }
-    } else if (splits[4] === 'tc' || splits[4] === 'tck') {
+    } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
@@ -2416,11 +2418,12 @@ export default function Home(props) {
         );
       } else {
         const trustedContactRequest = {
-          isGuardian: splits[4] === 'tck' ? true : false,
-          encryptedKey: splits[5],
-          hintType: splits[6],
-          hint: splits[7],
-          uploadedAt: splits[8],
+          isGuardian: splits[4] === 'tcg' ? true : false,
+          requester: splits[5],
+          encryptedKey: splits[6],
+          hintType: splits[7],
+          hint: splits[8],
+          uploadedAt: splits[9],
         };
         props.navigation.navigate('Home', { trustedContactRequest });
       }
@@ -2466,7 +2469,18 @@ export default function Home(props) {
       (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
       (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
-  }, [custodyRequest, recoveryRequest]);
+
+    if (trustedContactRequest) {
+      if (tabBarZIndex == 999) {
+        setTimeout(() => {
+          setTabBarZIndex(0);
+          setDeepLinkModalOpen(true);
+        }, 2);
+      }
+      (TrustedContactRequestBottomSheet as any).current.snapTo(1);
+      (transactionTabBarBottomSheet as any).current.snapTo(1);
+    }
+  }, [custodyRequest, recoveryRequest, trustedContactRequest]);
 
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
@@ -2687,16 +2701,59 @@ export default function Home(props) {
   }, [NotificationData, NotificationDataChange]);
 
   const renderTrustedContactRequestContent = useCallback(() => {
+    if (!trustedContactRequest) return;
+
+    const {
+      requester,
+      hintType,
+      hint,
+      isGuardian,
+      encryptedKey,
+      uploadedAt,
+    } = trustedContactRequest;
+
     return (
       <TrustedContactRequest
-        inputType = {'phone'}
+        inputType={
+          hintType === 'num' ? 'phone' : hintType === 'ema' ? 'email' : 'otp'
+        }
+        isGuardian={isGuardian}
+        hint={hint}
         bottomSheetRef={TrustedContactRequestBottomSheet}
-        trustedContactName={'Arpan Jain'}
-        onPressAccept={() => {
+        trustedContactName={requester}
+        onPressAccept={(key) => {
           setTimeout(() => {
             setTabBarZIndex(999);
             setDeepLinkModalOpen(false);
           }, 2);
+
+          if (Date.now() - uploadedAt > 600000) {
+            Alert.alert(
+              'Request expired!',
+              'Please ask the sender to initiate a new request',
+            );
+            setLoading(false);
+          } else {
+            if (UNDER_CUSTODY[requester]) {
+              Alert.alert(
+                'Failed to store',
+                'You cannot custody multiple shares of the same user.',
+              );
+              setLoading(false);
+            } else {
+              try {
+                const pubKey = TrustedContactsService.decryptPub(
+                  encryptedKey,
+                  key,
+                ).decryptedPub;
+                dispatch(approveTrustedContact(requester, pubKey, true));
+              } catch (err) {
+                console.log({ err });
+                Alert.alert('Decryption Failed', err.message);
+              }
+            }
+          }
+
           TrustedContactRequestBottomSheet.current.snapTo(0);
         }}
         onPressReject={() => {
@@ -2711,7 +2768,7 @@ export default function Home(props) {
         }}
       />
     );
-  }, []);
+  }, [trustedContactRequest]);
 
   const renderTrustedContactRequestHeader = useCallback(() => {
     return (
