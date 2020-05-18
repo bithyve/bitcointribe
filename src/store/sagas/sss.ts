@@ -245,7 +245,7 @@ function* requestShareWorker({ payload }) {
     return;
   } // capping to 3 shares reception
 
-  const { otp, encryptedKey } = yield call(S3Service.generateRequestCreds);
+  const { key } = yield call(S3Service.generateRequestCreds);
 
   const updatedBackup = {
     ...DECENTRALIZED_BACKUP,
@@ -254,8 +254,7 @@ function* requestShareWorker({ payload }) {
       [payload.shareIndex]: {
         REQUEST_DETAILS: {
           TAG: WALLET_SETUP.walletName,
-          OTP: otp,
-          ENCRYPTED_KEY: encryptedKey,
+          KEY: key,
         },
       },
     },
@@ -318,7 +317,10 @@ export const uploadRequestedShareWatcher = createWatcher(
 function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader('downloadMetaShare'));
 
-  const { otp, encryptedKey } = payload;
+  const { otp, encryptedKey, key } = payload; // key is provided in case of recovery
+  if (!otp && !encryptedKey && !key) {
+    throw new Error('OTP/EK/Key missing');
+  }
   const { DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
   );
@@ -341,7 +343,14 @@ function* downloadMetaShareWorker({ payload }) {
       existingShares,
     );
   } else {
-    res = yield call(S3Service.downloadAndValidateShare, encryptedKey, otp);
+    res = yield call(
+      S3Service.downloadAndValidateShare,
+      null,
+      null,
+      null,
+      null,
+      key,
+    );
   }
 
   console.log({ res });
@@ -376,19 +385,19 @@ function* downloadMetaShareWorker({ payload }) {
       yield put(updateMSharesHealth(updatedBackup));
     } else {
       const updatedRecoveryShares = {};
-      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((key) => {
-        const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[key];
+      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((objectKey) => {
+        const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
         if (!recoveryShare.REQUEST_DETAILS) {
-          updatedRecoveryShares[key] = recoveryShare;
+          updatedRecoveryShares[objectKey] = recoveryShare;
         } else {
-          if (recoveryShare.REQUEST_DETAILS.OTP === otp) {
-            updatedRecoveryShares[key] = {
+          if (recoveryShare.REQUEST_DETAILS.KEY === key) {
+            updatedRecoveryShares[objectKey] = {
               REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
               META_SHARE: metaShare,
               ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
             };
           } else {
-            updatedRecoveryShares[key] = recoveryShare;
+            updatedRecoveryShares[objectKey] = recoveryShare;
           }
         }
       });
@@ -397,7 +406,7 @@ function* downloadMetaShareWorker({ payload }) {
         ...DECENTRALIZED_BACKUP,
         RECOVERY_SHARES: updatedRecoveryShares,
       };
-      yield put(downloadedMShare(otp, true));
+      // yield put(downloadedMShare(otp, true));
       yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
     }
     // yield put(
@@ -410,7 +419,7 @@ function* downloadMetaShareWorker({ payload }) {
     console.log({ res });
     yield put(ErrorReceiving(true));
     // Alert.alert('Download Failed!', res.err);
-    yield put(downloadedMShare(otp, false, res.err));
+    yield put(downloadedMShare(otp || key, false, res.err));
   }
   yield put(switchS3Loader('downloadMetaShare'));
 }
