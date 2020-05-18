@@ -13,6 +13,7 @@ import GetBittrReducer from './reducers/bittr';
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
+import sendReducer from './reducers/sendReducer';
 
 import {
   initDBWatcher,
@@ -110,6 +111,7 @@ import {
 } from './sagas/trustedContacts';
 
 import { fromPrivateKey } from 'bip32';
+import reducer from './reducers/fbtc';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -243,6 +245,7 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
+  sendReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
