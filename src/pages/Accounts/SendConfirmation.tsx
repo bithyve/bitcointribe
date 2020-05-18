@@ -1,18 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Image,
   TouchableOpacity,
   Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
-  KeyboardAvoidingView,
   Platform,
-  Keyboard,
+  AsyncStorage,
+  KeyboardAvoidingView,
+  StatusBar,
   TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar,
+  ScrollView,
   FlatList
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -25,13 +24,42 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Slider from 'react-native-slider';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import SendConfirmationContent from './SendConfirmationContent';
+import BottomSheetListContents from './BottomSheetListContents';
 import { useDispatch, useSelector } from 'react-redux';
 import { storeContactsAccountToSend, removeContactsAccountFromSend } from '../../store/actions/send-action';
-import { remove } from '../../storage/secure-store';
+import { clearContactsAccountSendStorage } from '../../store/actions/send-action';
+import {
+  transferST2,
+  transferST3,
+  clearTransfer,
+  alternateTransferST2,
+  fetchTransactions,
+  fetchBalance,
+  fetchBalanceTx
+} from '../../store/actions/accounts';
+import ModalHeader from '../../components/ModalHeader';
+import { timeConvert } from '../../common/utilities';
 
 export default function SendConfirmation(props) {
 
   const dispatch = useDispatch();
+
+  const serviceType = props.navigation.getParam('serviceType');
+  const sweepSecure = props.navigation.getParam('sweepSecure');
+  let netBalance = props.navigation.getParam('netBalance');
+  const recipientAddress = props.navigation.getParam('recipients');
+
+  const [
+    SendSuccessWithAddressBottomSheet,
+    setSuccessWithAddressBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    SendUnSuccessWithAddressBottomSheet,
+    setUnSuccessWithAddressBottomSheet,
+  ] = useState(React.createRef());
 
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts && accounts.exchangeRates);
@@ -39,15 +67,16 @@ export default function SendConfirmation(props) {
     if (accounts && accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
   const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
-
-  const selectedContact = props.navigation.getParam('selectedContact');
+  const transfer = useSelector((state) => state.accounts[serviceType].transfer);
+  const txPrerequisites  = transfer.stage1.txPrerequisites ;
 
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [bitcoinAmount, setBitCoinAmount] = useState('');
   const [currencyAmount, setCurrencyAmount] = useState('');
-  
+  const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
+  const [description, setDescription] = useState('');
 
   const removeFromSendStorage = (item) => {
     dispatch(removeContactsAccountFromSend(item));
@@ -70,6 +99,226 @@ export default function SendConfirmation(props) {
       });
     }
   };
+
+  // useEffect(() => {
+  //   if (sweepSecure) {
+  //     SendConfirmationBottomSheet.current.snapTo(0);
+  //     if (netBalance === 0) {
+  //       setAmount(`0`);
+  //     } else {
+  //       setAmount(
+  //         `${
+  //           netBalance -
+  //           Number(
+  //             averageTxFees[
+  //               sliderValueText === 'Low Fee'
+  //                 ? 'low'
+  //                 : sliderValueText === 'In the middle'
+  //                 ? 'medium'
+  //                 : 'high'
+  //             ].averageTxFee,
+  //           )
+  //         }`,
+  //       );
+  //     }
+  //   }
+  // }, [sweepSecure, sliderValueText]);
+
+  useEffect(() => {
+    if (
+      transfer.stage1.failed ||
+      transfer.stage2.failed ||
+      transfer.stage3.failed
+    ) {
+      if (SendUnSuccessWithAddressBottomSheet.current) {
+        // setTimeout(() => {
+        //   setIsConfirmDisabled(false);
+        // }, 10);
+        SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
+      }
+      // setIsEditable(true);
+    } else if (transfer.txid) {
+      if (description) {
+        updateDescription(transfer.txid, description);
+      }
+      if (SendSuccessWithAddressBottomSheet.current) {
+        // setTimeout(() => {
+        //   setIsConfirmDisabled(false);
+        // }, 10);
+        SendSuccessWithAddressBottomSheet.current.snapTo(1);
+      }
+    } else if (!transfer.txid && transfer.executed === 'ST2') {
+      // setIsConfirmDisabled(false);
+      props.navigation.navigate('TwoFAToken', {
+        serviceType,
+        recipientAddress,
+      });
+    }
+  }, [transfer]);
+
+  console.log("111", txPrerequisites );
+  console.log("22--22", transfer);
+
+  let userInfo = {
+    to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
+    from: 'Secure Account',
+    amount: '0.00012',
+    fee: '0.0001',
+    total: 0.00022,
+    estDeliveryTime: '2 hours',
+    description: '',
+  };
+
+  const renderSendSuccessWithAddressContents = () => {
+    if (transfer) {
+      userInfo = {
+        to: recipientAddress && recipientAddress[0].address,
+        from: getServiceTypeAccount(),
+        amount: amount,
+        fee: transfer.stage1.fee,
+        total: parseInt(amount, 10) + parseInt(transfer.stage1.fee, 10),
+        estDeliveryTime: timeConvert(transfer.stage1.estimatedBlocks * 10),
+        description: description,
+      };
+    }
+    return (
+      <BottomSheetListContents
+        title={'Sent Successfully'}
+        info={'Bitcoins successfully sent to Contact'}
+        listData={sendStorage}
+        okButtonText={'View Account'}
+        cancelButtonText={'Back'}
+        isCancel={false}
+        onPressOk={() => {
+          dispatch(clearTransfer(serviceType));
+          dispatch(
+            fetchBalanceTx(serviceType, {
+              loader: true,
+            }),
+          );
+          if (SendSuccessWithAddressBottomSheet.current)
+            SendSuccessWithAddressBottomSheet.current.snapTo(0);
+          props.navigation.replace('Accounts', { serviceType: serviceType });
+        }}
+        isSuccess={true}
+      />
+      // <SendConfirmationContent
+      //   title={'Sent Successfully'}
+      //   info={'Bitcoins successfully sent to Contact'}
+      //   userInfo={userInfo}
+      //   isFromContact={false}
+      //   okButtonText={'View Account'}
+      //   cancelButtonText={'Back'}
+      //   isCancel={false}
+      //   onPressOk={() => {
+      //     dispatch(clearTransfer(serviceType));
+      //     dispatch(
+      //       fetchBalanceTx(serviceType, {
+      //         loader: true,
+      //       }),
+      //     );
+      //     if (SendSuccessWithAddressBottomSheet.current)
+      //       SendSuccessWithAddressBottomSheet.current.snapTo(0);
+      //     props.navigation.replace('Accounts', { serviceType: serviceType });
+      //   }}
+      //   isSuccess={true}
+      // />
+    );
+  };
+
+  const renderSendSuccessWithAddressHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          dispatch(clearTransfer(serviceType));
+          dispatch(
+            fetchBalanceTx(serviceType, {
+              loader: true,
+            }),
+          );
+          if (SendSuccessWithAddressBottomSheet.current)
+            SendSuccessWithAddressBottomSheet.current.snapTo(0);
+          dispatch(clearContactsAccountSendStorage());
+          props.navigation.navigate('Accounts');
+        }}
+      />
+    );
+  };
+
+  const renderSendUnSuccessWithAddressContents = () => {
+    return (
+      <SendConfirmationContent
+        title={'Sent Unsuccessful'}
+        info={'There seems to be a problem'}
+        userInfo={userInfo}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessWithAddressBottomSheet.current)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+          checkBalance();
+        }}
+        onPressCancel={() => {
+          dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessWithAddressBottomSheet.current)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+        isUnSuccess={true}
+      />
+    );
+  };
+
+  const renderSendUnSuccessWithAddressHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessWithAddressBottomSheet.current)
+            SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const updateDescription = useCallback(async (txid, description) => {
+    let descriptionHistory = {};
+    const storedHistory = JSON.parse(
+      await AsyncStorage.getItem('descriptionHistory'),
+    );
+    if (storedHistory) descriptionHistory = storedHistory;
+    descriptionHistory[txid] = description;
+
+    await AsyncStorage.setItem(
+      'descriptionHistory',
+      JSON.stringify(descriptionHistory),
+    );
+  }, []);
+
+
+  const handleTransferST2 = () => {
+    // TODO: Handle txnPriority as per user selection.
+    const txnPriority = 'low';
+    if (sweepSecure) {
+      dispatch(alternateTransferST2(serviceType, txnPriority));
+    } else {
+      dispatch(transferST2(serviceType, txnPriority));
+    }
+  }
+
+  const getServiceTypeAccount = () => {
+    if (serviceType == 'TEST_ACCOUNT') {
+      return 'Test Account';
+    } else if (serviceType == 'SECURE_ACCOUNT') {
+      return 'Secure Account';
+    } else if (serviceType == 'REGULAR_ACCOUNT') {
+      return 'Checking Account';
+    } else if (serviceType == 'S3_SERVICE') {
+      return 'S3 Service';
+    }
+  }
 
   const renderSingleContact = ({ item, index }) => {
     return (
@@ -149,6 +398,14 @@ export default function SendConfirmation(props) {
     );
   }
 
+  const getTotalAmount = () => {
+    let totalAmount = 0;
+    sendStorage.map((item) => {
+      totalAmount += parseInt(item.bitcoinAmount);
+    })
+    return totalAmount;
+  }
+
   const renderBitCoinAmountText = () => {
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
@@ -166,7 +423,7 @@ export default function SendConfirmation(props) {
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: 10
           }}>
-          2000
+          {getTotalAmount()}
         </Text>
         <Text
           style={{
@@ -237,7 +494,7 @@ export default function SendConfirmation(props) {
                           fontSize: RFValue(10),
                           fontFamily: Fonts.FiraSansRegular,
                         }}>
-                        Saving Account
+                        {getServiceTypeAccount()}
                       </Text>
                     </View>
                   </View>
@@ -414,7 +671,8 @@ export default function SendConfirmation(props) {
                   >
                     <TouchableOpacity
                       onPress={() => {
-                        props.navigation.goBack();
+                        handleTransferST2();
+                        // props.navigation.goBack();
                       }}
                       style={{
                         ...styles.confirmButtonView,
@@ -450,6 +708,36 @@ export default function SendConfirmation(props) {
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
+      <BottomSheet
+        onCloseStart={() => {
+          {
+            dispatch(clearTransfer(serviceType));
+            dispatch(
+              fetchBalanceTx(serviceType, {
+                loader: true,
+              }),
+            );
+            dispatch(clearContactsAccountSendStorage());
+            props.navigation.navigate('Accounts');
+          }
+        }}
+        enabledInnerScrolling={true}
+        ref={SendSuccessWithAddressBottomSheet}
+        snapPoints={[-50, hp('70%')]}
+        renderContent={renderSendSuccessWithAddressContents}
+        renderHeader={renderSendSuccessWithAddressHeader}
+      />
+      <BottomSheet
+        onCloseStart={() => {
+          dispatch(clearTransfer(serviceType));
+          SendUnSuccessWithAddressBottomSheet.current.snapTo(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={SendUnSuccessWithAddressBottomSheet}
+        snapPoints={[-50, hp('70%')]}
+        renderContent={renderSendUnSuccessWithAddressContents}
+        renderHeader={renderSendUnSuccessWithAddressHeader}
+      />
     </View>
   );
 }

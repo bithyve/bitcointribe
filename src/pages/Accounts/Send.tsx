@@ -45,6 +45,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import { clearContactsAccountSendStorage } from '../../store/actions/send-action';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
@@ -638,18 +639,29 @@ export default function Send(props) {
   };
 
   useEffect(() => {
+    const instance = service.hdWallet || service.secureHDWallet;
+    let isAddressValid = instance.isValidAddress(recipientAddress);
+    if (isAddressValid) {
+      let item = {
+        id: recipientAddress
+      };
+      onSelectContact(item);
+    }
+  }, [recipientAddress]);
+
+  useEffect(() => {
     console.log(
       'isInvalidAddress && recipientAddress && amount',
       isInvalidAddress,
       recipientAddress,
       amount,
     );
-    if (isInvalidAddress && recipientAddress && amount) {
+    if (isInvalidAddress && recipientAddress) {
       setIsConfirmDisabled(false);
     } else {
       setIsConfirmDisabled(true);
     }
-  }, [recipientAddress, isInvalidAddress, amount]);
+  }, [recipientAddress, isInvalidAddress]);
 
   const renderQRCodeThumbnail = () => {
     return (
@@ -676,7 +688,8 @@ export default function Send(props) {
   const onSelectContact = (item) => {
     let isNavigate = true;
     if (sendStorage && sendStorage.length === 0) {
-      props.navigation.navigate('SendToContact', { selectedContact: item, serviceType });
+      props.navigation.navigate('SendToContact', { selectedContact: item, serviceType, averageTxFees, sweepSecure, netBalance });
+      setRecipientAddress('');
     }
     else {
       sendStorage && sendStorage.map((contact) => {
@@ -685,7 +698,8 @@ export default function Send(props) {
         }
       })
       if(isNavigate) {
-        props.navigation.navigate('SendToContact', { selectedContact: item, serviceType });
+        props.navigation.navigate('SendToContact', { selectedContact: item, serviceType, averageTxFees, sweepSecure, netBalance });
+        setRecipientAddress('');
       }
     }
   }
@@ -866,6 +880,7 @@ export default function Send(props) {
                         if (getServiceType) {
                           getServiceType(serviceType);
                         }
+                        dispatch(clearContactsAccountSendStorage());
                         props.navigation.goBack();
                       }}
                       style={{

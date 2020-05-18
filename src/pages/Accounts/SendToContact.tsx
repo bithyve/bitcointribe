@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -23,15 +23,10 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ToggleSwitch from '../../components/ToggleSwitch';
-import {
-  SECURE_ACCOUNT,
-  TEST_ACCOUNT,
-  REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { storeContactsAccountToSend, removeContactsAccountFromSend } from '../../store/actions/send-action';
-import { remove } from '../../storage/secure-store';
+import { transferST1 } from '../../store/actions/accounts';
 
 export default function SendToContact(props) {
 
@@ -46,6 +41,9 @@ export default function SendToContact(props) {
 
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
+  const averageTxFees = props.navigation.getParam('averageTxFees');
+  const sweepSecure = props.navigation.getParam('sweepSecure');
+  let netBalance = props.navigation.getParam('netBalance');
 
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
@@ -71,15 +69,35 @@ export default function SendToContact(props) {
   }
 
   const getServiceTypeAccount = () => {
-    if (serviceType === TEST_ACCOUNT) {
-      return "Test Account";
-    } else if (serviceType === REGULAR_ACCOUNT) {
-      return "Checking Account";
-    } else if (serviceType === SECURE_ACCOUNT) {
-      return "Saving Account";
-    } else {
-      return "";
+    if (serviceType == 'TEST_ACCOUNT') {
+      return 'Test Account';
+    } else if (serviceType == 'SECURE_ACCOUNT') {
+      return 'Secure Account';
+    } else if (serviceType == 'REGULAR_ACCOUNT') {
+      return 'Checking Account';
+    } else if (serviceType == 'S3_SERVICE') {
+      return 'S3 Service';
     }
+  }
+
+  const handleTrasferST1 = () => {
+    let recipients = [];
+    const tempData = {
+      selectedContact,
+      bitcoinAmount,
+      currencyAmount,
+      note
+    };
+    let storage = [...sendStorage, tempData];
+    storage.map((item) => {
+      let data = {
+        address: item.selectedContact.id, amount: parseInt(item.bitcoinAmount)
+      }
+      recipients.push(data);
+    })
+    console.log("REcipients", recipients);
+    dispatch(transferST1(serviceType, recipients, averageTxFees));
+    props.navigation.navigate('SendConfirmation', { serviceType, sweepSecure, netBalance, recipients });
   }
 
   const getImageIcon = item => {
@@ -406,7 +424,9 @@ export default function SendToContact(props) {
                           currencyAmount,
                           note
                         }));
-                        props.navigation.navigate('SendConfirmation');
+                        setTimeout(() => {
+                          handleTrasferST1();
+                        }, 10);
                       }}
                       disabled={isConfirmDisabled}
                       style={{
@@ -465,35 +485,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
   },
-  errorText: {
-    fontFamily: Fonts.FiraSansMediumItalic,
-    color: Colors.red,
-    fontSize: RFValue(11),
-    fontStyle: 'italic',
-  },
-  modalHeaderContainer: {
-    backgroundColor: Colors.white,
-    marginTop: 'auto',
-    flex: 1,
-    height: Platform.OS == 'ios' ? 45 : 40,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
-    zIndex: 9999,
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 7,
-  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
@@ -520,12 +511,6 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: hp('1%'),
     marginBottom: hp('1%'),
-  },
-  contactNameInputImageView: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   textBoxImage: {
     width: wp('6%'),
@@ -559,172 +544,12 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
-  passcodeTextInputText: {
-    color: Colors.blue,
-    fontWeight: 'bold',
-    fontSize: RFValue(13),
-  },
-  textBoxStyles: {
-    borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
-    borderRadius: 7,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    marginLeft: 8,
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textBoxActive: {
-    borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
-    borderRadius: 7,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 3 },
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    marginLeft: 8,
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textStyles: {
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textFocused: {
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  otpRequestHeaderView: {
-    marginTop: hp('4%'),
-    marginBottom: hp('2%'),
-  },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  modalInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  confirmModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
-    alignSelf: 'center',
-  },
-  confirmButtonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  passcodeTextInputView: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: hp('2.5%'),
-    marginBottom: hp('2.5%'),
-  },
-  dropdownBox: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-  },
-  dropdownBoxOpened: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
-    backgroundColor: Colors.white,
-    alignItems: 'center',
-  },
-  dropdownBoxText: {
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
-  },
-  dropdownBoxModal: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    marginTop: hp('1%'),
-    width: wp('90%'),
-    height: hp('18%'),
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
-    backgroundColor: Colors.white,
-    position: 'absolute',
-    zIndex: 9999,
-    overflow: 'hidden',
-  },
-  dropdownBoxModalElementView: {
-    height: 50,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 15,
-  },
   circleShapeView: {
     width: 50,
     height: 50,
     borderRadius: 50/2,
     borderColor: Colors.white,
     borderWidth: 2
-  },
-  smallCircleShapeView: {
-    width: 40,
-    height: 40,
-    borderRadius: 40/2,
-    borderColor: Colors.white,
-    borderWidth: 2
-  },
-  card: {
-    width: 108,
-    height: 110,
-    borderColor: Colors.borderColor,
-    borderWidth: 0.4,
-    marginLeft: 15,
-    backgroundColor: Colors.white,
   },
   closemarkStyle: {
     justifyContent: 'center',
