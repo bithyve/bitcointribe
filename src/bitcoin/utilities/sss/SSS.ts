@@ -72,8 +72,9 @@ export default class SSS {
   };
 
   public static downloadShare = async (
-    encryptedKey: string,
-    otp: string,
+    encryptedKey?: string,
+    otp?: string,
+    key?: string,
   ): Promise<
     | {
         metaShare: MetaShare;
@@ -86,7 +87,10 @@ export default class SSS {
         encryptedDynamicNonPMDD?: undefined;
       }
   > => {
-    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    if (!key) {
+      if (!encryptedKey) throw new Error('EncryptedKey & Key missing');
+      key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
     let res: AxiosResponse;
     try {
@@ -199,8 +203,8 @@ export default class SSS {
 
   public static generateRequestCreds = () => {
     const key = SSS.generateKey(SSS.cipherSpec.keyLength);
-    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
-    return { otp, encryptedKey: otpEncryptedData };
+    // const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    return { key };
   };
 
   public static uploadRequestedShare = async (
@@ -236,10 +240,11 @@ export default class SSS {
   };
 
   public static downloadAndValidateShare = async (
-    encryptedKey: string,
-    otp: string,
+    encryptedKey?: string,
+    otp?: string,
     existingShares?: MetaShare[],
     walletId?: string,
+    key?: string,
   ): Promise<{
     metaShare: MetaShare;
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
@@ -248,7 +253,7 @@ export default class SSS {
       metaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    } = await SSS.downloadShare(encryptedKey, otp);
+    } = await SSS.downloadShare(encryptedKey, otp, key);
 
     if (SSS.validateStorage(metaShare, existingShares, walletId)) {
       const { deleted } = await SSS.affirmDecryption(messageId);
