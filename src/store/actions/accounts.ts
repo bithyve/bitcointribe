@@ -42,24 +42,25 @@ export const fetchBalanceTx = (
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
 
-export const transferST1 = (
-  serviceType,
-  recipients,
-  priority,
-  averageTxFees?,
-) => {
+export const transferST1 = (serviceType, recipients, averageTxFees?) => {
   return {
     type: TRANSFER_ST1,
-    payload: { serviceType, recipients, priority, averageTxFees },
+    payload: { serviceType, recipients, averageTxFees },
   };
 };
 
-export const transferST2 = (serviceType) => {
-  return { type: TRANSFER_ST2, payload: { serviceType } };
+export const transferST2 = (serviceType, txnPriority, nSequence?) => {
+  return {
+    type: TRANSFER_ST2,
+    payload: { serviceType, txnPriority, nSequence },
+  };
 };
 
-export const alternateTransferST2 = (serviceType) => {
-  return { type: ALTERNATE_TRANSFER_ST2, payload: { serviceType } };
+export const alternateTransferST2 = (serviceType, txnPriority, nSequence?) => {
+  return {
+    type: ALTERNATE_TRANSFER_ST2,
+    payload: { serviceType, txnPriority, nSequence },
+  };
 };
 
 export const transferST3 = (serviceType, token) => {
