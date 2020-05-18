@@ -123,7 +123,7 @@ export default function TwoFASweepFunds(props) {
       const recipients = [
         { address: recipientAddress, amount: parseInt(amount) },
       ];
-      dispatch(transferST1(serviceType, recipients, priority, averageTxFees));
+      dispatch(transferST1(serviceType, recipients, averageTxFees));
     }
   };
 

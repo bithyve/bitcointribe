@@ -514,10 +514,11 @@ export default function Send(props) {
         cancelButtonText={'Back'}
         isCancel={true}
         onPressOk={() => {
+          const txnPriority = 'low';
           if (sweepSecure) {
-            dispatch(alternateTransferST2(serviceType));
+            dispatch(alternateTransferST2(serviceType, txnPriority));
           } else {
-            dispatch(transferST2(serviceType));
+            dispatch(transferST2(serviceType, txnPriority));
           }
         }}
         onPressCancel={() => {
@@ -706,7 +707,7 @@ export default function Send(props) {
       const recipients = [
         { address: recipientAddress, amount: parseInt(amount) },
       ];
-      dispatch(transferST1(serviceType, recipients, priority, averageTxFees));
+      dispatch(transferST1(serviceType, recipients, averageTxFees));
     }
   };
 

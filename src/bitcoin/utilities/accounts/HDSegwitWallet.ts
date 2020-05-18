@@ -10,6 +10,9 @@ import {
   INotification,
   DerivativeAccounts,
   TransactionDetails,
+  TransactionPrerequisite,
+  InputUTXOs,
+  OutputUTXOs,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
@@ -754,78 +757,208 @@ export default class HDSegwitWallet extends Bitcoin {
     return { balances, transactions };
   };
 
-  public createHDTransaction = async (
+  // public createHDTransaction = async (
+  //   recipients: {
+  //     address: string;
+  //     amount: number;
+  //   }[],
+  //   txnPriority: string,
+  //   averageTxFees?: any,
+  //   nSequence?: number,
+  // ): Promise<
+  //   | {
+  //       fee: number;
+  //       balance: number;
+  //       estimatedBlocks?: undefined;
+  //       inputs?: undefined;
+  //       txb?: undefined;
+  //     }
+  //   | {
+  //       inputs: Array<{
+  //         txId: string;
+  //         vout: number;
+  //         value: number;
+  //         address: string;
+  //       }>;
+  //       txb: bitcoinJS.TransactionBuilder;
+  //       fee: number;
+  //       balance: number;
+  //       estimatedBlocks: number;
+  //     }
+  // > => {
+  //   try {
+  //     const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
+  //     console.log('Input UTXOs:', inputUTXOs);
+
+  //     const outputUTXOs = [];
+  //     for (const recipient of recipients) {
+  //       outputUTXOs.push({
+  //         address: recipient.address,
+  //         value: recipient.amount,
+  //       });
+  //     }
+  //     console.log('Output UTXOs:', outputUTXOs);
+  //     let balance: number = 0;
+  //     inputUTXOs.forEach((utxo) => {
+  //       balance += utxo.value;
+  //     });
+
+  //     let feePerByte, estimatedBlocks;
+  //     console.log({ averageTxFees });
+  //     if (averageTxFees) {
+  //       feePerByte = averageTxFees[txnPriority].feePerByte;
+  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
+  //     } else {
+  //       const averageTxFees = await this.averageTransactionFee();
+  //       feePerByte = averageTxFees[txnPriority].feePerByte;
+  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
+  //     }
+
+  //     const { inputs, outputs, fee } = coinselect(
+  //       inputUTXOs,
+  //       outputUTXOs,
+  //       feePerByte,
+  //     );
+
+  //     console.log('-------Transaction--------');
+  //     console.log('\tDynamic Fee', fee);
+  //     console.log('\tInputs:', inputs);
+  //     console.log('\tOutputs:', outputs);
+
+  //     if (!inputs) {
+  //       // insufficient input utxos to compensate for output utxos + fee
+  //       return { fee, balance };
+  //     }
+
+  //     const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
+  //       this.network,
+  //     );
+
+  //     inputs.forEach((input) =>
+  //       txb.addInput(input.txId, input.vout, nSequence),
+  //     );
+
+  //     const sortedOuts = await this.sortOutputs(outputs);
+  //     sortedOuts.forEach((output) => {
+  //       console.log('Adding Output:', output);
+  //       txb.addOutput(output.address, output.value);
+  //     });
+
+  //     return {
+  //       inputs,
+  //       txb,
+  //       fee,
+  //       balance,
+  //       estimatedBlocks,
+  //     };
+  //   } catch (err) {
+  //     throw new Error(`Transaction creation failed: ${err.message}`);
+  //   }
+  // };
+
+  public transactionPrerequisites = async (
     recipients: {
       address: string;
       amount: number;
     }[],
-    txnPriority: string,
     averageTxFees?: any,
-    nSequence?: number,
   ): Promise<
     | {
         fee: number;
         balance: number;
-        estimatedBlocks?: undefined;
-        inputs?: undefined;
-        txb?: undefined;
+        txPrerequisites?: undefined;
       }
     | {
-        inputs: Array<{
-          txId: string;
-          vout: number;
-          value: number;
-          address: string;
-        }>;
-        txb: bitcoinJS.TransactionBuilder;
-        fee: number;
-        balance: number;
-        estimatedBlocks: number;
+        txPrerequisites: TransactionPrerequisite;
+        fee?: undefined;
+        balance?: undefined;
       }
   > => {
-    try {
-      const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
-      console.log('Input UTXOs:', inputUTXOs);
+    const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
+    console.log('Input UTXOs:', inputUTXOs);
 
-      const outputUTXOs = [];
-      for (const recipient of recipients) {
-        outputUTXOs.push({
-          address: recipient.address,
-          value: recipient.amount,
-        });
-      }
-      console.log('Output UTXOs:', outputUTXOs);
-      let balance: number = 0;
-      inputUTXOs.forEach((utxo) => {
-        balance += utxo.value;
+    const outputUTXOs = [];
+    for (const recipient of recipients) {
+      outputUTXOs.push({
+        address: recipient.address,
+        value: recipient.amount,
       });
+    }
+    console.log('Output UTXOs:', outputUTXOs);
+    let balance: number = 0;
+    inputUTXOs.forEach((utxo) => {
+      balance += utxo.value;
+    });
 
-      let feePerByte, estimatedBlocks;
-      console.log({ averageTxFees });
-      if (averageTxFees) {
-        feePerByte = averageTxFees[txnPriority].feePerByte;
-        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
+    const defaultTxPriority = 'low'; // doing  base calculation with low fee
+    let feePerByte, estimatedBlocks;
+    console.log({ averageTxFees });
+    if (averageTxFees) {
+      feePerByte = averageTxFees[defaultTxPriority].feePerByte;
+      estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+    } else {
+      const averageTxFees = await this.averageTransactionFee();
+      feePerByte = averageTxFees[defaultTxPriority].feePerByte;
+      estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+    }
+
+    const { inputs, outputs, fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      feePerByte,
+    );
+
+    console.log('-------Transaction--------');
+    console.log('\tDynamic Fee', fee);
+    console.log('\tInputs:', inputs);
+    console.log('\tOutputs:', outputs);
+
+    if (!inputs) {
+      // insufficient input utxos to compensate for output utxos + fee
+      return { fee, balance };
+    }
+
+    let netAmount = 0;
+    recipients.forEach((recipient) => {
+      netAmount += recipient.amount;
+    });
+
+    const txPrerequisites: TransactionPrerequisite = {};
+    for (const priority of Object.keys(averageTxFees)) {
+      const netFeeByPriority =
+        (fee / feePerByte) * averageTxFees[priority].feePerByte;
+      const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+
+      if (balance > netAmount + fee) {
+        txPrerequisites[priority] = {
+          inputs,
+          outputs,
+          fee: netFeeByPriority,
+          estimatedBlocks,
+        };
       } else {
-        const averageTxFees = await this.averageTransactionFee();
-        feePerByte = averageTxFees[txnPriority].feePerByte;
-        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
+        txPrerequisites[priority] = {
+          inputs: null, // if null >> insufficient balance to pay with fee corresponding to this tx priority
+          outputs,
+          fee: netFeeByPriority,
+          estimatedBlocks,
+        };
       }
+    }
 
-      const { inputs, outputs, fee } = coinselect(
-        inputUTXOs,
-        outputUTXOs,
-        feePerByte,
-      );
+    console.log({ txPrerequisites });
+    return { txPrerequisites };
+  };
 
-      console.log('-------Transaction--------');
-      console.log('\tDynamic Fee', fee);
-      console.log('\tInputs:', inputs);
-      console.log('\tOutputs:', outputs);
-
-      if (!inputs) {
-        // insufficient input utxos to compensate for output utxos + fee
-        return { fee, balance };
-      }
+  public createHDTransaction = async (
+    txPrerequisites: TransactionPrerequisite,
+    txnPriority: string,
+    nSequence?: number,
+  ): Promise<{
+    txb: bitcoinJS.TransactionBuilder;
+  }> => {
+    try {
+      const { inputs, outputs, fee } = txPrerequisites[txnPriority];
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
@@ -835,6 +968,15 @@ export default class HDSegwitWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
+      // adjusting fee according to selected priority
+      const defaultTxPriority = 'low'; // default deducted fee
+      outputs.forEach((output) => {
+        if (!output.address) {
+          output.value =
+            output.value + txPrerequisites[defaultTxPriority].fee - fee;
+        }
+      });
+
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
@@ -842,11 +984,7 @@ export default class HDSegwitWallet extends Bitcoin {
       });
 
       return {
-        inputs,
         txb,
-        fee,
-        balance,
-        estimatedBlocks,
       };
     } catch (err) {
       throw new Error(`Transaction creation failed: ${err.message}`);
@@ -883,45 +1021,45 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public transfer = async (
-    recipientAddress: string,
-    amount: number,
-  ): Promise<{
-    txid: string;
-  }> => {
-    try {
-      if (this.isValidAddress(recipientAddress)) {
-        amount = amount * 1e8; // converting into sats
-        const { balance } = await this.fetchBalance();
+  // public transfer = async (
+  //   recipientAddress: string,
+  //   amount: number,
+  // ): Promise<{
+  //   txid: string;
+  // }> => {
+  //   try {
+  //     if (this.isValidAddress(recipientAddress)) {
+  //       amount = amount * 1e8; // converting into sats
+  //       const { balance } = await this.fetchBalance();
 
-        const recipients = [{ address: recipientAddress, amount }];
-        const { inputs, txb, fee } = await this.createHDTransaction(
-          recipients,
-          'high',
-        );
-        console.log('---- Transaction Created ----');
+  //       const recipients = [{ address: recipientAddress, amount }];
+  //       const { inputs, txb, fee } = await this.createHDTransaction(
+  //         recipients,
+  //         'high',
+  //       );
+  //       console.log('---- Transaction Created ----');
 
-        if (balance < amount + fee) {
-          throw new Error(
-            'Insufficient balance to compensate for transfer amount and the txn fee',
-          );
-        }
+  //       if (balance < amount + fee) {
+  //         throw new Error(
+  //           'Insufficient balance to compensate for transfer amount and the txn fee',
+  //         );
+  //       }
 
-        const signedTxb = this.signHDTransaction(inputs, txb);
-        console.log('---- Transaction Signed ----');
+  //       const signedTxb = this.signHDTransaction(inputs, txb);
+  //       console.log('---- Transaction Signed ----');
 
-        const txHex = signedTxb.build().toHex();
-        const { txid } = await this.broadcastTransaction(txHex);
-        console.log('---- Transaction Broadcasted ----');
+  //       const txHex = signedTxb.build().toHex();
+  //       const { txid } = await this.broadcastTransaction(txHex);
+  //       console.log('---- Transaction Broadcasted ----');
 
-        return { txid };
-      } else {
-        throw new Error('Recipient address is wrong');
-      }
-    } catch (err) {
-      throw new Error(`Unable to transfer: ${err.message}`);
-    }
-  };
+  //       return { txid };
+  //     } else {
+  //       throw new Error('Recipient address is wrong');
+  //     }
+  //   } catch (err) {
+  //     throw new Error(`Unable to transfer: ${err.message}`);
+  //   }
+  // };
 
   public fetchUtxo = async () => {
     try {

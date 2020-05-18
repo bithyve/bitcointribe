@@ -346,16 +346,11 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
 
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  const { recipients, priority, averageTxFees } = payload;
+  const { recipients, averageTxFees } = payload;
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
-  const res = yield call(
-    service.transferST1,
-    recipients,
-    priority,
-    averageTxFees,
-  );
+  const res = yield call(service.transferST1, recipients, averageTxFees);
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
@@ -370,26 +365,33 @@ export const transferST1Watcher = createWatcher(
 );
 
 function* transferST2Worker({ payload }) {
-  yield put(switchLoader(payload.serviceType, 'transfer'));
+  const { serviceType, txnPriority, nSequence } = payload;
+
+  yield put(switchLoader(serviceType, 'transfer'));
   const { service, transfer } = yield select(
-    (state) => state.accounts[payload.serviceType],
+    (state) => state.accounts[serviceType],
   );
 
-  const { inputs, txb } = transfer.stage1;
-  if (!inputs && !txb) {
-    console.log('Transaction object missing');
+  const { txPrerequisites } = transfer.stage1;
+  if (!txPrerequisites) {
+    console.log('Transaction prerequisites missing');
     return;
   }
-  const res = yield call(service.transferST2, inputs, txb);
+  const res = yield call(
+    service.transferST2,
+    txPrerequisites,
+    txnPriority,
+    nSequence,
+  );
   if (res.status === 200) {
-    if (payload.serviceType === SECURE_ACCOUNT) {
+    if (serviceType === SECURE_ACCOUNT) {
       console.log({ res });
-      yield put(executedST2(payload.serviceType, res.data));
-    } else yield put(executedST2(payload.serviceType, res.data.txid));
+      yield put(executedST2(serviceType, res.data));
+    } else yield put(executedST2(serviceType, res.data.txid));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST2(payload.serviceType));
-    // yield put(switchLoader(payload.serviceType, 'transfer'));
+    yield put(failedST2(serviceType));
+    // yield put(switchLoader(serviceType, 'transfer'));
   }
 }
 
@@ -426,26 +428,33 @@ export const generateSecondaryXprivWatcher = createWatcher(
 );
 
 function* alternateTransferST2Worker({ payload }) {
-  if (payload.serviceType !== SECURE_ACCOUNT) return;
+  const { serviceType, txnPriority, nSequence } = payload;
+  if (serviceType !== SECURE_ACCOUNT) return;
 
-  yield put(switchLoader(payload.serviceType, 'transfer'));
+  yield put(switchLoader(serviceType, 'transfer'));
   const { service, transfer } = yield select(
-    (state) => state.accounts[payload.serviceType],
+    (state) => state.accounts[serviceType],
   );
 
-  const { inputs, txb } = transfer.stage1;
-  if (!inputs && !txb) {
-    console.log('Transaction object missing');
+  const { txPrerequisites } = transfer.stage1;
+  if (!txPrerequisites) {
+    console.log('Transaction prerequisites missing');
     return;
   }
-  const res = yield call(service.alternateTransferST2, inputs, txb);
+
+  const res = yield call(
+    service.alternateTransferST2,
+    txPrerequisites,
+    txnPriority,
+    nSequence,
+  );
   console.log({ res });
   if (res.status === 200) {
-    yield put(alternateTransferST2Executed(payload.serviceType, res.data.txid));
+    yield put(alternateTransferST2Executed(serviceType, res.data.txid));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST2(payload.serviceType));
-    // yield put(switchLoader(payload.serviceType, 'transfer'));
+    yield put(failedST2(serviceType));
+    // yield put(switchLoader(serviceType, 'transfer'));
   }
 }
 
