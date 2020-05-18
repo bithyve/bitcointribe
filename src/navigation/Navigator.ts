@@ -77,6 +77,8 @@ import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from "../pages/Contacts/SendRequest";
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
+import SendToContact from '../pages/Accounts/SendToContact';
+import SendConfirmation from '../pages/Accounts/SendConfirmation';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -151,6 +153,8 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    SendToContact,
+    SendConfirmation,
     TwoFAToken,
     RecoveryRequestOTP,
     SettingManagePin,
