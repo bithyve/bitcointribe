@@ -8,6 +8,7 @@ import {
   INotification,
   DerivativeAccounts,
   TransactionDetails,
+  TransactionPrerequisite,
 } from '../Interface';
 
 export default class BaseAccount {
@@ -543,32 +544,12 @@ export default class BaseAccount {
       address: string;
       amount: number;
     }[],
-    priority,
     averageTxFees?: any,
   ): Promise<
     | {
         status: number;
-        err: string;
-        message: string;
         data: {
-          fee: number;
-          inputs?: undefined;
-          txb?: undefined;
-          estimatedBlocks?: undefined;
-        };
-      }
-    | {
-        status: number;
-        data: {
-          inputs: Array<{
-            txId: string;
-            vout: number;
-            value: number;
-            address: string;
-          }>;
-          txb: TransactionBuilder;
-          fee: number;
-          estimatedBlocks: number;
+          txPrerequisites: TransactionPrerequisite;
         };
         err?: undefined;
         message?: undefined;
@@ -581,14 +562,11 @@ export default class BaseAccount {
       // amount = Math.round(amount);
 
       const {
-        inputs,
-        txb,
         fee,
         balance,
-        estimatedBlocks,
-      } = await this.hdWallet.createHDTransaction(
+        txPrerequisites,
+      } = await this.hdWallet.transactionPrerequisites(
         recipients,
-        priority.toLowerCase(),
         averageTxFees,
       );
 
@@ -603,21 +581,20 @@ export default class BaseAccount {
           err:
             'Insufficient balance to compensate for transfer amount and the txn fee',
           message: ErrMap[0o6],
-          data: { fee },
         };
       }
 
-      if (inputs && txb) {
-        console.log('---- Transaction Created ----');
+      if (txPrerequisites) {
         return {
           status: config.STATUS.SUCCESS,
-          data: { inputs, txb, fee, estimatedBlocks },
+          data: { txPrerequisites },
         };
       } else {
         throw new Error(
           'Unable to create transaction: inputs failed at coinselect',
         );
       }
+
       // } else {
       //   throw new Error('Recipient address is wrong');
       // }
@@ -627,13 +604,9 @@ export default class BaseAccount {
   };
 
   public transferST2 = async (
-    inputs: Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>,
-    txb: TransactionBuilder,
+    txPrerequisites: TransactionPrerequisite,
+    txnPriority: string,
+    nSequence?: number,
   ): Promise<
     | {
         status: number;
@@ -651,6 +624,13 @@ export default class BaseAccount {
       }
   > => {
     try {
+      const { txb } = await this.hdWallet.createHDTransaction(
+        txPrerequisites,
+        txnPriority.toLowerCase(),
+        nSequence,
+      );
+      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+
       const signedTxb = this.hdWallet.signHDTransaction(inputs, txb);
       console.log('---- Transaction Signed ----');
 

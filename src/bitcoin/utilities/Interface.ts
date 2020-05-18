@@ -1,3 +1,24 @@
+export interface InputUTXOs {
+  txId: string;
+  vout: number;
+  value: number;
+  address: string;
+}
+
+export interface OutputUTXOs {
+  value: number;
+  address: string;
+}
+
+export interface TransactionPrerequisite {
+  [txnPriority: string]: {
+    inputs?: InputUTXOs[];
+    outputs: OutputUTXOs[];
+    fee: number;
+    estimatedBlocks: number;
+  };
+}
+
 export interface TransactionDetails {
   txid: string;
   status: string;

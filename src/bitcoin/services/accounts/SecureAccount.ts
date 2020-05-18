@@ -6,6 +6,7 @@ import {
   Transactions,
   DerivativeAccounts,
   TransactionDetails,
+  TransactionPrerequisite,
 } from '../../utilities/Interface';
 
 export default class SecureAccount {
@@ -588,32 +589,12 @@ export default class SecureAccount {
       address: string;
       amount: number;
     }[],
-    priority,
     averageTxFees?: any,
   ): Promise<
     | {
         status: number;
-        err: string;
-        message: string;
         data: {
-          fee: number;
-          inputs?: undefined;
-          txb?: undefined;
-          estimatedBlocks?: undefined;
-        };
-      }
-    | {
-        status: number;
-        data: {
-          inputs: Array<{
-            txId: string;
-            vout: number;
-            value: number;
-            address: string;
-          }>;
-          txb: TransactionBuilder;
-          fee: number;
-          estimatedBlocks: number;
+          txPrerequisites: TransactionPrerequisite;
         };
         err?: undefined;
         message?: undefined;
@@ -621,16 +602,16 @@ export default class SecureAccount {
     | { status: number; err: string; message: string; data?: undefined }
   > => {
     try {
-      console.log('---- Creating Transaction ----');
+      // if (this.hdWallet.isValidAddress(recipientAddress)) {
+      // amount = Math.round(amount * 1e8); // converting into sats
+      // amount = Math.round(amount);
+
       const {
-        inputs,
-        txb,
         fee,
         balance,
-        estimatedBlocks,
-      } = await this.secureHDWallet.createHDTransaction(
+        txPrerequisites,
+      } = await this.secureHDWallet.transactionPrerequisites(
         recipients,
-        priority,
         averageTxFees,
       );
 
@@ -645,33 +626,32 @@ export default class SecureAccount {
           err:
             'Insufficient balance to compensate for transfer amount and the txn fee',
           message: ErrMap[0o6],
-          data: { fee },
         };
       }
-      if (inputs && txb) {
-        console.log('---- Transaction Created ----');
+
+      if (txPrerequisites) {
         return {
           status: config.STATUS.SUCCESS,
-          data: { inputs, txb, fee, estimatedBlocks },
+          data: { txPrerequisites },
         };
       } else {
         throw new Error(
           'Unable to create transaction: inputs failed at coinselect',
         );
       }
+
+      // } else {
+      //   throw new Error('Recipient address is wrong');
+      // }
     } catch (err) {
-      return { status: 309, err: err.message, message: ErrMap[309] };
+      return { status: 106, err: err.message, message: ErrMap[106] };
     }
   };
 
   public transferST2 = async (
-    inputs: Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>,
-    txb: TransactionBuilder,
+    txPrerequisites: TransactionPrerequisite,
+    txnPriority: string,
+    nSequence?: number,
   ): Promise<
     | {
         status: number;
@@ -696,6 +676,13 @@ export default class SecureAccount {
       }
   > => {
     try {
+      const { txb } = await this.secureHDWallet.createHDTransaction(
+        txPrerequisites,
+        txnPriority.toLowerCase(),
+        nSequence,
+      );
+      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+
       const {
         signedTxb,
         childIndexArray,
@@ -757,13 +744,9 @@ export default class SecureAccount {
   };
 
   public alternateTransferST2 = async (
-    inputs: Array<{
-      txId: string;
-      vout: number;
-      value: number;
-      address: string;
-    }>,
-    txb: TransactionBuilder,
+    txPrerequisites: TransactionPrerequisite,
+    txnPriority: string,
+    nSequence?: number,
   ): Promise<
     | {
         status: number;
@@ -781,6 +764,13 @@ export default class SecureAccount {
       }
   > => {
     try {
+      const { txb } = await this.secureHDWallet.createHDTransaction(
+        txPrerequisites,
+        txnPriority.toLowerCase(),
+        nSequence,
+      );
+      const { inputs } = txPrerequisites[txnPriority.toLowerCase()];
+
       const { signedTxb } = this.secureHDWallet.dualSignHDTransaction(
         inputs,
         txb,

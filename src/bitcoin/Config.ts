@@ -266,6 +266,7 @@ class Config {
     console.log(this.HEALTH_STATUS.TIME_SLOTS);
     console.log(this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
+
     this.BITCOIN_NODE = new Client({
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
