@@ -10,6 +10,7 @@ import {
   DerivativeAccount,
   DerivativeAccounts,
   TransactionDetails,
+  TransactionPrerequisite,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
@@ -721,77 +722,207 @@ export default class SecureHDWallet extends Bitcoin {
     return outputs;
   };
 
-  public createHDTransaction = async (
+  // public createHDTransaction = async (
+  //   recipients: {
+  //     address: string;
+  //     amount: number;
+  //   }[],
+  //   txnPriority: string,
+  //   averageTxFees?: any,
+  //   nSequence?: number,
+  // ): Promise<
+  //   | {
+  //       fee: number;
+  //       balance: number;
+  //       inputs?: undefined;
+  //       txb?: undefined;
+  //       estimatedBlocks?: undefined;
+  //     }
+  //   | {
+  //       inputs: Array<{
+  //         txId: string;
+  //         vout: number;
+  //         value: number;
+  //         address: string;
+  //       }>;
+  //       txb: bitcoinJS.TransactionBuilder;
+  //       fee: number;
+  //       balance: number;
+  //       estimatedBlocks: number;
+  //     }
+  // > => {
+  //   try {
+  //     const inputUTXOs = await this.fetchUtxo();
+  //     console.log('Input UTXOs:', inputUTXOs);
+
+  //     const outputUTXOs = [];
+  //     for (const recipient of recipients) {
+  //       outputUTXOs.push({
+  //         address: recipient.address,
+  //         value: recipient.amount,
+  //       });
+  //     }
+  //     console.log('Output UTXOs:', outputUTXOs);
+  //     // const txnFee = await this.feeRatesPerByte(txnPriority);
+
+  //     let feePerByte, estimatedBlocks;
+  //     if (averageTxFees) {
+  //       feePerByte = averageTxFees[txnPriority].feePerByte;
+  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
+  //     } else {
+  //       const averageTxFees = await this.averageTransactionFee();
+  //       feePerByte = averageTxFees[txnPriority].feePerByte;
+  //       estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
+  //     }
+
+  //     let balance: number = 0;
+  //     inputUTXOs.forEach((utxo) => {
+  //       balance += utxo.value;
+  //     });
+  //     const { inputs, outputs, fee } = coinselect(
+  //       inputUTXOs,
+  //       outputUTXOs,
+  //       feePerByte,
+  //     );
+  //     console.log('-------Transaction--------');
+  //     console.log('\tFee', fee);
+  //     console.log('\tInputs:', inputs);
+  //     console.log('\tOutputs:', outputs);
+
+  //     if (!inputs) {
+  //       // insufficient input utxos to compensate for output utxos + fee
+  //       return { fee, balance };
+  //     }
+
+  //     const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
+  //       this.network,
+  //     );
+
+  //     inputs.forEach((input) =>
+  //       txb.addInput(input.txId, input.vout, nSequence),
+  //     );
+
+  //     const sortedOuts = await this.sortOutputs(outputs);
+  //     sortedOuts.forEach((output) => {
+  //       console.log('Adding Output:', output);
+  //       txb.addOutput(output.address, output.value);
+  //     });
+
+  //     return {
+  //       inputs,
+  //       txb,
+  //       fee,
+  //       balance,
+  //       estimatedBlocks,
+  //     };
+  //   } catch (err) {
+  //     throw new Error(`Transaction creation failed: ${err.message}`);
+  //   }
+  // };
+
+  public transactionPrerequisites = async (
     recipients: {
       address: string;
       amount: number;
     }[],
-    txnPriority: string,
     averageTxFees?: any,
-    nSequence?: number,
   ): Promise<
     | {
         fee: number;
         balance: number;
-        inputs?: undefined;
-        txb?: undefined;
-        estimatedBlocks?: undefined;
+        txPrerequisites?: undefined;
       }
     | {
-        inputs: Array<{
-          txId: string;
-          vout: number;
-          value: number;
-          address: string;
-        }>;
-        txb: bitcoinJS.TransactionBuilder;
-        fee: number;
-        balance: number;
-        estimatedBlocks: number;
+        txPrerequisites: TransactionPrerequisite;
+        fee?: undefined;
+        balance?: undefined;
       }
   > => {
-    try {
-      const inputUTXOs = await this.fetchUtxo();
-      console.log('Input UTXOs:', inputUTXOs);
+    const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
+    console.log('Input UTXOs:', inputUTXOs);
 
-      const outputUTXOs = [];
-      for (const recipient of recipients) {
-        outputUTXOs.push({
-          address: recipient.address,
-          value: recipient.amount,
-        });
-      }
-      console.log('Output UTXOs:', outputUTXOs);
-      // const txnFee = await this.feeRatesPerByte(txnPriority);
-
-      let feePerByte, estimatedBlocks;
-      if (averageTxFees) {
-        feePerByte = averageTxFees[txnPriority].feePerByte;
-        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
-      } else {
-        const averageTxFees = await this.averageTransactionFee();
-        feePerByte = averageTxFees[txnPriority].feePerByte;
-        estimatedBlocks = averageTxFees[txnPriority].estimatedBlocks;
-      }
-
-      let balance: number = 0;
-      inputUTXOs.forEach((utxo) => {
-        balance += utxo.value;
+    const outputUTXOs = [];
+    for (const recipient of recipients) {
+      outputUTXOs.push({
+        address: recipient.address,
+        value: recipient.amount,
       });
-      const { inputs, outputs, fee } = coinselect(
-        inputUTXOs,
-        outputUTXOs,
-        feePerByte,
-      );
-      console.log('-------Transaction--------');
-      console.log('\tFee', fee);
-      console.log('\tInputs:', inputs);
-      console.log('\tOutputs:', outputs);
+    }
+    console.log('Output UTXOs:', outputUTXOs);
+    let balance: number = 0;
+    inputUTXOs.forEach((utxo) => {
+      balance += utxo.value;
+    });
 
-      if (!inputs) {
-        // insufficient input utxos to compensate for output utxos + fee
-        return { fee, balance };
+    const defaultTxPriority = 'low'; // doing  base calculation with low fee
+    let feePerByte, estimatedBlocks;
+    console.log({ averageTxFees });
+    if (averageTxFees) {
+      feePerByte = averageTxFees[defaultTxPriority].feePerByte;
+      estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+    } else {
+      const averageTxFees = await this.averageTransactionFee();
+      feePerByte = averageTxFees[defaultTxPriority].feePerByte;
+      estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+    }
+
+    const { inputs, outputs, fee } = coinselect(
+      inputUTXOs,
+      outputUTXOs,
+      feePerByte,
+    );
+
+    console.log('-------Transaction--------');
+    console.log('\tDynamic Fee', fee);
+    console.log('\tInputs:', inputs);
+    console.log('\tOutputs:', outputs);
+
+    if (!inputs) {
+      // insufficient input utxos to compensate for output utxos + fee
+      return { fee, balance };
+    }
+
+    let netAmount = 0;
+    recipients.forEach((recipient) => {
+      netAmount += recipient.amount;
+    });
+
+    const txPrerequisites: TransactionPrerequisite = {};
+    for (const priority of Object.keys(averageTxFees)) {
+      const netFeeByPriority =
+        (fee / feePerByte) * averageTxFees[priority].feePerByte;
+      const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+
+      if (balance > netAmount + fee) {
+        txPrerequisites[priority] = {
+          inputs,
+          outputs,
+          fee: netFeeByPriority,
+          estimatedBlocks,
+        };
+      } else {
+        txPrerequisites[priority] = {
+          inputs: null, // if null >> insufficient balance to pay with fee corresponding to this tx priority
+          outputs,
+          fee: netFeeByPriority,
+          estimatedBlocks,
+        };
       }
+    }
+
+    console.log({ txPrerequisites });
+    return { txPrerequisites };
+  };
+
+  public createHDTransaction = async (
+    txPrerequisites: TransactionPrerequisite,
+    txnPriority: string,
+    nSequence?: number,
+  ): Promise<{
+    txb: bitcoinJS.TransactionBuilder;
+  }> => {
+    try {
+      const { inputs, outputs, fee } = txPrerequisites[txnPriority];
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
@@ -801,6 +932,15 @@ export default class SecureHDWallet extends Bitcoin {
         txb.addInput(input.txId, input.vout, nSequence),
       );
 
+      // adjusting fee according to selected priority
+      const defaultTxPriority = 'low'; // default deducted fee
+      outputs.forEach((output) => {
+        if (!output.address) {
+          output.value =
+            output.value + txPrerequisites[defaultTxPriority].fee - fee;
+        }
+      });
+
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {
         console.log('Adding Output:', output);
@@ -808,11 +948,7 @@ export default class SecureHDWallet extends Bitcoin {
       });
 
       return {
-        inputs,
         txb,
-        fee,
-        balance,
-        estimatedBlocks,
       };
     } catch (err) {
       throw new Error(`Transaction creation failed: ${err.message}`);
