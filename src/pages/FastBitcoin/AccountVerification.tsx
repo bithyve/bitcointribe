@@ -54,7 +54,8 @@ export default function AccountVerification(props) {
             flexDirection: 'row',
             marginTop: 'auto',
             alignItems: 'center',
-            marginBottom: wp('2%')
+            marginBottom: wp('2%'),
+            marginRight: wp('8%'),
           }}
         >
           <CopyThisText 
