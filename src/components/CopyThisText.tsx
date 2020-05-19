@@ -18,21 +18,21 @@ export default function CopyThisText(props) {
   return (
     <View
       style={{
+        marginTop: 30,
         paddingLeft: 25,
         paddingRight: 25,
-        marginTop: 30,
-        flex: 1,
+        marginLeft:25, marginRight:25,
+        alignItems:'center', justifyContent:'center'
       }}
     >
       <AppBottomSheetTouchableWrapper
         onPress={() => (props.openLink ? props.openLink() : writeToClipboard())}
         style={{
           flexDirection: 'row',
-        }}
+          }}
       >
         <View
           style={{
-            flex: 1,
             backgroundColor: Colors.backgroundColor,
             borderBottomLeftRadius: 8,
             borderTopLeftRadius: 8,
