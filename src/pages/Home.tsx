@@ -1426,9 +1426,9 @@ export default function Home(props) {
 
       case 'recoveryQR':
         const recoveryRequest = {
+          isRecovery: true,
           requester: scannedData.requester,
-          rk: scannedData.ENCRYPTED_KEY,
-          otp: scannedData.OTP,
+          rk: scannedData.KEY,
           isQR: true,
         };
         setLoading(false);
@@ -1766,7 +1766,7 @@ export default function Home(props) {
               setLoading(false);
             } else {
               if (custodyRequest.isQR) {
-                dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+                dispatch(downloadMShare(custodyRequest.ek, custodyRequest.otp));
                 setLoading(false);
               } else {
                 props.navigation.navigate('CustodianRequestOTP', {
@@ -2434,7 +2434,17 @@ export default function Home(props) {
         };
         props.navigation.navigate('Home', { trustedContactRequest });
       }
+    } else if (splits[4] === 'rk') {
+      const recoveryRequest = {
+        isRecovery: true,
+        requester: splits[5],
+        encryptedKey: splits[6],
+        hintType: splits[7],
+        hint: splits[8],
+      };
+      props.navigation.navigate('Home', { recoveryRequest });
     }
+
     if (event.url.includes('fastbitcoins')) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
       props.navigation.navigate('VoucherScanner', { userKey });
@@ -2473,7 +2483,7 @@ export default function Home(props) {
           setDeepLinkModalOpen(true);
         }, 2);
       }
-      (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
+      (TrustedContactRequestBottomSheet as any).current.snapTo(1);
       (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
 
@@ -2516,70 +2526,70 @@ export default function Home(props) {
   //   // return unsubscribe; // unsubscribing
   // }, []);
 
-  const renderRecoverySecretRequestModalContent = useCallback(() => {
-    if (!recoveryRequest) return <View></View>;
-    return (
-      <RecoverySecretRequestModalContents
-        name={recoveryRequest.requester}
-        title={'You have a Recovery Request\nfrom your Trusted Contact'}
-        infoText={
-          'Please contact the sender to get\nthe OTP and share the secret'
-        }
-        subTitle={'Message from the Sender'}
-        subTitleInfo={
-          'I am trying to restore my Hexa wallet and need the Recovery Secret shared with you'
-        }
-        acceptButtonName={'Accept Request'}
-        rejectButtonName={'Reject Request'}
-        onPressAccept={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          if (!UNDER_CUSTODY[recoveryRequest.requester]) {
-            Alert.alert(
-              'Failed to send!',
-              'You do not host any secret for this user.',
-            );
-            setLoading(false);
-          } else {
-            if (recoveryRequest.isQR) {
-              dispatch(
-                uploadRequestedShare(
-                  recoveryRequest.requester,
-                  recoveryRequest.rk,
-                  recoveryRequest.otp,
-                ),
-              );
-            } else {
-              props.navigation.navigate('RecoveryRequestOTP', {
-                recoveryRequest,
-              });
-            }
-          }
-        }}
-        onPressReject={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [recoveryRequest]);
+  // const renderRecoverySecretRequestModalContent = useCallback(() => {
+  //   if (!recoveryRequest) return <View></View>;
+  //   return (
+  //     <RecoverySecretRequestModalContents
+  //       name={recoveryRequest.requester}
+  //       title={'You have a Recovery Request\nfrom your Trusted Contact'}
+  //       infoText={
+  //         'Please contact the sender to get\nthe OTP and share the secret'
+  //       }
+  //       subTitle={'Message from the Sender'}
+  //       subTitleInfo={
+  //         'I am trying to restore my Hexa wallet and need the Recovery Secret shared with you'
+  //       }
+  //       acceptButtonName={'Accept Request'}
+  //       rejectButtonName={'Reject Request'}
+  //       onPressAccept={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //         if (!UNDER_CUSTODY[recoveryRequest.requester]) {
+  //           Alert.alert(
+  //             'Failed to send!',
+  //             'You do not host any secret for this user.',
+  //           );
+  //           setLoading(false);
+  //         } else {
+  //           if (recoveryRequest.isQR) {
+  //             dispatch(
+  //               uploadRequestedShare(
+  //                 recoveryRequest.requester,
+  //                 recoveryRequest.rk,
+  //                 recoveryRequest.otp,
+  //               ),
+  //             );
+  //           } else {
+  //             props.navigation.navigate('RecoveryRequestOTP', {
+  //               recoveryRequest,
+  //             });
+  //           }
+  //         }
+  //       }}
+  //       onPressReject={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, [recoveryRequest]);
 
-  const renderRecoverySecretRequestModalHeader = useCallback(() => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-        }}
-      />
-    );
-  }, []);
+  // const renderRecoverySecretRequestModalHeader = useCallback(() => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   // const renderShareRecoverySecretQrCodeModalContent = () => {
   //   return (
@@ -2708,7 +2718,7 @@ export default function Home(props) {
   }, [NotificationData, NotificationDataChange]);
 
   const renderTrustedContactRequestContent = useCallback(() => {
-    if (!trustedContactRequest) return;
+    if (!trustedContactRequest && !recoveryRequest) return;
 
     let {
       requester,
@@ -2719,7 +2729,8 @@ export default function Home(props) {
       publicKey,
       isQR,
       uploadedAt,
-    } = trustedContactRequest;
+      isRecovery,
+    } = trustedContactRequest || recoveryRequest;
 
     return (
       <TrustedContactRequest
@@ -2728,6 +2739,7 @@ export default function Home(props) {
           hintType === 'num' ? 'phone' : hintType === 'ema' ? 'email' : null
         }
         isGuardian={isGuardian}
+        isRecovery={isRecovery}
         hint={hint}
         bottomSheetRef={TrustedContactRequestBottomSheet}
         trustedContactName={requester}
@@ -2736,33 +2748,52 @@ export default function Home(props) {
             setTabBarZIndex(999);
             setDeepLinkModalOpen(false);
           }, 2);
-
-          if (Date.now() - uploadedAt > 600000) {
-            Alert.alert(
-              `${isQR ? 'QR' : 'Link'} expired!`,
-              `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
-            );
-            setLoading(false);
-          } else {
-            if (UNDER_CUSTODY[requester]) {
+          if (!isRecovery) {
+            if (Date.now() - uploadedAt > 600000) {
               Alert.alert(
-                'Failed to store',
-                'You cannot custody multiple shares of the same user.',
+                `${isQR ? 'QR' : 'Link'} expired!`,
+                `Please ask the sender to initiate a new ${
+                  isQR ? 'QR' : 'Link'
+                }`,
               );
               setLoading(false);
             } else {
-              if (!publicKey) {
-                try {
-                  publicKey = TrustedContactsService.decryptPub(
-                    encryptedKey,
-                    key,
-                  ).decryptedPub;
-                } catch (err) {
-                  console.log({ err });
-                  Alert.alert('Decryption Failed', err.message);
+              if (UNDER_CUSTODY[requester]) {
+                Alert.alert(
+                  'Failed to store',
+                  'You cannot custody multiple shares of the same user.',
+                );
+                setLoading(false);
+              } else {
+                if (!publicKey) {
+                  try {
+                    publicKey = TrustedContactsService.decryptPub(
+                      encryptedKey,
+                      key,
+                    ).decryptedPub;
+                  } catch (err) {
+                    console.log({ err });
+                    Alert.alert('Decryption Failed', err.message);
+                  }
                 }
+                dispatch(approveTrustedContact(requester, publicKey, true));
               }
-              dispatch(approveTrustedContact(requester, publicKey, true));
+            }
+          } else {
+            if (!UNDER_CUSTODY[requester]) {
+              Alert.alert(
+                'Failed to send!',
+                'You do not host any secret for this user.',
+              );
+              setLoading(false);
+            } else {
+              const decryptedKey = TrustedContactsService.decryptPub(
+                encryptedKey,
+                key,
+              ).decryptedPub;
+              dispatch(
+                uploadRequestedShare(recoveryRequest.requester, decryptedKey),
+              );
             }
           }
 
@@ -2780,7 +2811,7 @@ export default function Home(props) {
         }}
       />
     );
-  }, [trustedContactRequest]);
+  }, [trustedContactRequest, recoveryRequest]);
 
   const renderTrustedContactRequestHeader = useCallback(() => {
     return (
@@ -3259,7 +3290,7 @@ export default function Home(props) {
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -3275,7 +3306,7 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
-      />
+      /> */}
       <BottomSheet
         onCloseEnd={() => {
           if (tabBarZIndex == 0 && !deepLinkModalOpen) {
