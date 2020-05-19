@@ -317,10 +317,8 @@ export const uploadRequestedShareWatcher = createWatcher(
 function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader('downloadMetaShare'));
 
-  const { otp, encryptedKey, key } = payload; // key is provided in case of recovery
-  if (!otp && !encryptedKey && !key) {
-    throw new Error('OTP/EK/Key missing');
-  }
+  const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
+
   const { DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
   );
@@ -343,14 +341,7 @@ function* downloadMetaShareWorker({ payload }) {
       existingShares,
     );
   } else {
-    res = yield call(
-      S3Service.downloadAndValidateShare,
-      null,
-      null,
-      null,
-      null,
-      key,
-    );
+    res = yield call(S3Service.downloadAndValidateShare, encryptedKey);
   }
 
   console.log({ res });
@@ -390,7 +381,7 @@ function* downloadMetaShareWorker({ payload }) {
         if (!recoveryShare.REQUEST_DETAILS) {
           updatedRecoveryShares[objectKey] = recoveryShare;
         } else {
-          if (recoveryShare.REQUEST_DETAILS.KEY === key) {
+          if (recoveryShare.REQUEST_DETAILS.KEY === encryptedKey) {
             updatedRecoveryShares[objectKey] = {
               REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
               META_SHARE: metaShare,
@@ -419,7 +410,7 @@ function* downloadMetaShareWorker({ payload }) {
     console.log({ res });
     yield put(ErrorReceiving(true));
     // Alert.alert('Download Failed!', res.err);
-    yield put(downloadedMShare(otp || key, false, res.err));
+    yield put(downloadedMShare(otp, false, res.err));
   }
   yield put(switchS3Loader('downloadMetaShare'));
 }

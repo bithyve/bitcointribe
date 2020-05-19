@@ -118,7 +118,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       yield delay(1000); // introducing delay in order to evade database insertion collision
-      yield put(downloadMShare(otp, encryptedKey));
+      yield put(downloadMShare(encryptedKey, otp));
     }
   } else {
     console.log(res.err);
@@ -142,7 +142,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
     const data: EphemeralData = res.data.data;
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
-      downloadMShare(otp, encryptedKey);
+      downloadMShare(encryptedKey, otp);
     }
 
     yield put(ephemeralChannelFetched(contactName, data));

@@ -72,9 +72,8 @@ export default class SSS {
   };
 
   public static downloadShare = async (
-    encryptedKey?: string,
+    encryptedKey: string,
     otp?: string,
-    key?: string,
   ): Promise<
     | {
         metaShare: MetaShare;
@@ -87,8 +86,8 @@ export default class SSS {
         encryptedDynamicNonPMDD?: undefined;
       }
   > => {
-    if (!key) {
-      if (!encryptedKey) throw new Error('EncryptedKey & Key missing');
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
       key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
     }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
@@ -209,11 +208,14 @@ export default class SSS {
 
   public static uploadRequestedShare = async (
     encryptedKey: string,
-    otp: string,
-    metaShare: MetaShare,
+    otp?: string,
+    metaShare?: MetaShare,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<{ success: boolean }> => {
-    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
     const { encryptedMetaShare, messageId } = SSS.encryptMetaShare(
       metaShare,
       key,
@@ -240,11 +242,10 @@ export default class SSS {
   };
 
   public static downloadAndValidateShare = async (
-    encryptedKey?: string,
+    encryptedKey: string,
     otp?: string,
     existingShares?: MetaShare[],
     walletId?: string,
-    key?: string,
   ): Promise<{
     metaShare: MetaShare;
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
@@ -253,7 +254,7 @@ export default class SSS {
       metaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    } = await SSS.downloadShare(encryptedKey, otp, key);
+    } = await SSS.downloadShare(encryptedKey, otp);
 
     if (SSS.validateStorage(metaShare, existingShares, walletId)) {
       const { deleted } = await SSS.affirmDecryption(messageId);

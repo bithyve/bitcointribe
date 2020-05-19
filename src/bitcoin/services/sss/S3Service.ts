@@ -168,8 +168,8 @@ export default class S3Service {
 
   public static uploadRequestedShare = async (
     encryptedKey: string,
-    otp: string,
-    metaShare: MetaShare,
+    otp?: string,
+    metaShare?: MetaShare,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
     | {
@@ -203,11 +203,10 @@ export default class S3Service {
   };
 
   public static downloadAndValidateShare = async (
-    encryptedKey?: string,
+    encryptedKey: string,
     otp?: string,
     existingShares: MetaShare[] = [],
     walletId?: string,
-    key?: string,
   ): Promise<
     | {
         status: number;
@@ -233,7 +232,6 @@ export default class S3Service {
           otp,
           existingShares,
           walletId,
-          key,
         ),
       };
     } catch (err) {
