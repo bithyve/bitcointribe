@@ -17,7 +17,6 @@ import com.peel.react.TcpSocketsModule;
 import com.peel.react.rnos.RNOSModule;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.horcrux.svg.SvgPackage;
-import com.christopherdro.htmltopdf.RNHTMLtoPDFPackage;
 import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -74,7 +73,7 @@ public class MainApplication extends Application implements ShareApplication, Re
           new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
           new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
           new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
-          new RNHTMLtoPDFPackage(), new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
+          new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
           new RandomBytesPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
           new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
     }
