@@ -29,6 +29,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import RecoveryTrustedQR from './RecoveryTrustedQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import config from '../../bitcoin/Config';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
@@ -137,6 +138,9 @@ export default function RecoveryCommunication(props) {
         // props.navigation.navigate('ShareRecoveryOTP', {
         //   OTP: REQUEST_DETAILS.OTP,
         // });
+        setTimeout(() => {
+          props.navigation.navigate('RestoreSelectedContactsList');
+        }, 1000);
         break;
 
       case 'email':
@@ -164,6 +168,9 @@ export default function RecoveryCommunication(props) {
         // props.navigation.navigate('ShareRecoveryOTP', {
         //   OTP: REQUEST_DETAILS.OTP,
         // });
+        setTimeout(() => {
+          props.navigation.navigate('RestoreSelectedContactsList');
+        }, 1000);
         break;
       case 'qrcode':
         (trustedContactQrBottomSheet as any).current.snapTo(1);

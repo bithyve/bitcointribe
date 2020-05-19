@@ -533,7 +533,7 @@ export default function RestoreSelectedContactsList(props) {
     if (!META_SHARE) {
       const { KEY } = REQUEST_DETAILS;
       console.log({ KEY });
-      dispatch(downloadMShare(null, null, 'recovery', KEY));
+      dispatch(downloadMShare(KEY, null, 'recovery'));
     } else {
       Alert.alert('Received', 'Secret already Received');
     }

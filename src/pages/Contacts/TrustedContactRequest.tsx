@@ -218,10 +218,14 @@ export default function TrustedContactRequest(props) {
       >
         <View>
           <View style={styles.successModalHeaderView}>
-            <Text style={styles.modalTitleText}>
-              Trusted Contact{'\n'}Request{' '}
-              {props.isGuardian ? '(Guardian)' : null}
-            </Text>
+            {!props.isRecovery ? (
+              <Text style={styles.modalTitleText}>
+                Trusted Contact{'\n'}Request{' '}
+                {props.isGuardian ? '(Guardian)' : null}
+              </Text>
+            ) : (
+              <Text style={styles.modalTitleText}>Recovery Share Request</Text>
+            )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor

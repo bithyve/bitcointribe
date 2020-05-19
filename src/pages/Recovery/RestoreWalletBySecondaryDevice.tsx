@@ -180,7 +180,9 @@ export default function RestoreWalletBySecondaryDevice(props) {
             >
               <TouchableOpacity
                 onPress={() => {
-                  dispatch(downloadMShare(REQUEST_DETAILS.KEY, 'recovery'));
+                  dispatch(
+                    downloadMShare(REQUEST_DETAILS.KEY, null, 'recovery'),
+                  );
                 }}
                 disabled={!!META_SHARE}
                 style={{
