@@ -163,14 +163,13 @@ export default class S3Service {
   };
 
   public static generateRequestCreds = (): {
-    otp: string;
-    encryptedKey: string;
+    key: string;
   } => SSS.generateRequestCreds();
 
   public static uploadRequestedShare = async (
     encryptedKey: string,
-    otp: string,
-    metaShare: MetaShare,
+    otp?: string,
+    metaShare?: MetaShare,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
     | {
@@ -205,7 +204,7 @@ export default class S3Service {
 
   public static downloadAndValidateShare = async (
     encryptedKey: string,
-    otp: string,
+    otp?: string,
     existingShares: MetaShare[] = [],
     walletId?: string,
   ): Promise<

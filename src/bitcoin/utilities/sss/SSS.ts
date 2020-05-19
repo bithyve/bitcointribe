@@ -73,7 +73,7 @@ export default class SSS {
 
   public static downloadShare = async (
     encryptedKey: string,
-    otp: string,
+    otp?: string,
   ): Promise<
     | {
         metaShare: MetaShare;
@@ -86,7 +86,10 @@ export default class SSS {
         encryptedDynamicNonPMDD?: undefined;
       }
   > => {
-    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
     let res: AxiosResponse;
     try {
@@ -199,17 +202,20 @@ export default class SSS {
 
   public static generateRequestCreds = () => {
     const key = SSS.generateKey(SSS.cipherSpec.keyLength);
-    const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
-    return { otp, encryptedKey: otpEncryptedData };
+    // const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+    return { key };
   };
 
   public static uploadRequestedShare = async (
     encryptedKey: string,
-    otp: string,
-    metaShare: MetaShare,
+    otp?: string,
+    metaShare?: MetaShare,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<{ success: boolean }> => {
-    const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
     const { encryptedMetaShare, messageId } = SSS.encryptMetaShare(
       metaShare,
       key,
@@ -237,7 +243,7 @@ export default class SSS {
 
   public static downloadAndValidateShare = async (
     encryptedKey: string,
-    otp: string,
+    otp?: string,
     existingShares?: MetaShare[],
     walletId?: string,
   ): Promise<{
