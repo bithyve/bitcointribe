@@ -60,7 +60,6 @@ export default () => {
     const getAppVersion = async () => {
       let version = await getVersion()
       let buildNumber = await getBuildId()
-      debugger
       setApiHeaders({ appVersion: version, appBuildNumber: buildNumber })
     }
 
