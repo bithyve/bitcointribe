@@ -10,7 +10,8 @@ import {
   Image,
   ImageBackground,
   AsyncStorage,
-  Linking
+  Linking,
+  TextInput,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -126,12 +127,12 @@ const VoucherScanner = (props) => {
       amount: '5,000',
       image: require('../../assets/images/icons/icon_regular.png'),
     },
-    {
-      accountType: TEST_ACCOUNT,
-      accountName: 'Test Account',
-      amount: '2,000',
-      image: require('../../assets/images/icons/icon_test.png'),
-    },
+    // {
+    //   accountType: TEST_ACCOUNT,
+    //   accountName: 'Test Account',
+    //   amount: '2,000',
+    //   image: require('../../assets/images/icons/icon_test.png'),
+    // },
     {
       accountType: SECURE_ACCOUNT,
       accountName: 'Saving Account',
@@ -781,7 +782,7 @@ const VoucherScanner = (props) => {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={BackupStyles.modalHeaderTitleText}>Voucher</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>Scan a FastBitcoin Voucher</Text>
         </View>
       </View>
       <ScrollView>
@@ -881,14 +882,19 @@ const VoucherScanner = (props) => {
               </ImageBackground>
             </TouchableOpacity>
           )}
-          <View style={{ marginTop: 5 }}>
-            <BottomInfoBox
+          <View style={{ marginTop: 5, justifyContent: 'center', alignItems: 'center'}}>
+          <TextInput placeholder={'Enter Voucher Code'} 
+						placeholderTextColor={Colors.borderColor} 
+						style={styles.qrModalTextInput} 
+						autoCorrect={false}
+						/>
+            {/* <BottomInfoBox
               backgroundColor={Colors.white}
               title={'Note'}
               infoText={
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
               }
-            />
+            /> */}
           </View>
         </View>
       </ScrollView>
@@ -1120,6 +1126,19 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     marginBottom: 5,
   },
+  qrModalTextInput: {
+		borderRadius: 20,
+		borderWidth: 1,
+		borderColor: Colors.backgroundColor,
+		width: wp('72%'),
+		height: 60,
+		marginTop: 20,
+		marginBottom: 20,
+		paddingLeft: 15,
+		paddingRight: 15,
+		fontSize: RFValue(11, 812),
+		fontFamily: Fonts.FiraSansMedium
+	},
 });
 
 export default VoucherScanner;
