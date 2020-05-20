@@ -8,7 +8,7 @@ import {
 import crypto from 'crypto';
 import config from '../Config';
 import { ec as EC } from 'elliptic';
-import { BH_AXIOS } from '../../services/bittr';
+import { BH_AXIOS } from '../../services/api';
 var ec = new EC('curve25519');
 
 const { HEXA_ID } = config;

@@ -16,12 +16,8 @@ import {
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
-const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
-
-const BH_AXIOS: AxiosInstance = axios.create({
-  baseURL: RELAY,
-  timeout: REQUEST_TIMEOUT,
-});
+import { BH_AXIOS } from '../../../services/api';
+const { HEXA_ID } = config;
 
 export default class HDSegwitWallet extends Bitcoin {
   private mnemonic: string;
@@ -206,7 +202,7 @@ export default class HDSegwitWallet extends Bitcoin {
         if (
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
-            itr <
+          itr <
           0
         ) {
           continue;
@@ -506,8 +502,8 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const externalAddress = this.getExternalAddressByIndex(
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-        this.gapLimit -
-        1,
+      this.gapLimit -
+      1,
       this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
@@ -864,15 +860,15 @@ export default class HDSegwitWallet extends Bitcoin {
     averageTxFees?: any,
   ): Promise<
     | {
-        fee: number;
-        balance: number;
-        txPrerequisites?: undefined;
-      }
+      fee: number;
+      balance: number;
+      txPrerequisites?: undefined;
+    }
     | {
-        txPrerequisites: TransactionPrerequisite;
-        fee?: undefined;
-        balance?: undefined;
-      }
+      txPrerequisites: TransactionPrerequisite;
+      fee?: undefined;
+      balance?: undefined;
+    }
   > => {
     const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
     console.log('Input UTXOs:', inputUTXOs);
@@ -1280,7 +1276,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();

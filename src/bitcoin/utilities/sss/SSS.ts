@@ -10,7 +10,7 @@ import {
   MetaShare,
   SocialStaticNonPMDD,
 } from '../Interface';
-import { BH_AXIOS } from '../../../services/bittr';
+import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID } = config;
 export default class SSS {
   public static cipherSpec: {
