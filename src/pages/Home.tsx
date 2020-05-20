@@ -83,7 +83,6 @@ import {
   updateFCMTokens,
   fetchNotifications,
 } from '../store/actions/notifications';
-import axios from 'axios';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';

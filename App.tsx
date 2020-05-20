@@ -10,7 +10,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import NetInfo from '@react-native-community/netinfo';
-import firebase from "react-native-firebase";
+import { getVersion, getBuildId } from 'react-native-device-info'
+import { setApiHeaders } from "./src/services/bittr";
 
 const prefix = 'hexa://'
 export default () => {
@@ -22,8 +23,8 @@ export default () => {
   const renderNoInternetModalContent = () => {
     return (
       <NoInternetModalContents
-        onPressTryAgain={() => { (NoInternetBottomSheet as any).current.snapTo(0)}}
-        onPressIgnore={() => { (NoInternetBottomSheet as any).current.snapTo(0)}}
+        onPressTryAgain={() => { (NoInternetBottomSheet as any).current.snapTo(0) }}
+        onPressIgnore={() => { (NoInternetBottomSheet as any).current.snapTo(0) }}
       />
     );
   };
@@ -38,22 +39,34 @@ export default () => {
     );
   };
 
-  useEffect(()=>{
-    if(!Internet){
+  useEffect(() => {
+    if (!Internet) {
       (NoInternetBottomSheet as any).current.snapTo(1);
     }
   }, [Internet])
 
   useEffect(() => {
     NetInfo.addEventListener(state => {
-      if (state.isInternetReachable==true)
-        setInternet(true); 
-      else if (state.isInternetReachable==false){
-        setInternet(false); 
+      if (state.isInternetReachable == true)
+        setInternet(true);
+      else if (state.isInternetReachable == false) {
+        setInternet(false);
       }
-    });    
-  },[]);
-  
+    });
+  }, []);
+
+
+  useEffect(() => {
+    const getAppVersion = async () => {
+      let version = await getVersion()
+      let buildNumber = await getBuildId()
+      debugger
+      setApiHeaders({ appVersion: version, appBuildNumber: buildNumber })
+    }
+
+    getAppVersion()
+  })
+
   return (
     <Provider store={store} uriPrefix={prefix}>
       <Navigator />

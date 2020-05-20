@@ -14,14 +14,9 @@ import {
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
+import { SIGNING_AXIOS } from '../../../services/bittr';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
-
-const BH_AXIOS: AxiosInstance = axios.create({
-  baseURL: SIGNING_SERVER,
-  timeout: REQUEST_TIMEOUT,
-});
-
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
     qrData: string;
@@ -170,7 +165,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('importBHXpub', {
+      res = await SIGNING_AXIOS.post('importBHXpub', {
         HEXA_ID,
         token,
         walletID: walletId,
@@ -251,7 +246,7 @@ export default class SecureHDWallet extends Bitcoin {
     const { walletId } = this.getWalletId();
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('checkSecureHealth', {
+      res = await SIGNING_AXIOS.post('checkSecureHealth', {
         HEXA_ID,
         chunk,
         pos,
@@ -600,7 +595,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       console.log({ SIGNING_SERVER });
 
-      res = await BH_AXIOS.post('setupSecureAccount', {
+      res = await SIGNING_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
         secondaryID,
@@ -661,7 +656,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     const { secondaryID } = this.getSecondaryID(secondaryMnemonic);
     try {
-      res = await BH_AXIOS.post('resetTwoFA', {
+      res = await SIGNING_AXIOS.post('resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
         secondaryID,
@@ -678,7 +673,7 @@ export default class SecureHDWallet extends Bitcoin {
   public isActive = async (): Promise<{ isActive: boolean }> => {
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('isSecureActive', {
+      res = await SIGNING_AXIOS.post('isSecureActive', {
         HEXA_ID,
         walletID: this.walletID,
       });
@@ -1015,7 +1010,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       let res: AxiosResponse;
       try {
-        res = await BH_AXIOS.post('secureHDTransaction', {
+        res = await SIGNING_AXIOS.post('secureHDTransaction', {
           HEXA_ID,
           walletID: this.walletID,
           token,

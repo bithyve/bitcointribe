@@ -1,22 +1,17 @@
-import { AxiosResponse, AxiosInstance } from 'axios';
+import { AxiosResponse } from 'axios';
 import * as bip39 from 'bip39';
 import crypto from 'crypto';
 import secrets from 'secrets.js-grempe';
 import config from '../../Config';
-import axios from 'axios';
+
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD,
 } from '../Interface';
-const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
-
-const BH_AXIOS: AxiosInstance = axios.create({
-  baseURL: RELAY,
-  timeout: REQUEST_TIMEOUT,
-});
-
+import { BH_AXIOS } from '../../../services/bittr';
+const { HEXA_ID } = config;
 export default class SSS {
   public static cipherSpec: {
     algorithm: string;
@@ -76,15 +71,15 @@ export default class SSS {
     otp: string,
   ): Promise<
     | {
-        metaShare: MetaShare;
-        encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-        messageId: string;
-      }
+      metaShare: MetaShare;
+      encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+      messageId: string;
+    }
     | {
-        metaShare: MetaShare;
-        messageId: string;
-        encryptedDynamicNonPMDD?: undefined;
-      }
+      metaShare: MetaShare;
+      messageId: string;
+      encryptedDynamicNonPMDD?: undefined;
+    }
   > => {
     const key = SSS.decryptViaOTP(encryptedKey, otp).decryptedData;
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH);
@@ -516,9 +511,9 @@ export default class SSS {
     this.walletId = stateVars
       ? stateVars.walletId
       : crypto
-          .createHash('sha256')
-          .update(bip39.mnemonicToSeedSync(this.mnemonic))
-          .digest('hex');
+        .createHash('sha256')
+        .update(bip39.mnemonicToSeedSync(this.mnemonic))
+        .digest('hex');
     this.encryptedSecrets = stateVars ? stateVars.encryptedSecrets : [];
     this.shareIDs = stateVars ? stateVars.shareIDs : [];
     this.metaShares = stateVars ? stateVars.metaShares : [];
@@ -837,8 +832,8 @@ export default class SSS {
         return dnp1.updatedAt > dnp2.updatedAt
           ? 1
           : dnp2.updatedAt > dnp1.updatedAt
-          ? -1
-          : 0;
+            ? -1
+            : 0;
       })
       .pop();
 
