@@ -48,11 +48,11 @@ export const uploadEncMShare = (
   };
 };
 
-export const uploadRequestedShare = (tag, encryptedKey, otp) => {
+export const uploadRequestedShare = (tag, encryptedKey, otp?) => {
   return { type: UPLOAD_REQUESTED_SHARE, payload: { tag, encryptedKey, otp } };
 };
 
-export const downloadMShare = (otp, encryptedKey, downloadType?) => {
+export const downloadMShare = (encryptedKey, otp?, downloadType?) => {
   return {
     type: DOWNLOAD_MSHARE,
     payload: { otp, encryptedKey, downloadType },

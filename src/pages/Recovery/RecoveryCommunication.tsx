@@ -28,6 +28,8 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import RecoveryTrustedQR from './RecoveryTrustedQR';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import config from '../../bitcoin/Config';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
@@ -44,9 +46,9 @@ export default function RecoveryCommunication(props) {
   const [contactInfo, setContactInfo] = useState([]);
   const [trustedQR, setTrustedQR] = useState('');
 
-  const onContactSelect = index => {
+  const onContactSelect = (index) => {
     setContactInfo([
-      ...contactInfo.map(item => {
+      ...contactInfo.map((item) => {
         if (item !== contactInfo[index]) {
           return {
             ...item,
@@ -69,7 +71,7 @@ export default function RecoveryCommunication(props) {
   };
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
@@ -111,32 +113,64 @@ export default function RecoveryCommunication(props) {
       )
     : null;
 
-  const communicate = async selectedContactMode => {
-    const deepLink =
-      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/rk/` + // rk: recovery key
-      REQUEST_DETAILS.ENCRYPTED_KEY;
-
-    console.log("deepLink", deepLink)
+  const communicate = async (selectedContactMode) => {
+    const requester = WALLET_SETUP.walletName;
 
     switch (selectedContactMode.type) {
       case 'number':
-        textWithoutEncoding(selectedContactMode.info, deepLink);
-        props.navigation.navigate('ShareRecoveryOTP', {
-          OTP: REQUEST_DETAILS.OTP,
-        });
+        const number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        const numHintType = 'num';
+        const numHint = number.slice(number.length - 3);
+        const numberEncKey = TrustedContactsService.encryptPub(
+          // using TCs encryption mech
+          REQUEST_DETAILS.KEY,
+          number,
+        ).encryptedPub;
+
+        const numberDL =
+          `https://hexawallet.io/${config.APP_STAGE}/rk` +
+          `/${requester}` +
+          `/${numberEncKey}` +
+          `/${numHintType}` +
+          `/${numHint}`;
+
+        textWithoutEncoding(selectedContactMode.info, numberDL);
+        // props.navigation.navigate('ShareRecoveryOTP', {
+        //   OTP: REQUEST_DETAILS.OTP,
+        // });
+        setTimeout(() => {
+          props.navigation.navigate('RestoreSelectedContactsList');
+        }, 1000);
         break;
 
       case 'email':
+        const emailInitials: string = selectedContactMode.info.split('@')[0];
+        const emailHintType = 'eml';
+        const emailHint = emailInitials.slice(emailInitials.length - 3);
+        const emailEncPubKey = TrustedContactsService.encryptPub(
+          REQUEST_DETAILS.KEY,
+          emailInitials,
+        ).encryptedPub;
+        const emailDL =
+          `https://hexawallet.io/${config.APP_STAGE}/rk` +
+          `/${requester}` +
+          `/${emailEncPubKey}` +
+          `/${emailHintType}` +
+          `/${emailHint}`;
+
         email(
           [selectedContactMode.info],
           null,
           null,
           'Guardian request',
-          deepLink,
+          emailDL,
         );
-        props.navigation.navigate('ShareRecoveryOTP', {
-          OTP: REQUEST_DETAILS.OTP,
-        });
+        // props.navigation.navigate('ShareRecoveryOTP', {
+        //   OTP: REQUEST_DETAILS.OTP,
+        // });
+        setTimeout(() => {
+          props.navigation.navigate('RestoreSelectedContactsList');
+        }, 1000);
         break;
       case 'qrcode':
         (trustedContactQrBottomSheet as any).current.snapTo(1);

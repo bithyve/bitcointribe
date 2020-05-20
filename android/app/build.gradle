@@ -106,7 +106,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 35         
+        versionCode 38         
         versionName "0.8"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
@@ -193,7 +193,6 @@ dependencies {
     implementation project(':react-native-os')
     implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-svg')
-    implementation project(':react-native-html-to-pdf')
     implementation project(':react-native-cardview')
     implementation project(':react-native-video')
     implementation project(':react-native-device-info')

@@ -1650,25 +1650,41 @@ export default function ManageBackup(props) {
                         {getImageIcon(item)}
                         <View style={{ marginLeft: 15 }}>
                           <Text style={styles.cardTitleText}>
-                            {item.personalInfo &&
-                            (item.type == 'contact1' || item.type == 'contact2')
-                              ? item.personalInfo.firstName &&
-                                item.personalInfo.lastName
-                                ? item.personalInfo.firstName +
-                                  ' ' +
-                                  item.personalInfo.lastName
-                                : item.personalInfo.firstName &&
-                                  !item.personalInfo.lastName
-                                ? item.personalInfo.firstName
-                                : !item.personalInfo.firstName &&
-                                  item.personalInfo.lastName
-                                ? item.personalInfo.lastName
-                                : ''
-                              : item.title}
+                            {item.type === 'contact1' || item.type === 'contact2'
+                                ? 'Friends and Family'
+                                : (item.type === 'copy1' || item.type === 'copy2')
+                                  ? 'Personal Copies'
+                                  : (item.type === 'SecondaryDevice')
+                                    ? 'Keeper Device'
+                                    : item.title
+                            }
                           </Text>
                           <Text style={styles.cardTimeText}>
-                            Last backup{' '}
-                            <Text
+                          {(item.type === 'contact1' || item.type === 'contact2')
+                              ? item.personalInfo                            
+                                ? item.personalInfo.firstName &&
+                                  item.personalInfo.lastName
+                                  ? item.personalInfo.firstName +
+                                    ' ' +
+                                    item.personalInfo.lastName
+                                  : item.personalInfo.firstName &&
+                                    !item.personalInfo.lastName
+                                  ? item.personalInfo.firstName
+                                  : !item.personalInfo.firstName &&
+                                    item.personalInfo.lastName
+                                  ? item.personalInfo.lastName
+                                  : ''
+                                : 'Select a Trusted Contact as a Keeper'
+                              : item.type === 'secondaryDevice'
+                                ? item.status === 'Ugly'
+                                  ? 'Another device running Hexa app that you own'
+                                  : 'Last Backup '
+                                : (item.type === 'copy1' || item.type === 'copy2')
+                                  ? item.status === 'Ugly'
+                                    ? 'PDF as a Keeper for one of your Recovery Keys'
+                                    : 'The PDFs are locked with your Security Answers'
+                                  : 'Last Backup '}
+                            {(item.type === 'security' || (item.type === 'secondaryDevice' && item.status !== 'Ugly')) && <Text
                               style={{
                                 fontFamily: Fonts.FiraSansMediumItalic,
                                 fontWeight: 'bold',
@@ -1676,7 +1692,7 @@ export default function ManageBackup(props) {
                               }}
                             >
                               {getTime(item.time)}
-                            </Text>
+                            </Text>}
                           </Text>
                         </View>
                         <Image

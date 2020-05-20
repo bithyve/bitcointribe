@@ -46,9 +46,11 @@ export default function RestoreWalletBySecondaryDevice(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  const isErrorReceivingFailed = useSelector(
+    (state) => state.sss.errorReceiving,
+  );
   const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
@@ -179,11 +181,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
               <TouchableOpacity
                 onPress={() => {
                   dispatch(
-                    downloadMShare(
-                      REQUEST_DETAILS.OTP,
-                      REQUEST_DETAILS.ENCRYPTED_KEY,
-                      'recovery',
-                    ),
+                    downloadMShare(REQUEST_DETAILS.KEY, null, 'recovery'),
                   );
                 }}
                 disabled={!!META_SHARE}
@@ -212,8 +210,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
                 onPress={() =>
                   dispatch(
                     downloadMShare(
-                      REQUEST_DETAILS.OTP,
-                      REQUEST_DETAILS.ENCRYPTED_KEY,
+                      REQUEST_DETAILS.KEY,
                       'recovery',
                     ),
                   )

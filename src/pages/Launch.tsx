@@ -102,6 +102,15 @@ export default function Launch(props) {
                   };
                   props.navigation.replace('Login', { trustedContactRequest });
                 }
+              } else if (splits[4] === 'rk') {
+                const recoveryRequest = {
+                  isRecovery: true,
+                  requester: splits[5],
+                  encryptedKey: splits[6],
+                  hintType: splits[7],
+                  hint: splits[8],
+                };
+                props.navigation.replace('Login', { recoveryRequest });
               } else {
                 const EmailToken = url.substr(url.lastIndexOf('/') + 1);
                 console.log('EmailToken', EmailToken);
