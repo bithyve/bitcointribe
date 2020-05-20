@@ -41,8 +41,8 @@ export default function WalletBackupAndRecoveryContents(props) {
             <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>As only you can access your wallet,{"\n"}it is important to back it up properly{"\n"}in case you lose your phone</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("5%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once backed up,{"\n"}the automated health process help{"\n"}keep the back-up accessible at all times</Text>
-            <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>The shield tells you{"\n"}how healthy your wallet back-up is</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once backed up,{'\n'}the automated health check process ensures{'\n'} you have access to the backup at all times</Text>
+            <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>The shield tells you{'\n'}how healthy your back-up is</Text>
         </View>
         <View style={{
             flexDirection: 'row',
@@ -89,17 +89,20 @@ export default function WalletBackupAndRecoveryContents(props) {
             }} />
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("4%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>For wallet recovery,{"\n"}you have <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>five recovery secrets</Text>{"\n"}that your app generates</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>The app creates five Recovery Keys for your wallet</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("4%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>All you need to do is to follow the steps and share{"\n"}these across <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>five separate</Text> and unrelated sources</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>All you need to do is follow the steps and{'\n'}share these Recovery Keys{'\n'}with five separate and unrelated Keepers</Text>
+        </View>
+        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("2%") }}>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>(Don’t worry, Keepers can only help you recover{'\n'}your wallet and cannot see or use your bitcoins)</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/walletBackupIllutration.png")} style={{ width: wp("90%"), height: wp("80%"), resizeMode: "contain" }} />
         </View>
         <View style={{ backgroundColor: Colors.homepageButtonColor, height: 1, marginLeft: wp('5%'), marginRight: wp('5%') }} />
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("5%"),  }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>In the situation, where you have lost the phone and want{"\n"}to recreate the wallet, all you have to do is{"\n"}<Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>request back three</Text> of the five secrets</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>If you lose your phone,{'\n'}all you have to do is get back <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>three of the five</Text> Recovery Keys</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/walletbackupRequestBackupThree.png")} style={{ width: wp("90%"), height: wp("80%"), resizeMode: "contain" }} />
