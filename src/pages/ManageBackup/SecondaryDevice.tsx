@@ -59,11 +59,12 @@ export default function SecondaryDeviceModelContents(props) {
         setChangeContact(false);
       } else {
         if (SHARES_TRANSFER_DETAILS[0]) {
+          console.log('HERE');
           if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
+            console.log('here');
             dispatch(uploadEncMShare(0, contactName, data));
-          } else {
-            // do nothing
           }
+          console.log('HERE');
           // setSecondaryQR(
           //   JSON.stringify({
           //     requester: WALLET_SETUP.walletName,
@@ -71,24 +72,29 @@ export default function SecondaryDeviceModelContents(props) {
           //     type: 'secondaryDeviceQR',
           //   }),
           // );
-          const publicKey =
-            trustedContacts.tc.trustedContacts[contactName].publicKey;
-          setSecondaryQR(
-            JSON.stringify({
-              isGuardian: true,
-              requester: WALLET_SETUP.walletName,
-              publicKey,
-              uploadedAt: SHARES_TRANSFER_DETAILS[0].UPLOADED_AT,
-              type: 'secondaryDeviceGuardian',
-            }),
-          );
+
+          if (trustedContacts.tc.trustedContacts[contactName]) {
+            const publicKey =
+              trustedContacts.tc.trustedContacts[contactName].publicKey;
+
+            setSecondaryQR(
+              JSON.stringify({
+                isGuardian: true,
+                requester: WALLET_SETUP.walletName,
+                publicKey,
+                uploadedAt: SHARES_TRANSFER_DETAILS[0].UPLOADED_AT,
+                type: 'secondaryDeviceGuardian',
+              }),
+            );
+          }
         } else {
           dispatch(uploadEncMShare(0, contactName, data));
         }
       }
     })();
-  }, [SHARES_TRANSFER_DETAILS, changeContact]);
+  }, [SHARES_TRANSFER_DETAILS, changeContact, trustedContacts]);
 
+  console.log(secondaryQR);
   return (
     <View
       style={{
