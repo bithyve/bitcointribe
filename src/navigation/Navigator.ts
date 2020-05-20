@@ -79,6 +79,7 @@ import SendRequest from "../pages/Contacts/SendRequest";
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContact';
 import SendConfirmation from '../pages/Accounts/SendConfirmation';
+import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -199,6 +200,7 @@ const HomeNavigator = createStackNavigator(
     SettingNewWalletName,
     SendRequest,
     VoucherScanner,
+    AddContactSendRequest,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

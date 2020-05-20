@@ -2295,7 +2295,8 @@ export default function Home(props) {
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          props.navigation.navigate('SendRequest');
+          props.navigation.navigate('AddContactSendRequest', {SelectedContact: SelectedContact});
+          // props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onSelectContact={(selectedContact) => {

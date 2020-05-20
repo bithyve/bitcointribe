@@ -17,5 +17,5 @@ export default {
   backgroundColor1: "#FCFCFC",
   black1: '#3A3A3C',
   buttonText:'#626262',
-  lightTextColor: '#8B8B8B'
+  lightTextColor: '#8B8B8B',
 };
