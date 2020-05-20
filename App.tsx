@@ -11,7 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import NetInfo from '@react-native-community/netinfo';
 import { getVersion, getBuildId } from 'react-native-device-info'
-import { setApiHeaders } from "./src/services/bittr";
+import { setApiHeaders } from "./src/services/api";
 
 const prefix = 'hexa://'
 export default () => {
