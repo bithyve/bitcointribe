@@ -117,7 +117,7 @@ export default function AddContactSendRequest(props) {
         number,
       ).encryptedPub;
       const numberDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `https://hexawallet.io/${config.APP_STAGE}/tc` +
         `/${requester}` +
         `/${numberEncPubKey}` +
         `/${numHintType}` +
@@ -134,7 +134,7 @@ export default function AddContactSendRequest(props) {
         emailInitials,
       ).encryptedPub;
       const emailDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `https://hexawallet.io/${config.APP_STAGE}/tc` +
         `/${requester}` +
         `/${emailEncPubKey}` +
         `/${emailHintType}` +
