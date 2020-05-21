@@ -35,7 +35,7 @@ const RestoreAndRecoverWallet = props => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{ flex: 1 }}>
         <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
-          <Text style={styles.headerTitleText}>New Wallet</Text>
+          <Text style={styles.headerTitleText}>New Hexa Wallet</Text>
           <Text style={styles.headerInfoText}>
             The app creates a new wallet for you with accounts to start using
             right away
@@ -65,10 +65,10 @@ const RestoreAndRecoverWallet = props => {
         </View>
         <View style={styles.separator} />
         <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
-          <Text style={styles.headerTitleText}>Restore Wallet</Text>
+          <Text style={styles.headerTitleText}>Restore Hexa Wallet</Text>
           <Text style={styles.headerInfoText}>
             If you previously had a Hexa wallet, use this method to restore your
-            wallet.
+            wallet using Recovery Keys
           </Text>
           <TouchableOpacity
             onPress={async () => {
@@ -87,7 +87,7 @@ const RestoreAndRecoverWallet = props => {
               source={require('../assets/images/icons/icon_secrets.png')}
             />
             <View style={styles.textView}>
-              <Text style={styles.touchableText}>Using Recovery Secrets</Text>
+              <Text style={styles.touchableText}>Using Recovery Keys</Text>
             </View>
             <View style={styles.arrowIconView}>
               <Ionicons
