@@ -781,7 +781,7 @@ export default function Accounts(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                View your transactions here
+                View your transactions
               </Text>
               <Text
                 style={{
@@ -790,7 +790,7 @@ export default function Accounts(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                All your recent transactions across the accounts appear here
+                All recent transactions across your accounts appear here
               </Text>
             </View>
           </View>
@@ -891,7 +891,7 @@ export default function Accounts(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                View your transactions here
+                View your transactions
             </Text>
               <Text
                 style={{
@@ -900,7 +900,7 @@ export default function Accounts(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                All your recent transactions across the accounts appear here
+                All recent transactions across your accounts appear here
             </Text>
             </View>
           </View>
@@ -952,7 +952,7 @@ export default function Accounts(props) {
         topButtonText={`Test Account`}
         image={require('../../assets/images/icons/icon_test_white.png')}
         boldPara={``}
-        helperInfo={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins\n\nYou can even send and receive test bitcoins from other Hexa wallet test accounts`}
+        helperInfo={`This account is designed for those who are new to Bitcoin, and for those who want to experiment with Bitcoin. It comes pre-loaded with test bitcoins that you can send to and receive from other Hexa test accounts`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           if (TestAccountHelperBottomSheet.current)
@@ -990,7 +990,7 @@ export default function Accounts(props) {
         image={require('../../assets/images/icons/secure.png')}
         boldPara={''}
         helperInfo={
-          'The funds in this account are secured by two factor authentication which is set up on your secondary device\n\nUse this account to store most of your funds. Something you will not need on an ongoing basis'
+          'The funds in this account are secured by two factor authentication (2FA) which should be set up on a secondary device\n\nUse this account to store funds that you will not require on a daily basis. Transactions from and to this account are costlier compared to the Checking Account'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -1029,7 +1029,7 @@ export default function Accounts(props) {
         image={require('../../assets/images/icons/regular.png')}
         boldPara={''}
         helperInfo={
-          'These are the funds that you have easy access to for your transactional needs\n\nTransfers from this account are typically cheaper and faster'
+          'These are funds that you want to have easy access to for transactional needs\n\nTransfers from and to this account are typically cheap and fast'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {

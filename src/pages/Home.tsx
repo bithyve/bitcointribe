@@ -1222,7 +1222,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              View your transactions here
+              View your transactions
             </Text>
             <Text
               style={{
@@ -1231,7 +1231,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              All your recent transactions across the accounts appear here
+              All recent transactions across your accounts appear here
             </Text>
           </View>
         ) : null}
@@ -1330,7 +1330,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              View your transactions here
+              View your transactions
             </Text>
             <Text
               style={{
@@ -1339,7 +1339,7 @@ export default function Home(props) {
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              All your recent transactions across the accounts appear here
+              All recent transactions across your accounts appear here
             </Text>
           </View>
         </View>
