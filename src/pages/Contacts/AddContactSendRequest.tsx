@@ -8,7 +8,10 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
+  Alert,
+  AsyncStorage,
 } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -25,9 +28,12 @@ import SendViaLink from '../../components/SendViaLink';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import config from '../../bitcoin/Config';
 
 export default function AddContactSendRequest(props) {
-  
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
@@ -35,18 +41,106 @@ export default function AddContactSendRequest(props) {
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
+  const [trustedLink, setTrustedLink] = useState('');
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
     : [];
   console.log('SelectedContact', SelectedContact);
-  const [Contact, setContact] = useState(SelectedContact ? SelectedContact[0] : {});
-  
+  const [Contact, setContact] = useState(
+    SelectedContact ? SelectedContact[0] : {},
+  );
+
+  const WALLET_SETUP = useSelector(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (Contact && Contact.firstName) {
+      const contactName = `${Contact.firstName} ${Contact.lastName}`.toLowerCase();
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+      if (!trustedContact) {
+        (async () => {
+          const walletID = await AsyncStorage.getItem('walletID');
+          const FCM = await AsyncStorage.getItem('fcmToken');
+
+          const data: EphemeralData = {
+            walletID,
+            FCM,
+          };
+          dispatch(updateEphemeralChannel(contactName, data));
+        })();
+      } else {
+        if (!trustedLink) createDeepLink();
+      }
+    }
+  }, [Contact, trustedContacts]);
+
+  const createDeepLink = useCallback(() => {
+    if (!Contact) {
+      console.log('Err: Contact missing');
+      return;
+    }
+
+    const contactName = `${Contact.firstName} ${Contact.lastName}`.toLowerCase();
+
+    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const requester = WALLET_SETUP.walletName;
+
+    if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+      const phoneNumber = Contact.phoneNumbers[0].number;
+      console.log({ phoneNumber });
+      const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      const numHintType = 'num';
+      const numHint = number.slice(number.length - 3);
+      const numberEncPubKey = TrustedContactsService.encryptPub(
+        publicKey,
+        number,
+      ).encryptedPub;
+      const numberDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `/${requester}` +
+        `/${numberEncPubKey}` +
+        `/${numHintType}` +
+        `/${numHint}`;
+      console.log({ numberDL });
+      setTrustedLink(numberDL);
+    } else if (Contact.emails && Contact.emails.length) {
+      const email = Contact.emails[0].email;
+      const emailInitials: string = email.split('@')[0];
+      const emailHintType = 'eml';
+      const emailHint = emailInitials.slice(emailInitials.length - 3);
+      const emailEncPubKey = TrustedContactsService.encryptPub(
+        publicKey,
+        emailInitials,
+      ).encryptedPub;
+      const emailDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `/${requester}` +
+        `/${emailEncPubKey}` +
+        `/${emailHintType}` +
+        `/${emailHint}`;
+      console.log({ emailDL });
+      setTrustedLink(emailDL);
+    } else {
+      Alert.alert(
+        'Invalid Contact',
+        'Cannot add a contact without phone-num/email as a trusted entity',
+      );
+    }
+  }, [Contact, trustedContacts]);
+
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
         contactText={'Adding as a Trusted Contact:'}
         contact={Contact}
+        link={trustedLink}
         contactEmail={''}
         onPressBack={() => {
           if (SendViaLinkBottomSheet.current)
@@ -57,7 +151,7 @@ export default function AddContactSendRequest(props) {
         }}
       />
     );
-  }, [Contact]);
+  }, [Contact, trustedLink]);
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
@@ -325,7 +419,7 @@ export default function AddContactSendRequest(props) {
         </View>
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={SendViaLinkBottomSheet}
+          ref={SendViaLinkBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -337,7 +431,7 @@ export default function AddContactSendRequest(props) {
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={SendViaQRBottomSheet}
+          ref={SendViaQRBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()

@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, Linking, FlatList,Clipboard } from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  Linking,
+  FlatList,
+  Clipboard,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -16,7 +24,7 @@ import Toast from '../components/Toast';
 
 export default function SendViaLink(props) {
   const [contactName, setContactName] = useState('');
-  const [shareLink, setShareLink] = useState('http://hexawallet.io/trustedcontacts/ubcskuejm');
+  const [shareLink, setShareLink] = useState('');
 
   const [shareApps, setshareApps] = useState([
     {
@@ -72,6 +80,10 @@ export default function SendViaLink(props) {
     Clipboard.setString(shareLink);
     Toast('Copied Successfully');
   }
+
+  useEffect(() => {
+    if (props.link) setShareLink(props.link);
+  }, [props.link]);
 
   return (
     <View style={styles.modalContainer}>
@@ -218,9 +230,7 @@ export default function SendViaLink(props) {
             )}
           </View>
         </View>
-        <View
-          style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}
-        >
+        <View style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}>
           <Text
             style={{
               color: Colors.textColorGrey,
@@ -256,7 +266,7 @@ export default function SendViaLink(props) {
               paddingTop: 5,
             }}
           >
-            {shareLink}
+            {shareLink ? shareLink : 'creating...'}
           </Text>
         </View>
 
@@ -269,50 +279,55 @@ export default function SendViaLink(props) {
           }}
         >
           <FlatList
-    data={shareApps}
-    horizontal={true}
-    renderItem={({ item }) => {
-    if(item.isAvailable){
-       return <AppBottomSheetTouchableWrapper
-        onPress={() => {
-            if(item.title == 'Copy Link') 
-            writeToClipboard();
-
-        }}
-        style={{
-            ...styles.addModalView,
-            backgroundColor: Colors.white,
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}
-        >
-            <View style={styles.modalElementInfoView}>
-                <View
-                style={{ justifyContent: 'center', alignItems: 'center' }}
-                >
-                <View
-                    style={{
-                    shadowColor: Colors.shadowBlue,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: 15,
-                    height: 15,
-                    shadowOpacity: 1,
-                    shadowOffset: { width: 5, height: 5 },
+            data={shareApps}
+            horizontal={true}
+            renderItem={({ item }) => {
+              if (item.isAvailable) {
+                return (
+                  <AppBottomSheetTouchableWrapper
+                    onPress={() => {
+                      if (item.title == 'Copy Link') writeToClipboard();
                     }}
-                >
-                    <Image
-                    source={item.image}
-                    style={{ width: 50, height: 50 }}
-                    />
-                </View>
-                <Text style={styles.addModalInfoText}>{item.title}</Text>
-                </View>
-            </View>
-            </AppBottomSheetTouchableWrapper>
-        }
-    }}
-/>
+                    style={{
+                      ...styles.addModalView,
+                      backgroundColor: Colors.white,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <View style={styles.modalElementInfoView}>
+                      <View
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <View
+                          style={{
+                            shadowColor: Colors.shadowBlue,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: 15,
+                            height: 15,
+                            shadowOpacity: 1,
+                            shadowOffset: { width: 5, height: 5 },
+                          }}
+                        >
+                          <Image
+                            source={item.image}
+                            style={{ width: 50, height: 50 }}
+                          />
+                        </View>
+                        <Text style={styles.addModalInfoText}>
+                          {item.title}
+                        </Text>
+                      </View>
+                    </View>
+                  </AppBottomSheetTouchableWrapper>
+                );
+              }
+            }}
+          />
         </View>
       </ScrollView>
       <View style={{ marginTop: 'auto' }}>
