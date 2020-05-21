@@ -18,17 +18,26 @@ export default function SendViaQR(props) {
   const [receivingAddress, setReceivingAddress] = useState('http://hexawallet.io/trustedcontacts/ubcskuejm');
   const [contactName, setContactName] = useState('');
 
+  const contact = props.contact;
+
+  const [Contact, setContact] = useState(props.contact ? props.contact : {});
+  useEffect(() => {
+    if (contact) {
+      setContact(props.contact);
+    }
+  }, [contact]);
+  
     useEffect(()=>{
-      let contactName = props.contact.firstName && props.contact.lastName
-      ? props.contact.firstName + ' ' + props.contact.lastName
-      : props.contact.firstName && !props.contact.lastName
-      ? props.contact.firstName
-      : !props.contact.firstName && props.contact.lastName
-      ? props.contact.lastName
-      : '';
-      console.log("contactName",contactName)
-      setContactName(contactName);
-   },[]);
+      let contactName =
+    Contact && Contact.firstName && Contact.lastName
+        ? Contact.firstName + ' ' + Contact.lastName
+        : Contact && Contact.firstName && !Contact.lastName
+        ? Contact.firstName
+        : Contact && !Contact.firstName && Contact.lastName
+        ? Contact.lastName
+        : '';
+    setContactName(contactName);
+   },[Contact]);
 
   return (
     <View style={styles.modalContainer}>
@@ -107,7 +116,7 @@ export default function SendViaQR(props) {
                 borderRadius: 10,
               }}
             >
-              <View style={{ marginLeft: 70 }}>
+             <View style={{ marginLeft: 70 }}>
                 {props.contactText ? (
                   <Text
                     style={{
@@ -116,36 +125,57 @@ export default function SendViaQR(props) {
                       fontSize: RFValue(11),
                       marginLeft: 25,
                       paddingTop: 5,
-                      paddingBottom: 5,
+                    paddingBottom: 3,
                     }}
                   >
                     {props.contactText}
                   </Text>
                 ) : null}
-                {contactName ? 
-                <Text style={styles.contactNameText}>{contactName}</Text>
-                : null}
-                {props.contactEmail ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 5,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {props.contactEmail}
-                  </Text>
+                {contactName ? (
+                  <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
+                {Contact && Contact.phoneNumbers.length ? <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 25,
+                    paddingTop: 3,
+                  }}
+                >
+                  {Contact && Contact.phoneNumbers[0].digits}
+                </Text> : null }
+                {Contact && Contact.emails.length ? <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 25,
+                    paddingTop: 3,
+                    paddingBottom: 5,
+                  }}
+                >
+                  {Contact && Contact.emails[0].email}
+                </Text> : null}
               </View>
             </View>
-            {props.contact && props.contact.imageAvailable ? (
+            {Contact && Contact.imageAvailable ? (
+              <View
+              style={{
+                position: 'absolute',
+                marginLeft: 15,
+                marginRight: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowOpacity: 1,
+                shadowOffset: { width: 2, height: 2 },
+              }}
+            >
               <Image
-                source={props.contact.image}
+                source={Contact && Contact.image}
                 style={{ ...styles.contactProfileImage }}
               />
+              </View>
             ) : (
               <View
                 style={{
@@ -154,10 +184,13 @@ export default function SendViaQR(props) {
                   marginRight: 15,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: Colors.shadowBlue,
+                  backgroundColor: Colors.backgroundColor,
                   width: 70,
                   height: 70,
                   borderRadius: 70 / 2,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
                 }}
               >
                 <Text
@@ -228,14 +261,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contactProfileImage: {
+    borderRadius: 60 / 2,
     width: 60,
     height: 60,
     resizeMode: 'cover',
-    borderRadius: 60 / 2,
-    elevation: 20,
-    shadowColor: Colors.borderColor,
+    shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 1, height: 4 },
+    shadowOffset: { width: 15, height: 15 },
   },
   contactNameText: {
     color: Colors.textColorGrey,
