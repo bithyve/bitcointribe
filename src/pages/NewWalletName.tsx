@@ -58,8 +58,8 @@ export default function NewWalletName(props) {
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
               secondLineTitle={''}
-              infoTextNormal={'Please name your '}
-              infoTextBold={'wallet'}
+              infoTextNormal={'Please enter a Wallet Name. Your contacts will see this to identify messages from your Wallet'}
+              // infoTextBold={'wallet'}
             />
             <TextInput
               style={inputStyle}
@@ -116,7 +116,7 @@ export default function NewWalletName(props) {
               <BottomInfoBox
                 title={'We do not store this'}
                 infoText={
-                  'Only your contacts will see this when you transact with them, to identify you'
+                  'This is used during your communication with your contacts'
                 }
               />
             </View>
