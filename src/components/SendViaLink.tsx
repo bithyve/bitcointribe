@@ -25,11 +25,10 @@ import Toast from '../components/Toast';
 
 export default function SendViaLink(props) {
   const [contactName, setContactName] = useState('');
-  const [shareLink, setShareLink] = useState(
-    'http://hexawallet.io/trustedcontacts/ubcskuejm',
-  );
-  
-  const [shareApps, setShareApps] = useState([
+
+  const [shareLink, setShareLink] = useState('');
+
+  const [shareApps, setshareApps] = useState([
     {
       title: `WhatsApp`,
       image: require('../assets/images/icons/whatsapp.png'),
@@ -92,6 +91,10 @@ export default function SendViaLink(props) {
     Toast('Copied Successfully');
   }
 
+  useEffect(() => {
+    if (props.link) setShareLink(props.link);
+  }, [props.link]);
+  
   const openWhatsApp = (appUrl) => {
     if (shareLink) {
       let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
@@ -336,7 +339,7 @@ export default function SendViaLink(props) {
               paddingTop: 5,
             }}
           >
-            {shareLink}
+            {shareLink ? shareLink : 'creating...'}
           </Text>
         </View>
 
@@ -348,6 +351,7 @@ export default function SendViaLink(props) {
             marginBottom: hp('4%'),
           }}
         >
+
           <ScrollView horizontal={true}>
             {shareApps.map((item) => {
               if (item.isAvailable) {
@@ -355,6 +359,7 @@ export default function SendViaLink(props) {
                   <AppBottomSheetTouchableWrapper
                     onPress={() => {
                       if (item.title == 'Copy Link') writeToClipboard();
+
                       if (item.title == 'WhatsApp') openWhatsApp(item.url);
                       if (item.title == 'Telegram') openTelegram(item.url);
                       if (item.title == 'Messenger') openMessenger(item.url);
@@ -397,6 +402,7 @@ export default function SendViaLink(props) {
                   </AppBottomSheetTouchableWrapper>
                 );
               }
+
             })}
           </ScrollView>
         </View>
