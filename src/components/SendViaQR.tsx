@@ -15,8 +15,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-svg';
 
 export default function SendViaQR(props) {
-  const [receivingAddress, setReceivingAddress] = useState('http://hexawallet.io/trustedcontacts/ubcskuejm');
   const [contactName, setContactName] = useState('');
+
 
   const contact = props.contact;
 
@@ -100,9 +100,9 @@ export default function SendViaQR(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView style={{ marginLeft: 20,
-    marginRight: 20,
-    marginTop: hp('1.7%'),}}>
+      <ScrollView
+        style={{ marginLeft: 20, marginRight: 20, marginTop: hp('1.7%') }}
+      >
         <View style={styles.contactProfileView}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
@@ -207,12 +207,11 @@ export default function SendViaQR(props) {
           </View>
         </View>
         <View style={styles.loader}>
-            
-        {!receivingAddress ? (
-          <ActivityIndicator size="large" />
-        ) : (
-          <QRCode value={receivingAddress} size={hp('27%')} />
-        )}
+          {!props.QR ? (
+            <ActivityIndicator size="large" />
+          ) : (
+            <QRCode value={props.QR} size={hp('27%')} />
+          )}
         </View>
       </ScrollView>
       <View style={{ marginTop: 'auto' }}>
@@ -229,12 +228,14 @@ export default function SendViaQR(props) {
   );
 }
 const styles = StyleSheet.create({
-  loader: { 
-  height: hp('27%'), justifyContent: 'center',
-  marginLeft: 20,
-  marginRight: 20,
-  alignItems: 'center',
-  marginTop: hp('4%'), },
+  loader: {
+    height: hp('27%'),
+    justifyContent: 'center',
+    marginLeft: 20,
+    marginRight: 20,
+    alignItems: 'center',
+    marginTop: hp('4%'),
+  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),

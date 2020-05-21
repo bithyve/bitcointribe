@@ -1405,6 +1405,20 @@ export default function Home(props) {
         });
         break;
 
+      case 'trustedContactQR':
+        const tcRequest = {
+          requester: scannedData.requester,
+          publicKey: scannedData.publicKey,
+          type: scannedData.type,
+          isQR: true,
+        };
+        setLoading(false);
+        setSecondaryDeviceOtp(tcRequest);
+        props.navigation.navigate('Home', {
+          trustedContactRequest: tcRequest,
+        });
+        break;
+
       case 'secondaryDeviceGuardian':
         const secondaryDeviceGuardianRequest = {
           isGuardian: scannedData.isGuardian,
@@ -2293,7 +2307,9 @@ export default function Home(props) {
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          props.navigation.navigate('AddContactSendRequest', {SelectedContact: SelectedContact});
+          props.navigation.navigate('AddContactSendRequest', {
+            SelectedContact: SelectedContact,
+          });
           // props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
@@ -2748,6 +2764,7 @@ export default function Home(props) {
             setDeepLinkModalOpen(false);
           }, 2);
           if (!isRecovery) {
+            if (!uploadedAt) uploadedAt = Date.now(); // a non-guardian tc request
             if (Date.now() - uploadedAt > 600000) {
               Alert.alert(
                 `${isQR ? 'QR' : 'Link'} expired!`,
@@ -2765,6 +2782,7 @@ export default function Home(props) {
                 setLoading(false);
               } else {
                 if (!publicKey) {
+                  // public key is directly available in case of QRs
                   try {
                     publicKey = TrustedContactsService.decryptPub(
                       encryptedKey,
