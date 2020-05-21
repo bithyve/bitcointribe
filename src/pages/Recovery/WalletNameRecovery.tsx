@@ -116,9 +116,9 @@ export default function WalletNameRecovery(props) {
               }}>
                 
               <BottomInfoBox
-                title={"Name of your existing wallet"}
+                title={"Wallet Name"}
                 infoText={
-                  "This can be any name, preferably what you were using for your wallet previously"
+                  "Enter a name for your wallet. This need not be the same as the one used previously"
                 }
               />
             </View>

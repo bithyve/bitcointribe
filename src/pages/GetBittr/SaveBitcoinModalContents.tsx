@@ -51,7 +51,7 @@ export default function SaveBitcoinModalContents(props) {
           <View style={{ flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>Buy Bitcoin</Text>
             <Text style={styles.pageInfoText}>
-              Get bitcoins directly into your Hexa wallet
+              Get bitcoins directly in your wallet
             </Text>
           </View>
         </View>
