@@ -85,6 +85,9 @@ import {
   BIT_SHARE_HEALTH_TIME_SLOT2_DEV,
   BIT_SHARE_HEALTH_TIME_SLOT2_PROD,
   BIT_FAST_BITCOINS_SERIES,
+  BIT_FAST_BITCOINS_INSTANCE_COUNT,
+  BIT_TRUSTED_CONTACTS_SERIES,
+  BIT_TRUSTED_CONTACTS_INSTANCE_COUNT,
 } from 'react-native-dotenv';
 import { DerivativeAccount, DerivativeAccounts } from './utilities/Interface';
 
@@ -232,15 +235,30 @@ class Config {
 
   FAST_BITCOINS: DerivativeAccount = {
     series: parseInt(BIT_FAST_BITCOINS_SERIES, 10),
+    instance: {
+      max: parseInt(BIT_FAST_BITCOINS_INSTANCE_COUNT, 10),
+      using: 0,
+    },
+  };
+
+  TRUSTED_ACCOUNTS: DerivativeAccount = {
+    // corresponds to trusted channels
+    series: parseInt(BIT_TRUSTED_CONTACTS_SERIES, 10),
+    instance: {
+      max: parseInt(BIT_TRUSTED_CONTACTS_INSTANCE_COUNT, 10),
+      using: 0,
+    },
   };
 
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
+    TRUSTED_ACCOUNTS: this.TRUSTED_ACCOUNTS,
   };
 
   constructor(env: string) {
     this.ENVIRONMENT = env;
-    console.log({ BIT_SERVER_MODE, env });
+    console.log({ env });
+    console.log({ BIT_SERVER_MODE });
 
     if (BIT_SERVER_MODE === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;

@@ -77,6 +77,10 @@ export interface BuddyStaticNonPMDD {
 
 export interface DerivativeAccount {
   series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
   [accounts: number]: {
     xpub: string;
     ypub?: string;
@@ -90,6 +94,7 @@ export interface DerivativeAccount {
     transactions?: Transactions;
     lastBalTxSync?: number;
     newTransactions?: TransactionDetails[];
+    additional?: { contactName?: string }; // TC identifier
   };
 }
 
@@ -127,7 +132,9 @@ export interface EphemeralData {
   };
 }
 
-export interface TrustedDataElements {}
+export interface TrustedDataElements {
+  xpub?: string;
+}
 export interface TrustedData {
   publicKey: string;
   data: TrustedDataElements;
