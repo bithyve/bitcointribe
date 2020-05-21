@@ -10,7 +10,7 @@ import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
 import manageBackupReducer from './reducers/manageBackup';
 import GetBittrReducer from './reducers/bittr';
-import fBTCReducers from './reducers/fbtc'
+import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 import sendReducer from './reducers/sendReducer';
@@ -93,7 +93,7 @@ import {
   getQuoteWatcher,
   executeOrderWatcher,
   getBalancesWatcher,
-} from './sagas/fbtc'
+} from './sagas/fbtc';
 
 import {
   updateFCMTokensWatcher,
@@ -108,6 +108,7 @@ import {
   fetchEphemeralChannelWatcher,
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
+  trustedChannelXpubsUploadWatcher,
 } from './sagas/trustedContacts';
 
 import { fromPrivateKey } from 'bip32';
@@ -217,6 +218,7 @@ const rootSaga = function* () {
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
+    trustedChannelXpubsUploadWatcher,
   ];
 
   yield all(

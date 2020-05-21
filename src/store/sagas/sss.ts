@@ -45,11 +45,18 @@ import { dbInsertedSSS } from '../actions/storage';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  SECURE_ACCOUNT,
+  REGULAR_ACCOUNT,
+  TRUSTED_ACCOUNTS,
+} from '../../common/constants/serviceTypes';
 import {
   EncDynamicNonPMDD,
   MetaShare,
   EphemeralData,
+  DerivativeAccounts,
+  DerivativeAccount,
+  TrustedDataElements,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -60,6 +67,7 @@ import {
   trustedChannelFetched,
 } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -564,6 +572,9 @@ export const updateMSharesHealthWatcher = createWatcher(
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select((state) => state.sss.service);
+  const regularService: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
   // const preInstance = JSON.stringify(s3Service);
   const res = yield call(s3Service.checkHealth);
   // const postInstance = JSON.stringify(s3Service);
@@ -588,6 +599,40 @@ function* checkMSharesHealthWorker() {
           );
           if (res.status === 200) {
             console.log('Trusted Channel create: ', guardian);
+
+            // generate a corresponding derivative acc and assign xpub
+            const trustedAccounts: DerivativeAccount =
+              regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
+            const accountNumber = trustedAccounts.instance.using + 1;
+            const additional = {
+              contactName: guardian,
+            };
+            yield call(
+              regularService.getDerivativeAccXpub,
+              TRUSTED_ACCOUNTS,
+              accountNumber,
+              additional,
+            );
+            console.log({ trustedAccounts });
+
+            // update the trusted channel with the xpub
+            if (
+              trustedAccounts[accountNumber].additional.contactName === guardian
+            ) {
+              const data: TrustedDataElements = {
+                xpub: trustedAccounts[accountNumber].xpub,
+              };
+              const res = yield call(
+                trustedContacts.updateTrustedChannel,
+                guardian,
+                data,
+                true,
+              );
+              if (res.status === 200) {
+                console.log('Xpub updated to TC for: ', guardian);
+              }
+            }
+
             approvedAny = true;
           }
         }
@@ -599,6 +644,7 @@ function* checkMSharesHealthWorker() {
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
+        REGULAR_ACCOUNT: JSON.stringify(regularService),
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
       yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
