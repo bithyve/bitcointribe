@@ -158,10 +158,17 @@ export default class HDSegwitWallet extends Bitcoin {
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
+    additional?: {
+      contactName?: string;
+    },
   ): string => {
     // generates receiving xpub for derivative accounts
 
-    const baseXpub = this.generateDerivativeXpub(accountType, accountNumber);
+    const baseXpub = this.generateDerivativeXpub(
+      accountType,
+      accountNumber,
+      additional,
+    );
     // console.log({ baseXpub });
     // const node = bip32.fromBase58(baseXpub, this.network);
     // const address = this.getAddress(node.derive(0).derive(0), this.purpose);
@@ -175,7 +182,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public getDerivativeAccReceivingAddress = async (
     accountType: string,
-    accountNumber: number = 0,
+    accountNumber: number = 1,
   ): Promise<{ address: string }> => {
     // generates receiving address for derivative accounts
     if (!this.derivativeAccounts[accountType])
@@ -251,7 +258,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public fetchDerivativeAccBalanceTxs = async (
     accountType: string,
-    accountNumber: number = 0,
+    accountNumber: number = 1,
   ): Promise<{
     balances: {
       balance: number;
@@ -1261,13 +1268,16 @@ export default class HDSegwitWallet extends Bitcoin {
 
   private generateDerivativeXpub = (
     accountType: string,
-    accountNumber: number = 0,
+    accountNumber: number = 1,
+    additional?: {
+      contactName?: string;
+    },
   ) => {
     if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
-    if (accountNumber > 9)
+    if (accountNumber > this.derivativeAccounts[accountType].instance.max)
       throw Error(
-        `Cannot create more than 10 ${accountType} derivative accounts`,
+        `Cannot create more than ${this.derivativeAccounts[accountType].instance.max} ${accountType} derivative accounts`,
       );
     if (this.derivativeAccounts[accountType][accountNumber]) {
       return this.derivativeAccounts[accountType][accountNumber]['xpub'];
@@ -1282,6 +1292,14 @@ export default class HDSegwitWallet extends Bitcoin {
       const xpub = child.toBase58();
       const ypub = this.xpubToYpub(xpub, null, this.network);
       this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
+      this.derivativeAccounts[accountType].instance.using++;
+
+      if (additional) {
+        this.derivativeAccounts[accountType][accountNumber].additional = {
+          ...this.derivativeAccounts[accountType][accountNumber].additional,
+          ...additional,
+        };
+      }
       return xpub;
     }
   };

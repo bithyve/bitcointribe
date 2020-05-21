@@ -114,6 +114,7 @@ export default class TrustedContacts {
   }
 
   public encryptData = (key: string, dataPacket: any) => {
+    key = key.slice(key.length - TrustedContacts.cipherSpec.keyLength);
     const cipher = crypto.createCipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
@@ -126,6 +127,7 @@ export default class TrustedContacts {
   };
 
   public decryptData = (key: string, encryptedDataPacket: string) => {
+    key = key.slice(key.length - TrustedContacts.cipherSpec.keyLength);
     const decipher = crypto.createDecipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
@@ -228,7 +230,6 @@ export default class TrustedContacts {
       },
       contactsPubKey: encodedPublicKey,
     };
-    console.log({ contactName: this.trustedContacts[contactName] });
     return {
       channelAddress,
       ephemeralAddress,
@@ -364,39 +365,53 @@ export default class TrustedContacts {
     }
   };
 
-  public processTrustedChannelData = (
+  public updateTrustedChannelData = (
     contactName: string,
-    encryptedData: EncryptedTrustedData,
-    symmetricKey: string,
+    newTrustedData: TrustedData,
   ): TrustedData => {
-    const decryptedTrustedData: TrustedData = {
-      publicKey: encryptedData.publicKey,
-      data: this.decryptData(symmetricKey, encryptedData.encryptedData).data,
-    };
-
     let trustedData = this.trustedContacts[contactName].trustedChannel.data;
+    let updatedTrustedData: TrustedData = newTrustedData;
     if (trustedData) {
       let updated = false;
       for (let index = 0; index < trustedData.length; index++) {
-        if (trustedData[index].publicKey === decryptedTrustedData.publicKey) {
-          trustedData[index] = {
-            ...trustedData[index],
-            ...decryptedTrustedData,
+        if (trustedData[index].publicKey === newTrustedData.publicKey) {
+          trustedData[index].data = {
+            ...trustedData[index].data,
+            ...newTrustedData.data,
           };
           updated = true;
+          updatedTrustedData = trustedData[index];
           break;
         }
       }
 
       if (!updated) {
         // 2nd party data reception for the first time
-        trustedData.push(decryptedTrustedData);
+        trustedData.push(newTrustedData);
       }
     } else {
-      trustedData = [decryptedTrustedData];
+      trustedData = [newTrustedData];
     }
 
     this.trustedContacts[contactName].trustedChannel.data = trustedData;
+    return updatedTrustedData;
+  };
+
+  public processTrustedChannelData = (
+    contactName: string,
+    encryptedData: EncryptedTrustedData,
+    symmetricKey: string,
+  ): TrustedData => {
+    const data: TrustedDataElements = this.decryptData(
+      symmetricKey,
+      encryptedData.encryptedData,
+    ).data;
+
+    const decryptedTrustedData: TrustedData = {
+      publicKey: encryptedData.publicKey,
+      data,
+    };
+    this.updateTrustedChannelData(contactName, decryptedTrustedData);
 
     return decryptedTrustedData;
   };
@@ -435,7 +450,21 @@ export default class TrustedContacts {
         contactName
       ];
 
-      const { encryptedData } = this.encryptData(symmetricKey, dataElements);
+      const trustedData: TrustedData = {
+        publicKey,
+        data: dataElements,
+      };
+
+      const updatedTrustedData: TrustedData = this.updateTrustedChannelData(
+        contactName,
+        trustedData,
+      );
+
+      const { encryptedData } = this.encryptData(
+        symmetricKey,
+        updatedTrustedData.data,
+      );
+
       const encryptedDataPacket: EncryptedTrustedData = {
         publicKey,
         encryptedData,
@@ -447,7 +476,6 @@ export default class TrustedContacts {
         data: encryptedDataPacket,
         fetch,
       });
-
       let { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
 
