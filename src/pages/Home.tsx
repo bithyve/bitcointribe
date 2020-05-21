@@ -1004,22 +1004,21 @@ export default function Home(props) {
     if (health == 0) {
       return (
         <Text numberOfLines={1} style={{ ...styles.headerInfoText }}>
-          The wallet backup is not secure.{'\n'}Please visit the health section
-          to{'\n'}improve the health of your backup
+          Wallet backup not secure.{'\n'}Please visit 'Manage Backup'
         </Text>
       );
     } else if (health > 0 && health < 100) {
       return (
         <Text numberOfLines={1} style={styles.headerInfoText}>
-          The wallet backup is not secured.{'\n'}Please complete the setup to
-          {'\n'}safeguard against loss of funds
+          Wallet backup not secure.{'\n'}Please complete 'Manage Backup' setup to
+          {'\n'}improve backup health.
         </Text>
       );
     } else {
       return (
         <Text numberOfLines={1} style={styles.headerInfoText}>
-          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>The wallet backup
-          is{'\n'}secure. Keep an eye on the{'\n'}health of the backup here
+          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>Wallet Backup
+          is{'\n'}Secure. Keep track of its{'\n'}health routinely.
         </Text>
       );
     }
@@ -1061,7 +1060,7 @@ export default function Home(props) {
     setTimeout(() => {
       setErrorMessageHeader('Error sending Recovery Secret');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'Error sending Recovery Secret, please try again!',
       );
       setButtonText('Try again');
     }, 2);
@@ -1071,9 +1070,9 @@ export default function Home(props) {
 
   if (isUploadSuccessfully) {
     setTimeout(() => {
-      setErrorMessageHeader('Sending successful');
+      setErrorMessageHeader('Seding successful');
       setErrorMessage(
-        'The Recovery Secret has been sent, the receiver needs to accept ',
+        'Recovery Secret sent, please notify the receiver to accept',
       );
       setButtonText('Done');
     }, 2);
@@ -1085,7 +1084,7 @@ export default function Home(props) {
     setTimeout(() => {
       setErrorMessageHeader('Error receiving Recovery Secret');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'Rrror receiving Recovery Secret, please try again!',
       );
       setButtonText('Try again');
     }, 2);

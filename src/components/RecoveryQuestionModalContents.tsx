@@ -37,8 +37,6 @@ export default function RecoveryQuestionModalContents(props) {
               Enter Security Question{'\n'}and Answer
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              To recover your wallet you have to select the security question
-              and enter its answer
             </Text>
           </View>
           <View style={{ flex: 1 }}>
@@ -147,8 +145,8 @@ export default function RecoveryQuestionModalContents(props) {
               }}
             />
             <Text style={styles.modalInfoText}>
-              The Security Answer is case sensitive, make sure you{'\n'}enter
-              the case, numeric or symbolic values correctly
+              The Security Answer is case sensitive. Please make sure{'\n'}you enter
+              all characters accurately.
             </Text>
           </View>
           <TouchableOpacity

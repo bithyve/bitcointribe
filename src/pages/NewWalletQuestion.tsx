@@ -294,11 +294,11 @@ export default function NewWalletQuestion(props) {
 
   const seLoaderMessages = () => {
     setTimeout(() => {
-      setMessage('Setting up your accounts');
+      setMessage('Bootstrapping Accounts');
       setTimeout(() => {
-        setMessage('Getting test bitcoins (sats) for the Test account');
+        setMessage('Filling Test account with test sats');
         setTimeout(() => {
-          setMessage('Generating Recovery Secrets for the wallet backup');
+          setMessage('Generating Recovery Secrets');
         }, 3000);
       }, 3000);
     }, 3000);
@@ -371,7 +371,7 @@ export default function NewWalletQuestion(props) {
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
                 infoTextBold={'secret question and answer'}
-                infoTextNormal1={'\n(this is a very important step)'}
+                infoTextNormal1={'\n(you need to remember this)'}
               />
 
               <TouchableOpacity
@@ -654,9 +654,9 @@ export default function NewWalletQuestion(props) {
             }}
           >
             <BottomInfoBox
-              title={'The answer is used to encrypt parts of your wallet'}
-              infoText={'Very important that this is something that only you '}
-              italicText={'know and remember'}
+              title={'This answer is used to encrypt parts of your wallet'}
+              infoText={'It is extremely important that only you'}
+              italicText={'know and remember the answer'}
             />
           </View>
         ) : null}
