@@ -227,7 +227,7 @@ export default function PasscodeConfirm( props ) {
           { passcode.length == 4 ? (
             <View>
               <Text style={ styles.headerInfoText }>
-                Re-enter a <Text style={ styles.boldItalicText }>passcode</Text>
+                Re-enter the <Text style={ styles.boldItalicText }>passcode</Text>
               </Text>
               <View>
                 <View style={ { flexDirection: "row", marginTop: hp( "4.5%" ), } }>

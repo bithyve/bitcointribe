@@ -113,7 +113,7 @@ export default function SecondaryDeviceModelContents(props) {
           marginLeft: 20,
         }}
       >
-        <Text style={BackupStyles.modalHeaderTitleText}>Scan the QR</Text>
+        <Text style={BackupStyles.modalHeaderTitleText}>Scan QR Code</Text>
       </View>
       <View style={BackupStyles.modalContentView}>
         {uploadMetaShare || !secondaryQR ? (

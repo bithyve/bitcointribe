@@ -25,13 +25,13 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import SendViaLink from '../../components/SendViaLink';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/Config';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
@@ -47,7 +47,7 @@ export default function AddContactSendRequest(props) {
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
     : [];
-  console.log('SelectedContact', SelectedContact);
+
   const [Contact, setContact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
@@ -169,9 +169,7 @@ export default function AddContactSendRequest(props) {
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (SendViaLinkBottomSheet.current)
             (SendViaLinkBottomSheet as any).current.snapTo(0);
@@ -200,9 +198,7 @@ export default function AddContactSendRequest(props) {
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (SendViaQRBottomSheet.current)
             (SendViaQRBottomSheet as any).current.snapTo(0);
@@ -306,7 +302,7 @@ export default function AddContactSendRequest(props) {
                     fontSize: RFValue(11),
                     marginLeft: 25,
                     paddingTop: 5,
-                    paddingBottom: 5,
+                    paddingBottom: 3,
                   }}
                 >
                   Adding as a Trusted Contact:
@@ -320,25 +316,52 @@ export default function AddContactSendRequest(props) {
                     ? Contact.lastName
                     : ''}
                 </Text>
-                {/* <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 5,
-                    paddingBottom: 5,
-                  }}
-                >
-                  asarah@bithyve.com
-                </Text> */}
+                {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                    }}
+                  >
+                    {Contact.phoneNumbers[0].digits}
+                  </Text>
+                ) : null}
+                {Contact.emails && Contact.emails.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                      paddingBottom: 5,
+                    }}
+                  >
+                    {Contact.emails[0].email}
+                  </Text>
+                ) : null}
               </View>
             </View>
             {Contact.imageAvailable ? (
-              <Image
-                source={Contact.image}
-                style={{ ...styles.contactProfileImage }}
-              />
+              <View
+                style={{
+                  position: 'absolute',
+                  marginLeft: 15,
+                  marginRight: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
+                }}
+              >
+                <Image
+                  source={Contact.image}
+                  style={{ ...styles.contactProfileImage }}
+                />
+              </View>
             ) : (
               <View
                 style={{
@@ -347,10 +370,13 @@ export default function AddContactSendRequest(props) {
                   marginRight: 15,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: Colors.shadowBlue,
+                  backgroundColor: Colors.backgroundColor,
                   width: 70,
                   height: 70,
                   borderRadius: 70 / 2,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
                 }}
               >
                 <Text
@@ -438,7 +464,7 @@ export default function AddContactSendRequest(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('80%')
+              ? hp('83%')
               : hp('85%'),
           ]}
           renderContent={renderSendViaLinkContents}
@@ -450,7 +476,7 @@ export default function AddContactSendRequest(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('80%')
+              ? hp('83%')
               : hp('85%'),
           ]}
           renderContent={renderSendViaQRContents}
@@ -479,14 +505,13 @@ const styles = StyleSheet.create({
     marginTop: hp('1.7%'),
   },
   contactProfileImage: {
+    borderRadius: 60 / 2,
     width: 60,
     height: 60,
     resizeMode: 'cover',
-    borderRadius: 60 / 2,
-    elevation: 20,
-    shadowColor: Colors.borderColor,
+    shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 1, height: 4 },
+    shadowOffset: { width: 15, height: 15 },
   },
   contactNameText: {
     color: Colors.textColorGrey,

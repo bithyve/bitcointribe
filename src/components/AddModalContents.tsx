@@ -23,7 +23,7 @@ export default function AddModalContents( props ) {
 		{
 			title: `Buy Bitcoins`, 
 			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
-			info: 'Buy bitcoins directly into your Hexa wallet',
+			info: 'Get bitcoins directly in your wallet',
 			type:'buyBitcoins'
 		},
 		{

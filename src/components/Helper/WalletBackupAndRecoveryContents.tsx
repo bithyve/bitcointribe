@@ -32,17 +32,17 @@ export default function WalletBackupAndRecoveryContents(props) {
             <Image source={require("../../assets/images/icons/shieldWithRoundBorder.png")} style={{ width: wp("50%"), height: wp("50%"), resizeMode: "contain" }} />
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%') }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>In <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>Hexa</Text>, you have full control of your bitcoins.{"\n"}This gives you <Text style={{ color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>better privacy and more security</Text></Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>With <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>Hexa</Text>, you have full control over your bitcoins.{"\n"}This gives you <Text style={{ color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>better privacy and security></Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/mobileWithCircle.png")} style={{ width: wp("25%"), height: wp("25%"), resizeMode: "contain" }} />
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>As only you can access your wallet,{"\n"}it is important to back it up properly{"\n"}in case you lose your phone</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>As only you can access your wallet,{"\n"}it is important to manage your backup health{"\n"}for easy recovery in case you {"\n"}lose your phone</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("5%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once backed up,{'\n'}the automated health check process ensures{'\n'} you have access to the backup at all times</Text>
-            <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>The shield tells you{'\n'}how healthy your back-up is</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once backed up,{'\n'}Hexa's automated health check process ensures{'\n'} you have access to the backup anytime</Text>
+            <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>The shield tells you{'\n'}how healthy your backup is</Text>
         </View>
         <View style={{
             flexDirection: 'row',
@@ -92,23 +92,23 @@ export default function WalletBackupAndRecoveryContents(props) {
             <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>The app creates five Recovery Keys for your wallet</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("4%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>All you need to do is follow the steps and{'\n'}share these Recovery Keys{'\n'}with five separate and unrelated Keepers</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>All you need to do is follow the outlined steps and{'\n'}share these Keys{'\n'}with five independent Keepers.</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("2%") }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>(Don’t worry, Keepers can only help you recover{'\n'}your wallet and cannot see or use your bitcoins)</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Keepers can only help you recover{'\n'}your wallet and cannot see your balance or use your bitcoins.</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/walletBackupIllutration.png")} style={{ width: wp("90%"), height: wp("80%"), resizeMode: "contain" }} />
         </View>
         <View style={{ backgroundColor: Colors.homepageButtonColor, height: 1, marginLeft: wp('5%'), marginRight: wp('5%') }} />
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp("5%"),  }}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>If you lose your phone,{'\n'}all you have to do is get back <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>three of the five</Text> Recovery Keys</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>If you lose your phone,{'\n'}all you have to do is request <Text style={{ marginTop: 5, textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansMedium }}>three of the five</Text> Recovery Keys held by your Keepers</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/walletbackupRequestBackupThree.png")} style={{ width: wp("90%"), height: wp("80%"), resizeMode: "contain" }} />
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center',}}>
-            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once you answer your secure question,{"\n"}the wallet is instantly recreated</Text>
+            <Text style={{ textAlign: 'center', color: Colors.white, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Once you answer your secret question,{"\n"}the wallet is recreated and you can use Hexa from your new device</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('1%'), marginBottom: hp('2%') }}>
             <Image source={require("../../assets/images/icons/Walletbackupwalletrecreate.png")} style={{ width: wp("90%"), height: wp("50%"), resizeMode: "contain" }} />

@@ -91,7 +91,7 @@ export default function SettingNewWalletName(props) {
         </View>
         <View style={{ flex: 1, marginLeft: 10 }}>
           <Text style={styles.headerInfoText}>
-            Please enter a new Wallet Name
+            Please enter Wallet Name
           </Text>
           <View style={{ marginTop: 15 }}>
             <View
