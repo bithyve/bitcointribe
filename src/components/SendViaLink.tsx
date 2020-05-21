@@ -28,9 +28,8 @@ export default function SendViaLink(props) {
   const [shareLink, setShareLink] = useState(
     'http://hexawallet.io/trustedcontacts/ubcskuejm',
   );
-  const [ShareData, setShareData] = useState(false);
-
-  const [shareApps, setshareApps] = useState([
+  const contact = props.contact;
+  const [shareApps, setShareApps] = useState([
     {
       title: `WhatsApp`,
       image: require('../assets/images/icons/whatsapp.png'),
@@ -56,6 +55,7 @@ export default function SendViaLink(props) {
       isAvailable: true,
     },
   ]);
+  
   useEffect(() => {
     let contactName =
       props.contact.firstName && props.contact.lastName
@@ -69,66 +69,60 @@ export default function SendViaLink(props) {
   }, []);
 
   useEffect(() => {
-    if (props.contact) {
-      setShareData(true);
-    }
-  }, [props.contact]);
-
-  useEffect(() => {
-    if (ShareData) {
-      (async () => {
-        for (let i = 0; i < shareApps.length; i++) {
-          if (shareApps[i].url) {
-            await Linking.canOpenURL(shareApps[i].url)
-              .then((supported) => {
-                console.log('supported', shareApps[i].title, supported);
-                shareApps[i].isAvailable = supported;
-              })
-              .catch((err) => console.error('An error occurred', err));
-          }
+    (async () => {
+      for (let i = 0; i < shareApps.length; i++) {
+        if (shareApps[i].url) {
+          let supported = await Linking.canOpenURL(shareApps[i].url);
+          shareApps[i].isAvailable = supported;
         }
-      })();
-      console.log('shareApps', shareApps);
-    }
-  }, [ShareData]);
+      }
+      setShareApps(shareApps);
+    })();
+  }, [contact]);
 
   function writeToClipboard() {
     Clipboard.setString(shareLink);
     Toast('Copied Successfully');
   }
 
-  const openWhatsApp = (appUrl) =>{
+  const openWhatsApp = (appUrl) => {
     if (shareLink) {
-        let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
-        Linking.openURL(url).then((data) => {
+      let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
+      Linking.openURL(url)
+        .then((data) => {
           console.log('WhatsApp Opened');
-        }).catch(() => {
+        })
+        .catch(() => {
           alert('Make sure WhatsApp installed on your device');
         });
-      }
-  }
+    }
+  };
 
-  const openTelegram = (appUrl) =>{
+  const openTelegram = (appUrl) => {
     if (shareLink) {
-        let url = appUrl + shareLink;
-        Linking.openURL(url).then((data) => {
+      let url = appUrl + shareLink;
+      Linking.openURL(url)
+        .then((data) => {
           console.log('Telegram Opened');
-        }).catch(() => {
+        })
+        .catch(() => {
           alert('Make sure Telegram installed on your device');
         });
-      }
-  }
+    }
+  };
 
-  const openMessenger = (appUrl) =>{
+  const openMessenger = (appUrl) => {
     if (shareLink) {
-        let url = appUrl
-        Linking.openURL(url).then((data) => {
+      let url = appUrl;
+      Linking.openURL(url)
+        .then((data) => {
           console.log('Messenger Opened');
-        }).catch(() => {
+        })
+        .catch(() => {
           alert('Make sure Facebook Messenger installed on your device');
         });
-      }
-  }
+    }
+  };
 
   return (
     <View style={styles.modalContainer}>
@@ -218,7 +212,7 @@ export default function SendViaLink(props) {
                       fontSize: RFValue(11),
                       marginLeft: 25,
                       paddingTop: 5,
-                    paddingBottom: 3,
+                      paddingBottom: 3,
                     }}
                   >
                     {props.contactText}
@@ -227,29 +221,33 @@ export default function SendViaLink(props) {
                 {contactName ? (
                   <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
-                {props.contact.phoneNumbers.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                  }}
-                >
-                  {props.contact.phoneNumbers[0].digits}
-                </Text> : null }
-                {props.contact.emails.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                    paddingBottom: 5,
-                  }}
-                >
-                  {props.contact.emails[0].email}
-                </Text> : null}
+                {props.contact && props.contact.phoneNumbers.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                    }}
+                  >
+                    {props.contact.phoneNumbers[0].digits}
+                  </Text>
+                ) : null}
+                {props.contact && props.contact.emails.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                      paddingBottom: 5,
+                    }}
+                  >
+                    {props.contact.emails[0].email}
+                  </Text>
+                ) : null}
               </View>
             </View>
             {props.contact.imageAvailable ? (
@@ -347,18 +345,16 @@ export default function SendViaLink(props) {
             marginBottom: hp('4%'),
           }}
         >
-          <FlatList
-            data={shareApps}
-            horizontal={true}
-            renderItem={({ item }) => {
+          <ScrollView horizontal={true}>
+            {shareApps.map((item) => {
               if (item.isAvailable) {
                 return (
                   <AppBottomSheetTouchableWrapper
                     onPress={() => {
                       if (item.title == 'Copy Link') writeToClipboard();
-                      if((item.title == 'WhatsApp')) openWhatsApp(item.url);
-                      if((item.title == 'Telegram')) openTelegram(item.url);
-                      if((item.title == 'Messenger')) openMessenger(item.url);
+                      if (item.title == 'WhatsApp') openWhatsApp(item.url);
+                      if (item.title == 'Telegram') openTelegram(item.url);
+                      if (item.title == 'Messenger') openMessenger(item.url);
                     }}
                     style={{
                       ...styles.addModalView,
@@ -398,8 +394,8 @@ export default function SendViaLink(props) {
                   </AppBottomSheetTouchableWrapper>
                 );
               }
-            }}
-          />
+            })}
+          </ScrollView>
         </View>
       </ScrollView>
       <View style={{ marginTop: 'auto' }}>

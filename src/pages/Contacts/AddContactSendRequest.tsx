@@ -22,9 +22,9 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import SendViaLink from '../../components/SendViaLink';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
+import ModalHeader from '../../components/ModalHeader';
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
@@ -41,7 +41,7 @@ export default function AddContactSendRequest(props) {
   const [Contact, setContact] = useState(
     SelectedContact ? SelectedContact[0] : {},
   );
-console.log("Contact", Contact, typeof Contact.phoneNumbers, Contact.phoneNumbers[0]);
+
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
@@ -61,9 +61,7 @@ console.log("Contact", Contact, typeof Contact.phoneNumbers, Contact.phoneNumber
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (SendViaLinkBottomSheet.current)
             (SendViaLinkBottomSheet as any).current.snapTo(0);
@@ -91,9 +89,7 @@ console.log("Contact", Contact, typeof Contact.phoneNumbers, Contact.phoneNumber
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (SendViaQRBottomSheet.current)
             (SendViaQRBottomSheet as any).current.snapTo(0);
@@ -211,29 +207,33 @@ console.log("Contact", Contact, typeof Contact.phoneNumbers, Contact.phoneNumber
                     ? Contact.lastName
                     : ''}
                 </Text>
-                {Contact.phoneNumbers.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                  }}
-                >
-                  {Contact.phoneNumbers[0].digits}
-                </Text> : null }
-                {Contact.emails.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                    paddingBottom: 5,
-                  }}
-                >
-                  {Contact.emails[0].email}
-                </Text> : null}
+                {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                    }}
+                  >
+                    {Contact.phoneNumbers[0].digits}
+                  </Text>
+                ) : null}
+                {Contact.emails && Contact.emails.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                      paddingBottom: 5,
+                    }}
+                  >
+                    {Contact.emails[0].email}
+                  </Text>
+                ) : null}
               </View>
             </View>
             {Contact.imageAvailable ? (
