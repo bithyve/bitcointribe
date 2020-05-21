@@ -218,6 +218,9 @@ export default class BaseAccount {
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
+    additional?: {
+      contactName?: string;
+    },
   ):
     | {
         status: number;
@@ -234,7 +237,11 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getDerivativeAccXpub(accountType, accountNumber),
+        data: this.hdWallet.getDerivativeAccXpub(
+          accountType,
+          accountNumber,
+          additional,
+        ),
       };
     } catch (err) {
       return {

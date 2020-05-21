@@ -6,3 +6,4 @@ export const TRUSTED_CONTACTS = 'TRUSTED_CONTACTS';
 
 // Third Party Services
 export const FAST_BITCOINS = 'FAST_BITCOINS';
+export const TRUSTED_ACCOUNTS = 'TRUSTED_ACCOUNTS';
