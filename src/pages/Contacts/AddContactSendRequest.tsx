@@ -42,6 +42,7 @@ export default function AddContactSendRequest(props) {
     React.createRef(),
   );
   const [trustedLink, setTrustedLink] = useState('');
+  const [trustedQR, setTrustedQR] = useState('');
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
@@ -77,6 +78,19 @@ export default function AddContactSendRequest(props) {
         })();
       } else {
         if (!trustedLink) createDeepLink();
+
+        if (!trustedQR) {
+          const publicKey =
+            trustedContacts.tc.trustedContacts[contactName].publicKey;
+
+          setTrustedQR(
+            JSON.stringify({
+              requester: WALLET_SETUP.walletName,
+              publicKey,
+              type: 'trustedContactQR',
+            }),
+          );
+        }
       }
     }
   }, [Contact, trustedContacts]);
@@ -171,6 +185,7 @@ export default function AddContactSendRequest(props) {
       <SendViaQR
         contactText={'Adding as a Trusted Contact:'}
         contact={Contact}
+        QR={trustedQR}
         contactEmail={''}
         onPressBack={() => {
           if (SendViaQRBottomSheet.current)
@@ -181,7 +196,7 @@ export default function AddContactSendRequest(props) {
         }}
       />
     );
-  }, [Contact]);
+  }, [Contact, trustedQR]);
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
