@@ -6,16 +6,12 @@ import {
   TrustedDataElements,
 } from './Interface';
 import crypto from 'crypto';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import config from '../Config';
 import { ec as EC } from 'elliptic';
+import { BH_AXIOS } from '../../services/api';
 var ec = new EC('curve25519');
 
-const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
-const BH_AXIOS: AxiosInstance = axios.create({
-  baseURL: RELAY,
-  timeout: REQUEST_TIMEOUT,
-});
+const { HEXA_ID } = config;
 
 export default class TrustedContacts {
   public static cipherSpec: {
@@ -54,13 +50,13 @@ export default class TrustedContacts {
     key?: string,
   ):
     | {
-        encryptedPub: string;
-        otp: string;
-      }
+      encryptedPub: string;
+      otp: string;
+    }
     | {
-        encryptedPub: string;
-        otp?: undefined;
-      } => {
+      encryptedPub: string;
+      otp?: undefined;
+    } => {
     let usedOTP = false;
     if (!key) {
       key = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
@@ -275,15 +271,15 @@ export default class TrustedContacts {
     fetch?: Boolean,
   ): Promise<
     | {
-        updated: any;
-        publicKey: string;
-        data: EphemeralData;
-      }
+      updated: any;
+      publicKey: string;
+      data: EphemeralData;
+    }
     | {
-        updated: any;
-        publicKey: string;
-        data?: undefined;
-      }
+      updated: any;
+      publicKey: string;
+      data?: undefined;
+    }
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -411,13 +407,13 @@ export default class TrustedContacts {
     fetch?: Boolean,
   ): Promise<
     | {
-        updated: any;
-        data: TrustedData;
-      }
+      updated: any;
+      data: TrustedData;
+    }
     | {
-        updated: any;
-        data?: undefined;
-      }
+      updated: any;
+      data?: undefined;
+    }
   > => {
     try {
       if (!this.trustedContacts[contactName]) {

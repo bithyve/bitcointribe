@@ -24,15 +24,15 @@ import {
   smsService,
   verifyEmailService,
   xpubService
-} from '../../services/bittr'
+} from '../../services/api'
 import { createWatcher } from '../utils/utilities'
 
 export function* createUserWorker({ payload }) {
   const result = yield call(createService, payload.data)
-  if(result && result.data && result.data){
+  if (result && result.data && result.data) {
     yield put(createUserSuccess(result.data))
   }
-  else{
+  else {
     yield put(createUserFail())
   }
 }

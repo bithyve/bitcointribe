@@ -54,7 +54,6 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import moment from 'moment';
-import axios from 'axios';
 
 import { UsNumberFormat } from '../../common/utilities';
 import TransactionDetails from './TransactionDetails';
@@ -330,16 +329,16 @@ export default function Accounts(props) {
   };
   function isEmpty(obj) {
     return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
-}
+  }
   const renderFBTC = (FBTCAccount, accountType) => {
     console.log("FBTCAccount, renderFBTC", isEmpty(FBTCAccount), accountType);
-    if(accountType){
-    if (accountType == 'Test Account')
-     return FBTCAccount.test_account.voucher.length && FBTCAccount.test_account.voucher[0].hasOwnProperty('quotes')
-    else if (accountType == 'Checking Account')
-      return FBTCAccount.checking_account.voucher.length && FBTCAccount.checking_account.voucher[0].hasOwnProperty('quotes');
-    else if (accountType == 'Savings Account')
-      return FBTCAccount.saving_account.length && FBTCAccount.saving_account.voucher[0].hasOwnProperty('quotes');
+    if (accountType) {
+      if (accountType == 'Test Account')
+        return FBTCAccount.test_account.voucher.length && FBTCAccount.test_account.voucher[0].hasOwnProperty('quotes')
+      else if (accountType == 'Checking Account')
+        return FBTCAccount.checking_account.voucher.length && FBTCAccount.checking_account.voucher[0].hasOwnProperty('quotes');
+      else if (accountType == 'Savings Account')
+        return FBTCAccount.saving_account.length && FBTCAccount.saving_account.voucher[0].hasOwnProperty('quotes');
     }
     return false;
   };
@@ -362,10 +361,10 @@ export default function Accounts(props) {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -457,27 +456,27 @@ export default function Accounts(props) {
             {GetBittrAccount.findIndex(
               (value) => value.accountType == item.type,
             ) > -1 ? (
-              <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.white,
-                  borderRadius: 15,
-                  padding: 5,
-                }}
-              >
-                <Image
+                <View
                   style={{
-                    marginLeft: 'auto',
-                    width: wp('3%'),
-                    height: wp('3%'),
-                    resizeMode: 'contain',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.white,
+                    borderRadius: 15,
                     padding: 5,
                   }}
-                  source={require('../../assets/images/icons/icon_getbitter.png')}
-                />
-              </View>
-            ) : null}
+                >
+                  <Image
+                    style={{
+                      marginLeft: 'auto',
+                      width: wp('3%'),
+                      height: wp('3%'),
+                      resizeMode: 'contain',
+                      padding: 5,
+                    }}
+                    source={require('../../assets/images/icons/icon_getbitter.png')}
+                  />
+                </View>
+              ) : null}
 
             {!isEmpty(FBTCAccount) ? renderFBTC(FBTCAccount, item.accountType) ? (
               <View
@@ -543,29 +542,29 @@ export default function Accounts(props) {
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
               />
             ) : (
-              <Image
-                style={styles.cardBitCoinImage}
-                source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-              />
-            )}
+                <Image
+                  style={styles.cardBitCoinImage}
+                  source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                />
+              )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(netBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
-                : exchangeRates
-                ? (
-                    (netBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
+                  ? UsNumberFormat(netBalance)
+                  : exchangeRates
+                    ? (
+                      (netBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                    : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : switchOn
-                ? 'sats'
-                : CurrencyCode.toLocaleLowerCase()}
+                  ? 'sats'
+                  : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -716,13 +715,13 @@ export default function Accounts(props) {
                           {item.accountType == 'Test Account'
                             ? UsNumberFormat(item.amount)
                             : switchOn
-                            ? UsNumberFormat(item.amount)
-                            : exchangeRates
-                            ? (
-                                (item.amount / 1e8) *
-                                exchangeRates[CurrencyCode].last
-                              ).toFixed(2)
-                            : null}
+                              ? UsNumberFormat(item.amount)
+                              : exchangeRates
+                                ? (
+                                  (item.amount / 1e8) *
+                                  exchangeRates[CurrencyCode].last
+                                ).toFixed(2)
+                                : null}
                         </Text>
                         <Text
                           style={{
@@ -736,8 +735,8 @@ export default function Accounts(props) {
                           {item.accountType == 'Test Account'
                             ? 't-sats'
                             : switchOn
-                            ? 'sats'
-                            : CurrencyCode.toLocaleLowerCase()}
+                              ? 'sats'
+                              : CurrencyCode.toLocaleLowerCase()}
                         </Text>
                       </View>
                       <Text
@@ -798,42 +797,62 @@ export default function Accounts(props) {
         ) : null}
       </View>
     ) : (
-      <View style={styles.modalContentContainer}>
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          {[1, 2, 3, 4, 5].map((value) => {
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingTop: wp('5%'),
-                  paddingBottom: wp('5%'),
-                  borderBottomWidth: 0.5,
-                  borderColor: Colors.borderColor,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                  <View>
+        <View style={styles.modalContentContainer}>
+          <View
+            style={{
+              flex: 1,
+            }}
+          >
+            {[1, 2, 3, 4, 5].map((value) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingTop: wp('5%'),
+                    paddingBottom: wp('5%'),
+                    borderBottomWidth: 0.5,
+                    borderColor: Colors.borderColor,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View
                       style={{
                         backgroundColor: Colors.backgroundColor,
                         height: wp('5%'),
-                        width: wp('25%'),
+                        width: wp('5%'),
+                        borderRadius: wp('5%') / 2,
+                        marginLeft: 10,
+                        marginRight: 10,
+                      }}
+                    />
+                    <View>
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('5%'),
+                          width: wp('25%'),
+                          borderRadius: 10,
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('5%'),
+                          width: wp('35%'),
+                          marginTop: 5,
+                          borderRadius: 10,
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('7%'),
+                        width: wp('20%'),
                         borderRadius: 10,
                       }}
                     />
@@ -841,72 +860,52 @@ export default function Accounts(props) {
                       style={{
                         backgroundColor: Colors.backgroundColor,
                         height: wp('5%'),
-                        width: wp('35%'),
-                        marginTop: 5,
-                        borderRadius: 10,
+                        width: wp('5%'),
+                        borderRadius: wp('5%') / 2,
+                        marginLeft: 10,
+                        marginRight: 10,
                       }}
                     />
                   </View>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('7%'),
-                      width: wp('20%'),
-                      borderRadius: 10,
-                    }}
-                  />
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                </View>
-              </View>
-            );
-          })}
-        </View>
-        <View style={{ backgroundColor: Colors.white }}>
-          <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
-              borderRadius: 7,
-            }}
-          >
-            <Text
+              );
+            })}
+          </View>
+          <View style={{ backgroundColor: Colors.white }}>
+            <View
               style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
+                margin: 15,
+                backgroundColor: Colors.backgroundColor,
+                padding: 10,
+                paddingTop: 20,
+                paddingBottom: 20,
+                marginBottom:
+                  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                borderRadius: 7,
               }}
             >
-              View your transactions here
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                View your transactions here
             </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              All your recent transactions across the accounts appear here
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                All your recent transactions across the accounts appear here
             </Text>
+            </View>
           </View>
         </View>
-      </View>
-    );
+      );
   };
 
   const renderTransactionsHeader = () => {
@@ -1254,7 +1253,7 @@ export default function Accounts(props) {
         </Text>
         <TouchableOpacity
           style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          onPress={() => { }}
         >
           <View
             style={{
@@ -1310,8 +1309,8 @@ export default function Accounts(props) {
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
-                    ? getServiceType(REGULAR_ACCOUNT)
-                    : getServiceType(SECURE_ACCOUNT);
+                      ? getServiceType(REGULAR_ACCOUNT)
+                      : getServiceType(SECURE_ACCOUNT);
                   handleIndexChange(index);
                 }}
                 renderItem={renderItem}
@@ -1446,45 +1445,45 @@ export default function Accounts(props) {
                               </View>
                             </View>
                           ) : (
-                            <View style={styles.modalElementInfoView}>
-                              <View style={{ justifyContent: 'center' }}>
-                                <FontAwesome
-                                  name={
-                                    item.transactionType == 'Received'
-                                      ? 'long-arrow-down'
-                                      : 'long-arrow-up'
-                                  }
-                                  size={15}
-                                  color={
-                                    item.transactionType == 'Received'
-                                      ? Colors.green
-                                      : Colors.red
-                                  }
-                                />
-                              </View>
-                              <View
-                                style={{
-                                  justifyContent: 'center',
-                                  marginLeft: 10,
-                                }}
-                              >
-                                <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
-                                </Text>
-                                <Text style={styles.transactionModalDateText}>
-                                  {moment(item.date)
-                                    .utc()
-                                    .format('DD MMMM YYYY')}{' '}
-                                  {/* <Entypo
+                              <View style={styles.modalElementInfoView}>
+                                <View style={{ justifyContent: 'center' }}>
+                                  <FontAwesome
+                                    name={
+                                      item.transactionType == 'Received'
+                                        ? 'long-arrow-down'
+                                        : 'long-arrow-up'
+                                    }
+                                    size={15}
+                                    color={
+                                      item.transactionType == 'Received'
+                                        ? Colors.green
+                                        : Colors.red
+                                    }
+                                  />
+                                </View>
+                                <View
+                                  style={{
+                                    justifyContent: 'center',
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  <Text style={styles.transactionModalTitleText}>
+                                    {item.accountType}{' '}
+                                  </Text>
+                                  <Text style={styles.transactionModalDateText}>
+                                    {moment(item.date)
+                                      .utc()
+                                      .format('DD MMMM YYYY')}{' '}
+                                    {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                  {/* {item.time} */}
-                                </Text>
+                                    {/* {item.time} */}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
+                            )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1516,13 +1515,13 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                  ? UsNumberFormat(item.amount)
-                                  : exchangeRates
-                                  ? (
-                                      (item.amount / 1e8) *
-                                      exchangeRates[CurrencyCode].last
-                                    ).toFixed(2)
-                                  : null}
+                                    ? UsNumberFormat(item.amount)
+                                    : exchangeRates
+                                      ? (
+                                        (item.amount / 1e8) *
+                                        exchangeRates[CurrencyCode].last
+                                      ).toFixed(2)
+                                      : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1538,8 +1537,8 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                  ? 'sats'
-                                  : CurrencyCode.toLocaleLowerCase()}
+                                    ? 'sats'
+                                    : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1567,20 +1566,20 @@ export default function Accounts(props) {
                                 />
                               </View>
                             ) : (
-                              <View
-                                style={{
-                                  padding: 10,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Ionicons
-                                  name="ios-arrow-forward"
-                                  color={Colors.textColorGrey}
-                                  size={12}
-                                />
-                              </View>
-                            )}
+                                <View
+                                  style={{
+                                    padding: 10,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Ionicons
+                                    name="ios-arrow-forward"
+                                    color={Colors.textColorGrey}
+                                    size={12}
+                                  />
+                                </View>
+                              )}
                           </View>
                         </TouchableOpacity>
                       );
@@ -1849,13 +1848,13 @@ export default function Accounts(props) {
           />
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{
-            backgroundColor: Colors.backgroundColor,
-          }}
-          refreshControl={<RefreshControl refreshing={!is_initiated} />}
-        />
-      )}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={<RefreshControl refreshing={!is_initiated} />}
+          />
+        )}
     </View>
   );
   //  } else {

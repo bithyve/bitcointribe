@@ -290,13 +290,10 @@ DEPENDENCIES:
   - yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
     - boost-for-react-native
     - Crashlytics
     - Fabric
-    - PDFGenerator
-    - QRCoder
-  trunk:
     - Firebase
     - FirebaseAnalytics
     - FirebaseAnalyticsInterop
@@ -306,7 +303,9 @@ SPEC REPOS:
     - GoogleAppMeasurement
     - GoogleUtilities
     - nanopb
+    - PDFGenerator
     - Protobuf
+    - QRCoder
 
 EXTERNAL SOURCES:
   DoubleConversion:

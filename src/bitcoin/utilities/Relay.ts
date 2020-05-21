@@ -1,13 +1,8 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import config from '../Config';
 import { INotification } from './Interface';
-
-const { RELAY, HEXA_ID, REQUEST_TIMEOUT } = config;
-const BH_AXIOS: AxiosInstance = axios.create({
-  baseURL: RELAY,
-  timeout: REQUEST_TIMEOUT,
-});
-
+import { BH_AXIOS } from '../../services/api';
+const { HEXA_ID } = config;
 export default class Relay {
   public static fetchReleases = async (
     build: string,

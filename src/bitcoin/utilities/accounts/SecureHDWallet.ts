@@ -14,14 +14,9 @@ import {
 } from '../Interface';
 import Bitcoin from './Bitcoin';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
+import { SIGNING_AXIOS } from '../../../services/api';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
-
-const BH_AXIOS: AxiosInstance = axios.create({
-  baseURL: SIGNING_SERVER,
-  timeout: REQUEST_TIMEOUT,
-});
-
 export default class SecureHDWallet extends Bitcoin {
   public twoFASetup: {
     qrData: string;
@@ -64,11 +59,11 @@ export default class SecureHDWallet extends Bitcoin {
     iv: Buffer;
     keyLength: number;
   } = {
-    algorithm: 'aes-192-cbc',
-    salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
-    keyLength: 24,
-    iv: Buffer.alloc(16, 0),
-  };
+      algorithm: 'aes-192-cbc',
+      salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
+      keyLength: 24,
+      iv: Buffer.alloc(16, 0),
+    };
 
   constructor(
     primaryMnemonic: string,
@@ -170,7 +165,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('importBHXpub', {
+      res = await SIGNING_AXIOS.post('importBHXpub', {
         HEXA_ID,
         token,
         walletID: walletId,
@@ -251,7 +246,7 @@ export default class SecureHDWallet extends Bitcoin {
     const { walletId } = this.getWalletId();
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('checkSecureHealth', {
+      res = await SIGNING_AXIOS.post('checkSecureHealth', {
         HEXA_ID,
         chunk,
         pos,
@@ -463,7 +458,7 @@ export default class SecureHDWallet extends Bitcoin {
         if (
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
-            itr <
+          itr <
           0
         ) {
           continue;
@@ -600,7 +595,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       console.log({ SIGNING_SERVER });
 
-      res = await BH_AXIOS.post('setupSecureAccount', {
+      res = await SIGNING_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
         secondaryID,
@@ -661,7 +656,7 @@ export default class SecureHDWallet extends Bitcoin {
     let res: AxiosResponse;
     const { secondaryID } = this.getSecondaryID(secondaryMnemonic);
     try {
-      res = await BH_AXIOS.post('resetTwoFA', {
+      res = await SIGNING_AXIOS.post('resetTwoFA', {
         HEXA_ID,
         walletID: this.walletID,
         secondaryID,
@@ -678,7 +673,7 @@ export default class SecureHDWallet extends Bitcoin {
   public isActive = async (): Promise<{ isActive: boolean }> => {
     let res: AxiosResponse;
     try {
-      res = await BH_AXIOS.post('isSecureActive', {
+      res = await SIGNING_AXIOS.post('isSecureActive', {
         HEXA_ID,
         walletID: this.walletID,
       });
@@ -828,15 +823,15 @@ export default class SecureHDWallet extends Bitcoin {
     averageTxFees?: any,
   ): Promise<
     | {
-        fee: number;
-        balance: number;
-        txPrerequisites?: undefined;
-      }
+      fee: number;
+      balance: number;
+      txPrerequisites?: undefined;
+    }
     | {
-        txPrerequisites: TransactionPrerequisite;
-        fee?: undefined;
-        balance?: undefined;
-      }
+      txPrerequisites: TransactionPrerequisite;
+      fee?: undefined;
+      balance?: undefined;
+    }
   > => {
     const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
     console.log('Input UTXOs:', inputUTXOs);
@@ -1015,7 +1010,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       let res: AxiosResponse;
       try {
-        res = await BH_AXIOS.post('secureHDTransaction', {
+        res = await SIGNING_AXIOS.post('secureHDTransaction', {
           HEXA_ID,
           walletID: this.walletID,
           token,
@@ -1411,8 +1406,8 @@ export default class SecureHDWallet extends Bitcoin {
 
     const multiSig = this.createSecureMultiSig(
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-        this.gapLimit -
-        1,
+      this.gapLimit -
+      1,
       this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
@@ -1447,7 +1442,7 @@ export default class SecureHDWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${config.DPATH_PURPOSE}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
