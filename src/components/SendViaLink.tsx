@@ -28,7 +28,7 @@ export default function SendViaLink(props) {
   const [shareLink, setShareLink] = useState(
     'http://hexawallet.io/trustedcontacts/ubcskuejm',
   );
-  const contact = props.contact;
+  
   const [shareApps, setShareApps] = useState([
     {
       title: `WhatsApp`,
@@ -55,28 +55,35 @@ export default function SendViaLink(props) {
       isAvailable: true,
     },
   ]);
+  const contact = props.contact;
+  //console.log("Contact SEND VIA LINK", contact);
+  const [Contact, setContact] = useState(props.contact ? props.contact : {});
   
   useEffect(() => {
     let contactName =
-      props.contact.firstName && props.contact.lastName
-        ? props.contact.firstName + ' ' + props.contact.lastName
-        : props.contact.firstName && !props.contact.lastName
-        ? props.contact.firstName
-        : !props.contact.firstName && props.contact.lastName
-        ? props.contact.lastName
+    Contact && Contact.firstName && Contact.lastName
+        ? Contact.firstName + ' ' + Contact.lastName
+        : Contact && Contact.firstName && !Contact.lastName
+        ? Contact.firstName
+        : Contact && !Contact.firstName && Contact.lastName
+        ? Contact.lastName
         : '';
     setContactName(contactName);
-  }, []);
+  }, [Contact]);
 
   useEffect(() => {
+    //console.log("Contact SEND VIA LINK1 ", contact);
+    setContact(props.contact);
     (async () => {
       for (let i = 0; i < shareApps.length; i++) {
         if (shareApps[i].url) {
           let supported = await Linking.canOpenURL(shareApps[i].url);
           shareApps[i].isAvailable = supported;
+          //console.log("supported", supported);
         }
       }
       setShareApps(shareApps);
+      
     })();
   }, [contact]);
 
@@ -90,7 +97,7 @@ export default function SendViaLink(props) {
       let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
       Linking.openURL(url)
         .then((data) => {
-          console.log('WhatsApp Opened');
+          //console.log('WhatsApp Opened');
         })
         .catch(() => {
           alert('Make sure WhatsApp installed on your device');
@@ -103,7 +110,7 @@ export default function SendViaLink(props) {
       let url = appUrl + shareLink;
       Linking.openURL(url)
         .then((data) => {
-          console.log('Telegram Opened');
+          //console.log('Telegram Opened');
         })
         .catch(() => {
           alert('Make sure Telegram installed on your device');
@@ -116,7 +123,7 @@ export default function SendViaLink(props) {
       let url = appUrl;
       Linking.openURL(url)
         .then((data) => {
-          console.log('Messenger Opened');
+          //console.log('Messenger Opened');
         })
         .catch(() => {
           alert('Make sure Facebook Messenger installed on your device');
@@ -221,36 +228,32 @@ export default function SendViaLink(props) {
                 {contactName ? (
                   <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
-                {props.contact && props.contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {props.contact.phoneNumbers[0].digits}
-                  </Text>
-                ) : null}
-                {props.contact && props.contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {props.contact.emails[0].email}
-                  </Text>
-                ) : null}
+                {Contact && Contact.phoneNumbers.length ? <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 25,
+                    paddingTop: 3,
+                  }}
+                >
+                  {Contact.phoneNumbers[0].digits}
+                </Text> : null }
+                {Contact && Contact.emails.length ? <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 25,
+                    paddingTop: 3,
+                    paddingBottom: 5,
+                  }}
+                >
+                  {Contact.emails[0].email}
+                </Text> : null}
               </View>
             </View>
-            {props.contact.imageAvailable ? (
+            {Contact && Contact.imageAvailable ? (
               <View
                 style={{
                   position: 'absolute',
@@ -263,7 +266,7 @@ export default function SendViaLink(props) {
                 }}
               >
                 <Image
-                  source={props.contact.image}
+                  source={Contact.image}
                   style={{ ...styles.contactProfileImage }}
                 />
               </View>

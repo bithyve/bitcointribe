@@ -41,6 +41,10 @@ import {
   ErrorSending,
 } from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
+import RequestModalContents from '../../components/RequestModalContents';
+import TransparentHeaderModal from '../../components/TransparentHeaderModal';
+import SendViaLink from '../../components/SendViaLink';
+import SendViaQR from '../../components/SendViaQR';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -63,6 +67,16 @@ const TrustedContactHistory = (props) => {
   const [chosenContactIndex, setChosenContactIndex] = useState(1);
   const [chosenContact, setChosenContact] = useState({});
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+    React.createRef(),
+  );
+
+  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [requestBottomSheet, setRequestBottomSheet] = useState(
     React.createRef(),
   );
   const [
@@ -134,6 +148,23 @@ const TrustedContactHistory = (props) => {
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
   );
+  function isEmpty(obj) {
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+  }
+  useEffect(() => {
+    (async () => {
+      let selectedContactModeTemp = await AsyncStorage.getItem(
+        'selectedContactMode',
+      );
+      setSelectedContactMode(JSON.parse(selectedContactModeTemp));
+      const shareHistory = JSON.parse(
+        await AsyncStorage.getItem('shareHistory'),
+      );
+      //console.log("test",{ shareHistory });
+      if (shareHistory) updateHistory(shareHistory);
+    })();
+    setContactInfo();
+  }, []);
 
   const setContactInfo = useCallback(async () => {
     let SelectedContactsTemp = JSON.parse(
@@ -168,7 +199,8 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[0]);
       }, 2);
       (trustedContactsBottomSheet as any).current.snapTo(0);
-      (CommunicationModeBottomSheet as any).current.snapTo(1);
+      //(CommunicationModeBottomSheet as any).current.snapTo(1);
+      (requestBottomSheet as any).current.snapTo(1);
     },
     [SelectedContacts, chosenContact],
   );
@@ -481,7 +513,7 @@ const TrustedContactHistory = (props) => {
   //     dispatch(uploadEncMShare(index));
   //   else {
   //     //  Alert.alert('OTP', SHARES_TRANSFER_DETAILS[index].OTP);
-  //     console.log(SHARES_TRANSFER_DETAILS[index]);
+  //     //console.log(SHARES_TRANSFER_DETAILS[index]);
   //   }
   // }, [SHARES_TRANSFER_DETAILS[index]]);
 
@@ -489,14 +521,15 @@ const TrustedContactHistory = (props) => {
     let selectedContactList = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
     );
-    console.log({ selectedContactList });
-    console.log({ chosenContact });
+    //console.log({ selectedContactList });
+    //console.log({ chosenContact });
     if (selectedTitle == 'Trusted Contact 1') {
       setChosenContact(selectedContactList[0]);
     } else if (selectedTitle == 'Trusted Contact 2') {
       setChosenContact(selectedContactList[1]);
     }
-    (CommunicationModeBottomSheet as any).current.snapTo(1);
+    // (CommunicationModeBottomSheet as any).current.snapTo(1);
+    (requestBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);
   }, [selectedTitle, chosenContact]);
 
@@ -659,21 +692,6 @@ const TrustedContactHistory = (props) => {
     }
   }, [next]);
 
-  useEffect(() => {
-    (async () => {
-      let selectedContactModeTemp = await AsyncStorage.getItem(
-        'selectedContactMode',
-      );
-      setSelectedContactMode(JSON.parse(selectedContactModeTemp));
-      const shareHistory = JSON.parse(
-        await AsyncStorage.getItem('shareHistory'),
-      );
-      console.log({ shareHistory });
-      if (shareHistory) updateHistory(shareHistory);
-    })();
-    setContactInfo();
-  }, []);
-
   const getImageIcon = () => {
     if (chosenContact.name) {
       if (chosenContact.imageAvailable) {
@@ -740,6 +758,96 @@ const TrustedContactHistory = (props) => {
       />
     );
   };
+
+  const RequestModalContentFunction = useCallback(() => {
+    //console.log("chosenContact", chosenContact);
+    if (!isEmpty(chosenContact)) {
+      return (
+        <RequestModalContents
+          contact={chosenContact ? chosenContact : null}
+          textHeader={'Requesting Recovery Secret From'}
+          onPressViaQr={() => {
+            if (SendViaQRBottomSheet.current)
+              (SendViaQRBottomSheet as any).current.snapTo(1);
+          }}
+          onPressViaLink={() => {
+            if (SendViaLinkBottomSheet.current)
+              (SendViaLinkBottomSheet as any).current.snapTo(1);
+          }}
+        />
+      );
+    }
+  }, [chosenContact]);
+
+  const RequestHeaderFunction = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (requestBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSendViaLinkContents = useCallback(() => {
+    if (!isEmpty(chosenContact)) {
+      return (
+        <SendViaLink
+          contactText={'Adding as a Trusted Contact:'}
+          contact={chosenContact ? chosenContact : null}
+          contactEmail={''}
+          onPressBack={() => {
+            if (SendViaLinkBottomSheet.current)
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+          }}
+          onPressDone={() => {
+            (SendViaLinkBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }
+  }, [chosenContact]);
+
+  const renderSendViaLinkHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (SendViaLinkBottomSheet.current)
+            (SendViaLinkBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderSendViaQRContents = useCallback(() => {
+    if (!isEmpty(chosenContact)) {
+      return (
+        <SendViaQR
+          contactText={'Adding as a Trusted Contact:'}
+          contact={chosenContact ? chosenContact : null}
+          contactEmail={''}
+          onPressBack={() => {
+            if (SendViaQRBottomSheet.current)
+              (SendViaQRBottomSheet as any).current.snapTo(0);
+          }}
+          onPressDone={() => {
+            (SendViaQRBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }
+  }, [chosenContact]);
+
+  const renderSendViaQRHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (SendViaQRBottomSheet.current)
+            (SendViaQRBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -935,6 +1043,36 @@ const TrustedContactHistory = (props) => {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={requestBottomSheet as any}
+        snapPoints={[
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('65%'),
+        ]}
+        renderContent={RequestModalContentFunction}
+        renderHeader={RequestHeaderFunction}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendViaLinkBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+        ]}
+        renderContent={renderSendViaLinkContents}
+        renderHeader={renderSendViaLinkHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendViaQRBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+        ]}
+        renderContent={renderSendViaQRContents}
+        renderHeader={renderSendViaQRHeader}
       />
     </View>
   );

@@ -18,17 +18,26 @@ export default function SendViaQR(props) {
   const [receivingAddress, setReceivingAddress] = useState('http://hexawallet.io/trustedcontacts/ubcskuejm');
   const [contactName, setContactName] = useState('');
 
+  const contact = props.contact;
+
+  const [Contact, setContact] = useState(props.contact ? props.contact : {});
+  useEffect(() => {
+    if (contact) {
+      setContact(props.contact);
+    }
+  }, [contact]);
+  
     useEffect(()=>{
-      let contactName = props.contact.firstName && props.contact.lastName
-      ? props.contact.firstName + ' ' + props.contact.lastName
-      : props.contact.firstName && !props.contact.lastName
-      ? props.contact.firstName
-      : !props.contact.firstName && props.contact.lastName
-      ? props.contact.lastName
-      : '';
-      console.log("contactName",contactName)
-      setContactName(contactName);
-   },[]);
+      let contactName =
+    Contact && Contact.firstName && Contact.lastName
+        ? Contact.firstName + ' ' + Contact.lastName
+        : Contact && Contact.firstName && !Contact.lastName
+        ? Contact.firstName
+        : Contact && !Contact.firstName && Contact.lastName
+        ? Contact.lastName
+        : '';
+    setContactName(contactName);
+   },[Contact]);
 
   return (
     <View style={styles.modalContainer}>
@@ -125,7 +134,7 @@ export default function SendViaQR(props) {
                 {contactName ? (
                   <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
-                {props.contact.phoneNumbers.length ? <Text
+                {Contact && Contact.phoneNumbers.length ? <Text
                   style={{
                     color: Colors.textColorGrey,
                     fontFamily: Fonts.FiraSansRegular,
@@ -134,9 +143,9 @@ export default function SendViaQR(props) {
                     paddingTop: 3,
                   }}
                 >
-                  {props.contact.phoneNumbers[0].digits}
+                  {Contact && Contact.phoneNumbers[0].digits}
                 </Text> : null }
-                {props.contact.emails.length ? <Text
+                {Contact && Contact.emails.length ? <Text
                   style={{
                     color: Colors.textColorGrey,
                     fontFamily: Fonts.FiraSansRegular,
@@ -146,11 +155,11 @@ export default function SendViaQR(props) {
                     paddingBottom: 5,
                   }}
                 >
-                  {props.contact.emails[0].email}
+                  {Contact && Contact.emails[0].email}
                 </Text> : null}
               </View>
             </View>
-            {props.contact && props.contact.imageAvailable ? (
+            {Contact && Contact.imageAvailable ? (
               <View
               style={{
                 position: 'absolute',
@@ -163,7 +172,7 @@ export default function SendViaQR(props) {
               }}
             >
               <Image
-                source={props.contact.image}
+                source={Contact && Contact.image}
                 style={{ ...styles.contactProfileImage }}
               />
               </View>
