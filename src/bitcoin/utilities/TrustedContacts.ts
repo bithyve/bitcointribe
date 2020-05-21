@@ -118,21 +118,15 @@ export default class TrustedContacts {
   }
 
   public encryptData = (key: string, dataPacket: any) => {
-    console.log({ key, dataPacket });
-    console.log({ cipherSpec: TrustedContacts.cipherSpec });
-
     key = key.slice(key.length - TrustedContacts.cipherSpec.keyLength);
     const cipher = crypto.createCipheriv(
       TrustedContacts.cipherSpec.algorithm,
       key,
       TrustedContacts.cipherSpec.iv,
     );
-    console.log({ dataPacket });
     dataPacket.validator = config.HEXA_ID;
-    console.log({ dataPacket });
     let encrypted = cipher.update(JSON.stringify(dataPacket), 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    console.log({ encrypted });
     return { encryptedData: encrypted };
   };
 
@@ -147,7 +141,6 @@ export default class TrustedContacts {
     decrypted += decipher.final('utf8');
 
     const data = JSON.parse(decrypted);
-    console.log({ decryptedData: data });
     if (data.validator !== config.HEXA_ID) {
       throw new Error(
         'Decryption failed, invalid validator for the following data packet',
@@ -241,7 +234,6 @@ export default class TrustedContacts {
       },
       contactsPubKey: encodedPublicKey,
     };
-    console.log({ contactName: this.trustedContacts[contactName] });
     return {
       channelAddress,
       ephemeralAddress,
@@ -488,7 +480,6 @@ export default class TrustedContacts {
         data: encryptedDataPacket,
         fetch,
       });
-      console.log({ res });
       let { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
 
