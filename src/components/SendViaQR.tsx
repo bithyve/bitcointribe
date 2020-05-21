@@ -107,7 +107,7 @@ export default function SendViaQR(props) {
                 borderRadius: 10,
               }}
             >
-              <View style={{ marginLeft: 70 }}>
+             <View style={{ marginLeft: 70 }}>
                 {props.contactText ? (
                   <Text
                     style={{
@@ -116,36 +116,57 @@ export default function SendViaQR(props) {
                       fontSize: RFValue(11),
                       marginLeft: 25,
                       paddingTop: 5,
-                      paddingBottom: 5,
+                    paddingBottom: 3,
                     }}
                   >
                     {props.contactText}
                   </Text>
                 ) : null}
-                {contactName ? 
-                <Text style={styles.contactNameText}>{contactName}</Text>
-                : null}
-                {props.contactEmail ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 5,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {props.contactEmail}
-                  </Text>
+                {contactName ? (
+                  <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
+                {props.contact.phoneNumbers.length ? <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 25,
+                    paddingTop: 3,
+                  }}
+                >
+                  {props.contact.phoneNumbers[0].digits}
+                </Text> : null }
+                {props.contact.emails.length ? <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 25,
+                    paddingTop: 3,
+                    paddingBottom: 5,
+                  }}
+                >
+                  {props.contact.emails[0].email}
+                </Text> : null}
               </View>
             </View>
             {props.contact && props.contact.imageAvailable ? (
+              <View
+              style={{
+                position: 'absolute',
+                marginLeft: 15,
+                marginRight: 15,
+                alignItems: 'center',
+                justifyContent: 'center',
+                shadowOpacity: 1,
+                shadowOffset: { width: 2, height: 2 },
+              }}
+            >
               <Image
                 source={props.contact.image}
                 style={{ ...styles.contactProfileImage }}
               />
+              </View>
             ) : (
               <View
                 style={{
@@ -154,10 +175,13 @@ export default function SendViaQR(props) {
                   marginRight: 15,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: Colors.shadowBlue,
+                  backgroundColor: Colors.backgroundColor,
                   width: 70,
                   height: 70,
                   borderRadius: 70 / 2,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
                 }}
               >
                 <Text
@@ -228,14 +252,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contactProfileImage: {
+    borderRadius: 60 / 2,
     width: 60,
     height: 60,
     resizeMode: 'cover',
-    borderRadius: 60 / 2,
-    elevation: 20,
-    shadowColor: Colors.borderColor,
+    shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 1, height: 4 },
+    shadowOffset: { width: 15, height: 15 },
   },
   contactNameText: {
     color: Colors.textColorGrey,
