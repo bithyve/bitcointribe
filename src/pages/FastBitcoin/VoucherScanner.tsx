@@ -12,6 +12,7 @@ import {
   AsyncStorage,
   Linking,
   TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -54,10 +55,12 @@ import {
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import { FBTC_REGISTRATION_URL } from 'react-native-dotenv';
+import Toast from '../../components/Toast';
 
 const VoucherScanner = (props) => {
   const userKey1 = props.navigation.state.params
-  ? props.navigation.state.params.userKey : '';
+    ? props.navigation.state.params.userKey
+    : '';
   const [bitcoinAddress, setBitcoinAddress] = useState('');
   const QuoteDetails = useSelector((state) => state.fbtc.getQuoteDetails);
   const executeOrderDetails = useSelector(
@@ -71,20 +74,26 @@ const VoucherScanner = (props) => {
   const [userKey, setUserKey] = useState(userKey1);
   const accounts1 = useSelector((state) => state.accounts);
   const accountsSyncFail = useSelector((state) => state.fbtc.accountSyncFail);
-  const accountSyncFailMessage = useSelector((state) => state.fbtc.accountSyncFailMessage);
-  
+  const accountSyncFailMessage = useSelector(
+    (state) => state.fbtc.accountSyncFailMessage,
+  );
+
   const IsGetQuoteFail = useSelector((state) => state.fbtc.getQuoteFail);
-  const getQuoteFailMessage = useSelector((state) => state.fbtc.getQuoteFailMessage);
+  const getQuoteFailMessage = useSelector(
+    (state) => state.fbtc.getQuoteFailMessage,
+  );
 
   const IsExecuteOrderFail = useSelector((state) => state.fbtc.accountSyncFail);
-  const executeOrderFailMessage = useSelector((state) => state.fbtc.accountSyncFailMessage);
+  const executeOrderFailMessage = useSelector(
+    (state) => state.fbtc.accountSyncFailMessage,
+  );
 
   const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
   const dispatch = useDispatch();
   const accountSyncDetails = useSelector(
     (state) => state.fbtc.accountSyncDetails,
   );
-  
+
   const [errorTitle, setErrorTitle] = useState('');
   const [errorInfo, setErrorInfo] = useState('');
   const [errorNote, setErrorNote] = useState('');
@@ -99,11 +108,10 @@ const VoucherScanner = (props) => {
     secureBalance: 0,
     accumulativeBalance: 0,
   });
-  
-  const [
-    ErrorModalBottomSheet,
-    setErrorModalBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
+
+  const [ErrorModalBottomSheet, setErrorModalBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
   const [
     RegistrationSuccessBottomSheet,
     setRegistrationSuccessBottomSheet,
@@ -122,17 +130,17 @@ const VoucherScanner = (props) => {
   const [Quote, setQuote] = useState({});
   const accounts = [
     {
+      accountType: '',
+      accountName: 'Choose the deposit Account',
+      amount: '',
+      image: require('../../assets/images/icons/icon_test.png'),
+    },
+    {
       accountType: REGULAR_ACCOUNT,
       accountName: 'Checking Account',
       amount: '5,000',
       image: require('../../assets/images/icons/icon_regular.png'),
     },
-    // {
-    //   accountType: TEST_ACCOUNT,
-    //   accountName: 'Test Account',
-    //   amount: '2,000',
-    //   image: require('../../assets/images/icons/icon_test.png'),
-    // },
     {
       accountType: SECURE_ACCOUNT,
       accountName: 'Saving Account',
@@ -141,28 +149,32 @@ const VoucherScanner = (props) => {
     },
   ];
   const [selectedAccount, setSelectedAccount] = useState({
-    accountType: REGULAR_ACCOUNT,
-    accountName: 'Checking Account',
-    amount: '5,000',
-    image: require('../../assets/images/icons/icon_regular.png'),
+    accountType: '',
+    accountName: 'Choose the deposit Account',
+    amount: '',
+    image: require('../../assets/images/icons/icon_test.png'),
   });
-  const service = useSelector(
-    (state) => state.accounts[selectedAccount.accountType].service,
+  let service = useSelector(
+    (state) => state.accounts[selectedAccount.accountType],
   );
 
   useEffect(() => {
     (async () => {
-      if(userKey1){
-        let voucherCodeTemp = JSON.parse(await AsyncStorage.getItem("voucherData"));
-        console.log("voucherCodeTemp", voucherCodeTemp);
-        if(voucherCodeTemp){
-          console.log("voucherCodeTemp 1", voucherCodeTemp);
+      if (userKey1) {
+        let voucherCodeTemp = JSON.parse(
+          await AsyncStorage.getItem('voucherData'),
+        );
+        console.log('voucherCodeTemp', voucherCodeTemp);
+        if (voucherCodeTemp) {
+          console.log('voucherCodeTemp 1', voucherCodeTemp);
           setVoucherCode(voucherCodeTemp.voucher_code);
           setSelectedAccount(voucherCodeTemp.selectedAccount);
         }
       }
-      let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    console.log("getFBTCAccount", getFBTCAccount);
+      let getFBTCAccount = JSON.parse(
+        await AsyncStorage.getItem('FBTCAccount'),
+      );
+      console.log('getFBTCAccount', getFBTCAccount);
       let FBTCAccountData = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
       );
@@ -173,21 +185,24 @@ const VoucherScanner = (props) => {
   }, []);
 
   useEffect(() => {
-    const accountNumber = 0;
-    const { derivativeAccounts } =
-      selectedAccount.accountType === SECURE_ACCOUNT
-        ? service.secureHDWallet
-        : service.hdWallet;
+    console.log('service', service);
+    if (service) {
+      const accountNumber = 0;
+      const { derivativeAccounts } =
+        selectedAccount.accountType === SECURE_ACCOUNT
+          ? service.service.secureHDWallet
+          : service.service.hdWallet;
 
-    if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
-      dispatch(
-        fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
-      );
-    else {
-      if (derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress) {
-        setBitcoinAddress(
-          derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
+      if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
+        dispatch(
+          fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
         );
+      else {
+        if (derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress) {
+          setBitcoinAddress(
+            derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
+          );
+        }
       }
     }
   }, [selectedAccount]);
@@ -216,31 +231,34 @@ const VoucherScanner = (props) => {
     });
   }, [accounts1]);
 
-  useEffect(()=>{
-    if(voucherCode){
-      (async () => {
-        let voucherDataTemp = JSON.parse(
-          await AsyncStorage.getItem('voucherData'),
-        );
-        voucherDataTemp = {
-          voucher_code: voucherCode,
-          selectedAccount: selectedAccount,
-        };
-        await AsyncStorage.setItem(
-          'voucherData',
-          JSON.stringify(voucherDataTemp),
-        );
-        let voucherDataAfterAdd = JSON.parse(
-          await AsyncStorage.getItem('voucherData'),
-        );
-        console.log("voucherDataAfterAdd 3", voucherDataAfterAdd);
-      })();
-      if (isUserRegistered){
-        if(voucherCode && selectedAccount)
-        createFBTCAccount();
-      } else{
-        if(voucherCode && selectedAccount && !userKey1)
-        AccountVerificationBottomSheet.current.snapTo(1);
+  useEffect(() => {
+      if (voucherCode) {
+        if (selectedAccount.accountType != '') {
+        (async () => {
+          let voucherDataTemp = JSON.parse(
+            await AsyncStorage.getItem('voucherData'),
+          );
+          voucherDataTemp = {
+            voucher_code: voucherCode,
+            selectedAccount: selectedAccount,
+          };
+          await AsyncStorage.setItem(
+            'voucherData',
+            JSON.stringify(voucherDataTemp),
+          );
+          let voucherDataAfterAdd = JSON.parse(
+            await AsyncStorage.getItem('voucherData'),
+          );
+          console.log('voucherDataAfterAdd 3', voucherDataAfterAdd);
+        })();
+        if (isUserRegistered) {
+          if (voucherCode && selectedAccount) createFBTCAccount();
+        } else {
+          if (voucherCode && selectedAccount && !userKey1)
+            AccountVerificationBottomSheet.current.snapTo(1);
+        }
+      } else {
+        Toast('Please select Account');
       }
     }
   }, [selectedAccount, voucherCode]);
@@ -250,7 +268,7 @@ const VoucherScanner = (props) => {
       if (barcodes.data.includes('fastbitcoins.com')) {
         let tempData = barcodes.data.split('/');
         setVoucherCode(tempData[tempData.length - 1]);
-        console.log("tempData 2", tempData)
+        console.log('tempData 2', tempData);
       }
       setOpenCameraFlag(false);
     }
@@ -261,8 +279,16 @@ const VoucherScanner = (props) => {
     let temp = true;
     for (let i = 0; i < fBTCAccount.test_account.voucher.length; i++) {
       const element = fBTCAccount.test_account.voucher[i];
-      if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
-        console.log("test voucherCode, element.voucherCode , element.hasOwnProperty('quotes')", voucherCode, element.voucherCode, element.hasOwnProperty('quotes'))
+      if (
+        voucherCode == element.voucherCode &&
+        element.hasOwnProperty('quotes')
+      ) {
+        console.log(
+          "test voucherCode, element.voucherCode , element.hasOwnProperty('quotes')",
+          voucherCode,
+          element.voucherCode,
+          element.hasOwnProperty('quotes'),
+        );
         temp = false;
         break;
       }
@@ -270,8 +296,16 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.checking_account.voucher.length; i++) {
         const element = fBTCAccount.checking_account.voucher[i];
-        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
-          console.log("checking voucherCode, element.voucherCode , element.hasOwnProperty('quotes')", voucherCode, element.voucherCode, element.hasOwnProperty('quotes'))
+        if (
+          voucherCode == element.voucherCode &&
+          element.hasOwnProperty('quotes')
+        ) {
+          console.log(
+            "checking voucherCode, element.voucherCode , element.hasOwnProperty('quotes')",
+            voucherCode,
+            element.voucherCode,
+            element.hasOwnProperty('quotes'),
+          );
           temp = false;
           break;
         }
@@ -280,15 +314,23 @@ const VoucherScanner = (props) => {
     if (temp) {
       for (let i = 0; i < fBTCAccount.saving_account.voucher.length; i++) {
         const element = fBTCAccount.saving_account.voucher[i];
-        if (voucherCode == element.voucherCode && element.hasOwnProperty('quotes')) {
-          console.log("saving voucherCode, element.voucherCode , element.hasOwnProperty('quotes')", voucherCode, element.voucherCode, element.hasOwnProperty('quotes'))
+        if (
+          voucherCode == element.voucherCode &&
+          element.hasOwnProperty('quotes')
+        ) {
+          console.log(
+            "saving voucherCode, element.voucherCode , element.hasOwnProperty('quotes')",
+            voucherCode,
+            element.voucherCode,
+            element.hasOwnProperty('quotes'),
+          );
           temp = false;
           break;
         }
       }
     }
     if (temp) {
-      console.log("temp", temp)
+      console.log('temp', temp);
       let accountType = 'saving_account';
       if (selectedAccount.accountType == TEST_ACCOUNT) {
         accountType = 'test_account';
@@ -298,13 +340,12 @@ const VoucherScanner = (props) => {
       fBTCAccount[accountType].voucher.push({
         voucherCode: voucherCode,
       });
-      console.log("after temp FBTCAccount", fBTCAccount)
+      console.log('after temp FBTCAccount', fBTCAccount);
       if (fBTCAccount.redeem_vouchers) getQuoteDetailsMethod();
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
-    }
-    else{
+    } else {
       setTimeout(() => {
-        setErrorTitle("This voucher already redeemed");
+        setErrorTitle('This voucher already redeemed');
         setErrorProccedButtonText('Done');
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
@@ -344,7 +385,8 @@ const VoucherScanner = (props) => {
       !obj.hasOwnProperty('redeem_vouchers') &&
       !obj.hasOwnProperty('exchange_balances') &&
       !obj.hasOwnProperty('sell_bitcoins')
-    ) checkAuth();
+    )
+      checkAuth();
   };
 
   const checkAuth = () => {
@@ -360,7 +402,13 @@ const VoucherScanner = (props) => {
         let FBTCAccountData = JSON.parse(
           await AsyncStorage.getItem('FBTCAccount'),
         );
-        console.log("FBTCAccountData",FBTCAccountData,accountSyncDetails, accountSyncDetails.redeem_vouchers, typeof accountSyncDetails)
+        console.log(
+          'FBTCAccountData',
+          FBTCAccountData,
+          accountSyncDetails,
+          accountSyncDetails.redeem_vouchers,
+          typeof accountSyncDetails,
+        );
         let obj;
         if (FBTCAccountData) {
           obj = {
@@ -374,7 +422,6 @@ const VoucherScanner = (props) => {
         if (accountSyncDetails.redeem_vouchers) {
           setTimeout(() => {
             (RegistrationSuccessBottomSheet as any).current.snapTo(1);
-            
           }, 2);
           dispatch(ClearAccountSyncData());
         }
@@ -396,17 +443,16 @@ const VoucherScanner = (props) => {
   };
 
   useEffect(() => {
-    (async()=>{
+    (async () => {
       if (QuoteDetails) {
-        console.log("[QuoteDetails]", QuoteDetails)
+        console.log('[QuoteDetails]', QuoteDetails);
         QuoteBottomSheet.current.snapTo(1);
         setTimeout(() => {
           setQuote(QuoteDetails);
         }, 2);
-        await AsyncStorage.setItem("quoteData", JSON.stringify(QuoteDetails));
+        await AsyncStorage.setItem('quoteData', JSON.stringify(QuoteDetails));
       }
     })();
-    
   }, [QuoteDetails]);
 
   const storeQuotesDetails = async () => {
@@ -423,12 +469,12 @@ const VoucherScanner = (props) => {
           fBTCAccountData.test_account.voucher[i].quotes = QuoteDetails;
           break;
         }
-      }    
-      if(tmp){
+      }
+      if (tmp) {
         let obj = {
           quotes: QuoteDetails,
-          voucherCode: voucherFromAsync.voucher_code
-        }
+          voucherCode: voucherFromAsync.voucher_code,
+        };
         fBTCAccountData.test_account.voucher.push(obj);
       }
     }
@@ -442,11 +488,11 @@ const VoucherScanner = (props) => {
           break;
         }
       }
-      if(tmp){
+      if (tmp) {
         let obj = {
           quotes: QuoteDetails,
-          voucherCode: voucherFromAsync.voucher_code
-        }
+          voucherCode: voucherFromAsync.voucher_code,
+        };
         fBTCAccountData.saving_account.voucher.push(obj);
       }
     }
@@ -464,20 +510,19 @@ const VoucherScanner = (props) => {
           break;
         }
       }
-      if(tmp){
+      if (tmp) {
         let obj = {
           quotes: QuoteDetails,
-          voucherCode: voucherFromAsync.voucher_code
-        }
+          voucherCode: voucherFromAsync.voucher_code,
+        };
         fBTCAccountData.checking_account.voucher.push(obj);
       }
     }
-    console.log("FBTCAccount after quotes", fBTCAccountData)
+    console.log('FBTCAccount after quotes', fBTCAccountData);
     await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccountData));
     executeOrderMethod();
   };
 
-  
   const renderRegistrationSuccessModalContent = useCallback(() => {
     return (
       <ErrorModalContents
@@ -499,8 +544,7 @@ const VoucherScanner = (props) => {
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
-        onPressIgnore={() => {
-        }}
+        onPressIgnore={() => {}}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/illustration.png')}
       />
@@ -563,7 +607,11 @@ const VoucherScanner = (props) => {
         ) {
           const element = fBTCAccountData.checking_account.voucher[i];
           if (element.voucherCode == voucherFromAsync.voucher_code) {
-            console.log("element.voucherCode == voucherFromAsync.voucher_code", element.voucherCode, voucherFromAsync.voucher_code)
+            console.log(
+              'element.voucherCode == voucherFromAsync.voucher_code',
+              element.voucherCode,
+              voucherFromAsync.voucher_code,
+            );
             fBTCAccountData.checking_account.voucher[
               i
             ].orderData = executeOrderDetails;
@@ -571,26 +619,25 @@ const VoucherScanner = (props) => {
           }
         }
       }
-      console.log("fBTCAccountData after order", fBTCAccountData)
+      console.log('fBTCAccountData after order', fBTCAccountData);
       await AsyncStorage.setItem(
         'FBTCAccount',
         JSON.stringify(fBTCAccountData),
       );
       VoucherRedeemSuccessBottomSheet.current.snapTo(1);
-      await AsyncStorage.setItem("quoteData", '');
-      await AsyncStorage.setItem('voucherData', '')
+      await AsyncStorage.setItem('quoteData', '');
+      await AsyncStorage.setItem('voucherData', '');
     }
     dispatch(ClearOrderDetails());
   };
 
   const executeOrderMethod = async () => {
-    let quoteData = JSON.parse(await AsyncStorage.getItem("quoteData"));
+    let quoteData = JSON.parse(await AsyncStorage.getItem('quoteData'));
     let fBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     let voucherFromAsync = JSON.parse(
       await AsyncStorage.getItem('voucherData'),
     );
-    console.log("executeOrderMethod =>wwwQuote", Quote)
-    if (fBTCAccountData && fBTCAccountData.user_key) {
+    if (fBTCAccountData && fBTCAccountData.user_key && bitcoinAddress) {
       let data = {
         user_key: fBTCAccountData.user_key,
         wallet_slug: 'bithyve',
@@ -602,6 +649,8 @@ const VoucherScanner = (props) => {
       };
       dispatch(executeOrder(data));
       dispatch(ClearQuoteDetails());
+    } else {
+      Toast('Please select Account');
     }
   };
 
@@ -616,7 +665,7 @@ const VoucherScanner = (props) => {
           setTimeout(() => {
             setVoucherCode('');
           }, 2);
-         }}
+        }}
         voucherNumber={voucherCode ? voucherCode : ''}
         purchasedFor={QuoteDetails ? QuoteDetails.amount : ''}
         redeemAmount={QuoteDetails ? QuoteDetails.bitcoin_amount : ''}
@@ -640,13 +689,14 @@ const VoucherScanner = (props) => {
     return (
       <VoucherRedeemSuccess
         onPressRedeem={() => {
-          props.navigation.navigate("Accounts", {
+          props.navigation.navigate('Accounts', {
             serviceType:
-            selectedAccount.accountName === 'Test Account'
+              selectedAccount.accountName === 'Test Account'
                 ? TEST_ACCOUNT
                 : selectedAccount.accountName === 'Checking Account'
                 ? REGULAR_ACCOUNT
-                : SECURE_ACCOUNT,});
+                : SECURE_ACCOUNT,
+          });
         }}
         onPressBack={() => {
           VoucherRedeemSuccessBottomSheet.current.snapTo(0);
@@ -670,13 +720,13 @@ const VoucherScanner = (props) => {
 
   const renderAccountVerificationModalContent = useCallback(() => {
     return (
-      <AccountVerification 
-        link={FBTC_REGISTRATION_URL} 
-        openLinkVerification={()=> {
+      <AccountVerification
+        link={FBTC_REGISTRATION_URL}
+        openLinkVerification={() => {
           Linking.openURL(FBTC_REGISTRATION_URL);
           props.navigation.goBack();
         }}
-       />
+      />
     );
   }, []);
 
@@ -697,14 +747,14 @@ const VoucherScanner = (props) => {
         setErrorProccedButtonText('Done');
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
-      let data={
+      let data = {
         accountSyncFail: false,
-        accountSyncFailMessage: ''
-      }
-      dispatch(accountSyncFail(data))
+        accountSyncFailMessage: '',
+      };
+      dispatch(accountSyncFail(data));
     }
-  }, [accountsSyncFail,accountSyncFailMessage]);
-  
+  }, [accountsSyncFail, accountSyncFailMessage]);
+
   useEffect(() => {
     if (IsGetQuoteFail && getQuoteFailMessage) {
       setTimeout(() => {
@@ -712,13 +762,13 @@ const VoucherScanner = (props) => {
         setErrorProccedButtonText('Done');
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
-      let data={
+      let data = {
         getQuoteFail: false,
-        getQuoteFailMessage: ''
-      }
-      dispatch(getQuoteFail(data))
+        getQuoteFailMessage: '',
+      };
+      dispatch(getQuoteFail(data));
     }
-  }, [IsGetQuoteFail,getQuoteFailMessage]);
+  }, [IsGetQuoteFail, getQuoteFailMessage]);
 
   useEffect(() => {
     if (IsExecuteOrderFail && executeOrderFailMessage) {
@@ -727,14 +777,13 @@ const VoucherScanner = (props) => {
         setErrorProccedButtonText('Done');
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
-      let data={
+      let data = {
         executeOrderFail: false,
-        executeOrderFailMessage: ''
-      }
-      dispatch(executeOrderFail(data))
+        executeOrderFailMessage: '',
+      };
+      dispatch(executeOrderFail(data));
     }
-  }, [IsExecuteOrderFail,executeOrderFailMessage]);
-
+  }, [IsExecuteOrderFail, executeOrderFailMessage]);
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -745,18 +794,18 @@ const VoucherScanner = (props) => {
         note={errorNote}
         proceedButtonText={errorProccedButtonText}
         onPressProceed={() => {
-            (ErrorModalBottomSheet as any).current.snapTo(0);
+          (ErrorModalBottomSheet as any).current.snapTo(0);
         }}
         isIgnoreButton={true}
         cancelButtonText={'Back'}
         onPressIgnore={() => {
           (ErrorModalBottomSheet as any).current.snapTo(0);
-      }}
+        }}
         isBottomImage={true}
         bottomImage={require('../../assets/images/icons/reject.png')}
       />
     );
-  }, [errorTitle,errorInfo,errorNote,errorProccedButtonText]);
+  }, [errorTitle, errorInfo, errorNote, errorProccedButtonText]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -782,161 +831,185 @@ const VoucherScanner = (props) => {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={BackupStyles.modalHeaderTitleText}>Scan a FastBitcoin Voucher</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>
+            Scan a FastBitcoin voucher
+          </Text>
         </View>
       </View>
-      <ScrollView>
-        <View style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}>
-          {hideShow ? (
-            <View style={styles.dropDownView}>
-              {accounts.map((value) => {
-                return (
-                  <TouchableOpacity
-                    activeOpacity={10}
-                    onPress={() => {
-                      setHideShow(false);
-                      setSelectedAccount(value);
-                    }}
-                    style={styles.dropDownElement}
-                  >
-                    <Image
-                      source={value.image}
-                      style={{ width: wp('8%'), height: wp('8%') }}
-                    />
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <Text style={styles.dropDownElementTitleText}>
-                        {value.accountName}
-                      </Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS == 'ios' ? 'padding' : ''}
+        enabled
+      >
+        <ScrollView>
+          <View style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}>
+            {hideShow ? (
+              <View style={styles.dropDownView}>
+                {accounts.map((value) => {
+                  return (
+                    <TouchableOpacity
+                      activeOpacity={10}
+                      onPress={() => {
+                        setHideShow(false);
+                        setSelectedAccount(value);
+                      }}
+                      style={styles.dropDownElement}
+                    >
+                      <Image
+                        source={value.image}
+                        style={{ width: wp('8%'), height: wp('8%') }}
+                      />
+                      <View style={{ flex: 1, marginLeft: 10 }}>
+                        <Text style={styles.dropDownElementTitleText}>
+                          {value.accountName}
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'flex-end',
+                          }}
+                        >
+                          <Image
+                            style={styles.cardBitCoinImage}
+                            source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                          />
+                          <Text style={styles.cardAmountText}>
+                            {value.accountType === TEST_ACCOUNT
+                              ? UsNumberFormat(balances.testBalance)
+                              : value.accountType === REGULAR_ACCOUNT
+                              ? UsNumberFormat(balances.regularBalance)
+                              : UsNumberFormat(balances.secureBalance)}
+                          </Text>
+                          <Text style={styles.cardAmountUnitText}>sats</Text>
+                        </View>
+                      </View>
                       <View
                         style={{
-                          flexDirection: 'row',
-                          alignItems: 'flex-end',
+                          justifyContent: 'center',
+                          alignItems: 'center',
                         }}
                       >
-                        <Image
-                          style={styles.cardBitCoinImage}
-                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        <Entypo
+                          name={'dots-three-horizontal'}
+                          color={Colors.borderColor}
+                          size={RFValue(13)}
                         />
-                        <Text style={styles.cardAmountText}>
-                          {value.accountType === TEST_ACCOUNT
-                            ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === REGULAR_ACCOUNT
-                            ? UsNumberFormat(balances.regularBalance)
-                            : UsNumberFormat(balances.secureBalance)}
-                        </Text>
-                        <Text style={styles.cardAmountUnitText}>sats</Text>
                       </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : null}
+            {openCameraFlag ? (
+              <View style={styles.cameraView}>
+                <RNCamera
+                  ref={(ref) => {
+                    this.cameraRef = ref;
+                  }}
+                  style={styles.camera}
+                  onBarCodeRead={barcodeRecognized}
+                  captureAudio={false}
+                >
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.topCornerView}>
+                      <View style={styles.topLeftCornerView} />
+                      <View style={styles.topRightCornerView} />
                     </View>
-                    <View
-                      style={{ justifyContent: 'center', alignItems: 'center' }}
-                    >
-                      <Entypo
-                        name={'dots-three-horizontal'}
-                        color={Colors.borderColor}
-                        size={RFValue(13)}
-                      />
+                    <View style={styles.bottomCornerView}>
+                      <View style={styles.bottomLeftCornerView} />
+                      <View style={styles.bottomRightCornerView} />
                     </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          ) : null}
-          {openCameraFlag ? (
-            <View style={styles.cameraView}>
-              <RNCamera
-                ref={(ref) => {
-                  this.cameraRef = ref;
-                }}
-                style={styles.camera}
-                onBarCodeRead={barcodeRecognized}
-                captureAudio={false}
-              >
-                <View style={{ flex: 1 }}>
-                  <View style={styles.topCornerView}>
-                    <View style={styles.topLeftCornerView} />
-                    <View style={styles.topRightCornerView} />
                   </View>
-                  <View style={styles.bottomCornerView}>
-                    <View style={styles.bottomLeftCornerView} />
-                    <View style={styles.bottomRightCornerView} />
+                </RNCamera>
+              </View>
+            ) : (
+              <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
+                <ImageBackground
+                  source={require('../../assets/images/icons/iPhone-QR.png')}
+                  style={styles.cameraImage}
+                >
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.topCornerView}>
+                      <View style={styles.topLeftCornerView} />
+                      <View style={styles.topRightCornerView} />
+                    </View>
+                    <View style={styles.bottomCornerView}>
+                      <View style={styles.bottomLeftCornerView} />
+                      <View style={styles.bottomRightCornerView} />
+                    </View>
                   </View>
-                </View>
-              </RNCamera>
-            </View>
-          ) : (
-            <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
-              <ImageBackground
-                source={require('../../assets/images/icons/iPhone-QR.png')}
-                style={styles.cameraImage}
-              >
-                <View style={{ flex: 1 }}>
-                  <View style={styles.topCornerView}>
-                    <View style={styles.topLeftCornerView} />
-                    <View style={styles.topRightCornerView} />
-                  </View>
-                  <View style={styles.bottomCornerView}>
-                    <View style={styles.bottomLeftCornerView} />
-                    <View style={styles.bottomRightCornerView} />
-                  </View>
-                </View>
-              </ImageBackground>
-            </TouchableOpacity>
-          )}
-          <View style={{ marginTop: 5, justifyContent: 'center', alignItems: 'center'}}>
-          <TextInput placeholder={'Enter Voucher Code'} 
-						placeholderTextColor={Colors.borderColor} 
-						style={styles.qrModalTextInput} 
-						autoCorrect={false}
-						/>
-            {/* <BottomInfoBox
-              backgroundColor={Colors.white}
-              title={'Note'}
-              infoText={
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-              }
-            /> */}
+                </ImageBackground>
+              </TouchableOpacity>
+            )}
+            <TextInput
+              placeholder={'Enter Voucher Code'}
+              placeholderTextColor={Colors.borderColor}
+              style={styles.qrModalTextInput}
+              autoCorrect={false}
+            />
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
       <View
         style={{
           marginBottom: hp('2%'),
         }}
       >
+        <Text
+          style={{
+            marginBottom: 10,
+            paddingLeft: 20,
+            paddingRight: 15,
+            fontSize: RFValue(11),
+            fontFamily: Fonts.FiraSansMedium,
+            color: Colors.textColorGrey,
+          }}
+        >
+          Deposit Account
+        </Text>
         <TouchableOpacity
           activeOpacity={10}
           onPress={() => {
             setHideShow(!hideShow);
           }}
-          style={{ ...styles.dropDownElement, borderRadius: 10, margin: 20 }}
+          style={{
+            ...styles.dropDownElement,
+            borderRadius: 10,
+            marginLeft: 20,
+            marginRight: 20,
+            marginBottom: 20,
+          }}
         >
-          <Image
-            source={selectedAccount.image}
-            style={{ width: wp('8%'), height: wp('8%') }}
-          />
+          {selectedAccount.accountType != '' && (
+            <Image
+              source={selectedAccount.image}
+              style={{ width: wp('8%'), height: wp('8%') }}
+            />
+          )}
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.dropDownElementTitleText}>
-              {selectedAccount.accountName}
+              {selectedAccount.accountName ? selectedAccount.accountName : ''}
             </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'flex-end',
-              }}
-            >
-              <Image
-                style={styles.cardBitCoinImage}
-                source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-              />
-              <Text style={styles.cardAmountText}>
-                {selectedAccount.accountType === TEST_ACCOUNT
-                  ? UsNumberFormat(balances.testBalance)
-                  : selectedAccount.accountType === REGULAR_ACCOUNT
-                  ? UsNumberFormat(balances.regularBalance)
-                  : UsNumberFormat(balances.secureBalance)}
-              </Text>
-              <Text style={styles.cardAmountUnitText}>sats</Text>
-            </View>
+            {selectedAccount.accountType != '' && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                }}
+              >
+                <Image
+                  style={styles.cardBitCoinImage}
+                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                />
+                <Text style={styles.cardAmountText}>
+                  {selectedAccount.accountType === TEST_ACCOUNT
+                    ? UsNumberFormat(balances.testBalance)
+                    : selectedAccount.accountType === REGULAR_ACCOUNT
+                    ? UsNumberFormat(balances.regularBalance)
+                    : UsNumberFormat(balances.secureBalance)}
+                </Text>
+                <Text style={styles.cardAmountUnitText}>sats</Text>
+              </View>
+            )}
           </View>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Entypo
@@ -1127,18 +1200,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   qrModalTextInput: {
-		borderRadius: 20,
-		borderWidth: 1,
-		borderColor: Colors.backgroundColor,
-		width: wp('72%'),
-		height: 60,
-		marginTop: 20,
-		marginBottom: 20,
-		paddingLeft: 15,
-		paddingRight: 15,
-		fontSize: RFValue(11, 812),
-		fontFamily: Fonts.FiraSansMedium
-	},
+    flex: 1,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.backgroundColor,
+    height: 50,
+    margin: 20,
+    paddingLeft: 15,
+    paddingRight: 15,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansMedium,
+  },
 });
 
 export default VoucherScanner;
