@@ -1492,6 +1492,11 @@ babel-plugin-module-resolver@^3.1.1:
     reselect "^3.0.1"
     resolve "^1.4.0"
 
+babel-plugin-react-native-web@^0.11.2:
+  version "0.11.7"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-native-web/-/babel-plugin-react-native-web-0.11.7.tgz#15b578c0731bd7d65d334f9c759d95e8e4a602e2"
+  integrity sha512-CxE7uhhqkzAFkwV2X7+Mc/UVPujQQDtja/EGxCXRJvdYRi72QTmaJYKbK1lV9qgTZuB+TDguU89coaA9Z1BNbg==
+
 babel-plugin-syntax-trailing-function-commas@^7.0.0-beta.0:
   version "7.0.0-beta.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-trailing-function-commas/-/babel-plugin-syntax-trailing-function-commas-7.0.0-beta.0.tgz#aa213c1435e2bffeb6fca842287ef534ad05d5cf"
