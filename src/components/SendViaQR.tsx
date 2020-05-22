@@ -17,7 +17,6 @@ import QRCode from 'react-native-qrcode-svg';
 export default function SendViaQR(props) {
   const [contactName, setContactName] = useState('');
 
-
   const contact = props.contact;
 
   const [Contact, setContact] = useState(props.contact ? props.contact : {});
@@ -26,10 +25,10 @@ export default function SendViaQR(props) {
       setContact(props.contact);
     }
   }, [contact]);
-  
-    useEffect(()=>{
-      let contactName =
-    Contact && Contact.firstName && Contact.lastName
+
+  useEffect(() => {
+    let contactName =
+      Contact && Contact.firstName && Contact.lastName
         ? Contact.firstName + ' ' + Contact.lastName
         : Contact && Contact.firstName && !Contact.lastName
         ? Contact.firstName
@@ -37,7 +36,7 @@ export default function SendViaQR(props) {
         ? Contact.lastName
         : '';
     setContactName(contactName);
-   },[Contact]);
+  }, [Contact]);
 
   return (
     <View style={styles.modalContainer}>
@@ -116,7 +115,7 @@ export default function SendViaQR(props) {
                 borderRadius: 10,
               }}
             >
-             <View style={{ marginLeft: 70 }}>
+              <View style={{ marginLeft: 70 }}>
                 {props.contactText ? (
                   <Text
                     style={{
@@ -125,7 +124,7 @@ export default function SendViaQR(props) {
                       fontSize: RFValue(11),
                       marginLeft: 25,
                       paddingTop: 5,
-                    paddingBottom: 3,
+                      paddingBottom: 3,
                     }}
                   >
                     {props.contactText}
@@ -134,47 +133,53 @@ export default function SendViaQR(props) {
                 {contactName ? (
                   <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
-                {Contact && Contact.phoneNumbers.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                  }}
-                >
-                  {Contact && Contact.phoneNumbers[0].digits}
-                </Text> : null }
-                {Contact && Contact.emails.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                    paddingBottom: 5,
-                  }}
-                >
-                  {Contact && Contact.emails[0].email}
-                </Text> : null}
+                {Contact &&
+                Contact.phoneNumbers &&
+                Contact.phoneNumbers.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                    }}
+                  >
+                    {Contact && Contact.phoneNumbers[0].digits}
+                  </Text>
+                ) : null}
+                {Contact && Contact.emails && Contact.emails.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                      paddingBottom: 5,
+                    }}
+                  >
+                    {Contact && Contact.emails[0].email}
+                  </Text>
+                ) : null}
               </View>
             </View>
             {Contact && Contact.imageAvailable ? (
               <View
-              style={{
-                position: 'absolute',
-                marginLeft: 15,
-                marginRight: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
-              }}
-            >
-              <Image
-                source={Contact && Contact.image}
-                style={{ ...styles.contactProfileImage }}
-              />
+                style={{
+                  position: 'absolute',
+                  marginLeft: 15,
+                  marginRight: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
+                }}
+              >
+                <Image
+                  source={Contact && Contact.image}
+                  style={{ ...styles.contactProfileImage }}
+                />
               </View>
             ) : (
               <View
