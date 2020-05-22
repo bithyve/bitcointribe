@@ -55,9 +55,12 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import RadioButton from '../../components/RadioButton';
 import { UsNumberFormat } from '../../common/utilities';
 import { nameToInitials } from '../../common/CommonFunctions';
+import { RNCamera } from 'react-native-camera';
 
 export default function Send(props) {
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
+  const [accountType, setAccountType] = useState('Checking Account')
+  const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [
     SendConfirmationBottomSheet,
     setSendConfirmationBottomSheet,
@@ -564,6 +567,16 @@ export default function Send(props) {
   };
 
   useEffect(() => {
+    if (serviceType === TEST_ACCOUNT) {
+      setAccountType('Test Account')
+    }
+    else if (serviceType === SECURE_ACCOUNT) {
+      console.log('Secure Account')
+      setAccountType('Saving Account')
+    }
+  }, [])
+
+  useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
       (async () => {
         if (
@@ -663,9 +676,47 @@ export default function Send(props) {
     }
   }, [recipientAddress, isInvalidAddress]);
 
+  const barcodeRecognized = async (barcodes) => {
+    if (barcodes.data) {
+      setRecipientAddress(barcodes.data);
+      const instance = service.hdWallet || service.secureHDWallet;
+      let isAddressValid = instance.isValidAddress(recipientAddress)
+      console.log(isAddressValid);
+      setIsInvalidAddress(isAddressValid);
+      setOpenCameraFlag(false);
+    }
+  };
+
   const renderQRCodeThumbnail = () => {
+
+    if (openCameraFlag) {
+      return (
+        <View style={styles.cameraView}>
+          <RNCamera
+            ref={(ref) => {
+              this.cameraRef = ref;
+            }}
+            style={styles.camera}
+            onBarCodeRead={barcodeRecognized}
+            captureAudio={false}
+          >
+            <View style={{ flex: 1 }}>
+              <View style={styles.topCornerView}>
+                <View style={styles.topLeftCornerView} />
+                <View style={styles.topRightCornerView} />
+              </View>
+              <View style={styles.bottomCornerView}>
+                <View style={styles.bottomLeftCornerView} />
+                <View style={styles.bottomRightCornerView} />
+              </View>
+            </View>
+          </RNCamera>
+        </View>
+      )
+    }
+
     return (
-      <AppBottomSheetTouchableWrapper>
+      <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
         <ImageBackground source={require("../../assets/images/icons/iPhone-QR.png")} style={{
           width: wp('100%'),
           height: wp('70%'),
@@ -681,7 +732,7 @@ export default function Send(props) {
             <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
           </View>
         </ImageBackground>
-      </AppBottomSheetTouchableWrapper>
+      </TouchableOpacity>
     )
   }
 
@@ -1357,5 +1408,70 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     zIndex: 5
-  }
+  },
+  cameraView: {
+    width: wp('100%'),
+    height: wp('100%'),
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+  camera: {
+    width: wp('100%'),
+    height: wp('100%'),
+  },
+  cameraImage: {
+    width: wp('100%'),
+    height: wp('100%'),
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+  topCornerView: {
+    flexDirection: 'row',
+    paddingTop: 12,
+    paddingRight: 12,
+    paddingLeft: 12,
+    width: '100%',
+  },
+  bottomCornerView: {
+    marginTop: 'auto',
+    flexDirection: 'row',
+    paddingBottom: 12,
+    paddingRight: 12,
+    paddingLeft: 12,
+    width: '100%',
+  },
+  topLeftCornerView: {
+    borderLeftWidth: 1,
+    borderTopColor: 'white',
+    borderLeftColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    borderTopWidth: 1,
+  },
+  topRightCornerView: {
+    borderTopWidth: 1,
+    borderRightWidth: 1,
+    borderRightColor: 'white',
+    borderTopColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    marginLeft: 'auto',
+  },
+  bottomLeftCornerView: {
+    borderLeftWidth: 1,
+    borderBottomColor: 'white',
+    borderLeftColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    borderBottomWidth: 1,
+  },
+  bottomRightCornerView: {
+    borderBottomWidth: 1,
+    borderRightWidth: 1,
+    borderRightColor: 'white',
+    borderBottomColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    marginLeft: 'auto',
+  },
 });

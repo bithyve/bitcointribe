@@ -102,6 +102,25 @@ export default function SendToContact(props) {
 
   const getImageIcon = item => {
     if (item) {
+
+      if (item.account_name === 'Checking Account') {
+        return (
+          <Image
+            source={require('../../assets/images/icons/icon_regular.png')}
+            style={styles.circleShapeView}
+          />
+        )
+      }
+
+      if (item.account_name === 'Saving Account') {
+        return (
+          <Image
+            source={require('../../assets/images/icons/icon_secureaccount.png')}
+            style={styles.circleShapeView}
+          />
+        )
+      }
+
       if (item.imageAvailable) {
         return (
           <Image
@@ -267,7 +286,7 @@ export default function SendToContact(props) {
         {renderVerticalDivider()}
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
-          placeholder={'Converted Amount'}
+          placeholder={switchOn ? 'Enter Amount in Sats' : 'Converted Amount in Sats'}
           editable={switchOn}
           value={bitcoinAmount}
           returnKeyLabel="Done"
@@ -295,7 +314,7 @@ export default function SendToContact(props) {
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           editable={!switchOn}
-          placeholder={'Enter Amount'}
+          placeholder={switchOn ? 'Converted Amount in Dollars' : 'Enter Amount in Dollars'}
           value={currencyAmount}
           returnKeyLabel="Done"
           returnKeyType="done"
