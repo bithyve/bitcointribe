@@ -23,7 +23,7 @@ export default function MoreHomePageTabContents( props ) {
             title: 'Address Book', image: require( '../assets/images/icons/addressbook.png' ), info: `View and manage your trusted contacts `,
         },
         {
-            title: 'Settings', image: require( '../assets/images/icons/settings.png' ), info: `Wallet settings and preferences`,
+            title: 'Wallet Settings', image: require( '../assets/images/icons/settings.png' ), info: `Wallet settings and preferences`,
         },
         // {
         //     title: `All accounts and funds`, image: require( '../assets/images/icons/accounts.png' ), info: `View and manage all accounts and funds`,

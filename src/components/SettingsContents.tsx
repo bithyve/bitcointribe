@@ -18,24 +18,24 @@ export default function SettingsContents(props) {
     const [currencycode, setCurrencycode] = useState('');
     const [switchOn, setSwitchOn] = useState(false);
     const [PageData, setPageData] = useState([
-        {
-            title:"Jumble Keyboard",
-            info:"Lorem ipsum dolor sit amet, consectetur",
-            image:require("../assets/images/icons/jumble.png"),
-            type:"JumbleKeyboard"
-        },
+        // {
+        //     title:"Jumble Keyboard",
+        //     info:"Lorem ipsum dolor sit amet, consectetur",
+        //     image:require("../assets/images/icons/jumble.png"),
+        //     type:"JumbleKeyboard"
+        // },
         {
             title:"Manage Pin",
             info:"Change your passcode",
             image:require("../assets/images/icons/managepin.png"),
             type:"ManagePin"
         },
-        {
-            title:"Change Wallet Name",
-            info:"Lorem ipsum dolor sit amet, consectetur",
-            image:require("../assets/images/icons/existing_saving_method.png"),
-            type:"ChangeWalletName"
-        },
+        // {
+        //     title:"Change Wallet Name",
+        //     info:"Lorem ipsum dolor sit amet, consectetur",
+        //     image:require("../assets/images/icons/existing_saving_method.png"),
+        //     type:"ChangeWalletName"
+        // },
         {
             title:"Change Currency",
             info:"Choose your Currency",

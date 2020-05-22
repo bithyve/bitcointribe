@@ -1637,7 +1637,7 @@ export default function Home(props) {
     }
     if (item.title == 'Address Book') {
       props.navigation.navigate('AddressBookContents');
-    } else if (item.title == 'Settings') {
+    } else if (item.title == 'Wallet Settings') {
       (settingsBottomSheet as any).current.snapTo(1);
       setTimeout(() => {
         setTabBarZIndex(0);
@@ -2034,7 +2034,8 @@ export default function Home(props) {
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          props.navigation.navigate('SendRequest');
+          props.navigation.navigate('AddContactSendRequest', {SelectedContact: SelectedContact});
+         // props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onSelectContact={(selectedContact) => {
