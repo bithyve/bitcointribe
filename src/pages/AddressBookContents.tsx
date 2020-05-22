@@ -33,30 +33,74 @@ export default function AddressBookContents(props) {
     React.createRef(),
   );
   let [AssociatedContact, setAssociatedContact] = useState([]);
-  let [SelectedContacts, setSelectedContacts] = useState([]);
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
-  let [TrustedContact, setTrustedContact] = useState([
-    {
-      name: 'Uraiah Cabe',
-      phoneNumber: '+1 000 000 0000',
-    },
-    {
-      name: 'Mike Ross',
-      phoneNumber: 'miker@bithyve.com',
-    },
-    {
-      name: 'Donna Paulsen',
-      phoneNumber: '+966 0 00 000 0000',
-    },
-    {
-      name: 'Rachel Zane',
-      phoneNumber: 'zanerachel@bithyve.com',
-    },
-    {
-      name: 'Louis Litt',
-      phoneNumber: '+1 000 000 0000',
-    },
-  ]);
+  let [trustedContacts, setTrustedContacts] = useState([]);
+  let [guardians, setGuardians] = useState([]);
+
+  const updateAddressBook = async () => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      console.log({ trustedContactsInfo });
+      if (trustedContactsInfo.length) {
+        const trustedContacts = [];
+        for (const contactInfo of trustedContactsInfo) {
+          const contactName = `${contactInfo.firstName} ${
+            contactInfo.lastName ? contactInfo.lastName : ''
+          }`;
+          let connectedVia;
+          if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
+            connectedVia = contactInfo.phoneNumbers[0].number;
+          } else if (contactInfo.emails && contactInfo.emails.length) {
+            connectedVia = contactInfo.emails[0].email;
+          }
+
+          trustedContacts.push({
+            contactName,
+            connectedVia,
+            ...contactInfo,
+          });
+        }
+        console.log({ trustedContacts });
+        setTrustedContacts(trustedContacts);
+      }
+    }
+
+    let guardiansInfo: any = await AsyncStorage.getItem('GuardiansInfo');
+    if (guardiansInfo) {
+      guardiansInfo = JSON.parse(guardiansInfo);
+      console.log({ guardiansInfo });
+      if (guardiansInfo.length) {
+        const guardians = [];
+        for (const guardianInfo of guardiansInfo) {
+          if (!guardianInfo) continue;
+          const contactName = `${guardianInfo.firstName} ${
+            guardianInfo.lastName ? guardianInfo.lastName : ''
+          }`;
+          let connectedVia;
+          if (guardianInfo.phoneNumbers && guardianInfo.phoneNumbers.length) {
+            connectedVia = guardianInfo.phoneNumbers[0].number;
+          } else if (guardianInfo.emails && guardianInfo.emails.length) {
+            connectedVia = guardianInfo.emails[0].email;
+          }
+
+          guardians.push({
+            contactName,
+            connectedVia,
+            ...guardianInfo,
+          });
+        }
+        console.log({ guardians });
+        setGuardians(guardians);
+      }
+    }
+  };
+
+  useEffect(() => {
+    updateAddressBook();
+  }, []);
 
   const trustedContactWatermarkMessage =
     'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
@@ -64,36 +108,36 @@ export default function AddressBookContents(props) {
     'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
   const YourGuardianWatermarkMessage =
     'Contacts or devices who are guarding your\nRecovery Secret will appear here';
-  useEffect(() => {
-    getAssociatedContact();
-  }, []);
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(trustedChannelXpubUpload());
   }, []);
 
-  const getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setSelectedContacts(SelectedContacts);
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
-    setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
-    setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  };
+  // useEffect(() => {
+  //   getAssociatedContact();
+  // }, []);
+  // const getAssociatedContact = async () => {
+  //   let SelectedContacts = JSON.parse(
+  //     await AsyncStorage.getItem('SelectedContacts'),
+  //   );
+  //   setSelectedContacts(SelectedContacts);
+  //   let AssociatedContact = JSON.parse(
+  //     await AsyncStorage.getItem('AssociatedContacts'),
+  //   );
+  //   setAssociatedContact(AssociatedContact);
+  //   let SecondaryDeviceAddress = JSON.parse(
+  //     await AsyncStorage.getItem('secondaryDeviceAddress'),
+  //   );
+  //   setSecondaryDeviceAddress(SecondaryDeviceAddress);
+  // };
 
   function renderFilterModalContent() {
     return (
       <AddressBookFilterModalContent
         modalRef={FilterModalBottomSheet}
         onPressBack={() => {
-          FilterModalBottomSheet.current.snapTo(0);
+          (FilterModalBottomSheet.current as any).snapTo(0);
         }}
       />
     );
@@ -103,7 +147,7 @@ export default function AddressBookContents(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          FilterModalBottomSheet.current.snapTo(0);
+          (FilterModalBottomSheet.current as any).snapTo(0);
         }}
         backgroundColor={Colors.backgroundColor1}
       />
@@ -115,17 +159,17 @@ export default function AddressBookContents(props) {
       <View style={styles.selectedContactsView}>
         <View>
           <Text style={styles.contactText}>
-            {item.name && item.name.split(' ')[0]
-              ? item.name.split(' ')[0]
+            {item.contactName && item.contactName.split(' ')[0]
+              ? item.contactName.split(' ')[0]
               : ''}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {item.name && item.name.split(' ')[1]
-                ? item.name.split(' ')[1]
+              {item.contactName && item.contactName.split(' ')[1]
+                ? item.contactName.split(' ')[1]
                 : ''}
             </Text>
           </Text>
-          {item.phoneNumber ? (
-            <Text style={styles.phoneText}>{item.phoneNumber}</Text>
+          {item.connectedVia ? (
+            <Text style={styles.phoneText}>{item.connectedVia}</Text>
           ) : null}
         </View>
         <View
@@ -258,7 +302,7 @@ export default function AddressBookContents(props) {
                 flexDirection: 'row',
               }}
               onPress={() => {
-                FilterModalBottomSheet.current.snapTo(1);
+                (FilterModalBottomSheet.current as any).snapTo(1);
               }}
             >
               <Text
@@ -289,10 +333,10 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {TrustedContact && TrustedContact.length ? (
+            {trustedContacts && trustedContacts.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {TrustedContact.map((item, index) => {
+                  {trustedContacts.map((item, index) => {
                     return getElement(item, index);
                   })}
                 </View>
@@ -339,10 +383,10 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {SelectedContacts && SelectedContacts.length ? (
+            {guardians && guardians.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {SelectedContacts.map((item, index) => {
+                  {guardians.map((item, index) => {
                     return getElement(item, index);
                   })}
                 </View>
