@@ -207,11 +207,7 @@ export default function Login(props) {
         }, 2);
       }
     });
-    console.log(
-      'DeviceInfo.getVersion(), DeviceInfo.getBuildNumber()',
-      DeviceInfo.getVersion(),
-      DeviceInfo.getBuildNumber(),
-    );
+
 
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
@@ -219,7 +215,6 @@ export default function Login(props) {
         let releaseCases = JSON.parse(
           await AsyncStorage.getItem('releaseCases'),
         );
-        console.log('releaseCases Login', releaseCases);
         if (
           res.data.releases.length &&
           res.data.releases[0].build != DeviceInfo.getBuildNumber()
@@ -234,6 +229,7 @@ export default function Login(props) {
             releaseData: res.data.releases,
           });
         }
+        return
       })
       .catch((error) => {
         console.error(error);
@@ -323,7 +319,7 @@ export default function Login(props) {
       setTimeout(() => {
         (loaderBottomSheet as any).current.snapTo(0);
       }, 2);
-      
+
       return (
         <View style={{ marginLeft: 'auto' }}>
           <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
@@ -413,8 +409,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -442,8 +438,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -471,8 +467,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -500,8 +496,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -668,7 +664,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet as any}

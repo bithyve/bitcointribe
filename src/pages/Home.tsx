@@ -23,23 +23,18 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Animated from 'react-native-reanimated';
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
 import ToggleSwitch from '../components/ToggleSwitch';
-import Entypo from 'react-native-vector-icons/Entypo';
 import { RFValue } from 'react-native-responsive-fontsize';
 import CommonStyles from '../common/Styles';
 import NoInternetModalContents from '../components/NoInternetModalContents';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
-import CustodianRequestOtpModalContents from '../components/CustodianRequestOtpModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import AddressBookContents from './AddressBookContents';
 import SaveBitcoinModalContents from './GetBittr/SaveBitcoinModalContents';
-import CustodianRequestAcceptModalContents from '../components/CustodianRequestAcceptModalContents';
 import HomePageShield from '../components/HomePageShield';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
 import TransactionListModalContents from '../components/TransactionListModalContents';
@@ -108,6 +103,11 @@ import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/Config';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import { approveTrustedContact } from '../store/actions/trustedContacts';
+import MessageAsPerHealth from '../components/home/messgae-health';
+import TransactionsContent from '../components/home/transaction-content';
+import idx from 'idx';
+
+
 
 export default function Home(props) {
   const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
@@ -244,8 +244,8 @@ export default function Home(props) {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             props.navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -263,16 +263,16 @@ export default function Home(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
     const accumulativeBalance = regularBalance + secureBalance;
 
@@ -281,12 +281,12 @@ export default function Home(props) {
       : [];
     const regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
     const accumulativeTransactions = [
       ...testTransactions,
@@ -665,9 +665,9 @@ export default function Home(props) {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -821,7 +821,7 @@ export default function Home(props) {
       if (this.appState == 'active') {
         scheduleNotification();
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const createNotificationListeners = async () => {
@@ -895,7 +895,7 @@ export default function Home(props) {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch((err) => console.log('err', err));
     firebase
       .notifications()
@@ -1000,29 +1000,7 @@ export default function Home(props) {
   //   }
   // };
 
-  const messageAsPerHealth = (health) => {
-    if (health == 0) {
-      return (
-        <Text numberOfLines={1} style={{ ...styles.headerInfoText }}>
-          Wallet backup not secure.{'\n'}Please visit 'Manage Backup'
-        </Text>
-      );
-    } else if (health > 0 && health < 100) {
-      return (
-        <Text numberOfLines={1} style={styles.headerInfoText}>
-          Wallet backup not secure.{'\n'}Please complete 'Manage Backup' setup to
-          {'\n'}improve backup health.
-        </Text>
-      );
-    } else {
-      return (
-        <Text numberOfLines={1} style={styles.headerInfoText}>
-          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>Wallet Backup
-          is{'\n'}Secure. Keep track of its{'\n'}health routinely.
-        </Text>
-      );
-    }
-  };
+
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -1060,7 +1038,7 @@ export default function Home(props) {
     setTimeout(() => {
       setErrorMessageHeader('Error sending Recovery Secret');
       setErrorMessage(
-        'Error sending Recovery Secret, please try again!',
+        'There was an error while sending your Recovery Secret, please try again in a little while',
       );
       setButtonText('Try again');
     }, 2);
@@ -1070,9 +1048,9 @@ export default function Home(props) {
 
   if (isUploadSuccessfully) {
     setTimeout(() => {
-      setErrorMessageHeader('Seding successful');
+      setErrorMessageHeader('Sending successful');
       setErrorMessage(
-        'Recovery Secret sent, please notify the receiver to accept',
+        'The Recovery Secret has been sent, the receiver needs to accept ',
       );
       setButtonText('Done');
     }, 2);
@@ -1084,7 +1062,7 @@ export default function Home(props) {
     setTimeout(() => {
       setErrorMessageHeader('Error receiving Recovery Secret');
       setErrorMessage(
-        'Rrror receiving Recovery Secret, please try again!',
+        'There was an error while receiving your Recovery Secret, please try again',
       );
       setButtonText('Try again');
     }, 2);
@@ -1110,242 +1088,7 @@ export default function Home(props) {
     }
   };
 
-  const renderTransactionsContent = () => {
-    return transactions.length ? (
-      <View style={styles.modalContentContainer}>
-        <View style={{ flex: 1 }}>
-          <View
-            style={{ height: 'auto', marginTop: 10, marginBottom: hp('13%') }}
-          >
-            <FlatList
-              data={transactions}
-              ItemSeparatorComponent={() => (
-                <View style={{ backgroundColor: Colors.white }}>
-                  <View style={styles.separatorView} />
-                </View>
-              )}
-              renderItem={({ item }) => (
-                <AppBottomSheetTouchableWrapper
-                  onPress={
-                    () => {
-                      (TransactionDetailsBottomSheet as any).current.snapTo(1);
-                      setTimeout(() => {
-                        setTransactionItem(item);
-                        setTabBarZIndex(0);
-                      }, 10);
-                    }
-                    //props.navigation.navigate('TransactionDetails', { item })
-                  }
-                  style={{
-                    ...styles.transactionModalElementView,
-                    backgroundColor: Colors.white,
-                  }}
-                >
-                  <View style={styles.modalElementInfoView}>
-                    <View style={{ justifyContent: 'center' }}>
-                      <FontAwesome
-                        name={
-                          item.transactionType == 'Received'
-                            ? 'long-arrow-down'
-                            : 'long-arrow-up'
-                        }
-                        size={15}
-                        color={
-                          item.transactionType == 'Received'
-                            ? Colors.green
-                            : Colors.red
-                        }
-                      />
-                    </View>
-                    <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                      <Text style={styles.transactionModalTitleText}>
-                        {item.accountType}{' '}
-                      </Text>
-                      <Text style={styles.transactionModalDateText}>
-                        {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
-                        {/* <Entypo
-                      size={10}
-                      name={"dot-single"}
-                      color={Colors.textColorGrey}
-                    />
-                    {item.time} */}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.transactionModalAmountView}>
-                    <Image
-                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
-                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                    />
-                    <Text
-                      style={{
-                        ...styles.transactionModalAmountText,
-                        color:
-                          item.transactionType == 'Received'
-                            ? Colors.green
-                            : Colors.red,
-                      }}
-                    >
-                      {UsNumberFormat(item.amount)}
-                    </Text>
-                    <Text style={styles.transactionModalAmountUnitText}>
-                      {item.confirmations < 6 ? item.confirmations : '6+'}
-                    </Text>
-                    <Ionicons
-                      name="ios-arrow-forward"
-                      color={Colors.textColorGrey}
-                      size={12}
-                      style={{ marginLeft: 20, alignSelf: 'center' }}
-                    />
-                  </View>
-                </AppBottomSheetTouchableWrapper>
-              )}
-            />
-          </View>
-        </View>
-        {transactions.length <= 1 ? (
-          <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              marginBottom: AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              borderRadius: 7,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              View your transactions
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              All recent transactions across your accounts appear here
-            </Text>
-          </View>
-        ) : null}
-      </View>
-    ) : (
-      <View style={styles.modalContentContainer}>
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          {[1, 2, 3, 4, 5].map((value) => {
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingTop: wp('5%'),
-                  paddingBottom: wp('5%'),
-                  borderBottomWidth: 0.5,
-                  borderColor: Colors.borderColor,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                  <View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('25%'),
-                        borderRadius: 10,
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('35%'),
-                        marginTop: 5,
-                        borderRadius: 10,
-                      }}
-                    />
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('7%'),
-                      width: wp('20%'),
-                      borderRadius: 10,
-                    }}
-                  />
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                </View>
-              </View>
-            );
-          })}
-        </View>
-        <View style={{ backgroundColor: Colors.white }}>
-          <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              marginBottom: hp('12%') + 15,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              borderRadius: 7,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              View your transactions
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              All recent transactions across your accounts appear here
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
+
 
   const setSecondaryDeviceAddresses = async () => {
     let secondaryDeviceOtpTemp = JSON.parse(
@@ -1405,20 +1148,6 @@ export default function Home(props) {
         });
         break;
 
-      case 'trustedContactQR':
-        const tcRequest = {
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          type: scannedData.type,
-          isQR: true,
-        };
-        setLoading(false);
-        setSecondaryDeviceOtp(tcRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: tcRequest,
-        });
-        break;
-
       case 'secondaryDeviceGuardian':
         const secondaryDeviceGuardianRequest = {
           isGuardian: scannedData.isGuardian,
@@ -1450,9 +1179,7 @@ export default function Home(props) {
     }
   };
 
-  const renderTransactionContent = useCallback(() => {
-    return renderTransactionsContent();
-  }, [AtCloseEnd, transactions]);
+
 
   function renderTransactionHeader() {
     return (
@@ -1690,7 +1417,7 @@ export default function Home(props) {
   const renderNoInternetModalContent = () => {
     return (
       <NoInternetModalContents
-        onPressTryAgain={() => {}}
+        onPressTryAgain={() => { }}
         onPressIgnore={() => {
           (NoInternetBottomSheet as any).current.snapTo(0);
         }}
@@ -2307,10 +2034,7 @@ export default function Home(props) {
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          props.navigation.navigate('AddContactSendRequest', {
-            SelectedContact: SelectedContact,
-          });
-          // props.navigation.navigate('SendRequest');
+          props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onSelectContact={(selectedContact) => {
@@ -2435,7 +2159,7 @@ export default function Home(props) {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -2764,12 +2488,11 @@ export default function Home(props) {
             setDeepLinkModalOpen(false);
           }, 2);
           if (!isRecovery) {
-            if (!uploadedAt) uploadedAt = Date.now(); // a non-guardian tc request
             if (Date.now() - uploadedAt > 600000) {
               Alert.alert(
                 `${isQR ? 'QR' : 'Link'} expired!`,
                 `Please ask the sender to initiate a new ${
-                  isQR ? 'QR' : 'Link'
+                isQR ? 'QR' : 'Link'
                 }`,
               );
               setLoading(false);
@@ -2782,7 +2505,6 @@ export default function Home(props) {
                 setLoading(false);
               } else {
                 if (!publicKey) {
-                  // public key is directly available in case of QRs
                   try {
                     publicKey = TrustedContactsService.decryptPub(
                       encryptedKey,
@@ -2851,7 +2573,6 @@ export default function Home(props) {
       imageStyle={{ resizeMode: 'stretch' }}
     >
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-
       <View
         style={{
           flex: 3.8,
@@ -2876,17 +2597,17 @@ export default function Home(props) {
                   resizeMode={'contain'}
                 >
                   {NotificationData.findIndex((value) => value.read == false) >
-                  -1 ? (
-                    <View
-                      style={{
-                        backgroundColor: Colors.red,
-                        height: wp('2.5%'),
-                        width: wp('2.5%'),
-                        borderRadius: wp('2.5%') / 2,
-                        alignSelf: 'flex-end',
-                      }}
-                    />
-                  ) : null}
+                    -1 ? (
+                      <View
+                        style={{
+                          backgroundColor: Colors.red,
+                          height: wp('2.5%'),
+                          width: wp('2.5%'),
+                          borderRadius: wp('2.5%') / 2,
+                          alignSelf: 'flex-end',
+                        }}
+                      />
+                    ) : null}
                 </ImageBackground>
               </TouchableOpacity>
               <View style={{ marginBottom: wp('2%') }}>
@@ -2909,14 +2630,14 @@ export default function Home(props) {
                       source={require('../assets/images/icons/icon_bitcoin_light.png')}
                     />
                   ) : (
-                    <Image
-                      style={{
-                        ...styles.cardBitCoinImage,
-                        marginBottom: wp('1.5%'),
-                      }}
-                      source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-                    />
-                  )}
+                      <Image
+                        style={{
+                          ...styles.cardBitCoinImage,
+                          marginBottom: wp('1.5%'),
+                        }}
+                        source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                      />
+                    )}
                   <Text
                     style={{
                       ...CommonStyles.homepageAmountText,
@@ -2926,11 +2647,11 @@ export default function Home(props) {
                     {switchOn
                       ? UsNumberFormat(balances.accumulativeBalance)
                       : exchangeRates
-                      ? (
+                        ? (
                           (balances.accumulativeBalance / 1e8) *
                           exchangeRates[CurrencyCode].last
                         ).toFixed(2)
-                      : 0}
+                        : 0}
                   </Text>
                   <Text
                     style={{
@@ -2941,9 +2662,7 @@ export default function Home(props) {
                     {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
                   </Text>
                 </View>
-                {messageAsPerHealth(
-                  overallHealth ? overallHealth.overallStatus : 0,
-                )}
+                <MessageAsPerHealth health={overallHealth ? (overallHealth as any).overallStatus : 0} />
               </View>
               <TouchableOpacity
                 onPress={() => {
@@ -2971,7 +2690,7 @@ export default function Home(props) {
                 }}
               >
                 <HomePageShield
-                  shieldStatus={overallHealth ? overallHealth.overallStatus : 0}
+                  shieldStatus={overallHealth ? (overallHealth as any).overallStatus : 0}
                 />
               </TouchableOpacity>
             </View>
@@ -3032,14 +2751,14 @@ export default function Home(props) {
                                 value.accountType === 'test'
                                   ? TEST_ACCOUNT
                                   : value.accountType === 'regular'
-                                  ? REGULAR_ACCOUNT
-                                  : SECURE_ACCOUNT,
+                                    ? REGULAR_ACCOUNT
+                                    : SECURE_ACCOUNT,
                               index:
                                 value.accountType === 'test'
                                   ? 0
                                   : value.accountType === 'regular'
-                                  ? 1
-                                  : 2,
+                                    ? 1
+                                    : 2,
                             });
                           }}
                         >
@@ -3100,14 +2819,14 @@ export default function Home(props) {
                                     source={value.bitcoinicon}
                                   />
                                 ) : (
-                                  <Image
-                                    style={styles.cardBitCoinImage}
-                                    source={getCurrencyImageByRegion(
-                                      CurrencyCode,
-                                      'light_blue',
-                                    )}
-                                  />
-                                )}
+                                    <Image
+                                      style={styles.cardBitCoinImage}
+                                      source={getCurrencyImageByRegion(
+                                        CurrencyCode,
+                                        'light_blue',
+                                      )}
+                                    />
+                                  )}
                                 <Text
                                   style={
                                     accounts.accountsSynched
@@ -3119,29 +2838,29 @@ export default function Home(props) {
                                     ? value.accountType === 'test'
                                       ? UsNumberFormat(balances.testBalance)
                                       : value.accountType === 'regular'
-                                      ? UsNumberFormat(balances.regularBalance)
-                                      : UsNumberFormat(balances.secureBalance)
+                                        ? UsNumberFormat(balances.regularBalance)
+                                        : UsNumberFormat(balances.secureBalance)
                                     : value.accountType === 'test'
-                                    ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular' &&
-                                      exchangeRates
-                                    ? (
-                                        (balances.regularBalance / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : exchangeRates
-                                    ? (
-                                        (balances.secureBalance / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : 0}
+                                      ? UsNumberFormat(balances.testBalance)
+                                      : value.accountType === 'regular' &&
+                                        exchangeRates
+                                        ? (
+                                          (balances.regularBalance / 1e8) *
+                                          exchangeRates[CurrencyCode].last
+                                        ).toFixed(2)
+                                        : exchangeRates
+                                          ? (
+                                            (balances.secureBalance / 1e8) *
+                                            exchangeRates[CurrencyCode].last
+                                          ).toFixed(2)
+                                          : 0}
                                 </Text>
                                 <Text style={styles.cardAmountUnitText}>
                                   {switchOn
                                     ? value.unit
                                     : value.accountType === 'test'
-                                    ? value.unit
-                                    : CurrencyCode.toLocaleLowerCase()}
+                                      ? value.unit
+                                      : CurrencyCode.toLocaleLowerCase()}
                                 </Text>
                               </View>
                             </View>
@@ -3192,12 +2911,17 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
-        renderContent={renderTransactionContent}
+        renderContent={() =>
+          <TransactionsContent transactions={transactions}
+            AtCloseEnd={AtCloseEnd}
+            setTransactionItem={setTransactionItem}
+            setTabBarZIndex={setTabBarZIndex}
+            TransactionDetailsBottomSheet={TransactionDetailsBottomSheet} />}
         renderHeader={renderTransactionHeader}
       />
       <BottomSheet
@@ -3216,8 +2940,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderAddContent}
@@ -3249,8 +2973,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderQrContent}
@@ -3272,8 +2996,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderMoreContent}
@@ -3552,9 +3276,9 @@ export default function Home(props) {
         />
       ) : null}
       <BottomSheet
-        onOpenEnd={() => {}}
-        onCloseEnd={() => {}}
-        onCloseStart={() => {}}
+        onOpenEnd={() => { }}
+        onCloseEnd={() => { }}
+        onCloseStart={() => { }}
         enabledInnerScrolling={true}
         ref={GetBittrRecurringBuy as any}
         snapPoints={[
@@ -3587,7 +3311,7 @@ export default function Home(props) {
       />
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
-          onOpenEnd={() => {}}
+          onOpenEnd={() => { }}
           enabledInnerScrolling={true}
           ref={ContactSelectedFromAddressBookBottomSheet as any}
           snapPoints={[
@@ -3602,7 +3326,7 @@ export default function Home(props) {
       ) : null}
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
-          onOpenEnd={() => {}}
+          onOpenEnd={() => { }}
           enabledInnerScrolling={true}
           ref={ContactSelectedFromAddressBookQrCodeBottomSheet as any}
           snapPoints={[
@@ -3756,13 +3480,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>transactions</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_transactions.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_transactions.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('Add')}
@@ -3777,13 +3501,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>add</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_add.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_add.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
@@ -3798,13 +3522,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>qr</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_qr.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_qr.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabBarTabView}
@@ -3819,13 +3543,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>more</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_more.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_more.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -3903,8 +3627,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
