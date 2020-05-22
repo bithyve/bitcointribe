@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ActivityIndicator, AsyncStorage } from 'react-native';
 import BackupStyles from '../../pages/ManageBackup/Styles';
 import Colors from '../../common/Colors';
@@ -43,6 +43,18 @@ export default function SecondaryDeviceModelContents(props) {
     (state) => state.trustedContacts.service,
   );
 
+  const updateGuardianInfo = useCallback(async (contact) => {
+    let guardiansInfo: any = await AsyncStorage.getItem('GuardiansInfo');
+    if (guardiansInfo) {
+      guardiansInfo = JSON.parse(guardiansInfo);
+      guardiansInfo[0] = contact;
+    } else {
+      guardiansInfo = Array(3);
+      guardiansInfo[0] = contact;
+    }
+    await AsyncStorage.setItem('GuardiansInfo', JSON.stringify(guardiansInfo));
+  }, []);
+
   useEffect(() => {
     (async () => {
       const walletID = await AsyncStorage.getItem('walletID');
@@ -56,6 +68,7 @@ export default function SecondaryDeviceModelContents(props) {
 
       if (changeContact) {
         dispatch(uploadEncMShare(0, contactName, data, true));
+        updateGuardianInfo({ firstName: 'Self' });
         setChangeContact(false);
       } else {
         if (SHARES_TRANSFER_DETAILS[0]) {
@@ -63,8 +76,8 @@ export default function SecondaryDeviceModelContents(props) {
           if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
             console.log('here');
             dispatch(uploadEncMShare(0, contactName, data));
+            updateGuardianInfo({ firstName: 'Self' });
           }
-          console.log('HERE');
           // setSecondaryQR(
           //   JSON.stringify({
           //     requester: WALLET_SETUP.walletName,
@@ -89,6 +102,7 @@ export default function SecondaryDeviceModelContents(props) {
           }
         } else {
           dispatch(uploadEncMShare(0, contactName, data));
+          updateGuardianInfo({ firstName: 'Self' });
         }
       }
     })();

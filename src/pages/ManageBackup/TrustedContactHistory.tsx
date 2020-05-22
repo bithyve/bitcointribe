@@ -806,7 +806,24 @@ const TrustedContactHistory = (props) => {
     }
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
-  console.log({ chosenContact });
+  const updateGuardianInfo = useCallback(
+    async (contact) => {
+      let guardiansInfo: any = await AsyncStorage.getItem('GuardiansInfo');
+      if (guardiansInfo) {
+        guardiansInfo = JSON.parse(guardiansInfo);
+        guardiansInfo[index] = contact;
+      } else {
+        guardiansInfo = Array(3);
+        guardiansInfo[index] = contact;
+      }
+      await AsyncStorage.setItem(
+        'GuardiansInfo',
+        JSON.stringify(guardiansInfo),
+      );
+    },
+    [index],
+  );
+
   useEffect(() => {
     (async () => {
       if (!Object.keys(chosenContact).length) return;
@@ -827,12 +844,14 @@ const TrustedContactHistory = (props) => {
         if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
           // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
           dispatch(uploadEncMShare(index, contactName, data, true));
+          updateGuardianInfo(chosenContact);
           setChangeContact(false);
         } else if (
           !SHARES_TRANSFER_DETAILS[index] ||
           Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
         ) {
           dispatch(uploadEncMShare(index, contactName, data));
+          updateGuardianInfo(chosenContact);
         }
       } else {
         console.log({ chosenContact });
