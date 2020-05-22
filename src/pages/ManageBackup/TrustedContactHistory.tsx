@@ -41,10 +41,13 @@ import {
   ErrorSending,
 } from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
-import RequestModalContents from '../../components/RequestModalContents';
+import SendShareModal from './SendShareModal';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import config from '../../bitcoin/Config';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -65,7 +68,7 @@ const TrustedContactHistory = (props) => {
   const [OTP, setOTP] = useState('');
   const [renderTimer, setRenderTimer] = useState(false);
   const [chosenContactIndex, setChosenContactIndex] = useState(1);
-  const [chosenContact, setChosenContact] = useState({});
+  const [chosenContact, setChosenContact] = useState(Object);
   const [trustedContactsBottomSheet, setTrustedContactsBottomSheet] = useState(
     React.createRef(),
   );
@@ -76,9 +79,7 @@ const TrustedContactHistory = (props) => {
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
-  const [requestBottomSheet, setRequestBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [shareBottomSheet, setshareBottomSheet] = useState(React.createRef());
   const [
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
@@ -91,11 +92,11 @@ const TrustedContactHistory = (props) => {
   let [SelectedContacts, setSelectedContacts] = useState([]);
   // const [isSecretShared1, setIsSecretShared1] = useState(false);
   // const [isSecretShared2, setIsSecretShared2] = useState(false);
-  const [
-    trustedContactQrBottomSheet,
-    setTrustedContactQrBottomSheet,
-  ] = useState(React.createRef());
-  const [Temp, setTemp] = useState(false);
+  // const [
+  //   trustedContactQrBottomSheet,
+  //   setTrustedContactQrBottomSheet,
+  // ] = useState(React.createRef());
+  // const [Temp, setTemp] = useState(false);
   //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
   //     secondaryDevice: false,
   //     trustedContact1: false,
@@ -200,7 +201,7 @@ const TrustedContactHistory = (props) => {
       }, 2);
       (trustedContactsBottomSheet as any).current.snapTo(0);
       //(CommunicationModeBottomSheet as any).current.snapTo(1);
-      (requestBottomSheet as any).current.snapTo(1);
+      (shareBottomSheet as any).current.snapTo(1);
     },
     [SelectedContacts, chosenContact],
   );
@@ -212,9 +213,9 @@ const TrustedContactHistory = (props) => {
         onPressBack={() => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={(selectedContacts, index) =>
-          getContacts(selectedContacts, index)
-        }
+        onPressContinue={(selectedContacts, index) => {
+          getContacts(selectedContacts, index);
+        }}
         index={index}
       />
     );
@@ -230,69 +231,68 @@ const TrustedContactHistory = (props) => {
     );
   }, []);
 
-  const [contactForTrustedQR, setContactForTrustedQR] = useState();
-  const renderCommunicationModeModalContent = useCallback(() => {
-    return (
-      <CommunicationMode
-        onContactUpdate={(contact) => {
-          setTimeout(() => {
-            setChosenContact(contact);
-            setTemp(!Temp);
-          }, 2);
-        }}
-        contact={chosenContact ? chosenContact : null}
-        index={index}
-        changeContact={changeContact}
-        onPressBack={() => {
-          (CommunicationModeBottomSheet as any).current.snapTo(0);
-        }}
-        onPressContinue={async (OTP, index, selectedContactMode, contact) => {
-          let selectedContactModeTemp = JSON.parse(
-            await AsyncStorage.getItem('selectedContactMode'),
-          );
-          if (!selectedContactModeTemp) {
-            selectedContactModeTemp = [];
-          }
-          if (index == 1) {
-            selectedContactModeTemp[0] = selectedContactMode;
-          }
-          if (index == 2) {
-            selectedContactModeTemp[1] = selectedContactMode;
-          }
-          await AsyncStorage.setItem(
-            'selectedContactMode',
-            JSON.stringify(selectedContactModeTemp),
-          );
-          setSelectedContactMode(selectedContactModeTemp);
-          if (selectedContactMode.type == 'qrcode') {
-            setContactForTrustedQR(contact);
-            (trustedContactQrBottomSheet as any).current.snapTo(1);
-            (CommunicationModeBottomSheet as any).current.snapTo(0);
-          } else {
-            // setTimeout(() => {
-            //   setRenderTimer(true);
-            //   setOTP(OTP);
-            //   setChosenContactIndex(index);
-            // }, 10);
-            setChosenContactIndex(index);
-            onOTPShare(index); // enables reshare
-            (CommunicationModeBottomSheet as any).current.snapTo(0);
-            // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
-          }
-        }}
-      />
-    );
-  }, [chosenContact, index, selectedContactMode]);
+  // const renderCommunicationModeModalContent = useCallback(() => {
+  //   return (
+  //     <CommunicationMode
+  //       onContactUpdate={(contact) => {
+  //         setTimeout(() => {
+  //           setChosenContact(contact);
+  //           setTemp(!Temp);
+  //         }, 2);
+  //       }}
+  //       contact={chosenContact ? chosenContact : null}
+  //       index={index}
+  //       changeContact={changeContact}
+  //       onPressBack={() => {
+  //         (CommunicationModeBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       onPressContinue={async (OTP, index, selectedContactMode, contact) => {
+  //         let selectedContactModeTemp = JSON.parse(
+  //           await AsyncStorage.getItem('selectedContactMode'),
+  //         );
+  //         if (!selectedContactModeTemp) {
+  //           selectedContactModeTemp = [];
+  //         }
+  //         if (index == 1) {
+  //           selectedContactModeTemp[0] = selectedContactMode;
+  //         }
+  //         if (index == 2) {
+  //           selectedContactModeTemp[1] = selectedContactMode;
+  //         }
+  //         await AsyncStorage.setItem(
+  //           'selectedContactMode',
+  //           JSON.stringify(selectedContactModeTemp),
+  //         );
+  //         setSelectedContactMode(selectedContactModeTemp);
+  //         if (selectedContactMode.type == 'qrcode') {
+  //           setContactForTrustedQR(contact);
+  //           (trustedContactQrBottomSheet as any).current.snapTo(1);
+  //           (CommunicationModeBottomSheet as any).current.snapTo(0);
+  //         } else {
+  //           // setTimeout(() => {
+  //           //   setRenderTimer(true);
+  //           //   setOTP(OTP);
+  //           //   setChosenContactIndex(index);
+  //           // }, 10);
+  //           setChosenContactIndex(index);
+  //           onOTPShare(index); // enables reshare
+  //           (CommunicationModeBottomSheet as any).current.snapTo(0);
+  //           // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+  //         }
+  //       }}
+  //     />
+  //   );
+  // }, [chosenContact, index, selectedContactMode]);
 
-  const renderCommunicationModeModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (CommunicationModeBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  // const renderCommunicationModeModalHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (CommunicationModeBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   const updateHistory = useCallback(
     (shareHistory) => {
@@ -331,8 +331,8 @@ const TrustedContactHistory = (props) => {
 
   const onOTPShare = useCallback(
     async (index) => {
-      (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
-      (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
+      // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
+      // (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
 
       let selectedContactList = JSON.parse(
         await AsyncStorage.getItem('SelectedContacts'),
@@ -353,7 +353,7 @@ const TrustedContactHistory = (props) => {
       updateAutoHighlightFlags();
       saveInTransitHistory();
       setActivateReshare(true);
-      dispatch(checkMSharesHealth());
+      // dispatch(checkMSharesHealth());
     },
     [updateAutoHighlightFlags, saveInTransitHistory, chosenContact],
   );
@@ -456,54 +456,54 @@ const TrustedContactHistory = (props) => {
     dispatch(ErrorSending(null));
   }
 
-  const communicate = async () => {
-    let selectedContactModeTmp =
-      index == 1 ? selectedContactMode[0] : selectedContactMode[1];
-    if (!SHARES_TRANSFER_DETAILS[index]) {
-      setTimeout(() => {
-        setErrorMessageHeader('Failed to share');
-        setErrorMessage(
-          'There was some error while sharing the Recovery Secret, please try again',
-        );
-      }, 2);
-      (ErrorBottomSheet as any).current.snapTo(1);
-      //Alert.alert('Failed to share');
-      return;
-    }
-    const deepLink =
-      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
+  // const communicate = async () => {
+  //   let selectedContactModeTmp =
+  //     index == 1 ? selectedContactMode[0] : selectedContactMode[1];
+  //   if (!SHARES_TRANSFER_DETAILS[index]) {
+  //     setTimeout(() => {
+  //       setErrorMessageHeader('Failed to share');
+  //       setErrorMessage(
+  //         'There was some error while sharing the Recovery Secret, please try again',
+  //       );
+  //     }, 2);
+  //     (ErrorBottomSheet as any).current.snapTo(1);
+  //     //Alert.alert('Failed to share');
+  //     return;
+  //   }
+  //   const deepLink =
+  //     `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
+  //     SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY;
 
-    switch (selectedContactModeTmp.type) {
-      case 'number':
-        textWithoutEncoding(selectedContactModeTmp.info, deepLink);
-        break;
+  //   switch (selectedContactModeTmp.type) {
+  //     case 'number':
+  //       textWithoutEncoding(selectedContactModeTmp.info, deepLink);
+  //       break;
 
-      case 'email':
-        email(
-          [selectedContactModeTmp.info],
-          null,
-          null,
-          'Guardian request',
-          deepLink,
-        );
-        break;
-      case 'qrcode':
-        (trustedContactQrBottomSheet as any).current.snapTo(1);
-        break;
-    }
-    if (selectedContactModeTmp.type != 'qrcode') {
-      let otpTemp = SHARES_TRANSFER_DETAILS[index].OTP
-        ? SHARES_TRANSFER_DETAILS[index].OTP
-        : null;
-      setTimeout(() => {
-        setRenderTimer(true);
-        setOTP(otpTemp);
-        setChosenContactIndex(index);
-      }, 10);
-      (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
-    }
-  };
+  //     case 'email':
+  //       email(
+  //         [selectedContactModeTmp.info],
+  //         null,
+  //         null,
+  //         'Guardian request',
+  //         deepLink,
+  //       );
+  //       break;
+  //     case 'qrcode':
+  //       (trustedContactQrBottomSheet as any).current.snapTo(1);
+  //       break;
+  //   }
+  //   if (selectedContactModeTmp.type != 'qrcode') {
+  //     let otpTemp = SHARES_TRANSFER_DETAILS[index].OTP
+  //       ? SHARES_TRANSFER_DETAILS[index].OTP
+  //       : null;
+  //     setTimeout(() => {
+  //       setRenderTimer(true);
+  //       setOTP(otpTemp);
+  //       setChosenContactIndex(index);
+  //     }, 10);
+  //     (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+  //   }
+  // };
 
   // useEffect(() => {
   //   if (
@@ -529,7 +529,7 @@ const TrustedContactHistory = (props) => {
       setChosenContact(selectedContactList[1]);
     }
     // (CommunicationModeBottomSheet as any).current.snapTo(1);
-    (requestBottomSheet as any).current.snapTo(1);
+    (shareBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);
   }, [selectedTitle, chosenContact]);
 
@@ -605,61 +605,34 @@ const TrustedContactHistory = (props) => {
     );
   }, []);
 
-  const renderTrustedContactQrContents = useCallback(() => {
-    const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
-    if (!contactForTrustedQR) return;
+  // const renderTrustedContactQrContents = useCallback(() => {
+  //   const index = selectedTitle == 'Trusted Contact 1' ? 1 : 2;
+  //   if (!contactForTrustedQR) return;
 
-    return (
-      <TrustedContactQr
-        index={index}
-        contact={contactForTrustedQR}
-        onPressOk={() => {
-          onOTPShare(index);
-        }}
-        onPressBack={() => {
-          onOTPShare(index);
-          (trustedContactQrBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [selectedTitle, contactForTrustedQR]);
+  //   return (
+  //     <TrustedContactQr
+  //       index={index}
+  //       contact={contactForTrustedQR}
+  //       onPressOk={() => {
+  //         onOTPShare(index);
+  //       }}
+  //       onPressBack={() => {
+  //         onOTPShare(index);
+  //         (trustedContactQrBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, [selectedTitle, contactForTrustedQR]);
 
-  const renderTrustedContactQrHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (trustedContactQrBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  const renderSecondaryDeviceMessageContents = () => {
-    return (
-      <TestAccountHelperModalContents
-        topButtonText={`Secondary Device`}
-        image={require('../../assets/images/icons/icon_secondarydevice.png')}
-        helperInfo={`Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (secondaryDeviceMessageBottomSheet.current)
-            (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderSecondaryDeviceMessageHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
+  // const renderTrustedContactQrHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (trustedContactQrBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
 
   const sortedHistory = useCallback((history) => {
     const currentHistory = history.filter((element) => {
@@ -759,31 +732,169 @@ const TrustedContactHistory = (props) => {
     );
   };
 
-  const RequestModalContentFunction = useCallback(() => {
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
+  const [trustedLink, setTrustedLink] = useState('');
+  const [trustedQR, setTrustedQR] = useState('');
+
+  const createDeepLink = useCallback(() => {
+    if (!SHARES_TRANSFER_DETAILS[index]) {
+      setTimeout(() => {
+        setErrorMessageHeader('Failed to share');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Secret, please try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      return;
+    }
+
+    if (!chosenContact) {
+      console.log('Err: Contact missing');
+      return;
+    }
+
+    const contactName = `${chosenContact.firstName} ${chosenContact.lastName}`.toLowerCase();
+
+    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const requester = WALLET_SETUP.walletName;
+
+    if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+      const phoneNumber = chosenContact.phoneNumbers[0].number;
+      console.log({ phoneNumber });
+      const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      const numHintType = 'num';
+      const numHint = number.slice(number.length - 3);
+      const numberEncPubKey = TrustedContactsService.encryptPub(
+        publicKey,
+        number,
+      ).encryptedPub;
+      const numberDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `/${requester}` +
+        `/${numberEncPubKey}` +
+        `/${numHintType}` +
+        `/${numHint}` +
+        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+      console.log({ numberDL });
+      setTrustedLink(numberDL);
+    } else if (chosenContact.emails && chosenContact.emails.length) {
+      const email = chosenContact.emails[0].email;
+      const emailInitials: string = email.split('@')[0];
+      const emailHintType = 'eml';
+      const emailHint = emailInitials.slice(emailInitials.length - 3);
+      const emailEncPubKey = TrustedContactsService.encryptPub(
+        publicKey,
+        emailInitials,
+      ).encryptedPub;
+      const emailDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `/${requester}` +
+        `/${emailEncPubKey}` +
+        `/${emailHintType}` +
+        `/${emailHint}` +
+        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+      console.log({ emailDL });
+      setTrustedLink(emailDL);
+    } else {
+      Alert.alert(
+        'Invalid Contact',
+        'Cannot add a contact without phone-num/email as a trusted entity',
+      );
+    }
+  }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
+
+  console.log({ chosenContact });
+  useEffect(() => {
+    (async () => {
+      if (!Object.keys(chosenContact).length) return;
+      if (
+        chosenContact.firstName &&
+        ((chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) ||
+          (chosenContact.emails && chosenContact.emails.length))
+      ) {
+        const walletID = await AsyncStorage.getItem('walletID');
+        const FCM = await AsyncStorage.getItem('fcmToken');
+        console.log({ walletID, FCM });
+
+        const contactName = `${chosenContact.firstName} ${chosenContact.lastName}`.toLowerCase();
+        const data: EphemeralData = {
+          walletID,
+          FCM,
+        };
+        if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
+          // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
+          dispatch(uploadEncMShare(index, contactName, data, true));
+          setChangeContact(false);
+        } else if (
+          !SHARES_TRANSFER_DETAILS[index] ||
+          Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+        ) {
+          dispatch(uploadEncMShare(index, contactName, data));
+        }
+      } else {
+        console.log({ chosenContact });
+        Alert.alert(
+          'Invalid Contact',
+          'Cannot add a contact without phone-num/email as a trusted entity',
+        );
+      }
+    })();
+  }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);
+
+  useEffect(() => {
+    if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
+      const contactName = `${chosenContact.firstName} ${chosenContact.lastName}`.toLowerCase();
+      console.log({ contactName });
+      if (!trustedContacts.tc.trustedContacts[contactName]) return;
+
+      createDeepLink();
+      const publicKey =
+        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      setTrustedQR(
+        JSON.stringify({
+          isGuardian: true,
+          requester: WALLET_SETUP.walletName,
+          publicKey,
+          uploadedAt: SHARES_TRANSFER_DETAILS[index].UPLOADED_AT,
+          type: 'trustedGuardian',
+        }),
+      );
+    }
+  }, [SHARES_TRANSFER_DETAILS[index], chosenContact, trustedContacts]);
+
+  const SendShareModalFunction = useCallback(() => {
     //console.log("chosenContact", chosenContact);
     if (!isEmpty(chosenContact)) {
       return (
-        <RequestModalContents
+        <SendShareModal
           contact={chosenContact ? chosenContact : null}
-          textHeader={'Requesting Recovery Secret From'}
-          onPressViaQr={() => {
+          index={index}
+          textHeader={'Sharing Secret with'}
+          onPressViaQr={(index) => {
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
+            // setChosenContactIndex(index);
+            onOTPShare(index); // enables reshare
           }}
-          onPressViaLink={() => {
+          onPressViaLink={(index) => {
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
+            // setChosenContactIndex(index);
+            onOTPShare(index); // enables reshare
           }}
         />
       );
     }
-  }, [chosenContact]);
+  }, [chosenContact, index]);
 
-  const RequestHeaderFunction = useCallback(() => {
+  const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (requestBottomSheet as any).current.snapTo(0);
+          (shareBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -793,9 +904,10 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaLink
-          contactText={'Adding as a Trusted Contact:'}
+          contactText={'Adding as a Trusted Contact(Guardian):'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
+          link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(0);
@@ -806,7 +918,7 @@ const TrustedContactHistory = (props) => {
         />
       );
     }
-  }, [chosenContact]);
+  }, [chosenContact, trustedLink]);
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
@@ -825,6 +937,7 @@ const TrustedContactHistory = (props) => {
         <SendViaQR
           contactText={'Adding as a Trusted Contact:'}
           contact={chosenContact ? chosenContact : null}
+          QR={trustedQR}
           contactEmail={''}
           onPressBack={() => {
             if (SendViaQRBottomSheet.current)
@@ -836,7 +949,7 @@ const TrustedContactHistory = (props) => {
         />
       );
     }
-  }, [chosenContact]);
+  }, [chosenContact, trustedQR]);
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
@@ -971,13 +1084,13 @@ const TrustedContactHistory = (props) => {
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={CommunicationModeBottomSheet as any}
         snapPoints={[-30, hp('75%')]}
         renderContent={renderCommunicationModeModalContent}
         renderHeader={renderCommunicationModeModalHeader}
-      />
+      /> */}
       <BottomSheet
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {
@@ -1021,7 +1134,7 @@ const TrustedContactHistory = (props) => {
         renderContent={renderConfirmContent}
         renderHeader={renderConfirmHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {
             onOTPShare(index);
@@ -1033,10 +1146,10 @@ const TrustedContactHistory = (props) => {
         snapPoints={[-30, hp('85%')]}
         renderContent={renderTrustedContactQrContents}
         renderHeader={renderTrustedContactQrHeader}
-      />
+      /> */}
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
@@ -1046,17 +1159,17 @@ const TrustedContactHistory = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={requestBottomSheet as any}
+        ref={shareBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('65%'),
         ]}
-        renderContent={RequestModalContentFunction}
-        renderHeader={RequestHeaderFunction}
+        renderContent={SendShareModalFunction}
+        renderHeader={SendModalFunction}
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={SendViaLinkBottomSheet}
+        ref={SendViaLinkBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
@@ -1066,7 +1179,7 @@ const TrustedContactHistory = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={SendViaQRBottomSheet}
+        ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),

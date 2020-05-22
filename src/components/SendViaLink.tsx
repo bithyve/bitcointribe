@@ -57,10 +57,10 @@ export default function SendViaLink(props) {
   const contact = props.contact;
   //console.log("Contact SEND VIA LINK", contact);
   const [Contact, setContact] = useState(props.contact ? props.contact : {});
-  
+
   useEffect(() => {
     let contactName =
-    Contact && Contact.firstName && Contact.lastName
+      Contact && Contact.firstName && Contact.lastName
         ? Contact.firstName + ' ' + Contact.lastName
         : Contact && Contact.firstName && !Contact.lastName
         ? Contact.firstName
@@ -82,7 +82,6 @@ export default function SendViaLink(props) {
         }
       }
       setShareApps(shareApps);
-      
     })();
   }, [contact]);
 
@@ -94,7 +93,7 @@ export default function SendViaLink(props) {
   useEffect(() => {
     if (props.link) setShareLink(props.link);
   }, [props.link]);
-  
+
   const openWhatsApp = (appUrl) => {
     if (shareLink) {
       let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
@@ -231,29 +230,35 @@ export default function SendViaLink(props) {
                 {contactName ? (
                   <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
-                {Contact && Contact.phoneNumbers.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                  }}
-                >
-                  {Contact.phoneNumbers[0].digits}
-                </Text> : null }
-                {Contact && Contact.emails.length ? <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                    paddingBottom: 5,
-                  }}
-                >
-                  {Contact.emails[0].email}
-                </Text> : null}
+                {Contact &&
+                Contact.phoneNumbers &&
+                Contact.phoneNumbers.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                    }}
+                  >
+                    {Contact.phoneNumbers[0].digits}
+                  </Text>
+                ) : null}
+                {Contact && Contact.emails && Contact.emails.length ? (
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(10),
+                      marginLeft: 25,
+                      paddingTop: 3,
+                      paddingBottom: 5,
+                    }}
+                  >
+                    {Contact.emails[0].email}
+                  </Text>
+                ) : null}
               </View>
             </View>
             {Contact && Contact.imageAvailable ? (
@@ -351,7 +356,6 @@ export default function SendViaLink(props) {
             marginBottom: hp('4%'),
           }}
         >
-
           <ScrollView horizontal={true}>
             {shareApps.map((item) => {
               if (item.isAvailable) {
@@ -402,7 +406,6 @@ export default function SendViaLink(props) {
                   </AppBottomSheetTouchableWrapper>
                 );
               }
-
             })}
           </ScrollView>
         </View>
