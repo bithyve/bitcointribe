@@ -59,6 +59,24 @@ export default function AddContactSendRequest(props) {
     (state) => state.trustedContacts.service,
   );
 
+  const updateTrustedContactsInfo = async (contact) => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    console.log({ trustedContactsInfo });
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      trustedContactsInfo.push(contact);
+    } else {
+      trustedContactsInfo = [contact];
+    }
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
+  };
+
   const dispatch = useDispatch();
   useEffect(() => {
     if (Contact && Contact.firstName) {
@@ -77,6 +95,7 @@ export default function AddContactSendRequest(props) {
           dispatch(updateEphemeralChannel(contactName, data));
         })();
       } else {
+        updateTrustedContactsInfo(Contact); // Contact initialized to become TC
         if (!trustedLink) createDeepLink();
 
         if (!trustedQR) {
