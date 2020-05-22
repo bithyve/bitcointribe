@@ -320,6 +320,66 @@ export default function SendConfirmation(props) {
     }
   }
 
+  const getImageIcon = item => {
+    if (item) {
+
+      if (item.account_name === 'Checking Account') {
+        return (
+          <Image
+            source={require('../../assets/images/icons/icon_regular.png')}
+            style={styles.circleShapeView}
+          />
+        )
+      }
+
+      if (item.account_name === 'Saving Account') {
+        return (
+          <Image
+            source={require('../../assets/images/icons/icon_secureaccount.png')}
+            style={styles.circleShapeView}
+          />
+        )
+      }
+
+      if (item.imageAvailable) {
+        return (
+          <Image
+            source={item.image}
+            style={styles.circleShapeView}
+          />
+        );
+      } else {
+        return (
+          <View
+            style={{...styles.circleShapeView, 
+              backgroundColor: Colors.shadowBlue, 
+              alignItems: 'center', 
+              justifyContent: 'center'}}>
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 13,
+                lineHeight: 13, //... One for top and one for bottom alignment
+              }}
+            >
+              {item
+                ? nameToInitials(
+                    item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
+                : ''}
+            </Text>
+          </View>
+        );
+      }
+    }
+  }
+
   const renderSingleContact = ({ item, index }) => {
     return (
       <View style={{ flexDirection: 'column' }}>
@@ -332,7 +392,8 @@ export default function SendConfirmation(props) {
               justifyContent: 'center',
               backgroundColor: Colors.backgroundColor1
             }}>
-            <Image style={{ ...styles.circleShapeView, margin: 10 }} source={require('../../assets/images/icons/icon_contact.png')} resizeMode="contain" />
+            {/* <Image style={{ ...styles.circleShapeView, margin: 10 }} source={require('../../assets/images/icons/icon_contact.png')} resizeMode="contain" /> */}
+            {getImageIcon(item.selectedContact)}
             <View style={{ flex: 1, margin: 10, justifyContent: 'center' }}>
               <Text
                 style={{
@@ -486,7 +547,7 @@ export default function SendConfirmation(props) {
                           fontSize: RFValue(10),
                           fontFamily: Fonts.FiraSansRegular,
                         }}>
-                        Sending From:
+                        Sending From: 
                       </Text>
                       <Text
                         style={{
