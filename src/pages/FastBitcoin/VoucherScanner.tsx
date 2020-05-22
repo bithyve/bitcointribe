@@ -232,8 +232,8 @@ const VoucherScanner = (props) => {
   }, [accounts1]);
 
   useEffect(() => {
-      if (voucherCode) {
-        if (selectedAccount.accountType != '') {
+    if (voucherCode) {
+      if (selectedAccount.accountType != '') {
         (async () => {
           let voucherDataTemp = JSON.parse(
             await AsyncStorage.getItem('voucherData'),
@@ -854,33 +854,37 @@ const VoucherScanner = (props) => {
                       }}
                       style={styles.dropDownElement}
                     >
-                      <Image
-                        source={value.image}
-                        style={{ width: wp('8%'), height: wp('8%') }}
-                      />
+                      {value.accountType != '' && (
+                        <Image
+                          source={value.image}
+                          style={{ width: wp('8%'), height: wp('8%') }}
+                        />
+                      )}
                       <View style={{ flex: 1, marginLeft: 10 }}>
                         <Text style={styles.dropDownElementTitleText}>
                           {value.accountName}
                         </Text>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'flex-end',
-                          }}
-                        >
-                          <Image
-                            style={styles.cardBitCoinImage}
-                            source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                          />
-                          <Text style={styles.cardAmountText}>
-                            {value.accountType === TEST_ACCOUNT
-                              ? UsNumberFormat(balances.testBalance)
-                              : value.accountType === REGULAR_ACCOUNT
-                              ? UsNumberFormat(balances.regularBalance)
-                              : UsNumberFormat(balances.secureBalance)}
-                          </Text>
-                          <Text style={styles.cardAmountUnitText}>sats</Text>
-                        </View>
+                        {value.accountType != '' && (
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'flex-end',
+                            }}
+                          >
+                            <Image
+                              style={styles.cardBitCoinImage}
+                              source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                            />
+                            <Text style={styles.cardAmountText}>
+                              {value.accountType === TEST_ACCOUNT
+                                ? UsNumberFormat(balances.testBalance)
+                                : value.accountType === REGULAR_ACCOUNT
+                                ? UsNumberFormat(balances.regularBalance)
+                                : UsNumberFormat(balances.secureBalance)}
+                            </Text>
+                            <Text style={styles.cardAmountUnitText}>sats</Text>
+                          </View>
+                        )}
                       </View>
                       <View
                         style={{
