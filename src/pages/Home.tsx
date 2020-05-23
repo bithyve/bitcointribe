@@ -85,7 +85,6 @@ import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
-import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
@@ -1785,16 +1784,6 @@ export default function Home(props) {
   //   );
   // };
 
-  const renderGetBittrRecurringBuyContents = () => {
-    return (
-      <GetBittrRecurringBuyContents
-        onPressBack={() => {
-          (GetBittrRecurringBuy as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
   const renderGetBittrRecurringBuyHeader = () => {
     return (
       <ModalHeader
@@ -3275,19 +3264,6 @@ export default function Home(props) {
           renderHeader={renderFastBitcoinSellCalculationHeader}
         />
       ) : null}
-      <BottomSheet
-        onOpenEnd={() => { }}
-        onCloseEnd={() => { }}
-        onCloseStart={() => { }}
-        enabledInnerScrolling={true}
-        ref={GetBittrRecurringBuy as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderGetBittrRecurringBuyContents}
-        renderHeader={renderGetBittrRecurringBuyHeader}
-      />
       <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
