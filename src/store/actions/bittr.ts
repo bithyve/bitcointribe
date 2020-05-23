@@ -101,21 +101,4 @@ export const verifiedEmail = () => {
   return { type: VERIFIED_EMAIL, payload: { emailVerified: false } }
 }
 
-export const verifyXpubSuccess = data => {
-  return {
-    type: VERIFY_XPUB_SUCCESS,
-    payload: {
-      xpubVerified: true,
-      xpubDetails: data
-    }
-  }
-}
 
-export const verifyXpubFail = () => {
-  return {
-    type: VERIFY_XPUB_FAIL,
-    payload: {
-      xpubVerified: false
-    }
-  }
-}

@@ -10,20 +10,16 @@ import {
   sendSmsFail,
   verifyEmailSuccess,
   verifyEmailFail,
-  verifyXpubSuccess,
-  verifyXpubFail,
   SEND_EMAIL_REQUEST,
   CREATE_USER_REQUEST,
   SEND_SMS_REQUEST,
   VERIFY_EMAIL_REQUEST,
-  VERIFY_XPUB_REQUEST
 } from '../actions/bittr'
 import {
   createService,
   sendEmailService,
   smsService,
   verifyEmailService,
-  xpubService
 } from '../../services/api'
 import { createWatcher } from '../utils/utilities'
 
@@ -73,15 +69,3 @@ export function* verifyEmailWorker({ payload }) {
   }
 }
 export const verifyEmailWatcher = createWatcher(verifyEmailWorker, VERIFY_EMAIL_REQUEST);
-
-export function* verifyXpubWorker({ payload }) {
-  // yield take(types.VERIFY_XPUB_REQUEST);
-  const result = yield call(xpubService, payload.data)
-  console.log('XPUB RESULT', result)
-  if (!result) {
-    yield put(verifyXpubFail())
-  } else {
-    yield put(verifyXpubSuccess(result.data))
-  }
-}
-export const verifyXpubWatcher = createWatcher(verifyXpubWorker, VERIFY_XPUB_REQUEST);
