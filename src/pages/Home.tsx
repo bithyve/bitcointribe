@@ -132,7 +132,7 @@ export default function Home(props) {
     notificationsListBottomSheet,
     setNotificationsListBottomSheet,
   ] = useState(React.createRef());
-  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(
+  const [GetBittrRecurringBuy ] = useState(
     React.createRef(),
   );
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -1784,47 +1784,7 @@ export default function Home(props) {
   //   );
   // };
 
-  const renderGetBittrRecurringBuyHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setAddSubBottomSheetsFlag(false);
-            setTabBarZIndex(999);
-          }, 2);
-          (GetBittrRecurringBuy as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderGetBittrSaveBitcoinContents = () => {
-    return (
-      <SaveBitcoinModalContents
-        onPressBack={() => {
-          (AddBottomSheet as any).current.snapTo(0);
-        }}
-        onPressElements={(type) => onPressSaveBitcoinElements(type)}
-      />
-    );
-  };
-
-  const onPressSaveBitcoinElements = (type) => {
-    if (type == 'recurringBuy') {
-      (GetBittrRecurringBuy as any).current.snapTo(1);
-    } else if (type == 'voucher') {
-      props.navigation.navigate('VoucherScanner');
-    } else if (type == 'existingSavingMethods') {
-      props.navigation.navigate('ExistingSavingMethods');
-    }
-  };
-
   const renderAddModalContents = () => {
-    if (selectToAdd == 'Getbittr') {
-      return renderGetBittrSaveBitcoinContents();
-    } else if (selectToAdd == 'buyBitcoins') {
-      return renderGetBittrSaveBitcoinContents();
-    }
     //else if (selectToAdd == 'Fastbitcoins') {
     //   return (
     //     <FastBitcoinModalContents
@@ -1850,7 +1810,7 @@ export default function Home(props) {
     //     />
     //   );
     //}
-    else if (selectToAdd == 'addContact') {
+    if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
