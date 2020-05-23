@@ -9,7 +9,6 @@ import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
 import manageBackupReducer from './reducers/manageBackup';
-import GetBittrReducer from './reducers/bittr';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
@@ -79,14 +78,6 @@ import {
   sharePdfWatcher,
   dbUpdatePdfSharingWatcher,
 } from './sagas/manageBackup';
-
-import {
-  sendEmailWatcher,
-  createUserWatcher,
-  sendSmsWatcher,
-  verifyEmailWatcher,
-  verifyXpubWatcher,
-} from './sagas/bittr';
 
 import {
   accountSyncWatcher,
@@ -193,13 +184,6 @@ const rootSaga = function* () {
     sharePdfWatcher,
     dbUpdatePdfSharingWatcher,
 
-    //GetBittr
-    sendEmailWatcher,
-    createUserWatcher,
-    sendSmsWatcher,
-    verifyEmailWatcher,
-    verifyXpubWatcher,
-
     //fBTC
     accountSyncWatcher,
     getQuoteWatcher,
@@ -243,7 +227,6 @@ const rootReducer = combineReducers({
   accounts: accountsReducer,
   sss: sssReducer,
   manageBackup: manageBackupReducer,
-  bittr: GetBittrReducer,
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
