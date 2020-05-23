@@ -20,16 +20,6 @@ export const SIGNING_AXIOS: AxiosInstance = axios.create({
     timeout: REQUEST_TIMEOUT,
 });
 
-export const createService = (data) =>
-    api.post('/customer', data);
-
-export const sendEmailService = (data) =>
-    api.post('/verify/email', data);
-
-export const smsService = (data) =>
-    api.post('/verify/sms', data);
-
-
 export function setApiHeaders({ appVersion, appBuildNumber }) {
     axios.defaults.headers.common.appVersion = appVersion;
     axios.defaults.headers.common.appBuildNumber = appBuildNumber;
