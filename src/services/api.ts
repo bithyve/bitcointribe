@@ -1,8 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import config from '../bitcoin/Config';
 const { RELAY, SIGNING_SERVER, REQUEST_TIMEOUT } = config;
-//const PROXY_URL = 'https://cors-anywhere.herokuapp.com/'
-const URL = 'GETBITTR_URL';
+const URL = '';
 
 const api = axios.create({
     baseURL: URL,
