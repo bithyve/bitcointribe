@@ -14,12 +14,6 @@ import { FlatList } from "react-native-gesture-handler";
 
 export default function AddModalContents( props ) {
 	const [ addData, setAddData ] = useState( [
-		// {
-		// 	title: 'Getbittr', 
-		// 	image: require('../assets/images/icons/icon_getbitter.png'), 
-		// 	info: 'GetBittr gives you an easy way to stack sats',
-		// 	type:'getBittr'
-		// },
 		{
 			title: `Buy Bitcoins`, 
 			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 

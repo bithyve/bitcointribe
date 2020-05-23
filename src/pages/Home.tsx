@@ -42,7 +42,6 @@ import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
 import FastBitcoinModalContents from '../components/FastBitcoinModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
-import GetBittrModalContents from '../components/GetBittrModalContents';
 import AddContactsModalContents from '../components/AddContactsModalContents';
 import FamilyandFriendsAddressBookModalContents from '../components/FamilyandFriendsAddressBookModalContents';
 import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
