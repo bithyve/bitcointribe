@@ -24,13 +24,3 @@ export const SEND_SMS_PARAMS = {
   country_code: 44
 }
 
-export const VERIFY_EMAIL_PARAMS = {
-  token: 'IUP5TCLFEZX6ACVOH9KH1WQD54HCVYO7TOP5JTSOCIJEABSPZ98WNJJTXEIJIFVO'
-}
-
-export const VERIFY_XPUB_PARAMS = {
-  xpub_key:
-    'xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKrhko4egpiMZbpiaQL2jkwSB1icqYh2cfDfVxdx4df189oLKnC5fSwqPfgyP3hooxujYzAu3fDVmz',
-  xpub_path: 'm/0/x',
-  xpub_addr_type: 'auto' // (auto/p2sh-segwit/bech32)
-}
