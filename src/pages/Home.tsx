@@ -34,7 +34,6 @@ import CustodianRequestModalContents from '../components/CustodianRequestModalCo
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import SaveBitcoinModalContents from './GetBittr/SaveBitcoinModalContents';
 import HomePageShield from '../components/HomePageShield';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
 import TransactionListModalContents from '../components/TransactionListModalContents';
@@ -132,9 +131,6 @@ export default function Home(props) {
     notificationsListBottomSheet,
     setNotificationsListBottomSheet,
   ] = useState(React.createRef());
-  const [GetBittrRecurringBuy ] = useState(
-    React.createRef(),
-  );
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -2137,13 +2133,6 @@ export default function Home(props) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
       props.navigation.navigate('VoucherScanner', { userKey });
     }
-    /**
-     * Below else loop is for Getbittr changes
-     */
-    // else {
-    //   const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-    //   props.navigation.navigate('SignUpDetails', { EmailToken });
-    // }
   }, []);
 
   useEffect(() => {
