@@ -26,17 +26,8 @@ export const createService = (data) =>
 export const sendEmailService = (data) =>
     api.post('/verify/email', data);
 
-export const emailService = (data) =>
-    api.post('/verify/email/check', data);
-
-export const verifyEmailService = (data) =>
-    api.post('/verify/email/check', data);
-
 export const smsService = (data) =>
     api.post('/verify/sms', data);
-
-export const xpubService = (data) =>
-    api.post('/xpub/check', data);
 
 
 export function setApiHeaders({ appVersion, appBuildNumber }) {
