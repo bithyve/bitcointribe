@@ -75,6 +75,21 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
+export interface DerivativeAccountElements {
+  xpub: string;
+  ypub?: string;
+  usedAddresses?: string[];
+  nextFreeAddressIndex?: number;
+  receivingAddress?: string;
+  balances?: {
+    balance: number;
+    unconfirmedBalance: number;
+  };
+  transactions?: Transactions;
+  lastBalTxSync?: number;
+  newTransactions?: TransactionDetails[];
+}
+
 // Base Dervative Account
 export interface DerivativeAccount {
   series: number;
@@ -82,20 +97,29 @@ export interface DerivativeAccount {
     max: number;
     using: number;
   };
-  [accounts: number]: {
+  [accounts: number]: DerivativeAccountElements;
+}
+
+export interface TrustedContactDerivativeAccountElements {
+  contactName: string;
+  contactDetails?: {
     xpub: string;
-    ypub?: string;
+    receivingAddress?: string;
     usedAddresses?: string[];
     nextFreeAddressIndex?: number;
-    receivingAddress?: string;
-    balances?: {
-      balance: number;
-      unconfirmedBalance: number;
-    };
-    transactions?: Transactions;
-    lastBalTxSync?: number;
-    newTransactions?: TransactionDetails[];
   };
+  xpub: string;
+  ypub?: string;
+  usedAddresses?: string[];
+  nextFreeAddressIndex?: number;
+  receivingAddress?: string;
+  balances?: {
+    balance: number;
+    unconfirmedBalance: number;
+  };
+  transactions?: Transactions;
+  lastBalTxSync?: number;
+  newTransactions?: TransactionDetails[];
 }
 
 // Trusted Contact Dervative Account (extension of Base Derivative Account)
@@ -105,25 +129,7 @@ export interface TrustedContactDerivativeAccount {
     max: number;
     using: number;
   };
-  [accounts: number]: {
-    contactName: string;
-    contactDetails?: {
-      xpub: string;
-      receivingAddress?: string;
-    };
-    xpub: string;
-    ypub?: string;
-    usedAddresses?: string[];
-    nextFreeAddressIndex?: number;
-    receivingAddress?: string;
-    balances?: {
-      balance: number;
-      unconfirmedBalance: number;
-    };
-    transactions?: Transactions;
-    lastBalTxSync?: number;
-    newTransactions?: TransactionDetails[];
-  };
+  [accounts: number]: TrustedContactDerivativeAccountElements;
 }
 
 export interface DerivativeAccounts {
