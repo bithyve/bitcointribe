@@ -9,6 +9,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  TCAdditionals,
 } from '../Interface';
 
 export default class BaseAccount {
@@ -219,7 +220,7 @@ export default class BaseAccount {
     accountType: string,
     accountNumber?: number,
     additional?: {
-      contactName?: string;
+      trustedContact?: TCAdditionals;
     },
   ):
     | {

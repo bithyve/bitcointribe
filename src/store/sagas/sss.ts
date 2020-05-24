@@ -604,20 +604,25 @@ function* checkMSharesHealthWorker() {
             const trustedAccounts: DerivativeAccount =
               regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
             const accountNumber = trustedAccounts.instance.using + 1;
-            const additional = {
-              contactName: guardian,
+            const additionalData = {
+              trustedContact: {
+                contactName: guardian,
+              },
             };
             yield call(
               regularService.getDerivativeAccXpub,
               TRUSTED_ACCOUNTS,
               accountNumber,
-              additional,
+              additionalData,
             );
             console.log({ trustedAccounts });
 
             // update the trusted channel with the xpub
+            const { additional } = trustedAccounts[accountNumber];
             if (
-              trustedAccounts[accountNumber].additional.contactName === guardian
+              additional &&
+              additional.trustedContact &&
+              additional.trustedContact.contactName === guardian
             ) {
               const data: TrustedDataElements = {
                 xpub: trustedAccounts[accountNumber].xpub,

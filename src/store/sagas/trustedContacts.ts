@@ -246,10 +246,8 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
     const { trustedChannel } = contacts[contactName];
     if (trustedChannel) {
       if (trustedChannel.data) {
-        console.log('here');
         if (trustedChannel.data.length !== 2) {
           // implies missing trusted data from the counter party
-          console.log('here');
           const res = yield call(
             trustedContacts.fetchTrustedChannel,
             contactName,
@@ -279,7 +277,9 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
           regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
         const accountNumber = trustedAccounts.instance.using + 1;
         const additional = {
-          contactName,
+          trustedContact: {
+            contactName,
+          },
         };
         yield call(
           regularService.getDerivativeAccXpub,
@@ -324,7 +324,9 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
           regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
         const accountNumber = trustedAccounts.instance.using + 1;
         const additional = {
-          contactName,
+          trustedContact: {
+            contactName,
+          },
         };
         yield call(
           regularService.getDerivativeAccXpub,

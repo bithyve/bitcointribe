@@ -50,13 +50,13 @@ export default class TrustedContacts {
     key?: string,
   ):
     | {
-      encryptedPub: string;
-      otp: string;
-    }
+        encryptedPub: string;
+        otp: string;
+      }
     | {
-      encryptedPub: string;
-      otp?: undefined;
-    } => {
+        encryptedPub: string;
+        otp?: undefined;
+      } => {
     let usedOTP = false;
     if (!key) {
       key = TrustedContacts.generateOTP(parseInt(config.SSS_OTP_LENGTH, 10));
@@ -272,15 +272,15 @@ export default class TrustedContacts {
     fetch?: Boolean,
   ): Promise<
     | {
-      updated: any;
-      publicKey: string;
-      data: EphemeralData;
-    }
+        updated: any;
+        publicKey: string;
+        data: EphemeralData;
+      }
     | {
-      updated: any;
-      publicKey: string;
-      data?: undefined;
-    }
+        updated: any;
+        publicKey: string;
+        data?: undefined;
+      }
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -422,13 +422,13 @@ export default class TrustedContacts {
     fetch?: Boolean,
   ): Promise<
     | {
-      updated: any;
-      data: TrustedData;
-    }
+        updated: any;
+        data: TrustedData;
+      }
     | {
-      updated: any;
-      data?: undefined;
-    }
+        updated: any;
+        data?: undefined;
+      }
   > => {
     try {
       if (!this.trustedContacts[contactName]) {

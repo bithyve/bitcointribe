@@ -13,6 +13,7 @@ import {
   TransactionPrerequisite,
   InputUTXOs,
   OutputUTXOs,
+  TCAdditionals,
 } from '../Interface';
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
@@ -159,7 +160,7 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountNumber?: number,
     additional?: {
-      contactName?: string;
+      trustedContact?: TCAdditionals;
     },
   ): string => {
     // generates receiving xpub for derivative accounts
@@ -209,7 +210,7 @@ export default class HDSegwitWallet extends Bitcoin {
         if (
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
-          itr <
+            itr <
           0
         ) {
           continue;
@@ -358,7 +359,7 @@ export default class HDSegwitWallet extends Bitcoin {
         console.log(
           'Failed to find a free address in the external address cycle, using the next address without checking',
         );
-        // giving up as we could find a free address in the above cycle
+        // giving up as we couldn't find a free address in the above cycle
         freeAddress = this.getExternalAddressByIndex(
           this.nextFreeAddressIndex + itr,
         ); // not checking this one, it might be free
@@ -509,8 +510,8 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const externalAddress = this.getExternalAddressByIndex(
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-      this.gapLimit -
-      1,
+        this.gapLimit -
+        1,
       this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
@@ -867,15 +868,15 @@ export default class HDSegwitWallet extends Bitcoin {
     averageTxFees?: any,
   ): Promise<
     | {
-      fee: number;
-      balance: number;
-      txPrerequisites?: undefined;
-    }
+        fee: number;
+        balance: number;
+        txPrerequisites?: undefined;
+      }
     | {
-      txPrerequisites: TransactionPrerequisite;
-      fee?: undefined;
-      balance?: undefined;
-    }
+        txPrerequisites: TransactionPrerequisite;
+        fee?: undefined;
+        balance?: undefined;
+      }
   > => {
     const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
     console.log('Input UTXOs:', inputUTXOs);
@@ -1270,7 +1271,7 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountNumber: number = 1,
     additional?: {
-      contactName?: string;
+      trustedContact?: TCAdditionals;
     },
   ) => {
     if (!this.derivativeAccounts[accountType])
@@ -1286,7 +1287,7 @@ export default class HDSegwitWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
@@ -1295,10 +1296,12 @@ export default class HDSegwitWallet extends Bitcoin {
       this.derivativeAccounts[accountType].instance.using++;
 
       if (additional) {
-        this.derivativeAccounts[accountType][accountNumber].additional = {
-          ...this.derivativeAccounts[accountType][accountNumber].additional,
-          ...additional,
-        };
+        if (additional.trustedContact) {
+          this.derivativeAccounts[accountType][accountNumber].additional = {
+            ...this.derivativeAccounts[accountType][accountNumber].additional,
+            trustedContact: additional.trustedContact,
+          };
+        }
       }
       return xpub;
     }

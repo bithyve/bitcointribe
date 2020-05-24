@@ -75,6 +75,11 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
+export interface TCAdditionals {
+  contactName: string;
+  contactsXpub?: string;
+  receivingAddress?: string;
+}
 export interface DerivativeAccount {
   series: number;
   instance: {
@@ -94,7 +99,10 @@ export interface DerivativeAccount {
     transactions?: Transactions;
     lastBalTxSync?: number;
     newTransactions?: TransactionDetails[];
-    additional?: { contactName?: string }; // TC identifier
+    additional?: {
+      // contains addtional data (specific to derivative acc type)
+      trustedContact?: TCAdditionals;
+    };
   };
 }
 
