@@ -75,11 +75,7 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
-export interface TCAdditionals {
-  contactName: string;
-  contactsXpub?: string;
-  receivingAddress?: string;
-}
+// Base Dervative Account
 export interface DerivativeAccount {
   series: number;
   instance: {
@@ -99,15 +95,39 @@ export interface DerivativeAccount {
     transactions?: Transactions;
     lastBalTxSync?: number;
     newTransactions?: TransactionDetails[];
-    additional?: {
-      // contains addtional data (specific to derivative acc type)
-      trustedContact?: TCAdditionals;
+  };
+}
+
+// Trusted Contact Dervative Account (extension of Base Derivative Account)
+export interface TrustedContactDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: {
+    contactName: string;
+    contactDetails?: {
+      xpub: string;
+      receivingAddress?: string;
     };
+    xpub: string;
+    ypub?: string;
+    usedAddresses?: string[];
+    nextFreeAddressIndex?: number;
+    receivingAddress?: string;
+    balances?: {
+      balance: number;
+      unconfirmedBalance: number;
+    };
+    transactions?: Transactions;
+    lastBalTxSync?: number;
+    newTransactions?: TransactionDetails[];
   };
 }
 
 export interface DerivativeAccounts {
-  [accountType: string]: DerivativeAccount;
+  [accountType: string]: DerivativeAccount | TrustedContactDerivativeAccount;
 }
 
 export enum notificationType {

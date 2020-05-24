@@ -11,10 +11,12 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
-  TCAdditionals,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
-import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
+import {
+  FAST_BITCOINS,
+  TRUSTED_ACCOUNTS,
+} from '../../../common/constants/serviceTypes';
 import { SIGNING_AXIOS } from '../../../services/api';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -1429,10 +1431,12 @@ export default class SecureHDWallet extends Bitcoin {
   private generateDerivativeXpub = (
     accountType: string,
     accountNumber: number = 1,
-    additional?: {
-      trustedContact?: TCAdditionals;
-    },
   ) => {
+    if (accountType === TRUSTED_ACCOUNTS)
+      throw new Error(
+        `Secure a/c doesn't support account-type: ${accountType} yet`,
+      );
+
     if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
     if (accountNumber > this.derivativeAccounts[accountType].instance.max)
@@ -1454,14 +1458,6 @@ export default class SecureHDWallet extends Bitcoin {
       this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
       this.derivativeAccounts[accountType].instance.using++;
 
-      if (additional) {
-        if (additional.trustedContact) {
-          this.derivativeAccounts[accountType][accountNumber].additional = {
-            ...this.derivativeAccounts[accountType][accountNumber].additional,
-            trustedContact: additional.trustedContact,
-          };
-        }
-      }
       return xpub;
     }
   };

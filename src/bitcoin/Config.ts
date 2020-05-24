@@ -89,7 +89,11 @@ import {
   BIT_TRUSTED_CONTACTS_SERIES,
   BIT_TRUSTED_CONTACTS_INSTANCE_COUNT,
 } from 'react-native-dotenv';
-import { DerivativeAccount, DerivativeAccounts } from './utilities/Interface';
+import {
+  DerivativeAccount,
+  DerivativeAccounts,
+  TrustedContactDerivativeAccount,
+} from './utilities/Interface';
 
 class Config {
   public ENVIRONMENT: string;
@@ -241,7 +245,7 @@ class Config {
     },
   };
 
-  TRUSTED_ACCOUNTS: DerivativeAccount = {
+  TRUSTED_ACCOUNTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: parseInt(BIT_TRUSTED_CONTACTS_SERIES, 10),
     instance: {

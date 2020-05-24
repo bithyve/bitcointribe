@@ -9,7 +9,6 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
-  TCAdditionals,
 } from '../Interface';
 
 export default class BaseAccount {
@@ -219,9 +218,7 @@ export default class BaseAccount {
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
-    additional?: {
-      trustedContact?: TCAdditionals;
-    },
+    contactName?: string,
   ):
     | {
         status: number;
@@ -241,7 +238,7 @@ export default class BaseAccount {
         data: this.hdWallet.getDerivativeAccXpub(
           accountType,
           accountNumber,
-          additional,
+          contactName,
         ),
       };
     } catch (err) {
