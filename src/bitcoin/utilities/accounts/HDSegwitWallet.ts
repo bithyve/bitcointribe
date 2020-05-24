@@ -231,9 +231,7 @@ export default class HDSegwitWallet extends Bitcoin {
         accountType,
         contactName,
       );
-    }
-
-    if (!this.derivativeAccounts[accountType][accountNumber]) {
+    } else if (!this.derivativeAccounts[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
@@ -383,6 +381,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public fetchDerivativeAccBalanceTxs = async (
     accountType: string,
     accountNumber: number = 1,
+    contactName?: string,
   ): Promise<{
     balances: {
       balance: number;
@@ -393,7 +392,32 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (!this.derivativeAccounts[accountType][accountNumber]) {
+    if (accountType === TRUSTED_ACCOUNTS) {
+      if (!contactName)
+        throw new Error(`Required param: contactName for ${accountType}`);
+
+      contactName = contactName.toLowerCase();
+      const trustedAccounts: TrustedContactDerivativeAccount = this
+        .derivativeAccounts[accountType];
+      const inUse = trustedAccounts.instance.using;
+      let account;
+
+      for (let index = 0; index <= inUse; index++) {
+        if (
+          trustedAccounts[index] &&
+          trustedAccounts[index].contactName === contactName
+        ) {
+          account = trustedAccounts[index];
+          accountNumber = index;
+        }
+      }
+
+      if (!account) {
+        throw new Error(
+          `No trusted contact derivative account exists for: ${contactName}`,
+        );
+      }
+    } else if (!this.derivativeAccounts[accountType][accountNumber]) {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
@@ -423,7 +447,7 @@ export default class HDSegwitWallet extends Bitcoin {
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
       usedAddresses,
-      accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
+      accountType,
     );
 
     const lastSyncTime =
