@@ -14,7 +14,6 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 
 const ModalHeader = (props) => {
-  console.log("ModalHeader rendered")
   return <AppBottomSheetTouchableWrapper
     activeOpacity={10}
     onPress={() => props.onPressHeader()}
