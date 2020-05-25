@@ -32,6 +32,7 @@ export default class BaseAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
     },
     network?: Network,
   ) {
@@ -218,9 +219,7 @@ export default class BaseAccount {
   public getDerivativeAccXpub = (
     accountType: string,
     accountNumber?: number,
-    additional?: {
-      contactName?: string;
-    },
+    contactName?: string,
   ):
     | {
         status: number;
@@ -240,7 +239,7 @@ export default class BaseAccount {
         data: this.hdWallet.getDerivativeAccXpub(
           accountType,
           accountNumber,
-          additional,
+          contactName,
         ),
       };
     } catch (err) {

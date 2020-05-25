@@ -48,7 +48,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-  TRUSTED_ACCOUNTS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import {
   EncDynamicNonPMDD,
@@ -601,36 +601,35 @@ function* checkMSharesHealthWorker() {
             console.log('Trusted Channel create: ', guardian);
 
             // generate a corresponding derivative acc and assign xpub
-            const trustedAccounts: DerivativeAccount =
-              regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
-            const accountNumber = trustedAccounts.instance.using + 1;
-            const additional = {
-              contactName: guardian,
-            };
-            yield call(
+            const res = yield call(
               regularService.getDerivativeAccXpub,
-              TRUSTED_ACCOUNTS,
-              accountNumber,
-              additional,
+              TRUSTED_CONTACTS,
+              null,
+              guardian,
             );
-            console.log({ trustedAccounts });
 
-            // update the trusted channel with the xpub
-            if (
-              trustedAccounts[accountNumber].additional.contactName === guardian
-            ) {
+            if (res.status === 200) {
+              const xpub = res.data;
+              // update the trusted channel with the xpub
               const data: TrustedDataElements = {
-                xpub: trustedAccounts[accountNumber].xpub,
+                xpub,
               };
-              const res = yield call(
+
+              const updateRes = yield call(
                 trustedContacts.updateTrustedChannel,
                 guardian,
                 data,
                 true,
               );
-              if (res.status === 200) {
-                console.log('Xpub updated to TC for: ', guardian);
+              if (updateRes.status === 200) {
+                console.log('Xpub updated to trusted channel for: ', guardian);
+              } else {
+                console.log(
+                  `Failed to update xpub to trusted channel for ${guardian}`,
+                );
               }
+            } else {
+              console.log(`Failed to generate xpub for ${guardian}`);
             }
 
             approvedAny = true;

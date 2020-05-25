@@ -75,31 +75,65 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
+export interface DerivativeAccountElements {
+  xpub: string;
+  ypub?: string;
+  usedAddresses?: string[];
+  nextFreeAddressIndex?: number;
+  receivingAddress?: string;
+  balances?: {
+    balance: number;
+    unconfirmedBalance: number;
+  };
+  transactions?: Transactions;
+  lastBalTxSync?: number;
+  newTransactions?: TransactionDetails[];
+}
+
+// Base Dervative Account
 export interface DerivativeAccount {
   series: number;
   instance: {
     max: number;
     using: number;
   };
-  [accounts: number]: {
+  [accounts: number]: DerivativeAccountElements;
+}
+
+export interface TrustedContactDerivativeAccountElements {
+  contactName: string;
+  contactDetails?: {
     xpub: string;
-    ypub?: string;
+    receivingAddress?: string;
     usedAddresses?: string[];
     nextFreeAddressIndex?: number;
-    receivingAddress?: string;
-    balances?: {
-      balance: number;
-      unconfirmedBalance: number;
-    };
-    transactions?: Transactions;
-    lastBalTxSync?: number;
-    newTransactions?: TransactionDetails[];
-    additional?: { contactName?: string }; // TC identifier
   };
+  xpub: string;
+  ypub?: string;
+  usedAddresses?: string[];
+  nextFreeAddressIndex?: number;
+  receivingAddress?: string;
+  balances?: {
+    balance: number;
+    unconfirmedBalance: number;
+  };
+  transactions?: Transactions;
+  lastBalTxSync?: number;
+  newTransactions?: TransactionDetails[];
+}
+
+// Trusted Contact Dervative Account (extension of Base Derivative Account)
+export interface TrustedContactDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: TrustedContactDerivativeAccountElements;
 }
 
 export interface DerivativeAccounts {
-  [accountType: string]: DerivativeAccount;
+  [accountType: string]: DerivativeAccount | TrustedContactDerivativeAccount;
 }
 
 export enum notificationType {

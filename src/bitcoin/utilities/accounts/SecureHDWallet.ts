@@ -13,7 +13,10 @@ import {
   TransactionPrerequisite,
 } from '../Interface';
 import Bitcoin from './Bitcoin';
-import { FAST_BITCOINS } from '../../../common/constants/serviceTypes';
+import {
+  FAST_BITCOINS,
+  TRUSTED_CONTACTS,
+} from '../../../common/constants/serviceTypes';
 import { SIGNING_AXIOS } from '../../../services/api';
 
 const { SIGNING_SERVER, HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -59,11 +62,11 @@ export default class SecureHDWallet extends Bitcoin {
     iv: Buffer;
     keyLength: number;
   } = {
-      algorithm: 'aes-192-cbc',
-      salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
-      keyLength: 24,
-      iv: Buffer.alloc(16, 0),
-    };
+    algorithm: 'aes-192-cbc',
+    salt: 'bithyeSalt', // NOTE: The salt should be as unique as possible. It is recommended that a salt is random and at least 16 bytes long
+    keyLength: 24,
+    iv: Buffer.alloc(16, 0),
+  };
 
   constructor(
     primaryMnemonic: string,
@@ -458,7 +461,7 @@ export default class SecureHDWallet extends Bitcoin {
         if (
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
-          itr <
+            itr <
           0
         ) {
           continue;
@@ -823,15 +826,15 @@ export default class SecureHDWallet extends Bitcoin {
     averageTxFees?: any,
   ): Promise<
     | {
-      fee: number;
-      balance: number;
-      txPrerequisites?: undefined;
-    }
+        fee: number;
+        balance: number;
+        txPrerequisites?: undefined;
+      }
     | {
-      txPrerequisites: TransactionPrerequisite;
-      fee?: undefined;
-      balance?: undefined;
-    }
+        txPrerequisites: TransactionPrerequisite;
+        fee?: undefined;
+        balance?: undefined;
+      }
   > => {
     const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
     console.log('Input UTXOs:', inputUTXOs);
@@ -1406,8 +1409,8 @@ export default class SecureHDWallet extends Bitcoin {
 
     const multiSig = this.createSecureMultiSig(
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-      this.gapLimit -
-      1,
+        this.gapLimit -
+        1,
       this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
@@ -1428,10 +1431,12 @@ export default class SecureHDWallet extends Bitcoin {
   private generateDerivativeXpub = (
     accountType: string,
     accountNumber: number = 1,
-    additional?: {
-      contactName?: string;
-    },
   ) => {
+    if (accountType === TRUSTED_CONTACTS)
+      throw new Error(
+        `Secure a/c doesn't support account-type: ${accountType} yet`,
+      );
+
     if (!this.derivativeAccounts[accountType])
       throw new Error('Unsupported dervative account');
     if (accountNumber > this.derivativeAccounts[accountType].instance.max)
@@ -1445,19 +1450,14 @@ export default class SecureHDWallet extends Bitcoin {
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${config.DPATH_PURPOSE}'/${
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
-        }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
+      }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
       const child = root.derivePath(path).neutered();
       const xpub = child.toBase58();
       const ypub = this.xpubToYpub(xpub, null, this.network);
       this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
       this.derivativeAccounts[accountType].instance.using++;
-      if (additional) {
-        this.derivativeAccounts[accountType][accountNumber].additional = {
-          ...this.derivativeAccounts[accountType][accountNumber].additional,
-          ...additional,
-        };
-      }
+
       return xpub;
     }
   };

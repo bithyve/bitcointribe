@@ -24,12 +24,13 @@ import {
   Contacts,
   TrustedData,
   TrustedDataElements,
+  TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import { downloadMShare } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
-  TRUSTED_ACCOUNTS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 
 function* initializedTrustedContactWorker({ payload }) {
@@ -234,6 +235,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
 );
 
 function* trustedChannelXpubsUploadWorker({ payload }) {
+  // TODO: simplify and optimise the saga
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
@@ -243,63 +245,73 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
 
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   for (const contactName of Object.keys(contacts)) {
-    const { trustedChannel } = contacts[contactName];
-    if (trustedChannel) {
-      if (trustedChannel.data) {
-        console.log('here');
-        if (trustedChannel.data.length !== 2) {
-          // implies missing trusted data from the counter party
-          console.log('here');
-          const res = yield call(
-            trustedContacts.fetchTrustedChannel,
-            contactName,
-          );
-          console.log({ res });
-          if (res.status === 200) {
-            console.log('Attempted a fetch from TC of: ', contactName);
-            const { data } = res.data;
-            if (data) {
-              console.log('Received data from TC of: ', contactName);
-            }
+    let { trustedChannel } = contacts[contactName];
 
-            const { SERVICES } = yield select(
-              (state) => state.storage.database,
-            );
-            const updatedSERVICES = {
-              ...SERVICES,
-              REGULAR_ACCOUNT: JSON.stringify(regularService),
-              TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-            };
-            yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-          }
-        }
+    if (!trustedChannel) {
+      // trusted channel not setup; probably need to still get the counter party's pubKey
+      const res = yield call(
+        trustedContacts.fetchEphemeralChannel,
+        contactName,
+        true,
+      );
+
+      if (res.status !== 200) {
+        console.log(
+          `Failed to setup channel for trusted contact ${contactName}`,
+        );
+        continue;
       } else {
-        // generate a corresponding derivative acc and assign xpub
-        const trustedAccounts: DerivativeAccount =
-          regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
-        const accountNumber = trustedAccounts.instance.using + 1;
-        const additional = {
-          contactName,
-        };
-        yield call(
-          regularService.getDerivativeAccXpub,
-          TRUSTED_ACCOUNTS,
-          accountNumber,
-          additional,
-        );
+        // refresh the trustedChannel object
+        trustedChannel =
+          trustedContacts.tc.trustedContacts[contactName].trustedChannel;
+      }
+    }
 
-        const data: TrustedDataElements = {
-          xpub: trustedAccounts[accountNumber].xpub,
-        };
+    if (trustedChannel.data) {
+      if (trustedChannel.data.length !== 2) {
+        // implies missing trusted data from the counter party
         const res = yield call(
-          trustedContacts.updateTrustedChannel,
+          trustedContacts.fetchTrustedChannel,
           contactName,
-          data,
-          true,
         );
-
+        console.log({ res });
         if (res.status === 200) {
-          console.log('Xpub updated to TC for: ', contactName);
+          console.log('Attempted a fetch from TC with: ', contactName);
+          const { data } = res.data;
+          if (data) console.log('Received data from TC with: ', contactName);
+
+          // update the xpub to the trusted contact derivative acc if contact's xpub is received
+          trustedChannel =
+            trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+          if (trustedChannel.data.length === 2) {
+            const contactsData = trustedChannel.data[1].data;
+            if (contactsData && contactsData.xpub) {
+              const accountNumber =
+                regularService.hdWallet.trustedContactToDA[contactName];
+              if (accountNumber) {
+                (regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+                  accountNumber
+                ] as TrustedContactDerivativeAccountElements).contactDetails = {
+                  xpub: contactsData.xpub,
+                };
+
+                console.log(
+                  `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
+                );
+              } else {
+                console.log(
+                  'Failed to find account number corersponding to contact: ',
+                  contactName,
+                );
+              }
+            } else {
+              console.log(
+                'Missing xpub corresponding to contact: ',
+                contactName,
+              );
+            }
+          }
+
           const { SERVICES } = yield select((state) => state.storage.database);
           const updatedSERVICES = {
             ...SERVICES,
@@ -310,41 +322,67 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
         }
       }
     } else {
-      // trusted channel not setup; probably need to still get the counter party's pubKey
+      // generate a corresponding derivative acc and assign xpub
       const res = yield call(
-        trustedContacts.fetchEphemeralChannel,
+        regularService.getDerivativeAccXpub,
+        TRUSTED_CONTACTS,
+        null,
         contactName,
-        true,
       );
 
       if (res.status === 200) {
-        console.log('Trusted Channel create: ', contactName);
-        // generate a corresponding derivative acc and assign xpub
-        const trustedAccounts: DerivativeAccount =
-          regularService.hdWallet.derivativeAccounts[TRUSTED_ACCOUNTS];
-        const accountNumber = trustedAccounts.instance.using + 1;
-        const additional = {
-          contactName,
-        };
-        yield call(
-          regularService.getDerivativeAccXpub,
-          TRUSTED_ACCOUNTS,
-          accountNumber,
-          additional,
-        );
+        const xpub = res.data;
 
         const data: TrustedDataElements = {
-          xpub: trustedAccounts[accountNumber].xpub,
+          xpub,
         };
-        const res = yield call(
+        const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
           contactName,
           data,
           true,
         );
 
-        if (res.status === 200) {
+        if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactName);
+
+          if (updateRes.data) {
+            // received some data back from the channel; probably contact's xpub
+            console.log('Received data from TC with: ', contactName);
+
+            // update the xpub to the trusted contact derivative acc if contact's xpub is received
+            const trustedChannel =
+              trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+            if (trustedChannel.data.length === 2) {
+              const contactsData = trustedChannel.data[1].data;
+              if (contactsData && contactsData.xpub) {
+                const accountNumber =
+                  regularService.hdWallet.trustedContactToDA[contactName];
+                if (accountNumber) {
+                  (regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+                    accountNumber
+                  ] as TrustedContactDerivativeAccountElements).contactDetails = {
+                    xpub: contactsData.xpub,
+                  };
+
+                  console.log(
+                    `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
+                  );
+                } else {
+                  console.log(
+                    'Failed to find account number corersponding to contact: ',
+                    contactName,
+                  );
+                }
+              } else {
+                console.log(
+                  'Missing xpub corresponding to contact: ',
+                  contactName,
+                );
+              }
+            }
+          }
+
           const { SERVICES } = yield select((state) => state.storage.database);
           const updatedSERVICES = {
             ...SERVICES,
@@ -353,6 +391,8 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
           };
           yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
         }
+      } else {
+        console.log(`Failed to generate xpub for ${contactName}`);
       }
     }
   }
