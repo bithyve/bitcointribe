@@ -34,7 +34,6 @@ import CustodianRequestModalContents from '../components/CustodianRequestModalCo
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import SaveBitcoinModalContents from './GetBittr/SaveBitcoinModalContents';
 import HomePageShield from '../components/HomePageShield';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
 import TransactionListModalContents from '../components/TransactionListModalContents';
@@ -42,7 +41,6 @@ import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
 import FastBitcoinModalContents from '../components/FastBitcoinModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
-import GetBittrModalContents from '../components/GetBittrModalContents';
 import AddContactsModalContents from '../components/AddContactsModalContents';
 import FamilyandFriendsAddressBookModalContents from '../components/FamilyandFriendsAddressBookModalContents';
 import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
@@ -86,7 +84,6 @@ import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
-import GetBittrRecurringBuyContents from './GetBittr/GetBittrRecurringBuyContent';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
@@ -134,9 +131,6 @@ export default function Home(props) {
     notificationsListBottomSheet,
     setNotificationsListBottomSheet,
   ] = useState(React.createRef());
-  const [GetBittrRecurringBuy, setGetBittrRecurringBuy] = useState(
-    React.createRef(),
-  );
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
@@ -1786,57 +1780,7 @@ export default function Home(props) {
   //   );
   // };
 
-  const renderGetBittrRecurringBuyContents = () => {
-    return (
-      <GetBittrRecurringBuyContents
-        onPressBack={() => {
-          (GetBittrRecurringBuy as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderGetBittrRecurringBuyHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setAddSubBottomSheetsFlag(false);
-            setTabBarZIndex(999);
-          }, 2);
-          (GetBittrRecurringBuy as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderGetBittrSaveBitcoinContents = () => {
-    return (
-      <SaveBitcoinModalContents
-        onPressBack={() => {
-          (AddBottomSheet as any).current.snapTo(0);
-        }}
-        onPressElements={(type) => onPressSaveBitcoinElements(type)}
-      />
-    );
-  };
-
-  const onPressSaveBitcoinElements = (type) => {
-    if (type == 'recurringBuy') {
-      (GetBittrRecurringBuy as any).current.snapTo(1);
-    } else if (type == 'voucher') {
-      props.navigation.navigate('VoucherScanner');
-    } else if (type == 'existingSavingMethods') {
-      props.navigation.navigate('ExistingSavingMethods');
-    }
-  };
-
   const renderAddModalContents = () => {
-    if (selectToAdd == 'Getbittr') {
-      return renderGetBittrSaveBitcoinContents();
-    } else if (selectToAdd == 'buyBitcoins') {
-      return renderGetBittrSaveBitcoinContents();
-    }
     //else if (selectToAdd == 'Fastbitcoins') {
     //   return (
     //     <FastBitcoinModalContents
@@ -1862,7 +1806,7 @@ export default function Home(props) {
     //     />
     //   );
     //}
-    else if (selectToAdd == 'addContact') {
+    if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
@@ -2189,13 +2133,6 @@ export default function Home(props) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
       props.navigation.navigate('VoucherScanner', { userKey });
     }
-    /**
-     * Below else loop is for Getbittr changes
-     */
-    // else {
-    //   const EmailToken = event.url.substr(event.url.lastIndexOf('/') + 1);
-    //   props.navigation.navigate('SignUpDetails', { EmailToken });
-    // }
   }, []);
 
   useEffect(() => {
@@ -3276,19 +3213,6 @@ export default function Home(props) {
           renderHeader={renderFastBitcoinSellCalculationHeader}
         />
       ) : null}
-      <BottomSheet
-        onOpenEnd={() => { }}
-        onCloseEnd={() => { }}
-        onCloseStart={() => { }}
-        enabledInnerScrolling={true}
-        ref={GetBittrRecurringBuy as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderGetBittrRecurringBuyContents}
-        renderHeader={renderGetBittrRecurringBuyHeader}
-      />
       <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
