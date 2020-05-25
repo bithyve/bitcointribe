@@ -43,7 +43,9 @@ export default function TrustedContactQr(props) {
       if (SHARES_TRANSFER_DETAILS[props.index]) {
         // uploading of share is already done on the communication mode component
 
-        const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+        const contactName = `${contact.firstName} ${
+          contact.lastName ? contact.lastName : ''
+        }`.toLowerCase();
         const publicKey =
           trustedContacts.tc.trustedContacts[contactName].publicKey;
         console.log({ contactName });

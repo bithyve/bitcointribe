@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
   Text,
@@ -27,6 +27,12 @@ import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
 import BottomInfoBox from '../components/BottomInfoBox';
 import { trustedChannelXpubUpload } from '../store/actions/trustedContacts';
+import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+import {
+  REGULAR_ACCOUNT,
+  TRUSTED_CONTACTS,
+} from '../common/constants/serviceTypes';
+import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
 
 export default function AddressBookContents(props) {
   let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
@@ -36,6 +42,9 @@ export default function AddressBookContents(props) {
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   let [trustedContacts, setTrustedContacts] = useState([]);
   let [guardians, setGuardians] = useState([]);
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
 
   const updateAddressBook = async () => {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
@@ -57,9 +66,27 @@ export default function AddressBookContents(props) {
             connectedVia = contactInfo.emails[0].email;
           }
 
+          let hasXpub = false;
+          const {
+            trustedContactToDA,
+            derivativeAccounts,
+          } = regularAccount.hdWallet;
+          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          if (accountNumber) {
+            const trustedContact: TrustedContactDerivativeAccountElements =
+              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
+            if (
+              trustedContact.contactDetails &&
+              trustedContact.contactDetails.xpub
+            ) {
+              hasXpub = true;
+            }
+          }
+
           trustedContacts.push({
             contactName,
             connectedVia,
+            hasXpub,
             ...contactInfo,
           });
         }
@@ -86,9 +113,27 @@ export default function AddressBookContents(props) {
             connectedVia = guardianInfo.emails[0].email;
           }
 
+          let hasXpub = false;
+          const {
+            trustedContactToDA,
+            derivativeAccounts,
+          } = regularAccount.hdWallet;
+          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          if (accountNumber) {
+            const trustedContact: TrustedContactDerivativeAccountElements =
+              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
+            if (
+              trustedContact.contactDetails &&
+              trustedContact.contactDetails.xpub
+            ) {
+              hasXpub = true;
+            }
+          }
+
           guardians.push({
             contactName,
             connectedVia,
+            hasXpub,
             ...guardianInfo,
           });
         }
@@ -100,7 +145,7 @@ export default function AddressBookContents(props) {
 
   useEffect(() => {
     updateAddressBook();
-  }, []);
+  }, [regularAccount.hdWallet.derivativeAccounts]);
 
   const trustedContactWatermarkMessage =
     'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
@@ -180,22 +225,24 @@ export default function AddressBookContents(props) {
             marginLeft: 'auto',
           }}
         >
-          <TouchableOpacity
-            style={styles.shareButtonView}
-            onPress={() =>
-              props.navigation.navigate('Send', { isFromAddressBook: true })
-            }
-          >
-            <Text style={styles.shareButtonText}>Send</Text>
-            <Image
-              style={{
-                width: wp('3%'),
-                height: wp('3%'),
-                resizeMode: 'contain',
-              }}
-              source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
-            />
-          </TouchableOpacity>
+          {item.hasXpub ? (
+            <TouchableOpacity
+              style={styles.shareButtonView}
+              onPress={() =>
+                props.navigation.navigate('Send', { isFromAddressBook: true })
+              }
+            >
+              <Text style={styles.shareButtonText}>Send</Text>
+              <Image
+                style={{
+                  width: wp('3%'),
+                  height: wp('3%'),
+                  resizeMode: 'contain',
+                }}
+                source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
+              />
+            </TouchableOpacity>
+          ) : null}
           <View
             style={{
               width: 10,
