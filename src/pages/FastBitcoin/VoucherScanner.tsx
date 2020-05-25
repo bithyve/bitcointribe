@@ -13,6 +13,7 @@ import {
   Linking,
   TextInput,
   KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -164,9 +165,7 @@ const VoucherScanner = (props) => {
         let voucherCodeTemp = JSON.parse(
           await AsyncStorage.getItem('voucherData'),
         );
-        console.log('voucherCodeTemp', voucherCodeTemp);
         if (voucherCodeTemp) {
-          console.log('voucherCodeTemp 1', voucherCodeTemp);
           setVoucherCode(voucherCodeTemp.voucher_code);
           setSelectedAccount(voucherCodeTemp.selectedAccount);
         }
@@ -174,7 +173,6 @@ const VoucherScanner = (props) => {
       let getFBTCAccount = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
       );
-      console.log('getFBTCAccount', getFBTCAccount);
       let FBTCAccountData = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
       );
@@ -185,9 +183,8 @@ const VoucherScanner = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log('service', service);
     if (service) {
-      const accountNumber = 0;
+      const accountNumber = 1;
       const { derivativeAccounts } =
         selectedAccount.accountType === SECURE_ACCOUNT
           ? service.service.secureHDWallet
@@ -249,7 +246,6 @@ const VoucherScanner = (props) => {
           let voucherDataAfterAdd = JSON.parse(
             await AsyncStorage.getItem('voucherData'),
           );
-          console.log('voucherDataAfterAdd 3', voucherDataAfterAdd);
         })();
         if (isUserRegistered) {
           if (voucherCode && selectedAccount) createFBTCAccount();
@@ -268,7 +264,6 @@ const VoucherScanner = (props) => {
       if (barcodes.data.includes('fastbitcoins.com')) {
         let tempData = barcodes.data.split('/');
         setVoucherCode(tempData[tempData.length - 1]);
-        console.log('tempData 2', tempData);
       }
       setOpenCameraFlag(false);
     }
@@ -283,12 +278,6 @@ const VoucherScanner = (props) => {
         voucherCode == element.voucherCode &&
         element.hasOwnProperty('quotes')
       ) {
-        console.log(
-          "test voucherCode, element.voucherCode , element.hasOwnProperty('quotes')",
-          voucherCode,
-          element.voucherCode,
-          element.hasOwnProperty('quotes'),
-        );
         temp = false;
         break;
       }
@@ -300,12 +289,6 @@ const VoucherScanner = (props) => {
           voucherCode == element.voucherCode &&
           element.hasOwnProperty('quotes')
         ) {
-          console.log(
-            "checking voucherCode, element.voucherCode , element.hasOwnProperty('quotes')",
-            voucherCode,
-            element.voucherCode,
-            element.hasOwnProperty('quotes'),
-          );
           temp = false;
           break;
         }
@@ -318,19 +301,12 @@ const VoucherScanner = (props) => {
           voucherCode == element.voucherCode &&
           element.hasOwnProperty('quotes')
         ) {
-          console.log(
-            "saving voucherCode, element.voucherCode , element.hasOwnProperty('quotes')",
-            voucherCode,
-            element.voucherCode,
-            element.hasOwnProperty('quotes'),
-          );
           temp = false;
           break;
         }
       }
     }
     if (temp) {
-      console.log('temp', temp);
       let accountType = 'saving_account';
       if (selectedAccount.accountType == TEST_ACCOUNT) {
         accountType = 'test_account';
@@ -340,7 +316,6 @@ const VoucherScanner = (props) => {
       fBTCAccount[accountType].voucher.push({
         voucherCode: voucherCode,
       });
-      console.log('after temp FBTCAccount', fBTCAccount);
       if (fBTCAccount.redeem_vouchers) getQuoteDetailsMethod();
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
     } else {
@@ -402,13 +377,6 @@ const VoucherScanner = (props) => {
         let FBTCAccountData = JSON.parse(
           await AsyncStorage.getItem('FBTCAccount'),
         );
-        console.log(
-          'FBTCAccountData',
-          FBTCAccountData,
-          accountSyncDetails,
-          accountSyncDetails.redeem_vouchers,
-          typeof accountSyncDetails,
-        );
         let obj;
         if (FBTCAccountData) {
           obj = {
@@ -445,7 +413,6 @@ const VoucherScanner = (props) => {
   useEffect(() => {
     (async () => {
       if (QuoteDetails) {
-        console.log('[QuoteDetails]', QuoteDetails);
         QuoteBottomSheet.current.snapTo(1);
         setTimeout(() => {
           setQuote(QuoteDetails);
@@ -518,7 +485,6 @@ const VoucherScanner = (props) => {
         fBTCAccountData.checking_account.voucher.push(obj);
       }
     }
-    console.log('FBTCAccount after quotes', fBTCAccountData);
     await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccountData));
     executeOrderMethod();
   };
@@ -607,11 +573,6 @@ const VoucherScanner = (props) => {
         ) {
           const element = fBTCAccountData.checking_account.voucher[i];
           if (element.voucherCode == voucherFromAsync.voucher_code) {
-            console.log(
-              'element.voucherCode == voucherFromAsync.voucher_code',
-              element.voucherCode,
-              voucherFromAsync.voucher_code,
-            );
             fBTCAccountData.checking_account.voucher[
               i
             ].orderData = executeOrderDetails;
@@ -619,7 +580,6 @@ const VoucherScanner = (props) => {
           }
         }
       }
-      console.log('fBTCAccountData after order', fBTCAccountData);
       await AsyncStorage.setItem(
         'FBTCAccount',
         JSON.stringify(fBTCAccountData),
@@ -949,6 +909,12 @@ const VoucherScanner = (props) => {
               placeholderTextColor={Colors.borderColor}
               style={styles.qrModalTextInput}
               autoCorrect={false}
+              onChangeText={(text) => {
+                if (text.length == 12) {
+                  setVoucherCode(text);
+                  Keyboard.dismiss();
+                }
+              }}
             />
           </View>
         </ScrollView>
