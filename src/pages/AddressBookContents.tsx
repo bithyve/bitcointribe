@@ -33,6 +33,7 @@ import {
   TRUSTED_CONTACTS,
 } from '../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
+import { nameToInitials } from '../common/CommonFunctions';
 
 export default function AddressBookContents(props) {
   let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
@@ -147,35 +148,10 @@ export default function AddressBookContents(props) {
     updateAddressBook();
   }, [regularAccount.hdWallet.derivativeAccounts]);
 
-  const trustedContactWatermarkMessage =
-    'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
-  const GuardianOfWatermarkMessage =
-    'Contacts or devices for whom you are guarding the Recovery Secret will appear here';
-  const YourGuardianWatermarkMessage =
-    'Contacts or devices who are guarding your\nRecovery Secret will appear here';
-
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(trustedChannelXpubUpload());
   }, []);
-
-  // useEffect(() => {
-  //   getAssociatedContact();
-  // }, []);
-  // const getAssociatedContact = async () => {
-  //   let SelectedContacts = JSON.parse(
-  //     await AsyncStorage.getItem('SelectedContacts'),
-  //   );
-  //   setSelectedContacts(SelectedContacts);
-  //   let AssociatedContact = JSON.parse(
-  //     await AsyncStorage.getItem('AssociatedContacts'),
-  //   );
-  //   setAssociatedContact(AssociatedContact);
-  //   let SecondaryDeviceAddress = JSON.parse(
-  //     await AsyncStorage.getItem('secondaryDeviceAddress'),
-  //   );
-  //   setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  // };
 
   function renderFilterModalContent() {
     return (
@@ -199,9 +175,61 @@ export default function AddressBookContents(props) {
     );
   };
 
+  const getImageIcon = (item) => {
+    if (item) {
+      if (item.imageAvailable) {
+        return (
+          <Image
+            source={item.image}
+            style={{
+              width: 35,
+              height: 35,
+              borderRadius: 35 / 2,
+              resizeMode: 'contain',
+            }}
+          />
+        );
+      } else {
+        return (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: Colors.shadowBlue,
+              width: 35,
+              height: 35,
+              borderRadius: 30,
+            }}
+          >
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 13,
+                lineHeight: 13,
+              }}
+            >
+              {item
+                ? nameToInitials(
+                    item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
+                : ''}
+            </Text>
+          </View>
+        );
+      }
+    }
+  };
+
   const getElement = (item, index) => {
     return (
-      <View style={styles.selectedContactsView}>
+      <TouchableOpacity onPress={() => {}} style={styles.selectedContactsView}>
+        {getImageIcon(item)}
         <View>
           <Text style={styles.contactText}>
             {item.contactName && item.contactName.split(' ')[0]
@@ -225,24 +253,6 @@ export default function AddressBookContents(props) {
             marginLeft: 'auto',
           }}
         >
-          {item.hasXpub ? (
-            <TouchableOpacity
-              style={styles.shareButtonView}
-              onPress={() =>
-                props.navigation.navigate('Send', { isFromAddressBook: true })
-              }
-            >
-              <Text style={styles.shareButtonText}>Send</Text>
-              <Image
-                style={{
-                  width: wp('3%'),
-                  height: wp('3%'),
-                  resizeMode: 'contain',
-                }}
-                source={require('../assets/images/icons/icon_bitcoin_dark_grey.png')}
-              />
-            </TouchableOpacity>
-          ) : null}
           <View
             style={{
               width: 10,
@@ -263,11 +273,11 @@ export default function AddressBookContents(props) {
             />
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
-  const getWaterMark = (message) => {
+  const getWaterMark = () => {
     return (
       <View
         style={{
@@ -302,17 +312,6 @@ export default function AddressBookContents(props) {
           <View style={styles.watermarkViewButton} />
           <View style={styles.watermarkViewArrow} />
         </View>
-        {/* <View style={{backgroundColor:Colors.backgroundColor, margin:10, padding:10, borderRadius:10, marginTop:0}}>
-        <Text
-          style={{
-            color: Colors.black,
-            fontSize: RFValue(13),
-            fontFamily: Fonts.textColorGrey,
-          }}
-        >
-          {message}
-        </Text>
-      </View> */}
       </View>
     );
   };
@@ -336,64 +335,39 @@ export default function AddressBookContents(props) {
             </TouchableOpacity>
             <Text style={styles.modalHeaderTitleText}>{'Address Book'}</Text>
             <TouchableOpacity
-              style={{
-                height: wp('8%'),
-                width: wp('20%'),
-                backgroundColor: Colors.lightBlue,
-                borderWidth: 1,
-                borderColor: Colors.borderColor,
-                borderRadius: 7,
-                marginLeft: 'auto',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}
+              style={styles.filterButton}
               onPress={() => {
                 (FilterModalBottomSheet.current as any).snapTo(1);
               }}
             >
-              <Text
-                onPress={() => {}}
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Filter
-              </Text>
+              <Text style={styles.filterButtonText}>Filter</Text>
               <Image
-                style={{
-                  width: 12,
-                  height: 12,
-                  resizeMode: 'contain',
-                  marginLeft: 5,
-                }}
+                style={styles.filterButtonImage}
                 source={require('../assets/images/icons/filter.png')}
               />
             </TouchableOpacity>
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View style={{}}>
-            <Text style={styles.pageTitle}>Trusted Contacts</Text>
+          <View style={{ marginTop: wp('2%') }}>
+            <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {trustedContacts && trustedContacts.length ? (
+            {guardians && guardians.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {trustedContacts.map((item, index) => {
+                  {guardians.map((item, index) => {
                     return getElement(item, index);
                   })}
                 </View>
               </View>
             ) : (
-              getWaterMark(trustedContactWatermarkMessage)
+              getWaterMark()
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>You are the Guardian of</Text>
+            <Text style={styles.pageTitle}>I am the keeper of</Text>
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
@@ -420,26 +394,24 @@ export default function AddressBookContents(props) {
                 </View>
               </View>
             ) : (
-              getWaterMark(GuardianOfWatermarkMessage)
+              getWaterMark()
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>
-              Guardians of your Recovery Secret
-            </Text>
+            <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {guardians && guardians.length ? (
+            {trustedContacts && trustedContacts.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {guardians.map((item, index) => {
+                  {trustedContacts.map((item, index) => {
                     return getElement(item, index);
                   })}
                 </View>
               </View>
             ) : (
-              getWaterMark(YourGuardianWatermarkMessage)
+              getWaterMark()
             )}
           </View>
         </ScrollView>
@@ -568,5 +540,33 @@ const styles = StyleSheet.create({
     height: wp('3%'),
     width: wp('3%'),
     borderRadius: wp('3%') / 2,
+  },
+  cardImage: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
+  },
+  filterButton: {
+    height: wp('8%'),
+    width: wp('20%'),
+    backgroundColor: Colors.lightBlue,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    borderRadius: 7,
+    marginLeft: 'auto',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  filterButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  filterButtonImage: {
+    width: 12,
+    height: 12,
+    resizeMode: 'contain',
+    marginLeft: 5,
   },
 });
