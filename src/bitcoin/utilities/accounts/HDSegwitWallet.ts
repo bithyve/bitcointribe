@@ -19,7 +19,7 @@ import {
 import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
   FAST_BITCOINS,
-  TRUSTED_ACCOUNTS,
+  TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID } = config;
@@ -174,7 +174,7 @@ export default class HDSegwitWallet extends Bitcoin {
     contactName?: string,
   ): string => {
     // generates receiving xpub for derivative accounts
-    if (accountType === TRUSTED_ACCOUNTS) {
+    if (accountType === TRUSTED_CONTACTS) {
       if (!contactName)
         throw new Error(`Required param: contactName for ${accountType}`);
 
@@ -234,7 +234,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (accountType === TRUSTED_ACCOUNTS) {
+    if (accountType === TRUSTED_CONTACTS) {
       if (!contactName)
         throw new Error(`Required param: contactName for ${accountType}`);
 
@@ -398,7 +398,7 @@ export default class HDSegwitWallet extends Bitcoin {
     if (!this.derivativeAccounts[accountType])
       throw new Error(`${accountType} does not exists`);
 
-    if (accountType === TRUSTED_ACCOUNTS) {
+    if (accountType === TRUSTED_CONTACTS) {
       if (!contactName)
         throw new Error(`Required param: contactName for ${accountType}`);
 

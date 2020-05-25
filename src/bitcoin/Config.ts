@@ -245,7 +245,7 @@ class Config {
     },
   };
 
-  TRUSTED_ACCOUNTS: TrustedContactDerivativeAccount = {
+  TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: parseInt(BIT_TRUSTED_CONTACTS_SERIES, 10),
     instance: {
@@ -256,7 +256,7 @@ class Config {
 
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
-    TRUSTED_ACCOUNTS: this.TRUSTED_ACCOUNTS,
+    TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
   };
 
   constructor(env: string) {

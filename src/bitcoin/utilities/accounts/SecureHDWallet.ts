@@ -15,7 +15,7 @@ import {
 import Bitcoin from './Bitcoin';
 import {
   FAST_BITCOINS,
-  TRUSTED_ACCOUNTS,
+  TRUSTED_CONTACTS,
 } from '../../../common/constants/serviceTypes';
 import { SIGNING_AXIOS } from '../../../services/api';
 
@@ -1432,7 +1432,7 @@ export default class SecureHDWallet extends Bitcoin {
     accountType: string,
     accountNumber: number = 1,
   ) => {
-    if (accountType === TRUSTED_ACCOUNTS)
+    if (accountType === TRUSTED_CONTACTS)
       throw new Error(
         `Secure a/c doesn't support account-type: ${accountType} yet`,
       );

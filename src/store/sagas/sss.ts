@@ -48,7 +48,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-  TRUSTED_ACCOUNTS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import {
   EncDynamicNonPMDD,
@@ -603,7 +603,7 @@ function* checkMSharesHealthWorker() {
             // generate a corresponding derivative acc and assign xpub
             const res = yield call(
               regularService.getDerivativeAccXpub,
-              TRUSTED_ACCOUNTS,
+              TRUSTED_CONTACTS,
               null,
               guardian,
             );
