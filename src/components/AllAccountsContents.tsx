@@ -63,14 +63,6 @@ function AllAccountsContents(props) {
       image: require('../assets/images/icons/icon_secureaccount.png'),
     },
     {
-      title: 'Get Bittr Account',
-      accountType: 'getBittr',
-      unit: 'sats',
-      amount: '60,000',
-      info: 'Buy and sell bitcoin with our partners',
-      image: require('../assets/images/icons/icon_test.png'),
-    },
-    {
       title: 'Fast Bitcoin Account',
       accountType: 'fastBitcoin',
       unit: 'sats',

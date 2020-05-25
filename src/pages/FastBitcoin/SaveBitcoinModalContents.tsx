@@ -15,16 +15,6 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 
 export default function SaveBitcoinModalContents(props) {
     const [ addData, setAddData ] = useState( [
-      // {
-      //   title: 'Recurring Buy',
-      //   image: require('../../assets/images/icons/recurring_buy.png'),
-      //   info: 'Set up a recurring payment to Stack Sats',
-      // },
-      // {
-      //   title: `Credit Card`,
-      //   image: require('../../assets/images/icons/credit_card.png'),
-      //   info: 'Buy bitcoins using a credit card',
-      // },
       {
         title: 'Use a Voucher',
         image: require('../../assets/images/icons/voucher.png'),
@@ -35,7 +25,7 @@ export default function SaveBitcoinModalContents(props) {
         title: 'Existing Saving Methods',
         image: require('../../assets/images/icons/existing_saving_method.png'),
         info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
-        type: 'ExistingSavingMethods'
+        type: 'existingSavingMethods'
       },
 	] )
   return (
