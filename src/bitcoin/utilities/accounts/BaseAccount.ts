@@ -32,6 +32,7 @@ export default class BaseAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
     },
     network?: Network,
   ) {

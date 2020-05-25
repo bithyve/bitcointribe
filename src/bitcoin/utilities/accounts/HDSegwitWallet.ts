@@ -54,6 +54,7 @@ export default class HDSegwitWallet extends Bitcoin {
     | DerivativeAccounts
     | TrustedContactDerivativeAccount = config.DERIVATIVE_ACC;
   public newTransactions: Array<TransactionDetails> = [];
+  public trustedContactToDA: { [contactName: string]: number } = {};
 
   constructor(
     mnemonic?: string,
@@ -73,6 +74,7 @@ export default class HDSegwitWallet extends Bitcoin {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
     },
     network?: bitcoinJS.Network,
   ) {
@@ -139,6 +141,10 @@ export default class HDSegwitWallet extends Bitcoin {
       stateVars && stateVars.newTransactions
         ? stateVars.newTransactions
         : this.newTransactions;
+    this.trustedContactToDA =
+      stateVars && stateVars.trustedContactToDA
+        ? stateVars.trustedContactToDA
+        : this.trustedContactToDA;
   };
 
   public getMnemonic = (): { mnemonic: string } => {
@@ -196,15 +202,20 @@ export default class HDSegwitWallet extends Bitcoin {
       .derivativeAccounts[accountType];
     const inUse = trustedAccounts.instance.using;
 
-    for (let index = 0; index <= inUse; index++) {
-      if (
-        trustedAccounts[index] &&
-        trustedAccounts[index].contactName === contactName
-      ) {
-        return trustedAccounts[index].xpub;
-      }
+    let accountNumber = this.trustedContactToDA[contactName];
+    if (accountNumber) {
+      return trustedAccounts[accountNumber].xpub;
     }
-    const accountNumber = inUse + 1;
+
+    // for (let index = 0; index <= inUse; index++) {
+    //   if (
+    //     trustedAccounts[index] &&
+    //     trustedAccounts[index].contactName === contactName
+    //   ) {
+    //     return trustedAccounts[index].xpub;
+    //   }
+    // }
+    accountNumber = inUse + 1;
 
     const baseXpub = this.generateDerivativeXpub(
       accountType,
@@ -309,16 +320,11 @@ export default class HDSegwitWallet extends Bitcoin {
     contactName = contactName.toLowerCase();
     const trustedAccounts: TrustedContactDerivativeAccount = this
       .derivativeAccounts[accountType];
-    const inUse = trustedAccounts.instance.using;
     let account: TrustedContactDerivativeAccountElements;
 
-    for (let index = 0; index <= inUse; index++) {
-      if (
-        trustedAccounts[index] &&
-        trustedAccounts[index].contactName === contactName
-      ) {
-        account = trustedAccounts[index];
-      }
+    let accountNumber = this.trustedContactToDA[contactName];
+    if (accountNumber) {
+      account = trustedAccounts[accountNumber];
     }
 
     if (!account) {
@@ -397,22 +403,9 @@ export default class HDSegwitWallet extends Bitcoin {
         throw new Error(`Required param: contactName for ${accountType}`);
 
       contactName = contactName.toLowerCase();
-      const trustedAccounts: TrustedContactDerivativeAccount = this
-        .derivativeAccounts[accountType];
-      const inUse = trustedAccounts.instance.using;
-      let account;
+      accountNumber = this.trustedContactToDA[contactName];
 
-      for (let index = 0; index <= inUse; index++) {
-        if (
-          trustedAccounts[index] &&
-          trustedAccounts[index].contactName === contactName
-        ) {
-          account = trustedAccounts[index];
-          accountNumber = index;
-        }
-      }
-
-      if (!account) {
+      if (!accountNumber) {
         throw new Error(
           `No trusted contact derivative account exists for: ${contactName}`,
         );
@@ -1441,10 +1434,13 @@ export default class HDSegwitWallet extends Bitcoin {
       this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
       this.derivativeAccounts[accountType].instance.using++;
 
-      if (contactName)
+      if (contactName) {
         this.derivativeAccounts[accountType][
           accountNumber
         ].contactName = contactName;
+        this.trustedContactToDA[contactName] = accountNumber;
+      }
+
       return xpub;
     }
   };
