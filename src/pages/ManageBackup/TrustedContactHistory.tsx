@@ -756,7 +756,9 @@ const TrustedContactHistory = (props) => {
       return;
     }
 
-    const contactName = `${chosenContact.firstName} ${chosenContact.lastName}`.toLowerCase();
+    const contactName = `${chosenContact.firstName} ${
+      chosenContact.lastName ? chosenContact.lastName : ''
+    }`.toLowerCase();
 
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
@@ -836,7 +838,9 @@ const TrustedContactHistory = (props) => {
         const FCM = await AsyncStorage.getItem('fcmToken');
         console.log({ walletID, FCM });
 
-        const contactName = `${chosenContact.firstName} ${chosenContact.lastName}`.toLowerCase();
+        const contactName = `${chosenContact.firstName} ${
+          chosenContact.lastName ? chosenContact.lastName : ''
+        }`.toLowerCase();
         const data: EphemeralData = {
           walletID,
           FCM,
@@ -865,7 +869,9 @@ const TrustedContactHistory = (props) => {
 
   useEffect(() => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
-      const contactName = `${chosenContact.firstName} ${chosenContact.lastName}`.toLowerCase();
+      const contactName = `${chosenContact.firstName} ${
+        chosenContact.lastName ? chosenContact.lastName : ''
+      }`.toLowerCase();
       console.log({ contactName });
       if (!trustedContacts.tc.trustedContacts[contactName]) return;
 

@@ -80,7 +80,9 @@ export default function AddContactSendRequest(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     if (Contact && Contact.firstName) {
-      const contactName = `${Contact.firstName} ${Contact.lastName}`.toLowerCase();
+      const contactName = `${Contact.firstName} ${
+        Contact.lastName ? Contact.lastName : ''
+      }`.toLowerCase();
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       if (!trustedContact) {
@@ -120,8 +122,9 @@ export default function AddContactSendRequest(props) {
       return;
     }
 
-    const contactName = `${Contact.firstName} ${Contact.lastName}`.toLowerCase();
-
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`.toLowerCase();
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
 

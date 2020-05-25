@@ -122,7 +122,9 @@ export default function CommunicationMode(props) {
     //   SHARES_TRANSFER_DETAILS[index].ENCRYPTED_KEY +
     //   `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
 
-    const contactName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
+    const contactName = `${contact.firstName} ${
+      contact.lastName ? contact.lastName : ''
+    }`.toLowerCase();
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
 
@@ -193,7 +195,9 @@ export default function CommunicationMode(props) {
       console.log({ walletID, FCM });
 
       if (contact && contact.firstName) {
-        const contactName = `${contact.firstName} ${contact.lastName}`;
+        const contactName = `${contact.firstName} ${
+          contact.lastName ? contact.lastName : ''
+        }`.toLowerCase();
         const data: EphemeralData = {
           walletID,
           FCM,
