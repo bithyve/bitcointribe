@@ -5,7 +5,7 @@ import * as bip39 from 'bip39';
 import bip65 from 'bip65';
 import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import config from '../../Config';
+import config from '../../HexaConfig';
 import { Transactions } from '../Interface';
 import bs58check from 'bs58check';
 

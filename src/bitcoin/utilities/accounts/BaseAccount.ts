@@ -1,6 +1,6 @@
 import * as bip39 from 'bip39';
 import { Network, TransactionBuilder } from 'bitcoinjs-lib';
-import config from '../../Config';
+import config from '../../HexaConfig';
 import { ErrMap } from '../ErrMap';
 import HDSegwitWallet from './HDSegwitWallet';
 import {

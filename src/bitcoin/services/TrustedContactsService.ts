@@ -1,5 +1,5 @@
 import TrustedContacts from '../utilities/TrustedContacts';
-import config from '../Config';
+import config from '../HexaConfig';
 import {
   Contacts,
   TrustedData,

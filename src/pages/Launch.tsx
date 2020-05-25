@@ -21,7 +21,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import config from '../bitcoin/Config';
+import config from '../bitcoin/HexaConfig';
 
 export default function Launch(props) {
   const dispatch = useDispatch();

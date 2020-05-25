@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import config from '../bitcoin/Config';
+import config from '../bitcoin/HexaConfig';
 const { RELAY, SIGNING_SERVER, REQUEST_TIMEOUT } = config;
 const URL = '';
 

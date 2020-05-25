@@ -64,7 +64,10 @@ require_relative '../node_modules/react-native-unimodules/cocoapods'
   pod 'react-native-in-app-utils', :path => '../node_modules/react-native-in-app-utils'
 
   pod 'jail-monkey', :path => '../node_modules/jail-monkey'
-target 'HEXA' do
+
+  pod 'react-native-config', :path => '../node_modules/react-native-config'
+
+target 'HEXA' do 
 end
 
 target 'HEXA Dev' do

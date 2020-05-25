@@ -34,7 +34,7 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import config from '../../bitcoin/Config';
+import config from '../../bitcoin/HexaConfig';
 
 export default function CommunicationMode(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());

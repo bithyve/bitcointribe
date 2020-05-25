@@ -2,7 +2,7 @@ import { AxiosResponse } from 'axios';
 import * as bip39 from 'bip39';
 import crypto from 'crypto';
 import secrets from 'secrets.js-grempe';
-import config from '../../Config';
+import config from '../../HexaConfig';
 
 import {
   BuddyStaticNonPMDD,

@@ -3,7 +3,7 @@ import * as bip39 from 'bip39';
 import * as bitcoinJS from 'bitcoinjs-lib';
 import coinselect from 'coinselect';
 import crypto from 'crypto';
-import config from '../../Config';
+import config from '../../HexaConfig';
 import Bitcoin from './Bitcoin';
 import {
   Transactions,

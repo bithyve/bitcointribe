@@ -6,7 +6,7 @@ import {
   TrustedDataElements,
 } from './Interface';
 import crypto from 'crypto';
-import config from '../Config';
+import config from '../HexaConfig';
 import { ec as EC } from 'elliptic';
 import { BH_AXIOS } from '../../services/api';
 var ec = new EC('curve25519');

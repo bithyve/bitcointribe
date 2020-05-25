@@ -1,5 +1,5 @@
 import Relay from '../utilities/Relay';
-import config from '../Config';
+import config from '../HexaConfig';
 import { INotification } from '../utilities/Interface';
 
 export default class RelayServices {
