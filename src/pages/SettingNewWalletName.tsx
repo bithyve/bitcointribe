@@ -24,7 +24,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BottomInfoBox from '../components/BottomInfoBox';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import VerificationSuccessModalContents from './GetBittr/VerificationSuccessModalContents';
 import ModalHeader from '../components/ModalHeader';
 import WalletNameChangeSuccessModalContents from '../components/WalletNameChangeSuccessModalContents';
 

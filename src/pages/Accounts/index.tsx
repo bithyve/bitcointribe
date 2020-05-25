@@ -59,7 +59,6 @@ import { UsNumberFormat } from '../../common/utilities';
 import TransactionDetails from './TransactionDetails';
 
 export default function Accounts(props) {
-  const [GetBittrAccount, setGetBittrAccount] = useState([]);
   const [FBTCAccount, setFBTCAccount] = useState({});
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
@@ -195,7 +194,6 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
-    checkGetBittrAccount();
     checkFastBitcoin();
     if (wallet.transactions.transactionDetails.length) {
       wallet.transactions.transactionDetails.sort(function (left, right) {
@@ -210,13 +208,6 @@ export default function Accounts(props) {
 
     getServiceType(serviceType);
   }, []);
-
-  const checkGetBittrAccount = async () => {
-    let getBittrAccount = JSON.parse(
-      await AsyncStorage.getItem('getBittrAccounts'),
-    );
-    setGetBittrAccount(getBittrAccount ? getBittrAccount : []);
-  };
 
   const checkFastBitcoin = async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
@@ -453,31 +444,6 @@ export default function Accounts(props) {
               marginLeft: 'auto',
             }}
           >
-            {GetBittrAccount.findIndex(
-              (value) => value.accountType == item.type,
-            ) > -1 ? (
-                <View
-                  style={{
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: Colors.white,
-                    borderRadius: 15,
-                    padding: 5,
-                  }}
-                >
-                  <Image
-                    style={{
-                      marginLeft: 'auto',
-                      width: wp('3%'),
-                      height: wp('3%'),
-                      resizeMode: 'contain',
-                      padding: 5,
-                    }}
-                    source={require('../../assets/images/icons/icon_getbitter.png')}
-                  />
-                </View>
-              ) : null}
-
             {!isEmpty(FBTCAccount) ? renderFBTC(FBTCAccount, item.accountType) ? (
               <View
                 style={{

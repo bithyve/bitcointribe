@@ -103,8 +103,7 @@ import { approveTrustedContact } from '../store/actions/trustedContacts';
 import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
-
-
+import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 
 export default function Home(props) {
   const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
@@ -334,7 +333,7 @@ export default function Home(props) {
     question: '',
   });
   const [answer, setAnswer] = useState('');
-  const [selectToAdd, setSelectToAdd] = useState('Getbittr');
+  const [selectToAdd, setSelectToAdd] = useState('buyBitcoins');
   const [openmodal, setOpenmodal] = useState('closed');
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
   const [deepLinkModalOpen, setDeepLinkModalOpen] = useState(false);
@@ -1217,8 +1216,6 @@ export default function Home(props) {
       <AddModalContents
         onPressElements={(type) => {
           if (
-            type == 'Fastbitcoins' ||
-            type == 'Getbittr' ||
             type == 'buyBitcoins'
           ) {
             setTimeout(() => {
@@ -1780,7 +1777,25 @@ export default function Home(props) {
   //   );
   // };
 
+  const onPressSaveBitcoinElements = (type) => {
+    if (type == 'voucher') {
+      props.navigation.navigate('VoucherScanner');
+    } else if (type == 'existingSavingMethods') {
+      props.navigation.navigate('ExistingSavingMethods');
+    }
+  };
+
   const renderAddModalContents = () => {
+    if (selectToAdd == 'buyBitcoins') {
+      return (
+        <SaveBitcoinModalContents
+          onPressBack={() => {
+            (AddBottomSheet as any).current.snapTo(0);
+          }}
+          onPressElements={(type) => onPressSaveBitcoinElements(type)}
+        />
+      );
+    }
     //else if (selectToAdd == 'Fastbitcoins') {
     //   return (
     //     <FastBitcoinModalContents
@@ -1806,7 +1821,7 @@ export default function Home(props) {
     //     />
     //   );
     //}
-    if (selectToAdd == 'addContact') {
+    else if (selectToAdd == 'addContact') {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
