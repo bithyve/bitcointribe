@@ -43,6 +43,7 @@ export default function AddressBookContents(props) {
   let [AssociatedContact, setAssociatedContact] = useState([]);
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   let [trustedContacts, setTrustedContacts] = useState([]);
+  let [myKeepers, setMyKeepers] = useState([]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -58,7 +59,7 @@ export default function AddressBookContents(props) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       console.log({ trustedContactsInfo });
       if (trustedContactsInfo.length) {
-        const trustedContacts = [];
+        const myKeepers = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
           const contactInfo = trustedContactsInfo[index];
           if (!contactInfo) continue;
@@ -94,7 +95,7 @@ export default function AddressBookContents(props) {
               .isWard;
 
           const isGuardian = index < 3 ? true : false;
-          trustedContacts.push({
+          myKeepers.push({
             contactName,
             connectedVia,
             hasXpub,
@@ -103,8 +104,8 @@ export default function AddressBookContents(props) {
             ...contactInfo,
           });
         }
-        console.log({ trustedContacts });
-        setTrustedContacts(trustedContacts);
+        console.log({ myKeepers });
+        setMyKeepers(myKeepers);
       }
     }
   };
@@ -142,7 +143,7 @@ export default function AddressBookContents(props) {
 
   const getImageIcon = (item) => {
     if (item) {
-      if (item.imageAvailable) {
+      if (item.image && item.image.uri) {
         return (
           <Image
             source={item.image}
@@ -191,9 +192,9 @@ export default function AddressBookContents(props) {
     }
   };
 
-  const getElement = (item, index) => {
+  const getElement = (item, type) => {
     return (
-      <TouchableOpacity onPress={() => {}} style={styles.selectedContactsView}>
+      <TouchableOpacity onPress={() => {props.navigation.navigate("ContactDetails", {contactsType: type, contact: item})}} style={styles.selectedContactsView}>
         {getImageIcon(item)}
         <View>
           <Text style={styles.contactText}>
@@ -319,11 +320,11 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {trustedContacts && trustedContacts.length ? (
+            {myKeepers && myKeepers.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {trustedContacts.map((item, index) => {
-                    if (item.isGuardian) return getElement(item, index);
+                  {myKeepers.map((item, index) => {
+                    if (item.isGuardian) return getElement(item, 'myKeepers');
                   })}
                 </View>
               </View>
@@ -336,11 +337,11 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {trustedContacts && trustedContacts.length ? (
+            {AssociatedContact && AssociatedContact.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {trustedContacts.map((item, index) => {
-                    if (item.isWard) return getElement(item, index);
+                  {AssociatedContact.map((item, index) => {
+                    if (item.isWard) return getElement(item, 'IMKeepers');
                   })}
                   {/* {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
                     <View>
@@ -371,7 +372,7 @@ export default function AddressBookContents(props) {
                 <View style={{ height: 'auto' }}>
                   {trustedContacts.map((item, index) => {
                     if (!item.isGuardian && !item.isWard)
-                      return getElement(item, index);
+                      return getElement(item, 'TrustedContacts');
                   })}
                 </View>
               </View>
@@ -379,13 +380,13 @@ export default function AddressBookContents(props) {
               getWaterMark()
             )}
           </View>
-        </ScrollView>
-        <BottomInfoBox
+          <BottomInfoBox
           title={'Note'}
           infoText={
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
           }
         />
+        </ScrollView>
       </View>
       <BottomSheet
         enabledInnerScrolling={true}

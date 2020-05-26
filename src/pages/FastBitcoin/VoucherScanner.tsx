@@ -859,6 +859,7 @@ const VoucherScanner = (props) => {
               }}
               onFocus={()=>{setTextHideShow(false)}}
               onBlur={()=>{setTextHideShow(true)}}
+              value={voucherCode}
             />
           </View>
         </ScrollView>
