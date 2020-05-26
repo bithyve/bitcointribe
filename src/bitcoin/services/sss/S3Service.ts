@@ -5,6 +5,7 @@ import {
   EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD,
+  EncryptedImage,
 } from '../../utilities/Interface';
 import SSS from '../../utilities/sss/SSS';
 
@@ -819,6 +820,70 @@ export default class S3Service {
       };
     } catch (err) {
       return { status: 523, err: err.message, message: ErrMap[523] };
+    }
+  };
+
+  public updateWalletImage = async (
+    encryptedImage: EncryptedImage,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.sss.updateWalletImage(encryptedImage),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update Wallet Image',
+      };
+    }
+  };
+
+  public fetchWalletImage = async (
+    walletID: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          encryptedImage: EncryptedImage;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.sss.fetchWalletImage(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch Wallet Image',
+      };
     }
   };
 }
