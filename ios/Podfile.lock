@@ -128,7 +128,7 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-netinfo (5.9.0):
+  - react-native-netinfo (5.9.1):
     - React
   - react-native-print (0.6.0):
     - React
@@ -192,7 +192,7 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - RNDeviceInfo (5.5.8):
+  - RNDeviceInfo (5.6.0):
     - React
   - RNFirebase (5.3.1):
     - Firebase/Core
@@ -470,11 +470,11 @@ SPEC CHECKSUMS:
   react-native-contacts: 439dd9c7ea7e0d86190f8370898b82cfb7cf4ef4
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-netinfo: 7b3c53674ea611b26a7788821f137c6d9d3a038b
+  react-native-netinfo: 4284e9f4ade9fc498f313b2e9e3f7fd4fa6e3082
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
-  RNDeviceInfo: 655265668063a05fff096c6819da0b7289753ef7
+  RNDeviceInfo: f7e473fc3cc0a7648d5c57c5413c7e875718a740
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c

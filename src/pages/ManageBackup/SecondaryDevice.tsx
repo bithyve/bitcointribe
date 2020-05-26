@@ -8,7 +8,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import QRCode from 'react-native-qrcode-svg';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +15,7 @@ import { uploadEncMShare } from '../../store/actions/sss';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import Toast from '../../components/Toast';
+import QRCodeWrapper from '../../components/qr-hoc';
 
 export default function SecondaryDeviceModelContents(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -73,7 +73,7 @@ export default function SecondaryDeviceModelContents(props) {
       const lastName = 'Device';
       const contactName = `${firstName} ${
         lastName ? lastName : ''
-      }`.toLowerCase();
+        }`.toLowerCase();
 
       const data: EphemeralData = {
         walletID,
@@ -120,7 +120,7 @@ export default function SecondaryDeviceModelContents(props) {
     })();
   }, [SHARES_TRANSFER_DETAILS, changeContact, trustedContacts]);
 
-  console.log(secondaryQR);
+
   return (
     <View
       style={{
@@ -147,8 +147,8 @@ export default function SecondaryDeviceModelContents(props) {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={secondaryQR} size={hp('27%')} />
-        )}
+            <QRCodeWrapper value={secondaryQR} size={hp('27%')} />
+          )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{

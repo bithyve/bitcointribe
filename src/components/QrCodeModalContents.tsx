@@ -13,7 +13,6 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../components/BottomInfoBox';
@@ -31,31 +30,31 @@ export default function QrCodeModalContents(props) {
 
 	useEffect(() => {
 		(async () => {
-		let isCameraOpen;
-		AsyncStorage.getItem('isCameraOpen', (err, value) => {
-		  if (err) {
-			  console.log(err)
-		  } else {
-			isCameraOpen = JSON.parse(value) // boolean false
-		  }
-		});
-		if (!isCameraOpen) {
-		  await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
-		}
-	  })();
-	  }, []);
+			let isCameraOpen;
+			AsyncStorage.getItem('isCameraOpen', (err, value) => {
+				if (err) {
+					console.log(err)
+				} else {
+					isCameraOpen = JSON.parse(value) // boolean false
+				}
+			});
+			if (!isCameraOpen) {
+				await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
+			}
+		})();
+	}, []);
 
-	const getFormattedString = ( qrString: string ) => {
-		qrString = qrString.split( 'Dquote' ).join( '"' );
-		qrString = qrString.split( 'Qutation' ).join( ':' );
-		qrString = qrString.split( 'Lbrace' ).join( '{' );
-		qrString = qrString.split( 'Rbrace' ).join( '}' );
-		qrString = qrString.split( 'Slash' ).join( '/' );
-		qrString = qrString.split( 'Comma' ).join( ',' );
-		qrString = qrString.split( 'Squote' ).join( "'" );
-		qrString = qrString.split( 'Space' ).join( ' ' );
+	const getFormattedString = (qrString: string) => {
+		qrString = qrString.split('Dquote').join('"');
+		qrString = qrString.split('Qutation').join(':');
+		qrString = qrString.split('Lbrace').join('{');
+		qrString = qrString.split('Rbrace').join('}');
+		qrString = qrString.split('Slash').join('/');
+		qrString = qrString.split('Comma').join(',');
+		qrString = qrString.split('Squote').join("'");
+		qrString = qrString.split('Space').join(' ');
 		return qrString;
-	  };
+	};
 
 	return (<View style={styles.modalContentContainer}>
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : undefined} enabled keyboardVerticalOffset={150}>
@@ -105,33 +104,33 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-						{ !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
-						placeholderTextColor={Colors.borderColor} 
-						style={styles.qrModalTextInput} 
+					{!props.flag ? <TextInput placeholder={'Enter Recipients Address'}
+						placeholderTextColor={Colors.borderColor}
+						style={styles.qrModalTextInput}
 						autoCorrect={false}
-						/> : null}
-					
+					/> : null}
+
 				</View>
-				{ !props.flag ? 
-				<BottomInfoBox
-				title={'QR'}
-				infoText={
-				  "Scan a QR code to send money or receive information from another Hexa wallet"
-				}
-			  />
-				// <View style={styles.qrModalInfoView}>
-				// 	<View style={{ marginRight: 15 }}>
-				// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
-				// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
-				// 	</View>
-				// 	<Ionicons
-				// 		name="ios-arrow-forward"
-				// 		color={Colors.textColorGrey}
-				// 		size={15}
-				// 		style={{ alignSelf: 'center' }}
-				// 	/>
-				// </View>
-				 : null }
+				{!props.flag ?
+					<BottomInfoBox
+						title={'QR'}
+						infoText={
+							"Scan a QR code to send money or receive information from another Hexa wallet"
+						}
+					/>
+					// <View style={styles.qrModalInfoView}>
+					// 	<View style={{ marginRight: 15 }}>
+					// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
+					// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
+					// 	</View>
+					// 	<Ionicons
+					// 		name="ios-arrow-forward"
+					// 		color={Colors.textColorGrey}
+					// 		size={15}
+					// 		style={{ alignSelf: 'center' }}
+					// 	/>
+					// </View>
+					: null}
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
 	qrModalScrollView: {
 		display: 'flex',
 		backgroundColor: Colors.white,
-		marginTop:hp('3%')
+		marginTop: hp('3%')
 	},
 	qrModalImageNTextInputView: {
 		marginBottom: 10,

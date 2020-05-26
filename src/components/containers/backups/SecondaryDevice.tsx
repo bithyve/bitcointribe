@@ -7,7 +7,6 @@ import {
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
 import BottomInfoBox from "../../BottomInfoBox";
-import QRCode from "react-native-qrcode-svg";
 import CopyThisText from "../../CopyThisText";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadEncMShare, ErrorSending } from "../../../store/actions/sss";
@@ -15,15 +14,17 @@ import ErrorModalContents from '../../../components/ErrorModalContents';
 import ModalHeader from '../../../components/ModalHeader';
 import DeviceInfo from "react-native-device-info";
 import BottomSheet from "reanimated-bottom-sheet";
+import { getVersion } from 'react-native-device-info'
+import QRCodeWrapper from "../../qr-hoc";
 
 const SecondaryDevice = props => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log("isErrorSendingFailed", isErrorSendingFailed);
   const [selectedStatus, setSelectedStatus] = useState("Ugly"); // for preserving health of this entity
   const [secondaryQR, setSecondaryQR] = useState("");
+  const [appVersion, setAppVersion] = useState(null)
   const { SHARES_TRANSFER_DETAILS } = useSelector(
     state => state.storage.database.DECENTRALIZED_BACKUP
   );
@@ -31,11 +32,12 @@ const SecondaryDevice = props => {
 
   SHARES_TRANSFER_DETAILS[0] && !secondaryQR
     ? setSecondaryQR(
-        JSON.stringify({
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: "secondaryDeviceQR"
-        })
-      )
+      JSON.stringify({
+        ...SHARES_TRANSFER_DETAILS[0],
+        type: "secondaryDeviceQR",
+        v: appVersion
+      })
+    )
     : null;
   const dispatch = useDispatch();
 
@@ -44,6 +46,16 @@ const SecondaryDevice = props => {
       dispatch(uploadEncMShare(0));
     }
   }, []);
+
+  useEffect(() => {
+    if (appVersion !== null) {
+      let appVersion = getVersion()
+      setAppVersion(appVersion)
+    }
+  })
+
+
+
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -59,7 +71,7 @@ const SecondaryDevice = props => {
         bottomImage={require('../../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -71,17 +83,17 @@ const SecondaryDevice = props => {
     );
   }, []);
 
-if(isErrorSendingFailed){
-  setTimeout(() => {
-    setErrorMessageHeader('Error sending Recovery Secret');
-    setErrorMessage(
-      'There was an error while sending your Recovery Secret, please try again in a little while',
-    );
-  }, 2);
-  (ErrorBottomSheet as any).current.snapTo(1);
-  dispatch(ErrorSending(null));
-}
-
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessage(
+        'There was an error while sending your Recovery Secret, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
+  debugger
   return (
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
@@ -112,8 +124,8 @@ if(isErrorSendingFailed){
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={secondaryQR} size={hp("27%")} />
-        )}
+            <QRCodeWrapper value={secondaryQR} size={hp("27%")} />
+          )}
         {secondaryQR ? <CopyThisText text={secondaryQR} /> : null}
       </View>
       <BottomInfoBox

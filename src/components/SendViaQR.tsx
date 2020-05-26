@@ -12,7 +12,7 @@ import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../common/CommonFunctions';
 import { ScrollView } from 'react-native-gesture-handler';
-import QRCode from 'react-native-qrcode-svg';
+import QRCodeWrapper from './qr-hoc';
 
 export default function SendViaQR(props) {
   const [contactName, setContactName] = useState('');
@@ -31,10 +31,10 @@ export default function SendViaQR(props) {
       Contact && Contact.firstName && Contact.lastName
         ? Contact.firstName + ' ' + Contact.lastName
         : Contact && Contact.firstName && !Contact.lastName
-        ? Contact.firstName
-        : Contact && !Contact.firstName && Contact.lastName
-        ? Contact.lastName
-        : '';
+          ? Contact.firstName
+          : Contact && !Contact.firstName && Contact.lastName
+            ? Contact.lastName
+            : '';
     setContactName(contactName);
   }, [Contact]);
 
@@ -134,20 +134,20 @@ export default function SendViaQR(props) {
                   <Text style={styles.contactNameText}>{contactName}</Text>
                 ) : null}
                 {Contact &&
-                Contact.phoneNumbers &&
-                Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {Contact && Contact.phoneNumbers[0].digits}
-                  </Text>
-                ) : null}
+                  Contact.phoneNumbers &&
+                  Contact.phoneNumbers.length ? (
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue(10),
+                        marginLeft: 25,
+                        paddingTop: 3,
+                      }}
+                    >
+                      {Contact && Contact.phoneNumbers[0].digits}
+                    </Text>
+                  ) : null}
                 {Contact && Contact.emails && Contact.emails.length ? (
                   <Text
                     style={{
@@ -182,41 +182,41 @@ export default function SendViaQR(props) {
                 />
               </View>
             ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Text
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    position: 'absolute',
+                    marginLeft: 15,
+                    marginRight: 15,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.backgroundColor,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                    shadowColor: Colors.shadowBlue,
+                    shadowOpacity: 1,
+                    shadowOffset: { width: 2, height: 2 },
                   }}
                 >
-                  {nameToInitials(contactName)}
-                </Text>
-              </View>
-            )}
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {nameToInitials(contactName)}
+                  </Text>
+                </View>
+              )}
           </View>
         </View>
         <View style={styles.loader}>
           {!props.QR ? (
             <ActivityIndicator size="large" />
           ) : (
-            <QRCode value={props.QR} size={hp('27%')} />
-          )}
+              <QRCodeWrapper value={props.QR} size={hp('27%')} />
+            )}
         </View>
       </ScrollView>
       <View style={{ marginTop: 'auto' }}>

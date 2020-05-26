@@ -14,18 +14,15 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import QRCode from 'react-native-qrcode-svg';
 import CopyThisText from '../../components/CopyThisText';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
+import QRCodeWrapper from '../../components/qr-hoc';
 
 const SendRequest = (props) => {
   const [receivingAddress, setReceivingAddress] = useState('test');
-
-  useEffect(() => {}, []);
-
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -45,7 +42,7 @@ const SendRequest = (props) => {
                 size={17}
               />
             </TouchableOpacity>
-            <View style={{flex:1}}>
+            <View style={{ flex: 1 }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
                 Send Request
               </Text>
@@ -60,8 +57,8 @@ const SendRequest = (props) => {
               </Text>
             </View>
             <TouchableOpacity
-                onPress={() => {}}
-                style={{
+              onPress={() => { }}
+              style={{
                 height: wp('8%'),
                 width: wp('22%'),
                 flexDirection: 'row',
@@ -70,15 +67,15 @@ const SendRequest = (props) => {
                 justifyContent: 'center',
                 borderRadius: 8,
                 alignSelf: 'center',
-                }}
+              }}
             >
-                <Text
-                    style={{
-                        color: Colors.white,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                    }}
-                >
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
                 Done
                 </Text>
             </TouchableOpacity>
@@ -98,8 +95,8 @@ const SendRequest = (props) => {
               <ActivityIndicator size="large" />
             </View>
           ) : (
-            <QRCode value={receivingAddress} size={hp('27%')} />
-          )}
+              <QRCodeWrapper value={receivingAddress} size={hp('27%')} />
+            )}
           {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
         </View>
 
