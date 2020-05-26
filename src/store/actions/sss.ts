@@ -20,6 +20,8 @@ export const RESET_REQUESTED_SHARE_UPLOADS = 'RESET_REQUESTED_SHARE_UPLOADS';
 export const OVERALL_HEALTH = 'OVERALL_HEALTH';
 export const CHECK_PDF_HEALTH = 'CHECK_PDF_HEALTH';
 export const RESTORE_SHARE_FROM_QR = 'RESTORE_SHARE_FROM_QR';
+export const UPDATE_WALLET_IMAGE = 'UPDATE_WALLET_IMAGE';
+export const FETCH_WALLET_IMAGE = 'FETCH_WALLET_IMAGE';
 export const ERROR_SENDING = 'ERROR_SENDING';
 export const ERROR_RECEIVING = 'ERROR_RECEIVING';
 
@@ -110,6 +112,14 @@ export const recoverWallet = () => {
 
 export const resetRequestedShareUpload = () => {
   return { type: RESET_REQUESTED_SHARE_UPLOADS };
+};
+
+export const updateWalletImage = (walletImage) => {
+  return { type: UPDATE_WALLET_IMAGE, payload: { walletImage } };
+};
+
+export const fetchWalletImage = () => {
+  return { type: FETCH_WALLET_IMAGE };
 };
 
 // types and action creators (saga): dispatched by saga workers

@@ -39,6 +39,8 @@ import {
   ErrorSending,
   UploadSuccessfully,
   ErrorReceiving,
+  UPDATE_WALLET_IMAGE,
+  FETCH_WALLET_IMAGE,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -57,6 +59,7 @@ import {
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
+  WalletImage,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -1125,4 +1128,73 @@ function* recoverWalletWorker({ payload }) {
 export const recoverWalletWatcher = createWatcher(
   recoverWalletWorker,
   RECOVER_WALLET,
+);
+
+function* updateWalletImageWorker({ payload }) {
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  let walletImage: WalletImage = payload.walletImage;
+  if (!walletImage) {
+    const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+      (state) => state.storage.database,
+    );
+
+    walletImage = {
+      DECENTRALIZED_BACKUP,
+      SERVICES,
+    };
+
+    // ASYNC DATA to backup
+    const [trustedContactsInfo] = yield call(AsyncStorage.multiGet, [
+      'TrustedContactsInfo',
+    ]);
+    console.log({ trustedContactsInfo });
+    if (trustedContactsInfo) {
+      const ASYNC_DATA = { trustedContactsInfo };
+      walletImage['ASYNC_DATA'] = ASYNC_DATA;
+    }
+  }
+
+  console.log({ walletImage });
+
+  const res = yield call(s3Service.updateWalletImage, walletImage);
+  if (res.status === 200) {
+    if (res.data.updated) console.log('Wallet Image updated');
+  } else {
+    console.log({ err: res.err });
+    throw new Error('Failed to update Wallet Image');
+  }
+}
+
+export const updateWalletImageWatcher = createWatcher(
+  updateWalletImageWorker,
+  UPDATE_WALLET_IMAGE,
+);
+
+function* fetchWalletImageWorker({ payload }) {
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  const res = yield call(s3Service.fetchWalletImage);
+  if (res.status === 200) {
+    const walletImage: WalletImage = res.data.walletImage;
+    console.log({ walletImage });
+    const { DECENTRALIZED_BACKUP, SERVICES, ASYNC_DATA } = walletImage;
+    // insert into DB
+    yield put(insertIntoDB({ SERVICES, DECENTRALIZED_BACKUP }));
+
+    // set async data
+    if (ASYNC_DATA) {
+      for (const key of Object.keys(ASYNC_DATA)) {
+        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+      }
+    }
+  } else {
+    console.log({ err: res.err });
+    throw new Error('Failed to fetch Wallet Image');
+  }
+}
+
+export const fetchWalletImageWatcher = createWatcher(
+  fetchWalletImageWorker,
+  FETCH_WALLET_IMAGE,
 );
