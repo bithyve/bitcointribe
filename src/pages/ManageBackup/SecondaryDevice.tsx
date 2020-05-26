@@ -55,6 +55,7 @@ export default function SecondaryDeviceModelContents(props) {
       trustedContactsInfo[0] = contact;
     } else {
       trustedContactsInfo = [];
+      trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
       trustedContactsInfo[0] = contact;
     }
     await AsyncStorage.setItem(

@@ -821,6 +821,7 @@ const TrustedContactHistory = (props) => {
         trustedContactsInfo[index] = contact;
       } else {
         trustedContactsInfo = [];
+        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
         trustedContactsInfo[index] = contact;
       }
       await AsyncStorage.setItem(

@@ -65,12 +65,13 @@ function* approveTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, contactsPublicKey } = payload;
+  const { contactName, contactsPublicKey, contactsWalletName } = payload;
 
   const res = yield call(
     trustedContacts.finalizeContact,
     contactName,
     contactsPublicKey,
+    contactsWalletName,
   );
   if (res.status === 200) {
     yield put(trustedContactApproved(contactName, true));

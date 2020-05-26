@@ -34,6 +34,7 @@ import {
 } from '../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
 import { nameToInitials } from '../common/CommonFunctions';
+import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 
 export default function AddressBookContents(props) {
   let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
@@ -44,6 +45,9 @@ export default function AddressBookContents(props) {
   let [trustedContacts, setTrustedContacts] = useState([]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const trustedContactsService: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
   );
 
   const updateAddressBook = async () => {
@@ -85,12 +89,17 @@ export default function AddressBookContents(props) {
             }
           }
 
+          const isWard =
+            trustedContactsService.tc.trustedContacts[contactName.toLowerCase()]
+              .isWard;
+
           const isGuardian = index < 3 ? true : false;
           trustedContacts.push({
             contactName,
             connectedVia,
             hasXpub,
             isGuardian,
+            isWard,
             ...contactInfo,
           });
         }

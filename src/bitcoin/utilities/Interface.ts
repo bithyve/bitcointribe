@@ -185,6 +185,9 @@ export interface Contacts {
     publicKey: string;
     symmetricKey?: string;
     contactsPubKey?: string;
+    contactsWalletName?: string;
+    isWard?: Boolean;
+    isGuardian?: Boolean;
     ephemeralChannel?: {
       address: string;
       data?: EphemeralData[];

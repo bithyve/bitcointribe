@@ -185,6 +185,7 @@ export default class TrustedContacts {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
+    contactsWalletName?: string,
   ): {
     channelAddress: string;
     ephemeralAddress: string;
@@ -229,6 +230,8 @@ export default class TrustedContacts {
         address: channelAddress,
       },
       contactsPubKey: encodedPublicKey,
+      contactsWalletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+      isWard: contactsWalletName ? true : false,
     };
     return {
       channelAddress,
@@ -289,6 +292,10 @@ export default class TrustedContacts {
 
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
       dataElements.publicKey = publicKey;
+
+      if (dataElements.shareTransferDetails) {
+        this.trustedContacts[contactName].isGuardian = true;
+      }
 
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,

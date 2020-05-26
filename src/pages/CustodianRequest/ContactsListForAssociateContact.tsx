@@ -6,6 +6,7 @@ import Toast from '../../components/Toast';
 const ContactsListForAssociateContact = (props) => {
   const [contacts, setContacts] = useState([]);
   const postAssociation = props.navigation.getParam('postAssociation');
+  const isGuardian = props.navigation.getParam('isGuardian');
 
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
@@ -25,15 +26,18 @@ const ContactsListForAssociateContact = (props) => {
         }) == -1
       ) {
         trustedContactsInfo.push(contacts[0]);
-        Toast('Trusted Contact added successfully');
+        Toast(
+          `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
+        );
         postAssociation(contacts[0]);
         props.navigation.navigate('Home');
       } else {
         Toast('Trusted Contact already exists');
       }
     } else {
-      trustedContactsInfo = [contacts[0]];
-      Toast('Trusted Contact added successfully');
+      trustedContactsInfo = [];
+      trustedContactsInfo[3] = contacts[0];
+      Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
       postAssociation(contacts[0]);
       props.navigation.navigate('Home');
     }
