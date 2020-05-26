@@ -55,11 +55,12 @@ import {
   executeOrderFail,
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
-import Config from "react-native-config";
+import Config from 'react-native-config';
 
 import Toast from '../../components/Toast';
 
 const VoucherScanner = (props) => {
+  const [TextHideShow, setTextHideShow] = useState(true);
   const userKey1 = props.navigation.state.params
     ? props.navigation.state.params.userKey
     : '';
@@ -798,72 +799,12 @@ const VoucherScanner = (props) => {
         </View>
       </View>
       <KeyboardAvoidingView
+        style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
-        <ScrollView>
-          <View style={{ flex: 1, paddingTop: wp('5%'), position: 'relative' }}>
-            {hideShow ? (
-              <View style={styles.dropDownView}>
-                {accounts.map((value) => {
-                  return (
-                    <TouchableOpacity
-                      activeOpacity={10}
-                      onPress={() => {
-                        setHideShow(false);
-                        setSelectedAccount(value);
-                      }}
-                      style={styles.dropDownElement}
-                    >
-                      {value.accountType != '' && (
-                        <Image
-                          source={value.image}
-                          style={{ width: wp('8%'), height: wp('8%') }}
-                        />
-                      )}
-                      <View style={{ flex: 1, marginLeft: 10 }}>
-                        <Text style={styles.dropDownElementTitleText}>
-                          {value.accountName}
-                        </Text>
-                        {value.accountType != '' && (
-                          <View
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'flex-end',
-                            }}
-                          >
-                            <Image
-                              style={styles.cardBitCoinImage}
-                              source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                            />
-                            <Text style={styles.cardAmountText}>
-                              {value.accountType === TEST_ACCOUNT
-                                ? UsNumberFormat(balances.testBalance)
-                                : value.accountType === REGULAR_ACCOUNT
-                                ? UsNumberFormat(balances.regularBalance)
-                                : UsNumberFormat(balances.secureBalance)}
-                            </Text>
-                            <Text style={styles.cardAmountUnitText}>sats</Text>
-                          </View>
-                        )}
-                      </View>
-                      <View
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Entypo
-                          name={'dots-three-horizontal'}
-                          color={Colors.borderColor}
-                          size={RFValue(13)}
-                        />
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ) : null}
+        <ScrollView style={{ flex: 1 }}>
+          <View style={{ height: '100%' }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
                 <RNCamera
@@ -916,17 +857,75 @@ const VoucherScanner = (props) => {
                   Keyboard.dismiss();
                 }
               }}
+              onFocus={()=>{setTextHideShow(false)}}
+              onBlur={()=>{setTextHideShow(true)}}
             />
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
-      <View
-        style={{
-          marginBottom: hp('2%'),
-        }}
-      >
+        {hideShow ? (
+          <View style={styles.dropDownView}>
+            {accounts.map((value) => {
+              return (
+                <TouchableOpacity
+                  activeOpacity={10}
+                  onPress={() => {
+                    setHideShow(false);
+                    setSelectedAccount(value);
+                  }}
+                  style={styles.dropDownElement}
+                >
+                  {value.accountType != '' && (
+                    <Image
+                      source={value.image}
+                      style={{ width: wp('8%'), height: wp('8%') }}
+                    />
+                  )}
+                  <View style={{ flex: 1, marginLeft: 10 }}>
+                    <Text style={styles.dropDownElementTitleText}>
+                      {value.accountName}
+                    </Text>
+                    {value.accountType != '' && (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'flex-end',
+                        }}
+                      >
+                        <Image
+                          style={styles.cardBitCoinImage}
+                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        />
+                        <Text style={styles.cardAmountText}>
+                          {value.accountType === TEST_ACCOUNT
+                            ? UsNumberFormat(balances.testBalance)
+                            : value.accountType === REGULAR_ACCOUNT
+                            ? UsNumberFormat(balances.regularBalance)
+                            : UsNumberFormat(balances.secureBalance)}
+                        </Text>
+                        <Text style={styles.cardAmountUnitText}>sats</Text>
+                      </View>
+                    )}
+                  </View>
+                  <View
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Entypo
+                      name={'dots-three-horizontal'}
+                      color={Colors.borderColor}
+                      size={RFValue(13)}
+                    />
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        ) : null}
         <Text
           style={{
+            marginTop:'auto',
             marginBottom: 10,
             paddingLeft: 20,
             paddingRight: 15,
@@ -935,8 +934,14 @@ const VoucherScanner = (props) => {
             color: Colors.textColorGrey,
           }}
         >
-          Deposit Account
+          {TextHideShow ?'Deposit Account':''}
         </Text>
+      </KeyboardAvoidingView>
+      <View
+        style={{
+          marginBottom: hp('2%'),
+        }}
+      >
         <TouchableOpacity
           activeOpacity={10}
           onPress={() => {
@@ -1153,6 +1158,7 @@ const styles = StyleSheet.create({
     width: wp('90%'),
   },
   dropDownView: {
+    marginBottom: 10,
     position: 'absolute',
     bottom: 0,
     zIndex: 999,
@@ -1181,6 +1187,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansMedium,
+    marginTop: wp("10%")
   },
 });
 

@@ -9,6 +9,11 @@ import Colors from '../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Toast from '../components/Toast';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+
 export default function CopyThisText(props) {
   function writeToClipboard() {
     Clipboard.setString(props.text);
@@ -33,10 +38,11 @@ export default function CopyThisText(props) {
       >
         <View
           style={{
+            width:wp('78%'),
             backgroundColor: Colors.backgroundColor,
             borderBottomLeftRadius: 8,
             borderTopLeftRadius: 8,
-            height: 50,
+            height: wp('13%'),
             paddingLeft: 15,
             paddingRight: 15,
             justifyContent: 'center',
@@ -54,8 +60,8 @@ export default function CopyThisText(props) {
         </View>
         <View
           style={{
-            width: 48,
-            height: 50,
+            width: wp('12%'),
+            height: wp('13%'),
             backgroundColor: Colors.borderColor,
             borderTopRightRadius: 8,
             borderBottomRightRadius: 8,
