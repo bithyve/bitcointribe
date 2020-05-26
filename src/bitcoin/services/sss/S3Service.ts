@@ -6,6 +6,7 @@ import {
   MetaShare,
   SocialStaticNonPMDD,
   EncryptedImage,
+  WalletImage,
 } from '../../utilities/Interface';
 import SSS from '../../utilities/sss/SSS';
 
@@ -824,7 +825,7 @@ export default class S3Service {
   };
 
   public updateWalletImage = async (
-    encryptedImage: EncryptedImage,
+    walletImage: WalletImage,
   ): Promise<
     | {
         status: number;
@@ -844,7 +845,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateWalletImage(encryptedImage),
+        data: await this.sss.updateWalletImage(walletImage),
       };
     } catch (err) {
       return {
@@ -855,13 +856,11 @@ export default class S3Service {
     }
   };
 
-  public fetchWalletImage = async (
-    walletID: string,
-  ): Promise<
+  public fetchWalletImage = async (): Promise<
     | {
         status: number;
         data: {
-          encryptedImage: EncryptedImage;
+          walletImage: WalletImage;
         };
         err?: undefined;
         message?: undefined;

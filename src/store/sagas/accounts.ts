@@ -294,7 +294,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
 
   const service = yield select((state) => state.accounts[serviceType].service);
 
-  if (!accountNumber) accountNumber = 0;
+  if (!accountNumber) accountNumber = 1;
 
   const { derivativeAccounts } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;

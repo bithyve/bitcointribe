@@ -10,6 +10,7 @@ import {
   MetaShare,
   SocialStaticNonPMDD,
   EncryptedImage,
+  WalletImage,
 } from '../Interface';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID } = config;
@@ -1059,14 +1060,71 @@ export default class SSS {
     return { encryptedSecrets: this.encryptedSecrets };
   };
 
-  public updateWalletImage = async (
+  public encryptWI = (
+    walletImage: WalletImage,
+  ): { encryptedImage: EncryptedImage } => {
+    // encrypts Wallet Image
+    const key = SSS.getDerivedKey(
+      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
+    );
+
+    const cipher = crypto.createCipheriv(
+      SSS.cipherSpec.algorithm,
+      key,
+      SSS.cipherSpec.iv,
+    );
+
+    const encryptedImage = {};
+    for (const key of Object.keys(walletImage)) {
+      let encrypted = cipher.update(
+        JSON.stringify(walletImage[key]),
+        'utf8',
+        'hex',
+      );
+      encrypted += cipher.final('hex');
+
+      encryptedImage[key] = encrypted;
+    }
+
+    return { encryptedImage };
+  };
+
+  public decryptWI = (
     encryptedImage: EncryptedImage,
+  ): {
+    walletImage: WalletImage;
+  } => {
+    const key = SSS.getDerivedKey(
+      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
+    );
+
+    const decipher = crypto.createDecipheriv(
+      SSS.cipherSpec.algorithm,
+      key,
+      SSS.cipherSpec.iv,
+    );
+
+    const walletImage = {};
+    for (const key of Object.keys(encryptedImage)) {
+      let decrypted = decipher.update(encryptedImage[key], 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+
+      walletImage[key] = JSON.parse(decrypted);
+    }
+
+    return { walletImage };
+  };
+
+  public updateWalletImage = async (
+    walletImage: WalletImage,
   ): Promise<{
     updated: Boolean;
   }> => {
     try {
       let res: AxiosResponse;
       try {
+        const { encryptedImage } = this.encryptWI(walletImage);
+
         res = await BH_AXIOS.post('updateWalletImage', {
           HEXA_ID,
           walletID: this.walletId,
@@ -1086,7 +1144,7 @@ export default class SSS {
   };
 
   public fetchWalletImage = async (): Promise<{
-    encryptedImage: EncryptedImage;
+    walletImage: WalletImage;
   }> => {
     try {
       let res: AxiosResponse;
@@ -1102,7 +1160,9 @@ export default class SSS {
       const { encryptedImage } = res.data;
       if (!encryptedImage) throw new Error();
 
-      return { encryptedImage };
+      const { walletImage } = this.decryptWI(encryptedImage);
+
+      return { walletImage };
     } catch (err) {
       throw new Error('Failed to update Wallet Image');
     }
