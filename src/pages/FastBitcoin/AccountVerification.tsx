@@ -48,23 +48,12 @@ export default function AccountVerification(props) {
             }
           </Text>
         </View>
-        <View
-          style={{
-            height: hp('18%'),
-            flexDirection: 'row',
-            marginTop: 'auto',
-            alignItems: 'center',
-            marginBottom: wp('2%'),
-            marginRight: wp('8%'),
-          }}
-        >
           <CopyThisText 
             text={props.link}
             openLink={() => {
               props.openLinkVerification();
             }} 
           />
-        </View>
       </View>
     </View>
   );
