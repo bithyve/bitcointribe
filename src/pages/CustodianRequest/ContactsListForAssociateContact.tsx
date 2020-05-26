@@ -20,8 +20,9 @@ const ContactsListForAssociateContact = (props) => {
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (
-        trustedContactsInfo.findIndex((value) => value.id == contacts[0].id) ==
-        -1
+        trustedContactsInfo.findIndex((value) => {
+          if (value && value.id) return value.id == contacts[0].id;
+        }) == -1
       ) {
         trustedContactsInfo.push(contacts[0]);
         Toast('Trusted Contact added successfully');

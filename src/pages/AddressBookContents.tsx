@@ -42,7 +42,6 @@ export default function AddressBookContents(props) {
   let [AssociatedContact, setAssociatedContact] = useState([]);
   let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   let [trustedContacts, setTrustedContacts] = useState([]);
-  let [guardians, setGuardians] = useState([]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -56,7 +55,9 @@ export default function AddressBookContents(props) {
       console.log({ trustedContactsInfo });
       if (trustedContactsInfo.length) {
         const trustedContacts = [];
-        for (const contactInfo of trustedContactsInfo) {
+        for (let index = 0; index < trustedContactsInfo.length; index++) {
+          const contactInfo = trustedContactsInfo[index];
+          if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
           }`;
@@ -84,62 +85,17 @@ export default function AddressBookContents(props) {
             }
           }
 
+          const isGuardian = index < 3 ? true : false;
           trustedContacts.push({
             contactName,
             connectedVia,
             hasXpub,
+            isGuardian,
             ...contactInfo,
           });
         }
         console.log({ trustedContacts });
         setTrustedContacts(trustedContacts);
-      }
-    }
-
-    let guardiansInfo: any = await AsyncStorage.getItem('GuardiansInfo');
-    if (guardiansInfo) {
-      guardiansInfo = JSON.parse(guardiansInfo);
-      console.log({ guardiansInfo });
-      if (guardiansInfo.length) {
-        const guardians = [];
-        for (const guardianInfo of guardiansInfo) {
-          if (!guardianInfo) continue;
-          const contactName = `${guardianInfo.firstName} ${
-            guardianInfo.lastName ? guardianInfo.lastName : ''
-          }`;
-          let connectedVia;
-          if (guardianInfo.phoneNumbers && guardianInfo.phoneNumbers.length) {
-            connectedVia = guardianInfo.phoneNumbers[0].number;
-          } else if (guardianInfo.emails && guardianInfo.emails.length) {
-            connectedVia = guardianInfo.emails[0].email;
-          }
-
-          let hasXpub = false;
-          const {
-            trustedContactToDA,
-            derivativeAccounts,
-          } = regularAccount.hdWallet;
-          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
-          if (accountNumber) {
-            const trustedContact: TrustedContactDerivativeAccountElements =
-              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
-            if (
-              trustedContact.contactDetails &&
-              trustedContact.contactDetails.xpub
-            ) {
-              hasXpub = true;
-            }
-          }
-
-          guardians.push({
-            contactName,
-            connectedVia,
-            hasXpub,
-            ...guardianInfo,
-          });
-        }
-        console.log({ guardians });
-        setGuardians(guardians);
       }
     }
   };
@@ -354,11 +310,11 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {guardians && guardians.length ? (
+            {trustedContacts && trustedContacts.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {guardians.map((item, index) => {
-                    return getElement(item, index);
+                  {trustedContacts.map((item, index) => {
+                    if (item.isGuardian) return getElement(item, index);
                   })}
                 </View>
               </View>
@@ -371,14 +327,13 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {(AssociatedContact && AssociatedContact.length) ||
-            (SecondaryDeviceAddress && SecondaryDeviceAddress.length) ? (
+            {trustedContacts && trustedContacts.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {AssociatedContact.map((item, index) => {
-                    return getElement(item, index);
+                  {trustedContacts.map((item, index) => {
+                    if (item.isWard) return getElement(item, index);
                   })}
-                  {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
+                  {/* {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
                     <View>
                       {SecondaryDeviceAddress.map((item, index) => {
                         return (
@@ -390,7 +345,7 @@ export default function AddressBookContents(props) {
                         );
                       })}
                     </View>
-                  ) : null}
+                  ) : null} */}
                 </View>
               </View>
             ) : (
@@ -406,7 +361,8 @@ export default function AddressBookContents(props) {
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {trustedContacts.map((item, index) => {
-                    return getElement(item, index);
+                    if (!item.isGuardian && !item.isWard)
+                      return getElement(item, index);
                   })}
                 </View>
               </View>
