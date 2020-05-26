@@ -14,7 +14,6 @@ import ErrorModalContents from '../../../components/ErrorModalContents';
 import ModalHeader from '../../../components/ModalHeader';
 import DeviceInfo from "react-native-device-info";
 import BottomSheet from "reanimated-bottom-sheet";
-import { getVersion } from 'react-native-device-info'
 import QRCodeWrapper from "../../qr-hoc";
 
 const SecondaryDevice = props => {
@@ -35,7 +34,6 @@ const SecondaryDevice = props => {
       JSON.stringify({
         ...SHARES_TRANSFER_DETAILS[0],
         type: "secondaryDeviceQR",
-        v: appVersion
       })
     )
     : null;
