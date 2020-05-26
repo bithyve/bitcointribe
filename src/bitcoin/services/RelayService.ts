@@ -1,6 +1,6 @@
 import Relay from '../utilities/Relay';
 import config from '../HexaConfig';
-import { INotification } from '../utilities/Interface';
+import { INotification, EncryptedImage } from '../utilities/Interface';
 
 export default class RelayServices {
   public static fetchReleases = async (
@@ -127,6 +127,71 @@ export default class RelayServices {
         status: 0o1,
         err: err.message,
         message: 'Failed to deliver notifications',
+      };
+    }
+  };
+
+  public static updateWalletImage = async (
+    walletID: string,
+    encryptedImage: EncryptedImage,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.updateWalletImage(walletID, encryptedImage),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update Wallet Image',
+      };
+    }
+  };
+
+  public static fetchWalletImage = async (
+    walletID: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          encryptedImage: EncryptedImage;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.fetchWalletImage(walletID),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch Wallet Image',
       };
     }
   };

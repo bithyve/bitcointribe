@@ -1,8 +1,8 @@
 import { AxiosResponse } from 'axios';
 import config from '../HexaConfig';
-import { INotification } from './Interface';
+import { INotification, EncryptedImage } from './Interface';
 import { BH_AXIOS } from '../../services/api';
-import idx from 'idx'
+import idx from 'idx';
 
 const { HEXA_ID } = config;
 export default class Relay {
@@ -21,7 +21,7 @@ export default class Relay {
       if (err.response) console.log(err.response.data.err);
       if (err.code) console.log(err.code);
     }
-    const { releases = [] } = idx(res, _ => _.data) || {};
+    const { releases = [] } = idx(res, (_) => _.data) || {};
     return { releases };
   };
 
@@ -95,6 +95,58 @@ export default class Relay {
       return { delivered };
     } catch (err) {
       throw new Error('Failed to deliver notifications');
+    }
+  };
+
+  public static updateWalletImage = async (
+    walletID: string,
+    encryptedImage: EncryptedImage,
+  ): Promise<{
+    updated: Boolean;
+  }> => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('updateWalletImage', {
+          HEXA_ID,
+          walletID,
+          encryptedImage,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { updated } = res.data;
+      if (!updated) throw new Error();
+
+      return { updated };
+    } catch (err) {
+      throw new Error('Failed to update Wallet Image');
+    }
+  };
+
+  public static fetchWalletImage = async (
+    walletID: string,
+  ): Promise<{
+    encryptedImage: EncryptedImage;
+  }> => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('fetchWalletImage', {
+          HEXA_ID,
+          walletID,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { encryptedImage } = res.data;
+      if (!encryptedImage) throw new Error();
+
+      return { encryptedImage };
+    } catch (err) {
+      throw new Error('Failed to update Wallet Image');
     }
   };
 }

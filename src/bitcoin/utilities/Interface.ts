@@ -198,3 +198,10 @@ export interface Contacts {
     };
   };
 }
+
+export interface EncryptedImage {
+  // Encrypted Wallet Image
+  DECENTRALIZED_BACKUP?: string;
+  SERVICES?: string;
+  ASYNC_DATA?: string;
+}
