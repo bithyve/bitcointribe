@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import Toast from '../../components/Toast';
 
 export default function SecondaryDeviceModelContents(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -43,16 +44,24 @@ export default function SecondaryDeviceModelContents(props) {
     (state) => state.trustedContacts.service,
   );
 
-  const updateGuardianInfo = useCallback(async (contact) => {
-    let guardiansInfo: any = await AsyncStorage.getItem('GuardiansInfo');
-    if (guardiansInfo) {
-      guardiansInfo = JSON.parse(guardiansInfo);
-      guardiansInfo[0] = contact;
+  const updateTrustedContactsInfo = useCallback(async (contact) => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    console.log({ trustedContactsInfo });
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      trustedContactsInfo[0] = contact;
     } else {
-      guardiansInfo = Array(3);
-      guardiansInfo[0] = contact;
+      trustedContactsInfo = [];
+      trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+      trustedContactsInfo[0] = contact;
     }
-    await AsyncStorage.setItem('GuardiansInfo', JSON.stringify(guardiansInfo));
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
   }, []);
 
   useEffect(() => {
@@ -60,7 +69,12 @@ export default function SecondaryDeviceModelContents(props) {
       const walletID = await AsyncStorage.getItem('walletID');
       const FCM = await AsyncStorage.getItem('fcmToken');
 
-      const contactName = 'self';
+      const firstName = 'Secondary';
+      const lastName = 'Device';
+      const contactName = `${firstName} ${
+        lastName ? lastName : ''
+      }`.toLowerCase();
+
       const data: EphemeralData = {
         walletID,
         FCM,
@@ -68,15 +82,13 @@ export default function SecondaryDeviceModelContents(props) {
 
       if (changeContact) {
         dispatch(uploadEncMShare(0, contactName, data, true));
-        updateGuardianInfo({ firstName: 'Self' });
+        updateTrustedContactsInfo({ firstName, lastName });
         setChangeContact(false);
       } else {
         if (SHARES_TRANSFER_DETAILS[0]) {
-          console.log('HERE');
           if (Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000) {
-            console.log('here');
             dispatch(uploadEncMShare(0, contactName, data));
-            updateGuardianInfo({ firstName: 'Self' });
+            updateTrustedContactsInfo({ firstName, lastName });
           }
           // setSecondaryQR(
           //   JSON.stringify({
@@ -102,7 +114,7 @@ export default function SecondaryDeviceModelContents(props) {
           }
         } else {
           dispatch(uploadEncMShare(0, contactName, data));
-          updateGuardianInfo({ firstName: 'Self' });
+          updateTrustedContactsInfo({ firstName, lastName });
         }
       }
     })();

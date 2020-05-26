@@ -32,6 +32,7 @@ import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
+import Toast from '../../components/Toast';
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
@@ -67,10 +68,21 @@ export default function AddContactSendRequest(props) {
 
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
-      trustedContactsInfo.push(contact);
+      if (
+        trustedContactsInfo.findIndex((value) => {
+          if (value && value.id) return value.id == contact.id;
+        }) == -1
+      ) {
+        trustedContactsInfo.push(contact);
+        // Toast('Trusted Contact added successfully');
+      } else {
+        // Toast('Trusted Contact already exists');
+      }
     } else {
-      trustedContactsInfo = [contact];
+      trustedContactsInfo = [];
+      trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
+    console.log({ trustedContactsInfo });
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),

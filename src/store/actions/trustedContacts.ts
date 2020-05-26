@@ -25,10 +25,16 @@ export const approveTrustedContact = (
   contactName: string,
   contactsPublicKey: string,
   updateEphemeralChannel?: Boolean,
+  contactsWalletName?: string,
 ) => {
   return {
     type: APPROVE_TRUSTED_CONTACT,
-    payload: { contactName, contactsPublicKey, updateEphemeralChannel },
+    payload: {
+      contactName,
+      contactsPublicKey,
+      updateEphemeralChannel,
+      contactsWalletName,
+    },
   };
 };
 

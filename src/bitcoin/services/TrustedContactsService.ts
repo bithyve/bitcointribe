@@ -78,6 +78,7 @@ export default class TrustedContactsService {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
+    contactsWalletName?: string,
   ):
     | {
         status: number;
@@ -101,6 +102,7 @@ export default class TrustedContactsService {
         data: this.tc.finalizeContact(
           contactName.toLowerCase(),
           encodedPublicKey,
+          contactsWalletName,
         ),
       };
     } catch (err) {

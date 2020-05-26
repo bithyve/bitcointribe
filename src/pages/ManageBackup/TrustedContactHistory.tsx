@@ -48,6 +48,7 @@ import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
+import Toast from '../../components/Toast';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -808,19 +809,24 @@ const TrustedContactHistory = (props) => {
     }
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
-  const updateGuardianInfo = useCallback(
+  const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      let guardiansInfo: any = await AsyncStorage.getItem('GuardiansInfo');
-      if (guardiansInfo) {
-        guardiansInfo = JSON.parse(guardiansInfo);
-        guardiansInfo[index] = contact;
+      let trustedContactsInfo: any = await AsyncStorage.getItem(
+        'TrustedContactsInfo',
+      );
+      console.log({ trustedContactsInfo });
+
+      if (trustedContactsInfo) {
+        trustedContactsInfo = JSON.parse(trustedContactsInfo);
+        trustedContactsInfo[index] = contact;
       } else {
-        guardiansInfo = Array(3);
-        guardiansInfo[index] = contact;
+        trustedContactsInfo = [];
+        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+        trustedContactsInfo[index] = contact;
       }
       await AsyncStorage.setItem(
-        'GuardiansInfo',
-        JSON.stringify(guardiansInfo),
+        'TrustedContactsInfo',
+        JSON.stringify(trustedContactsInfo),
       );
     },
     [index],
@@ -848,14 +854,14 @@ const TrustedContactHistory = (props) => {
         if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
           // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
           dispatch(uploadEncMShare(index, contactName, data, true));
-          updateGuardianInfo(chosenContact);
+          updateTrustedContactsInfo(chosenContact);
           setChangeContact(false);
         } else if (
           !SHARES_TRANSFER_DETAILS[index] ||
           Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
         ) {
           dispatch(uploadEncMShare(index, contactName, data));
-          updateGuardianInfo(chosenContact);
+          updateTrustedContactsInfo(chosenContact);
         }
       } else {
         console.log({ chosenContact });

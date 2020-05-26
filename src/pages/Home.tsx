@@ -2463,24 +2463,28 @@ export default function Home(props) {
                   }
                 }
                 if (publicKey) {
-                  if (!isGuardian) {
-                    // only for non-guardian Trusted Contacts for now
-                    props.navigation.navigate(
-                      'ContactsListForAssociateContact',
-                      {
-                        postAssociation: (contact) => {
-                          const contactName = `${contact.firstName} ${
-                            contact.lastName ? contact.lastName : ''
-                          }`;
-                          dispatch(
-                            approveTrustedContact(contactName, publicKey, true),
-                          );
-                        },
-                      },
-                    );
-                  } else {
-                    dispatch(approveTrustedContact(requester, publicKey, true));
-                  }
+                  props.navigation.navigate('ContactsListForAssociateContact', {
+                    postAssociation: (contact) => {
+                      const contactName = `${contact.firstName} ${
+                        contact.lastName ? contact.lastName : ''
+                      }`.toLowerCase();
+                      if (isGuardian) {
+                        dispatch(
+                          approveTrustedContact(
+                            contactName,
+                            publicKey,
+                            true,
+                            requester,
+                          ),
+                        );
+                      } else {
+                        dispatch(
+                          approveTrustedContact(contactName, publicKey, true),
+                        );
+                      }
+                    },
+                    isGuardian,
+                  });
                 }
               }
             }
