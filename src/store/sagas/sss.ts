@@ -41,6 +41,7 @@ import {
   ErrorReceiving,
   UPDATE_WALLET_IMAGE,
   FETCH_WALLET_IMAGE,
+  fetchWalletImage,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -71,6 +72,7 @@ import {
 } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import crypto from 'crypto';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -1074,6 +1076,7 @@ function* recoverWalletWorker({ payload }) {
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};
       if (encDynamicNonPMDD) {
+        // decentralized restoration of Wards
         const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
 
         if (res.status !== 200)
@@ -1103,6 +1106,8 @@ function* recoverWalletWorker({ payload }) {
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
       yield put(insertIntoDB({ SERVICES, DECENTRALIZED_BACKUP }));
+      yield delay(2000); // seconds delay prior to Wallet Image check
+      yield put(fetchWalletImage());
 
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
@@ -1132,34 +1137,82 @@ export const recoverWalletWatcher = createWatcher(
 
 function* updateWalletImageWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
+  const sha256 = crypto.createHash('sha256');
 
-  let walletImage: WalletImage = payload.walletImage;
-  if (!walletImage) {
-    const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-      (state) => state.storage.database,
-    );
+  const hash = (element) => {
+    return sha256.update(JSON.stringify(element)).digest('hex');
+  };
 
+  let walletImage: WalletImage = {};
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+    (state) => state.storage.database,
+  );
+
+  const walletImageHashes = yield call(AsyncStorage.getItem, 'WI_HASHES');
+  let hashesWI = JSON.parse(walletImageHashes);
+
+  if (walletImageHashes) {
+    const currentDBHash = hash(DECENTRALIZED_BACKUP);
+    if (
+      !hashesWI.DECENTRALIZED_BACKUP ||
+      currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
+    ) {
+      walletImage['DECENTRALIZED_BACKUP'] = DECENTRALIZED_BACKUP;
+      hashesWI.DECENTRALIZED_BACKUP = currentDBHash;
+    }
+
+    const currentSHash = hash(SERVICES);
+    if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
+      walletImage['SERVICES'] = SERVICES;
+      hashesWI.SERVICES = currentSHash;
+    }
+
+    const trustedContactsInfo = yield call(
+      AsyncStorage.getItem,
+      'TrustedContactsInfo',
+    ); // use multiGet while fetching multiple items
+    if (trustedContactsInfo) {
+      const ASYNC_DATA = { trustedContactsInfo };
+      const currentAsyncHash = hash(ASYNC_DATA);
+      if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
+        walletImage['ASYNC_DATA'] = ASYNC_DATA;
+        hashesWI.ASYNC_DATA = currentAsyncHash;
+      }
+    }
+  } else {
     walletImage = {
       DECENTRALIZED_BACKUP,
       SERVICES,
     };
 
+    hashesWI = {
+      DECENTRALIZED_BACKUP: hash(DECENTRALIZED_BACKUP),
+      SERVICES: hash(SERVICES),
+    };
+
     // ASYNC DATA to backup
-    const [trustedContactsInfo] = yield call(AsyncStorage.multiGet, [
+    const trustedContactsInfo = yield call(
+      AsyncStorage.getItem,
       'TrustedContactsInfo',
-    ]);
-    console.log({ trustedContactsInfo });
+    ); // use multiGet while fetching multiple items
     if (trustedContactsInfo) {
       const ASYNC_DATA = { trustedContactsInfo };
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
+      hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
     }
   }
 
   console.log({ walletImage });
 
+  if (Object.keys(walletImage).length === 0) {
+    console.log('WI: nothing to update');
+    return;
+  }
+
   const res = yield call(s3Service.updateWalletImage, walletImage);
   if (res.status === 200) {
     if (res.data.updated) console.log('Wallet Image updated');
+    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
   } else {
     console.log({ err: res.err });
     throw new Error('Failed to update Wallet Image');
@@ -1175,6 +1228,7 @@ function* fetchWalletImageWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
 
   const res = yield call(s3Service.fetchWalletImage);
+  console.log({ res });
   if (res.status === 200) {
     const walletImage: WalletImage = res.data.walletImage;
     console.log({ walletImage });
@@ -1185,6 +1239,7 @@ function* fetchWalletImageWorker({ payload }) {
     // set async data
     if (ASYNC_DATA) {
       for (const key of Object.keys(ASYNC_DATA)) {
+        console.log('restoring to async: ', key);
         yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
       }
     }

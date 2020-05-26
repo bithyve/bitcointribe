@@ -1,6 +1,6 @@
 // types and action creators: dispatched by components and sagas
 
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralData, WalletImage } from '../../bitcoin/utilities/Interface';
 
 export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
 export const PREPARE_MSHARES = 'PREPARE_MSHARES';
@@ -114,8 +114,8 @@ export const resetRequestedShareUpload = () => {
   return { type: RESET_REQUESTED_SHARE_UPLOADS };
 };
 
-export const updateWalletImage = (walletImage) => {
-  return { type: UPDATE_WALLET_IMAGE, payload: { walletImage } };
+export const updateWalletImage = () => {
+  return { type: UPDATE_WALLET_IMAGE };
 };
 
 export const fetchWalletImage = () => {
