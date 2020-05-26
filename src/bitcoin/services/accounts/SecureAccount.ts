@@ -1,5 +1,5 @@
 import { TransactionBuilder } from 'bitcoinjs-lib';
-import config from '../../Config';
+import config from '../../HexaConfig';
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
 import { ErrMap } from '../../utilities/ErrMap';
 import {

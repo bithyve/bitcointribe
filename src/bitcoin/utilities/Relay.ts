@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import config from '../Config';
+import config from '../HexaConfig';
 import { INotification } from './Interface';
 import { BH_AXIOS } from '../../services/api';
 import idx from 'idx'

@@ -1,4 +1,4 @@
-import config from '../../Config';
+import config from '../../HexaConfig';
 const HEXA_HEALTH = config.HEALTH_STATUS.HEXA_HEALTH;
 const ENTITY_HEALTH = config.HEALTH_STATUS.ENTITY_HEALTH;
 const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS;

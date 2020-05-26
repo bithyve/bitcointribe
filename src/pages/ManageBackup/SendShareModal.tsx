@@ -21,7 +21,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import config from '../../bitcoin/Config';
+import config from '../../bitcoin/HexaConfig';
 import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
 
 export default function SendShareModal(props) {

@@ -298,7 +298,7 @@ export default function NewWalletQuestion(props) {
       setTimeout(() => {
         setMessage('Filling Test account with test sats');
         setTimeout(() => {
-          setMessage('Generating Recovery Secrets');
+          setMessage('Generating Recovery Keys');
         }, 3000);
       }, 3000);
     }, 3000);

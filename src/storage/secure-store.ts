@@ -1,14 +1,14 @@
 import * as SecureStore from 'expo-secure-store';
-import { ENC_KEY_STORAGE_IDENTIFIER } from 'react-native-dotenv';
+import Config from "react-native-config";
 
 export const store = async (hash, enc_key) => {
   try {
-    if (await SecureStore.getItemAsync(ENC_KEY_STORAGE_IDENTIFIER)) {
+    if (await SecureStore.getItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER)) {
       console.log('Old key identified, removing...');
-      await SecureStore.deleteItemAsync(ENC_KEY_STORAGE_IDENTIFIER);
+      await SecureStore.deleteItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
     }
     await SecureStore.setItemAsync(
-      ENC_KEY_STORAGE_IDENTIFIER,
+      Config.ENC_KEY_STORAGE_IDENTIFIER,
       JSON.stringify({ hash, enc_key }),
     );
   } catch (err) {
@@ -20,7 +20,7 @@ export const store = async (hash, enc_key) => {
 
 export const fetch = async hash_current => {
   try {
-    const value = await SecureStore.getItemAsync(ENC_KEY_STORAGE_IDENTIFIER);
+    const value = await SecureStore.getItemAsync(Config.ENC_KEY_STORAGE_IDENTIFIER);
     if (!value) {
       throw new Error('Identifier missing');
     }

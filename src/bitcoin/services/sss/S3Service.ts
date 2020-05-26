@@ -1,4 +1,4 @@
-import config from '../../Config';
+import config from '../../HexaConfig';
 import { ErrMap } from '../../utilities/ErrMap';
 import {
   BuddyStaticNonPMDD,

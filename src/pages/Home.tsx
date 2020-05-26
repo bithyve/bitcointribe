@@ -93,11 +93,11 @@ import NotificationListContent from '../components/NotificationListContent';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
-import { NOTIFICATION_HOUR } from 'react-native-dotenv';
+import Config from "react-native-config";
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
-import config from '../bitcoin/Config';
+import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import { approveTrustedContact } from '../store/actions/trustedContacts';
 import MessageAsPerHealth from '../components/home/messgae-health';
@@ -879,9 +879,9 @@ export default function Home(props) {
 
     // Schedule the notification for 2hours on development and 2 weeks on Production in the future
     const date = new Date();
-    date.setHours(date.getHours() + Number(NOTIFICATION_HOUR));
+    date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
 
-    // console.log('DATE', date, NOTIFICATION_HOUR, date.getTime());
+    // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
     await firebase
       .notifications()
       .scheduleNotification(notification, {

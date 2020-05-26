@@ -20,8 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
-import { APP_ID } from 'react-native-dotenv';
+import Config from "react-native-config";
 import Octicons from 'react-native-vector-icons/Octicons';
 import DeviceInfo from 'react-native-device-info';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -144,8 +143,8 @@ export default function UpdateApp(props) {
   const upgradeNow = () => {
     const url =
       Platform.OS == 'ios'
-        ? 'itms://itunes.apple.com/us/app/apple-store/' + APP_ID + '?mt=8'
-        : 'market://details?id=' + APP_ID;
+        ? 'itms://itunes.apple.com/us/app/apple-store/' + Config.APP_ID + '?mt=8'
+        : 'market://details?id=' + Config.APP_ID;
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);

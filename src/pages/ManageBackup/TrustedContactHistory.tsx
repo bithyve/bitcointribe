@@ -47,7 +47,7 @@ import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
-import config from '../../bitcoin/Config';
+import config from '../../bitcoin/HexaConfig';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());

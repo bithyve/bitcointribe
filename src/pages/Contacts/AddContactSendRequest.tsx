@@ -30,7 +30,7 @@ import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
-import config from '../../bitcoin/Config';
+import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
 
 export default function AddContactSendRequest(props) {

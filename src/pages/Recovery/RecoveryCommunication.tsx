@@ -29,7 +29,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import RecoveryTrustedQR from './RecoveryTrustedQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import config from '../../bitcoin/Config';
+import config from '../../bitcoin/HexaConfig';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');

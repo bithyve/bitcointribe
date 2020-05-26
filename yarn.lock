@@ -1467,13 +1467,6 @@ axios@^0.19.0:
   dependencies:
     follow-redirects "1.5.10"
 
-babel-plugin-dotenv@0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/babel-plugin-dotenv/-/babel-plugin-dotenv-0.1.1.tgz#9c8faea67a7c034fe7e94099187ab2e7573400bc"
-  integrity sha1-nI+upnp8A0/n6UCZGHqy51c0ALw=
-  dependencies:
-    dotenv "^2.0.0"
-
 babel-plugin-dynamic-import-node@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/babel-plugin-dynamic-import-node/-/babel-plugin-dynamic-import-node-2.3.3.tgz#84fda19c976ec5c6defef57f9427b3def66e17a3"
@@ -2543,11 +2536,6 @@ domutils@^1.7.0:
   dependencies:
     dom-serializer "0"
     domelementtype "1"
-
-dotenv@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-2.0.0.tgz#bd759c357aaa70365e01c96b7b0bec08a6e0d949"
-  integrity sha1-vXWcNXqqcDZeAclrewvsCKbg2Uk=
 
 dtrace-provider@~0.8:
   version "0.8.8"
@@ -5602,10 +5590,10 @@ react-native-communications@^2.2.1:
   resolved "https://registry.yarnpkg.com/react-native-communications/-/react-native-communications-2.2.1.tgz#7883b56b20a002eeb790c113f8616ea8692ca795"
   integrity sha1-eIO1ayCgAu63kMET+GFuqGksp5U=
 
-react-native-config@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.0.0.tgz#fada8f79996db1eadcee9e221afd713c91f677e5"
-  integrity sha512-ZydFNkGgjPCgJ4nDDGxuoMSsz4HACJH6TyYEDeefnzGW3XS/HXxdiW8SOaOD8B0WACQJHM028ypnwhexJ7hhsA==
+react-native-config@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.1.0.tgz#e59ee672ca6cd36599d86b806b22b129f1631ca2"
+  integrity sha512-1L/2TMvuLeY9YUqcCdEwu7bAHjm7/CazrZ98itoA9uD+wkkYTigZEbA1BTkYk+rVaIRj/5cBJsI9gN4OmNhG8g==
 
 react-native-contacts@^5.0.6:
   version "5.2.0"
@@ -5649,13 +5637,6 @@ react-native-device-info@^5.3.1:
   version "5.5.8"
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-5.5.8.tgz#5b971db0b550b1e53eb176c5042812429cf3a16b"
   integrity sha512-Y4EkBXUfdpDMP+utVaQcgWnNXoqf7B6rLCS0hwpaifzhrzC7cb51vhaPBN1p4Kqym3AfqZ6VoMjorvFJLRAjqg==
-
-react-native-dotenv@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-dotenv/-/react-native-dotenv-0.2.0.tgz#311551cb6a35a3dcfede648bded55c0e3ece579d"
-  integrity sha1-MRVRy2o1o9z+3mSL3tVcDj7OV50=
-  dependencies:
-    babel-plugin-dotenv "0.1.1"
 
 react-native-firebase@5.3.1:
   version "5.3.1"
