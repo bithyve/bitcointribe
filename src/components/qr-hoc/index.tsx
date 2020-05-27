@@ -11,7 +11,6 @@ const generateQRCode = (value) => {
 
 const QRCodeWrapper = ({ value, size }) => {
     let qrValue = generateQRCode(value)
-    // console.log("QR Value Calculated", qrValue)
     return (
         <QRCode value={qrValue} size={size} />
     )

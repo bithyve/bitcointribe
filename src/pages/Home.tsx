@@ -237,8 +237,8 @@ export default function Home(props) {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             props.navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -256,16 +256,16 @@ export default function Home(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
     const accumulativeBalance = regularBalance + secureBalance;
 
@@ -274,12 +274,12 @@ export default function Home(props) {
       : [];
     const regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
     const accumulativeTransactions = [
       ...testTransactions,
@@ -658,9 +658,9 @@ export default function Home(props) {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -814,7 +814,7 @@ export default function Home(props) {
       if (this.appState == 'active') {
         scheduleNotification();
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const createNotificationListeners = async () => {
@@ -888,7 +888,7 @@ export default function Home(props) {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch((err) => console.log('err', err));
     firebase
       .notifications()
@@ -1120,6 +1120,7 @@ export default function Home(props) {
 
   const getQrCodeData = (qrData) => {
     const scannedData = JSON.parse(qrData);
+    debugger
     switch (scannedData.type) {
       case 'trustedGuardian':
         const trustedGruardianRequest = {
@@ -1129,6 +1130,7 @@ export default function Home(props) {
           uploadedAt: scannedData.uploadedAt,
           type: scannedData.type,
           isQR: true,
+          v: scannedData.v || ""
         };
         setLoading(false);
         setSecondaryDeviceOtp(trustedGruardianRequest);
@@ -1145,6 +1147,7 @@ export default function Home(props) {
           uploadedAt: scannedData.uploadedAt,
           type: scannedData.type,
           isQR: true,
+          v: scannedData.v || ""
         };
 
         setLoading(false);
@@ -1160,6 +1163,7 @@ export default function Home(props) {
           requester: scannedData.requester,
           rk: scannedData.KEY,
           isQR: true,
+          v: scannedData.v || ""
         };
         setLoading(false);
         props.navigation.navigate('Home', { recoveryRequest });
@@ -1400,7 +1404,7 @@ export default function Home(props) {
   const renderNoInternetModalContent = () => {
     return (
       <NoInternetModalContents
-        onPressTryAgain={() => {}}
+        onPressTryAgain={() => { }}
         onPressIgnore={() => {
           (NoInternetBottomSheet as any).current.snapTo(0);
         }}
@@ -2113,7 +2117,7 @@ export default function Home(props) {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -2405,7 +2409,6 @@ export default function Home(props) {
 
   const renderTrustedContactRequestContent = useCallback(() => {
     if (!trustedContactRequest && !recoveryRequest) return;
-
     let {
       requester,
       hintType,
@@ -2439,7 +2442,7 @@ export default function Home(props) {
               Alert.alert(
                 `${isQR ? 'QR' : 'Link'} expired!`,
                 `Please ask the sender to initiate a new ${
-                  isQR ? 'QR' : 'Link'
+                isQR ? 'QR' : 'Link'
                 }`,
               );
               setLoading(false);
@@ -2467,7 +2470,7 @@ export default function Home(props) {
                     postAssociation: (contact) => {
                       const contactName = `${contact.firstName} ${
                         contact.lastName ? contact.lastName : ''
-                      }`.toLowerCase();
+                        }`.toLowerCase();
                       if (isGuardian) {
                         dispatch(
                           approveTrustedContact(
@@ -2567,17 +2570,17 @@ export default function Home(props) {
                   resizeMode={'contain'}
                 >
                   {NotificationData.findIndex((value) => value.read == false) >
-                  -1 ? (
-                    <View
-                      style={{
-                        backgroundColor: Colors.red,
-                        height: wp('2.5%'),
-                        width: wp('2.5%'),
-                        borderRadius: wp('2.5%') / 2,
-                        alignSelf: 'flex-end',
-                      }}
-                    />
-                  ) : null}
+                    -1 ? (
+                      <View
+                        style={{
+                          backgroundColor: Colors.red,
+                          height: wp('2.5%'),
+                          width: wp('2.5%'),
+                          borderRadius: wp('2.5%') / 2,
+                          alignSelf: 'flex-end',
+                        }}
+                      />
+                    ) : null}
                 </ImageBackground>
               </TouchableOpacity>
               <View style={{ marginBottom: wp('2%') }}>
@@ -2600,14 +2603,14 @@ export default function Home(props) {
                       source={require('../assets/images/icons/icon_bitcoin_light.png')}
                     />
                   ) : (
-                    <Image
-                      style={{
-                        ...styles.cardBitCoinImage,
-                        marginBottom: wp('1.5%'),
-                      }}
-                      source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-                    />
-                  )}
+                      <Image
+                        style={{
+                          ...styles.cardBitCoinImage,
+                          marginBottom: wp('1.5%'),
+                        }}
+                        source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                      />
+                    )}
                   <Text
                     style={{
                       ...CommonStyles.homepageAmountText,
@@ -2617,11 +2620,11 @@ export default function Home(props) {
                     {switchOn
                       ? UsNumberFormat(balances.accumulativeBalance)
                       : exchangeRates
-                      ? (
+                        ? (
                           (balances.accumulativeBalance / 1e8) *
                           exchangeRates[CurrencyCode].last
                         ).toFixed(2)
-                      : 0}
+                        : 0}
                   </Text>
                   <Text
                     style={{
@@ -2727,14 +2730,14 @@ export default function Home(props) {
                                 value.accountType === 'test'
                                   ? TEST_ACCOUNT
                                   : value.accountType === 'regular'
-                                  ? REGULAR_ACCOUNT
-                                  : SECURE_ACCOUNT,
+                                    ? REGULAR_ACCOUNT
+                                    : SECURE_ACCOUNT,
                               index:
                                 value.accountType === 'test'
                                   ? 0
                                   : value.accountType === 'regular'
-                                  ? 1
-                                  : 2,
+                                    ? 1
+                                    : 2,
                             });
                           }}
                         >
@@ -2795,14 +2798,14 @@ export default function Home(props) {
                                     source={value.bitcoinicon}
                                   />
                                 ) : (
-                                  <Image
-                                    style={styles.cardBitCoinImage}
-                                    source={getCurrencyImageByRegion(
-                                      CurrencyCode,
-                                      'light_blue',
-                                    )}
-                                  />
-                                )}
+                                    <Image
+                                      style={styles.cardBitCoinImage}
+                                      source={getCurrencyImageByRegion(
+                                        CurrencyCode,
+                                        'light_blue',
+                                      )}
+                                    />
+                                  )}
                                 <Text
                                   style={
                                     accounts.accountsSynched
@@ -2814,29 +2817,29 @@ export default function Home(props) {
                                     ? value.accountType === 'test'
                                       ? UsNumberFormat(balances.testBalance)
                                       : value.accountType === 'regular'
-                                      ? UsNumberFormat(balances.regularBalance)
-                                      : UsNumberFormat(balances.secureBalance)
+                                        ? UsNumberFormat(balances.regularBalance)
+                                        : UsNumberFormat(balances.secureBalance)
                                     : value.accountType === 'test'
-                                    ? UsNumberFormat(balances.testBalance)
-                                    : value.accountType === 'regular' &&
-                                      exchangeRates
-                                    ? (
-                                        (balances.regularBalance / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : exchangeRates
-                                    ? (
-                                        (balances.secureBalance / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : 0}
+                                      ? UsNumberFormat(balances.testBalance)
+                                      : value.accountType === 'regular' &&
+                                        exchangeRates
+                                        ? (
+                                          (balances.regularBalance / 1e8) *
+                                          exchangeRates[CurrencyCode].last
+                                        ).toFixed(2)
+                                        : exchangeRates
+                                          ? (
+                                            (balances.secureBalance / 1e8) *
+                                            exchangeRates[CurrencyCode].last
+                                          ).toFixed(2)
+                                          : 0}
                                 </Text>
                                 <Text style={styles.cardAmountUnitText}>
                                   {switchOn
                                     ? value.unit
                                     : value.accountType === 'test'
-                                    ? value.unit
-                                    : CurrencyCode.toLocaleLowerCase()}
+                                      ? value.unit
+                                      : CurrencyCode.toLocaleLowerCase()}
                                 </Text>
                               </View>
                             </View>
@@ -2887,8 +2890,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
@@ -2919,8 +2922,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderAddContent}
@@ -2952,8 +2955,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderQrContent}
@@ -2975,8 +2978,8 @@ export default function Home(props) {
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
             ? hp('18%')
             : Platform.OS == 'android'
-            ? hp('19%')
-            : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
         ]}
         renderContent={renderMoreContent}
@@ -3277,7 +3280,7 @@ export default function Home(props) {
       />
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
-          onOpenEnd={() => {}}
+          onOpenEnd={() => { }}
           enabledInnerScrolling={true}
           ref={ContactSelectedFromAddressBookBottomSheet as any}
           snapPoints={[
@@ -3292,7 +3295,7 @@ export default function Home(props) {
       ) : null}
       {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
-          onOpenEnd={() => {}}
+          onOpenEnd={() => { }}
           enabledInnerScrolling={true}
           ref={ContactSelectedFromAddressBookQrCodeBottomSheet as any}
           snapPoints={[
@@ -3446,13 +3449,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>transactions</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_transactions.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_transactions.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('Add')}
@@ -3467,13 +3470,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>add</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_add.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_add.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
@@ -3488,13 +3491,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>qr</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_qr.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_qr.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.tabBarTabView}
@@ -3509,13 +3512,13 @@ export default function Home(props) {
               <Text style={styles.activeTabTextStyle}>more</Text>
             </View>
           ) : (
-            <View style={{ flexDirection: 'row' }}>
-              <Image
-                source={require('../assets/images/HomePageIcons/icon_more.png')}
-                style={styles.tabBarImage}
-              />
-            </View>
-          )}
+              <View style={{ flexDirection: 'row' }}>
+                <Image
+                  source={require('../assets/images/HomePageIcons/icon_more.png')}
+                  style={styles.tabBarImage}
+                />
+              </View>
+            )}
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -3593,8 +3596,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

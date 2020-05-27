@@ -224,8 +224,8 @@ export default function TrustedContactRequest(props) {
                 {props.isGuardian ? '(Guardian)' : null}
               </Text>
             ) : (
-              <Text style={styles.modalTitleText}>Recovery Share Request</Text>
-            )}
+                <Text style={styles.modalTitleText}>Recovery Share Request</Text>
+              )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor
@@ -270,8 +270,8 @@ export default function TrustedContactRequest(props) {
                 {props.inputType === 'phone'
                   ? `+91 XXX XXX X${props.hint}`
                   : props.inputType === 'email'
-                  ? `XXX${props.hint}@bithyve.com`
-                  : null}
+                    ? `XXX${props.hint}@bithyve.com`
+                    : null}
               </Text>
             </Text>
           ) : null}
@@ -296,8 +296,8 @@ export default function TrustedContactRequest(props) {
                   props.inputType === 'phone'
                     ? PhoneNumber
                     : props.inputType === 'email'
-                    ? EmailId
-                    : null;
+                      ? EmailId
+                      : null;
                 props.onPressAccept(key);
               }}
               style={{ ...styles.successModalButtonView }}
@@ -305,8 +305,8 @@ export default function TrustedContactRequest(props) {
               {props.loading && props.loading == true ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={styles.proceedButtonText}>Accept Request</Text>
-              )}
+                  <Text style={styles.proceedButtonText}>Accept Request</Text>
+                )}
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressReject()}
