@@ -42,6 +42,7 @@ import {
 } from '../../store/actions/accounts';
 import ModalHeader from '../../components/ModalHeader';
 import { timeConvert } from '../../common/utilities';
+import { nameToInitials } from '../../common/CommonFunctions';
 
 export default function SendConfirmation(props) {
 
