@@ -79,7 +79,7 @@ export const fetchSSSDBWatcher = createWatcher(
   FETCHSSS_FROM_DB,
 );
 
-function* insertDBWorker({ payload }) {
+export function* insertDBWorker({ payload }) {
   try {
     const storage = yield select((state) => state.storage);
     const { database, insertedIntoDB, key } = storage;
