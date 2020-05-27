@@ -93,7 +93,7 @@ import NotificationListContent from '../components/NotificationListContent';
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
 import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
-import Config from "react-native-config";
+import Config from 'react-native-config';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
@@ -1134,6 +1134,7 @@ export default function Home(props) {
         setSecondaryDeviceOtp(trustedGruardianRequest);
         props.navigation.navigate('Home', {
           trustedContactRequest: trustedGruardianRequest,
+          recoveryRequest: null,
         });
         break;
 
@@ -1151,6 +1152,7 @@ export default function Home(props) {
         setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
         props.navigation.navigate('Home', {
           trustedContactRequest: secondaryDeviceGuardianRequest,
+          recoveryRequest: null,
         });
         break;
 
@@ -1158,11 +1160,16 @@ export default function Home(props) {
         const recoveryRequest = {
           isRecovery: true,
           requester: scannedData.requester,
-          rk: scannedData.KEY,
+          publicKey: scannedData.KEY,
           isQR: true,
         };
         setLoading(false);
-        props.navigation.navigate('Home', { recoveryRequest });
+        props.navigation.navigate('Home', {
+          recoveryRequest,
+          trustedContactRequest: null,
+        });
+        break;
+
       default:
         break;
     }
@@ -2106,7 +2113,10 @@ export default function Home(props) {
         props.navigation.navigate('Home', { custodyRequest });
       } else if (splits[6] === 'rk') {
         const recoveryRequest = { requester, rk: splits[7] };
-        props.navigation.navigate('Home', { recoveryRequest });
+        props.navigation.navigate('Home', {
+          recoveryRequest,
+          trustedContactRequest: null,
+        });
       }
     } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
       if (splits[3] !== config.APP_STAGE) {
@@ -2125,7 +2135,10 @@ export default function Home(props) {
           hint: splits[8],
           uploadedAt: splits[9],
         };
-        props.navigation.navigate('Home', { trustedContactRequest });
+        props.navigation.navigate('Home', {
+          trustedContactRequest,
+          recoveryRequest: null,
+        });
       }
     } else if (splits[4] === 'rk') {
       const recoveryRequest = {
@@ -2135,7 +2148,10 @@ export default function Home(props) {
         hintType: splits[7],
         hint: splits[8],
       };
-      props.navigation.navigate('Home', { recoveryRequest });
+      props.navigation.navigate('Home', {
+        recoveryRequest,
+        trustedContactRequest: null,
+      });
     }
 
     if (event.url.includes('fastbitcoins')) {
@@ -2405,6 +2421,7 @@ export default function Home(props) {
 
   const renderTrustedContactRequestContent = useCallback(() => {
     if (!trustedContactRequest && !recoveryRequest) return;
+    console.log({ trustedContactRequest, recoveryRequest });
 
     let {
       requester,
@@ -2496,13 +2513,22 @@ export default function Home(props) {
               );
               setLoading(false);
             } else {
-              const decryptedKey = TrustedContactsService.decryptPub(
-                encryptedKey,
-                key,
-              ).decryptedPub;
-              dispatch(
-                uploadRequestedShare(recoveryRequest.requester, decryptedKey),
-              );
+              if (!publicKey) {
+                try {
+                  publicKey = TrustedContactsService.decryptPub(
+                    encryptedKey,
+                    key,
+                  ).decryptedPub;
+                } catch (err) {
+                  console.log({ err });
+                  Alert.alert('Decryption Failed', err.message);
+                }
+              }
+              if (publicKey) {
+                dispatch(
+                  uploadRequestedShare(recoveryRequest.requester, publicKey),
+                );
+              }
             }
           }
 
