@@ -9,6 +9,8 @@ import {
   EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD,
+  EncryptedImage,
+  WalletImage,
 } from '../Interface';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID } = config;
@@ -71,15 +73,15 @@ export default class SSS {
     otp?: string,
   ): Promise<
     | {
-      metaShare: MetaShare;
-      encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-      messageId: string;
-    }
+        metaShare: MetaShare;
+        encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+        messageId: string;
+      }
     | {
-      metaShare: MetaShare;
-      messageId: string;
-      encryptedDynamicNonPMDD?: undefined;
-    }
+        metaShare: MetaShare;
+        messageId: string;
+        encryptedDynamicNonPMDD?: undefined;
+      }
   > => {
     let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
     if (otp) {
@@ -517,9 +519,9 @@ export default class SSS {
     this.walletId = stateVars
       ? stateVars.walletId
       : crypto
-        .createHash('sha256')
-        .update(bip39.mnemonicToSeedSync(this.mnemonic))
-        .digest('hex');
+          .createHash('sha256')
+          .update(bip39.mnemonicToSeedSync(this.mnemonic))
+          .digest('hex');
     this.encryptedSecrets = stateVars ? stateVars.encryptedSecrets : [];
     this.shareIDs = stateVars ? stateVars.shareIDs : [];
     this.metaShares = stateVars ? stateVars.metaShares : [];
@@ -838,8 +840,8 @@ export default class SSS {
         return dnp1.updatedAt > dnp2.updatedAt
           ? 1
           : dnp2.updatedAt > dnp1.updatedAt
-            ? -1
-            : 0;
+          ? -1
+          : 0;
       })
       .pop();
 
@@ -1056,5 +1058,113 @@ export default class SSS {
     }
     this.shareIDs = shareIDs.slice(0, 3); // preserving just the online(relay-transmitted) shareIDs
     return { encryptedSecrets: this.encryptedSecrets };
+  };
+
+  public encryptWI = (
+    walletImage: WalletImage,
+  ): { encryptedImage: EncryptedImage } => {
+    // encrypts Wallet Image
+    const encKey = SSS.getDerivedKey(
+      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
+    );
+
+    const encryptedImage = {};
+    for (const key of Object.keys(walletImage)) {
+      const cipher = crypto.createCipheriv(
+        SSS.cipherSpec.algorithm,
+        encKey,
+        SSS.cipherSpec.iv,
+      ); // needs to be re-created per decryption
+
+      let encrypted = cipher.update(
+        JSON.stringify(walletImage[key]),
+        'utf8',
+        'hex',
+      );
+      encrypted += cipher.final('hex');
+
+      encryptedImage[key] = encrypted;
+    }
+
+    return { encryptedImage };
+  };
+
+  public decryptWI = (
+    encryptedImage: EncryptedImage,
+  ): {
+    walletImage: WalletImage;
+  } => {
+    const decKey = SSS.getDerivedKey(
+      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
+    );
+
+    const walletImage = {};
+    for (const key of Object.keys(encryptedImage)) {
+      const decipher = crypto.createDecipheriv(
+        SSS.cipherSpec.algorithm,
+        decKey,
+        SSS.cipherSpec.iv,
+      ); // needs to be re-created per decryption
+
+      let decrypted = decipher.update(encryptedImage[key], 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      walletImage[key] = JSON.parse(decrypted);
+    }
+
+    return { walletImage };
+  };
+
+  public updateWalletImage = async (
+    walletImage: WalletImage,
+  ): Promise<{
+    updated: Boolean;
+  }> => {
+    try {
+      let res: AxiosResponse;
+      try {
+        const { encryptedImage } = this.encryptWI(walletImage);
+
+        res = await BH_AXIOS.post('updateWalletImage', {
+          HEXA_ID,
+          walletID: this.walletId,
+          encryptedImage,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { updated } = res.data;
+      if (!updated) throw new Error();
+
+      return { updated };
+    } catch (err) {
+      throw new Error('Failed to update Wallet Image');
+    }
+  };
+
+  public fetchWalletImage = async (): Promise<{
+    walletImage: WalletImage;
+  }> => {
+    try {
+      let res: AxiosResponse;
+      try {
+        res = await BH_AXIOS.post('fetchWalletImage', {
+          HEXA_ID,
+          walletID: this.walletId,
+        });
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+      const { encryptedImage } = res.data;
+      console.log({ encryptedImage });
+      if (!encryptedImage) throw new Error();
+
+      const { walletImage } = this.decryptWI(encryptedImage);
+      console.log({ walletImage });
+      return { walletImage };
+    } catch (err) {
+      throw new Error('Failed to fetch Wallet Image');
+    }
   };
 }

@@ -40,10 +40,7 @@ export default function AddressBookContents(props) {
   let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
     React.createRef(),
   );
-  let [AssociatedContact, setAssociatedContact] = useState([]);
-  let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   let [trustedContacts, setTrustedContacts] = useState([]);
-  let [myKeepers, setMyKeepers] = useState([]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -59,7 +56,7 @@ export default function AddressBookContents(props) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       console.log({ trustedContactsInfo });
       if (trustedContactsInfo.length) {
-        const myKeepers = [];
+        const trustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
           const contactInfo = trustedContactsInfo[index];
           if (!contactInfo) continue;
@@ -95,7 +92,7 @@ export default function AddressBookContents(props) {
               .isWard;
 
           const isGuardian = index < 3 ? true : false;
-          myKeepers.push({
+          trustedContacts.push({
             contactName,
             connectedVia,
             hasXpub,
@@ -104,8 +101,8 @@ export default function AddressBookContents(props) {
             ...contactInfo,
           });
         }
-        console.log({ myKeepers });
-        setMyKeepers(myKeepers);
+        console.log({ trustedContacts });
+        setTrustedContacts(trustedContacts);
       }
     }
   };
@@ -194,7 +191,15 @@ export default function AddressBookContents(props) {
 
   const getElement = (item, type) => {
     return (
-      <TouchableOpacity onPress={() => {props.navigation.navigate("ContactDetails", {contactsType: type, contact: item})}} style={styles.selectedContactsView}>
+      <TouchableOpacity
+        onPress={() => {
+          props.navigation.navigate('ContactDetails', {
+            contactsType: type,
+            contact: item,
+          });
+        }}
+        style={styles.selectedContactsView}
+      >
         {getImageIcon(item)}
         <View>
           <Text style={styles.contactText}>
@@ -320,10 +325,10 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {myKeepers && myKeepers.length ? (
+            {trustedContacts && trustedContacts.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {myKeepers.map((item, index) => {
+                  {trustedContacts.map((item, index) => {
                     if (item.isGuardian) return getElement(item, 'myKeepers');
                   })}
                 </View>
@@ -337,10 +342,10 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {AssociatedContact && AssociatedContact.length ? (
+            {trustedContacts && trustedContacts.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {AssociatedContact.map((item, index) => {
+                  {trustedContacts.map((item, index) => {
                     if (item.isWard) return getElement(item, 'IMKeepers');
                   })}
                   {/* {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
@@ -381,11 +386,11 @@ export default function AddressBookContents(props) {
             )}
           </View>
           <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-          }
-        />
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+            }
+          />
         </ScrollView>
       </View>
       <BottomSheet

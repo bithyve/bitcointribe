@@ -72,6 +72,8 @@ import {
   checkPDFHealthWatcher,
   restoreShareFromQRWatcher,
   shareHistoryUpdateWatcher,
+  updateWalletImageWatcher,
+  fetchWalletImageWatcher,
 } from './sagas/sss';
 
 import {
@@ -179,6 +181,8 @@ const rootSaga = function* () {
     recoverWalletWatcher,
     restoreShareFromQRWatcher,
     shareHistoryUpdateWatcher,
+    updateWalletImageWatcher,
+    fetchWalletImageWatcher,
 
     // manage backup
     sharePdfWatcher,

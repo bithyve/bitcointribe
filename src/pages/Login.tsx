@@ -23,7 +23,11 @@ import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import { syncAccounts, calculateExchangeRate } from '../store/actions/accounts';
-import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
+import {
+  updateMSharesHealth,
+  checkMSharesHealth,
+  updateWalletImage,
+} from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -208,7 +212,6 @@ export default function Login(props) {
       }
     });
 
-
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
         console.log('Release note', res.data.releases);
@@ -229,7 +232,7 @@ export default function Login(props) {
             releaseData: res.data.releases,
           });
         }
-        return
+        return;
       })
       .catch((error) => {
         console.error(error);
@@ -272,7 +275,7 @@ export default function Login(props) {
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
-            // calculate the exchangeRate
+            dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
               (loaderBottomSheet as any).current.snapTo(0);
@@ -409,8 +412,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -438,8 +441,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -467,8 +470,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -496,8 +499,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -664,7 +667,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet as any}

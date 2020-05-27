@@ -1,7 +1,11 @@
 import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import { DerivativeAccount, DerivativeAccounts, TrustedContactDerivativeAccount } from './utilities/Interface';
-import Config from "react-native-config";
+import {
+  DerivativeAccount,
+  DerivativeAccounts,
+  TrustedContactDerivativeAccount,
+} from './utilities/Interface';
+import Config from 'react-native-config';
 
 class HexaConfig {
   public ENVIRONMENT: string;
@@ -58,7 +62,10 @@ class HexaConfig {
   public CHECKSUM_ITR: number = parseInt(Config.BIT_CHECKSUM_ITR, 10);
   public HEXA_ID: string = Config.BIT_HEXA_ID;
   public DPATH_PURPOSE: number = parseInt(Config.BIT_DPATH_PURPOSE, 10);
-  public SSS_METASHARE_SPLITS: number = parseInt(Config.BIT_SSS_METASHARE_SPLITS, 10);
+  public SSS_METASHARE_SPLITS: number = parseInt(
+    Config.BIT_SSS_METASHARE_SPLITS,
+    10,
+  );
   public STATUS = {
     SUCCESS: parseInt(Config.BIT_SUCCESS_STATUS_CODE, 10),
     ERROR: parseInt(Config.BIT_ERROR_STATUS_CODE, 10),
@@ -170,7 +177,8 @@ class HexaConfig {
   constructor(env: string) {
     this.ENVIRONMENT = env;
     console.log({ env });
-    console.log(Config.BIT_SERVER_MODE);
+
+    console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE });
 
     if (Config.BIT_SERVER_MODE.trim() === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;
@@ -194,7 +202,7 @@ class HexaConfig {
       this.SIGNING_SERVER = this.BH_SERVERS.LOCAL.SIGNING_SERVER;
     }
     console.log(this.HEALTH_STATUS.TIME_SLOTS);
-    console.log(Config.BIT_SERVER_MODE,this.RELAY, this.SIGNING_SERVER);
+    console.log(Config.BIT_SERVER_MODE, this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
 
     this.BITCOIN_NODE = new Client({
@@ -206,7 +214,10 @@ class HexaConfig {
       host: Config.BIT_HOST_IP,
     });
 
-    if (Config.BIT_SERVER_MODE === 'LOCAL' || Config.BIT_SERVER_MODE === 'DEV') {
+    if (
+      Config.BIT_SERVER_MODE === 'LOCAL' ||
+      Config.BIT_SERVER_MODE === 'DEV'
+    ) {
       this.APP_STAGE = 'dev';
     } else if (Config.BIT_SERVER_MODE === 'STA') {
       this.APP_STAGE = 'sta';

@@ -1,3 +1,8 @@
+import {
+  DecentralizedBackup,
+  ServicesJSON,
+} from '../../common/interfaces/Interfaces';
+
 export interface InputUTXOs {
   txId: string;
   vout: number;
@@ -197,4 +202,19 @@ export interface Contacts {
       data?: TrustedData[];
     };
   };
+}
+
+export interface WalletImage {
+  DECENTRALIZED_BACKUP?: DecentralizedBackup;
+  SERVICES?: ServicesJSON;
+  ASYNC_DATA?: {
+    [identifier: string]: string;
+  };
+}
+
+export interface EncryptedImage {
+  // Encrypted Wallet Image
+  DECENTRALIZED_BACKUP?: string;
+  SERVICES?: string;
+  ASYNC_DATA?: string;
 }

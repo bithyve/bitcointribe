@@ -12,7 +12,8 @@ import {
   WALLET_RECOVERY_FAILED,
   ERROR_SENDING,
   UPLOAD_SUCCEFULLY,
-  ERROR_RECEIVING
+  ERROR_RECEIVING,
+  WALLET_IMAGE_CHECKED,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -51,6 +52,7 @@ const initialState: {
   qrChecked: Boolean;
   unableRecoverShareFromQR: Boolean;
   walletRecoveryFailed: Boolean;
+  walletImageChecked: Boolean;
   errorSending: Boolean;
   uploadSuccessfully: Boolean;
   errorReceiving: Boolean;
@@ -79,6 +81,7 @@ const initialState: {
   qrChecked: false,
   unableRecoverShareFromQR: false,
   walletRecoveryFailed: false,
+  walletImageChecked: false,
   errorSending: false,
   uploadSuccessfully: false,
   errorReceiving: false,
@@ -154,7 +157,7 @@ export default (state = initialState, action) => {
           ],
         },
       };
-      case CHECKED_PDF_HEALTH:
+    case CHECKED_PDF_HEALTH:
       return {
         ...state,
         loading: {
@@ -163,32 +166,39 @@ export default (state = initialState, action) => {
         },
         //personalCopyIndex: action.payload.index
       };
-      case QR_CHECKED:
+    case QR_CHECKED:
       return {
         ...state,
         qrChecked: action.payload.isFailed,
       };
-      case UNABLE_RECOVER_SHARE_FROM_QR:
+    case UNABLE_RECOVER_SHARE_FROM_QR:
       return {
         ...state,
         unableRecoverShareFromQR: action.payload.isFailed,
       };
-      case WALLET_RECOVERY_FAILED:
+    case WALLET_RECOVERY_FAILED:
       return {
         ...state,
         walletRecoveryFailed: action.payload.isFailed,
       };
-      case ERROR_SENDING:
+
+    case WALLET_IMAGE_CHECKED:
+      return {
+        ...state,
+        walletImageChecked: action.payload.checked,
+      };
+
+    case ERROR_SENDING:
       return {
         ...state,
         errorSending: action.payload.isFailed,
       };
-      case UPLOAD_SUCCEFULLY:
+    case UPLOAD_SUCCEFULLY:
       return {
         ...state,
         uploadSuccessfully: action.payload.isUploaded,
       };
-      case ERROR_RECEIVING:
+    case ERROR_RECEIVING:
       return {
         ...state,
         errorReceiving: action.payload.isFailed,

@@ -39,6 +39,10 @@ import {
   ErrorSending,
   UploadSuccessfully,
   ErrorReceiving,
+  UPDATE_WALLET_IMAGE,
+  FETCH_WALLET_IMAGE,
+  fetchWalletImage,
+  walletImageChecked,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -57,6 +61,7 @@ import {
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
+  WalletImage,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -68,6 +73,8 @@ import {
 } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import crypto from 'crypto';
+import { insertDBWorker, insertDBWatcher } from './storage';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -1071,6 +1078,7 @@ function* recoverWalletWorker({ payload }) {
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};
       if (encDynamicNonPMDD) {
+        // decentralized restoration of Wards
         const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
 
         if (res.status !== 200)
@@ -1099,7 +1107,10 @@ function* recoverWalletWorker({ payload }) {
         S3_SERVICE: JSON.stringify(s3Service),
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
-      yield put(insertIntoDB({ SERVICES, DECENTRALIZED_BACKUP }));
+      const payload = { SERVICES, DECENTRALIZED_BACKUP };
+      yield call(insertDBWorker, { payload });
+      yield delay(2000); // seconds delay prior to Wallet Image check
+      yield put(fetchWalletImage());
 
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
@@ -1125,4 +1136,136 @@ function* recoverWalletWorker({ payload }) {
 export const recoverWalletWatcher = createWatcher(
   recoverWalletWorker,
   RECOVER_WALLET,
+);
+
+const sha256 = crypto.createHash('sha256');
+const hash = (element) => {
+  return sha256.update(JSON.stringify(element)).digest('hex');
+};
+
+function* updateWalletImageWorker({ payload }) {
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  let walletImage: WalletImage = {};
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+    (state) => state.storage.database,
+  );
+
+  const walletImageHashes = yield call(AsyncStorage.getItem, 'WI_HASHES');
+  let hashesWI = JSON.parse(walletImageHashes);
+
+  if (walletImageHashes) {
+    const currentDBHash = hash(DECENTRALIZED_BACKUP);
+    if (
+      !hashesWI.DECENTRALIZED_BACKUP ||
+      currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
+    ) {
+      walletImage['DECENTRALIZED_BACKUP'] = DECENTRALIZED_BACKUP;
+      hashesWI.DECENTRALIZED_BACKUP = currentDBHash;
+    }
+
+    const currentSHash = hash(SERVICES);
+    if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
+      walletImage['SERVICES'] = SERVICES;
+      hashesWI.SERVICES = currentSHash;
+    }
+
+    const TrustedContactsInfo = yield call(
+      AsyncStorage.getItem,
+      'TrustedContactsInfo',
+    ); // use multiGet while fetching multiple items
+    if (TrustedContactsInfo) {
+      const ASYNC_DATA = { TrustedContactsInfo };
+      const currentAsyncHash = hash(ASYNC_DATA);
+      if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
+        walletImage['ASYNC_DATA'] = ASYNC_DATA;
+        hashesWI.ASYNC_DATA = currentAsyncHash;
+      }
+    }
+  } else {
+    walletImage = {
+      DECENTRALIZED_BACKUP,
+      SERVICES,
+    };
+
+    hashesWI = {
+      DECENTRALIZED_BACKUP: hash(DECENTRALIZED_BACKUP),
+      SERVICES: hash(SERVICES),
+    };
+
+    // ASYNC DATA to backup
+    const TrustedContactsInfo = yield call(
+      AsyncStorage.getItem,
+      'TrustedContactsInfo',
+    ); // use multiGet while fetching multiple items
+    if (TrustedContactsInfo) {
+      const ASYNC_DATA = { TrustedContactsInfo };
+      walletImage['ASYNC_DATA'] = ASYNC_DATA;
+      hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
+    }
+  }
+
+  console.log({ walletImage });
+
+  if (Object.keys(walletImage).length === 0) {
+    console.log('WI: nothing to update');
+    return;
+  }
+
+  const res = yield call(s3Service.updateWalletImage, walletImage);
+  if (res.status === 200) {
+    if (res.data.updated) console.log('Wallet Image updated');
+    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+  } else {
+    console.log({ err: res.err });
+    throw new Error('Failed to update Wallet Image');
+  }
+}
+
+export const updateWalletImageWatcher = createWatcher(
+  updateWalletImageWorker,
+  UPDATE_WALLET_IMAGE,
+);
+
+function* fetchWalletImageWorker({ payload }) {
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  const res = yield call(s3Service.fetchWalletImage);
+  console.log({ res });
+  if (res.status === 200) {
+    const walletImage: WalletImage = res.data.walletImage;
+    console.log({ walletImage });
+
+    if (!Object.keys(walletImage).length)
+      console.log('Failed fetch: Empty Wallet Image');
+
+    // update DB and Async
+    const { DECENTRALIZED_BACKUP, SERVICES, ASYNC_DATA } = walletImage;
+
+    if (ASYNC_DATA) {
+      for (const key of Object.keys(ASYNC_DATA)) {
+        console.log('restoring to async: ', key);
+        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+      }
+    }
+
+    const payload = { SERVICES, DECENTRALIZED_BACKUP };
+    yield call(insertDBWorker, { payload }); // synchronously update db
+
+    // update hashes
+    const hashesWI = {};
+    Object.keys(walletImage).forEach((key) => {
+      hashesWI[key] = hash(walletImage[key]);
+    });
+    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+  } else {
+    console.log({ err: res.err });
+    console.log('Failed to fetch Wallet Image');
+  }
+  yield put(walletImageChecked(true));
+}
+
+export const fetchWalletImageWatcher = createWatcher(
+  fetchWalletImageWorker,
+  FETCH_WALLET_IMAGE,
 );
