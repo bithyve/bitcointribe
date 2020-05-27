@@ -1064,18 +1064,18 @@ export default class SSS {
     walletImage: WalletImage,
   ): { encryptedImage: EncryptedImage } => {
     // encrypts Wallet Image
-    const key = SSS.getDerivedKey(
+    const encKey = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
-
-    const cipher = crypto.createCipheriv(
-      SSS.cipherSpec.algorithm,
-      key,
-      SSS.cipherSpec.iv,
     );
 
     const encryptedImage = {};
     for (const key of Object.keys(walletImage)) {
+      const cipher = crypto.createCipheriv(
+        SSS.cipherSpec.algorithm,
+        encKey,
+        SSS.cipherSpec.iv,
+      ); // needs to be re-created per decryption
+
       let encrypted = cipher.update(
         JSON.stringify(walletImage[key]),
         'utf8',
@@ -1094,21 +1094,20 @@ export default class SSS {
   ): {
     walletImage: WalletImage;
   } => {
-    const key = SSS.getDerivedKey(
+    const decKey = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
-
-    const decipher = crypto.createDecipheriv(
-      SSS.cipherSpec.algorithm,
-      key,
-      SSS.cipherSpec.iv,
     );
 
     const walletImage = {};
     for (const key of Object.keys(encryptedImage)) {
+      const decipher = crypto.createDecipheriv(
+        SSS.cipherSpec.algorithm,
+        decKey,
+        SSS.cipherSpec.iv,
+      ); // needs to be re-created per decryption
+
       let decrypted = decipher.update(encryptedImage[key], 'hex', 'utf8');
       decrypted += decipher.final('utf8');
-
       walletImage[key] = JSON.parse(decrypted);
     }
 
@@ -1158,13 +1157,14 @@ export default class SSS {
         if (err.code) throw new Error(err.code);
       }
       const { encryptedImage } = res.data;
+      console.log({ encryptedImage });
       if (!encryptedImage) throw new Error();
 
       const { walletImage } = this.decryptWI(encryptedImage);
-
+      console.log({ walletImage });
       return { walletImage };
     } catch (err) {
-      throw new Error('Failed to update Wallet Image');
+      throw new Error('Failed to fetch Wallet Image');
     }
   };
 }
