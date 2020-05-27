@@ -238,4 +238,4 @@ class HexaConfig {
   };
 }
 
-export default new HexaConfig(Config.BIT_ENVIRONMENT);
+export default new HexaConfig(Config.BIT_ENVIRONMENT.trim());
