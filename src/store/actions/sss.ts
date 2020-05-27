@@ -135,6 +135,7 @@ export const QR_CHECKED = 'QR_CHECKED';
 export const UNABLE_RECOVER_SHARE_FROM_QR = 'UNABLE_RECOVER_SHARE_FROM_QR';
 export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
 export const UPLOAD_SUCCEFULLY = 'UPLOAD_SUCCEFULLY';
+export const WALLET_IMAGE_CHECKED = 'WALLET_IMAGE_CHECKED';
 
 export const healthCheckInitialized = () => {
   return { type: HEALTH_CHECK_INITIALIZED };
@@ -182,6 +183,10 @@ export const UnableRecoverShareFromQR = (isFailed) => {
 
 export const walletRecoveryFailed = (isFailed) => {
   return { type: WALLET_RECOVERY_FAILED, payload: { isFailed } };
+};
+
+export const walletImageChecked = (checked) => {
+  return { type: WALLET_IMAGE_CHECKED, payload: { checked } };
 };
 
 export const ErrorSending = (isFailed) => {
