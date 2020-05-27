@@ -333,6 +333,7 @@ export default function Home(props) {
     id: '',
     question: '',
   });
+  const [FBTCAccount, setFBTCAccount] = useState({});
   const [answer, setAnswer] = useState('');
   const [selectToAdd, setSelectToAdd] = useState('buyBitcoins');
   const [openmodal, setOpenmodal] = useState('closed');
@@ -865,10 +866,12 @@ export default function Home(props) {
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
+      checkFastBitcoin();
     });
     getAssociatedContact();
     setCurrencyCodeFromAsync();
     updateAccountCardData();
+    checkFastBitcoin();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
@@ -888,6 +891,16 @@ export default function Home(props) {
       focusListener.remove();
     };
   }, []);
+
+  function isEmpty(obj) {
+    return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+  }
+
+  const checkFastBitcoin = async () => {
+    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    console.log("getFBTCAccount", getFBTCAccount);
+    setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+  };
 
   const onAppStateChange = async (nextAppState) => {
     try {
@@ -1862,7 +1875,7 @@ export default function Home(props) {
   const onPressSaveBitcoinElements = (type) => {
     if (type == 'voucher') {
       props.navigation.navigate('VoucherScanner');
-    } else if (type == 'existingSavingMethods') {
+    } else if (type == 'existingBuyingMethods') {
       props.navigation.navigate('ExistingSavingMethods');
     }
   };
@@ -1875,6 +1888,7 @@ export default function Home(props) {
             (AddBottomSheet as any).current.snapTo(0);
           }}
           onPressElements={(type) => onPressSaveBitcoinElements(type)}
+          isExistingSavingMethod={isEmpty(FBTCAccount)}
         />
       );
     }
