@@ -87,6 +87,9 @@ function* generateMetaSharesWorker() {
 
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
+  if (!secondaryMnemonic || !twoFASecret) {
+    throw new Error('secure assets missing; staticNonPMDD');
+  }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
@@ -124,7 +127,7 @@ function* initHCWorker() {
 
   yield put(switchS3Loader('initHC'));
   if (!s3Service.sss.metaShares.length) {
-    s3Service = yield call(generateMetaSharesWorker);
+    s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
   const res = yield call(s3Service.initializeHealthcheck);
   if (res.status === 200) {

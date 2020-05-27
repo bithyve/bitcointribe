@@ -96,10 +96,17 @@ export const serviceGenerator = async (
     bhXpub = res.data.decryptedStaticNonPMDD.bhXpub;
   }
 
-  // Secure account
+  // Secure account setup
   const secureAcc = new SecureAccount(primaryMnemonic);
-  if (!secondaryXpub) res = await secureAcc.setupSecureAccount();
-  else res = await secureAcc.importSecureAccount(secondaryXpub, bhXpub); // restoring
+  if (!metaShares) {
+    console.log('New setup: secure account');
+    res = await secureAcc.setupSecureAccount(); // executed once (during initial wallet creation)
+  } else {
+    if (!secondaryXpub)
+      throw new Error('Failed to extract secondary Xpub from metaShare ');
+    console.log('Importing secure account');
+    res = await secureAcc.importSecureAccount(secondaryXpub, bhXpub);
+  } // restoring
   if (res.status !== 200) {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ res });

@@ -293,30 +293,8 @@ export default class SecureAccount {
     }
   };
 
-  public getSecondaryMnemonic = ():
-    | {
-        status: number;
-        data: {
-          secondaryMnemonic: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.secureHDWallet.getSecondaryMnemonic(),
-      };
-    } catch (err) {
-      return { status: 307, err: err.message, message: ErrMap[307] };
-    }
-  };
+  public removeSecondaryMnemonic = (): { removed: Boolean } =>
+    this.secureHDWallet.removeSecondaryMnemonic();
 
   public getSecondaryXpub = ():
     | {
