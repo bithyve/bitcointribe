@@ -7,14 +7,14 @@ const MessageAsPerHealth = ({ health }) => {
     if (health == 0) {
         return (
             <Text numberOfLines={1} style={{ ...styles.headerInfoText }}>
-                The wallet backup is not secure.{'\n'}Please visit the health section
+                The wallet backup is not complete.{'\n'}Please visit the health section
             to{'\n'}improve the health of your backup
             </Text>
         );
     } else if (health > 0 && health < 100) {
         return (
             <Text numberOfLines={1} style={styles.headerInfoText}>
-                The wallet backup is not secured.{'\n'}Please complete the setup to
+                The wallet backup is not complete.{'\n'}Please complete the setup to
                 {'\n'}safeguard against loss of funds
             </Text>
         );
