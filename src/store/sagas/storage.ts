@@ -59,7 +59,8 @@ function* fetchSSSDBWorker() {
     const key = yield select((state) => state.storage.key);
     const database = yield call(dataManager.fetchSSS, key);
     if (key && database == undefined) {
-      yield put(generatePDF({ personalcopy1: 4, personalcopy2: 5 }));
+      console.log('Generating PDF');
+      yield put(generatePDF());
     }
     console.log({ key, database });
     if (key && database) {

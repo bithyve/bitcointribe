@@ -438,21 +438,17 @@ export const downloadMetaShareWatcher = createWatcher(
   DOWNLOAD_MSHARE,
 );
 
-function* generatePDFWorker({ payload }) {
+function* generatePDFWorker() {
   // yield put(switchS3Loader('generatePDF'));
+  const personalCopy1Index = 3; // corresponds to metaShare index
+  const personalCopy2Index = 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const resQRPersonalCopy1 = yield call(
-    s3Service.createQR,
-    payload.personalcopy1 - 1,
-  );
+  const resQRPersonalCopy1 = yield call(s3Service.createQR, personalCopy1Index);
   if (resQRPersonalCopy1.status !== 200) {
     console.log({ err: resQRPersonalCopy1.err });
     return;
   }
-  const resQRPersonalCopy2 = yield call(
-    s3Service.createQR,
-    payload.personalcopy2 - 1,
-  );
+  const resQRPersonalCopy2 = yield call(s3Service.createQR, personalCopy2Index);
   if (resQRPersonalCopy2.status !== 200) {
     console.log({ err: resQRPersonalCopy2.err });
     return;
@@ -495,14 +491,14 @@ function* generatePDFWorker({ payload }) {
       generatePDF,
       pdfDataPersonalCopy1,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy_1.pdf`,
-      `Hexa Share ${payload.personalcopy1}`,
+      `Hexa Share ${personalCopy1Index + 1}`,
       security.answer,
     );
     const personalCopy2PdfPath = yield call(
       generatePDF,
       pdfDataPersonalCopy2,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy_2.pdf`,
-      `Hexa Share  ${payload.personalcopy2}`,
+      `Hexa Share  ${personalCopy2Index + 1}`,
       security.answer,
     );
     let path = {
