@@ -104,6 +104,7 @@ import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
+import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
 
 export default function Home(props) {
   const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
@@ -117,7 +118,7 @@ export default function Home(props) {
   //     dispatch(initializeTrustedContact('Blake'));
   //   }, 4000); // letting other db insertion happen
   // }, []);
-  // console.log(trustedContacts.tc.trustedContacts['Blake']);
+  // //console.log(trustedContacts.tc.trustedContacts['Blake']);
   const [
     TrustedContactRequestBottomSheet,
     setTrustedContactRequestBottomSheet,
@@ -332,6 +333,7 @@ export default function Home(props) {
     id: '',
     question: '',
   });
+  const [FBTCAccount, setFBTCAccount] = useState({});
   const [answer, setAnswer] = useState('');
   const [selectToAdd, setSelectToAdd] = useState('buyBitcoins');
   const [openmodal, setOpenmodal] = useState('closed');
@@ -576,9 +578,11 @@ export default function Home(props) {
 
   useEffect(() => {
     getNotificationList();
+    getNewTransactionNotifications();
     let notificationOnFocusListener = props.navigation.addListener(
       'didFocus',
       () => {
+        getNewTransactionNotifications();
         getNotificationList();
       },
     );
@@ -586,6 +590,85 @@ export default function Home(props) {
       notificationOnFocusListener.remove();
     };
   }, []);
+
+  function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const getNewTransactionNotifications = async () => {
+    let newTransactions = [];
+    const derivativeAccountType = 'FAST_BITCOINS';
+    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+    if (
+      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
+      secureAccount.derivativeAccounts[derivativeAccountType][1].xpub
+    )
+      dispatch(fetchDerivativeAccBalTx(SECURE_ACCOUNT, derivativeAccountType));
+
+    if (
+      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
+      regularAccount.derivativeAccounts[derivativeAccountType][1].xpub
+    )
+      dispatch(fetchDerivativeAccBalTx(REGULAR_ACCOUNT, derivativeAccountType));
+
+    let newTransactionsRegular = regularAccount.derivativeAccounts[
+      derivativeAccountType
+    ][1] && regularAccount.derivativeAccounts[derivativeAccountType][1].newTransactions;
+    let newTransactionsSecure =
+      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
+      secureAccount.derivativeAccounts[derivativeAccountType][1]
+        .newTransactions;
+
+    if (
+      newTransactionsRegular &&
+      newTransactionsRegular.length &&
+      newTransactionsSecure &&
+      newTransactionsSecure.length
+    ) {
+      newTransactions = [...newTransactionsRegular, ...newTransactionsSecure];
+    } else if (newTransactionsRegular && newTransactionsRegular.length)
+      newTransactions = [...newTransactionsRegular];
+    else if (newTransactionsSecure && newTransactionsSecure.length)
+      newTransactions = [...newTransactionsSecure];
+
+    //console.log('newTransactions', newTransactions);
+
+    if (newTransactions.length) {
+      let asyncNotification = JSON.parse(
+        await AsyncStorage.getItem('notificationList'),
+      );
+      let asyncNotificationList = [];
+      if (asyncNotification.length) {
+        asyncNotificationList = [];
+        for (let i = 0; i < asyncNotification.length; i++) {
+          asyncNotificationList.push(asyncNotification[i]);
+        }
+      }
+      let tmpList = asyncNotificationList;
+      let obj = {
+        type: 'transaction',
+        isMandatory: false,
+        read: false,
+        title: 'New FastBitcoin Transactions',
+        time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+        date: new Date(),
+        info: newTransactions.length + ' New FBTC transactions',
+        notificationId: randomInteger(1, 1000),
+      };
+      tmpList.push(obj);
+
+      await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+      tmpList.sort(function (left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setTimeout(() => {
+        setNotificationData(tmpList);
+      setNotificationDataChange(!NotificationDataChange);
+      }, 2);
+      
+    }
+  };
 
   const getNotificationList = async () => {
     dispatch(fetchNotifications());
@@ -768,10 +851,10 @@ export default function Home(props) {
           })
           .catch((error) => {
             // User has rejected permissions
-            console.log(
-              'PERMISSION REQUEST :: notification permission rejected',
-              error,
-            );
+            //console.log(
+             // 'PERMISSION REQUEST :: notification permission rejected',
+            //  error,
+            //);
           });
       } else {
         createNotificationListeners();
@@ -783,10 +866,12 @@ export default function Home(props) {
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
       getAssociatedContact();
+      checkFastBitcoin();
     });
     getAssociatedContact();
     setCurrencyCodeFromAsync();
     updateAccountCardData();
+    checkFastBitcoin();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
@@ -806,6 +891,16 @@ export default function Home(props) {
       focusListener.remove();
     };
   }, []);
+
+  function isEmpty(obj) {
+    return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+  }
+
+  const checkFastBitcoin = async () => {
+    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    console.log("getFBTCAccount", getFBTCAccount);
+    setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+  };
 
   const onAppStateChange = async (nextAppState) => {
     try {
@@ -881,7 +976,7 @@ export default function Home(props) {
     const date = new Date();
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
 
-    // console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
+    // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
     await firebase
       .notifications()
       .scheduleNotification(notification, {
@@ -889,12 +984,13 @@ export default function Home(props) {
         //repeatInterval: 'hour',
       })
       .then(() => {})
-      .catch((err) => console.log('err', err));
+      .catch((err) =>{} //console.log('err', err)
+      );
     firebase
       .notifications()
       .getScheduledNotifications()
       .then((notifications) => {
-        // console.log('logging notifications', notifications);
+         //console.log('logging notifications', notifications);
       });
   };
 
@@ -923,7 +1019,7 @@ export default function Home(props) {
     firebase.notifications().displayNotification(deviceTrayNotification);
   };
 
-  // console.log("notification.data", JSON.parse(notification.data.content));
+  // //console.log("notification.data", JSON.parse(notification.data.content));
   //   let data = JSON.parse(notification.data.content);
   //   if(data.notificationType == "release"){
   //     props.navigation.navigate('UpdateApp', {releaseData: data})
@@ -933,7 +1029,7 @@ export default function Home(props) {
   //   const unsubscribe = firebase
   //     .messaging()
   //     .onMessage(async (remoteMessage) => {
-  //       console.log('A new FCM message arrived!', remoteMessage);
+  //       //console.log('A new FCM message arrived!', remoteMessage);
   //     });
 
   //   return unsubscribe;
@@ -942,7 +1038,7 @@ export default function Home(props) {
   // const notifications = useSelector(
   //   (state) => state.notifications.notifications,
   // );
-  // console.log({ notifications });
+  // //console.log({ notifications });
   // useEffect(() => {
   //   dispatch(fetchNotifications());
   // }, []);
@@ -1779,7 +1875,7 @@ export default function Home(props) {
   const onPressSaveBitcoinElements = (type) => {
     if (type == 'voucher') {
       props.navigation.navigate('VoucherScanner');
-    } else if (type == 'existingSavingMethods') {
+    } else if (type == 'existingBuyingMethods') {
       props.navigation.navigate('ExistingSavingMethods');
     }
   };
@@ -1792,6 +1888,7 @@ export default function Home(props) {
             (AddBottomSheet as any).current.snapTo(0);
           }}
           onPressElements={(type) => onPressSaveBitcoinElements(type)}
+          isExistingSavingMethod={isEmpty(FBTCAccount)}
         />
       );
     }
@@ -2215,8 +2312,8 @@ export default function Home(props) {
 
   // useEffect(() => {
   //   const unsubscribe = NetInfo.addEventListener(state => {
-  //     console.log('Connection type', state.type);
-  //     console.log('Is connected?', state.isConnected);
+  //     //console.log('Connection type', state.type);
+  //     //console.log('Is connected?', state.isConnected);
   //
   //     if (!state.isConnected) {
   //       (NoInternetBottomSheet as any).current.snapTo(1);
@@ -2475,7 +2572,7 @@ export default function Home(props) {
                       key,
                     ).decryptedPub;
                   } catch (err) {
-                    console.log({ err });
+                    //console.log({ err });
                     Alert.alert('Decryption Failed', err.message);
                   }
                 }

@@ -362,8 +362,7 @@ export default function AddContactSendRequest(props) {
                   >
                     {Contact.phoneNumbers[0].digits}
                   </Text>
-                ) : null}
-                {Contact.emails && Contact.emails.length ? (
+                ) : Contact.emails && Contact.emails.length ? (
                   <Text
                     style={{
                       color: Colors.textColorGrey,
