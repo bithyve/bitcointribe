@@ -8,6 +8,7 @@ import {
   StatusBar,
   Image,
   ScrollView,
+  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -19,44 +20,178 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Entypo from 'react-native-vector-icons/Entypo';
-import moment from 'moment';
 import _ from 'underscore';
+import moment from 'moment';
 
 export default function ContactDetails(props) {
   const Contact = props.navigation.state.params.contact;
   const contactsType = props.navigation.state.params.contactsType;
+  const index = props.navigation.state.params.index;
   const [contact, setContact] = useState(Contact ? Contact : Object);
   const [SelectedOption, setSelectedOption] = useState(0);
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
       title: 'Recovery Secret created',
-      date: '1 June ‘19, 9:00am',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
       title: 'Recovery Secret in-transit',
-      date: '1 June ‘19, 9:00am',
+      date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
       title: 'Recovery Secret accessible',
-      date: '1 June ‘19, 9:00am',
+      date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
       title: 'Recovery Secret not accessible',
-      date: '1 June ‘19, 9:00am',
+      date: null,
+      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
+    },
+    {
+      id: 5,
+      title: 'Sent Amount',
+      date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
   useEffect(() => {
     setContact(Contact);
+    if (contactsType == 'My Keepers') saveInTransitHistory("inTransit");
+    else getHistoryForTrustedContacts();
   }, [Contact]);
+
+  const onPressSend = () =>{
+    if(contactsType == "My Keepers"){
+      saveInTransitHistory("isSent");
+    }
+    else{
+      storeTrustedContactsHistory();
+    }
+    props.navigation.navigate('Send', { isFromAddressBook: true })
+  }
+
+  const createId = (length) => {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }
+
+  const storeTrustedContactsHistory = async() =>{
+    let OtherTrustedContactsHistory = [];
+    if(contactsType=="Other Trusted Contacts"){
+      let OtherTrustedContactsHistoryArray = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
+      OtherTrustedContactsHistory = OtherTrustedContactsHistoryArray
+    }
+    else{
+      let IMKeeperOfHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
+      OtherTrustedContactsHistory = IMKeeperOfHistory
+    }
+    if(!OtherTrustedContactsHistory){
+      OtherTrustedContactsHistory = [];
+    }
+    let obj = {
+      id: createId(10),
+      title: 'Sent Amount',
+      date: moment(Date.now()).valueOf(),
+      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+    }
+    OtherTrustedContactsHistory.push(obj);
+    if(contactsType=="Other Trusted Contacts"){
+      await AsyncStorage.setItem('OtherTrustedContactsHistory', JSON.stringify(OtherTrustedContactsHistory));
+    }
+    else{
+      await AsyncStorage.setItem('IMKeeperOfHistory', JSON.stringify(OtherTrustedContactsHistory));
+    }
+    console.log("obj", OtherTrustedContactsHistory)
+    setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
+  }
+
+  const getHistoryForTrustedContacts = async() =>{
+    let OtherTrustedContactsHistory = [];
+    if(contactsType=="Other Trusted Contacts"){
+      OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
+    }
+    else{
+      OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
+    }
+    if(!OtherTrustedContactsHistory){
+      OtherTrustedContactsHistory = [];
+    }
+    if(OtherTrustedContactsHistory.length>0){
+      setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
+    }
+    else{
+      setTrustedContactHistory([]);
+    }
+  }
+
+  const sortedHistory = useCallback((history) => {
+    const currentHistory = history.filter((element) => {
+      if (element.date) return element;
+    });
+    const sortedHistory = _.sortBy(currentHistory, 'date');
+    sortedHistory.forEach((element) => {
+      element.date = moment(element.date)
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm');
+    });
+    return sortedHistory;
+  }, []);
+
+  const updateHistory = useCallback(
+    (shareHistory) => {
+      const updatedTrustedContactHistory = [...trustedContactHistory];
+      if (shareHistory[index].createdAt)
+        updatedTrustedContactHistory[0].date = shareHistory[index].createdAt;
+      if (shareHistory[index].inTransit)
+        updatedTrustedContactHistory[1].date = shareHistory[index].inTransit;
+      if (shareHistory[index].accessible)
+        updatedTrustedContactHistory[2].date = shareHistory[index].accessible;
+      if (shareHistory[index].notAccessible)
+        updatedTrustedContactHistory[3].date = shareHistory[index].notAccessible;
+      if (shareHistory[index].inSent)
+        updatedTrustedContactHistory[4].date = shareHistory[index].inSent;
+      setTrustedContactHistory(updatedTrustedContactHistory);
+    },
+    [trustedContactHistory],
+  );
+
+  const saveInTransitHistory = useCallback(async (type) => {
+    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
+    if (shareHistory) {
+      const updatedShareHistory = [...shareHistory];
+      if(type=="inTransit"){
+        updatedShareHistory[index] = {
+          ...updatedShareHistory[index],
+          inTransit: Date.now(),
+        };
+      }
+      if(type=="isSent"){
+        updatedShareHistory[index] = {
+          ...updatedShareHistory[index],
+          inSent: Date.now(),
+        };
+      }
+      updateHistory(updatedShareHistory);
+      await AsyncStorage.setItem(
+        'shareHistory',
+        JSON.stringify(updatedShareHistory),
+      );
+    }
+  }, [updateHistory]);
 
   const getImageIcon = (item) => {
     if (item) {
@@ -127,7 +262,7 @@ export default function ContactDetails(props) {
                   marginLeft: 10,
                 }}
               >
-                {'My Keeper'}
+                {contactsType}
               </Text>
               <Text style={styles.contactText}>{contact.contactName}</Text>
               {contact.connectedVia ? (
@@ -143,78 +278,30 @@ export default function ContactDetails(props) {
             </TouchableOpacity>
           </View>
         </View>
-        <ScrollView style={{ flex: 1 }}>
-          {trustedContactHistory.map((value) => {
-            if (SelectedOption == value.id) {
-              return (
-                <TouchableOpacity
-                  key={value.id}
-                  onPress={() => SelectOption(value.id)}
-                  style={{
-                    margin: wp('3%'),
-                    backgroundColor: Colors.white,
-                    borderRadius: 10,
-                    height: wp('20%'),
-                    width: wp('90%'),
-                    justifyContent: 'center',
-                    paddingLeft: wp('3%'),
-                    paddingRight: wp('3%'),
-                    alignSelf: 'center',
-                  }}
-                >
-                  <Text
+        {sortedHistory(trustedContactHistory).length > 0 ? (
+          <ScrollView style={{ flex: 1 }}>
+            {sortedHistory(trustedContactHistory).map((value) => {
+              if (SelectedOption == value.id) {
+                return (
+                  <TouchableOpacity
+                    key={value.id}
+                    onPress={() => SelectOption(value.id)}
                     style={{
-                      color: Colors.blue,
-                      fontSize: RFValue(13),
-                      fontFamily: Fonts.FiraSansRegular,
+                      margin: wp('3%'),
+                      backgroundColor: Colors.white,
+                      borderRadius: 10,
+                      height: wp('20%'),
+                      width: wp('90%'),
+                      justifyContent: 'center',
+                      paddingLeft: wp('3%'),
+                      paddingRight: wp('3%'),
+                      alignSelf: 'center',
                     }}
                   >
-                    {value.title}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(10),
-                      fontFamily: Fonts.FiraSansRegular,
-                      marginTop: 5
-                    }}
-                  >
-                    {value.info}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(9),
-                      fontFamily: Fonts.FiraSansRegular,
-                      marginTop: hp('0.3%'),
-                    }}
-                  >
-                    {value.date}
-                  </Text>
-                </TouchableOpacity>
-              );
-            } else {
-              return (
-                <TouchableOpacity
-                  key={value.id}
-                  onPress={() => SelectOption(value.id)}
-                  style={{
-                    margin: wp('3%'),
-                    backgroundColor: Colors.white,
-                    borderRadius: 10,
-                    height: wp('15%'),
-                    width: wp('85%'),
-                    justifyContent: 'center',
-                    paddingLeft: wp('3%'),
-                    paddingRight: wp('3%'),
-                    alignSelf: 'center',
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text
                       style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
+                        color: Colors.blue,
+                        fontSize: RFValue(13),
                         fontFamily: Fonts.FiraSansRegular,
                       }}
                     >
@@ -223,64 +310,190 @@ export default function ContactDetails(props) {
                     <Text
                       style={{
                         color: Colors.textColorGrey,
+                        fontSize: RFValue(10),
+                        fontFamily: Fonts.FiraSansRegular,
+                        marginTop: 5,
+                      }}
+                    >
+                      {value.info}
+                    </Text>
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
                         fontSize: RFValue(9),
                         fontFamily: Fonts.FiraSansRegular,
-                        marginLeft: 'auto',
+                        marginTop: hp('0.3%'),
                       }}
                     >
                       {value.date}
                     </Text>
-                  </View>
-                  <Text
+                  </TouchableOpacity>
+                );
+              } else {
+                return (
+                  <TouchableOpacity
+                    key={value.id}
+                    onPress={() => SelectOption(value.id)}
                     style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(8),
-                      fontFamily: Fonts.FiraSansRegular,
-                      marginTop: 5
+                      margin: wp('3%'),
+                      backgroundColor: Colors.white,
+                      borderRadius: 10,
+                      height: wp('15%'),
+                      width: wp('85%'),
+                      justifyContent: 'center',
+                      paddingLeft: wp('3%'),
+                      paddingRight: wp('3%'),
+                      alignSelf: 'center',
                     }}
                   >
-                    {value.info}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }
-          })}
-        </ScrollView>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansRegular,
+                        }}
+                      >
+                        {value.title}
+                      </Text>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(9),
+                          fontFamily: Fonts.FiraSansRegular,
+                          marginLeft: 'auto',
+                        }}
+                      >
+                        {value.date}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(8),
+                        fontFamily: Fonts.FiraSansRegular,
+                        marginTop: 5,
+                      }}
+                    >
+                      {value.info}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }
+            })}
+          </ScrollView>
+        ) : (
+          <View style={{ flex: 1 }}>
+            <ScrollView>
+              {[1, 2, 3, 4, 5].map((value) => {
+                return (
+                  <View
+                    style={{
+                      margin: wp('3%'),
+                      backgroundColor: Colors.white,
+                      borderRadius: 10,
+                      height: wp('20%'),
+                      width: wp('90%'),
+                      paddingLeft: wp('3%'),
+                      paddingRight: wp('3%'),
+                      alignSelf: 'center',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View>
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('4%'),
+                          width: wp('40%'),
+                          borderRadius: 10,
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('4%'),
+                          width: wp('30%'),
+                          marginTop: 5,
+                          borderRadius: 10,
+                        }}
+                      />
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <View style={{ backgroundColor: Colors.backgroundColor }}>
+              <View
+                style={{
+                  margin: 15,
+                  backgroundColor: Colors.white,
+                  padding: 10,
+                  paddingTop: 20,
+                  borderRadius: 7,
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.black,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  No history
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  The history of your Recovery Secret will appear here
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
         <View>
-        <View
-            style={styles.bottomButton}
-          >
-            {(contactsType=="myKeepers"||contactsType=="IMKeepers") &&
-            <TouchableOpacity
-              style={styles.buttonInnerView}
-            >
-              <Image
-                source={require('../../assets/images/icons/openlink.png')}
-                style={styles.buttonImage}
+          <View style={styles.bottomButton}>
+            {(contactsType == 'My Keepers' ||
+              contactsType == "I'm Keeper of") && (
+              <TouchableOpacity style={styles.buttonInnerView}>
+                <Image
+                  source={require('../../assets/images/icons/openlink.png')}
+                  style={styles.buttonImage}
+                />
+                <Text style={styles.buttonText}>Help restore</Text>
+              </TouchableOpacity>
+            )}
+            {(contactsType == 'My Keepers' ||
+              contactsType == "I'm Keeper of") && (
+              <View
+                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
               />
-              <Text style={styles.buttonText}>Help restore</Text>
-            </TouchableOpacity>
-            }
-            {(contactsType=="myKeepers"||contactsType=="IMKeepers") &&
-            <View
-              style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-            />}
-            {(contactsType=="myKeepers"||contactsType=="IMKeepers") &&
-            <TouchableOpacity
-              style={styles.buttonInnerView}
-            >
-              <Image
-                source={require('../../assets/images/icons/openlink.png')}
-                style={styles.buttonImage}
+            )}
+            {(contactsType == 'My Keepers' ||
+              contactsType == "I'm Keeper of") && (
+              <TouchableOpacity style={styles.buttonInnerView}>
+                <Image
+                  source={require('../../assets/images/icons/openlink.png')}
+                  style={styles.buttonImage}
+                />
+                <Text style={styles.buttonText}>Reshare</Text>
+              </TouchableOpacity>
+            )}
+            {(contactsType == 'My Keepers' ||
+              contactsType == "I'm Keeper of") && (
+              <View
+                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
               />
-              <Text style={styles.buttonText}>Reshare</Text>
-            </TouchableOpacity>}
-            {(contactsType=="myKeepers"||contactsType=="IMKeepers") &&<View
-              style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-            />}
-            <TouchableOpacity
-              style={styles.buttonInnerView}
-            >
+            )}
+            <TouchableOpacity onPress={()=>onPressSend()} style={styles.buttonInnerView}>
               <Image
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                 style={styles.buttonImage}
@@ -383,7 +596,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
-  bottomButton:{
+  bottomButton: {
     flexDirection: 'row',
     backgroundColor: Colors.blue,
     height: 60,
@@ -396,5 +609,5 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
     shadowOffset: { width: 15, height: 15 },
-  }
+  },
 });

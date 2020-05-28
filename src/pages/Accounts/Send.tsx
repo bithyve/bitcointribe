@@ -14,7 +14,7 @@ import {
   StatusBar,
   AsyncStorage,
   ImageBackground,
-  FlatList
+  FlatList,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Colors from '../../common/Colors';
@@ -25,6 +25,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   transferST1,
@@ -59,7 +60,7 @@ import { RNCamera } from 'react-native-camera';
 
 export default function Send(props) {
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
-  const [accountType, setAccountType] = useState('Checking Account')
+  const [accountType, setAccountType] = useState('Checking Account');
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [
     SendConfirmationBottomSheet,
@@ -137,24 +138,28 @@ export default function Send(props) {
 
   const [isEditable, setIsEditable] = useState(true);
 
-  const accountData = [
+  const accountData1 = [
     {
       id: '1',
       account_name: 'Checking Account',
       type: REGULAR_ACCOUNT,
+      checked: false,
       icon: require('../../assets/images/icons/icon_regular_account.png'),
     },
     {
       id: '2',
       account_name: 'Saving Account',
       type: SECURE_ACCOUNT,
+      checked: false,
       icon: require('../../assets/images/icons/icon_secureaccount_white.png'),
-    }
+    },
   ];
+
+  const [accountData, setAccountData] = useState(accountData1);
 
   const getContact = () => {
     ExpoContacts.getContactsAsync().then(async ({ data }) => {
-      if(data.length > 0) {
+      if (data.length > 0) {
         await AsyncStorage.setItem('ContactData', JSON.stringify(data));
         const contactList = data.sort(function (a, b) {
           if (a.name && b.name) {
@@ -568,13 +573,12 @@ export default function Send(props) {
 
   useEffect(() => {
     if (serviceType === TEST_ACCOUNT) {
-      setAccountType('Test Account')
+      setAccountType('Test Account');
+    } else if (serviceType === SECURE_ACCOUNT) {
+      console.log('Secure Account');
+      setAccountType('Saving Account');
     }
-    else if (serviceType === SECURE_ACCOUNT) {
-      console.log('Secure Account')
-      setAccountType('Saving Account')
-    }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) {
@@ -656,7 +660,7 @@ export default function Send(props) {
     let isAddressValid = instance.isValidAddress(recipientAddress);
     if (isAddressValid) {
       let item = {
-        id: recipientAddress
+        id: recipientAddress,
       };
       onSelectContact(item);
     }
@@ -680,7 +684,7 @@ export default function Send(props) {
     if (barcodes.data) {
       setRecipientAddress(barcodes.data);
       const instance = service.hdWallet || service.secureHDWallet;
-      let isAddressValid = instance.isValidAddress(recipientAddress)
+      let isAddressValid = instance.isValidAddress(recipientAddress);
       console.log(isAddressValid);
       setIsInvalidAddress(isAddressValid);
       setOpenCameraFlag(false);
@@ -688,7 +692,6 @@ export default function Send(props) {
   };
 
   const renderQRCodeThumbnail = () => {
-
     if (openCameraFlag) {
       return (
         <View style={styles.cameraView}>
@@ -712,65 +715,134 @@ export default function Send(props) {
             </View>
           </RNCamera>
         </View>
-      )
+      );
     }
 
     return (
       <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
-        <ImageBackground source={require("../../assets/images/icons/iPhone-QR.png")} style={{
-          width: wp('100%'),
-          height: wp('70%'),
-          overflow: "hidden",
-          borderRadius: 20,
-        }} >
-          <View style={{ flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%' }}>
-            <View style={{ borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderTopWidth: 1 }} />
-            <View style={{ borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
+        <ImageBackground
+          source={require('../../assets/images/icons/iPhone-QR.png')}
+          style={{
+            width: wp('100%'),
+            height: wp('70%'),
+            overflow: 'hidden',
+            borderRadius: 20,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              paddingTop: 12,
+              paddingRight: 12,
+              paddingLeft: 12,
+              width: '100%',
+            }}
+          >
+            <View
+              style={{
+                borderLeftWidth: 1,
+                borderTopColor: 'white',
+                borderLeftColor: 'white',
+                height: hp('5%'),
+                width: hp('5%'),
+                borderTopWidth: 1,
+              }}
+            />
+            <View
+              style={{
+                borderTopWidth: 1,
+                borderRightWidth: 1,
+                borderRightColor: 'white',
+                borderTopColor: 'white',
+                height: hp('5%'),
+                width: hp('5%'),
+                marginLeft: 'auto',
+              }}
+            />
           </View>
-          <View style={{ marginTop: 'auto', flexDirection: 'row', paddingBottom: 12, paddingRight: 12, paddingLeft: 12, width: '100%', }}>
-            <View style={{ borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: hp('5%'), width: hp('5%'), borderBottomWidth: 1 }} />
-            <View style={{ borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: hp('5%'), width: hp('5%'), marginLeft: 'auto' }} />
+          <View
+            style={{
+              marginTop: 'auto',
+              flexDirection: 'row',
+              paddingBottom: 12,
+              paddingRight: 12,
+              paddingLeft: 12,
+              width: '100%',
+            }}
+          >
+            <View
+              style={{
+                borderLeftWidth: 1,
+                borderBottomColor: 'white',
+                borderLeftColor: 'white',
+                height: hp('5%'),
+                width: hp('5%'),
+                borderBottomWidth: 1,
+              }}
+            />
+            <View
+              style={{
+                borderBottomWidth: 1,
+                borderRightWidth: 1,
+                borderRightColor: 'white',
+                borderBottomColor: 'white',
+                height: hp('5%'),
+                width: hp('5%'),
+                marginLeft: 'auto',
+              }}
+            />
           </View>
         </ImageBackground>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const onSelectContact = (item) => {
+    //if(item.account_name && item.account_name == )
     let isNavigate = true;
     if (sendStorage && sendStorage.length === 0) {
-      props.navigation.navigate('SendToContact', { selectedContact: item, serviceType, averageTxFees, sweepSecure, netBalance });
+      props.navigation.navigate('SendToContact', {
+        selectedContact: item,
+        serviceType,
+        averageTxFees,
+        sweepSecure,
+        netBalance,
+      });
       setRecipientAddress('');
-    }
-    else {
-      sendStorage && sendStorage.map((contact) => {
-        if(contact.selectedContact.id === item.id) {
-          return isNavigate = false;
-        }
-      })
-      if(isNavigate) {
-        props.navigation.navigate('SendToContact', { selectedContact: item, serviceType, averageTxFees, sweepSecure, netBalance });
+    } else {
+      sendStorage &&
+        sendStorage.map((contact) => {
+          if (contact.selectedContact.id === item.id) {
+            return (isNavigate = false);
+          }
+        });
+      if (isNavigate) {
+        props.navigation.navigate('SendToContact', {
+          selectedContact: item,
+          serviceType,
+          averageTxFees,
+          sweepSecure,
+          netBalance,
+        });
         setRecipientAddress('');
       }
     }
-  }
+  };
 
-  const getImageIcon = item => {
+  const getImageIcon = (item) => {
     if (item) {
       if (item.imageAvailable) {
-        return (
-          <Image
-            source={item.image}
-            style={styles.circleShapeView}
-          />
-        );
+        return <Image source={item.image} style={styles.circleShapeView} />;
       } else {
         return (
           <View
-            style={{...styles.circleShapeView, 
-              backgroundColor: Colors.shadowBlue, 
-              alignItems: 'center', 
-              justifyContent: 'center'}}>
+            style={{
+              ...styles.circleShapeView,
+              backgroundColor: Colors.shadowBlue,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <Text
               style={{
                 textAlign: 'center',
@@ -801,40 +873,43 @@ export default function Send(props) {
       <View style={{ flexDirection: 'column' }}>
         <TouchableOpacity onPress={() => onSelectContact(item)}>
           <View style={{ justifyContent: 'center', marginLeft: hp('4%') }}>
-            {sendStorage && sendStorage.length > 0 && 
+            {sendStorage &&
+              sendStorage.length > 0 &&
               sendStorage.map((contact) => {
-                if(contact.selectedContact.id === item.id) {
+                if (contact.selectedContact.id === item.id) {
                   return (
-                    <Image style={styles.checkmarkStyle} 
-                      source={require('../../assets/images/icons/checkmark.png')} 
-                      resizeMode="contain" />
-                  )
+                    <Image
+                      style={styles.checkmarkStyle}
+                      source={require('../../assets/images/icons/checkmark.png')}
+                      resizeMode="contain"
+                    />
+                  );
                 }
-              })
-            }
+              })}
             {/* <Image style={styles.circleShapeView} 
               source={require('../../assets/images/icons/icon_contact.png')} 
               resizeMode="contain" /> */}
             {getImageIcon(item)}
-            <Text 
+            <Text
               style={{
                 width: 50,
                 height: 15,
                 color: Colors.textColorGrey,
                 fontSize: RFValue(10),
                 fontFamily: Fonts.FiraSansRegular,
-                textAlign: 'center'
-              }}>
+                textAlign: 'center',
+              }}
+            >
               {item.name}
             </Text>
           </View>
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   const renderAccounts = ({ item, index }) => {
-    return(
+    return (
       <View style={{ flexDirection: 'column' }}>
         <TouchableOpacity onPress={() => onSelectContact(item)}>
           <CardView cornerRadius={10} opacity={1} style={styles.card}>
@@ -844,7 +919,7 @@ export default function Send(props) {
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginLeft: 2,
-                marginRight: 2
+                marginRight: 2,
               }}
             >
               <Image
@@ -856,24 +931,35 @@ export default function Send(props) {
                   color: Colors.black,
                   fontSize: RFValue(10),
                   fontWeight: '500',
-                  textAlign: 'center'
+                  textAlign: 'center',
                 }}
               >
                 {item.account_name}
               </Text>
-              <Text 
+              <Text
                 style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue(10),
                   fontFamily: Fonts.FiraSansRegular,
                   textAlign: 'center',
-                  marginTop: 2
-                }}>
-                {item.type === REGULAR_ACCOUNT ? '$'+UsNumberFormat(balances.regularBalance) : '$'+UsNumberFormat(balances.secureBalance)}
+                  marginTop: 2,
+                }}
+              >
+                {item.type === REGULAR_ACCOUNT
+                  ? '$' + UsNumberFormat(balances.regularBalance)
+                  : '$' + UsNumberFormat(balances.secureBalance)}
               </Text>
-              <View style={{ marginTop: 5}}>
-                {sendStorage && sendStorage.length > 0 && 
+              <View style={{ marginTop: 10 }}>
+                <RadioButton
+                  size={15}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={item.checked}
+                  onPress={() => onSelectContact(item)}
+                />
+                {/* {sendStorage && sendStorage.length > 0 && 
                   sendStorage.map((contact) => {
+                    console.log("sendStorage", sendStorage);
                     if(contact.selectedContact.id === item.id) {
                       return (
                         <Image style={styles.checkmarkStyle} 
@@ -891,14 +977,14 @@ export default function Send(props) {
                       )
                     }
                   })
-                }
+                } */}
               </View>
             </View>
           </CardView>
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -966,7 +1052,9 @@ export default function Send(props) {
                   </View>
                 </View>
                 {renderQRCodeThumbnail()}
-                <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}>
+                <View
+                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}
+                >
                   <View style={styles.textBoxView}>
                     <TextInput
                       editable={isEditable}
@@ -1004,16 +1092,33 @@ export default function Send(props) {
                       </Text>
                     </View>
                   ) : null}
-                  <View style={{ paddingTop: 15 }}>
-                    <Text
-                      style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
-                    >
-                      Send to Contact
-                    </Text>
+                  <View style={{ paddingTop: 10 }}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          fontSize: RFValue(13),
+                          fontFamily: Fonts.FiraSansRegular,
+                        }}
+                      >
+                        Send to Contact
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {}}
+                        style={{
+                          height: 20,
+                          width: 20,
+                          justifyContent: 'center',
+                          marginLeft: 'auto',
+                        }}
+                      >
+                        <SimpleLineIcons
+                          name="options-vertical"
+                          color={Colors.blue}
+                          size={17}
+                        />
+                      </TouchableOpacity>
+                    </View>
                     <View
                       style={{
                         ...styles.textBoxView,
@@ -1021,31 +1126,55 @@ export default function Send(props) {
                         height: 90,
                         marginTop: hp('2%'),
                         justifyContent: 'center',
-                        backgroundColor: Colors.backgroundColor1
-                      }}>
-                        <View style={{ flex: 1,  flexDirection: 'row', alignItems: 'center' }}>
-                          <FlatList
-                            horizontal
-                            nestedScrollEnabled={true}
-                            showsHorizontalScrollIndicator={false}
-                            data={filterContactData}
-                            renderItem={renderContacts}
-                            extraData={{ sendStorage }}
-                            keyExtractor={(item, index) => index.toString()}
-                          />
-                        </View>
-                    </View>
-                  </View>
-                  <View style={{ paddingTop: 15 }}>
-                    <Text
-                      style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
+                        backgroundColor: Colors.backgroundColor1,
                       }}
                     >
-                      Send to Account
-                    </Text>
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <FlatList
+                          horizontal
+                          nestedScrollEnabled={true}
+                          showsHorizontalScrollIndicator={false}
+                          data={filterContactData}
+                          renderItem={renderContacts}
+                          extraData={{ sendStorage }}
+                          keyExtractor={(item, index) => index.toString()}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                  <View style={{ paddingTop: 10 }}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          fontSize: RFValue(13),
+                          fontFamily: Fonts.FiraSansRegular,
+                        }}
+                      >
+                        Send to Account
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {}}
+                        style={{
+                          height: 20,
+                          width: 20,
+                          justifyContent: 'center',
+                          marginLeft: 'auto',
+                        }}
+                      >
+                        <SimpleLineIcons
+                          name="options-vertical"
+                          color={Colors.blue}
+                          size={17}
+                        />
+                      </TouchableOpacity>
+                    </View>
                     <View
                       style={{
                         ...styles.textBoxView,
@@ -1053,19 +1182,27 @@ export default function Send(props) {
                         height: 130,
                         marginTop: hp('2%'),
                         justifyContent: 'center',
-                        backgroundColor: Colors.backgroundColor1
-                      }}>
-                        <View style={{ flex: 1,  flexDirection: 'row', alignItems: 'center' }}>
-                          <FlatList
-                            data={accountData}
-                            horizontal
-                            nestedScrollEnabled={true}
-                            showsHorizontalScrollIndicator={false}
-                            showsVerticalScrollIndicator={false}
-                            renderItem={renderAccounts}
-                            keyExtractor={(item, index) => index.toString()}
-                          />
-                        </View>
+                        backgroundColor: Colors.backgroundColor1,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <FlatList
+                          data={accountData}
+                          horizontal
+                          nestedScrollEnabled={true}
+                          showsHorizontalScrollIndicator={false}
+                          showsVerticalScrollIndicator={false}
+                          renderItem={renderAccounts}
+                          extraData={{ sendStorage }}
+                          //keyExtractor={(item, index) => index.toString()}
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
@@ -1385,9 +1522,9 @@ const styles = StyleSheet.create({
   circleShapeView: {
     width: 50,
     height: 50,
-    borderRadius: 50/2,
+    borderRadius: 50 / 2,
     borderColor: Colors.white,
-    borderWidth: 2
+    borderWidth: 2,
   },
   card: {
     width: 108,
@@ -1407,7 +1544,7 @@ const styles = StyleSheet.create({
     height: 16,
     top: 0,
     right: 0,
-    zIndex: 5
+    zIndex: 5,
   },
   cameraView: {
     width: wp('100%'),
