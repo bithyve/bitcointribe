@@ -32,14 +32,12 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
-import { ModalShareIntent } from '../../components/Modal/ManageBackup';
+import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
 import moment from 'moment';
 import _ from 'underscore';
 import Toast from '../../components/Toast';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -145,57 +143,6 @@ const PersonalCopyHistory = (props) => {
     dispatch(QRChecked(null));
   }
 
-  const renderErrorModalContent = useCallback(() => {
-    return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={errorMessageHeader}
-        info={errorMessage}
-        proceedButtonText={'Try again'}
-        onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/errorImage.png')}
-      />
-    );
-  }, [errorMessage, errorMessageHeader]);
-
-  const renderErrorModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  const renderPersonalCopyShareModalContent = useCallback(() => {
-    return (
-      <ModalShareIntent
-        removeHighlightingFromCard={() => {}}
-        selectedPersonalCopy={selectedPersonalCopy}
-        onPressBack={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-        }}
-        onPressShare={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [selectedPersonalCopy]);
-
-  const renderPersonalCopyShareModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
   useEffect(() => {
     if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
   }, [next]);
@@ -291,6 +238,57 @@ const PersonalCopyHistory = (props) => {
         }
       });
     }
+  }, []);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderPersonalCopyShareModalContent = useCallback(() => {
+    return (
+      <PersonalCopyShareModal
+        removeHighlightingFromCard={() => {}}
+        selectedPersonalCopy={selectedPersonalCopy}
+        onPressBack={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+        onPressShare={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [selectedPersonalCopy]);
+
+  const renderPersonalCopyShareModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   }, []);
 
   return (

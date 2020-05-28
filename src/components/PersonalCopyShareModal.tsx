@@ -5,35 +5,39 @@ import {
   Text,
   Image,
   FlatList,
-  Platform
+  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Colors from '../../../../src/common/Colors';
-import Fonts from '../../../../src/common/Fonts';
-import Icons from '../../../../src/common/Icons';
-import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper';
+import Colors from '../common/Colors';
+import Fonts from '../common/Fonts';
+import Icons from '../common/Icons';
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
-import { requestSharePdf,PDFSharingFailed } from '../../../store/actions/manageBackup';
-import BottomInfoBox from '../../../components/BottomInfoBox';
+import {
+  requestSharePdf,
+  PDFSharingFailed,
+} from '../store/actions/manageBackup';
+import BottomInfoBox from './BottomInfoBox';
 import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from '../../../components/ErrorModalContents';
-import ModalHeader from '../../../components/ModalHeader';
+import ErrorModalContents from './ErrorModalContents';
+import ModalHeader from './ModalHeader';
 
-export default function ModalShareIntent(props) {
-  const database = useSelector(state => state.storage.databaseSSS);
+export default function PersonalCopyShareModal(props) {
+  const database = useSelector((state) => state.storage.databaseSSS);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isPDFSharedFailed = useSelector(state => state.manageBackup.pdfSharingFailed);
-  console.log("isPDFSharedFailed", isPDFSharedFailed);
+  const isPDFSharedFailed = useSelector(
+    (state) => state.manageBackup.pdfSharingFailed,
+  );
   // const [flagRefreshing, setFagRefreshing] = useState(false);
-  const [arrShareOption] = useState([
+  const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
     {
       id: 1,
       title: 'Send pdf on email',
@@ -84,7 +88,7 @@ export default function ModalShareIntent(props) {
   // }, [props]);
   const dispatch = useDispatch();
 
-  const onShare = async item => {
+  const onShare = async (item) => {
     // TODO: Remove Hack: Avoiding state mix on ManageBackup due to multiple modals
 
     // if (props.selectedPersonalCopy.type === 'copy1') {
@@ -154,7 +158,7 @@ export default function ModalShareIntent(props) {
     // }
   };
 
-  const disableOrEnableOption = item => {
+  const disableOrEnableOption = (item) => {
     if (props.selectedPersonalCopy.type == 'copy1') {
       return database.pdfDetails &&
         database.pdfDetails.copy2.shareDetails.type == item.type
@@ -184,7 +188,7 @@ export default function ModalShareIntent(props) {
         bottomImage={require('../../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -196,71 +200,87 @@ export default function ModalShareIntent(props) {
     );
   }, []);
 
-if(isPDFSharedFailed){
-  setTimeout(() => {
-    setErrorMessageHeader('PDF Sharing failed');
-    setErrorMessage(
-      'There was some error while sharing the Recovery Secret, please try again',
-    );
-  }, 2);
-  (ErrorBottomSheet as any).current.snapTo(1);
-  dispatch(PDFSharingFailed(null));
-}
+  if (isPDFSharedFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('PDF Sharing failed');
+      setErrorMessage(
+        'There was some error while sharing the Recovery Secret, please try again',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(PDFSharingFailed(null));
+  }
   return (
     <View style={[styles.modalContainer]}>
       <View
         style={{
           borderBottomWidth: 1,
           borderColor: Colors.borderColor,
-          flexDirection: "row",
+          flexDirection: 'row',
           paddingRight: 10,
-          paddingBottom: hp("1.5%"),
+          paddingBottom: hp('1.5%'),
           marginRight: 10,
-          marginBottom: hp("1.5%"),
-          paddingTop: hp("0.5%"),
+          marginBottom: hp('1.5%'),
+          paddingTop: hp('0.5%'),
           alignItems: 'center',
-          marginLeft: 20 
+          marginLeft: 20,
         }}
       >
-        <Text style={{color: Colors.blue, fontSize: RFValue(18), fontFamily: Fonts.FiraSansMedium}}>Store personal copy PDF</Text>
+        <Text
+          style={{
+            color: Colors.blue,
+            fontSize: RFValue(18),
+            fontFamily: Fonts.FiraSansMedium,
+          }}
+        >
+          Store personal copy PDF
+        </Text>
       </View>
       <View style={{ flex: 1 }}>
         <FlatList
-          data={arrShareOption}
+          data={personalCopyShareOptions}
           renderItem={({ item, index }) => (
             <View>
-            <AppBottomSheetTouchableWrapper
-              onPress={() => {
-                onShare(item);
-              }}
-              disabled={disableOrEnableOption(item)}
-              style={[
-                styles.listElements,
-                disableOrEnableOption(item) ? 
-                { backgroundColor: Colors.borderColor }
-                : null,
-              ]}
-            >
-              <Image
-                style={styles.listElementsIconImage}
-                source={item.imageIcon}
-              />
-              <View style={{ justifyContent: 'space-between', flex: 1 }}>
-                <Text style={styles.listElementsTitle}>{item.title}</Text>
-                <Text style={styles.listElementsInfo}>{item.info}</Text>
-              </View>
-              <View style={styles.listElementIcon}>
-                <Ionicons
-                  name="ios-arrow-forward"
-                  color={Colors.textColorGrey}
-                  size={15}
-                  style={{ alignSelf: 'center' }}
+              <AppBottomSheetTouchableWrapper
+                onPress={() => {
+                  onShare(item);
+                }}
+                disabled={disableOrEnableOption(item)}
+                style={[
+                  styles.listElements,
+                  disableOrEnableOption(item)
+                    ? { backgroundColor: Colors.borderColor }
+                    : null,
+                ]}
+              >
+                <Image
+                  style={styles.listElementsIconImage}
+                  source={item.imageIcon}
                 />
-              </View>
-            </AppBottomSheetTouchableWrapper>
-            <View style={{ marginLeft:20, marginRight:20, marginTop:2, marginBottom:2, height: 1,
-              backgroundColor: Colors.borderColor,}} />
-              </View>
+                <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                  <Text style={styles.listElementsTitle}>{item.title}</Text>
+                  <Text style={styles.listElementsInfo}>{item.info}</Text>
+                </View>
+                <View style={styles.listElementIcon}>
+                  <Ionicons
+                    name="ios-arrow-forward"
+                    color={Colors.textColorGrey}
+                    size={15}
+                    style={{ alignSelf: 'center' }}
+                  />
+                </View>
+              </AppBottomSheetTouchableWrapper>
+              <View
+                style={{
+                  marginLeft: 20,
+                  marginRight: 20,
+                  marginTop: 2,
+                  marginBottom: 2,
+                  height: 1,
+                  backgroundColor: Colors.borderColor,
+                }}
+              />
+            </View>
           )}
           keyExtractor={(item, index) => index.toString()}
         />
@@ -273,7 +293,7 @@ if(isPDFSharedFailed){
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),

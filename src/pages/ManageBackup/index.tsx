@@ -182,7 +182,7 @@ export default function ManageBackup(props) {
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.sss.service);
   // const { databaseSSS } = useSelector(state => state.storage);
-  const [overallHealth, setOverallHealth] = useState();
+  const [overallHealth, setOverallHealth] = useState(null);
   const health = useSelector((state) => state.sss.overallHealth);
   //const { overallHealth } = useSelector( state => state.sss );
   const healthLoading = useSelector(
