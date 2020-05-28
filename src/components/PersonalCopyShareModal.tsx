@@ -27,6 +27,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from './ErrorModalContents';
 import ModalHeader from './ModalHeader';
+import { sharePersonalCopy } from '../store/actions/sss';
 
 export default function PersonalCopyShareModal(props) {
   const database = useSelector((state) => state.storage.databaseSSS);
@@ -65,97 +66,11 @@ export default function PersonalCopyShareModal(props) {
     },
   ]);
 
-  // useEffect(() => {
-  //   let singleton = Singleton.getInstance();
-  //   let selectedPdfDetails = singleton.getSeletedPdfDetails();
-  //   let shareItem =
-  //     selectedPdfDetails != undefined
-  //       ? props.data.item.type == 'copy1'
-  //         ? selectedPdfDetails[4]
-  //         : selectedPdfDetails[3]
-  //       : null;
-  //   if (shareItem != null) {
-  //     let mediaShare = shareItem.personalInfo.shareDetails;
-  //     if (mediaShare != {})
-  //       for (var i = 0; i < arrShareOption.length; i++)
-  //         if (arrShareOption[i].type === mediaShare.type) {
-  //           arrShareOption[i].flagShare = true;
-  //           setFagRefreshing(true);
-  //           break;
-  //         }
-  //   }
-  //   refShareIntentBottomSheet.current.snapTo(props.data.snapTop);
-  // }, [props]);
   const dispatch = useDispatch();
 
-  const onShare = async (item) => {
-    // TODO: Remove Hack: Avoiding state mix on ManageBackup due to multiple modals
-
-    // if (props.selectedPersonalCopy.type === 'copy1') {
-    //   const personalCopy1Shared = await AsyncStorage.getItem(
-    //     'personalCopy1Shared',
-    //   );
-
-    //   if (personalCopy1Shared) {
-    //     console.log('Dispatching alternate: copy2');
-
-    //     dispatch(
-    //       requestSharePdf(item.type, {
-    //         title: 'Personal Copy 2',
-    //         personalInfo: null,
-    //         time: 'never',
-    //         status: 'Ugly',
-    //         type: 'copy2',
-    //         route: 'PersonalCopy',
-    //       }),
-    //     );
-    //   } else {
-    //     dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
-    //   }
-    // } else if (props.selectedPersonalCopy.type === 'copy2') {
-    //   const personalCopy2Shared = await AsyncStorage.getItem(
-    //     'personalCopy2Shared',
-    //   );
-    //   if (personalCopy2Shared) {
-    //     console.log('Dispatching alternate: copy1');
-    //     dispatch(
-    //       requestSharePdf(item.type, {
-    //         title: 'Personal Copy 1',
-    //         personalInfo: null,
-    //         time: 'never',
-    //         status: 'Ugly',
-    //         type: 'copy1',
-    //         route: 'PersonalCopy',
-    //       }),
-    //     );
-    //   } else {
-    //     dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
-    //   }
-    // }
-
-    dispatch(requestSharePdf(item.type, props.selectedPersonalCopy));
+  const onShare = async (shareOption) => {
+    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy));
     props.onPressShare();
-
-    // if (props.selectedPersonalCopy.type === 'copy1') {
-    //   await AsyncStorage.setItem('personalCopy1Shared', 'true');
-    // } else if (props.selectedPersonalCopy.type === 'copy2') {
-    //   await AsyncStorage.setItem('personalCopy2Shared', 'true');
-    // }
-    // let personalCopyCounter = await AsyncStorage.getItem('personalCopyCounter');
-    // if (personalCopyCounter && personalCopyCounter == '1') {
-    //   await AsyncStorage.setItem('personalCopyCounter', '2');
-    //   await AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-    //   props.removeHighlightingFromCard();
-    // } else if (!personalCopyCounter) {
-    //   await AsyncStorage.setItem('personalCopyCounter', '1');
-    //   await AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-    //   props.removeHighlightingFromCard();
-    // } else {
-    //   await AsyncStorage.setItem('personalCopyCounter', '2');
-    //   await AsyncStorage.setItem('personalCopy2AutoHighlightFlags', 'true');
-    //   await AsyncStorage.setItem('personalCopy1AutoHighlightFlags', 'true');
-    //   props.removeHighlightingFromCard();
-    // }
   };
 
   const disableOrEnableOption = (item) => {
@@ -185,7 +100,7 @@ export default function PersonalCopyShareModal(props) {
           (ErrorBottomSheet as any).current.snapTo(0);
         }}
         isBottomImage={true}
-        bottomImage={require('../../../assets/images/icons/errorImage.png')}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
       />
     );
   }, [errorMessage, errorMessageHeader]);

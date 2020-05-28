@@ -44,9 +44,8 @@ import {
   walletImageChecked,
   GENERATE_PERSONAL_COPIES,
   personalCopiesGenerated,
+  SHARE_PERSONAL_COPY,
 } from '../actions/sss';
-import { dbInsertedSSS } from '../actions/storage';
-
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -66,16 +65,15 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
-import { AsyncStorage } from 'react-native';
-import { Alert } from 'react-native';
-import {
-  updateEphemeralChannel,
-  trustedChannelFetched,
-} from '../actions/trustedContacts';
+import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
+import { updateEphemeralChannel } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import crypto from 'crypto';
-import { insertDBWorker, insertDBWatcher } from './storage';
+import { insertDBWorker } from './storage';
+import Share from 'react-native-share';
+import RNPrint from 'react-native-print';
+var Mailer = require('NativeModules').RNMail;
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -504,8 +502,8 @@ function* generatePersonalCopiesWorker() {
       security.answer,
     );
     const personalCopyDetails = {
-      copy1: { path: pc1PDFPath, flagShare: false, shareDetails: {} },
-      copy2: { path: pc2PDFPath, flagShare: false, shareDetails: {} },
+      copy1: { path: pc1PDFPath, shared: false, sharingDetails: {} },
+      copy2: { path: pc2PDFPath, shared: false, sharingDetails: {} },
     };
     // console.log({ path });
     yield call(
@@ -535,6 +533,130 @@ function* generatePersonalCopiesWorker() {
 export const generatePersonalCopiesWatcher = createWatcher(
   generatePersonalCopiesWorker,
   GENERATE_PERSONAL_COPIES,
+);
+
+function* sharePersonalCopyWorker({ payload }) {
+  const { shareVia, selectedPersonalCopy } = payload;
+
+  try {
+    let personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
+    );
+    if (!personalCopyDetails)
+      throw new Error('Personal copies not found/generated');
+    personalCopyDetails = JSON.parse(personalCopyDetails);
+
+    const { security } = yield select(
+      (state) => state.storage.database.WALLET_SETUP,
+    );
+
+    switch (shareVia) {
+      case 'Email':
+        yield Mailer.mail(
+          {
+            subject: selectedPersonalCopy.title,
+            body: `<b>Please find attached the personal copy ${
+              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+            } share pdf, it is password protected by the answer to the security question.</b>`,
+            isHTML: true,
+            attachment: {
+              path:
+                Platform.OS == 'android'
+                  ? 'file://' +
+                    personalCopyDetails[selectedPersonalCopy.type].path
+                  : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
+              type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+              name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+            },
+          },
+          (error, event) => {
+            console.log({ event, error });
+          },
+        );
+        break;
+
+      case 'Print':
+        let pdfDecr = {
+          path: personalCopyDetails[selectedPersonalCopy.type].path,
+          filename:
+            selectedPersonalCopy.type === 'copy1'
+              ? 'PersonalCopy1.pdf'
+              : 'PersonalCopy2.pdf',
+          password: security.answer,
+        };
+        if (Platform.OS == 'android') {
+          var PdfPassword = yield NativeModules.PdfPassword;
+          yield PdfPassword.print(
+            JSON.stringify(pdfDecr),
+            async (err: any) => {
+              console.log({ err });
+            },
+            async (res: any) => {
+              await RNPrint.print({
+                filePath: 'file://' + res,
+              });
+              console.log({ res });
+            },
+          );
+        } else {
+          yield RNPrint.print({
+            filePath: personalCopyDetails[selectedPersonalCopy.type].path,
+          });
+        }
+        break;
+
+      case 'Other':
+        let shareOptions = {
+          title: selectedPersonalCopy.title,
+          message: `Please find attached the personal copy ${
+            selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+          } share pdf, it is password protected by the answer to the security question.`,
+          url:
+            Platform.OS == 'android'
+              ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+              : personalCopyDetails[selectedPersonalCopy.type].path,
+          type: 'application/pdf',
+          showAppsToView: true,
+          subject: selectedPersonalCopy.title,
+        };
+        yield Share.open(shareOptions).then(async (res: any) => {
+          return await res;
+        });
+        break;
+    }
+
+    const updatedPersonalCopyDetails = {
+      ...personalCopyDetails,
+      [selectedPersonalCopy.type]: {
+        ...personalCopyDetails[selectedPersonalCopy.type],
+        shared: true,
+        sharingDetails: { shareVia, sharedAt: Date.now() },
+      },
+    };
+
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      updatedPersonalCopyDetails,
+    );
+
+    // if (selectedPersonalCopy.type == 'copy1')
+    //   AsyncStorage.setItem('personalCopy1Shared', 'true');
+    // else if (selectedPersonalCopy.type == 'copy2')
+    //   AsyncStorage.setItem('personalCopy2Shared', 'true');
+
+    // yield put(personalCopyShared(item));
+  } catch (error) {
+    // yield put(PDFSharingFailed(true));
+    //Alert.alert( 'PDF Sharing failed', error.message );
+    console.log({ error });
+  }
+}
+
+export const sharePersonalCopyWatcher = createWatcher(
+  sharePersonalCopyWorker,
+  SHARE_PERSONAL_COPY,
 );
 
 function* updateMSharesHealthWorker({ payload }) {
