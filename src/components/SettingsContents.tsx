@@ -26,7 +26,7 @@ export default function SettingsContents(props) {
         // },
         {
             title:"Manage Pin",
-            info:"Change your passcode",
+            info:"Passcode",
             image:require("../assets/images/icons/managepin.png"),
             type:"ManagePin"
         },
