@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   AsyncStorage,
   Platform,
+  Alert,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -37,6 +38,8 @@ import _ from 'underscore';
 import Toast from '../../components/Toast';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -84,6 +87,19 @@ const PersonalCopyHistory = (props) => {
   const next = props.navigation.getParam('next');
   const { loading } = useSelector((state) => state.sss);
   const dispatch = useDispatch();
+
+  const personalCopiesGenerated = useSelector(
+    (state) => state.sss.personalCopiesGenerated,
+  );
+
+  useEffect(() => {
+    if (personalCopiesGenerated === false) {
+      Alert.alert(
+        'Internal Error',
+        'Personal Copy Generation Failed, try again',
+      );
+    }
+  }, [personalCopiesGenerated]);
 
   useEffect(() => {
     (async () => {

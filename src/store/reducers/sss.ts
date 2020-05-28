@@ -14,6 +14,8 @@ import {
   UPLOAD_SUCCEFULLY,
   ERROR_RECEIVING,
   WALLET_IMAGE_CHECKED,
+  PERSONAL_COPIES_GENERATED,
+  GENERATE_PERSONAL_COPIES,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -38,6 +40,7 @@ const initialState: {
   };
   mnemonic: String;
   personalCopyIndex: Number;
+  personalCopiesGenerated: Boolean;
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
@@ -75,6 +78,7 @@ const initialState: {
   },
   mnemonic: '',
   personalCopyIndex: 0,
+  personalCopiesGenerated: null,
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
@@ -139,6 +143,18 @@ export default (state = initialState, action) => {
             err: action.payload.err,
           },
         },
+      };
+
+    case GENERATE_PERSONAL_COPIES:
+      return {
+        ...state,
+        personalCopiesGenerated: null,
+      };
+
+    case PERSONAL_COPIES_GENERATED:
+      return {
+        ...state,
+        personalCopiesGenerated: action.payload.generated,
       };
 
     case OVERALL_HEALTH_CALCULATED:

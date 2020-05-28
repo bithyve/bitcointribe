@@ -180,13 +180,13 @@ export default function ManageBackup(props) {
     },
   ]);
   const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector(state => state.sss.service);
+  const s3Service: S3Service = useSelector((state) => state.sss.service);
   // const { databaseSSS } = useSelector(state => state.storage);
   const [overallHealth, setOverallHealth] = useState();
-  const health = useSelector(state => state.sss.overallHealth);
+  const health = useSelector((state) => state.sss.overallHealth);
   //const { overallHealth } = useSelector( state => state.sss );
   const healthLoading = useSelector(
-    state => state.sss.loading.checkMSharesHealth,
+    (state) => state.sss.loading.checkMSharesHealth,
   );
   const [is_initiated, setIs_initiated] = useState(false);
 
@@ -226,7 +226,7 @@ export default function ManageBackup(props) {
     }
   }
 
-  const getIconByStatus = status => {
+  const getIconByStatus = (status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -653,7 +653,7 @@ export default function ManageBackup(props) {
     );
   };
 
-  const getScannerData = data => {
+  const getScannerData = (data) => {
     console.log('data', data);
   };
 
@@ -791,19 +791,21 @@ export default function ManageBackup(props) {
     setContacts(contactList);
     if (contactList.length) {
       if (
-        contactList.findIndex(value => value && value.type == 'contact1') != -1
+        contactList.findIndex((value) => value && value.type == 'contact1') !=
+        -1
       ) {
         pageData[1].personalInfo =
           contactList[
-            contactList.findIndex(value => value && value.type == 'contact1')
+            contactList.findIndex((value) => value && value.type == 'contact1')
           ];
       }
       if (
-        contactList.findIndex(value => value && value.type == 'contact2') != -1
+        contactList.findIndex((value) => value && value.type == 'contact2') !=
+        -1
       ) {
         pageData[2].personalInfo =
           contactList[
-            contactList.findIndex(value => value && value.type == 'contact2')
+            contactList.findIndex((value) => value && value.type == 'contact2')
           ];
       }
     }
@@ -902,7 +904,7 @@ export default function ManageBackup(props) {
   }, [autoHighlightFlags]);
 
   useEffect(() => {
-    dispatch(fetchSSSFromDB());
+    // dispatch(fetchSSSFromDB());
     checkNShowHelperModal();
   }, []);
 
@@ -926,7 +928,7 @@ export default function ManageBackup(props) {
     if (overallHealth) {
       setIsNextStepDisable(false);
       const updatedPageData = [...pageData];
-      updatedPageData.forEach(data => {
+      updatedPageData.forEach((data) => {
         switch (data.title) {
           case 'Secondary Device':
             if (overallHealth.sharesInfo[0]) {
@@ -1307,26 +1309,26 @@ export default function ManageBackup(props) {
   const onContactsUpdate = async () => {
     if (contacts.length) {
       if (
-        contacts.findIndex(value => value && value.type == 'contact1') != -1
+        contacts.findIndex((value) => value && value.type == 'contact1') != -1
       ) {
         pageData[1].personalInfo =
           contacts[
-            contacts.findIndex(value => value && value.type == 'contact1')
+            contacts.findIndex((value) => value && value.type == 'contact1')
           ];
       }
       if (
-        contacts.findIndex(value => value && value.type == 'contact2') != -1
+        contacts.findIndex((value) => value && value.type == 'contact2') != -1
       ) {
         pageData[2].personalInfo =
           contacts[
-            contacts.findIndex(value => value && value.type == 'contact2')
+            contacts.findIndex((value) => value && value.type == 'contact2')
           ];
       }
     }
     setPageData(pageData);
   };
 
-  const getTime = item => {
+  const getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
       item.toString() == 'never'
       ? 'never'
@@ -1354,7 +1356,7 @@ export default function ManageBackup(props) {
     }
   }, [s3Service]);
 
-  const getStatusIcon = item => {
+  const getStatusIcon = (item) => {
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
       return getIconByStatus(item.status);
     }
@@ -1376,7 +1378,7 @@ export default function ManageBackup(props) {
     return require('../../assets/images/icons/settings.png');
   };
 
-  const getImageIcon = item => {
+  const getImageIcon = (item) => {
     if (item.type == 'contact1' || item.type == 'contact2') {
       if (item.personalInfo) {
         if (item.personalInfo.imageAvailable) {
@@ -1650,18 +1652,19 @@ export default function ManageBackup(props) {
                         {getImageIcon(item)}
                         <View style={{ marginLeft: 15 }}>
                           <Text style={styles.cardTitleText}>
-                            {item.type === 'contact1' || item.type === 'contact2'
-                                ? 'Friends and Family'
-                                : (item.type === 'copy1' || item.type === 'copy2')
-                                  ? 'Personal Copies'
-                                  : (item.type === 'SecondaryDevice')
-                                    ? 'Keeper Device'
-                                    : item.title
-                            }
+                            {item.type === 'contact1' ||
+                            item.type === 'contact2'
+                              ? 'Friends and Family'
+                              : item.type === 'copy1' || item.type === 'copy2'
+                              ? 'Personal Copies'
+                              : item.type === 'SecondaryDevice'
+                              ? 'Keeper Device'
+                              : item.title}
                           </Text>
                           <Text style={styles.cardTimeText}>
-                          {(item.type === 'contact1' || item.type === 'contact2')
-                              ? item.personalInfo                            
+                            {item.type === 'contact1' ||
+                            item.type === 'contact2'
+                              ? item.personalInfo
                                 ? item.personalInfo.firstName &&
                                   item.personalInfo.lastName
                                   ? item.personalInfo.firstName +
@@ -1676,23 +1679,27 @@ export default function ManageBackup(props) {
                                   : ''
                                 : 'Select a Trusted Contact as a Keeper'
                               : item.type === 'secondaryDevice'
-                                ? item.status === 'Ugly'
-                                  ? 'Another device running Hexa app that you own'
-                                  : 'Last Backup '
-                                : (item.type === 'copy1' || item.type === 'copy2')
-                                  ? item.status === 'Ugly'
-                                    ? 'PDF as a Keeper for one of your Recovery Keys'
-                                    : 'The PDFs are locked with your Security Answers'
-                                  : 'Last Backup '}
-                            {(item.type === 'security' || (item.type === 'secondaryDevice' && item.status !== 'Ugly')) && <Text
-                              style={{
-                                fontFamily: Fonts.FiraSansMediumItalic,
-                                fontWeight: 'bold',
-                                fontStyle: 'italic',
-                              }}
-                            >
-                              {getTime(item.time)}
-                            </Text>}
+                              ? item.status === 'Ugly'
+                                ? 'Another device running Hexa app that you own'
+                                : 'Last Backup '
+                              : item.type === 'copy1' || item.type === 'copy2'
+                              ? item.status === 'Ugly'
+                                ? 'PDF as a Keeper for one of your Recovery Keys'
+                                : 'The PDFs are locked with your Security Answers'
+                              : 'Last Backup '}
+                            {(item.type === 'security' ||
+                              (item.type === 'secondaryDevice' &&
+                                item.status !== 'Ugly')) && (
+                              <Text
+                                style={{
+                                  fontFamily: Fonts.FiraSansMediumItalic,
+                                  fontWeight: 'bold',
+                                  fontStyle: 'italic',
+                                }}
+                              >
+                                {getTime(item.time)}
+                              </Text>
+                            )}
                           </Text>
                         </View>
                         <Image

@@ -125,6 +125,7 @@ export const REQUESTED_SHARE_UPLOADED = 'REQUESTED_SHARE_UPLOADED';
 export const MNEMONIC_RECOVERED = 'MNEMONIC_RECOVERED';
 export const S3_LOADING = 'S3_LOADING';
 export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
+export const PERSONAL_COPIES_GENERATED = 'PERSONAL_COPIES_GENERATED';
 export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 export const UPDATE_SHARE_HISTORY = 'UPDATE_SHARE_HISTORY';
 export const CHECKED_PDF_HEALTH = 'CHECKED_PDF_HEALTH';
@@ -152,6 +153,10 @@ export const switchS3Loader = (beingLoaded) => {
 
 export const downloadedMShare = (otp, status, err?) => {
   return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
+};
+
+export const personalCopiesGenerated = (generated: Boolean) => {
+  return { type: PERSONAL_COPIES_GENERATED, payload: { generated } };
 };
 
 export const updateShareHistory = (overallHealth) => {

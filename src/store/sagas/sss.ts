@@ -43,6 +43,7 @@ import {
   fetchWalletImage,
   walletImageChecked,
   GENERATE_PERSONAL_COPIES,
+  personalCopiesGenerated,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -458,6 +459,12 @@ function* generatePersonalCopiesWorker() {
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
+  if (!secondaryMnemonic) {
+    yield put(personalCopiesGenerated(false));
+    throw new Error(
+      'Personal copies generation failed; secondary mnemonic missing',
+    );
+  }
   const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
   const secureAssets = {
@@ -508,9 +515,13 @@ function* generatePersonalCopiesWorker() {
     );
     // yield put(dbInsertedSSS(path));
 
+    const { removed } = secureAccount.removeSecondaryMnemonic(); // remove sec-mne post PDF gen
+    if (!removed) console.log('Failed to remove sec-mne');
+
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
+      SECURE_ACCOUNT: JSON.stringify(secureAccount),
       S3_SERVICE: JSON.stringify(s3Service),
     };
 
