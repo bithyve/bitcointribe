@@ -21,7 +21,6 @@ import {
   DOWNLOAD_DYNAMIC_NONPMDD,
   RECOVER_WALLET,
   RESTORE_DYNAMIC_NONPMDD,
-  GENERATE_PDF,
   requestedShareUploaded,
   downloadedMShare,
   OVERALL_HEALTH,
@@ -43,6 +42,7 @@ import {
   FETCH_WALLET_IMAGE,
   fetchWalletImage,
   walletImageChecked,
+  GENERATE_PERSONAL_COPIES,
 } from '../actions/sss';
 import { dbInsertedSSS } from '../actions/storage';
 
@@ -438,29 +438,21 @@ export const downloadMetaShareWatcher = createWatcher(
   DOWNLOAD_MSHARE,
 );
 
-function* generatePDFWorker() {
+function* generatePersonalCopiesWorker() {
   // yield put(switchS3Loader('generatePDF'));
   const personalCopy1Index = 3; // corresponds to metaShare index
   const personalCopy2Index = 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const resQRPersonalCopy1 = yield call(s3Service.createQR, personalCopy1Index);
-  if (resQRPersonalCopy1.status !== 200) {
-    console.log({ err: resQRPersonalCopy1.err });
+  const resPC1 = yield call(s3Service.createQR, personalCopy1Index);
+  if (resPC1.status !== 200) {
+    console.log({ err: resPC1.err });
     return;
   }
-  const resQRPersonalCopy2 = yield call(s3Service.createQR, personalCopy2Index);
-  if (resQRPersonalCopy2.status !== 200) {
-    console.log({ err: resQRPersonalCopy2.err });
+  const resPC2 = yield call(s3Service.createQR, personalCopy2Index);
+  if (resPC2.status !== 200) {
+    console.log({ err: resPC2.err });
     return;
   }
-
-  const { SERVICES } = yield select((state) => state.storage.database);
-  const updatedSERVICES = {
-    ...SERVICES,
-    S3_SERVICE: JSON.stringify(s3Service),
-  };
-
-  yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
 
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
@@ -475,47 +467,63 @@ function* generatePDFWorker() {
     secondaryXpub: secondary,
     bhXpub: bh,
   };
-  const pdfDataPersonalCopy1 = {
-    qrData: resQRPersonalCopy1.data.qrData,
+
+  const pc1PDFData = {
+    qrData: resPC1.data.qrData,
     ...secureAssets,
   };
-  const pdfDataPersonalCopy2 = {
-    qrData: resQRPersonalCopy2.data.qrData,
+  const pc2PDFData = {
+    qrData: resPC2.data.qrData,
     ...secureAssets,
   };
+
   const { security, walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
+
   try {
-    const personalCopy1PdfPath = yield call(
+    const pc1PDFPath = yield call(
       generatePDF,
-      pdfDataPersonalCopy1,
+      pc1PDFData,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy_1.pdf`,
       `Hexa Share ${personalCopy1Index + 1}`,
       security.answer,
     );
-    const personalCopy2PdfPath = yield call(
+    const pc2PDFPath = yield call(
       generatePDF,
-      pdfDataPersonalCopy2,
+      pc2PDFData,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy_2.pdf`,
       `Hexa Share  ${personalCopy2Index + 1}`,
       security.answer,
     );
-    let path = {
-      copy1: { path: personalCopy1PdfPath, flagShare: false, shareDetails: {} },
-      copy2: { path: personalCopy2PdfPath, flagShare: false, shareDetails: {} },
+    const personalCopyDetails = {
+      copy1: { path: pc1PDFPath, flagShare: false, shareDetails: {} },
+      copy2: { path: pc2PDFPath, flagShare: false, shareDetails: {} },
     };
     // console.log({ path });
-    yield put(dbInsertedSSS(path));
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      JSON.stringify(personalCopyDetails),
+    );
+    // yield put(dbInsertedSSS(path));
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify(s3Service),
+    };
+
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } catch (err) {
     console.log({ err });
   }
   //yield put(switchS3Loader('generatePDF'));
 }
 
-export const generatePDFWatcher = createWatcher(
-  generatePDFWorker,
-  GENERATE_PDF,
+export const generatePersonalCopiesWatcher = createWatcher(
+  generatePersonalCopiesWorker,
+  GENERATE_PERSONAL_COPIES,
 );
 
 function* updateMSharesHealthWorker({ payload }) {

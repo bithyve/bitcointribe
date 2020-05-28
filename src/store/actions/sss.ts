@@ -7,7 +7,7 @@ export const PREPARE_MSHARES = 'PREPARE_MSHARES';
 export const UPLOAD_ENC_MSHARE = 'UPLOAD_ENC_MSHARES';
 export const UPLOAD_REQUESTED_SHARE = 'UPLOAD_REQUESTED_SHARE';
 export const DOWNLOAD_MSHARE = 'DOWNLOAD_MSHARE';
-export const GENERATE_PDF = 'GENERATE_PDF';
+export const GENERATE_PERSONAL_COPIES = 'GENERATE_PERSONAL_COPIES';
 export const UPDATE_MSHARES_HEALTH = 'UPDATE_MSHARES_HEALTH';
 export const CHECK_MSHARES_HEALTH = 'CHECK_MSHARES_HEALTH';
 export const REQUEST_SHARE = 'REQUEST_SHARE';
@@ -61,9 +61,9 @@ export const downloadMShare = (encryptedKey, otp?, downloadType?) => {
   };
 };
 
-export const generatePDF = () => {
+export const generatePersonalCopies = () => {
   return {
-    type: GENERATE_PDF,
+    type: GENERATE_PERSONAL_COPIES,
   };
 };
 

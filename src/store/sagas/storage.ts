@@ -15,7 +15,7 @@ import {
   dbFetchedSSS,
   DB_UPDATESSS,
 } from '../actions/storage';
-import { generatePDF } from '../actions/sss';
+import { generatePersonalCopies } from '../actions/sss';
 import dataManager from '../../storage/database-manager';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -60,7 +60,7 @@ function* fetchSSSDBWorker() {
     const database = yield call(dataManager.fetchSSS, key);
     if (key && database == undefined) {
       console.log('Generating PDF');
-      yield put(generatePDF());
+      yield put(generatePersonalCopies());
     }
     console.log({ key, database });
     if (key && database) {

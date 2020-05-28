@@ -19,7 +19,7 @@ import { getIconByStatus } from './utils';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { generatePDF } from '../../store/actions/sss';
+import { generatePersonalCopies } from '../../store/actions/sss';
 
 const Cloud = (props) => {
   const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
@@ -50,7 +50,7 @@ const Cloud = (props) => {
   // const { loading } = useSelector((state) => state.sss);
 
   // useEffect(() => {
-  //   dispatch(generatePDF());
+  //   dispatch(generatePersonalCopies());
   // }, []);
 
   return (

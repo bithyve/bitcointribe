@@ -22,7 +22,8 @@ import {
   checkPDFHealth,
   pdfHealthChecked,
   checkMSharesHealth,
-  QRChecked
+  QRChecked,
+  generatePersonalCopies,
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -37,12 +38,11 @@ import Toast from '../../components/Toast';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 
-const PersonalCopyHistory = props => {
+const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isQRChecked = useSelector(state => state.sss.qrChecked);
-  console.log("isQRChecked", isQRChecked);
+  const isQRChecked = useSelector((state) => state.sss.qrChecked);
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -82,15 +82,26 @@ const PersonalCopyHistory = props => {
     'selectedPersonalCopy',
   );
   const next = props.navigation.getParam('next');
-  const { loading } = useSelector(state => state.sss);
+  const { loading } = useSelector((state) => state.sss);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    (async () => {
+      const personalCopyDetails = await AsyncStorage.getItem(
+        'personalCopyDetails',
+      );
+      if (!personalCopyDetails) {
+        dispatch(generatePersonalCopies());
+      }
+    })();
+  }, []);
 
   const onConfirm = useCallback(() => {
     // ConfirmBottomSheet.current.snapTo(1);
     // alert('confirm');
     const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
     props.navigation.navigate('QrScanner', {
-      scanedCode: qrData => {
+      scanedCode: (qrData) => {
         dispatch(checkPDFHealth(qrData, index));
       },
       title: 'Confirm your Recovery Secret',
@@ -109,12 +120,10 @@ const PersonalCopyHistory = props => {
     }
   }, [loading.pdfHealthChecked]);
 
-  if(isQRChecked){
+  if (isQRChecked) {
     setTimeout(() => {
       setErrorMessageHeader('Invalid QR!');
-      setErrorMessage(
-        'The scanned QR is wrong, please try again',
-      );
+      setErrorMessage('The scanned QR is wrong, please try again');
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(QRChecked(null));
@@ -134,7 +143,7 @@ const PersonalCopyHistory = props => {
         bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -197,7 +206,7 @@ const PersonalCopyHistory = props => {
     }
   };
 
-  const shared = useSelector(state => state.manageBackup.shared);
+  const shared = useSelector((state) => state.manageBackup.shared);
   useEffect(() => {
     if (selectedPersonalCopy.type === 'copy1' && shared.personalCopy1) {
       setPersonalCopyShared(true);
@@ -210,13 +219,13 @@ const PersonalCopyHistory = props => {
     }
   }, [shared]);
 
-  const sortedHistory = history => {
-    const currentHistory = history.filter(element => {
+  const sortedHistory = (history) => {
+    const currentHistory = history.filter((element) => {
       if (element.date) return element;
     });
 
     const sortedHistory = _.sortBy(currentHistory, 'date');
-    sortedHistory.forEach(element => {
+    sortedHistory.forEach((element) => {
       element.date = moment(element.date)
         .utc()
         .local()
@@ -226,7 +235,7 @@ const PersonalCopyHistory = props => {
     return sortedHistory;
   };
 
-  const updateHistory = shareHistory => {
+  const updateHistory = (shareHistory) => {
     const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
     const updatedPersonalCopyHistory = [...personalCopyHistory];
     if (shareHistory[index].createdAt)
@@ -254,13 +263,13 @@ const PersonalCopyHistory = props => {
 
   useEffect(() => {
     if (selectedPersonalCopy.type === 'copy1') {
-      AsyncStorage.getItem('personalCopy1Shared').then(shared => {
+      AsyncStorage.getItem('personalCopy1Shared').then((shared) => {
         if (shared) {
           setPersonalCopyShared(true);
         }
       });
     } else if (selectedPersonalCopy.type === 'copy2') {
-      AsyncStorage.getItem('personalCopy2Shared').then(shared => {
+      AsyncStorage.getItem('personalCopy2Shared').then((shared) => {
         if (shared) {
           setPersonalCopyShared(true);
         }
@@ -367,14 +376,14 @@ const PersonalCopyHistory = props => {
       </View>
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={PersonalCopyShareBottomSheet}
+        ref={PersonalCopyShareBottomSheet as any}
         snapPoints={[-50, hp('85%')]}
         renderContent={renderPersonalCopyShareModalContent}
         renderHeader={renderPersonalCopyShareModalHeader}
       />
-       <BottomSheet
+      <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
