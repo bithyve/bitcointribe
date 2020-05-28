@@ -6,6 +6,7 @@ import {
   Image,
   FlatList,
   Platform,
+  AsyncStorage,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -27,15 +28,14 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from './ErrorModalContents';
 import ModalHeader from './ModalHeader';
-import { sharePersonalCopy } from '../store/actions/sss';
+import { sharePersonalCopy, personalCopyShared } from '../store/actions/sss';
 
 export default function PersonalCopyShareModal(props) {
-  const database = useSelector((state) => state.storage.databaseSSS);
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isPDFSharedFailed = useSelector(
-    (state) => state.manageBackup.pdfSharingFailed,
+  const personalCopyShared = useSelector(
+    (state) => state.sss.personalCopyShared,
   );
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
@@ -68,26 +68,36 @@ export default function PersonalCopyShareModal(props) {
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (personalCopyShared === false) {
+      setTimeout(() => {
+        setErrorMessageHeader('PDF Sharing failed');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Secret, please try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(personalCopyShared(null));
+    }
+  }, [personalCopyShared]);
+
   const onShare = async (shareOption) => {
     dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy));
     props.onPressShare();
   };
 
-  const disableOrEnableOption = (item) => {
-    if (props.selectedPersonalCopy.type == 'copy1') {
-      return database.pdfDetails &&
-        database.pdfDetails.copy2.shareDetails.type == item.type
+  const disableOrEnableOption = useCallback(
+    (shareOption) => {
+      if (!props.personalCopyDetails) return false;
+
+      return props.personalCopyDetails[
+        props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
+      ].sharingDetails.shareVia == shareOption.type
         ? true
         : false;
-    }
-    if (props.selectedPersonalCopy.type == 'copy2') {
-      return database.pdfDetails &&
-        database.pdfDetails.copy1.shareDetails.type == item.type
-        ? true
-        : false;
-    }
-    return false;
-  };
+    },
+    [props.personalCopyDetails, props.selectedPersonalCopy],
+  );
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -115,16 +125,6 @@ export default function PersonalCopyShareModal(props) {
     );
   }, []);
 
-  if (isPDFSharedFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('PDF Sharing failed');
-      setErrorMessage(
-        'There was some error while sharing the Recovery Secret, please try again',
-      );
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(PDFSharingFailed(null));
-  }
   return (
     <View style={[styles.modalContainer]}>
       <View

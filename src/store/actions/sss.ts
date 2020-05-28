@@ -70,7 +70,7 @@ export const generatePersonalCopies = () => {
 
 export const sharePersonalCopy = (
   shareVia: string,
-  selectedPersonalCopy: { type: string; title; string },
+  selectedPersonalCopy: { type: string; title: string },
 ) => {
   return {
     type: SHARE_PERSONAL_COPY,
@@ -137,10 +137,11 @@ export const MNEMONIC_RECOVERED = 'MNEMONIC_RECOVERED';
 export const S3_LOADING = 'S3_LOADING';
 export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
 export const PERSONAL_COPIES_GENERATED = 'PERSONAL_COPIES_GENERATED';
+export const PERSONAL_COPY_SHARED = 'PERSONAL_COPY_SHARED';
 export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 export const UPDATE_SHARE_HISTORY = 'UPDATE_SHARE_HISTORY';
 export const CHECKED_PDF_HEALTH = 'CHECKED_PDF_HEALTH';
-export const QR_CHECKED = 'QR_CHECKED';
+export const PDF_HEALTH_CHECK_FAILED = 'PDF_HEALTH_CHECK_FAILED';
 export const UNABLE_RECOVER_SHARE_FROM_QR = 'UNABLE_RECOVER_SHARE_FROM_QR';
 export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
 export const UPLOAD_SUCCEFULLY = 'UPLOAD_SUCCEFULLY';
@@ -170,6 +171,13 @@ export const personalCopiesGenerated = (generated: Boolean) => {
   return { type: PERSONAL_COPIES_GENERATED, payload: { generated } };
 };
 
+export const personalCopyShared = (shared: Boolean) => {
+  return {
+    type: PERSONAL_COPY_SHARED,
+    payload: { shared },
+  };
+};
+
 export const updateShareHistory = (overallHealth) => {
   return { type: UPDATE_SHARE_HISTORY, payload: { overallHealth } };
 };
@@ -186,8 +194,8 @@ export const pdfHealthChecked = (pdfHealthChecked) => {
   return { type: CHECKED_PDF_HEALTH, payload: { pdfHealthChecked } };
 };
 
-export const QRChecked = (isFailed) => {
-  return { type: QR_CHECKED, payload: { isFailed } };
+export const pdfHealthCheckFailed = (failed) => {
+  return { type: PDF_HEALTH_CHECK_FAILED, payload: { failed } };
 };
 
 export const UnableRecoverShareFromQR = (isFailed) => {

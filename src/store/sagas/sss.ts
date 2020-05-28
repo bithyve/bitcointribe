@@ -32,7 +32,6 @@ import {
   UPDATE_SHARE_HISTORY,
   updateShareHistory,
   pdfHealthChecked,
-  QRChecked,
   UnableRecoverShareFromQR,
   walletRecoveryFailed,
   ErrorSending,
@@ -45,6 +44,8 @@ import {
   GENERATE_PERSONAL_COPIES,
   personalCopiesGenerated,
   SHARE_PERSONAL_COPY,
+  personalCopyShared,
+  pdfHealthCheckFailed,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
@@ -641,16 +642,10 @@ function* sharePersonalCopyWorker({ payload }) {
       updatedPersonalCopyDetails,
     );
 
-    // if (selectedPersonalCopy.type == 'copy1')
-    //   AsyncStorage.setItem('personalCopy1Shared', 'true');
-    // else if (selectedPersonalCopy.type == 'copy2')
-    //   AsyncStorage.setItem('personalCopy2Shared', 'true');
-
-    // yield put(personalCopyShared(item));
-  } catch (error) {
-    // yield put(PDFSharingFailed(true));
-    //Alert.alert( 'PDF Sharing failed', error.message );
-    console.log({ error });
+    yield put(personalCopyShared(true));
+  } catch (err) {
+    console.log({ err });
+    yield put(personalCopyShared(false));
   }
 }
 
@@ -856,7 +851,7 @@ function* checkPDFHealthWorker({ payload }) {
     yield put(pdfHealthChecked('pdfHealthChecked'));
   } else {
     console.log({ pdfHealth, payload });
-    yield put(QRChecked(true));
+    yield put(pdfHealthCheckFailed(true));
     //Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
   }
 
