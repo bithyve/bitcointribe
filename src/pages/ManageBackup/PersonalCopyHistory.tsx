@@ -23,8 +23,8 @@ import {
   checkPDFHealth,
   pdfHealthChecked,
   checkMSharesHealth,
-  QRChecked,
   generatePersonalCopies,
+  personalCopyShared,
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -43,7 +43,9 @@ const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isQRChecked = useSelector((state) => state.sss.qrChecked);
+  const pdfHealthCheckFailed = useSelector(
+    (state) => state.sss.pdfHealthCheckFailed,
+  );
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -83,12 +85,15 @@ const PersonalCopyHistory = (props) => {
     'selectedPersonalCopy',
   );
   const next = props.navigation.getParam('next');
-  const { loading } = useSelector((state) => state.sss);
-  const dispatch = useDispatch();
-
+  const pdfHealthChecked = useSelector(
+    (state) => state.sss.loading.pdfHealthChecked,
+  );
   const personalCopiesGenerated = useSelector(
     (state) => state.sss.personalCopiesGenerated,
   );
+  const [personalCopyDetails, setPersonalCopyDetails] = useState(null);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (personalCopiesGenerated === false) {
@@ -123,31 +128,29 @@ const PersonalCopyHistory = (props) => {
   }, [selectedPersonalCopy]);
 
   useEffect(() => {
-    if (loading.pdfHealthChecked) {
-      console.log(
-        'loading.pdfHealthChecked && personalCopyIndex',
-        loading.pdfHealthChecked,
-      );
+    if (pdfHealthChecked) {
       Toast('PDF scanned Successfully');
       dispatch(checkMSharesHealth());
       dispatch(pdfHealthChecked(''));
     }
-  }, [loading.pdfHealthChecked]);
+  }, [pdfHealthChecked]);
 
-  if (isQRChecked) {
-    setTimeout(() => {
-      setErrorMessageHeader('Invalid QR!');
-      setErrorMessage('The scanned QR is wrong, please try again');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(QRChecked(null));
-  }
+  useEffect(() => {
+    if (pdfHealthCheckFailed) {
+      setTimeout(() => {
+        setErrorMessageHeader('Invalid QR!');
+        setErrorMessage('The scanned QR is wrong, please try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(pdfHealthCheckFailed(false));
+    }
+  }, [pdfHealthCheckFailed]);
 
   useEffect(() => {
     if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
   }, [next]);
 
-  const [personalCopyShared, setPersonalCopyShared] = useState(false);
+  const [pcShared, setPCShared] = useState(false);
 
   const saveInTransitHistory = async () => {
     const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
@@ -168,19 +171,6 @@ const PersonalCopyHistory = (props) => {
       props.navigation.goBack();
     }
   };
-
-  const shared = useSelector((state) => state.manageBackup.shared);
-  useEffect(() => {
-    if (selectedPersonalCopy.type === 'copy1' && shared.personalCopy1) {
-      setPersonalCopyShared(true);
-      updateAutoHighlightFlags();
-      saveInTransitHistory();
-    } else if (selectedPersonalCopy.type === 'copy2' && shared.personalCopy2) {
-      setPersonalCopyShared(true);
-      updateAutoHighlightFlags();
-      saveInTransitHistory();
-    }
-  }, [shared]);
 
   const sortedHistory = (history) => {
     const currentHistory = history.filter((element) => {
@@ -224,21 +214,43 @@ const PersonalCopyHistory = (props) => {
     })();
   }, []);
 
+  const shared = useSelector((state) => state.sss.personalCopyShared);
+
   useEffect(() => {
-    if (selectedPersonalCopy.type === 'copy1') {
-      AsyncStorage.getItem('personalCopy1Shared').then((shared) => {
-        if (shared) {
-          setPersonalCopyShared(true);
-        }
-      });
-    } else if (selectedPersonalCopy.type === 'copy2') {
-      AsyncStorage.getItem('personalCopy2Shared').then((shared) => {
-        if (shared) {
-          setPersonalCopyShared(true);
-        }
-      });
+    (async () => {
+      const personalCopyDetails = await AsyncStorage.getItem(
+        'personalCopyDetails',
+      );
+      if (personalCopyDetails) {
+        setPersonalCopyDetails(JSON.parse(personalCopyDetails));
+      }
+    })();
+  }, [shared]);
+
+  useEffect(() => {
+    if (
+      personalCopyDetails &&
+      personalCopyDetails[selectedPersonalCopy.type].shared
+    ) {
+      if (!pcShared) setPCShared(true);
+      updateAutoHighlightFlags();
+      saveInTransitHistory();
     }
-  }, []);
+  }, [personalCopyDetails]);
+
+  useEffect(() => {
+    if (shared === false) {
+      setTimeout(() => {
+        setErrorMessageHeader('PDF Sharing failed');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Secret, please try again',
+        );
+      }, 2);
+      (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(personalCopyShared(null));
+    }
+  }, [shared]);
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -271,6 +283,7 @@ const PersonalCopyHistory = (props) => {
       <PersonalCopyShareModal
         removeHighlightingFromCard={() => {}}
         selectedPersonalCopy={selectedPersonalCopy}
+        personalCopyDetails={personalCopyDetails}
         onPressBack={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
@@ -279,7 +292,7 @@ const PersonalCopyHistory = (props) => {
         }}
       />
     );
-  }, [selectedPersonalCopy]);
+  }, [selectedPersonalCopy, personalCopyDetails]);
 
   const renderPersonalCopyShareModalHeader = useCallback(() => {
     return (
@@ -350,14 +363,14 @@ const PersonalCopyHistory = (props) => {
             </View>
             <Image
               style={{
-                width: personalCopyShared ? 14 : 17,
-                height: personalCopyShared ? 16 : 17,
+                width: pcShared ? 14 : 17,
+                height: pcShared ? 16 : 17,
                 resizeMode: 'contain',
                 marginLeft: 'auto',
                 alignSelf: 'center',
               }}
               source={
-                personalCopyShared
+                pcShared
                   ? getIconByStatus(
                       props.navigation.state.params.selectedStatus,
                     )
@@ -371,10 +384,10 @@ const PersonalCopyHistory = (props) => {
         <HistoryPageComponent
           type={'copy'}
           // IsReshare
-          IsReshare={personalCopyShared ? true : false}
+          IsReshare={pcShared ? true : false}
           data={sortedHistory(personalCopyHistory)}
           reshareInfo={
-            personalCopyShared
+            pcShared
               ? 'Want to send the Recovery Secret again to the same destination? '
               : null
           }

@@ -31,12 +31,6 @@ import ModalHeader from './ModalHeader';
 import { sharePersonalCopy, personalCopyShared } from '../store/actions/sss';
 
 export default function PersonalCopyShareModal(props) {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [errorMessage, setErrorMessage] = useState('');
-  const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const personalCopyShared = useSelector(
-    (state) => state.sss.personalCopyShared,
-  );
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
     {
@@ -68,62 +62,30 @@ export default function PersonalCopyShareModal(props) {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (personalCopyShared === false) {
-      setTimeout(() => {
-        setErrorMessageHeader('PDF Sharing failed');
-        setErrorMessage(
-          'There was some error while sharing the Recovery Secret, please try again',
-        );
-      }, 2);
-      (ErrorBottomSheet as any).current.snapTo(1);
-      dispatch(personalCopyShared(null));
-    }
-  }, [personalCopyShared]);
-
   const onShare = async (shareOption) => {
     dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy));
     props.onPressShare();
   };
 
-  const disableOrEnableOption = useCallback(
+  const disableSharingOption = useCallback(
     (shareOption) => {
       if (!props.personalCopyDetails) return false;
 
-      return props.personalCopyDetails[
-        props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
-      ].sharingDetails.shareVia == shareOption.type
-        ? true
-        : false;
+      const otherCopySharingDetails =
+        props.personalCopyDetails[
+          props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
+        ].sharingDetails;
+
+      if (otherCopySharingDetails) {
+        return otherCopySharingDetails.shareVia == shareOption.type
+          ? true
+          : false;
+      } else {
+        return false;
+      }
     },
     [props.personalCopyDetails, props.selectedPersonalCopy],
   );
-
-  const renderErrorModalContent = useCallback(() => {
-    return (
-      <ErrorModalContents
-        modalRef={ErrorBottomSheet}
-        title={errorMessageHeader}
-        info={errorMessage}
-        proceedButtonText={'Try again'}
-        onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={true}
-        bottomImage={require('../assets/images/icons/errorImage.png')}
-      />
-    );
-  }, [errorMessage, errorMessageHeader]);
-
-  const renderErrorModalHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
 
   return (
     <View style={[styles.modalContainer]}>
@@ -154,16 +116,17 @@ export default function PersonalCopyShareModal(props) {
       <View style={{ flex: 1 }}>
         <FlatList
           data={personalCopyShareOptions}
+          extraData={props.personalCopyDetails}
           renderItem={({ item, index }) => (
             <View>
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
                   onShare(item);
                 }}
-                disabled={disableOrEnableOption(item)}
+                disabled={disableSharingOption(item)}
                 style={[
                   styles.listElements,
-                  disableOrEnableOption(item)
+                  disableSharingOption(item)
                     ? { backgroundColor: Colors.borderColor }
                     : null,
                 ]}
@@ -205,16 +168,6 @@ export default function PersonalCopyShareModal(props) {
         infoText={
           'The answer your your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
         }
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
       />
     </View>
   );
