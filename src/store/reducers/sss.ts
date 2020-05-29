@@ -17,11 +17,11 @@ import {
   PERSONAL_COPIES_GENERATED,
   GENERATE_PERSONAL_COPIES,
   SHARE_PERSONAL_COPY,
+  PERSONAL_COPY_SHARED,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
 import { S3_SERVICE } from '../../common/constants/serviceTypes';
-import { PERSONAL_COPY_SHARED } from '../actions/manageBackup';
 
 const initialState: {
   service: S3Service;

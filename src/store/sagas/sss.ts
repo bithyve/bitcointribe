@@ -554,7 +554,8 @@ function* sharePersonalCopyWorker({ payload }) {
 
     switch (shareVia) {
       case 'Email':
-        yield Mailer.mail(
+        yield call(
+          Mailer.mail,
           {
             subject: selectedPersonalCopy.title,
             body: `<b>Please find attached the personal copy ${
@@ -571,8 +572,8 @@ function* sharePersonalCopyWorker({ payload }) {
               name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
             },
           },
-          (error, event) => {
-            console.log({ event, error });
+          (err, event) => {
+            console.log({ event, err });
           },
         );
         break;
@@ -588,9 +589,10 @@ function* sharePersonalCopyWorker({ payload }) {
         };
         if (Platform.OS == 'android') {
           var PdfPassword = yield NativeModules.PdfPassword;
-          yield PdfPassword.print(
+          yield call(
+            PdfPassword.print,
             JSON.stringify(pdfDecr),
-            async (err: any) => {
+            (err: any) => {
               console.log({ err });
             },
             async (res: any) => {
@@ -601,7 +603,7 @@ function* sharePersonalCopyWorker({ payload }) {
             },
           );
         } else {
-          yield RNPrint.print({
+          yield call(RNPrint.print, {
             filePath: personalCopyDetails[selectedPersonalCopy.type].path,
           });
         }
@@ -621,12 +623,13 @@ function* sharePersonalCopyWorker({ payload }) {
           showAppsToView: true,
           subject: selectedPersonalCopy.title,
         };
-        yield Share.open(shareOptions).then(async (res: any) => {
-          return await res;
-        });
-        break;
-    }
 
+        yield call(Share.open, shareOptions);
+        break;
+
+      default:
+        throw new Error('Invalid sharing option');
+    }
     const updatedPersonalCopyDetails = {
       ...personalCopyDetails,
       [selectedPersonalCopy.type]: {
@@ -639,9 +642,8 @@ function* sharePersonalCopyWorker({ payload }) {
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
-      updatedPersonalCopyDetails,
+      JSON.stringify(updatedPersonalCopyDetails),
     );
-
     yield put(personalCopyShared(true));
   } catch (err) {
     console.log({ err });

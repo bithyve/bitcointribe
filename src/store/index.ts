@@ -74,6 +74,7 @@ import {
   shareHistoryUpdateWatcher,
   updateWalletImageWatcher,
   fetchWalletImageWatcher,
+  sharePersonalCopyWatcher,
 } from './sagas/sss';
 
 import {
@@ -168,6 +169,7 @@ const rootSaga = function* () {
     uploadEncMetaShareWatcher,
     downloadMetaShareWatcher,
     generatePersonalCopiesWatcher,
+    sharePersonalCopyWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
     checkPDFHealthWatcher,
