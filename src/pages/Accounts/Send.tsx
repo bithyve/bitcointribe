@@ -46,7 +46,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { clearContactsAccountSendStorage } from '../../store/actions/send-action';
+import { clearContactsAccountSendStorage, storeContactsAccountToSend, removeContactsAccountFromSend } from '../../store/actions/send-action';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
@@ -105,6 +105,8 @@ export default function Send(props) {
   const [isSendHelperDone, setIsSendHelperDone] = useState(true);
   const [isInvalidBalance, setIsInvalidBalance] = useState(false);
   const [isInvalidAddress, setIsInvalidAddress] = useState(true);
+  const [onFocusCall, setOnFocusCall] = useState(false);
+
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
@@ -113,14 +115,19 @@ export default function Send(props) {
   );
 
   const [balances, setBalances] = useState({
+    testBalance: 0,
     regularBalance: 0,
     secureBalance: 0,
   });
   const [filterContactData, setFilterContactData] = useState([]);
   const accounts = useSelector((state) => state.accounts);
   const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
-
+console.log("sendStorage in Send", sendStorage);
   useEffect(() => {
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
@@ -131,6 +138,7 @@ export default function Send(props) {
           .unconfirmedBalance
       : 0;
     setBalances({
+      testBalance,
       regularBalance,
       secureBalance,
     });
@@ -175,7 +183,36 @@ export default function Send(props) {
 
   useEffect(() => {
     getContact();
+    let OnFocusListener = props.navigation.addListener(
+      'didFocus',
+      () => {
+       setOnFocusCall(true);
+      },
+    );
+    return () => {
+      OnFocusListener.remove();
+    };
   }, []);
+
+  useEffect(() => {
+    if (sendStorage && sendStorage.length && onFocusCall) {
+      setOnFocusCall(false);
+    checkRecordsHavingPrice();
+    }
+}, [sendStorage]);
+
+  const checkRecordsHavingPrice = () =>{
+    if (sendStorage && sendStorage.length) {
+      for (let i = 0; i < sendStorage.length; i++) {
+        console.log("sendStorage[i].selectedContact.hasOwnProperty", sendStorage[i].selectedContact.hasOwnProperty("bitcoinAmount"))
+        if (
+          !sendStorage[i].selectedContact.hasOwnProperty("bitcoinAmount") && !sendStorage[i].selectedContact.hasOwnProperty("currencyAmount")
+        ) {
+          dispatch(removeContactsAccountFromSend(sendStorage[i]));
+        }
+      }
+    }
+  }
 
   let userInfo = {
     to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
@@ -808,6 +845,8 @@ export default function Send(props) {
         sweepSecure,
         netBalance,
       });
+      dispatch(storeContactsAccountToSend({
+        selectedContact: item,}));
       setRecipientAddress('');
     } else {
       sendStorage &&
@@ -824,6 +863,8 @@ export default function Send(props) {
           sweepSecure,
           netBalance,
         });
+        dispatch(storeContactsAccountToSend({
+          selectedContact: item,}));
         setRecipientAddress('');
       }
     }

@@ -12,7 +12,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -25,20 +25,27 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeContactsAccountToSend, removeContactsAccountFromSend } from '../../store/actions/send-action';
+import {
+  storeContactsAccountToSend,
+  removeContactsAccountFromSend,
+} from '../../store/actions/send-action';
 import { transferST1 } from '../../store/actions/accounts';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import { UsNumberFormat } from '../../common/utilities';
 
 export default function SendToContact(props) {
-
   const dispatch = useDispatch();
 
   const accounts = useSelector((state) => state.accounts);
-  const [exchangeRates, setExchangeRates] = useState(accounts && accounts.exchangeRates);
+  const [exchangeRates, setExchangeRates] = useState(
+    accounts && accounts.exchangeRates,
+  );
   useEffect(() => {
-    if (accounts && accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
+    if (accounts && accounts.exchangeRates)
+      setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
   const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
-
+  console.log('sendStorage', sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
@@ -51,9 +58,11 @@ export default function SendToContact(props) {
   const [currencyAmount, setCurrencyAmount] = useState('');
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [note, setNote] = useState('');
-
+  const [InputStyle, setInputStyle] = useState(styles.textBoxView);
+  const [InputStyle1, setInputStyle1] = useState(styles.textBoxView);
+  const [InputStyleNote, setInputStyleNote] = useState(styles.textBoxView);
   const statePrint = useSelector((state) => {
-    console.log("sendStorage", sendStorage);
+    console.log('sendStorage', sendStorage);
   });
 
   useEffect(() => {
@@ -66,7 +75,7 @@ export default function SendToContact(props) {
 
   const removeFromSendStorage = (item) => {
     dispatch(removeContactsAccountFromSend(item));
-  }
+  };
 
   const getServiceTypeAccount = () => {
     if (serviceType == 'TEST_ACCOUNT') {
@@ -78,7 +87,7 @@ export default function SendToContact(props) {
     } else if (serviceType == 'S3_SERVICE') {
       return 'S3 Service';
     }
-  }
+  };
 
   const handleTrasferST1 = () => {
     let recipients = [];
@@ -86,30 +95,35 @@ export default function SendToContact(props) {
       selectedContact,
       bitcoinAmount,
       currencyAmount,
-      note
+      note,
     };
     let storage = [...sendStorage, tempData];
     storage.map((item) => {
       let data = {
-        address: item.selectedContact.id, amount: parseInt(item.bitcoinAmount)
-      }
+        address: item.selectedContact.id,
+        amount: parseInt(item.bitcoinAmount),
+      };
       recipients.push(data);
-    })
-    console.log("REcipients", recipients);
+    });
+    console.log('REcipients', recipients);
     dispatch(transferST1(serviceType, recipients, averageTxFees));
-    props.navigation.navigate('SendConfirmation', { serviceType, sweepSecure, netBalance, recipients });
-  }
+    props.navigation.navigate('SendConfirmation', {
+      serviceType,
+      sweepSecure,
+      netBalance,
+      recipients,
+    });
+  };
 
-  const getImageIcon = item => {
+  const getImageIcon = (item) => {
     if (item) {
-
       if (item.account_name === 'Checking Account') {
         return (
           <Image
             source={require('../../assets/images/icons/icon_regular.png')}
             style={styles.circleShapeView}
           />
-        )
+        );
       }
 
       if (item.account_name === 'Saving Account') {
@@ -118,23 +132,21 @@ export default function SendToContact(props) {
             source={require('../../assets/images/icons/icon_secureaccount.png')}
             style={styles.circleShapeView}
           />
-        )
+        );
       }
 
       if (item.imageAvailable) {
-        return (
-          <Image
-            source={item.image}
-            style={styles.circleShapeView}
-          />
-        );
+        return <Image source={item.image} style={styles.circleShapeView} />;
       } else {
         return (
           <View
-            style={{...styles.circleShapeView, 
-              backgroundColor: Colors.shadowBlue, 
-              alignItems: 'center', 
-              justifyContent: 'center'}}>
+            style={{
+              ...styles.circleShapeView,
+              backgroundColor: Colors.shadowBlue,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <Text
               style={{
                 textAlign: 'center',
@@ -164,15 +176,18 @@ export default function SendToContact(props) {
     return (
       <View style={{ flexDirection: 'column' }}>
         <TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
             {getImageIcon(item)}
             <Text
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
-                textAlign: 'center'
-              }}>
+                textAlign: 'center',
+              }}
+            >
               {item.name || item.account_name}
             </Text>
             <Text
@@ -180,57 +195,65 @@ export default function SendToContact(props) {
                 color: Colors.blue,
                 fontSize: RFValue(10),
                 fontFamily: Fonts.FiraSansRegular,
-              }}>
-              {switchOn ? `${bitcoinAmount} Sats` : '$'+`${currencyAmount}`}
-              </Text>
+              }}
+            >
+              {switchOn ? `${bitcoinAmount} Sats` : '$' + `${currencyAmount}`}
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   const renderMultipleContacts = (item) => {
     return (
-      <View style={{ flexDirection: 'column', marginRight: 10 }}>
-        <TouchableOpacity>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <View style={{ flex: 1, flexDirection: 'row' }}>
-              {getImageIcon(item.selectedContact)}
-              <TouchableOpacity onPress={() => removeFromSendStorage(item)} >
-                <View style={styles.closemarkStyle} >
-                  <Text 
-                    style={{
-                    color: Colors.white,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                    textAlign: 'center'}}>
-                    x
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansRegular,
-                textAlign: 'center'
-              }}>
-              {item.selectedContact.name || item.selectedContact.account_name}
-            </Text>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansRegular,
-              }}>
-              {switchOn ? `${item.bitcoinAmount} Sats` : '$'+`${item.currencyAmount}`}
-              </Text>
+      <ScrollView horizontal style={{}}>
+        <View
+          style={{
+            flexDirection: 'column',
+            marginRight: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <View style={{ flexDirection: 'row' }}>
+            {getImageIcon(item.selectedContact)}
+            <TouchableOpacity
+              style={styles.closemarkStyle}
+              onPress={() => removeFromSendStorage(item)}
+            >
+              <AntDesign size={16} color={Colors.blue} name={'closecircle'} />
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </View>
-    )
-  }
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              textAlign: 'center',
+              marginTop: 5,
+            }}
+          >
+            {item.selectedContact.name || item.selectedContact.account_name}
+          </Text>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(10),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+          >
+            {switchOn
+              ? `${
+                  item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount
+                } Sats`
+              : '$' +
+                `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
+          </Text>
+        </View>
+      </ScrollView>
+    );
+  };
 
   const renderDivider = () => {
     return (
@@ -243,7 +266,7 @@ export default function SendToContact(props) {
         }}
       />
     );
-  }
+  };
 
   const renderVerticalDivider = () => {
     return (
@@ -254,29 +277,40 @@ export default function SendToContact(props) {
           backgroundColor: Colors.borderColor,
           marginRight: 5,
           marginLeft: 5,
-          alignSelf: 'center'
+          alignSelf: 'center',
         }}
       />
     );
-  }
+  };
 
   const convertBitCoinToCurrency = (value) => {
     let temp = value;
     if (switchOn) {
-      let result = exchangeRates ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2) : 0;
+      let result = exchangeRates
+        ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+        : 0;
       setBitCoinAmount(temp);
       setCurrencyAmount(result.toString());
     } else {
-      let currency = exchangeRates ? (value / exchangeRates[CurrencyCode].last) : 0;
-      currency = currency < 1 ? (currency * 1e8) : currency;
+      let currency = exchangeRates
+        ? value / exchangeRates[CurrencyCode].last
+        : 0;
+      currency = currency < 1 ? currency * 1e8 : currency;
       setCurrencyAmount(temp);
       setBitCoinAmount(currency.toFixed(2));
     }
-  }
+  };
 
   const renderBitCoinInputText = () => {
     return (
-      <View style={styles.textBoxView}>
+      <View
+        style={{
+          ...InputStyle,
+          marginBottom: 6,
+          marginTop: 6,
+          flexDirection: 'row',
+        }}
+      >
         <View style={styles.amountInputImage}>
           <Image
             style={styles.textBoxImage}
@@ -286,7 +320,9 @@ export default function SendToContact(props) {
         {renderVerticalDivider()}
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
-          placeholder={switchOn ? 'Enter Amount in Sats' : 'Converted Amount in Sats'}
+          placeholder={
+            switchOn ? 'Enter Amount in Sats' : 'Converted Amount in Sats'
+          }
           editable={switchOn}
           value={bitcoinAmount}
           returnKeyLabel="Done"
@@ -296,14 +332,27 @@ export default function SendToContact(props) {
             convertBitCoinToCurrency(value);
           }}
           placeholderTextColor={Colors.borderColor}
+          onFocus={() => {
+            setInputStyle(styles.inputBoxFocused);
+          }}
+          onBlur={() => {
+            setInputStyle(styles.textBoxView);
+          }}
         />
       </View>
     );
-  }
+  };
 
   const renderUSDInputText = () => {
     return (
-      <View style={styles.textBoxView}>
+      <View
+        style={{
+          ...InputStyle1,
+          marginBottom: 6,
+          marginTop: 6,
+          flexDirection: 'row',
+        }}
+      >
         <View style={styles.amountInputImage}>
           <Image
             style={styles.textBoxImage}
@@ -314,19 +363,27 @@ export default function SendToContact(props) {
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           editable={!switchOn}
-          placeholder={switchOn ? 'Converted Amount in Dollars' : 'Enter Amount in Dollars'}
+          placeholder={
+            switchOn ? 'Converted Amount in Dollars' : 'Enter Amount in Dollars'
+          }
           value={currencyAmount}
           returnKeyLabel="Done"
           returnKeyType="done"
           keyboardType={'numeric'}
-          onChangeText={(value) =>  {
+          onChangeText={(value) => {
             convertBitCoinToCurrency(value);
           }}
           placeholderTextColor={Colors.borderColor}
+          onFocus={() => {
+            setInputStyle1(styles.inputBoxFocused);
+          }}
+          onBlur={() => {
+            setInputStyle1(styles.textBoxView);
+          }}
         />
       </View>
     );
-  }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -365,53 +422,133 @@ export default function SendToContact(props) {
                         size={17}
                       />
                     </TouchableOpacity>
-                    <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+                    <Text style={styles.modalHeaderTitleText}>
+                      {'Send To Contact'}
+                    </Text>
                   </View>
                 </View>
-                <View style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}>
-                  {renderSingleContact(selectedContact)}
-                  {sendStorage && sendStorage.length > 0 && 
-                    <View style={{ flex: 1, flexDirection: 'row', marginTop: 5, marginBottom: 5 }}>
+                <View
+                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}
+                >
+                  {/* {renderSingleContact(selectedContact)} */}
+                  {sendStorage && sendStorage.length > 0 ? (
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        marginTop: 5,
+                        marginBottom: 5,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
                       {sendStorage.map((item) => renderMultipleContacts(item))}
                     </View>
-                  }
-                  <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: hp('2%')}}>
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue(10),
-                          fontFamily: Fonts.FiraSansRegular,
-                        }}>
-                        { 'Sending From: ' }
-                      </Text>
+                  ) : null}
+                  <View
+                    style={{
+                      borderBottomWidth: 1,
+                      borderColor: Colors.borderColor,
+                      marginBottom: hp('1%'),
+                      marginTop: hp('2%'),
+                      flexDirection: 'row',
+                      paddingBottom: hp('1.5%'),
+                      paddingTop: hp('1%'),
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(12),
+                        fontFamily: Fonts.FiraSansRegular,
+                      }}
+                    >
+                      {'Sending From: '}
+                    </Text>
+                    <Text
+                      style={{
+                        color: Colors.blue,
+                        fontSize: RFValue(12),
+                        fontFamily: Fonts.FiraSansItalic,
+                      }}
+                    >
+                      {getServiceTypeAccount()}
+                    </Text>
+                    <Text
+                      style={{
+                        color: Colors.blue,
+                        fontSize: RFValue(10),
+                        fontFamily: Fonts.FiraSansItalic,
+                        lineHeight: 15,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {' (Availble to spend '}
                       <Text
                         style={{
                           color: Colors.blue,
                           fontSize: RFValue(10),
-                          fontFamily: Fonts.FiraSansRegular,
-                        }}>
-                        {getServiceTypeAccount()}
+                          fontFamily: Fonts.FiraSansItalic,
+                        }}
+                      >
+                        {serviceType == 'Test Account'
+                          ? UsNumberFormat(netBalance)
+                          : switchOn
+                          ? UsNumberFormat(netBalance)
+                          : exchangeRates
+                          ? (
+                              (netBalance / 1e8) *
+                              exchangeRates[CurrencyCode].last
+                            ).toFixed(2)
+                          : null}
                       </Text>
-                    </View>
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          fontSize: RFValue(9),
+                          fontFamily: Fonts.FiraSansMediumItalic,
+                        }}
+                      >
+                        {serviceType == 'Test Account'
+                          ? ' t-sats )'
+                          : switchOn
+                          ? ' sats )'
+                          : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+                      </Text>
+                    </Text>
                   </View>
-                  {renderDivider()}
                   <View style={{ flex: 1, flexDirection: 'row' }}>
                     <View style={{ flex: 1, flexDirection: 'column' }}>
                       {renderBitCoinInputText()}
                       {renderUSDInputText()}
                     </View>
-                    <View style={{ alignItems: "center", justifyContent: "center", transform: [{ rotate: '90deg'}] }}>
+                    <View
+                      style={{
+                        marginLeft: 'auto',
+                        paddingLeft: 20,
+                        paddingRight: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
                       <ToggleSwitch
                         currencyCodeValue={CurrencyCode}
                         onpress={async () => {
                           setSwitchOn(!switchOn);
                         }}
                         toggle={switchOn}
+                        transform={true}
                       />
                     </View>
                   </View>
-                  <View style={{ ...styles.textBoxView }}>
+                  <View
+                    style={{
+                      ...InputStyleNote,
+                      marginBottom: 6,
+                      marginTop: 6,
+                      flexDirection: 'row',
+                    }}
+                  >
                     <TextInput
                       style={styles.textBox}
                       returnKeyLabel="Done"
@@ -422,10 +559,16 @@ export default function SendToContact(props) {
                           ? 'ascii-capable'
                           : 'visible-password'
                       }
-                      placeholder={'Add a note (Optional)'}
+                      placeholder={'Add a Note ( Optional )'}
                       value={note}
                       onChangeText={setNote}
                       placeholderTextColor={Colors.borderColor}
+                      onFocus={() => {
+                        setInputStyleNote(styles.inputBoxFocused);
+                      }}
+                      onBlur={() => {
+                        setInputStyleNote(styles.textBoxView);
+                      }}
                     />
                   </View>
                   <View
@@ -437,12 +580,26 @@ export default function SendToContact(props) {
                   >
                     <TouchableOpacity
                       onPress={() => {
-                        dispatch(storeContactsAccountToSend({
-                          selectedContact,
-                          bitcoinAmount,
-                          currencyAmount,
-                          note
-                        }));
+                        if (sendStorage && sendStorage.length) {
+                          for (let i = 0; i < sendStorage.length; i++) {
+                            if (
+                              sendStorage[i].selectedContact.id ==
+                              selectedContact.id
+                            ) {
+                              removeFromSendStorage(
+                                sendStorage[i],
+                              );
+                            }
+                          }
+                          dispatch(
+                            storeContactsAccountToSend({
+                              selectedContact,
+                              bitcoinAmount,
+                              currencyAmount,
+                              note,
+                            }),
+                          );
+                        }
                         setTimeout(() => {
                           handleTrasferST1();
                         }, 10);
@@ -461,13 +618,16 @@ export default function SendToContact(props) {
                       {/* {loading.transfer && !isInvalidBalance ? (
                         <ActivityIndicator size="small" color={Colors.white} />
                       ) : ( */}
-                        <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                      <Text style={styles.buttonText}>
+                        {'Confirm & Proceed'}
+                      </Text>
                       {/* )} */}
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={{
                         ...styles.confirmButtonView,
                         width: wp('30%'),
+                        marginLeft: 10,
                       }}
                       disabled={isConfirmDisabled}
                       onPress={() => {
@@ -475,16 +635,32 @@ export default function SendToContact(props) {
                         // if (getServiceType) {
                         //   getServiceType(serviceType);
                         // }
-                        dispatch(storeContactsAccountToSend({
-                          selectedContact,
-                          bitcoinAmount,
-                          currencyAmount,
-                          note
-                        }));
-                        props.navigation.goBack();
+                        if (sendStorage && sendStorage.length) {
+                          for (let i = 0; i < sendStorage.length; i++) {
+                            if (
+                              sendStorage[i].selectedContact.id ==
+                              selectedContact.id
+                            ) {
+                              removeFromSendStorage(
+                                sendStorage[i],
+                              );
+                            }
+                          }
+                          dispatch(
+                            storeContactsAccountToSend({
+                              selectedContact,
+                              bitcoinAmount,
+                              currencyAmount,
+                              note,
+                            }),
+                          );
+                          props.navigation.goBack();
+                        }
                       }}
                     >
-                      <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                      <Text
+                        style={{ ...styles.buttonText, color: Colors.blue }}
+                      >
                         Add Recipient
                       </Text>
                     </TouchableOpacity>
@@ -523,13 +699,19 @@ const styles = StyleSheet.create({
     marginBottom: hp('1.5%'),
   },
   textBoxView: {
-    flexDirection: 'row',
+    borderWidth: 0.5,
     borderRadius: 10,
-    borderWidth: 1,
     borderColor: Colors.borderColor,
-    height: 50,
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
+  },
+  inputBoxFocused: {
+    borderWidth: 0.5,
+    borderRadius: 10,
+    elevation: 10,
+    borderColor: Colors.borderColor,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: { width: 2, height: 2 },
+    backgroundColor: Colors.white,
   },
   textBoxImage: {
     width: wp('6%'),
@@ -546,10 +728,11 @@ const styles = StyleSheet.create({
   },
   textBox: {
     flex: 1,
-    paddingLeft: 20,
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
+    height: 50,
     fontSize: RFValue(13),
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    paddingLeft: 15,
   },
   confirmButtonView: {
     width: wp('50%'),
@@ -566,22 +749,20 @@ const styles = StyleSheet.create({
   circleShapeView: {
     width: 50,
     height: 50,
-    borderRadius: 50/2,
+    borderRadius: 50 / 2,
     borderColor: Colors.white,
-    borderWidth: 2
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOpacity: 1,
+    shadowOffset: { width: 2, height: 2 },
+    shadowColor: Colors.shadowBlue,
   },
   closemarkStyle: {
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    width: 20,
-    height: 20,
-    backgroundColor: Colors.blue,
-    borderRadius: 20/2,
-    borderColor: Colors.white,
-    borderWidth: 2,
-    top: -5,
-    right: -10,
-    zIndex: -5
-  }
+    top: 0,
+    right: 0,
+  },
 });
