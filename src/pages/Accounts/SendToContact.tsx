@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
@@ -33,7 +32,7 @@ import {
 import { transferST1 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
-import { ScrollView as GestureHandlerScrollView } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
@@ -420,10 +419,7 @@ export default function SendToContact(props) {
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <ScrollView>
-            <TouchableWithoutFeedback>
-              <View onStartShouldSetResponder={() => true}>
-                <View style={styles.modalHeaderTitleView}>
+          <View style={styles.modalHeaderTitleView}>
                   <View
                     style={{
                       flex: 1,
@@ -534,6 +530,7 @@ export default function SendToContact(props) {
                       </Text>
                     </Text>
                   </View>
+                  <ScrollView>
                   <View style={{ flex: 1, flexDirection: 'row' }}>
                     <View style={{ flex: 1, flexDirection: 'column' }}>
                       {renderBitCoinInputText()}
@@ -678,10 +675,8 @@ export default function SendToContact(props) {
                       </Text>
                     </TouchableOpacity>
                   </View>
+                  </ScrollView>
                 </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </ScrollView>
         </KeyboardAvoidingView>
       </View>
       <BottomSheet
