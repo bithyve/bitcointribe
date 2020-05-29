@@ -855,6 +855,7 @@ const TrustedContactHistory = (props) => {
           // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
           dispatch(uploadEncMShare(index, contactName, data, true));
           updateTrustedContactsInfo(chosenContact);
+          onOTPShare(index); // enables reshare
           setChangeContact(false);
         } else if (
           !SHARES_TRANSFER_DETAILS[index] ||
@@ -862,6 +863,7 @@ const TrustedContactHistory = (props) => {
         ) {
           dispatch(uploadEncMShare(index, contactName, data));
           updateTrustedContactsInfo(chosenContact);
+          onOTPShare(index); // enables reshare
         }
       } else {
         console.log({ chosenContact });
@@ -908,13 +910,11 @@ const TrustedContactHistory = (props) => {
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
             // setChosenContactIndex(index);
-            onOTPShare(index); // enables reshare
           }}
           onPressViaLink={(index) => {
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
             // setChosenContactIndex(index);
-            onOTPShare(index); // enables reshare
           }}
         />
       );
