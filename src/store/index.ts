@@ -8,7 +8,6 @@ import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
-import manageBackupReducer from './reducers/manageBackup';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
@@ -17,11 +16,8 @@ import sendReducer from './reducers/sendReducer';
 import {
   initDBWatcher,
   fetchDBWatcher,
-  fetchSSSDBWatcher,
   insertDBWatcher,
-  insertSSSDBWatcher,
   servicesEnricherWatcher,
-  updateSSSDBWatcher,
 } from './sagas/storage';
 
 import {
@@ -78,11 +74,6 @@ import {
 } from './sagas/sss';
 
 import {
-  sharePdfWatcher,
-  dbUpdatePdfSharingWatcher,
-} from './sagas/manageBackup';
-
-import {
   accountSyncWatcher,
   getQuoteWatcher,
   executeOrderWatcher,
@@ -130,11 +121,8 @@ const rootSaga = function* () {
     // database watchers
     initDBWatcher,
     fetchDBWatcher,
-    fetchSSSDBWatcher,
     insertDBWatcher,
-    insertSSSDBWatcher,
     servicesEnricherWatcher,
-    updateSSSDBWatcher,
 
     // wallet setup watcher
     initSetupWatcher,
@@ -186,10 +174,6 @@ const rootSaga = function* () {
     updateWalletImageWatcher,
     fetchWalletImageWatcher,
 
-    // manage backup
-    sharePdfWatcher,
-    dbUpdatePdfSharingWatcher,
-
     //fBTC
     accountSyncWatcher,
     getQuoteWatcher,
@@ -232,7 +216,6 @@ const rootReducer = combineReducers({
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
-  manageBackup: manageBackupReducer,
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
