@@ -574,6 +574,13 @@ function* sharePersonalCopyWorker({ payload }) {
           },
           (err, event) => {
             console.log({ event, err });
+            // on delayed error (rollback the changes that happened post switch case)
+            setTimeout(() => {
+              AsyncStorage.setItem(
+                'personalCopyDetails',
+                JSON.stringify(personalCopyDetails),
+              );
+            }, 1000);
           },
         );
         break;
@@ -594,6 +601,13 @@ function* sharePersonalCopyWorker({ payload }) {
             JSON.stringify(pdfDecr),
             (err: any) => {
               console.log({ err });
+              // on delayed error (rollback the changes that happened post switch case)
+              setTimeout(() => {
+                AsyncStorage.setItem(
+                  'personalCopyDetails',
+                  JSON.stringify(personalCopyDetails),
+                );
+              }, 1000);
             },
             async (res: any) => {
               await RNPrint.print({
@@ -603,9 +617,14 @@ function* sharePersonalCopyWorker({ payload }) {
             },
           );
         } else {
-          yield call(RNPrint.print, {
-            filePath: personalCopyDetails[selectedPersonalCopy.type].path,
-          });
+          try {
+            yield call(RNPrint.print, {
+              filePath: personalCopyDetails[selectedPersonalCopy.type].path,
+            });
+          } catch (err) {
+            console.log(err);
+            throw new Error(`Print failed: ${err}`);
+          }
         }
         break;
 
@@ -624,12 +643,18 @@ function* sharePersonalCopyWorker({ payload }) {
           subject: selectedPersonalCopy.title,
         };
 
-        yield call(Share.open, shareOptions);
+        try {
+          yield call(Share.open, shareOptions);
+        } catch (err) {
+          console.log({ err });
+          throw new Error(`Share failed: ${err}`);
+        }
         break;
 
       default:
         throw new Error('Invalid sharing option');
     }
+
     const updatedPersonalCopyDetails = {
       ...personalCopyDetails,
       [selectedPersonalCopy.type]: {
@@ -644,6 +669,7 @@ function* sharePersonalCopyWorker({ payload }) {
       'personalCopyDetails',
       JSON.stringify(updatedPersonalCopyDetails),
     );
+
     yield put(personalCopyShared(true));
   } catch (err) {
     console.log({ err });
