@@ -217,7 +217,7 @@ export default function SendToContact(props) {
             fontFamily: Fonts.FiraSansRegular,
             textAlign: 'center',
             marginTop: 5,
-            height: 15,
+            // height: 15,
           }}
           numberOfLines={1}
         >
@@ -279,8 +279,8 @@ export default function SendToContact(props) {
       <View
         style={{
           ...InputStyle,
-          marginBottom: 6,
-          marginTop: 6,
+          marginBottom: wp('1.5%'),
+          marginTop: wp('1.5%'),
           flexDirection: 'row',
         }}
       >
@@ -321,8 +321,8 @@ export default function SendToContact(props) {
       <View
         style={{
           ...InputStyle1,
-          marginBottom: 6,
-          marginTop: 6,
+          marginBottom: wp('1.5%'),
+          marginTop: wp('1.5%'),
           flexDirection: 'row',
         }}
       >
@@ -405,10 +405,9 @@ export default function SendToContact(props) {
   return (
     <View
       style={{
-        height: '100%',
+        flex:1,
         backgroundColor: Colors.white,
         alignSelf: 'center',
-        width: '100%',
       }}
     >
       <SafeAreaView style={{ flex: 0 }} />
@@ -450,7 +449,7 @@ export default function SendToContact(props) {
                   </View>
                 </View>
                 <View
-                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}
+                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') }}
                 >
                   {sendStorage && sendStorage.length > 0 ? (
                     <ScrollView horizontal={true}>
@@ -558,8 +557,8 @@ export default function SendToContact(props) {
                   <View
                     style={{
                       ...InputStyleNote,
-                      marginBottom: 6,
-                      marginTop: 6,
+                      marginBottom: wp('1.5%'),
+                      marginTop: wp('1.5%'),
                       flexDirection: 'row',
                     }}
                   >
@@ -744,7 +743,7 @@ const styles = StyleSheet.create({
   },
   amountInputImage: {
     width: 40,
-    height: 50,
+    height: wp('13%'),
     justifyContent: 'center',
     alignItems: 'center',
     borderTopLeftRadius: 10,
@@ -752,7 +751,7 @@ const styles = StyleSheet.create({
   },
   textBox: {
     flex: 1,
-    height: 50,
+    height: wp('13%'),
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,

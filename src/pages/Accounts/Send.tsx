@@ -45,6 +45,7 @@ import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
+  TRUSTED_CONTACTS
 } from '../../common/constants/serviceTypes';
 import {
   clearContactsAccountSendStorage,
@@ -62,8 +63,12 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import { RNCamera } from 'react-native-camera';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export default function Send(props) {
+  let [trustedContacts, setTrustedContacts] = useState([]);
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [
@@ -173,6 +178,13 @@ export default function Send(props) {
   ];
 
   const [accountData, setAccountData] = useState(accountData1);
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const trustedContactsService: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
   const getContact = () => {
     ExpoContacts.getContactsAsync().then(async ({ data }) => {
       if (data.length > 0) {
@@ -235,6 +247,81 @@ export default function Send(props) {
       }
     }
   }, [sendStorage]);
+
+  const updateAddressBook = async () => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      if (trustedContactsInfo.length) {
+        let trustedContacts = [];
+        for (let index = 0; index < trustedContactsInfo.length; index++) {
+          const contactInfo = trustedContactsInfo[index];
+          if (!contactInfo) continue;
+          const contactName = `${contactInfo.firstName} ${
+            contactInfo.lastName ? contactInfo.lastName : ''
+          }`;
+          let connectedVia;
+          if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
+            connectedVia = contactInfo.phoneNumbers[0].number;
+          } else if (contactInfo.emails && contactInfo.emails.length) {
+            connectedVia = contactInfo.emails[0].email;
+          }
+
+          let hasXpub = false;
+          const {
+            trustedContactToDA,
+            derivativeAccounts,
+          } = regularAccount.hdWallet;
+          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          if (accountNumber) {
+            const trustedContact: TrustedContactDerivativeAccountElements =
+              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
+            if (
+              trustedContact.contactDetails &&
+              trustedContact.contactDetails.xpub
+            ) {
+              hasXpub = true;
+            }
+          }
+
+          const isWard =
+            trustedContactsService.tc.trustedContacts[contactName.toLowerCase()]
+              .isWard;
+
+          const isGuardian = index < 3 ? true : false;
+          trustedContacts.push({
+            contactName,
+            connectedVia,
+            hasXpub,
+            isGuardian,
+            isWard,
+            ...contactInfo,
+          });
+        }
+        let tempTrustedContact = [];
+        for (let i = 0; i < trustedContacts.length; i++) {
+          const element = trustedContacts[i];
+          if(element.contactName!="Secondary Device" && element.id){
+            tempTrustedContact.push(element);
+          }
+        }
+        let filteredTrustedContacts = tempTrustedContact.sort(function (a, b) {
+          if (a.contactName && b.contactName) {
+            if (a.contactName.toLowerCase() < b.contactName.toLowerCase()) return -1;
+            if (a.contactName.toLowerCase() > b.contactName.toLowerCase()) return 1;
+          }
+          return 0;
+        });
+        setTrustedContacts(filteredTrustedContacts);
+      }
+    }
+  };
+
+  useEffect(() => {
+    updateAddressBook();
+  }, [regularAccount.hdWallet.derivativeAccounts]);
 
   let userInfo = {
     to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
@@ -1127,7 +1214,7 @@ export default function Send(props) {
                           horizontal
                           nestedScrollEnabled={true}
                           showsHorizontalScrollIndicator={false}
-                          data={filterContactData}
+                          data={trustedContacts}
                           renderItem={renderContacts}
                           extraData={{ sendStorage }}
                           keyExtractor={(item, index) => index.toString()}
