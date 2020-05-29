@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Image,
@@ -32,11 +32,17 @@ import {
 import { transferST1 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
-import { ScrollView as GestureHandlerScrollView } from 'react-native-gesture-handler'
+import { ScrollView as GestureHandlerScrollView } from 'react-native-gesture-handler';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ModalHeader from '../../components/ModalHeader';
+import RemoveSelectedTrasaction from './RemoveSelectedTrasaction';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
-
+  const [RemoveBottomSheet, setRemoveBottomSheet] = useState(
+    React.createRef(),
+  );
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(
     accounts && accounts.exchangeRates,
@@ -52,6 +58,7 @@ export default function SendToContact(props) {
   const averageTxFees = props.navigation.getParam('averageTxFees');
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
+  const [removeItem, setRemoveItem] = useState({});
 
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
@@ -66,6 +73,10 @@ export default function SendToContact(props) {
     console.log('sendStorage', sendStorage);
   });
 
+  function isEmpty(obj) {
+    return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+  }
+
   useEffect(() => {
     if (bitcoinAmount && currencyAmount) {
       setIsConfirmDisabled(false);
@@ -75,8 +86,12 @@ export default function SendToContact(props) {
   }, [bitcoinAmount, currencyAmount]);
 
   const removeFromSendStorage = (item) => {
-    dispatch(removeContactsAccountFromSend(item));
-  };
+    console.log('remove object', item);
+    setTimeout(() => {
+      setRemoveItem(item);  
+    }, 2);
+    (RemoveBottomSheet as any).current.snapTo(1);
+    };
 
   const getServiceTypeAccount = () => {
     if (serviceType == 'TEST_ACCOUNT') {
@@ -148,94 +163,85 @@ export default function SendToContact(props) {
               justifyContent: 'center',
             }}
           >
-          {item && item.firstName ?
-            (<Text
-              style={{
-                textAlign: 'center',
-                fontSize: 13,
-                lineHeight: 13, //... One for top and one for bottom alignment
-              }}
-            >
-              {item
-                ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
-                : ''}
-            </Text>) : (<Image source={require('../../assets/images/icons/icon_user.png')} style={styles.circleShapeView} />)}
+            {item && item.firstName ? (
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 13,
+                  lineHeight: 13, //... One for top and one for bottom alignment
+                }}
+              >
+                {item
+                  ? nameToInitials(
+                      item.firstName && item.lastName
+                        ? item.firstName + ' ' + item.lastName
+                        : item.firstName && !item.lastName
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+                    )
+                  : ''}
+              </Text>
+            ) : (
+              <Image
+                source={require('../../assets/images/icons/icon_user.png')}
+                style={styles.circleShapeView}
+              />
+            )}
           </View>
         );
       }
     }
   };
 
-
   const renderMultipleContacts = (item) => {
-    return (
-        <View
-          style={{
-            marginRight: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 100
-          }}
-        >
-          <View style={{ flexDirection: 'row' }}>
-            {getImageIcon(item.selectedContact)}
-            <TouchableOpacity
-              style={styles.closemarkStyle}
-              onPress={() => removeFromSendStorage(item)}
-            >
-              <AntDesign size={16} color={Colors.blue} name={'closecircle'} />
-            </TouchableOpacity>
-          </View>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              textAlign: 'center',
-              marginTop: 5,
-              height: 15,
-            }}
-            numberOfLines={1}
-
-          >
-            {item.selectedContact.name || item.selectedContact.account_name || item.selectedContact.id}
-          </Text>
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(10),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            {switchOn
-              ? `${
-                  item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount
-                } Sats`
-              : '$' +
-                `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
-          </Text>
-        </View>
-    );
-  };
-
-  const renderDivider = () => {
     return (
       <View
         style={{
-          height: 1,
-          backgroundColor: Colors.borderColor,
-          marginTop: hp('3%'),
-          marginBottom: hp('3%'),
+          marginRight: 10,
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 100,
         }}
-      />
+      >
+        <View style={{ flexDirection: 'row' }}>
+          {getImageIcon(item.selectedContact)}
+          <TouchableOpacity
+            style={styles.closemarkStyle}
+            onPress={() => removeFromSendStorage(item)}
+          >
+            <AntDesign size={16} color={Colors.blue} name={'closecircle'} />
+          </TouchableOpacity>
+        </View>
+        <Text
+          style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue(13),
+            fontFamily: Fonts.FiraSansRegular,
+            textAlign: 'center',
+            marginTop: 5,
+            height: 15,
+          }}
+          numberOfLines={1}
+        >
+          {item.selectedContact.name ||
+            item.selectedContact.account_name ||
+            item.selectedContact.id}
+        </Text>
+        <Text
+          style={{
+            color: Colors.blue,
+            fontSize: RFValue(10),
+            fontFamily: Fonts.FiraSansRegular,
+          }}
+        >
+          {switchOn
+            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} Sats`
+            : '$' +
+              `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
+        </Text>
+      </View>
     );
   };
 
@@ -356,11 +362,46 @@ export default function SendToContact(props) {
     );
   };
 
+  const renderRemoveSelectedContents = useCallback(() => {
+    if(!isEmpty(removeItem)){
+    return (
+      <RemoveSelectedTrasaction
+        selectedContact={removeItem}
+        onPressBack={() => {
+          if (RemoveBottomSheet.current)
+            (RemoveBottomSheet as any).current.snapTo(0);
+        }}
+        onPressDone={() => {
+          setTimeout(() => {
+            dispatch(removeContactsAccountFromSend(removeItem));
+          }, 2);
+          (RemoveBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+      }
+  }, [removeItem]);
+
+  const renderRemoveSelectedkHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (RemoveBottomSheet.current)
+            (RemoveBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
-    <View style={{ height: '100%',
-    backgroundColor: Colors.white,
-    alignSelf: 'center',
-    width: '100%',}}>
+    <View
+      style={{
+        height: '100%',
+        backgroundColor: Colors.white,
+        alignSelf: 'center',
+        width: '100%',
+      }}
+    >
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContentContainer}>
@@ -411,16 +452,16 @@ export default function SendToContact(props) {
                         flexDirection: 'row',
                         marginTop: 5,
                         marginBottom: 5,
-                        backgroundColor:'yellow'
                       }}
                     >
-                       <ScrollView horizontal={true}>
-                    {sendStorage.map((item) => renderMultipleContacts(item))}
-                    </ScrollView>
+                      <ScrollView horizontal={true}>
+                        {sendStorage.map((item) =>
+                          renderMultipleContacts(item),
+                        )}
+                      </ScrollView>
                     </View>
-                    
                   ) : null}
-                  
+
                   <View
                     style={{
                       borderBottomWidth: 1,
@@ -562,9 +603,7 @@ export default function SendToContact(props) {
                               sendStorage[i].selectedContact.id ==
                               selectedContact.id
                             ) {
-                              removeFromSendStorage(
-                                sendStorage[i],
-                              );
+                              dispatch(removeContactsAccountFromSend(sendStorage[i]));
                             }
                           }
                           dispatch(
@@ -617,9 +656,7 @@ export default function SendToContact(props) {
                               sendStorage[i].selectedContact.id ==
                               selectedContact.id
                             ) {
-                              removeFromSendStorage(
-                                sendStorage[i],
-                              );
+                              dispatch(removeContactsAccountFromSend(sendStorage[i]));
                             }
                           }
                           dispatch(
@@ -647,6 +684,18 @@ export default function SendToContact(props) {
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
+      <BottomSheet
+          enabledInnerScrolling={true}
+          ref={RemoveBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('55%'),
+          ]}
+          renderContent={renderRemoveSelectedContents}
+          renderHeader={renderRemoveSelectedkHeader}
+        />
     </View>
   );
 }
