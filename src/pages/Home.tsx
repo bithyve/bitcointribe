@@ -107,9 +107,6 @@ import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
 
 export default function Home(props) {
-  const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
-    '',
-  );
   // const trustedContacts: TrustedContactsService = useSelector(
   //   (state) => state.trustedContacts.service,
   // );
@@ -612,9 +609,10 @@ export default function Home(props) {
     )
       dispatch(fetchDerivativeAccBalTx(REGULAR_ACCOUNT, derivativeAccountType));
 
-    let newTransactionsRegular = regularAccount.derivativeAccounts[
-      derivativeAccountType
-    ][1] && regularAccount.derivativeAccounts[derivativeAccountType][1].newTransactions;
+    let newTransactionsRegular =
+      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
+      regularAccount.derivativeAccounts[derivativeAccountType][1]
+        .newTransactions;
     let newTransactionsSecure =
       secureAccount.derivativeAccounts[derivativeAccountType][1] &&
       secureAccount.derivativeAccounts[derivativeAccountType][1]
@@ -664,9 +662,8 @@ export default function Home(props) {
       });
       setTimeout(() => {
         setNotificationData(tmpList);
-      setNotificationDataChange(!NotificationDataChange);
+        setNotificationDataChange(!NotificationDataChange);
       }, 2);
-      
     }
   };
 
@@ -852,7 +849,7 @@ export default function Home(props) {
           .catch((error) => {
             // User has rejected permissions
             //console.log(
-             // 'PERMISSION REQUEST :: notification permission rejected',
+            // 'PERMISSION REQUEST :: notification permission rejected',
             //  error,
             //);
           });
@@ -893,12 +890,12 @@ export default function Home(props) {
   }, []);
 
   function isEmpty(obj) {
-    return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
 
   const checkFastBitcoin = async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    console.log("getFBTCAccount", getFBTCAccount);
+    console.log('getFBTCAccount', getFBTCAccount);
     setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
   };
 
@@ -984,13 +981,14 @@ export default function Home(props) {
         //repeatInterval: 'hour',
       })
       .then(() => {})
-      .catch((err) =>{} //console.log('err', err)
+      .catch(
+        (err) => {}, //console.log('err', err)
       );
     firebase
       .notifications()
       .getScheduledNotifications()
       .then((notifications) => {
-         //console.log('logging notifications', notifications);
+        //console.log('logging notifications', notifications);
       });
   };
 
@@ -2536,7 +2534,7 @@ export default function Home(props) {
       <TrustedContactRequest
         isQR={isQR}
         inputType={
-          hintType === 'num' ? 'phone' : hintType === 'ema' ? 'email' : null
+          hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
         }
         isGuardian={isGuardian}
         isRecovery={isRecovery}
@@ -2637,9 +2635,6 @@ export default function Home(props) {
             setDeepLinkModalOpen(false);
           }, 2);
           TrustedContactRequestBottomSheet.current.snapTo(0);
-        }}
-        onPhoneNumberChange={(text) => {
-          setTrustedContactPhoneNumber(text);
         }}
       />
     );
