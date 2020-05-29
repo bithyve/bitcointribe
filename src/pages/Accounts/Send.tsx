@@ -46,7 +46,10 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { clearContactsAccountSendStorage, storeContactsAccountToSend, removeContactsAccountFromSend } from '../../store/actions/send-action';
+import {
+  clearContactsAccountSendStorage,
+  storeContactsAccountToSend,
+} from '../../store/actions/send-action';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
@@ -57,23 +60,24 @@ import RadioButton from '../../components/RadioButton';
 import { UsNumberFormat } from '../../common/utilities';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { RNCamera } from 'react-native-camera';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 export default function Send(props) {
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
-  const [accountType, setAccountType] = useState('Checking Account');
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
   const [
     SendConfirmationBottomSheet,
     setSendConfirmationBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState(React.createRef<BottomSheet>());
   const [
     SendSuccessWithAddressBottomSheet,
     setSuccessWithAddressBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState(React.createRef<BottomSheet>());
   const [
     SendUnSuccessWithAddressBottomSheet,
     setUnSuccessWithAddressBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState(React.createRef<BottomSheet>());
 
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
@@ -89,7 +93,6 @@ export default function Send(props) {
     (state) => state.accounts[serviceType],
   );
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const getServiceType = props.navigation.getParam('getServiceType')
     ? props.navigation.getParam('getServiceType')
     : null;
@@ -111,7 +114,7 @@ export default function Send(props) {
   //   React.createRef(),
   // );
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
-    React.createRef(),
+    React.createRef<BottomSheet>(),
   );
 
   const [balances, setBalances] = useState({
@@ -122,7 +125,6 @@ export default function Send(props) {
   const [filterContactData, setFilterContactData] = useState([]);
   const accounts = useSelector((state) => state.accounts);
   const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
-console.log("sendStorage in Send", sendStorage);
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -161,10 +163,16 @@ console.log("sendStorage in Send", sendStorage);
       checked: false,
       icon: require('../../assets/images/icons/icon_secureaccount_white.png'),
     },
+    {
+      id: '3',
+      account_name: 'Test Account',
+      type: TEST_ACCOUNT,
+      checked: false,
+      icon: require('../../assets/images/icons/icon_test_white.png'),
+    },
   ];
 
   const [accountData, setAccountData] = useState(accountData1);
-
   const getContact = () => {
     ExpoContacts.getContactsAsync().then(async ({ data }) => {
       if (data.length > 0) {
@@ -182,37 +190,51 @@ console.log("sendStorage in Send", sendStorage);
   };
 
   useEffect(() => {
+    if (serviceType === SECURE_ACCOUNT) twoFASetupMethod();
     getContact();
-    let OnFocusListener = props.navigation.addListener(
-      'didFocus',
-      () => {
-       setOnFocusCall(true);
-      },
-    );
-    return () => {
-      OnFocusListener.remove();
-    };
+    checkNShowHelperModal();
+    if (!averageTxFees) storeAverageTxFees();
   }, []);
 
-  useEffect(() => {
-    if (sendStorage && sendStorage.length && onFocusCall) {
-      setOnFocusCall(false);
-    checkRecordsHavingPrice();
+  const twoFASetupMethod = async () => {
+    if (
+      !(await AsyncStorage.getItem('twoFASetup')) &&
+      !(await AsyncStorage.getItem('walletRecovered'))
+    ) {
+      props.navigation.navigate('TwoFASetup', {
+        twoFASetup: service.secureHDWallet.twoFASetup,
+      });
+      await AsyncStorage.setItem('twoFASetup', 'true');
     }
-}, [sendStorage]);
+  };
 
-  const checkRecordsHavingPrice = () =>{
-    if (sendStorage && sendStorage.length) {
-      for (let i = 0; i < sendStorage.length; i++) {
-        console.log("sendStorage[i].selectedContact.hasOwnProperty", sendStorage[i].selectedContact.hasOwnProperty("bitcoinAmount"))
-        if (
-          !sendStorage[i].selectedContact.hasOwnProperty("bitcoinAmount") && !sendStorage[i].selectedContact.hasOwnProperty("currencyAmount")
-        ) {
-          dispatch(removeContactsAccountFromSend(sendStorage[i]));
-        }
+  const storeAverageTxFees = async () => {
+    const storedAverageTxFees = await AsyncStorage.getItem(
+      'storedAverageTxFees',
+    );
+    if (storedAverageTxFees) {
+      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+      if (Date.now() - lastFetched < 1800000) {
+        setAverageTxFees(averageTxFees);
+        return;
+      } // maintaining a half an hour difference b/w fetches
+    }
+    const instance = service.hdWallet || service.secureHDWallet;
+    const averageTxFees = await instance.averageTransactionFee();
+    setAverageTxFees(averageTxFees);
+    await AsyncStorage.setItem(
+      'storedAverageTxFees',
+      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+    );
+  };
+
+  useEffect(() => {
+    for (let i = 0; i < sendStorage.length; i++) {
+      const element = sendStorage[i].selectedContact;
+      if (element.id == 1 || element.id == 2 || element == 3) {
       }
     }
-  }
+  }, [sendStorage]);
 
   let userInfo = {
     to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
@@ -242,37 +264,6 @@ console.log("sendStorage in Send", sendStorage);
       }, 10);
     }
   };
-
-  useEffect(() => {
-    checkNShowHelperModal();
-  }, []);
-
-  useEffect(() => {
-    if (!averageTxFees) {
-      (async () => {
-        const storedAverageTxFees = await AsyncStorage.getItem(
-          'storedAverageTxFees',
-        );
-        if (storedAverageTxFees) {
-          const { averageTxFees, lastFetched } = JSON.parse(
-            storedAverageTxFees,
-          );
-          if (Date.now() - lastFetched < 1800000) {
-            setAverageTxFees(averageTxFees);
-            return;
-          } // maintaining a half an hour difference b/w fetches
-        }
-
-        const instance = service.hdWallet || service.secureHDWallet;
-        const averageTxFees = await instance.averageTransactionFee();
-        setAverageTxFees(averageTxFees);
-        await AsyncStorage.setItem(
-          'storedAverageTxFees',
-          JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-        );
-      })();
-    }
-  }, []);
 
   useEffect(() => {
     if (sweepSecure) {
@@ -313,30 +304,6 @@ console.log("sendStorage in Send", sendStorage);
   }, []);
 
   const dispatch = useDispatch();
-
-  const renderSuccessStatusContents = () => (
-    <SendStatusModalContents
-      title1stLine={'Sent Successfully'}
-      title2ndLine={''}
-      info1stLine={'Bitcoins successfully sent to'}
-      info2ndLine={''}
-      userName={recipientAddress}
-      // modalRef={SendSuccessBottomSheet}
-      isSuccess={true}
-      onPressViewAccount={() => {
-        dispatch(clearTransfer(serviceType));
-        // dispatch(fetchTransactions(serviceType));
-        dispatch(
-          fetchBalanceTx(serviceType, {
-            loader: true,
-          }),
-        );
-        props.navigation.navigate('Accounts');
-      }}
-      transactionId={transfer.txid}
-      transactionDateTime={Date()}
-    />
-  );
 
   useEffect(() => {
     if (
@@ -430,39 +397,7 @@ console.log("sendStorage in Send", sendStorage);
       setQrBottomSheetsFlag(false);
       setRecipientAddress(qrData);
     }, 2);
-    setTimeout(() => {
-      if (bottomSheet.current) (bottomSheet as any).current.snapTo(0);
-    }, 10);
   };
-
-  const renderContent1 = () => {
-    return (
-      <QrCodeModalContents
-        flag={true}
-        modalRef={bottomSheet}
-        isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => getQrCodeData(qrData)}
-      />
-    );
-  };
-
-  function renderHeader() {
-    return (
-      <TouchableOpacity
-        activeOpacity={10}
-        onPress={() => {
-          setTimeout(() => {
-            setQrBottomSheetsFlag(false);
-          }, 2);
-          if (bottomSheet.current) (bottomSheet as any).current.snapTo(0);
-        }}
-        style={styles.modalHeaderContainer}
-      >
-        <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>QR</Text>
-      </TouchableOpacity>
-    );
-  }
 
   const renderSendConfirmationContents = () => {
     if (transfer) {
@@ -608,31 +543,6 @@ console.log("sendStorage in Send", sendStorage);
     );
   };
 
-  useEffect(() => {
-    if (serviceType === TEST_ACCOUNT) {
-      setAccountType('Test Account');
-    } else if (serviceType === SECURE_ACCOUNT) {
-      console.log('Secure Account');
-      setAccountType('Saving Account');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (serviceType === SECURE_ACCOUNT) {
-      (async () => {
-        if (
-          !(await AsyncStorage.getItem('twoFASetup')) &&
-          !(await AsyncStorage.getItem('walletRecovered'))
-        ) {
-          props.navigation.navigate('TwoFASetup', {
-            twoFASetup: service.secureHDWallet.twoFASetup,
-          });
-          await AsyncStorage.setItem('twoFASetup', 'true');
-        }
-      })();
-    }
-  }, []);
-
   const getAccountFromType = () => {
     if (serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
@@ -704,12 +614,6 @@ console.log("sendStorage in Send", sendStorage);
   }, [recipientAddress]);
 
   useEffect(() => {
-    console.log(
-      'isInvalidAddress && recipientAddress && amount',
-      isInvalidAddress,
-      recipientAddress,
-      amount,
-    );
     if (isInvalidAddress && recipientAddress) {
       setIsConfirmDisabled(false);
     } else {
@@ -722,7 +626,6 @@ console.log("sendStorage in Send", sendStorage);
       setRecipientAddress(barcodes.data);
       const instance = service.hdWallet || service.secureHDWallet;
       let isAddressValid = instance.isValidAddress(recipientAddress);
-      console.log(isAddressValid);
       setIsInvalidAddress(isAddressValid);
       setOpenCameraFlag(false);
     }
@@ -835,7 +738,6 @@ console.log("sendStorage in Send", sendStorage);
   };
 
   const onSelectContact = (item) => {
-    //if(item.account_name && item.account_name == )
     let isNavigate = true;
     if (sendStorage && sendStorage.length === 0) {
       props.navigation.navigate('SendToContact', {
@@ -845,8 +747,11 @@ console.log("sendStorage in Send", sendStorage);
         sweepSecure,
         netBalance,
       });
-      dispatch(storeContactsAccountToSend({
-        selectedContact: item,}));
+      dispatch(
+        storeContactsAccountToSend({
+          selectedContact: item,
+        }),
+      );
       setRecipientAddress('');
     } else {
       sendStorage &&
@@ -863,8 +768,11 @@ console.log("sendStorage in Send", sendStorage);
           sweepSecure,
           netBalance,
         });
-        dispatch(storeContactsAccountToSend({
-          selectedContact: item,}));
+        dispatch(
+          storeContactsAccountToSend({
+            selectedContact: item,
+          }),
+        );
         setRecipientAddress('');
       }
     }
@@ -873,36 +781,42 @@ console.log("sendStorage in Send", sendStorage);
   const getImageIcon = (item) => {
     if (item) {
       if (item.imageAvailable) {
-        return <Image source={item.image} style={styles.circleShapeView} />;
+        return (
+          <View style={styles.contactImageBackGround}>
+            <Image source={item.image} style={styles.circleShapeView} />
+          </View>
+        );
       } else {
         return (
-          <View
-            style={{
-              ...styles.circleShapeView,
-              backgroundColor: Colors.shadowBlue,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Text
+          <View style={styles.contactImageBackGround}>
+            <View
               style={{
-                textAlign: 'center',
-                fontSize: 13,
-                lineHeight: 13, //... One for top and one for bottom alignment
+                ...styles.circleShapeView,
+                backgroundColor: Colors.shadowBlue,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              {item
-                ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
-                : ''}
-            </Text>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 13,
+                  lineHeight: 13, //... One for top and one for bottom alignment
+                }}
+              >
+                {item
+                  ? nameToInitials(
+                      item.firstName && item.lastName
+                        ? item.firstName + ' ' + item.lastName
+                        : item.firstName && !item.lastName
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+                    )
+                  : ''}
+              </Text>
+            </View>
           </View>
         );
       }
@@ -911,120 +825,132 @@ console.log("sendStorage in Send", sendStorage);
 
   const renderContacts = ({ item, index }) => {
     return (
-      <View style={{ flexDirection: 'column' }}>
-        <TouchableOpacity onPress={() => onSelectContact(item)}>
-          <View style={{ justifyContent: 'center', marginLeft: hp('4%') }}>
-            {sendStorage &&
-              sendStorage.length > 0 &&
-              sendStorage.map((contact) => {
-                if (contact.selectedContact.id === item.id) {
-                  return (
-                    <Image
-                      style={styles.checkmarkStyle}
-                      source={require('../../assets/images/icons/checkmark.png')}
-                      resizeMode="contain"
-                    />
-                  );
-                }
-              })}
-            {/* <Image style={styles.circleShapeView} 
-              source={require('../../assets/images/icons/icon_contact.png')} 
-              resizeMode="contain" /> */}
-            {getImageIcon(item)}
-            <Text
-              style={{
-                width: 50,
-                height: 15,
-                color: Colors.textColorGrey,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansRegular,
-                textAlign: 'center',
-              }}
-            >
-              {item.name}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity onPress={() => onSelectContact(item)}>
+        <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
+          {sendStorage &&
+            sendStorage.length > 0 &&
+            sendStorage.map((contact) => {
+              if (contact.selectedContact.id === item.id) {
+                return (
+                  <Image
+                    style={styles.checkmarkStyle}
+                    source={require('../../assets/images/icons/checkmark.png')}
+                    resizeMode="contain"
+                  />
+                );
+              }
+            })}
+          {getImageIcon(item)}
+          <Text numberOfLines={1} style={styles.contactName}>
+            {item.name}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
   const renderAccounts = ({ item, index }) => {
-    return (
-      <View style={{ flexDirection: 'column' }}>
-        <TouchableOpacity onPress={() => onSelectContact(item)}>
-          <CardView cornerRadius={10} opacity={1} style={styles.card}>
+    let checked = false;
+    for (let i = 0; i < sendStorage.length; i++) {
+      const element = sendStorage[i].selectedContact;
+      if (element.id == item.id) {
+        checked = true;
+      }
+    }
+    if (item.type != serviceType) {
+      return (
+        <TouchableOpacity
+          style={{
+            height: wp('40%'),
+            justifyContent: 'center',
+            shadowOffset: {
+              width: 4,
+              height: 4,
+            },
+            shadowOpacity: 0.7,
+            shadowRadius: 10,
+            shadowColor: Colors.borderColor,
+            elevation: 10,
+          }}
+          onPress={() => onSelectContact(item)}
+        >
+          <CardView
+            cornerRadius={10}
+            opacity={1}
+            style={{
+              ...styles.card,
+              backgroundColor: checked ? Colors.lightBlue : Colors.white,
+            }}
+          >
             <View
               style={{
                 flex: 1,
-                justifyContent: 'center',
                 alignItems: 'center',
                 marginLeft: 2,
                 marginRight: 2,
               }}
             >
               <Image
-                style={{ width: wp('10%'), height: wp('10%') }}
+                style={{
+                  width: wp('10%'),
+                  height: wp('10%'),
+                  alignSelf: 'center',
+                }}
                 source={item.icon}
               />
               <Text
                 style={{
-                  color: Colors.black,
+                  color: checked ? Colors.white : Colors.black,
                   fontSize: RFValue(10),
                   fontWeight: '500',
                   textAlign: 'center',
+                  alignSelf: 'center',
                 }}
               >
                 {item.account_name}
               </Text>
               <Text
                 style={{
-                  color: Colors.textColorGrey,
+                  color: checked ? Colors.white : Colors.borderColor,
                   fontSize: RFValue(10),
                   fontFamily: Fonts.FiraSansRegular,
                   textAlign: 'center',
-                  marginTop: 2,
+                  marginTop: 5,
+                  alignSelf: 'center',
                 }}
               >
                 {item.type === REGULAR_ACCOUNT
                   ? '$' + UsNumberFormat(balances.regularBalance)
                   : '$' + UsNumberFormat(balances.secureBalance)}
               </Text>
-              <View style={{ marginTop: 10 }}>
-                <RadioButton
-                  size={15}
-                  color={Colors.lightBlue}
-                  borderColor={Colors.borderColor}
-                  isChecked={item.checked}
+              <View style={{ marginTop: wp('5%'), marginBottom: 7 }}>
+                <TouchableOpacity
                   onPress={() => onSelectContact(item)}
-                />
-                {/* {sendStorage && sendStorage.length > 0 && 
-                  sendStorage.map((contact) => {
-                    console.log("sendStorage", sendStorage);
-                    if(contact.selectedContact.id === item.id) {
-                      return (
-                        <Image style={styles.checkmarkStyle} 
-                          source={require('../../assets/images/icons/checkmark.png')} 
-                          resizeMode="contain" />
-                      )
-                    } else {
-                      return (
-                        <RadioButton
-                          size={15}
-                          color={Colors.lightBlue}
-                          borderColor={Colors.borderColor}
-                          isChecked={item.checked}
-                        />
-                      )
-                    }
-                  })
-                } */}
+                  style={{
+                    height: wp('5%'),
+                    width: wp('5%'),
+                    borderRadius: wp('5%') / 2,
+                    borderWidth: 1,
+                    borderColor: checked ? Colors.blue : Colors.borderColor,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: checked ? Colors.blue : Colors.white,
+                  }}
+                >
+                  {checked && (
+                    <Entypo
+                      name={'check'}
+                      size={RFValue(12)}
+                      color={Colors.white}
+                    />
+                  )}
+                </TouchableOpacity>
               </View>
             </View>
           </CardView>
         </TouchableOpacity>
-      </View>
-    );
+      );
+    }
   };
 
   return (
@@ -1094,7 +1020,7 @@ console.log("sendStorage in Send", sendStorage);
                 </View>
                 {renderQRCodeThumbnail()}
                 <View
-                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}
+                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') }}
                 >
                   <View style={styles.textBoxView}>
                     <TextInput
@@ -1133,13 +1059,14 @@ console.log("sendStorage in Send", sendStorage);
                       </Text>
                     </View>
                   ) : null}
-                  <View style={{ paddingTop: 10 }}>
+                  <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
                           color: Colors.blue,
                           fontSize: RFValue(13),
                           fontFamily: Fonts.FiraSansRegular,
+                          marginBottom: wp('3%'),
                         }}
                       >
                         Send to Contact
@@ -1156,7 +1083,7 @@ console.log("sendStorage in Send", sendStorage);
                         <SimpleLineIcons
                           name="options-vertical"
                           color={Colors.blue}
-                          size={17}
+                          size={RFValue(13)}
                         />
                       </TouchableOpacity>
                     </View>
@@ -1165,9 +1092,9 @@ console.log("sendStorage in Send", sendStorage);
                         ...styles.textBoxView,
                         flexDirection: 'column',
                         height: 90,
-                        marginTop: hp('2%'),
                         justifyContent: 'center',
-                        backgroundColor: Colors.backgroundColor1,
+                        backgroundColor: Colors.backgroundColor,
+                        borderColor: Colors.backgroundColor,
                       }}
                     >
                       <View
@@ -1177,6 +1104,25 @@ console.log("sendStorage in Send", sendStorage);
                           alignItems: 'center',
                         }}
                       >
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: Colors.white,
+                            height: wp('12%'),
+                            width: wp('6%'),
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            alignSelf: 'center',
+                            borderRadius: 5,
+                            marginLeft: 10,
+                            marginRight: 15,
+                          }}
+                        >
+                          <Ionicons
+                            name={'ios-arrow-back'}
+                            size={RFValue(20)}
+                            color={Colors.borderColor}
+                          />
+                        </TouchableOpacity>
                         <FlatList
                           horizontal
                           nestedScrollEnabled={true}
@@ -1189,13 +1135,14 @@ console.log("sendStorage in Send", sendStorage);
                       </View>
                     </View>
                   </View>
-                  <View style={{ paddingTop: 10 }}>
+                  <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
                           color: Colors.blue,
                           fontSize: RFValue(13),
                           fontFamily: Fonts.FiraSansRegular,
+                          marginBottom: wp('3%'),
                         }}
                       >
                         Send to Account
@@ -1212,38 +1159,47 @@ console.log("sendStorage in Send", sendStorage);
                         <SimpleLineIcons
                           name="options-vertical"
                           color={Colors.blue}
-                          size={17}
+                          size={RFValue(13)}
                         />
                       </TouchableOpacity>
                     </View>
                     <View
                       style={{
-                        ...styles.textBoxView,
-                        flexDirection: 'column',
-                        height: 130,
-                        marginTop: hp('2%'),
-                        justifyContent: 'center',
-                        backgroundColor: Colors.backgroundColor1,
+                        flexDirection: 'row',
+                        borderRadius: 10,
+                        height: wp('40%'),
+                        alignItems: 'center',
+                        backgroundColor: Colors.backgroundColor,
                       }}
                     >
-                      <View
+                      <TouchableOpacity
                         style={{
-                          flex: 1,
-                          flexDirection: 'row',
+                          backgroundColor: Colors.white,
+                          height: wp('12%'),
+                          width: wp('6%'),
+                          justifyContent: 'center',
                           alignItems: 'center',
+                          alignSelf: 'center',
+                          borderRadius: 5,
+                          marginLeft: 10,
                         }}
                       >
-                        <FlatList
-                          data={accountData}
-                          horizontal
-                          nestedScrollEnabled={true}
-                          showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false}
-                          renderItem={renderAccounts}
-                          extraData={{ sendStorage }}
-                          //keyExtractor={(item, index) => index.toString()}
+                        <Ionicons
+                          name={'ios-arrow-back'}
+                          size={RFValue(20)}
+                          color={Colors.borderColor}
                         />
-                      </View>
+                      </TouchableOpacity>
+                      <FlatList
+                        data={accountData}
+                        horizontal
+                        nestedScrollEnabled={true}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                        renderItem={renderAccounts}
+                        extraData={{ sendStorage }}
+                        //keyExtractor={(item, index) => index.toString()}
+                      />
                     </View>
                   </View>
                 </View>
@@ -1261,19 +1217,6 @@ console.log("sendStorage in Send", sendStorage);
         ]}
         renderContent={renderSendHelperContents}
         renderHeader={renderSendHelperHeader}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag(true);
-        }}
-        onCloseStart={() => {
-          setQrBottomSheetsFlag(false);
-        }}
-        enabledInnerScrolling={true}
-        ref={bottomSheet}
-        snapPoints={[0, hp('90%')]}
-        renderContent={renderContent1}
-        renderHeader={renderHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
@@ -1319,35 +1262,13 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
+    paddingBottom: wp('10%')
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
     fontSize: RFValue(11),
     fontStyle: 'italic',
-  },
-  modalHeaderContainer: {
-    backgroundColor: Colors.white,
-    marginTop: 'auto',
-    flex: 1,
-    height: Platform.OS == 'ios' ? 45 : 40,
-    borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
-    borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
-    zIndex: 9999,
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 7,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
@@ -1372,29 +1293,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-    height: 50,
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-  },
-  contactNameInputImageView: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textBoxImage: {
-    width: wp('6%'),
-    height: wp('6%'),
-    resizeMode: 'contain',
-  },
-  amountInputImage: {
-    width: 40,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.borderColor,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
+    height: wp('13%'),
+    paddingTop: hp('1%'),
+    paddingBottom: hp('1%'),
   },
   textBox: {
     flex: 1,
@@ -1403,177 +1304,15 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue(13),
   },
-  confirmButtonView: {
-    width: wp('50%'),
-    height: wp('13%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  passcodeTextInputText: {
-    color: Colors.blue,
-    fontWeight: 'bold',
-    fontSize: RFValue(13),
-  },
-  textBoxStyles: {
-    borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
-    borderRadius: 7,
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    marginLeft: 8,
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textBoxActive: {
-    borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
-    borderRadius: 7,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 3 },
-    borderColor: Colors.borderColor,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.white,
-    marginLeft: 8,
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textStyles: {
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  textFocused: {
-    color: Colors.black,
-    fontSize: RFValue(13),
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  otpRequestHeaderView: {
-    marginTop: hp('4%'),
-    marginBottom: hp('2%'),
-  },
-  modalTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  modalInfoText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(11),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  confirmModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
-    alignSelf: 'center',
-  },
-  confirmButtonText: {
-    color: Colors.white,
-    fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium,
-  },
-  passcodeTextInputView: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginTop: hp('2.5%'),
-    marginBottom: hp('2.5%'),
-  },
-  dropdownBox: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-  },
-  dropdownBoxOpened: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
-    backgroundColor: Colors.white,
-    alignItems: 'center',
-  },
-  dropdownBoxText: {
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
-  },
-  dropdownBoxModal: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    marginTop: hp('1%'),
-    width: wp('90%'),
-    height: hp('18%'),
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
-    backgroundColor: Colors.white,
-    position: 'absolute',
-    zIndex: 9999,
-    overflow: 'hidden',
-  },
-  dropdownBoxModalElementView: {
-    height: 50,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 15,
-  },
   circleShapeView: {
-    width: 50,
-    height: 50,
-    borderRadius: 50 / 2,
-    borderColor: Colors.white,
-    borderWidth: 2,
+    width: wp('13%'),
+    height: wp('13%'),
+    borderRadius: wp('13%') / 2,
   },
   card: {
-    width: 108,
-    height: 110,
+    width: wp('30%'),
+    height: wp('35%'),
     marginLeft: 15,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    backgroundColor: Colors.white,
     flexDirection: 'row',
     borderRadius: 15,
     alignItems: 'center',
@@ -1581,8 +1320,8 @@ const styles = StyleSheet.create({
   },
   checkmarkStyle: {
     position: 'absolute',
-    width: 16,
-    height: 16,
+    width: wp('5%'),
+    height: wp('5%'),
     top: 0,
     right: 0,
     zIndex: 5,
@@ -1596,12 +1335,6 @@ const styles = StyleSheet.create({
   camera: {
     width: wp('100%'),
     height: wp('100%'),
-  },
-  cameraImage: {
-    width: wp('100%'),
-    height: wp('100%'),
-    overflow: 'hidden',
-    borderRadius: 20,
   },
   topCornerView: {
     flexDirection: 'row',
@@ -1651,5 +1384,29 @@ const styles = StyleSheet.create({
     height: hp('5%'),
     width: hp('5%'),
     marginLeft: 'auto',
+  },
+  contactImageBackGround: {
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.7,
+    // shadowRadius: 10,
+    shadowColor: Colors.borderColor,
+    elevation: 10,
+    height: wp('14%'),
+    width: wp('14%'),
+    backgroundColor: Colors.white,
+    borderRadius: wp('14%') / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contactName: {
+    width: wp('14%'),
+    color: Colors.black,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'center',
+    marginTop: 5,
   },
 });

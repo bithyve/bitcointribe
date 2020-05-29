@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
+  BackHandler,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -59,7 +60,6 @@ export default function SendToContact(props) {
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const [removeItem, setRemoveItem] = useState({});
-
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [bitcoinAmount, setBitCoinAmount] = useState('');
@@ -84,6 +84,12 @@ export default function SendToContact(props) {
       setIsConfirmDisabled(true);
     }
   }, [bitcoinAmount, currencyAmount]);
+
+  useEffect(()=>{
+    BackHandler.addEventListener("hardwareBackPress",()=>{
+      checkRecordsHavingPrice();
+    });
+  },[])
 
   const removeFromSendStorage = (item) => {
     console.log('remove object', item);
@@ -133,19 +139,10 @@ export default function SendToContact(props) {
 
   const getImageIcon = (item) => {
     if (item) {
-      if (item.account_name === 'Checking Account') {
+      if (item.account_name) {
         return (
           <Image
-            source={require('../../assets/images/icons/icon_regular.png')}
-            style={styles.circleShapeView}
-          />
-        );
-      }
-
-      if (item.account_name === 'Saving Account') {
-        return (
-          <Image
-            source={require('../../assets/images/icons/icon_secureaccount.png')}
+            source={item.account_name === 'Checking Account' ? require('../../assets/images/icons/icon_regular.png') : item.account_name === 'Saving Account' ? require('../../assets/images/icons/icon_secureaccount.png') : item.account_name === 'Test Account' ? require('../../assets/images/icons/icon_test_white.png') :require('../../assets/images/icons/icon_user.png') }
             style={styles.circleShapeView}
           />
         );
@@ -249,7 +246,7 @@ export default function SendToContact(props) {
     return (
       <View
         style={{
-          width: 1,
+          width: 2,
           height: '60%',
           backgroundColor: Colors.borderColor,
           marginRight: 5,
@@ -392,6 +389,19 @@ export default function SendToContact(props) {
       />
     );
   }, []);
+  
+  const checkRecordsHavingPrice = () => {
+    if (sendStorage && sendStorage.length) {
+      for (let i = 0; i < sendStorage.length; i++) {
+        if (
+          !sendStorage[i].selectedContact.hasOwnProperty('bitcoinAmount') &&
+          !sendStorage[i].selectedContact.hasOwnProperty('currencyAmount') && selectedContact.id == sendStorage[i].selectedContact.id
+        ) {
+          dispatch(removeContactsAccountFromSend(sendStorage[i]));
+        }
+      }
+    }
+  };
 
   return (
     <View
@@ -423,6 +433,7 @@ export default function SendToContact(props) {
                   >
                     <TouchableOpacity
                       onPress={() => {
+                        checkRecordsHavingPrice();
                         props.navigation.goBack();
                       }}
                       style={{
@@ -445,21 +456,10 @@ export default function SendToContact(props) {
                 <View
                   style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 15 }}
                 >
-                  {/* {renderSingleContact(selectedContact)} */}
                   {sendStorage && sendStorage.length > 0 ? (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        marginTop: 5,
-                        marginBottom: 5,
-                      }}
-                    >
-                      <ScrollView horizontal={true}>
-                        {sendStorage.map((item) =>
-                          renderMultipleContacts(item),
-                        )}
-                      </ScrollView>
-                    </View>
+                    <ScrollView horizontal={true}>
+                    {sendStorage.map((item) => renderMultipleContacts(item))}
+                    </ScrollView>
                   ) : null}
 
                   <View
@@ -733,9 +733,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 10,
     borderColor: Colors.borderColor,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
     shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
     backgroundColor: Colors.white,
   },
   textBoxImage: {
@@ -779,9 +783,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowOpacity: 1,
-    shadowOffset: { width: 2, height: 2 },
-    shadowColor: Colors.shadowBlue,
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.7,
+    shadowColor: Colors.borderColor,
+    elevation: 10,
   },
   closemarkStyle: {
     justifyContent: 'center',
