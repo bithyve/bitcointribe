@@ -32,6 +32,7 @@ import {
 import { transferST1 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
+import { ScrollView as GestureHandlerScrollView } from 'react-native-gesture-handler'
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
@@ -147,7 +148,8 @@ export default function SendToContact(props) {
               justifyContent: 'center',
             }}
           >
-            <Text
+          {item && item.firstName ?
+            (<Text
               style={{
                 textAlign: 'center',
                 fontSize: 13,
@@ -165,55 +167,22 @@ export default function SendToContact(props) {
                       : '',
                   )
                 : ''}
-            </Text>
+            </Text>) : (<Image source={require('../../assets/images/icons/icon_user.png')} style={styles.circleShapeView} />)}
           </View>
         );
       }
     }
   };
 
-  const renderSingleContact = (item) => {
-    return (
-      <View style={{ flexDirection: 'column' }}>
-        <TouchableOpacity>
-          <View
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-          >
-            {getImageIcon(item)}
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-                textAlign: 'center',
-              }}
-            >
-              {item.name || item.account_name}
-            </Text>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              {switchOn ? `${bitcoinAmount} Sats` : '$' + `${currencyAmount}`}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  };
 
   const renderMultipleContacts = (item) => {
     return (
-      <ScrollView horizontal style={{}}>
         <View
           style={{
-            flexDirection: 'column',
             marginRight: 10,
             justifyContent: 'center',
             alignItems: 'center',
+            width: 100
           }}
         >
           <View style={{ flexDirection: 'row' }}>
@@ -232,9 +201,12 @@ export default function SendToContact(props) {
               fontFamily: Fonts.FiraSansRegular,
               textAlign: 'center',
               marginTop: 5,
+              height: 15,
             }}
+            numberOfLines={1}
+
           >
-            {item.selectedContact.name || item.selectedContact.account_name}
+            {item.selectedContact.name || item.selectedContact.account_name || item.selectedContact.id}
           </Text>
           <Text
             style={{
@@ -251,7 +223,6 @@ export default function SendToContact(props) {
                 `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
           </Text>
         </View>
-      </ScrollView>
     );
   };
 
@@ -386,7 +357,10 @@ export default function SendToContact(props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ height: '100%',
+    backgroundColor: Colors.white,
+    alignSelf: 'center',
+    width: '100%',}}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContentContainer}>
@@ -395,7 +369,7 @@ export default function SendToContact(props) {
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <ScrollView nestedScrollEnabled={true}>
+          <ScrollView>
             <TouchableWithoutFeedback>
               <View onStartShouldSetResponder={() => true}>
                 <View style={styles.modalHeaderTitleView}>
@@ -434,17 +408,19 @@ export default function SendToContact(props) {
                   {sendStorage && sendStorage.length > 0 ? (
                     <View
                       style={{
-                        flex: 1,
                         flexDirection: 'row',
                         marginTop: 5,
                         marginBottom: 5,
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        backgroundColor:'yellow'
                       }}
                     >
-                      {sendStorage.map((item) => renderMultipleContacts(item))}
+                       <ScrollView horizontal={true}>
+                    {sendStorage.map((item) => renderMultipleContacts(item))}
+                    </ScrollView>
                     </View>
+                    
                   ) : null}
+                  
                   <View
                     style={{
                       borderBottomWidth: 1,
