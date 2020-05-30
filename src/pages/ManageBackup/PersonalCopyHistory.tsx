@@ -21,11 +21,12 @@ import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
-  pdfHealthChecked,
   checkMSharesHealth,
   personalCopyShared,
   generatePersonalCopy,
   personalCopyGenerated,
+  pdfHealthChecked,
+  pdfHealthCheckFailed,
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -50,7 +51,7 @@ const PersonalCopyHistory = (props) => {
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QRModalHeader, setQRModalHeader] = useState('');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const pdfHealthCheckFailed = useSelector(
+  const healthCheckFailed = useSelector(
     (state) => state.sss.pdfHealthCheckFailed,
   );
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
@@ -96,7 +97,7 @@ const PersonalCopyHistory = (props) => {
     'selectedPersonalCopy',
   );
   const next = props.navigation.getParam('next');
-  const pdfHealthChecked = useSelector(
+  const healthChecked = useSelector(
     (state) => state.sss.loading.pdfHealthChecked,
   );
   const personalCopiesGenerated = useSelector(
@@ -116,15 +117,15 @@ const PersonalCopyHistory = (props) => {
   }, [personalCopiesGenerated]);
 
   useEffect(() => {
-    if (pdfHealthChecked) {
+    if (healthChecked) {
       Toast('PDF scanned Successfully');
       dispatch(checkMSharesHealth());
       dispatch(pdfHealthChecked(''));
     }
-  }, [pdfHealthChecked]);
+  }, [healthChecked]);
 
   useEffect(() => {
-    if (pdfHealthCheckFailed) {
+    if (healthCheckFailed) {
       setTimeout(() => {
         setErrorMessageHeader('Invalid QR!');
         setErrorMessage('The scanned QR is wrong, please try again');
@@ -132,7 +133,7 @@ const PersonalCopyHistory = (props) => {
       (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(pdfHealthCheckFailed(false));
     }
-  }, [pdfHealthCheckFailed]);
+  }, [healthCheckFailed]);
 
   useEffect(() => {
     if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
@@ -339,6 +340,7 @@ const PersonalCopyHistory = (props) => {
           } else if (QRModalHeader === 'Reshare Personal Copy') {
             const { restored } = secureAccount.restoreSecondaryMnemonic(qrData);
             if (restored) {
+              setPCShared(false);
               dispatch(generatePersonalCopy(selectedPersonalCopy));
               (PersonalCopyShareBottomSheet as any).current.snapTo(1);
             } else {
@@ -348,8 +350,11 @@ const PersonalCopyHistory = (props) => {
               );
             }
           }
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet.current as any).snapTo(0);
+
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+            (QrBottomSheet.current as any).snapTo(0);
+          }, 2);
         }}
       />
     );

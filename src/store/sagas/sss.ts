@@ -513,6 +513,24 @@ function* generatePersonalCopyWorker({ payload }) {
       'personalCopyDetails',
       JSON.stringify(personalCopyDetails),
     );
+
+    // reset PDF health (if present) post reshare
+    let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    if (storedPDFHealth) {
+      const { pdfHealth } = s3Service.sss;
+      storedPDFHealth = JSON.parse(storedPDFHealth);
+      storedPDFHealth = {
+        ...storedPDFHealth,
+        [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
+      };
+
+      yield call(
+        AsyncStorage.setItem,
+        'PDF Health',
+        JSON.stringify(storedPDFHealth),
+      );
+    }
+
     yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: true }));
 
     if (Object.keys(personalCopyDetails).length == 2) {
