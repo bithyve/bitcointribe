@@ -56,13 +56,7 @@ const chunkArray = (arr: any, n: any) => {
 };
 
 export default async (pdfData, fileName, title, password) => {
-  const {
-    qrData,
-    secondaryMnemonic,
-
-    secondaryXpub,
-    bhXpub,
-  } = pdfData;
+  const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData;
   const qrcode: string[] = [];
   const qrCodeString: string[][] = [];
   qrData.forEach((qrString) => {
