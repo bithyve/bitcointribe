@@ -60,14 +60,13 @@ export default function SendToContact(props) {
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [
-    SendSuccessBottomSheet,
-    setSendSuccessBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
-  const [
-    SendUnSuccessBottomSheet,
-    setSendUnSuccessBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
+  const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const [SelectedContactId, setSelectedContactId] = useState(0);
 
   const tapSliderHandler = (evt) => {
     if (viewRef.current) {
@@ -136,129 +135,162 @@ export default function SendToContact(props) {
 
   const renderContacts = (item) => {
     return (
-      <TouchableOpacity style={styles.contactProfileView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              flex: 1,
-              backgroundColor: Colors.backgroundColor1,
-              height: 90,
-              position: 'relative',
-              borderRadius: 10,
-            }}
-          >
-            <View style={{ marginLeft: 70 }}>
+      <TouchableOpacity
+        onPress={() => {
+          if (item.note) {
+            if (SelectedContactId == item.selectedContact.id)
+              setSelectedContactId(0);
+            else setSelectedContactId(item.selectedContact.id);
+          }
+        }}
+        activeOpacity={10}
+        style={{
+          marginRight: wp('6%'),
+          marginLeft: wp('6%'),
+          borderRadius: 10,
+          marginTop: hp('1.7%'),
+          height:
+            SelectedContactId == item.selectedContact.id
+              ? wp('50%')
+              : wp('25%'),
+          backgroundColor: Colors.backgroundColor,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            height: wp('25%'),
+          }}
+        >
+          <View style={{ marginLeft: 20 }}>
+            {item.selectedContact.imageAvailable ? (
+              <Image
+                source={item.selectedContact.image}
+                style={styles.circleShapeView}
+              />
+            ) : (
+              <View style={styles.circleShapeView}>
+                {item.selectedContact && item.selectedContact.name ? (
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    }}
+                  >
+                    {nameToInitials(
+                      item.selectedContact.firstName &&
+                        item.selectedContact.lastName
+                        ? item.selectedContact.firstName +
+                            ' ' +
+                            item.selectedContact.lastName
+                        : item.selectedContact.firstName &&
+                          !item.selectedContact.lastName
+                        ? item.selectedContact.firstName
+                        : !item.selectedContact.firstName &&
+                          item.selectedContact.lastName
+                        ? item.selectedContact.lastName
+                        : '',
+                    )}
+                  </Text>
+                ) : (
+                  <Image
+                    source={require('../../assets/images/icons/icon_user.png')}
+                    style={styles.circleShapeView}
+                  />
+                )}
+              </View>
+            )}
+          </View>
+          <View style={{}}>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(11),
+                marginLeft: 25,
+                paddingTop: 5,
+                paddingBottom: 3,
+              }}
+            >
+              Sending to:
+            </Text>
+            <Text style={styles.contactNameText}>
+              {item.selectedContact.name ||
+                item.selectedContact.account_name ||
+                item.selectedContact.id}
+            </Text>
+            {item.hasOwnProperty('bitcoinAmount') ||
+            item.hasOwnProperty('currencyAmount') ? (
               <Text
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(11),
+                  fontSize: RFValue(10),
                   marginLeft: 25,
-                  paddingTop: 5,
-                  paddingBottom: 3,
+                  paddingTop: 3,
                 }}
               >
-                Sending to:
+                {item.bitcoinAmount
+                  ? item.bitcoinAmount + ' Sats'
+                  : '$ ' + item.currencyAmount
+                  ? item.currencyAmount
+                  : ''}
               </Text>
-              <Text style={styles.contactNameText}>
-                {item.selectedContact.name ||
-                  item.selectedContact.account_name ||
-                  item.selectedContact.id}
-              </Text>
-              {item.hasOwnProperty('bitcoinAmount') ||
-              item.hasOwnProperty('currencyAmount') ? (
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                  }}
-                >
-                  {item.bitcoinAmount
-                    ? item.bitcoinAmount + ' Sats'
-                    : '$ ' + item.currencyAmount
-                    ? item.currencyAmount
-                    : ''}
-                </Text>
-              ) : null}
-            </View>
-            <Ionicons
-              style={{ marginLeft: 'auto', marginRight: 10 }}
-              name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
-              size={20}
-              color={Colors.borderColor}
-            />
+            ) : null}
           </View>
-          {item.selectedContact.imageAvailable ? (
-            <View
-              style={{
-                position: 'absolute',
-                marginLeft: 15,
-                marginRight: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
-              }}
-            >
-              <Image
-                source={item.selectedContact.image}
-                style={{ ...styles.contactProfileImage }}
-              />
-            </View>
-          ) : (
-            <View
-              style={{
-                position: 'absolute',
-                marginLeft: 15,
-                marginRight: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: Colors.backgroundColor,
-                width: 70,
-                height: 70,
-                borderRadius: 70 / 2,
-                shadowColor: Colors.shadowBlue,
-                shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
-              }}
-            >
-              {item.selectedContact && item.selectedContact.name ? (
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(
-                    item.selectedContact.firstName &&
-                      item.selectedContact.lastName
-                      ? item.selectedContact.firstName +
-                          ' ' +
-                          item.selectedContact.lastName
-                      : item.selectedContact.firstName &&
-                        !item.selectedContact.lastName
-                      ? item.selectedContact.firstName
-                      : !item.selectedContact.firstName &&
-                        item.selectedContact.lastName
-                      ? item.selectedContact.lastName
-                      : '',
-                  )}
-                </Text>
-              ) : (
-                <Image
-                  source={require('../../assets/images/icons/icon_user.png')}
-                  style={styles.contactProfileImage}
-                />
-              )}
-            </View>
-          )}
+          <Ionicons
+            style={{ marginLeft: 'auto', marginRight: 10 }}
+            name={
+              SelectedContactId == item.selectedContact.id
+                ? 'ios-arrow-up'
+                : 'ios-arrow-down'
+            }
+            size={20}
+            color={Colors.borderColor}
+          />
         </View>
+        {SelectedContactId == item.selectedContact.id && (
+          <View
+            style={{
+              height: wp('25%'),
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                height: wp('17%'),
+                width: wp('78%'),
+                padding: wp('4%'),
+                alignSelf: 'center',
+                backgroundColor: Colors.backgroundColor1,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                }}
+              >
+                Note
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={{
+                  width: wp('70%'),
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginTop: 5,
+                }}
+              >
+                {item.note}
+              </Text>
+            </View>
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -351,7 +383,7 @@ export default function SendToContact(props) {
       <ModalHeader
         onPressHeader={() => {
           if (SendSuccessBottomSheet.current)
-          SendSuccessBottomSheet.current.snapTo(0);
+            SendSuccessBottomSheet.current.snapTo(0);
           props.navigation.navigate('Accounts');
         }}
       />
@@ -371,12 +403,12 @@ export default function SendToContact(props) {
         onPressOk={() => {
           //dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
-          SendUnSuccessBottomSheet.current.snapTo(0);
+            SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
-         //dispatch(clearTransfer(serviceType));
+          //dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
-          SendUnSuccessBottomSheet.current.snapTo(0);
+            SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         isUnSuccess={true}
       />
@@ -387,9 +419,9 @@ export default function SendToContact(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-        //  dispatch(clearTransfer(serviceType));
+          //  dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
-          SendUnSuccessBottomSheet.current.snapTo(0);
+            SendUnSuccessBottomSheet.current.snapTo(0);
         }}
       />
     );
@@ -406,347 +438,331 @@ export default function SendToContact(props) {
     >
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={styles.modalHeaderTitleView}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.goBack();
+            }}
+            style={{
+              height: 30,
+              width: 30,
+              justifyContent: 'center',
+            }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </TouchableOpacity>
+          <Text style={styles.modalHeaderTitleText}>{'Send Confirmation'}</Text>
+        </View>
+      </View>
       <ScrollView>
-        <View style={styles.modalContentContainer}>
-          <View style={styles.modalHeaderTitleView}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  props.navigation.goBack();
-                }}
-                style={{
-                  height: 30,
-                  width: 30,
-                  justifyContent: 'center',
-                }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>
-                {'Send Confirmation'}
-              </Text>
-            </View>
-          </View>
           <View
             style={{
-              borderBottomWidth: 1,
-              borderColor: Colors.borderColor,
-              paddingBottom: hp('2%'),
-              paddingTop: hp('1%'),
+              paddingBottom: hp('1%'),
+              paddingTop: hp('0.7%'),
               marginRight: wp('6%'),
               marginLeft: wp('6%'),
-            }}
-          >
-            <View
-              style={{
-                marginBottom: hp('1%'),
-                marginTop: hp('1%'),
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {'Sending From: '}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansItalic,
-                }}
-              >
-                {getServiceTypeAccount()}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansItalic,
-                  lineHeight: 15,
-                  textAlign: 'center',
-                }}
-              >
-                {' (Availble to spend '}
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansItalic,
-                  }}
-                >
-                  {serviceType == 'Test Account'
-                    ? UsNumberFormat(netBalance)
-                    : switchOn
-                    ? UsNumberFormat(netBalance)
-                    : exchangeRates
-                    ? (
-                        (netBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                    : null}
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontSize: RFValue(9),
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                  }}
-                >
-                  {serviceType == 'Test Account'
-                    ? ' t-sats )'
-                    : switchOn
-                    ? ' sats )'
-                    : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
-                </Text>
-              </Text>
-            </View>
-
-            {sendStorage && sendStorage.length > 0 ? (
-              <ScrollView>
-                {sendStorage.map((item) => renderContacts(item))}
-              </ScrollView>
-            ) : null}
-          </View>
-
-          <View
-            style={{
+              marginBottom: hp('1%'),
+              marginTop: hp('1%'),
               flexDirection: 'row',
+              justifyContent: 'center',
               alignItems: 'center',
-              marginRight: wp('6%'),
-              marginLeft: wp('6%'),
-              borderBottomWidth: 1,
-              borderColor: Colors.borderColor,
-              paddingBottom: hp('1.5%'),
-              paddingTop: hp('1.5%'),
             }}
           >
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-                marginLeft: 5,
-              }}
-            >
-              Total Amount
-            </Text>
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-              }}
-            >
-              {renderBitCoinAmountText()}
-            </View>
-          </View>
-
-          <View
-            style={{
-              marginRight: wp('6%'),
-              marginLeft: wp('6%'),
-              marginTop: hp('2%'),
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-                marginLeft: 5,
-              }}
-            >
-              Transaction Priority
-            </Text>
             <Text
               style={{
                 color: Colors.textColorGrey,
                 fontSize: RFValue(12),
                 fontFamily: Fonts.FiraSansRegular,
-                marginLeft: 5,
               }}
             >
-              Set priority for your transaction
+              {'Sending From: '}
             </Text>
-
-            <View
+            <Text
               style={{
-                ...styles.textBoxView,
-                flexDirection: 'column',
-                height: 'auto',
-                marginTop: hp('2%'),
-                alignItems: 'center',
-                paddingLeft: 10,
-                paddingRight: 10,
+                color: Colors.blue,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              <View
-                style={{ flexDirection: 'row' }}
-                ref={viewRef}
-                collapsable={false}
-              >
-                <TouchableWithoutFeedback onPressIn={tapSliderHandler}>
-                  <Slider
-                    style={{ flex: 1 }}
-                    minimumValue={0}
-                    maximumValue={10}
-                    step={5}
-                    minimumTrackTintColor={Colors.blue}
-                    maximumTrackTintColor={Colors.borderColor}
-                    thumbStyle={{
-                      borderWidth: 5,
-                      borderColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      height: 30,
-                      width: 30,
-                      borderRadius: 15,
-                    }}
-                    trackStyle={{ height: 8, borderRadius: 10 }}
-                    thumbTouchSize={{
-                      width: 30,
-                      height: 30,
-                      backgroundColor: 'blue',
-                    }}
-                    value={sliderValue}
-                    onValueChange={(value) => {
-                      setSliderValue(value);
-                    }}
-                    onSlidingComplete={(value) => {
-                      value == 0
-                        ? setSliderValueText('Low Fee')
-                        : value == 5
-                        ? setSliderValueText('In the middle')
-                        : setSliderValueText('Fast Transaction');
-                    }}
-                  />
-                </TouchableWithoutFeedback>
-              </View>
-              <View
+              {getServiceTypeAccount()}
+            </Text>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontSize: RFValue(10),
+                fontFamily: Fonts.FiraSansItalic,
+                lineHeight: 15,
+                textAlign: 'center',
+              }}
+            >
+              {' (Availble to spend '}
+              <Text
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  marginBottom: 10,
+                  color: Colors.blue,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansItalic,
                 }}
               >
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                    textAlign: 'center',
-                    flex: 1,
-                    flexWrap: 'wrap',
-                    marginRight: 5,
-                  }}
-                >
-                  {'Low Fee\n'} (
-                  {averageTxFees ? averageTxFees['low'].averageTxFee : ''}
-                  {' sats'})
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                    textAlign: 'center',
-                    flex: 1,
-                    flexWrap: 'wrap',
-                    marginRight: 5,
-                  }}
-                >
-                  {'In the middle\n'} (
-                  {averageTxFees ? averageTxFees['medium'].averageTxFee : ''}
-                  {' sats'})
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                    textAlign: 'center',
-                    flex: 1,
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  {'Fast Transaction\n'} (
-                  {averageTxFees ? averageTxFees['high'].averageTxFee : ''}
-                  {' sats'})
-                </Text>
-              </View>
-            </View>
+                {serviceType == 'Test Account'
+                  ? UsNumberFormat(netBalance)
+                  : switchOn
+                  ? UsNumberFormat(netBalance)
+                  : exchangeRates
+                  ? (
+                      (netBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                  : null}
+              </Text>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(9),
+                  fontFamily: Fonts.FiraSansMediumItalic,
+                }}
+              >
+                {serviceType == 'Test Account'
+                  ? ' t-sats )'
+                  : switchOn
+                  ? ' sats )'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+              </Text>
+            </Text>
           </View>
-          <View style={{ marginTop: hp('3%') }}>
-            <BottomInfoBox
-              title={'Note'}
-              infoText={
-                'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
-              }
-            />
+        {sendStorage && sendStorage.length > 0 ? (
+          <ScrollView>
+            {sendStorage.map((item) => renderContacts(item))}
+          </ScrollView>
+        ) : null}
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop:hp('2%'),
+            marginRight: wp('6%'),
+            marginLeft: wp('6%'),
+            borderTopWidth: 1,
+            borderBottomWidth: 1,
+            borderColor: Colors.borderColor,
+            paddingBottom: hp('1.5%'),
+            paddingTop: hp('1.5%'),
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: 5,
+            }}
+          >
+            Total Amount
+          </Text>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'flex-end',
+              alignItems: 'flex-end',
+            }}
+          >
+            {renderBitCoinAmountText()}
           </View>
+        </View>
+
+        <View
+          style={{
+            marginRight: wp('6%'),
+            marginLeft: wp('6%'),
+            marginTop: hp('2%'),
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: 5,
+            }}
+          >
+            Transaction Priority
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: 5,
+            }}
+          >
+            Set priority for your transaction
+          </Text>
 
           <View
             style={{
-              flexDirection: 'row',
-              marginTop: hp('3%'),
-              marginBottom: hp('5%'),
-              marginLeft: wp('6%'),
-              marginRight: wp('6%'),
+              ...styles.textBoxView,
+              flexDirection: 'column',
+              height: 'auto',
+              marginTop: hp('2%'),
+              alignItems: 'center',
+              paddingLeft: 10,
+              paddingRight: 10,
             }}
           >
-            <TouchableOpacity
-              onPress={() => {
-                // handleTransferST2();
-                // props.navigation.goBack();
-                SendUnSuccessBottomSheet.current.snapTo(1);
-                //SendSuccessBottomSheet.current.snapTo(1);
-              }}
+            <View
+              style={{ flexDirection: 'row' }}
+              ref={viewRef}
+              collapsable={false}
+            >
+              <TouchableWithoutFeedback onPressIn={tapSliderHandler}>
+                <Slider
+                  style={{ flex: 1 }}
+                  minimumValue={0}
+                  maximumValue={10}
+                  step={5}
+                  minimumTrackTintColor={Colors.blue}
+                  maximumTrackTintColor={Colors.borderColor}
+                  thumbStyle={{
+                    borderWidth: 5,
+                    borderColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    height: 30,
+                    width: 30,
+                    borderRadius: 15,
+                  }}
+                  trackStyle={{ height: 8, borderRadius: 10 }}
+                  thumbTouchSize={{
+                    width: 30,
+                    height: 30,
+                    backgroundColor: 'blue',
+                  }}
+                  value={sliderValue}
+                  onValueChange={(value) => {
+                    setSliderValue(value);
+                  }}
+                  onSlidingComplete={(value) => {
+                    value == 0
+                      ? setSliderValueText('Low Fee')
+                      : value == 5
+                      ? setSliderValueText('In the middle')
+                      : setSliderValueText('Fast Transaction');
+                  }}
+                />
+              </TouchableWithoutFeedback>
+            </View>
+            <View
               style={{
-                ...styles.confirmButtonView,
-                backgroundColor: Colors.blue,
-                elevation: 10,
-                shadowColor: Colors.shadowBlue,
-                shadowOpacity: 1,
-                shadowOffset: { width: 15, height: 15 },
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 10,
               }}
             >
-              <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.confirmButtonView,
-                width: wp('30%'),
-              }}
-              onPress={() => {
-                props.navigation.goBack();
-              }}
-            >
-              <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                Back
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textAlign: 'center',
+                  flex: 1,
+                  flexWrap: 'wrap',
+                  marginRight: 5,
+                }}
+              >
+                {'Low Fee\n'} (
+                {averageTxFees ? averageTxFees['low'].averageTxFee : ''}
+                {' sats'})
               </Text>
-            </TouchableOpacity>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textAlign: 'center',
+                  flex: 1,
+                  flexWrap: 'wrap',
+                  marginRight: 5,
+                }}
+              >
+                {'In the middle\n'} (
+                {averageTxFees ? averageTxFees['medium'].averageTxFee : ''}
+                {' sats'})
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textAlign: 'center',
+                  flex: 1,
+                  flexWrap: 'wrap',
+                }}
+              >
+                {'Fast Transaction\n'} (
+                {averageTxFees ? averageTxFees['high'].averageTxFee : ''}
+                {' sats'})
+              </Text>
+            </View>
           </View>
+        </View>
+        <View style={{ marginTop: hp('3%') }}>
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+            }
+          />
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: hp('3%'),
+            marginBottom: hp('5%'),
+            marginLeft: wp('6%'),
+            marginRight: wp('6%'),
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              // handleTransferST2();
+              // props.navigation.goBack();
+              SendUnSuccessBottomSheet.current.snapTo(1);
+              //SendSuccessBottomSheet.current.snapTo(1);
+            }}
+            style={{
+              ...styles.confirmButtonView,
+              backgroundColor: Colors.blue,
+              elevation: 10,
+              shadowColor: Colors.shadowBlue,
+              shadowOpacity: 1,
+              shadowOffset: { width: 15, height: 15 },
+            }}
+          >
+            <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              ...styles.confirmButtonView,
+              width: wp('30%'),
+            }}
+            onPress={() => {
+              props.navigation.goBack();
+            }}
+          >
+            <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+              Back
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <BottomSheet
-        onCloseStart={() => {
-         
-        }}
+        onCloseStart={() => {}}
         enabledInnerScrolling={true}
         ref={SendSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -754,7 +770,7 @@ export default function SendToContact(props) {
         renderHeader={renderSendSuccessHeader}
       />
 
-<BottomSheet
+      <BottomSheet
         onCloseStart={() => {
           SendUnSuccessBottomSheet.current.snapTo(0);
         }}
@@ -843,22 +859,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
-  circleShapeView: {
-    width: 50,
-    height: 50,
-    borderRadius: 50 / 2,
-    borderColor: Colors.white,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.7,
-    shadowColor: Colors.borderColor,
-    elevation: 10,
-  },
   closemarkStyle: {
     justifyContent: 'center',
     alignItems: 'center',
@@ -890,5 +890,21 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     resizeMode: 'cover',
+  },
+  circleShapeView: {
+    width: wp('20%'),
+    height: wp('20%'),
+    borderRadius: wp('20%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.7,
+    shadowColor: Colors.borderColor,
+    elevation: 10,
   },
 });

@@ -9,12 +9,15 @@ import {
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../../common/CommonFunctions';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function RemoveSelectedTrasaction(props) {
-  const contact = props.selectedContact;
-  const [Contact, setContact] = useState(contact ? contact.selectedContact : {});
+  const contact =
+    props.selectedContact && props.selectedContact.selectedContact
+      ? props.selectedContact.selectedContact
+      : {};
+  const contactInfo = props.selectedContact ? props.selectedContact : {};
 
-  console.log("Contact", Contact)
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View>
@@ -30,111 +33,97 @@ export default function RemoveSelectedTrasaction(props) {
             Lorem ipsum dolor sit amet, consectetur
           </Text>
         </View>
-        <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                backgroundColor: Colors.backgroundColor1,
-                height: 90,
-                position: 'relative',
-                borderRadius: 10,
-              }}
-            >
-              <View style={{ marginLeft: 70 }}>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(11),
-                    marginLeft: 25,
-                    paddingTop: 5,
-                    paddingBottom: 3,
-                  }}
-                >
-                  Sending to:
-                </Text>
-                <Text style={styles.contactNameText}>
-                {Contact.name ||
-            Contact.account_name ||
-            Contact.id}
-                </Text>
-                {contact.hasOwnProperty("bitcoinAmount") || contact.hasOwnProperty("currencyAmount") ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {contact.bitcoinAmount ? contact.bitcoinAmount + ' Sats' : '$ ' + contact.currencyAmount ? contact.currencyAmount : ''}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            {Contact.imageAvailable ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            marginRight: wp('6%'),
+            marginLeft: wp('6%'),
+            alignItems: 'center',
+            marginTop: hp('1.7%'),
+            backgroundColor: Colors.backgroundColor,
+            height: wp('25%'),
+            position: 'relative',
+            borderRadius: 10,
+          }}
+        >
+          <View style={{ marginLeft: 20 }}>
+            {contact.imageAvailable ? (
+              <Image source={contact.image} style={styles.circleShapeView} />
+            ) : (
               <View
                 style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
+                  ...styles.circleShapeView,
+                  backgroundColor: Colors.shadowBlue,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
                 }}
               >
-                <Image
-                  source={Contact.image}
-                  style={{ ...styles.contactProfileImage }}
-                />
+                {contact && contact.name ? (
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      fontSize: RFValue(20),
+                      lineHeight: RFValue(20),
+                    }}
+                  >
+                    {nameToInitials(
+                      contact.firstName && contact.lastName
+                        ? contact.firstName + ' ' + contact.lastName
+                        : contact.firstName && !contact.lastName
+                        ? contact.firstName
+                        : !contact.firstName && contact.lastName
+                        ? contact.lastName
+                        : '',
+                    )}
+                  </Text>
+                ) : (
+                  <Image
+                    source={require('../../assets/images/icons/icon_user.png')}
+                    style={styles.circleShapeView}
+                  />
+                )}
               </View>
-            ) : (<View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              > 
-              {Contact && Contact.name ? (
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(
-                    Contact.firstName && Contact.lastName
-                      ? Contact.firstName + ' ' + Contact.lastName
-                      : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                      ? Contact.lastName
-                      : '',
-                  )}
-                </Text>) : (<Image
-                source={require('../../assets/images/icons/icon_user.png')}
-                style={styles.contactProfileImage}
-              />)}
-            </View> 
             )}
           </View>
+          <View style={{}}>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(11),
+                marginLeft: 15,
+                paddingTop: 5,
+                paddingBottom: 3,
+              }}
+            >
+              Sending to:
+            </Text>
+            <Text style={styles.contactNameText}>
+              {contact.name || contact.account_name || contact.id}
+            </Text>
+            {contactInfo.hasOwnProperty('bitcoinAmount') ||
+            contactInfo.hasOwnProperty('currencyAmount') ? (
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(10),
+                  marginLeft: 15,
+                  paddingTop: 3,
+                }}
+              >
+                {contactInfo.bitcoinAmount
+                  ? contactInfo.bitcoinAmount + ' Sats'
+                  : '$ ' + contactInfo.currencyAmount
+                  ? contactInfo.currencyAmount
+                  : ''}
+              </Text>
+            ) : null}
+          </View>
+          <View style={{ justifyContent:'center', alignItems:'center', marginLeft:'auto', marginRight: wp("5%")}}>
+            <Ionicons name={"ios-arrow-down"} size={RFValue(20)} color={Colors.borderColor}/>
+          </View>
         </View>
-
         <View
           style={{
             marginTop: hp('3%'),
@@ -150,13 +139,12 @@ export default function RemoveSelectedTrasaction(props) {
           </Text>
         </View>
 
-        
         <View
           style={{
             flexDirection: 'row',
             marginTop: 'auto',
             alignItems: 'center',
-            marginBottom: hp('2%')
+            marginBottom: hp('2%'),
           }}
         >
           <AppBottomSheetTouchableWrapper
@@ -183,7 +171,7 @@ export default function RemoveSelectedTrasaction(props) {
             }}
           >
             <Text style={{ ...styles.proceedButtonText, color: Colors.blue }}>
-            Back
+              Back
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
@@ -195,9 +183,9 @@ export default function RemoveSelectedTrasaction(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
-      backgroundColor: Colors.white,
-      alignSelf: 'center',
-      width: '100%',
+    backgroundColor: Colors.white,
+    alignSelf: 'center',
+    width: '100%',
   },
   box: {
     backgroundColor: Colors.backgroundColor1,
@@ -289,20 +277,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: hp('1.7%'),
   },
-  contactProfileImage: {
-    borderRadius: 60 / 2,
-    width: 60,
-    height: 60,
-    resizeMode: 'cover',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+  circleShapeView: {
+    width: wp('20%'),
+    height: wp('20%'),
+    borderRadius: wp('20%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.7,
+    shadowColor: Colors.borderColor,
+    elevation: 10,
   },
   contactNameText: {
-    color: Colors.textColorGrey,
+    color: Colors.black,
     fontSize: RFValue(20),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 25,
+    marginLeft: 15,
   },
   contactIconImage: {
     width: 20,

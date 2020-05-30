@@ -16,7 +16,7 @@ export default function ToggleSwitch(props) {
         width: props.transform ? wp('10%') : wp('17%'),
         borderRadius: wp('10%') / 2,
         alignItems: 'center',
-        paddingLeft: 2,
+        paddingLeft: props.transform ? 4 : 2,
         paddingRight: 2,
       }}
     >
@@ -88,6 +88,8 @@ export default function ToggleSwitch(props) {
               alignItems: 'center',
               justifyContent: 'center',
               marginLeft: 2,
+              marginRight: props.transform ? 4 : 0,
+              marginTop: props.transform ? 4 : 0
             }}
           >
             {!props.isNotImage && (
@@ -111,8 +113,9 @@ export default function ToggleSwitch(props) {
               width: wp('8%'),
               justifyContent: 'center',
               alignItems: 'center',
-              marginLeft: props.toggle ? 'auto' : 0,
-              marginRight: -3,
+              marginLeft: props.toggle ? 'auto' : props.transform ? 2 : 0,
+              marginRight: props.transform ? 2 : -3,
+              marginTop:props.transform ? 0 : 0
             }}
           >
             {!props.isNotImage && (

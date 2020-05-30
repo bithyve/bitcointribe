@@ -45,7 +45,7 @@ import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import {
   clearContactsAccountSendStorage,
@@ -298,14 +298,16 @@ export default function Send(props) {
         let tempTrustedContact = [];
         for (let i = 0; i < trustedContacts.length; i++) {
           const element = trustedContacts[i];
-          if(element.contactName!="Secondary Device" && element.id){
+          if (element.contactName != 'Secondary Device' && element.id) {
             tempTrustedContact.push(element);
           }
         }
         let filteredTrustedContacts = tempTrustedContact.sort(function (a, b) {
           if (a.contactName && b.contactName) {
-            if (a.contactName.toLowerCase() < b.contactName.toLowerCase()) return -1;
-            if (a.contactName.toLowerCase() > b.contactName.toLowerCase()) return 1;
+            if (a.contactName.toLowerCase() < b.contactName.toLowerCase())
+              return -1;
+            if (a.contactName.toLowerCase() > b.contactName.toLowerCase())
+              return 1;
           }
           return 0;
         });
@@ -712,42 +714,36 @@ export default function Send(props) {
   const getImageIcon = (item) => {
     if (item) {
       if (item.imageAvailable) {
-        return (
-          <View style={styles.contactImageBackGround}>
-            <Image source={item.image} style={styles.circleShapeView} />
-          </View>
-        );
+        return <Image source={item.image} style={styles.circleShapeView} />;
       } else {
         return (
-          <View style={styles.contactImageBackGround}>
-            <View
+          <View
+            style={{
+              ...styles.circleShapeView,
+              backgroundColor: Colors.shadowBlue,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text
               style={{
-                ...styles.circleShapeView,
-                backgroundColor: Colors.shadowBlue,
-                alignItems: 'center',
-                justifyContent: 'center',
+                textAlign: 'center',
+                fontSize: 13,
+                lineHeight: 13, //... One for top and one for bottom alignment
               }}
             >
-              <Text
-                style={{
-                  textAlign: 'center',
-                  fontSize: 13,
-                  lineHeight: 13, //... One for top and one for bottom alignment
-                }}
-              >
-                {item
-                  ? nameToInitials(
-                      item.firstName && item.lastName
-                        ? item.firstName + ' ' + item.lastName
-                        : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-                    )
-                  : ''}
-              </Text>
-            </View>
+              {item
+                ? nameToInitials(
+                    item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
+                : ''}
+            </Text>
           </View>
         );
       }
@@ -951,7 +947,11 @@ export default function Send(props) {
                 </View>
                 {renderQRCodeThumbnail()}
                 <View
-                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') }}
+                  style={{
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    paddingTop: wp('5%'),
+                  }}
                 >
                   <View style={styles.textBoxView}>
                     <TextInput
@@ -1157,7 +1157,7 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
-    paddingBottom: wp('10%')
+    paddingBottom: wp('10%'),
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -1200,9 +1200,20 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
   },
   circleShapeView: {
-    width: wp('13%'),
-    height: wp('13%'),
-    borderRadius: wp('13%') / 2,
+    width: wp('14%'),
+    height: wp('14%'),
+    borderRadius: wp('14%') / 2,
+    borderColor: Colors.white,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowOffset: {
+      width: 0,
+      height: 7,
+    },
+    shadowOpacity: 0.7,
+    shadowColor: Colors.borderColor,
+    elevation: 10,
   },
   card: {
     width: wp('30%'),
@@ -1283,10 +1294,9 @@ const styles = StyleSheet.create({
   contactImageBackGround: {
     shadowOffset: {
       width: 0,
-      height: 10,
+      height: 7,
     },
     shadowOpacity: 0.7,
-    // shadowRadius: 10,
     shadowColor: Colors.borderColor,
     elevation: 10,
     height: wp('14%'),

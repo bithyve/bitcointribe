@@ -36,13 +36,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
-import RemoveSelectedTrasaction from './RemoveSelectedTrasaction';
+import RemoveSelectedTransaction from './RemoveSelectedTrasaction';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
-  const [RemoveBottomSheet, setRemoveBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [RemoveBottomSheet, setRemoveBottomSheet] = useState(React.createRef());
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(
     accounts && accounts.exchangeRates,
@@ -52,7 +50,6 @@ export default function SendToContact(props) {
       setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
   const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
-  console.log('sendStorage', sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
@@ -68,12 +65,9 @@ export default function SendToContact(props) {
   const [InputStyle, setInputStyle] = useState(styles.textBoxView);
   const [InputStyle1, setInputStyle1] = useState(styles.textBoxView);
   const [InputStyleNote, setInputStyleNote] = useState(styles.textBoxView);
-  const statePrint = useSelector((state) => {
-    console.log('sendStorage', sendStorage);
-  });
 
   function isEmpty(obj) {
-    return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
 
   useEffect(() => {
@@ -84,19 +78,18 @@ export default function SendToContact(props) {
     }
   }, [bitcoinAmount, currencyAmount]);
 
-  useEffect(()=>{
-    BackHandler.addEventListener("hardwareBackPress",()=>{
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
       checkRecordsHavingPrice();
     });
-  },[])
+  }, []);
 
   const removeFromSendStorage = (item) => {
-    console.log('remove object', item);
     setTimeout(() => {
-      setRemoveItem(item);  
+      setRemoveItem(item);
     }, 2);
     (RemoveBottomSheet as any).current.snapTo(1);
-    };
+  };
 
   const getServiceTypeAccount = () => {
     if (serviceType == 'TEST_ACCOUNT') {
@@ -126,7 +119,6 @@ export default function SendToContact(props) {
       };
       recipients.push(data);
     });
-    console.log('REcipients', recipients);
     dispatch(transferST1(serviceType, recipients, averageTxFees));
     props.navigation.navigate('SendConfirmation', {
       serviceType,
@@ -141,7 +133,15 @@ export default function SendToContact(props) {
       if (item.account_name) {
         return (
           <Image
-            source={item.account_name === 'Checking Account' ? require('../../assets/images/icons/icon_regular.png') : item.account_name === 'Saving Account' ? require('../../assets/images/icons/icon_secureaccount.png') : item.account_name === 'Test Account' ? require('../../assets/images/icons/icon_test_white.png') :require('../../assets/images/icons/icon_user.png') }
+            source={
+              item.account_name === 'Checking Account'
+                ? require('../../assets/images/icons/icon_regular.png')
+                : item.account_name === 'Saving Account'
+                ? require('../../assets/images/icons/icon_secureaccount.png')
+                : item.account_name === 'Test Account'
+                ? require('../../assets/images/icons/icon_test_white.png')
+                : require('../../assets/images/icons/icon_user.png')
+            }
             style={styles.circleShapeView}
           />
         );
@@ -195,16 +195,16 @@ export default function SendToContact(props) {
     return (
       <View
         style={{
-          marginRight: 10,
+          marginRight: 20,
           justifyContent: 'center',
           alignItems: 'center',
-          width: 100,
+          width: wp('15%'),
         }}
       >
         <View style={{ flexDirection: 'row' }}>
           {getImageIcon(item.selectedContact)}
           <TouchableOpacity
-            style={styles.closemarkStyle}
+            style={styles.closeMarkStyle}
             onPress={() => removeFromSendStorage(item)}
           >
             <AntDesign size={16} color={Colors.blue} name={'closecircle'} />
@@ -217,7 +217,7 @@ export default function SendToContact(props) {
             fontFamily: Fonts.FiraSansRegular,
             textAlign: 'center',
             marginTop: 5,
-            // height: 15,
+            width: wp('15%'),
           }}
           numberOfLines={1}
         >
@@ -282,6 +282,8 @@ export default function SendToContact(props) {
           marginBottom: wp('1.5%'),
           marginTop: wp('1.5%'),
           flexDirection: 'row',
+          width: wp('70%'),
+          height: wp('13%'),
         }}
       >
         <View style={styles.amountInputImage}>
@@ -324,6 +326,8 @@ export default function SendToContact(props) {
           marginBottom: wp('1.5%'),
           marginTop: wp('1.5%'),
           flexDirection: 'row',
+          width: wp('70%'),
+          height: wp('13%'),
         }}
       >
         <View style={styles.amountInputImage}>
@@ -359,42 +363,51 @@ export default function SendToContact(props) {
   };
 
   const renderRemoveSelectedContents = useCallback(() => {
-    if(!isEmpty(removeItem)){
-    return (
-      <RemoveSelectedTrasaction
-        selectedContact={removeItem}
-        onPressBack={() => {
-          if (RemoveBottomSheet.current)
+    if (
+      Object.keys(removeItem).length != 0 &&
+      removeItem.constructor === Object
+    ) {
+      return (
+        <RemoveSelectedTransaction
+          selectedContact={removeItem}
+          onPressBack={() => {
+            if (RemoveBottomSheet.current)
+              (RemoveBottomSheet as any).current.snapTo(0);
+          }}
+          onPressDone={() => {
+            setTimeout(() => {
+              dispatch(removeContactsAccountFromSend(removeItem));
+            }, 2);
             (RemoveBottomSheet as any).current.snapTo(0);
-        }}
-        onPressDone={() => {
-          setTimeout(() => {
-            dispatch(removeContactsAccountFromSend(removeItem));
-          }, 2);
-          (RemoveBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-      }
+          }}
+        />
+      );
+    }
   }, [removeItem]);
 
-  const renderRemoveSelectedkHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          if (RemoveBottomSheet.current)
-            (RemoveBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
+  const renderRemoveSelectedHeader = useCallback(() => {
+    if (
+      Object.keys(removeItem).length === 0 &&
+      removeItem.constructor === Object
+    ) {
+      return (
+        <ModalHeader
+          onPressHeader={() => {
+            if (RemoveBottomSheet.current)
+              (RemoveBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }
   }, []);
-  
+
   const checkRecordsHavingPrice = () => {
     if (sendStorage && sendStorage.length) {
       for (let i = 0; i < sendStorage.length; i++) {
         if (
           !sendStorage[i].selectedContact.hasOwnProperty('bitcoinAmount') &&
-          !sendStorage[i].selectedContact.hasOwnProperty('currencyAmount') && selectedContact.id == sendStorage[i].selectedContact.id
+          !sendStorage[i].selectedContact.hasOwnProperty('currencyAmount') &&
+          selectedContact.id == sendStorage[i].selectedContact.id
         ) {
           dispatch(removeContactsAccountFromSend(sendStorage[i]));
         }
@@ -405,300 +418,280 @@ export default function SendToContact(props) {
   return (
     <View
       style={{
-        flex:1,
+        flex: 1,
         backgroundColor: Colors.white,
         alignSelf: 'center',
       }}
     >
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={styles.modalContentContainer}>
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
-          enabled
+      <View style={styles.modalHeaderTitleView}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
         >
-          <View style={styles.modalHeaderTitleView}>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        checkRecordsHavingPrice();
-                        props.navigation.goBack();
-                      }}
-                      style={{
-                        height: 30,
-                        width: 30,
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <FontAwesome
-                        name="long-arrow-left"
-                        color={Colors.blue}
-                        size={17}
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.modalHeaderTitleText}>
-                      {'Send To Contact'}
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') }}
-                >
-                  {sendStorage && sendStorage.length > 0 ? (
-                    <ScrollView horizontal={true}>
-                    {sendStorage.map((item) => renderMultipleContacts(item))}
-                    </ScrollView>
-                  ) : null}
-
-                  <View
-                    style={{
-                      borderBottomWidth: 1,
-                      borderColor: Colors.borderColor,
-                      marginBottom: hp('1%'),
-                      marginTop: hp('2%'),
-                      flexDirection: 'row',
-                      paddingBottom: hp('1.5%'),
-                      paddingTop: hp('1%'),
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
-                    >
-                      {'Sending From: '}
-                    </Text>
-                    <Text
-                      style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansItalic,
-                      }}
-                    >
-                      {getServiceTypeAccount()}
-                    </Text>
-                    <Text
-                      style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansItalic,
-                        lineHeight: 15,
-                        textAlign: 'center',
-                      }}
-                    >
-                      {' (Availble to spend '}
-                      <Text
-                        style={{
-                          color: Colors.blue,
-                          fontSize: RFValue(10),
-                          fontFamily: Fonts.FiraSansItalic,
-                        }}
-                      >
-                        {serviceType == 'Test Account'
-                          ? UsNumberFormat(netBalance)
-                          : switchOn
-                          ? UsNumberFormat(netBalance)
-                          : exchangeRates
-                          ? (
-                              (netBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
-                            ).toFixed(2)
-                          : null}
-                      </Text>
-                      <Text
-                        style={{
-                          color: Colors.blue,
-                          fontSize: RFValue(9),
-                          fontFamily: Fonts.FiraSansMediumItalic,
-                        }}
-                      >
-                        {serviceType == 'Test Account'
-                          ? ' t-sats )'
-                          : switchOn
-                          ? ' sats )'
-                          : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
-                      </Text>
-                    </Text>
-                  </View>
-                  <ScrollView>
-                  <View style={{ flex: 1, flexDirection: 'row' }}>
-                    <View style={{ flex: 1, flexDirection: 'column' }}>
-                      {renderBitCoinInputText()}
-                      {renderUSDInputText()}
-                    </View>
-                    <View
-                      style={{
-                        marginLeft: 'auto',
-                        paddingLeft: 20,
-                        paddingRight: 10,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <ToggleSwitch
-                        currencyCodeValue={CurrencyCode}
-                        onpress={async () => {
-                          setSwitchOn(!switchOn);
-                        }}
-                        toggle={switchOn}
-                        transform={true}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      ...InputStyleNote,
-                      marginBottom: wp('1.5%'),
-                      marginTop: wp('1.5%'),
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <TextInput
-                      style={styles.textBox}
-                      returnKeyLabel="Done"
-                      returnKeyType="done"
-                      onSubmitEditing={Keyboard.dismiss}
-                      keyboardType={
-                        Platform.OS == 'ios'
-                          ? 'ascii-capable'
-                          : 'visible-password'
+          <TouchableOpacity
+            onPress={() => {
+              checkRecordsHavingPrice();
+              props.navigation.goBack();
+            }}
+            style={{
+              height: 30,
+              width: 30,
+              justifyContent: 'center',
+            }}
+          >
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+          </TouchableOpacity>
+          <Text style={styles.modalHeaderTitleText}>{'Send To Contact'}</Text>
+        </View>
+      </View>
+      <View style={{ width: wp('85%'), alignSelf: 'center' }}>
+        {sendStorage && sendStorage.length > 0 ? (
+          <ScrollView horizontal={true}>
+            {sendStorage.map((item) => renderMultipleContacts(item))}
+          </ScrollView>
+        ) : null}
+      </View>
+      <View
+        style={{
+          alignSelf: 'center',
+          width: wp('90%'),
+          borderBottomWidth: 1,
+          borderColor: Colors.borderColor,
+          marginBottom: hp('1%'),
+          marginTop: hp('2%'),
+          flexDirection: 'row',
+          paddingBottom: hp('1.5%'),
+          paddingTop: hp('1%'),
+        }}
+      >
+        <Text
+          style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue(12),
+            fontFamily: Fonts.FiraSansRegular,
+          }}
+        >
+          {'Sending From: '}
+        </Text>
+        <Text
+          style={{
+            color: Colors.blue,
+            fontSize: RFValue(12),
+            fontFamily: Fonts.FiraSansItalic,
+          }}
+        >
+          {getServiceTypeAccount()}
+        </Text>
+        <Text
+          style={{
+            color: Colors.blue,
+            fontSize: RFValue(10),
+            fontFamily: Fonts.FiraSansItalic,
+            lineHeight: 15,
+            textAlign: 'center',
+          }}
+        >
+          {' (Availble to spend '}
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(10),
+              fontFamily: Fonts.FiraSansItalic,
+            }}
+          >
+            {serviceType == 'Test Account'
+              ? UsNumberFormat(netBalance)
+              : switchOn
+              ? UsNumberFormat(netBalance)
+              : exchangeRates
+              ? ((netBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(
+                  2,
+                )
+              : null}
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue(7),
+              fontFamily: Fonts.FiraSansMediumItalic,
+            }}
+          >
+            {serviceType == 'Test Account'
+              ? ' t-sats )'
+              : switchOn
+              ? ' sats )'
+              : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+          </Text>
+        </Text>
+      </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS == 'ios' ? 'padding' : ''}
+        enabled
+      >
+        <View
+          style={{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') }}
+        >
+          <ScrollView>
+            <View style={{ flex: 1, flexDirection: 'row' }}>
+              <View style={{ flex: 1, flexDirection: 'column' }}>
+                {renderBitCoinInputText()}
+                {renderUSDInputText()}
+              </View>
+              <View
+                style={{
+                  marginLeft: 'auto',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <ToggleSwitch
+                  currencyCodeValue={CurrencyCode}
+                  onpress={async () => {
+                    setSwitchOn(!switchOn);
+                  }}
+                  toggle={switchOn}
+                  transform={true}
+                />
+              </View>
+            </View>
+            <View
+              style={{
+                ...InputStyleNote,
+                marginBottom: wp('1.5%'),
+                marginTop: wp('1.5%'),
+                flexDirection: 'row',
+                width: wp('85%'),
+                height: wp('13%'),
+              }}
+            >
+              <TextInput
+                style={styles.textBox}
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                onSubmitEditing={Keyboard.dismiss}
+                keyboardType={
+                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+                }
+                placeholder={'Add a Note ( Optional )'}
+                value={note}
+                onChangeText={setNote}
+                placeholderTextColor={Colors.borderColor}
+                onFocus={() => {
+                  setInputStyleNote(styles.inputBoxFocused);
+                }}
+                onBlur={() => {
+                  setInputStyleNote(styles.textBoxView);
+                }}
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: hp('3%'),
+                marginBottom: hp('5%'),
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  if (sendStorage && sendStorage.length) {
+                    for (let i = 0; i < sendStorage.length; i++) {
+                      if (
+                        sendStorage[i].selectedContact.id == selectedContact.id
+                      ) {
+                        dispatch(removeContactsAccountFromSend(sendStorage[i]));
                       }
-                      placeholder={'Add a Note ( Optional )'}
-                      value={note}
-                      onChangeText={setNote}
-                      placeholderTextColor={Colors.borderColor}
-                      onFocus={() => {
-                        setInputStyleNote(styles.inputBoxFocused);
-                      }}
-                      onBlur={() => {
-                        setInputStyleNote(styles.textBoxView);
-                      }}
-                    />
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      marginTop: hp('3%'),
-                      marginBottom: hp('5%'),
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (sendStorage && sendStorage.length) {
-                          for (let i = 0; i < sendStorage.length; i++) {
-                            if (
-                              sendStorage[i].selectedContact.id ==
-                              selectedContact.id
-                            ) {
-                              dispatch(removeContactsAccountFromSend(sendStorage[i]));
-                            }
-                          }
-                          dispatch(
-                            storeContactsAccountToSend({
-                              selectedContact,
-                              bitcoinAmount,
-                              currencyAmount,
-                              note,
-                            }),
-                          );
-                        }
-                        setTimeout(() => {
-                          handleTrasferST1();
-                        }, 10);
-                      }}
-                      disabled={isConfirmDisabled}
-                      style={{
-                        ...styles.confirmButtonView,
-                        backgroundColor: Colors.blue,
-                        elevation: 10,
-                        shadowColor: Colors.shadowBlue,
-                        shadowOpacity: 1,
-                        shadowOffset: { width: 15, height: 15 },
-                        opacity: isConfirmDisabled ? 0.5 : 1,
-                      }}
-                    >
-                      {/* {loading.transfer && !isInvalidBalance ? (
+                    }
+                    dispatch(
+                      storeContactsAccountToSend({
+                        selectedContact,
+                        bitcoinAmount,
+                        currencyAmount,
+                        note,
+                      }),
+                    );
+                  }
+                  setTimeout(() => {
+                    handleTrasferST1();
+                  }, 10);
+                }}
+                disabled={isConfirmDisabled}
+                style={{
+                  ...styles.confirmButtonView,
+                  backgroundColor: Colors.blue,
+                  elevation: 10,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 15, height: 15 },
+                  opacity: isConfirmDisabled ? 0.5 : 1,
+                }}
+              >
+                {/* {loading.transfer && !isInvalidBalance ? (
                         <ActivityIndicator size="small" color={Colors.white} />
                       ) : ( */}
-                      <Text style={styles.buttonText}>
-                        {'Confirm & Proceed'}
-                      </Text>
-                      {/* )} */}
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={{
-                        ...styles.confirmButtonView,
-                        width: wp('30%'),
-                        marginLeft: 10,
-                      }}
-                      disabled={isConfirmDisabled}
-                      onPress={() => {
-                        // dispatch(clearTransfer(serviceType));
-                        // if (getServiceType) {
-                        //   getServiceType(serviceType);
-                        // }
-                        if (sendStorage && sendStorage.length) {
-                          for (let i = 0; i < sendStorage.length; i++) {
-                            if (
-                              sendStorage[i].selectedContact.id ==
-                              selectedContact.id
-                            ) {
-                              dispatch(removeContactsAccountFromSend(sendStorage[i]));
-                            }
-                          }
-                          dispatch(
-                            storeContactsAccountToSend({
-                              selectedContact,
-                              bitcoinAmount,
-                              currencyAmount,
-                              note,
-                            }),
-                          );
-                          props.navigation.goBack();
-                        }
-                      }}
-                    >
-                      <Text
-                        style={{ ...styles.buttonText, color: Colors.blue }}
-                      >
-                        Add Recipient
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  </ScrollView>
-                </View>
-        </KeyboardAvoidingView>
-      </View>
+                <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                {/* )} */}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.confirmButtonView,
+                  width: wp('30%'),
+                  marginLeft: 10,
+                }}
+                disabled={isConfirmDisabled}
+                onPress={() => {
+                  // dispatch(clearTransfer(serviceType));
+                  // if (getServiceType) {
+                  //   getServiceType(serviceType);
+                  // }
+                  if (sendStorage && sendStorage.length) {
+                    for (let i = 0; i < sendStorage.length; i++) {
+                      if (
+                        sendStorage[i].selectedContact.id == selectedContact.id
+                      ) {
+                        dispatch(removeContactsAccountFromSend(sendStorage[i]));
+                      }
+                    }
+                    dispatch(
+                      storeContactsAccountToSend({
+                        selectedContact,
+                        bitcoinAmount,
+                        currencyAmount,
+                        note,
+                      }),
+                    );
+                    props.navigation.goBack();
+                  }
+                }}
+              >
+                <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                  Add Recipient
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
       <BottomSheet
-          enabledInnerScrolling={true}
-          ref={RemoveBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('55%'),
-          ]}
-          renderContent={renderRemoveSelectedContents}
-          renderHeader={renderRemoveSelectedkHeader}
-        />
+        enabledInnerScrolling={true}
+        ref={RemoveBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('50%'),
+        ]}
+        renderContent={renderRemoveSelectedContents}
+        renderHeader={renderRemoveSelectedHeader}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
@@ -706,16 +699,14 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
     alignItems: 'center',
+    alignSelf: 'center',
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp('1.5%'),
     paddingTop: hp('1%'),
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: hp('1.5%'),
+    marginBottom: hp('0.5%'),
+    width: wp('90%'),
   },
   textBoxView: {
     borderWidth: 0.5,
@@ -723,7 +714,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
   },
   inputBoxFocused: {
-    borderWidth: 0.5,
     borderRadius: 10,
     elevation: 10,
     borderColor: Colors.borderColor,
@@ -770,22 +760,22 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
   },
   circleShapeView: {
-    width: 50,
-    height: 50,
-    borderRadius: 50 / 2,
+    width: wp('14%'),
+    height: wp('14%'),
+    borderRadius: wp('14%') / 2,
     borderColor: Colors.white,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
     shadowOffset: {
       width: 0,
-      height: 10,
+      height: 7,
     },
     shadowOpacity: 0.7,
     shadowColor: Colors.borderColor,
     elevation: 10,
   },
-  closemarkStyle: {
+  closeMarkStyle: {
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
