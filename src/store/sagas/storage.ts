@@ -11,7 +11,6 @@ import {
   ENRICH_SERVICES,
   servicesEnriched,
 } from '../actions/storage';
-import { generatePersonalCopies } from '../actions/sss';
 import dataManager from '../../storage/database-manager';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
