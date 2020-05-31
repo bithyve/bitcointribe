@@ -103,6 +103,9 @@ export default function ContactDetails(props) {
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
+  const { UNDER_CUSTODY } = useSelector(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
 
   useEffect(() => {
     setContact(Contact);
@@ -274,22 +277,36 @@ export default function ContactDetails(props) {
   };
 
   useEffect(() => {
-    if (uploadSuccessfull) {
-      if (!Contact) {
-        console.log('Err: Contact missing');
-        return;
-      }
+    if (!Contact) {
+      Alert.alert('Contact details missing');
+      return;
+    }
 
-      if (!key) {
-        console.log('Err: Key missing');
-        return;
-      }
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`.toLowerCase();
 
-      const contactName = `${Contact.firstName} ${
-        Contact.lastName ? Contact.lastName : ''
-      }`.toLowerCase();
-      const requester =
-        trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
+    if (
+      !trustedContacts.tc.trustedContacts[contactName] &&
+      !trustedContacts.tc.trustedContacts[contactName].isWard
+    ) {
+      Alert.alert(
+        'Restore request failed',
+        'You are not a keeper of the selected contact',
+      );
+      return;
+    }
+
+    const requester =
+      trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
+
+    if (
+      UNDER_CUSTODY[requester] &&
+      UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
+      Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
+        600000
+    ) {
+      const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
 
       if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
         const phoneNumber = Contact.phoneNumbers[0].number;
@@ -297,16 +314,15 @@ export default function ContactDetails(props) {
         const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
         const numHintType = 'num';
         const numHint = number.slice(number.length - 3);
-        const numberEncKey = TrustedContactsService.encryptPub(key, number)
+        const numberEncKey = TrustedContactsService.encryptPub(KEY, number)
           .encryptedPub;
-        const uploadedAt = Date.now();
         const numberDL =
           `https://hexawallet.io/${config.APP_STAGE}/rrk` +
           `/${requester}` +
           `/${numberEncKey}` +
           `/${numHintType}` +
-          `/${numHint}`;
-        +`/${uploadedAt}`;
+          `/${numHint}` +
+          `/${UPLOADED_AT}`;
         console.log({ numberDL });
         setTrustedLink(numberDL);
         setTimeout(() => {
@@ -318,17 +334,16 @@ export default function ContactDetails(props) {
         const emailHintType = 'eml';
         const emailHint = emailInitials.slice(emailInitials.length - 3);
         const emailEncKey = TrustedContactsService.encryptPub(
-          key,
+          KEY,
           emailInitials,
         ).encryptedPub;
-        const uploadedAt = Date.now();
         const emailDL =
           `https://hexawallet.io/${config.APP_STAGE}/rrk` +
           `/${requester}` +
           `/${emailEncKey}` +
           `/${emailHintType}` +
-          `/${emailHint}`;
-        +`/${uploadedAt}`;
+          `/${emailHint}` +
+          `/${UPLOADED_AT}`;
         console.log({ emailDL });
         setTrustedLink(emailDL);
         setTimeout(() => {
@@ -342,7 +357,7 @@ export default function ContactDetails(props) {
       }
       dispatch(UploadSuccessfully(null));
     }
-  }, [Contact, uploadSuccessfull]);
+  }, [Contact, UNDER_CUSTODY]);
 
   const onHelpRestore = useCallback(() => {
     if (!Contact) {
@@ -367,10 +382,23 @@ export default function ContactDetails(props) {
     const requester =
       trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
     const encryptionKey = S3Service.generateRequestCreds().key;
-    dispatch(uploadRequestedShare(requester, encryptionKey));
 
-    setKey(encryptionKey);
-  }, [Contact]);
+    if (
+      !UNDER_CUSTODY[requester] ||
+      !UNDER_CUSTODY[requester].TRANSFER_DETAILS
+    ) {
+      dispatch(uploadRequestedShare(requester, encryptionKey));
+    } else if (
+      Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT >
+      600000
+    ) {
+      dispatch(uploadRequestedShare(requester, encryptionKey));
+    } else {
+      setTimeout(() => {
+        (SendViaLinkBottomSheet as any).current.snapTo(1);
+      }, 2);
+    }
+  }, [Contact, UNDER_CUSTODY]);
 
   useEffect(() => {
     if (errorSending) {
