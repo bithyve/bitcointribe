@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -8,14 +8,11 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { nameToInitials } from '../../common/CommonFunctions';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import RecipientComponent from './RecipientComponent';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function RemoveSelectedTrasaction(props) {
-  const contact =
-    props.selectedContact && props.selectedContact.selectedContact
-      ? props.selectedContact.selectedContact
-      : {};
+  const [SelectedContactId, setSelectedContactId] = useState(0);
   const contactInfo = props.selectedContact ? props.selectedContact : {};
 
   return (
@@ -33,97 +30,19 @@ export default function RemoveSelectedTrasaction(props) {
             Lorem ipsum dolor sit amet, consectetur
           </Text>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-            alignItems: 'center',
-            marginTop: hp('1.7%'),
-            backgroundColor: Colors.backgroundColor,
-            height: wp('25%'),
-            position: 'relative',
-            borderRadius: 10,
+        <ScrollView>
+        <RecipientComponent 
+          item={contactInfo}
+          onPressElement={() => {
+            if (contactInfo.note) {
+              if (SelectedContactId == contactInfo.selectedContact.id)
+                setSelectedContactId(0);
+              else setSelectedContactId(contactInfo.selectedContact.id);
+            }
           }}
-        >
-          <View style={{ marginLeft: 20 }}>
-            {contact.imageAvailable ? (
-              <Image source={contact.image} style={styles.circleShapeView} />
-            ) : (
-              <View
-                style={{
-                  ...styles.circleShapeView,
-                  backgroundColor: Colors.shadowBlue,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {contact && contact.name ? (
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      fontSize: RFValue(20),
-                      lineHeight: RFValue(20),
-                    }}
-                  >
-                    {nameToInitials(
-                      contact.firstName && contact.lastName
-                        ? contact.firstName + ' ' + contact.lastName
-                        : contact.firstName && !contact.lastName
-                        ? contact.firstName
-                        : !contact.firstName && contact.lastName
-                        ? contact.lastName
-                        : '',
-                    )}
-                  </Text>
-                ) : (
-                  <Image
-                    source={require('../../assets/images/icons/icon_user.png')}
-                    style={styles.circleShapeView}
-                  />
-                )}
-              </View>
-            )}
-          </View>
-          <View style={{}}>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(11),
-                marginLeft: 15,
-                paddingTop: 5,
-                paddingBottom: 3,
-              }}
-            >
-              Sending to:
-            </Text>
-            <Text style={styles.contactNameText}>
-              {contact.name || contact.account_name || contact.id}
-            </Text>
-            {contactInfo.hasOwnProperty('bitcoinAmount') ||
-            contactInfo.hasOwnProperty('currencyAmount') ? (
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(10),
-                  marginLeft: 15,
-                  paddingTop: 3,
-                }}
-              >
-                {contactInfo.bitcoinAmount
-                  ? contactInfo.bitcoinAmount + ' Sats'
-                  : '$ ' + contactInfo.currencyAmount
-                  ? contactInfo.currencyAmount
-                  : ''}
-              </Text>
-            ) : null}
-          </View>
-          <View style={{ justifyContent:'center', alignItems:'center', marginLeft:'auto', marginRight: wp("5%")}}>
-            <Ionicons name={"ios-arrow-down"} size={RFValue(20)} color={Colors.borderColor}/>
-          </View>
-        </View>
+          SelectedContactId={SelectedContactId}  
+        />
+        </ScrollView>
         <View
           style={{
             marginTop: hp('3%'),

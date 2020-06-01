@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Image,
@@ -6,11 +6,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Platform,
   TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
-  BackHandler,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -21,16 +19,15 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ToggleSwitch from '../../components/ToggleSwitch';
-import { nameToInitials } from '../../common/CommonFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import { transferST1 } from '../../store/actions/accounts';
 import { UsNumberFormat } from '../../common/utilities';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Slider from 'react-native-slider';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
+import RecipientComponent from './RecipientComponent';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
@@ -51,7 +48,6 @@ export default function SendToContact(props) {
 
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
-  const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [bitcoinAmount, setBitCoinAmount] = useState('');
@@ -159,163 +155,17 @@ export default function SendToContact(props) {
 
   const renderContacts = (item) => {
     return (
-      <TouchableOpacity
-        onPress={() => {
+      <RecipientComponent
+        onPressElement={() => {
           if (item.note) {
             if (SelectedContactId == item.selectedContact.id)
               setSelectedContactId(0);
             else setSelectedContactId(item.selectedContact.id);
           }
         }}
-        activeOpacity={10}
-        style={{
-          marginRight: wp('6%'),
-          marginLeft: wp('6%'),
-          borderRadius: 10,
-          marginTop: hp('1.7%'),
-          height:
-            SelectedContactId == item.selectedContact.id
-              ? wp('50%')
-              : wp('25%'),
-          backgroundColor: Colors.backgroundColor,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            height: wp('25%'),
-          }}
-        >
-          <View style={{ marginLeft: 20 }}>
-            {item.selectedContact.image ? (
-              <Image
-                source={item.selectedContact.image}
-                style={styles.circleShapeView}
-              />
-            ) : (
-              <View style={styles.circleShapeView}>
-                {item.selectedContact && item.selectedContact.name ? (
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      fontSize: RFValue(20),
-                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                    }}
-                  >
-                    {nameToInitials(
-                      item.selectedContact.firstName &&
-                        item.selectedContact.lastName
-                        ? item.selectedContact.firstName +
-                            ' ' +
-                            item.selectedContact.lastName
-                        : item.selectedContact.firstName &&
-                          !item.selectedContact.lastName
-                        ? item.selectedContact.firstName
-                        : !item.selectedContact.firstName &&
-                          item.selectedContact.lastName
-                        ? item.selectedContact.lastName
-                        : '',
-                    )}
-                  </Text>
-                ) : (
-                  <Image
-                    source={require('../../assets/images/icons/icon_user.png')}
-                    style={styles.circleShapeView}
-                  />
-                )}
-              </View>
-            )}
-          </View>
-          <View style={{}}>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(11),
-                marginLeft: 25,
-                paddingTop: 5,
-                paddingBottom: 3,
-              }}
-            >
-              Sending to:
-            </Text>
-            <Text style={styles.contactNameText}>
-              {item.selectedContact.name ||
-                item.selectedContact.account_name ||
-                item.selectedContact.id}
-            </Text>
-            {item.hasOwnProperty('bitcoinAmount') ||
-            item.hasOwnProperty('currencyAmount') ? (
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(10),
-                  marginLeft: 25,
-                  paddingTop: 3,
-                }}
-              >
-                {item.bitcoinAmount
-                  ? item.bitcoinAmount + ' Sats'
-                  : '$ ' + item.currencyAmount
-                  ? item.currencyAmount
-                  : ''}
-              </Text>
-            ) : null}
-          </View>
-          <Ionicons
-            style={{ marginLeft: 'auto', marginRight: 10 }}
-            name={
-              SelectedContactId == item.selectedContact.id
-                ? 'ios-arrow-up'
-                : 'ios-arrow-down'
-            }
-            size={20}
-            color={Colors.borderColor}
-          />
-        </View>
-        {SelectedContactId == item.selectedContact.id && (
-          <View
-            style={{
-              height: wp('25%'),
-              justifyContent: 'center',
-            }}
-          >
-            <View
-              style={{
-                height: wp('17%'),
-                width: wp('78%'),
-                padding: wp('4%'),
-                alignSelf: 'center',
-                backgroundColor: Colors.backgroundColor1,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                }}
-              >
-                Note
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={{
-                  width: wp('70%'),
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                  marginTop: 5,
-                }}
-              >
-                {item.note}
-              </Text>
-            </View>
-          </View>
-        )}
-      </TouchableOpacity>
+        item={item}
+        SelectedContactId={SelectedContactId}
+      />
     );
   };
 
@@ -485,80 +335,80 @@ export default function SendToContact(props) {
         </View>
       </View>
       <ScrollView>
-          <View
+        <View
+          style={{
+            paddingBottom: hp('1%'),
+            paddingTop: hp('0.7%'),
+            marginRight: wp('6%'),
+            marginLeft: wp('6%'),
+            marginBottom: hp('1%'),
+            marginTop: hp('1%'),
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Text
             style={{
-              paddingBottom: hp('1%'),
-              paddingTop: hp('0.7%'),
-              marginRight: wp('6%'),
-              marginLeft: wp('6%'),
-              marginBottom: hp('1%'),
-              marginTop: hp('1%'),
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
+              color: Colors.textColorGrey,
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansRegular,
             }}
           >
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              {'Sending From: '}
-            </Text>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansItalic,
-              }}
-            >
-              {getServiceTypeAccount()}
-            </Text>
+            {'Sending From: '}
+          </Text>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansItalic,
+            }}
+          >
+            {getServiceTypeAccount()}
+          </Text>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(10),
+              fontFamily: Fonts.FiraSansItalic,
+              lineHeight: 15,
+              textAlign: 'center',
+            }}
+          >
+            {' (Availble to spend '}
             <Text
               style={{
                 color: Colors.blue,
                 fontSize: RFValue(10),
                 fontFamily: Fonts.FiraSansItalic,
-                lineHeight: 15,
-                textAlign: 'center',
               }}
             >
-              {' (Availble to spend '}
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansItalic,
-                }}
-              >
-                {serviceType == 'Test Account'
-                  ? UsNumberFormat(netBalance)
-                  : switchOn
-                  ? UsNumberFormat(netBalance)
-                  : exchangeRates
-                  ? (
-                      (netBalance / 1e8) *
-                      exchangeRates[CurrencyCode].last
-                    ).toFixed(2)
-                  : null}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(9),
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                }}
-              >
-                {serviceType == 'Test Account'
-                  ? ' t-sats )'
-                  : switchOn
-                  ? ' sats )'
-                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
-              </Text>
+              {serviceType == 'Test Account'
+                ? UsNumberFormat(netBalance)
+                : switchOn
+                ? UsNumberFormat(netBalance)
+                : exchangeRates
+                ? (
+                    (netBalance / 1e8) *
+                    exchangeRates[CurrencyCode].last
+                  ).toFixed(2)
+                : null}
             </Text>
-          </View>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontSize: RFValue(9),
+                fontFamily: Fonts.FiraSansMediumItalic,
+              }}
+            >
+              {serviceType == 'Test Account'
+                ? ' t-sats )'
+                : switchOn
+                ? ' sats )'
+                : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+            </Text>
+          </Text>
+        </View>
         {sendStorage && sendStorage.length > 0 ? (
           <ScrollView>
             {sendStorage.map((item) => renderContacts(item))}
@@ -569,7 +419,7 @@ export default function SendToContact(props) {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginTop:hp('2%'),
+            marginTop: hp('2%'),
             marginRight: wp('6%'),
             marginLeft: wp('6%'),
             borderTopWidth: 1,
@@ -904,31 +754,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
   },
-  contactNameText: {
-    color: Colors.textColorGrey,
-    fontSize: RFValue(20),
-    fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 25,
-  },
-  contactIconImage: {
-    width: 20,
-    height: 20,
-    resizeMode: 'cover',
-  },
-  circleShapeView: {
-    width: wp('20%'),
-    height: wp('20%'),
-    borderRadius: wp('20%') / 2,
-    borderColor: Colors.white,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    shadowOpacity: 0.7,
-    shadowColor: Colors.borderColor,
-    elevation: 10,
-  },
+ 
 });

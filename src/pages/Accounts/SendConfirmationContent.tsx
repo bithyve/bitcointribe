@@ -23,135 +23,25 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ScrollView } from 'react-native-gesture-handler';
+import RecipientComponent from './RecipientComponent';
 
 export default function SendConfirmationContent(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
+  const [SelectedContactId, setSelectedContactId] = useState(0);
+
   const renderContacts = (item) => {
     return (
-      <TouchableOpacity style={styles.contactProfileView}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              flex: 1,
-              backgroundColor: Colors.backgroundColor1,
-              height: 90,
-              position: 'relative',
-              borderRadius: 10,
-            }}
-          >
-            <View style={{ marginLeft: 70 }}>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(11),
-                  marginLeft: 25,
-                  paddingTop: 5,
-                  paddingBottom: 3,
-                }}
-              >
-                Sending to:
-              </Text>
-              <Text style={styles.contactNameText}>
-                {item.selectedContact.name ||
-                  item.selectedContact.account_name ||
-                  item.selectedContact.id}
-              </Text>
-              {item.hasOwnProperty('bitcoinAmount') ||
-              item.hasOwnProperty('currencyAmount') ? (
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue(10),
-                    marginLeft: 25,
-                    paddingTop: 3,
-                  }}
-                >
-                  {item.bitcoinAmount
-                    ? item.bitcoinAmount + ' Sats'
-                    : '$ ' + item.currencyAmount
-                    ? item.currencyAmount
-                    : ''}
-                </Text>
-              ) : null}
-            </View>
-            <Ionicons
-              style={{ marginLeft: 'auto', marginRight: 10 }}
-              name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
-              size={20}
-              color={Colors.borderColor}
-            />
-          </View>
-          {item.selectedContact.imageAvailable ? (
-            <View
-              style={{
-                position: 'absolute',
-                marginLeft: 15,
-                marginRight: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
-              }}
-            >
-              <Image
-                source={item.selectedContact.image}
-                style={{ ...styles.contactProfileImage }}
-              />
-            </View>
-          ) : (
-            <View
-              style={{
-                position: 'absolute',
-                marginLeft: 15,
-                marginRight: 15,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: Colors.backgroundColor,
-                width: 70,
-                height: 70,
-                borderRadius: 70 / 2,
-                shadowColor: Colors.shadowBlue,
-                shadowOpacity: 1,
-                shadowOffset: { width: 2, height: 2 },
-              }}
-            >
-              {item.selectedContact && item.selectedContact.name ? (
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(
-                    item.selectedContact.firstName &&
-                      item.selectedContact.lastName
-                      ? item.selectedContact.firstName +
-                          ' ' +
-                          item.selectedContact.lastName
-                      : item.selectedContact.firstName &&
-                        !item.selectedContact.lastName
-                      ? item.selectedContact.firstName
-                      : !item.selectedContact.firstName &&
-                        item.selectedContact.lastName
-                      ? item.selectedContact.lastName
-                      : '',
-                  )}
-                </Text>
-              ) : (
-                <Image
-                  source={require('../../assets/images/icons/icon_user.png')}
-                  style={styles.contactProfileImage}
-                />
-              )}
-            </View>
-          )}
-        </View>
-      </TouchableOpacity>
+      <RecipientComponent
+        item={item}
+        onPressElement={() => {
+          if (item.note) {
+            if (SelectedContactId == item.selectedContact.id)
+              setSelectedContactId(0);
+            else setSelectedContactId(item.selectedContact.id);
+          }
+        }}
+        SelectedContactId={SelectedContactId}
+      />
     );
   };
 
@@ -169,34 +59,28 @@ export default function SendConfirmationContent(props) {
           {props.info}
         </Text>
       </View>
-        <View style={{ flex: 1, marginRight: wp('8%'),
-        marginLeft: wp('8%'), marginTop: hp('2%'), marginBottom: hp('2%') }}>
-          {props.userInfo && props.userInfo.length > 0 ? (
-              <ScrollView>
-                {props.userInfo.map((item) => renderContacts(item))}
-              </ScrollView>
-            ) : null}
-        </View>
-        <View
-          style={{
-            marginTop: hp('1%'),
-            marginBottom: hp('1%'),
-            marginRight: wp('8%'),
-        marginLeft: wp('8%'),
-          }}
-        >
-          <Text style={{ ...styles.modalInfoText }}>
-            {
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
-            }
-          </Text>
-          </View>
+      <ScrollView style={{ marginTop: hp('1.5%'), marginBottom: hp('2%') }}>
+        {props.userInfo.map((item) => renderContacts(item))}
+      </ScrollView>
+      <View
+        style={{
+          marginTop: hp('1%'),
+          marginBottom: hp('1%'),
+          marginRight: wp('8%'),
+          marginLeft: wp('8%'),
+        }}
+      >
+        <Text style={{ ...styles.modalInfoText }}>
+          {
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
+          }
+        </Text>
+      </View>
       <View
         style={{
           flexDirection: 'row',
           marginTop: 'auto',
           alignItems: 'center',
-          flex: 1,
         }}
       >
         <AppBottomSheetTouchableWrapper
