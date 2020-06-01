@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   StatusBar,
   BackHandler,
+  Alert,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -36,6 +37,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import RemoveSelectedTransaction from './RemoveSelectedTrasaction';
+import SendConfirmationContent from './SendConfirmationContent';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
@@ -44,10 +46,6 @@ export default function SendToContact(props) {
   const [exchangeRates, setExchangeRates] = useState(
     accounts && accounts.exchangeRates,
   );
-  useEffect(() => {
-    if (accounts && accounts.exchangeRates)
-      setExchangeRates(accounts.exchangeRates);
-  }, [accounts.exchangeRates]);
   const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
@@ -65,20 +63,27 @@ export default function SendToContact(props) {
   const [InputStyle1, setInputStyle1] = useState(styles.textBoxView);
   const [InputStyleNote, setInputStyleNote] = useState(styles.textBoxView);
   const [isInvalidBalance, setIsInvalidBalance] = useState(false);
+  const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const [recipients, setRecipients] = useState([]);
+  const { transfer } = useSelector((state) => state.accounts[serviceType]);
 
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
 
   useEffect(() => {
+    if (accounts && accounts.exchangeRates)
+      setExchangeRates(accounts.exchangeRates);
+  }, [accounts.exchangeRates]);
+
+  useEffect(() => {
     if (bitcoinAmount && currencyAmount) {
-      if (
-        netBalance <
-        Number(bitcoinAmount)){
+      if (netBalance < Number(bitcoinAmount)) {
         setIsInvalidBalance(true);
         setIsConfirmDisabled(true);
-      } else
-      setIsConfirmDisabled(false);
+      } else setIsConfirmDisabled(false);
     } else {
       setIsConfirmDisabled(true);
     }
@@ -89,6 +94,46 @@ export default function SendToContact(props) {
       checkRecordsHavingPrice();
     });
   }, []);
+
+  useEffect(() => {
+    if (!recipients.length) return;
+    if (transfer.executed === 'ST1') {
+      props.navigation.navigate('SendConfirmation', {
+        serviceType,
+        sweepSecure,
+        netBalance,
+        recipients,
+        averageTxFees,
+      });
+    } else if (transfer.stage1.failed) {
+      setTimeout(() => {
+        setIsConfirmDisabled(false);
+      }, 10);
+      SendUnSuccessBottomSheet.current.snapTo(1);
+    }
+  }, [transfer, recipients]);
+
+  const handleTrasferST1 = () => {
+    const recipients = [];
+    const tempData = {
+      selectedContact,
+      bitcoinAmount,
+      currencyAmount,
+      note,
+    };
+    // let storage = [...sendStorage, tempData]; //TODO: resolve extra entry error
+    let storage = [tempData];
+    console.log({ storage });
+    storage.map((item) => {
+      let data = {
+        address: item.selectedContact.id,
+        amount: parseInt(item.bitcoinAmount),
+      };
+      recipients.push(data);
+    });
+    setRecipients(recipients);
+    dispatch(transferST1(serviceType, recipients, averageTxFees));
+  };
 
   const removeFromSendStorage = (item) => {
     setTimeout(() => {
@@ -107,32 +152,6 @@ export default function SendToContact(props) {
     } else if (serviceType == 'S3_SERVICE') {
       return 'S3 Service';
     }
-  };
-
-  const handleTrasferST1 = () => {
-    let recipients = [];
-    const tempData = {
-      selectedContact,
-      bitcoinAmount,
-      currencyAmount,
-      note,
-    };
-    let storage = [...sendStorage, tempData];
-    storage.map((item) => {
-      let data = {
-        address: item.selectedContact.id,
-        amount: parseInt(item.bitcoinAmount),
-      };
-      recipients.push(data);
-    });
-    dispatch(transferST1(serviceType, recipients, averageTxFees));
-    props.navigation.navigate('SendConfirmation', {
-      serviceType,
-      sweepSecure,
-      netBalance,
-      recipients,
-      averageTxFees
-    });
   };
 
   const getImageIcon = (item) => {
@@ -281,6 +300,43 @@ export default function SendToContact(props) {
     }
   };
 
+  const renderSendUnSuccessContents = () => {
+    return (
+      <SendConfirmationContent
+        title={'Sent Unsuccessful'}
+        info={'There seems to be a problem'}
+        userInfo={sendStorage}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        onPressCancel={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        isUnSuccess={true}
+      />
+    );
+  };
+
+  const renderSendUnSuccessHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          //  dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   const renderBitCoinInputText = () => {
     return (
       <View
@@ -424,18 +480,14 @@ export default function SendToContact(props) {
 
   const checkBalance = () => {
     setIsConfirmDisabled(true);
-    if (
-      netBalance <
-      Number(bitcoinAmount)){
+    if (netBalance < Number(bitcoinAmount)) {
       setIsInvalidBalance(true);
       setIsConfirmDisabled(true);
     } else {
       setIsConfirmDisabled(false);
       if (sendStorage && sendStorage.length) {
         for (let i = 0; i < sendStorage.length; i++) {
-          if (
-            sendStorage[i].selectedContact.id == selectedContact.id
-          ) {
+          if (sendStorage[i].selectedContact.id == selectedContact.id) {
             dispatch(removeContactsAccountFromSend(sendStorage[i]));
           }
         }
@@ -581,12 +633,10 @@ export default function SendToContact(props) {
               <View style={{ flex: 1, flexDirection: 'column' }}>
                 {renderBitCoinInputText()}
                 {isInvalidBalance ? (
-                      <View style={{ marginLeft: 'auto' }}>
-                        <Text style={styles.errorText}>
-                          Insufficient balance
-                        </Text>
-                      </View>
-                    ) : null}
+                  <View style={{ marginLeft: 'auto' }}>
+                    <Text style={styles.errorText}>Insufficient balance</Text>
+                  </View>
+                ) : null}
                 {renderUSDInputText()}
               </View>
               <View
@@ -714,6 +764,16 @@ export default function SendToContact(props) {
         renderContent={renderRemoveSelectedContents}
         renderHeader={renderRemoveSelectedHeader}
       />
+      <BottomSheet
+        onCloseStart={() => {
+          SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={SendUnSuccessBottomSheet}
+        snapPoints={[-50, hp('65%')]}
+        renderContent={renderSendUnSuccessContents}
+        renderHeader={renderSendUnSuccessHeader}
+      />
     </View>
   );
 }
@@ -730,7 +790,7 @@ const styles = StyleSheet.create({
     color: Colors.red,
     fontSize: RFValue(11),
     fontStyle: 'italic',
-     marginRight: 10
+    marginRight: 10,
   },
   modalHeaderTitleView: {
     alignItems: 'center',

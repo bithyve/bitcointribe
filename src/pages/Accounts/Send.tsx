@@ -181,7 +181,7 @@ export default function Send(props) {
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
-        let trustedContacts = [];
+        const sendableTrustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
           const contactInfo = trustedContactsInfo[index];
           if (!contactInfo) continue;
@@ -217,32 +217,38 @@ export default function Send(props) {
               .isWard;
 
           const isGuardian = index < 3 ? true : false;
-          trustedContacts.push({
-            contactName,
-            connectedVia,
-            hasXpub,
-            isGuardian,
-            isWard,
-            ...contactInfo,
-          });
-        }
-        let tempTrustedContact = [];
-        for (let i = 0; i < trustedContacts.length; i++) {
-          const element = trustedContacts[i];
-          if (element.contactName != 'Secondary Device' && element.id) {
-            tempTrustedContact.push(element);
+          if (hasXpub) {
+            // sendable
+            sendableTrustedContacts.push({
+              contactName,
+              connectedVia,
+              hasXpub,
+              isGuardian,
+              isWard,
+              ...contactInfo,
+            });
           }
         }
-        let filteredTrustedContacts = tempTrustedContact.sort(function (a, b) {
-          if (a.contactName && b.contactName) {
-            if (a.contactName.toLowerCase() < b.contactName.toLowerCase())
+
+        let sortedTrustedContacts = sendableTrustedContacts.sort(function (
+          contactA,
+          contactB,
+        ) {
+          if (contactA.contactName && contactB.contactName) {
+            if (
+              contactA.contactName.toLowerCase() <
+              contactB.contactName.toLowerCase()
+            )
               return -1;
-            if (a.contactName.toLowerCase() > b.contactName.toLowerCase())
+            if (
+              contactA.contactName.toLowerCase() >
+              contactB.contactName.toLowerCase()
+            )
               return 1;
           }
           return 0;
         });
-        setTrustedContacts(filteredTrustedContacts);
+        setTrustedContacts(sortedTrustedContacts);
       }
     }
   };
@@ -250,7 +256,6 @@ export default function Send(props) {
   useEffect(() => {
     updateAddressBook();
   }, [regularAccount.hdWallet.derivativeAccounts]);
-
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
