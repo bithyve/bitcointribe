@@ -49,6 +49,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
+import KnowMoreButton from '../../components/KnowMoreButton';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -1047,6 +1048,15 @@ const TrustedContactHistory = (props) => {
                 </Text>
               </Text>
             </View>
+            <KnowMoreButton
+              onpress={() => {
+                (trustedContactsBottomSheet as any).current.snapTo(
+                  1,
+                );
+              }}
+              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              textStyle={{}}
+            />
             <Image
               style={{
                 width: shared || activateReshare ? 14 : 17,

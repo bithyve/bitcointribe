@@ -261,7 +261,7 @@ export default function HealthCheck(props) {
               <Text
                 style={{ ...CommonStyles.headerTitlesInfoText, marginLeft: 25 }}
               >
-                The wallet backup is not secured. Please complete the setup to
+                The wallet backup is not complete. Please complete the setup to
                 safeguard against loss of funds
               </Text>
               <KnowMoreButton

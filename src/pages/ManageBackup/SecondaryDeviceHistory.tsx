@@ -30,6 +30,8 @@ import moment from 'moment';
 import _ from 'underscore';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import KnowMoreButton from '../../components/KnowMoreButton';
 
 const SecondaryDeviceHistory = props => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -309,6 +311,15 @@ const SecondaryDeviceHistory = props => {
                 </Text>
               </Text>
             </View>
+            <KnowMoreButton
+              onpress={() => {
+                (secondaryDeviceMessageBottomSheet as any).current.snapTo(
+                  1,
+                );
+              }}
+              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              textStyle={{}}
+            />
             <Image
               style={{
                 width: isReshare ? 14 : 17,

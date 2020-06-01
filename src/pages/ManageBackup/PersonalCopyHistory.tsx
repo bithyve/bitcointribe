@@ -40,9 +40,11 @@ import _ from 'underscore';
 import Toast from '../../components/Toast';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
+import KnowMoreButton from '../../components/KnowMoreButton';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import QRModal from '../Accounts/QRModal';
+
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -430,6 +432,15 @@ const PersonalCopyHistory = (props) => {
                 </Text>
               </Text>
             </View>
+            <KnowMoreButton
+              onpress={() => {
+                (PersonalCopyShareBottomSheet as any).current.snapTo(
+                  1,
+                );
+              }}
+              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              textStyle={{}}
+            />
             <Image
               style={{
                 width: pcShared ? 14 : 17,
