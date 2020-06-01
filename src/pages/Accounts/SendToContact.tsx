@@ -320,6 +320,13 @@ export default function SendToContact(props) {
           onBlur={() => {
             setInputStyle(styles.textBoxView);
           }}
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === 'Backspace') {
+              setTimeout(() => {
+                setIsInvalidBalance(false);
+              }, 10);
+            }
+          }}
         />
       </View>
     );
@@ -363,6 +370,13 @@ export default function SendToContact(props) {
           }}
           onBlur={() => {
             setInputStyle1(styles.textBoxView);
+          }}
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === 'Backspace') {
+              setTimeout(() => {
+                setIsInvalidBalance(false);
+              }, 10);
+            }
           }}
         />
       </View>

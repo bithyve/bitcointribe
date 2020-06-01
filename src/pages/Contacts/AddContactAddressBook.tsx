@@ -299,7 +299,7 @@ export default function AddContactAddressBook(props) {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', flex: 1 }}>
-            <Text style={styles.modalHeaderTitleText}>{'Add Contact'}</Text>
+            <Text style={styles.modalHeaderTitleText}>{props.modalTitle ? props.modalTitle: 'Add Contact'}</Text>
             <Text style={styles.modalHeaderInfoText}>
               {'Lorem ipsum dolor sit amet, consec'}
             </Text>
