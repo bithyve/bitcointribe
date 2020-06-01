@@ -21,10 +21,12 @@ import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkPDFHealth,
-  pdfHealthChecked,
   checkMSharesHealth,
-  generatePersonalCopies,
   personalCopyShared,
+  generatePersonalCopy,
+  personalCopyGenerated,
+  pdfHealthChecked,
+  pdfHealthCheckFailed,
 } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -39,12 +41,19 @@ import Toast from '../../components/Toast';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import KnowMoreButton from '../../components/KnowMoreButton';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import QRModal from '../Accounts/QRModal';
+
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const pdfHealthCheckFailed = useSelector(
+  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+  const [QRModalHeader, setQRModalHeader] = useState('');
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const healthCheckFailed = useSelector(
     (state) => state.sss.pdfHealthCheckFailed,
   );
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
@@ -79,6 +88,10 @@ const PersonalCopyHistory = (props) => {
     setPersonalCopyShareBottomSheet,
   ] = useState(React.createRef());
 
+  const secureAccount: SecureAccount = useSelector(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
+
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
   );
@@ -86,7 +99,7 @@ const PersonalCopyHistory = (props) => {
     'selectedPersonalCopy',
   );
   const next = props.navigation.getParam('next');
-  const pdfHealthChecked = useSelector(
+  const healthChecked = useSelector(
     (state) => state.sss.loading.pdfHealthChecked,
   );
   const personalCopiesGenerated = useSelector(
@@ -106,38 +119,15 @@ const PersonalCopyHistory = (props) => {
   }, [personalCopiesGenerated]);
 
   useEffect(() => {
-    (async () => {
-      const personalCopyDetails = await AsyncStorage.getItem(
-        'personalCopyDetails',
-      );
-      if (!personalCopyDetails) {
-        dispatch(generatePersonalCopies());
-      }
-    })();
-  }, []);
-
-  const onConfirm = useCallback(() => {
-    // ConfirmBottomSheet.current.snapTo(1);
-    // alert('confirm');
-    const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
-    props.navigation.navigate('QrScanner', {
-      scanedCode: (qrData) => {
-        dispatch(checkPDFHealth(qrData, index));
-      },
-      title: 'Confirm your Recovery Secret',
-    });
-  }, [selectedPersonalCopy]);
-
-  useEffect(() => {
-    if (pdfHealthChecked) {
+    if (healthChecked) {
       Toast('PDF scanned Successfully');
       dispatch(checkMSharesHealth());
       dispatch(pdfHealthChecked(''));
     }
-  }, [pdfHealthChecked]);
+  }, [healthChecked]);
 
   useEffect(() => {
-    if (pdfHealthCheckFailed) {
+    if (healthCheckFailed) {
       setTimeout(() => {
         setErrorMessageHeader('Invalid QR!');
         setErrorMessage('The scanned QR is wrong, please try again');
@@ -145,7 +135,7 @@ const PersonalCopyHistory = (props) => {
       (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(pdfHealthCheckFailed(false));
     }
-  }, [pdfHealthCheckFailed]);
+  }, [healthCheckFailed]);
 
   useEffect(() => {
     if (next) (PersonalCopyShareBottomSheet as any).current.snapTo(1);
@@ -215,22 +205,36 @@ const PersonalCopyHistory = (props) => {
     })();
   }, []);
 
-  const shared = useSelector((state) => state.sss.personalCopyShared);
+  const shared = useSelector(
+    (state) => state.sss.personalCopyShared[selectedPersonalCopy.type],
+  );
+
+  const generated = useSelector(
+    (state) => state.sss.personalCopyGenerated[selectedPersonalCopy.type],
+  );
 
   useEffect(() => {
     (async () => {
-      const personalCopyDetails = await AsyncStorage.getItem(
+      let personalCopyDetails = await AsyncStorage.getItem(
         'personalCopyDetails',
       );
-      if (personalCopyDetails) {
-        setPersonalCopyDetails(JSON.parse(personalCopyDetails));
+      if (!personalCopyDetails) {
+        dispatch(generatePersonalCopy(selectedPersonalCopy));
+      } else {
+        personalCopyDetails = JSON.parse(personalCopyDetails);
+        console.log({ personalCopyDetails });
+
+        if (!personalCopyDetails[selectedPersonalCopy.type])
+          dispatch(generatePersonalCopy(selectedPersonalCopy));
+        else setPersonalCopyDetails(personalCopyDetails);
       }
     })();
-  }, [shared]);
+  }, [generated, shared]);
 
   useEffect(() => {
     if (
       personalCopyDetails &&
+      personalCopyDetails[selectedPersonalCopy.type] &&
       personalCopyDetails[selectedPersonalCopy.type].shared
     ) {
       if (!pcShared) setPCShared(true);
@@ -238,6 +242,19 @@ const PersonalCopyHistory = (props) => {
       saveInTransitHistory();
     }
   }, [personalCopyDetails]);
+
+  useEffect(() => {
+    if (generated === false) {
+      setTimeout(() => {
+        setErrorMessageHeader('Personal Copy Generation failed');
+        setErrorMessage(
+          'There was some error while generating the Personal Copy, please try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(personalCopyGenerated({ [selectedPersonalCopy.type]: null }));
+    }
+  }, [generated]);
 
   useEffect(() => {
     if (shared === false) {
@@ -249,7 +266,7 @@ const PersonalCopyHistory = (props) => {
       }, 2);
       (PersonalCopyShareBottomSheet as any).current.snapTo(0);
       (ErrorBottomSheet as any).current.snapTo(1);
-      dispatch(personalCopyShared(null));
+      dispatch(personalCopyShared({ [selectedPersonalCopy.type]: null }));
     }
   }, [shared]);
 
@@ -300,6 +317,59 @@ const PersonalCopyHistory = (props) => {
       <ModalHeader
         onPressHeader={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderQrContent = useCallback(() => {
+    return (
+      <QRModal
+        QRModalHeader={QRModalHeader}
+        title={'Scan the Secondary Mnemonic'}
+        infoText={
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+        }
+        noteText={
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+        }
+        modalRef={QrBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={(qrData) => {
+          if (QRModalHeader === 'Confirm Personal Copy') {
+            const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
+            dispatch(checkPDFHealth(qrData, index));
+          } else if (QRModalHeader === 'Reshare Personal Copy') {
+            const { restored } = secureAccount.restoreSecondaryMnemonic(qrData);
+            if (restored) {
+              setPCShared(false);
+              dispatch(generatePersonalCopy(selectedPersonalCopy));
+              (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+            } else {
+              Alert.alert(
+                'Invalid Secondary Mnemonic',
+                'Please scan appropriate QR from one of your personal copy',
+              );
+            }
+          }
+
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+            (QrBottomSheet.current as any).snapTo(0);
+          }, 2);
+        }}
+      />
+    );
+  }, [QRModalHeader, QrBottomSheetsFlag]);
+
+  const renderQrHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (QrBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -401,10 +471,17 @@ const PersonalCopyHistory = (props) => {
               ? 'Want to send the Recovery Secret again to the same destination? '
               : null
           }
-          onPressConfirm={onConfirm}
-          onPressReshare={() => {
-            // alert('reshare');
-            (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+          onPressConfirm={() => {
+            setTimeout(() => {
+              setQRModalHeader('Confirm Personal Copy');
+            }, 2);
+            (QrBottomSheet.current as any).snapTo(1);
+          }}
+          onPressReshare={async () => {
+            setTimeout(() => {
+              setQRModalHeader('Reshare Personal Copy');
+            }, 2);
+            (QrBottomSheet.current as any).snapTo(1);
           }}
           onPressContinue={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
@@ -427,6 +504,24 @@ const PersonalCopyHistory = (props) => {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {}}
+        enabledInnerScrolling={true}
+        ref={QrBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
       />
     </View>
   );

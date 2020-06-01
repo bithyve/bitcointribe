@@ -154,7 +154,12 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-    SendToContact,
+    SendToContact:{
+      screen: SendToContact,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     SendConfirmation,
     TwoFAToken,
     RecoveryRequestOTP,

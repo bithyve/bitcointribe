@@ -14,10 +14,10 @@ import {
   UPLOAD_SUCCEFULLY,
   ERROR_RECEIVING,
   WALLET_IMAGE_CHECKED,
-  PERSONAL_COPIES_GENERATED,
-  GENERATE_PERSONAL_COPIES,
+  GENERATE_PERSONAL_COPY,
   SHARE_PERSONAL_COPY,
   PERSONAL_COPY_SHARED,
+  PERSONAL_COPY_GENERATED,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -42,8 +42,8 @@ const initialState: {
   };
   mnemonic: String;
   personalCopyIndex: Number;
-  personalCopiesGenerated: Boolean;
-  personalCopyShared: Boolean;
+  personalCopyGenerated: { copy1: Boolean; copy2: Boolean };
+  personalCopyShared: { copy1: Boolean; copy2: Boolean };
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
@@ -81,8 +81,8 @@ const initialState: {
   },
   mnemonic: '',
   personalCopyIndex: 0,
-  personalCopiesGenerated: null,
-  personalCopyShared: null,
+  personalCopyGenerated: { copy1: null, copy2: null },
+  personalCopyShared: { copy1: null, copy2: null },
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
@@ -149,28 +149,40 @@ export default (state = initialState, action) => {
         },
       };
 
-    case GENERATE_PERSONAL_COPIES:
+    case GENERATE_PERSONAL_COPY:
       return {
         ...state,
-        personalCopiesGenerated: null,
+        personalCopyGenerated: {
+          ...state.personalCopyGenerated,
+          [action.payload.shareIndex === 3 ? 'copy1' : 'copy2']: null,
+        },
       };
 
-    case PERSONAL_COPIES_GENERATED:
+    case PERSONAL_COPY_GENERATED:
       return {
         ...state,
-        personalCopiesGenerated: action.payload.generated,
+        personalCopyGenerated: {
+          ...state.personalCopyGenerated,
+          ...action.payload.generated,
+        },
       };
 
     case SHARE_PERSONAL_COPY:
       return {
         ...state,
-        personalCopyShared: null,
+        personalCopyShared: {
+          ...state.personalCopyShared,
+          [action.payload.selectedPersonalCopy.type]: null,
+        },
       };
 
     case PERSONAL_COPY_SHARED:
       return {
         ...state,
-        personalCopyShared: action.payload.shared,
+        personalCopyShared: {
+          ...state.personalCopyShared,
+          ...action.payload.shared,
+        },
       };
 
     case OVERALL_HEALTH_CALCULATED:
