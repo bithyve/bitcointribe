@@ -7,7 +7,6 @@ import {
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../common/CommonFunctions';
@@ -16,9 +15,10 @@ import QRCode from 'react-native-qrcode-svg';
 
 export default function SendViaQR(props) {
   const [contactName, setContactName] = useState('');
-
+  const amount = props.amount;
   const contact = props.contact;
 
+  //console.log("amountCurrency", props.amountCurrency);
   const [Contact, setContact] = useState(props.contact ? props.contact : {});
   useEffect(() => {
     if (contact) {
@@ -38,6 +38,21 @@ export default function SendViaQR(props) {
     setContactName(contactName);
   }, [Contact]);
 
+  const renderVerticalDivider = () => {
+    return (
+      <View
+        style={{
+          width: 1,
+          height: '60%',
+          backgroundColor: Colors.borderColor,
+          marginRight: 5,
+          marginLeft: 5,
+          alignSelf: 'center',
+        }}
+      />
+    );
+  };
+
   return (
     <View style={styles.modalContainer}>
       <View
@@ -53,16 +68,16 @@ export default function SendViaQR(props) {
         }}
       >
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressBack();
             }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.modalHeaderTitleText}>Send Request via QR</Text>
+          </AppBottomSheetTouchableWrapper> */}
+          <View style={{ flex: 1, marginLeft: 5 }}>
+            <Text style={styles.modalHeaderTitleText}>{props.headerText ? props.headerText : "Send Request via QR"}</Text>
             <Text
               style={{
                 color: Colors.textColorGrey,
@@ -99,126 +114,187 @@ export default function SendViaQR(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView
-        style={{ marginLeft: 20, marginRight: 20, marginTop: hp('1.7%') }}
-      >
-        <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                backgroundColor: Colors.backgroundColor1,
-                height: 90,
-                position: 'relative',
-                borderRadius: 10,
-              }}
-            >
-              <View style={{ marginLeft: 70 }}>
-                {props.contactText ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(11),
-                      marginLeft: 25,
-                      paddingTop: 5,
-                      paddingBottom: 3,
-                    }}
-                  >
-                    {props.contactText}
-                  </Text>
-                ) : null}
-                {contactName ? (
-                  <Text style={styles.contactNameText}>{contactName}</Text>
-                ) : null}
-                {Contact &&
-                Contact.phoneNumbers &&
-                Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {Contact && Contact.phoneNumbers[0].digits}
-                  </Text>
-                ) : null}
-                {Contact && Contact.emails && Contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {Contact && Contact.emails[0].email}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            {Contact && Contact.imageAvailable ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Image
-                  source={Contact && Contact.image}
-                  style={{ ...styles.contactProfileImage }}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Text
+      <ScrollView>
+        <View
+          style={{ marginLeft: 20, marginRight: 20, marginTop: hp('1.7%'), marginBottom: hp('1.7%') }}
+        >
+          {contact &&
+            <View style={styles.contactProfileView}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View
                   style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    flex: 1,
+                    backgroundColor: Colors.backgroundColor1,
+                    height: 90,
+                    position: 'relative',
+                    borderRadius: 10,
                   }}
                 >
-                  {nameToInitials(contactName)}
-                </Text>
+                  <View style={{ marginLeft: 70 }}>
+                    {props.contactText ? (
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(11),
+                          marginLeft: 25,
+                          paddingTop: 5,
+                          paddingBottom: 3,
+                        }}
+                      >
+                        {props.contactText}
+                      </Text>
+                    ) : null}
+                    {contactName ? (
+                      <Text style={styles.contactNameText}>{contactName}</Text>
+                    ) : null}
+                    {Contact &&
+                    Contact.phoneNumbers &&
+                    Contact.phoneNumbers.length ? (
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(10),
+                          marginLeft: 25,
+                          paddingTop: 3,
+                        }}
+                      >
+                        {Contact && Contact.phoneNumbers[0].digits}
+                      </Text>
+                    ) : Contact && Contact.emails && Contact.emails.length ? (
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(10),
+                          marginLeft: 25,
+                          paddingTop: 3,
+                          paddingBottom: 5,
+                        }}
+                      >
+                        {Contact && Contact.emails[0].email}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+                {Contact && Contact.imageAvailable ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      marginLeft: 15,
+                      marginRight: 15,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowOpacity: 1,
+                      shadowOffset: { width: 2, height: 2 },
+                    }}
+                  >
+                    <Image
+                      source={Contact && Contact.image}
+                      style={{ ...styles.contactProfileImage }}
+                    />
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      marginLeft: 15,
+                      marginRight: 15,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: Colors.backgroundColor,
+                      width: 70,
+                      height: 70,
+                      borderRadius: 70 / 2,
+                      shadowColor: Colors.shadowBlue,
+                      shadowOpacity: 1,
+                      shadowOffset: { width: 2, height: 2 },
+                    }}
+                  >
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: RFValue(20),
+                        lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                      }}
+                    >
+                      {nameToInitials(contactName)}
+                    </Text>
+                  </View>
+                )}
               </View>
+            </View>
+          }
+          {props.amount && (
+            <View style={styles.amountContainer}>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginLeft: 5,
+                }}
+              >
+                Requested Amount
+              </Text>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  <View style={styles.amountInputImage}>
+                    <Image
+                      style={styles.textBoxImage}
+                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                    />
+                  </View>
+                  {renderVerticalDivider()}
+                  <Text
+                    style={{
+                      color: Colors.black,
+                      fontSize: RFValue(20),
+                      fontFamily: Fonts.FiraSansRegular,
+                      marginLeft: 10,
+                    }}
+                  >
+                    {amount}
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      marginRight: 5,
+                    }}
+                  >
+                    {props.amountCurrency ? " " + props.amountCurrency : ' sats'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
+          <View style={styles.loader}>
+            {!props.QR ? (
+              <ActivityIndicator size="large" />
+            ) : (
+              <QRCode value={props.QR} size={hp('27%')} />
             )}
           </View>
         </View>
-        <View style={styles.loader}>
-          {!props.QR ? (
-            <ActivityIndicator size="large" />
-          ) : (
-            <QRCode value={props.QR} size={hp('27%')} />
-          )}
-        </View>
       </ScrollView>
+
       <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
           backgroundColor={Colors.backgroundColor1}
@@ -304,5 +380,27 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: hp('1%'),
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    paddingBottom: hp('1.5%'),
+    paddingTop: hp('1.5%'),
+  },
+  amountInputImage: {
+    width: 40,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  textBoxImage: {
+    width: wp('6%'),
+    height: wp('6%'),
+    resizeMode: 'contain',
   },
 });

@@ -5,9 +5,7 @@ import {
   Text,
   StyleSheet,
   Linking,
-  FlatList,
   Clipboard,
-  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -16,7 +14,6 @@ import {
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../common/CommonFunctions';
@@ -28,7 +25,7 @@ export default function SendViaLink(props) {
 
   const [shareLink, setShareLink] = useState('');
 
-  const [shareApps, setshareApps] = useState([
+  const [shareApps, setShareApps] = useState([
     {
       title: `WhatsApp`,
       image: require('../assets/images/icons/whatsapp.png'),
@@ -55,7 +52,7 @@ export default function SendViaLink(props) {
     },
   ]);
   const contact = props.contact;
-  //console.log("Contact SEND VIA LINK", contact);
+  ////console.log("Contact SEND VIA LINK", contact);
   const [Contact, setContact] = useState(props.contact ? props.contact : {});
 
   useEffect(() => {
@@ -71,14 +68,14 @@ export default function SendViaLink(props) {
   }, [Contact]);
 
   useEffect(() => {
-    //console.log("Contact SEND VIA LINK1 ", contact);
+    ////console.log("Contact SEND VIA LINK1 ", contact);
     setContact(props.contact);
     (async () => {
       for (let i = 0; i < shareApps.length; i++) {
         if (shareApps[i].url) {
           let supported = await Linking.canOpenURL(shareApps[i].url);
           shareApps[i].isAvailable = supported;
-          //console.log("supported", supported);
+          ////console.log("supported", supported);
         }
       }
       setShareApps(shareApps);
@@ -90,6 +87,21 @@ export default function SendViaLink(props) {
     Toast('Copied Successfully');
   }
 
+  const renderVerticalDivider = () => {
+    return (
+      <View
+        style={{
+          width: 1,
+          height: '60%',
+          backgroundColor: Colors.borderColor,
+          marginRight: 5,
+          marginLeft: 5,
+          alignSelf: 'center',
+        }}
+      />
+    );
+  };
+
   useEffect(() => {
     if (props.link) setShareLink(props.link);
   }, [props.link]);
@@ -99,7 +111,7 @@ export default function SendViaLink(props) {
       let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
       Linking.openURL(url)
         .then((data) => {
-          //console.log('WhatsApp Opened');
+          ////console.log('WhatsApp Opened');
         })
         .catch(() => {
           alert('Make sure WhatsApp installed on your device');
@@ -112,7 +124,7 @@ export default function SendViaLink(props) {
       let url = appUrl + shareLink;
       Linking.openURL(url)
         .then((data) => {
-          //console.log('Telegram Opened');
+          ////console.log('Telegram Opened');
         })
         .catch(() => {
           alert('Make sure Telegram installed on your device');
@@ -125,7 +137,7 @@ export default function SendViaLink(props) {
       let url = appUrl;
       Linking.openURL(url)
         .then((data) => {
-          //console.log('Messenger Opened');
+          ////console.log('Messenger Opened');
         })
         .catch(() => {
           alert('Make sure Facebook Messenger installed on your device');
@@ -148,17 +160,17 @@ export default function SendViaLink(props) {
         }}
       >
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          <AppBottomSheetTouchableWrapper
+          {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressBack();
             }}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{ flex: 1 }}>
+          </AppBottomSheetTouchableWrapper> */}
+          <View style={{ flex: 1, marginLeft: 5 }}>
             <Text style={styles.modalHeaderTitleText}>
-              Send Request via Link
+              {props.headerText ? props.headerText : 'Send Request via Link'}
             </Text>
             <Text
               style={{
@@ -199,6 +211,10 @@ export default function SendViaLink(props) {
         </View>
       </View>
       <ScrollView style={{ marginTop: hp('1.7%') }}>
+      <View
+          style={{ marginLeft: 20, marginRight: 20, marginBottom: hp('1.7%') }}
+        >
+          {contact &&
         <View style={styles.contactProfileView}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View
@@ -244,8 +260,7 @@ export default function SendViaLink(props) {
                   >
                     {Contact.phoneNumbers[0].digits}
                   </Text>
-                ) : null}
-                {Contact && Contact.emails && Contact.emails.length ? (
+                ) : Contact && Contact.emails && Contact.emails.length ? (
                   <Text
                     style={{
                       color: Colors.textColorGrey,
@@ -307,6 +322,64 @@ export default function SendViaLink(props) {
               </View>
             )}
           </View>
+        </View>}
+        {props.amount && (
+            <View style={styles.amountContainer}>
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                  marginLeft: 5,
+                }}
+              >
+                Requested Amount
+              </Text>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: 'flex-end',
+                  alignItems: 'flex-end',
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                  }}
+                >
+                  <View style={styles.amountInputImage}>
+                    <Image
+                      style={styles.textBoxImage}
+                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                    />
+                  </View>
+                  {renderVerticalDivider()}
+                  <Text
+                    style={{
+                      color: Colors.black,
+                      fontSize: RFValue(20),
+                      fontFamily: Fonts.FiraSansRegular,
+                      marginLeft: 10,
+                    }}
+                  >
+                    {props.amount}
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      marginRight: 5,
+                    }}
+                  >
+                    {props.amountCurrency ? " " + props.amountCurrency : ' sats'}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
         <View style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}>
           <Text
@@ -318,7 +391,7 @@ export default function SendViaLink(props) {
             }}
           >
             {
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
+              props.info ? props.info : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
             }
           </Text>
         </View>
@@ -466,8 +539,6 @@ const styles = StyleSheet.create({
   contactProfileView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 20,
-    marginRight: 20,
   },
   contactProfileImage: {
     borderRadius: 60 / 2,
@@ -507,5 +578,27 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
+  },
+  amountInputImage: {
+    width: 40,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  textBoxImage: {
+    width: wp('6%'),
+    height: wp('6%'),
+    resizeMode: 'contain',
+  },
+  amountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: hp('1%'),
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    paddingBottom: hp('1.5%'),
+    paddingTop: hp('1.5%'),
   },
 });
