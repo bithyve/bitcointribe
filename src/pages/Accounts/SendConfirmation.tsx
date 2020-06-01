@@ -18,7 +18,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from '../../components/ToggleSwitch';
 import { useDispatch, useSelector } from 'react-redux';
 import { transferST1 } from '../../store/actions/accounts';
 import { UsNumberFormat } from '../../common/utilities';
@@ -50,10 +49,6 @@ export default function SendToContact(props) {
   let netBalance = props.navigation.getParam('netBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
-  const [bitcoinAmount, setBitCoinAmount] = useState('');
-  const [currencyAmount, setCurrencyAmount] = useState('');
-  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
-  const [note, setNote] = useState('');
   const viewRef = useRef(null);
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
@@ -107,14 +102,6 @@ export default function SendToContact(props) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
 
-  useEffect(() => {
-    if (bitcoinAmount && currencyAmount) {
-      setIsConfirmDisabled(false);
-    } else {
-      setIsConfirmDisabled(true);
-    }
-  }, [bitcoinAmount, currencyAmount]);
-
   const getServiceTypeAccount = () => {
     if (serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
@@ -125,32 +112,6 @@ export default function SendToContact(props) {
     } else if (serviceType == 'S3_SERVICE') {
       return 'S3 Service';
     }
-  };
-
-  const handleTrasferST1 = () => {
-    let recipients = [];
-    const tempData = {
-      selectedContact,
-      bitcoinAmount,
-      currencyAmount,
-      note,
-    };
-    let storage = [...sendStorage, tempData];
-    storage.map((item) => {
-      let data = {
-        address: item.selectedContact.id,
-        amount: parseInt(item.bitcoinAmount),
-      };
-      recipients.push(data);
-    });
-    console.log('REcipients', recipients);
-    dispatch(transferST1(serviceType, recipients, averageTxFees));
-    props.navigation.navigate('SendConfirmation', {
-      serviceType,
-      sweepSecure,
-      netBalance,
-      recipients,
-    });
   };
 
   const renderContacts = (item) => {

@@ -27,19 +27,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  transferST1,
-  clearTransfer,
-  transferST2,
-  fetchTransactions,
-  transferST3,
-  fetchBalance,
-  fetchBalanceTx,
-  alternateTransferST2,
-} from '../../store/actions/accounts';
 import DeviceInfo from 'react-native-device-info';
-import * as ExpoContacts from 'expo-contacts';
-import SendStatusModalContents from '../../components/SendStatusModalContents';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
   SECURE_ACCOUNT,
@@ -63,22 +51,9 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export default function Send(props) {
+  const dispatch = useDispatch();
   let [trustedContacts, setTrustedContacts] = useState([]);
-  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
-  const [
-    SendConfirmationBottomSheet,
-    setSendConfirmationBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
-  const [
-    SendSuccessWithAddressBottomSheet,
-    setSuccessWithAddressBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
-  const [
-    SendUnSuccessWithAddressBottomSheet,
-    setUnSuccessWithAddressBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
-
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
   );
@@ -92,30 +67,15 @@ export default function Send(props) {
   const { transfer, loading, service } = useSelector(
     (state) => state.accounts[serviceType],
   );
-  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const getServiceType = props.navigation.getParam('getServiceType')
     ? props.navigation.getParam('getServiceType')
     : null;
-  const isFromAddressBook = props.navigation.getParam('isFromAddressBook')
-    ? props.navigation.getParam('isFromAddressBook')
-    : false;
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [amount, setAmount] = useState('');
-  const [token, setToken] = useState('');
-  const [description, setDescription] = useState('');
-  const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [isSendHelperDone, setIsSendHelperDone] = useState(true);
-  const [isInvalidBalance, setIsInvalidBalance] = useState(false);
   const [isInvalidAddress, setIsInvalidAddress] = useState(true);
-  const [onFocusCall, setOnFocusCall] = useState(false);
-
-  // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
-  //   React.createRef(),
-  // );
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
-
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -146,8 +106,7 @@ export default function Send(props) {
   }, [accounts]);
 
   const [isEditable, setIsEditable] = useState(true);
-
-  const accountData1 = [
+  const [accountData, setAccountData] = useState([
     {
       id: '1',
       account_name: 'Checking Account',
@@ -169,9 +128,7 @@ export default function Send(props) {
       checked: false,
       image: require('../../assets/images/icons/icon_test_white.png'),
     },
-  ];
-
-  const [accountData, setAccountData] = useState(accountData1);
+  ]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -179,25 +136,8 @@ export default function Send(props) {
     (state) => state.trustedContacts.service,
   );
 
-  const getContact = () => {
-    ExpoContacts.getContactsAsync().then(async ({ data }) => {
-      if (data.length > 0) {
-        await AsyncStorage.setItem('ContactData', JSON.stringify(data));
-        const contactList = data.sort(function (a, b) {
-          if (a.name && b.name) {
-            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
-          }
-          return 0;
-        });
-        setFilterContactData(contactList);
-      }
-    });
-  };
-
   useEffect(() => {
     if (serviceType === SECURE_ACCOUNT) twoFASetupMethod();
-    getContact();
     checkNShowHelperModal();
     if (!averageTxFees) storeAverageTxFees();
   }, []);
@@ -233,14 +173,6 @@ export default function Send(props) {
       JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
     );
   };
-
-  useEffect(() => {
-    for (let i = 0; i < sendStorage.length; i++) {
-      const element = sendStorage[i].selectedContact;
-      if (element.id == 1 || element.id == 2 || element == 3) {
-      }
-    }
-  }, [sendStorage]);
 
   const updateAddressBook = async () => {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
@@ -327,7 +259,6 @@ export default function Send(props) {
       setTimeout(() => {
         setIsSendHelperDone(true);
       }, 10);
-
       setTimeout(() => {
         if (SendHelperBottomSheet.current)
           SendHelperBottomSheet.current.snapTo(1);
@@ -338,75 +269,6 @@ export default function Send(props) {
       }, 10);
     }
   };
-
-
-  const updateDescription = useCallback(async (txid, description) => {
-    let descriptionHistory = {};
-    const storedHistory = JSON.parse(
-      await AsyncStorage.getItem('descriptionHistory'),
-    );
-    if (storedHistory) descriptionHistory = storedHistory;
-    descriptionHistory[txid] = description;
-
-    await AsyncStorage.setItem(
-      'descriptionHistory',
-      JSON.stringify(descriptionHistory),
-    );
-  }, []);
-
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (
-      transfer.stage1.failed ||
-      transfer.stage2.failed ||
-      transfer.stage3.failed
-    ) {
-      if (SendConfirmationBottomSheet.current) {
-        setTimeout(() => {
-          setIsConfirmDisabled(false);
-        }, 10);
-        SendConfirmationBottomSheet.current.snapTo(0);
-      }
-      if (SendUnSuccessWithAddressBottomSheet.current) {
-        setTimeout(() => {
-          setIsConfirmDisabled(false);
-        }, 10);
-        SendUnSuccessWithAddressBottomSheet.current.snapTo(1);
-      }
-      setIsEditable(true);
-    } else if (transfer.txid) {
-      if (description) {
-        updateDescription(transfer.txid, description);
-      }
-      if (SendConfirmationBottomSheet.current) {
-        setTimeout(() => {
-          setIsConfirmDisabled(false);
-        }, 10);
-        SendConfirmationBottomSheet.current.snapTo(0);
-      }
-      if (SendSuccessWithAddressBottomSheet.current) {
-        setTimeout(() => {
-          setIsConfirmDisabled(false);
-        }, 10);
-        SendSuccessWithAddressBottomSheet.current.snapTo(1);
-      }
-    } else if (transfer.executed === 'ST1') {
-      if (SendConfirmationBottomSheet.current)
-        SendConfirmationBottomSheet.current.snapTo(1);
-      setTimeout(() => {
-        setIsConfirmDisabled(false);
-      }, 10);
-    } else if (!transfer.txid && transfer.executed === 'ST2') {
-      setIsConfirmDisabled(false);
-      if (SendConfirmationBottomSheet.current)
-        SendConfirmationBottomSheet.current.snapTo(0);
-      props.navigation.navigate('TwoFAToken', {
-        serviceType,
-        recipientAddress,
-      });
-    }
-  }, [transfer]);
 
   const renderSendHelperContents = () => {
     return (
@@ -443,34 +305,6 @@ export default function Send(props) {
     );
   };
 
-  const getAccountFromType = () => {
-    if (serviceType == 'TEST_ACCOUNT') {
-      return 'Test Account';
-    }
-    if (serviceType == 'SECURE_ACCOUNT') {
-      return 'Secure Account';
-    }
-    if (serviceType == 'REGULAR_ACCOUNT') {
-      return 'Checking Account';
-    }
-    if (serviceType == 'S3_SERVICE') {
-      return 'S3 Service';
-    }
-  };
-
-  function timeConvert(valueInMinutes) {
-    var num = valueInMinutes;
-    var hours = Math.round(num / 60);
-    var days = Math.round(hours / 24);
-    if (valueInMinutes < 60) {
-      return valueInMinutes + ' minutes';
-    } else if (hours < 24) {
-      return hours + ' hours';
-    } else if (days > 0) {
-      return days == 1 ? days + ' day' : days + ' days';
-    }
-  }
-
   useEffect(() => {
     const instance = service.hdWallet || service.secureHDWallet;
     let isAddressValid = instance.isValidAddress(recipientAddress);
@@ -481,14 +315,6 @@ export default function Send(props) {
       onSelectContact(item);
     }
   }, [recipientAddress]);
-
-  useEffect(() => {
-    if (isInvalidAddress && recipientAddress) {
-      setIsConfirmDisabled(false);
-    } else {
-      setIsConfirmDisabled(true);
-    }
-  }, [recipientAddress, isInvalidAddress]);
 
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
@@ -1226,21 +1052,6 @@ const styles = StyleSheet.create({
     height: hp('5%'),
     width: hp('5%'),
     marginLeft: 'auto',
-  },
-  contactImageBackGround: {
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    shadowOpacity: 0.7,
-    shadowColor: Colors.borderColor,
-    elevation: 10,
-    height: wp('14%'),
-    width: wp('14%'),
-    backgroundColor: Colors.white,
-    borderRadius: wp('14%') / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   contactName: {
     width: wp('14%'),
