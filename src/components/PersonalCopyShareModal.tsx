@@ -17,18 +17,10 @@ import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
 import Icons from '../common/Icons';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  requestSharePdf,
-  PDFSharingFailed,
-} from '../store/actions/manageBackup';
+import { useDispatch } from 'react-redux';
 import BottomInfoBox from './BottomInfoBox';
 import { RFValue } from 'react-native-responsive-fontsize';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from './ErrorModalContents';
-import ModalHeader from './ModalHeader';
-import { sharePersonalCopy, personalCopyShared } from '../store/actions/sss';
+import { sharePersonalCopy } from '../store/actions/sss';
 
 export default function PersonalCopyShareModal(props) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
@@ -71,13 +63,12 @@ export default function PersonalCopyShareModal(props) {
     (shareOption) => {
       if (!props.personalCopyDetails) return false;
 
-      const otherCopySharingDetails =
+      const alternateCopy =
         props.personalCopyDetails[
           props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
-        ].sharingDetails;
-
-      if (otherCopySharingDetails) {
-        return otherCopySharingDetails.shareVia == shareOption.type
+        ];
+      if (alternateCopy && alternateCopy.sharingDetails) {
+        return alternateCopy.sharingDetails.shareVia == shareOption.type
           ? true
           : false;
       } else {

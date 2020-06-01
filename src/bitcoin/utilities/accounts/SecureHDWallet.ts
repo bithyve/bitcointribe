@@ -209,6 +209,20 @@ export default class SecureHDWallet extends Bitcoin {
     return { removed: !Boolean(this.secondaryMnemonic) };
   };
 
+  public restoreSecondaryMnemonic = (
+    secondaryMnemonic: string,
+  ): {
+    restored: boolean;
+  } => {
+    const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      return { restored: false };
+    }
+    this.secondaryMnemonic = secondaryMnemonic;
+    return { restored: true };
+  };
+
   public getSecondaryXpub = (): { secondaryXpub: string } => {
     return { secondaryXpub: this.xpubs.secondary };
   };
