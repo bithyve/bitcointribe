@@ -65,6 +65,7 @@ export default function SendToContact(props) {
   const [InputStyle, setInputStyle] = useState(styles.textBoxView);
   const [InputStyle1, setInputStyle1] = useState(styles.textBoxView);
   const [InputStyleNote, setInputStyleNote] = useState(styles.textBoxView);
+  const [isInvalidBalance, setIsInvalidBalance] = useState(false);
 
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -72,6 +73,12 @@ export default function SendToContact(props) {
 
   useEffect(() => {
     if (bitcoinAmount && currencyAmount) {
+      if (
+        netBalance <
+        Number(bitcoinAmount)){
+        setIsInvalidBalance(true);
+        setIsConfirmDisabled(true);
+      } else
       setIsConfirmDisabled(false);
     } else {
       setIsConfirmDisabled(true);
@@ -125,6 +132,7 @@ export default function SendToContact(props) {
       sweepSecure,
       netBalance,
       recipients,
+      averageTxFees
     });
   };
 
@@ -147,7 +155,7 @@ export default function SendToContact(props) {
         );
       }
 
-      if (item.imageAvailable) {
+      if (item.image) {
         return <Image source={item.image} style={styles.circleShapeView} />;
       } else {
         return (
@@ -415,6 +423,38 @@ export default function SendToContact(props) {
     }
   };
 
+  const checkBalance = () => {
+    setIsConfirmDisabled(true);
+    if (
+      netBalance <
+      Number(bitcoinAmount)){
+      setIsInvalidBalance(true);
+      setIsConfirmDisabled(true);
+    } else {
+      setIsConfirmDisabled(false);
+      if (sendStorage && sendStorage.length) {
+        for (let i = 0; i < sendStorage.length; i++) {
+          if (
+            sendStorage[i].selectedContact.id == selectedContact.id
+          ) {
+            dispatch(removeContactsAccountFromSend(sendStorage[i]));
+          }
+        }
+        dispatch(
+          storeContactsAccountToSend({
+            selectedContact,
+            bitcoinAmount,
+            currencyAmount,
+            note,
+          }),
+        );
+      }
+      setTimeout(() => {
+        handleTrasferST1();
+      }, 10);
+    }
+  };
+
   return (
     <View
       style={{
@@ -541,6 +581,13 @@ export default function SendToContact(props) {
             <View style={{ flex: 1, flexDirection: 'row' }}>
               <View style={{ flex: 1, flexDirection: 'column' }}>
                 {renderBitCoinInputText()}
+                {isInvalidBalance ? (
+                      <View style={{ marginLeft: 'auto' }}>
+                        <Text style={styles.errorText}>
+                          Insufficient balance
+                        </Text>
+                      </View>
+                    ) : null}
                 {renderUSDInputText()}
               </View>
               <View
@@ -599,26 +646,7 @@ export default function SendToContact(props) {
             >
               <TouchableOpacity
                 onPress={() => {
-                  if (sendStorage && sendStorage.length) {
-                    for (let i = 0; i < sendStorage.length; i++) {
-                      if (
-                        sendStorage[i].selectedContact.id == selectedContact.id
-                      ) {
-                        dispatch(removeContactsAccountFromSend(sendStorage[i]));
-                      }
-                    }
-                    dispatch(
-                      storeContactsAccountToSend({
-                        selectedContact,
-                        bitcoinAmount,
-                        currencyAmount,
-                        note,
-                      }),
-                    );
-                  }
-                  setTimeout(() => {
-                    handleTrasferST1();
-                  }, 10);
+                  checkBalance();
                 }}
                 disabled={isConfirmDisabled}
                 style={{
@@ -697,6 +725,13 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 15,
+  },
+  errorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    color: Colors.red,
+    fontSize: RFValue(11),
+    fontStyle: 'italic',
+     marginRight: 10
   },
   modalHeaderTitleView: {
     alignItems: 'center',
