@@ -35,7 +35,9 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Getting the latest details');
+  let [message, setMessage] = useState('While you wait...');
+  let [subTextMessage1, setSubTextMessage1] = useState('Hexa has a Test Account which has some test sats preloaded')
+  let [subTextMessage2, setSubTextMessage2] = useState('If you are new to Bitcoin, this is the best place to start learning')
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -296,10 +298,11 @@ export default function Login(props) {
     return (
       <LoaderModal
         headerText={message}
-        messageText={'This may take a few seconds'}
+        messageText={subTextMessage1}
+        messageText2={subTextMessage2}
       />
     );
-  }, [message]);
+  }, [message, subTextMessage1, subTextMessage2]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -514,6 +517,10 @@ export default function Login(props) {
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
                   (loaderBottomSheet as any).current.snapTo(1);
+                  setTimeout(() => {
+                    setSubTextMessage1('Did you know that 1 bitcoin = 100 million sats?')
+                    setSubTextMessage2('Hexa uses sats to make it easier to use bitcoins')
+                  }, 3000)
                   setTimeout(() => {
                     setElevation(0);
                   }, 2);
