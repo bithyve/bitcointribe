@@ -7,13 +7,17 @@ import {
   DOWNLOADED_MSHARE,
   OVERALL_HEALTH_CALCULATED,
   CHECKED_PDF_HEALTH,
-  QR_CHECKED,
+  PDF_HEALTH_CHECK_FAILED,
   UNABLE_RECOVER_SHARE_FROM_QR,
   WALLET_RECOVERY_FAILED,
   ERROR_SENDING,
   UPLOAD_SUCCEFULLY,
   ERROR_RECEIVING,
   WALLET_IMAGE_CHECKED,
+  PERSONAL_COPIES_GENERATED,
+  GENERATE_PERSONAL_COPIES,
+  SHARE_PERSONAL_COPY,
+  PERSONAL_COPY_SHARED,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -38,6 +42,8 @@ const initialState: {
   };
   mnemonic: String;
   personalCopyIndex: Number;
+  personalCopiesGenerated: Boolean;
+  personalCopyShared: Boolean;
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
@@ -49,7 +55,7 @@ const initialState: {
     qaStatus: string;
     sharesInfo: { shareId: string; shareStage: string }[];
   };
-  qrChecked: Boolean;
+  pdfHealthCheckFailed: Boolean;
   unableRecoverShareFromQR: Boolean;
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -75,10 +81,12 @@ const initialState: {
   },
   mnemonic: '',
   personalCopyIndex: 0,
+  personalCopiesGenerated: null,
+  personalCopyShared: null,
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
-  qrChecked: false,
+  pdfHealthCheckFailed: false,
   unableRecoverShareFromQR: false,
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -141,6 +149,30 @@ export default (state = initialState, action) => {
         },
       };
 
+    case GENERATE_PERSONAL_COPIES:
+      return {
+        ...state,
+        personalCopiesGenerated: null,
+      };
+
+    case PERSONAL_COPIES_GENERATED:
+      return {
+        ...state,
+        personalCopiesGenerated: action.payload.generated,
+      };
+
+    case SHARE_PERSONAL_COPY:
+      return {
+        ...state,
+        personalCopyShared: null,
+      };
+
+    case PERSONAL_COPY_SHARED:
+      return {
+        ...state,
+        personalCopyShared: action.payload.shared,
+      };
+
     case OVERALL_HEALTH_CALCULATED:
       return {
         ...state,
@@ -157,6 +189,7 @@ export default (state = initialState, action) => {
           ],
         },
       };
+
     case CHECKED_PDF_HEALTH:
       return {
         ...state,
@@ -166,16 +199,19 @@ export default (state = initialState, action) => {
         },
         //personalCopyIndex: action.payload.index
       };
-    case QR_CHECKED:
+
+    case PDF_HEALTH_CHECK_FAILED:
       return {
         ...state,
-        qrChecked: action.payload.isFailed,
+        pdfHealthCheckFailed: action.payload.failed,
       };
+
     case UNABLE_RECOVER_SHARE_FROM_QR:
       return {
         ...state,
         unableRecoverShareFromQR: action.payload.isFailed,
       };
+
     case WALLET_RECOVERY_FAILED:
       return {
         ...state,

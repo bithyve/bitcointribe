@@ -35,7 +35,6 @@ export default function TrustedContactRequest(props) {
     setPasscodeArray(tmpPasscode);
     if (tmpPasscode.length == 6) {
       setPasscode(tmpPasscode.join(''));
-      props.onPhoneNumberChange(tmpPasscode.join(''));
     }
   }
 
@@ -76,12 +75,12 @@ export default function TrustedContactRequest(props) {
       return (
         <View style={styles.textboxView}>
           <TextInput
+            autoCapitalize={'none'}
             keyboardType={'email-address'}
             placeholderTextColor={Colors.borderColor}
             placeholder={'Enter email'}
             onChangeText={(text) => {
               setEmailId(text);
-              props.onPhoneNumberChange(text);
             }}
             style={{ flex: 1, fontSize: RFValue(13) }}
             onFocus={() => {
@@ -122,7 +121,6 @@ export default function TrustedContactRequest(props) {
             placeholder={'Enter Phone Number'}
             onChangeText={(text) => {
               setPhoneNumber(text);
-              props.onPhoneNumberChange(text);
             }}
             style={{ flex: 1 }}
             onFocus={() => {

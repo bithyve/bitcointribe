@@ -21,7 +21,6 @@ import {
   DOWNLOAD_DYNAMIC_NONPMDD,
   RECOVER_WALLET,
   RESTORE_DYNAMIC_NONPMDD,
-  GENERATE_PDF,
   requestedShareUploaded,
   downloadedMShare,
   OVERALL_HEALTH,
@@ -33,7 +32,6 @@ import {
   UPDATE_SHARE_HISTORY,
   updateShareHistory,
   pdfHealthChecked,
-  QRChecked,
   UnableRecoverShareFromQR,
   walletRecoveryFailed,
   ErrorSending,
@@ -43,9 +41,12 @@ import {
   FETCH_WALLET_IMAGE,
   fetchWalletImage,
   walletImageChecked,
+  GENERATE_PERSONAL_COPIES,
+  personalCopiesGenerated,
+  SHARE_PERSONAL_COPY,
+  personalCopyShared,
+  pdfHealthCheckFailed,
 } from '../actions/sss';
-import { dbInsertedSSS } from '../actions/storage';
-
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -65,16 +66,15 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
-import { AsyncStorage } from 'react-native';
-import { Alert } from 'react-native';
-import {
-  updateEphemeralChannel,
-  trustedChannelFetched,
-} from '../actions/trustedContacts';
+import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
+import { updateEphemeralChannel } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import crypto from 'crypto';
-import { insertDBWorker, insertDBWatcher } from './storage';
+import { insertDBWorker } from './storage';
+import Share from 'react-native-share';
+import RNPrint from 'react-native-print';
+var Mailer = require('NativeModules').RNMail;
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -87,6 +87,9 @@ function* generateMetaSharesWorker() {
 
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
+  if (!secondaryMnemonic || !twoFASecret) {
+    throw new Error('secure assets missing; staticNonPMDD');
+  }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
@@ -124,7 +127,7 @@ function* initHCWorker() {
 
   yield put(switchS3Loader('initHC'));
   if (!s3Service.sss.metaShares.length) {
-    s3Service = yield call(generateMetaSharesWorker);
+    s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
   const res = yield call(s3Service.initializeHealthcheck);
   if (res.status === 200) {
@@ -435,38 +438,32 @@ export const downloadMetaShareWatcher = createWatcher(
   DOWNLOAD_MSHARE,
 );
 
-function* generatePDFWorker({ payload }) {
+function* generatePersonalCopiesWorker() {
   // yield put(switchS3Loader('generatePDF'));
+  const personalCopy1Index = 3; // corresponds to metaShare index
+  const personalCopy2Index = 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const resQRPersonalCopy1 = yield call(
-    s3Service.createQR,
-    payload.personalcopy1 - 1,
-  );
-  if (resQRPersonalCopy1.status !== 200) {
-    console.log({ err: resQRPersonalCopy1.err });
+  const resPC1 = yield call(s3Service.createQR, personalCopy1Index);
+  if (resPC1.status !== 200) {
+    console.log({ err: resPC1.err });
     return;
   }
-  const resQRPersonalCopy2 = yield call(
-    s3Service.createQR,
-    payload.personalcopy2 - 1,
-  );
-  if (resQRPersonalCopy2.status !== 200) {
-    console.log({ err: resQRPersonalCopy2.err });
+  const resPC2 = yield call(s3Service.createQR, personalCopy2Index);
+  if (resPC2.status !== 200) {
+    console.log({ err: resPC2.err });
     return;
   }
-
-  const { SERVICES } = yield select((state) => state.storage.database);
-  const updatedSERVICES = {
-    ...SERVICES,
-    S3_SERVICE: JSON.stringify(s3Service),
-  };
-
-  yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
 
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
+  if (!secondaryMnemonic) {
+    yield put(personalCopiesGenerated(false));
+    throw new Error(
+      'Personal copies generation failed; secondary mnemonic missing',
+    );
+  }
   const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
   const secureAssets = {
@@ -476,47 +473,213 @@ function* generatePDFWorker({ payload }) {
     secondaryXpub: secondary,
     bhXpub: bh,
   };
-  const pdfDataPersonalCopy1 = {
-    qrData: resQRPersonalCopy1.data.qrData,
+
+  const pc1PDFData = {
+    qrData: resPC1.data.qrData,
     ...secureAssets,
   };
-  const pdfDataPersonalCopy2 = {
-    qrData: resQRPersonalCopy2.data.qrData,
+  const pc2PDFData = {
+    qrData: resPC2.data.qrData,
     ...secureAssets,
   };
+
   const { security, walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
+
   try {
-    const personalCopy1PdfPath = yield call(
+    const pc1PDFPath = yield call(
       generatePDF,
-      pdfDataPersonalCopy1,
+      pc1PDFData,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy_1.pdf`,
-      `Hexa Share ${payload.personalcopy1}`,
+      `Hexa Share ${personalCopy1Index + 1}`,
       security.answer,
     );
-    const personalCopy2PdfPath = yield call(
+    const pc2PDFPath = yield call(
       generatePDF,
-      pdfDataPersonalCopy2,
+      pc2PDFData,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy_2.pdf`,
-      `Hexa Share  ${payload.personalcopy2}`,
+      `Hexa Share  ${personalCopy2Index + 1}`,
       security.answer,
     );
-    let path = {
-      copy1: { path: personalCopy1PdfPath, flagShare: false, shareDetails: {} },
-      copy2: { path: personalCopy2PdfPath, flagShare: false, shareDetails: {} },
+    const personalCopyDetails = {
+      copy1: { path: pc1PDFPath, shared: false, sharingDetails: {} },
+      copy2: { path: pc2PDFPath, shared: false, sharingDetails: {} },
     };
     // console.log({ path });
-    yield put(dbInsertedSSS(path));
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      JSON.stringify(personalCopyDetails),
+    );
+    // yield put(dbInsertedSSS(path));
+
+    const { removed } = secureAccount.removeSecondaryMnemonic(); // remove sec-mne post PDF gen
+    if (!removed) console.log('Failed to remove sec-mne');
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      SECURE_ACCOUNT: JSON.stringify(secureAccount),
+      S3_SERVICE: JSON.stringify(s3Service),
+    };
+
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } catch (err) {
     console.log({ err });
   }
   //yield put(switchS3Loader('generatePDF'));
 }
 
-export const generatePDFWatcher = createWatcher(
-  generatePDFWorker,
-  GENERATE_PDF,
+export const generatePersonalCopiesWatcher = createWatcher(
+  generatePersonalCopiesWorker,
+  GENERATE_PERSONAL_COPIES,
+);
+
+function* sharePersonalCopyWorker({ payload }) {
+  const { shareVia, selectedPersonalCopy } = payload;
+
+  try {
+    let personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
+    );
+    if (!personalCopyDetails)
+      throw new Error('Personal copies not found/generated');
+    personalCopyDetails = JSON.parse(personalCopyDetails);
+
+    const { security } = yield select(
+      (state) => state.storage.database.WALLET_SETUP,
+    );
+
+    switch (shareVia) {
+      case 'Email':
+        yield call(
+          Mailer.mail,
+          {
+            subject: selectedPersonalCopy.title,
+            body: `<b>Please find attached the personal copy ${
+              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+            } share pdf, it is password protected by the answer to the security question.</b>`,
+            isHTML: true,
+            attachment: {
+              path:
+                Platform.OS == 'android'
+                  ? 'file://' +
+                    personalCopyDetails[selectedPersonalCopy.type].path
+                  : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
+              type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+              name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+            },
+          },
+          (err, event) => {
+            console.log({ event, err });
+            // on delayed error (rollback the changes that happened post switch case)
+            setTimeout(() => {
+              AsyncStorage.setItem(
+                'personalCopyDetails',
+                JSON.stringify(personalCopyDetails),
+              );
+            }, 1000);
+          },
+        );
+        break;
+
+      case 'Print':
+        let pdfDecr = {
+          path: personalCopyDetails[selectedPersonalCopy.type].path,
+          filename:
+            selectedPersonalCopy.type === 'copy1'
+              ? 'PersonalCopy1.pdf'
+              : 'PersonalCopy2.pdf',
+          password: security.answer,
+        };
+        if (Platform.OS == 'android') {
+          var PdfPassword = yield NativeModules.PdfPassword;
+          yield call(
+            PdfPassword.print,
+            JSON.stringify(pdfDecr),
+            (err: any) => {
+              console.log({ err });
+              // on delayed error (rollback the changes that happened post switch case)
+              setTimeout(() => {
+                AsyncStorage.setItem(
+                  'personalCopyDetails',
+                  JSON.stringify(personalCopyDetails),
+                );
+              }, 1000);
+            },
+            async (res: any) => {
+              await RNPrint.print({
+                filePath: 'file://' + res,
+              });
+              console.log({ res });
+            },
+          );
+        } else {
+          try {
+            yield call(RNPrint.print, {
+              filePath: personalCopyDetails[selectedPersonalCopy.type].path,
+            });
+          } catch (err) {
+            console.log(err);
+            throw new Error(`Print failed: ${err}`);
+          }
+        }
+        break;
+
+      case 'Other':
+        let shareOptions = {
+          title: selectedPersonalCopy.title,
+          message: `Please find attached the personal copy ${
+            selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+          } share pdf, it is password protected by the answer to the security question.`,
+          url:
+            Platform.OS == 'android'
+              ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+              : personalCopyDetails[selectedPersonalCopy.type].path,
+          type: 'application/pdf',
+          showAppsToView: true,
+          subject: selectedPersonalCopy.title,
+        };
+
+        try {
+          yield call(Share.open, shareOptions);
+        } catch (err) {
+          console.log({ err });
+          throw new Error(`Share failed: ${err}`);
+        }
+        break;
+
+      default:
+        throw new Error('Invalid sharing option');
+    }
+
+    const updatedPersonalCopyDetails = {
+      ...personalCopyDetails,
+      [selectedPersonalCopy.type]: {
+        ...personalCopyDetails[selectedPersonalCopy.type],
+        shared: true,
+        sharingDetails: { shareVia, sharedAt: Date.now() },
+      },
+    };
+
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      JSON.stringify(updatedPersonalCopyDetails),
+    );
+
+    yield put(personalCopyShared(true));
+  } catch (err) {
+    console.log({ err });
+    yield put(personalCopyShared(false));
+  }
+}
+
+export const sharePersonalCopyWatcher = createWatcher(
+  sharePersonalCopyWorker,
+  SHARE_PERSONAL_COPY,
 );
 
 function* updateMSharesHealthWorker({ payload }) {
@@ -716,7 +879,7 @@ function* checkPDFHealthWorker({ payload }) {
     yield put(pdfHealthChecked('pdfHealthChecked'));
   } else {
     console.log({ pdfHealth, payload });
-    yield put(QRChecked(true));
+    yield put(pdfHealthCheckFailed(true));
     //Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
   }
 
