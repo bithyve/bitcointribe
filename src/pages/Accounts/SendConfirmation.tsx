@@ -47,6 +47,8 @@ export default function SendToContact(props) {
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
+  console.log("averageTxFees",averageTxFees);
+
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const [removeItem, setRemoveItem] = useState({});
@@ -59,7 +61,6 @@ export default function SendToContact(props) {
   const viewRef = useRef(null);
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
@@ -67,6 +68,29 @@ export default function SendToContact(props) {
     React.createRef<BottomSheet>(),
   );
   const [SelectedContactId, setSelectedContactId] = useState(0);
+  const [amount, setAmount] = useState('');
+
+
+  useEffect(() => {
+    if (netBalance === 0) {
+        setAmount(`0`);
+      } else {
+        setAmount(
+          `${
+            netBalance -
+            Number(
+              averageTxFees[
+                sliderValueText === 'Low Fee'
+                  ? 'low'
+                  : sliderValueText === 'In the middle'
+                  ? 'medium'
+                  : 'high'
+              ].averageTxFee,
+            )
+          }`,
+        );
+      }
+  }, [sliderValueText]);
 
   const tapSliderHandler = (evt) => {
     if (viewRef.current) {
@@ -164,7 +188,7 @@ export default function SendToContact(props) {
           }}
         >
           <View style={{ marginLeft: 20 }}>
-            {item.selectedContact.imageAvailable ? (
+            {item.selectedContact.image ? (
               <Image
                 source={item.selectedContact.image}
                 style={styles.circleShapeView}

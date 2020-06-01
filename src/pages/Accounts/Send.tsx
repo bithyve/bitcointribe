@@ -103,7 +103,6 @@ export default function Send(props) {
   const [amount, setAmount] = useState('');
   const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
-  const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [isSendHelperDone, setIsSendHelperDone] = useState(true);
   const [isInvalidBalance, setIsInvalidBalance] = useState(false);
@@ -154,21 +153,21 @@ export default function Send(props) {
       account_name: 'Checking Account',
       type: REGULAR_ACCOUNT,
       checked: false,
-      icon: require('../../assets/images/icons/icon_regular_account.png'),
+      image: require('../../assets/images/icons/icon_regular_account.png'),
     },
     {
       id: '2',
       account_name: 'Saving Account',
       type: SECURE_ACCOUNT,
       checked: false,
-      icon: require('../../assets/images/icons/icon_secureaccount_white.png'),
+      image: require('../../assets/images/icons/icon_secureaccount_white.png'),
     },
     {
       id: '3',
       account_name: 'Test Account',
       type: TEST_ACCOUNT,
       checked: false,
-      icon: require('../../assets/images/icons/icon_test_white.png'),
+      image: require('../../assets/images/icons/icon_test_white.png'),
     },
   ];
 
@@ -320,15 +319,6 @@ export default function Send(props) {
     updateAddressBook();
   }, [regularAccount.hdWallet.derivativeAccounts]);
 
-  let userInfo = {
-    to: '2MvXh39FM7m5v8GHyQ3eCLi45ccA1pFL7DR',
-    from: 'Secure Account',
-    amount: '0.00012',
-    fee: '0.0001',
-    total: 0.00022,
-    estDeliveryTime: '2 hours',
-    description: '',
-  };
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -349,29 +339,6 @@ export default function Send(props) {
     }
   };
 
-  useEffect(() => {
-    if (sweepSecure) {
-      SendConfirmationBottomSheet.current.snapTo(0);
-      if (netBalance === 0) {
-        setAmount(`0`);
-      } else {
-        setAmount(
-          `${
-            netBalance -
-            Number(
-              averageTxFees[
-                sliderValueText === 'Low Fee'
-                  ? 'low'
-                  : sliderValueText === 'In the middle'
-                  ? 'medium'
-                  : 'high'
-              ].averageTxFee,
-            )
-          }`,
-        );
-      }
-    }
-  }, [sweepSecure, sliderValueText]);
 
   const updateDescription = useCallback(async (txid, description) => {
     let descriptionHistory = {};
@@ -503,37 +470,6 @@ export default function Send(props) {
       return days == 1 ? days + ' day' : days + ' days';
     }
   }
-
-  const checkBalance = () => {
-    setIsConfirmDisabled(true);
-    if (
-      netBalance <
-      Number(amount) +
-        Number(
-          averageTxFees[
-            sliderValueText === 'Low Fee'
-              ? 'low'
-              : sliderValueText === 'In the middle'
-              ? 'medium'
-              : 'high'
-          ].averageTxFee,
-        )
-    ) {
-      setIsInvalidBalance(true);
-    } else {
-      setIsEditable(false);
-      const priority =
-        sliderValueText === 'Low Fee'
-          ? 'low'
-          : sliderValueText === 'In the middle'
-          ? 'medium'
-          : 'high';
-      const recipients = [
-        { address: recipientAddress, amount: parseInt(amount) },
-      ];
-      dispatch(transferST1(serviceType, recipients, averageTxFees));
-    }
-  };
 
   useEffect(() => {
     const instance = service.hdWallet || service.secureHDWallet;
@@ -713,7 +649,7 @@ export default function Send(props) {
 
   const getImageIcon = (item) => {
     if (item) {
-      if (item.imageAvailable) {
+      if (item.image) {
         return <Image source={item.image} style={styles.circleShapeView} />;
       } else {
         return (
@@ -823,7 +759,7 @@ export default function Send(props) {
                   height: wp('10%'),
                   alignSelf: 'center',
                 }}
-                source={item.icon}
+                source={item.image}
               />
               <Text
                 style={{
