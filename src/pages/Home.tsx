@@ -104,6 +104,7 @@ import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
+import HomeList from '../components/home/home-list';
 
 export default function Home(props) {
   const [TrustedContactPhoneNumber, setTrustedContactPhoneNumber] = useState(
@@ -2683,174 +2684,18 @@ export default function Home(props) {
             showsHorizontalScrollIndicator={false}
             data={newData}
             extraData={{ balances, switchOn, walletName }}
-            renderItem={(Items) => {
-              return (
-                <View style={{ flexDirection: 'column' }}>
-                  {Items.item.map((value) => {
-                    if (value.accountType === 'add') {
-                      return (
-                        <TouchableOpacity disabled={true}>
-                          <CardView
-                            cornerRadius={10}
-                            style={{
-                              ...styles.card,
-                              opacity: 0.4,
-                              backgroundColor: Colors.borderColor,
-                            }}
-                          >
-                            <View
-                              style={{
-                                flex: 1,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <Image
-                                style={{ width: wp('10%'), height: wp('10%') }}
-                                source={require('../assets/images/icons/icon_add.png')}
-                              />
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontSize: RFValue(11),
-                                }}
-                              >
-                                Add Account
-                              </Text>
-                            </View>
-                          </CardView>
-                        </TouchableOpacity>
-                      );
-                    } else {
-                      return (
-                        <TouchableOpacity
-                          onPress={() => {
-                            props.navigation.navigate('Accounts', {
-                              serviceType:
-                                value.accountType === 'test'
-                                  ? TEST_ACCOUNT
-                                  : value.accountType === 'regular'
-                                    ? REGULAR_ACCOUNT
-                                    : SECURE_ACCOUNT,
-                              index:
-                                value.accountType === 'test'
-                                  ? 0
-                                  : value.accountType === 'regular'
-                                    ? 1
-                                    : 2,
-                            });
-                          }}
-                        >
-                          <CardView cornerRadius={10} style={styles.card}>
-                            <View style={{ flexDirection: 'row' }}>
-                              <Image
-                                style={{ width: wp('10%'), height: wp('10%') }}
-                                source={getIconByAccountType(value.accountType)}
-                              />
-                              {value.accountType == 'secure' ? (
-                                <TouchableOpacity
-                                  onPress={() => {
-                                    // alert('2FA');
-                                  }}
-                                  style={{
-                                    marginLeft: 'auto',
-                                    paddingLeft: 10,
-                                    paddingBottom: 10,
-                                  }}
-                                >
-                                  <Text
-                                    style={{
-                                      color: Colors.blue,
-                                      fontSize: RFValue(11),
-                                      fontFamily: Fonts.FiraSansRegular,
-                                    }}
-                                  >
-                                    2FA
-                                  </Text>
-                                </TouchableOpacity>
-                              ) : null}
-                            </View>
-                            <View
-                              style={{ flex: 1, justifyContent: 'flex-end' }}
-                            >
-                              <Text style={styles.cardTitle}>
-                                {value.title}
-                              </Text>
-                              <Text
-                                style={{
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  color: Colors.textColorGrey,
-                                  fontSize: RFValue(11),
-                                }}
-                              >
-                                {value.account}
-                              </Text>
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  alignItems: 'flex-end',
-                                  marginTop: hp('1%'),
-                                }}
-                              >
-                                {value.accountType === 'test' || switchOn ? (
-                                  <Image
-                                    style={styles.cardBitCoinImage}
-                                    source={value.bitcoinicon}
-                                  />
-                                ) : (
-                                    <Image
-                                      style={styles.cardBitCoinImage}
-                                      source={getCurrencyImageByRegion(
-                                        CurrencyCode,
-                                        'light_blue',
-                                      )}
-                                    />
-                                  )}
-                                <Text
-                                  style={
-                                    accounts.accountsSynched
-                                      ? styles.cardAmountText
-                                      : styles.cardAmountTextGrey
-                                  }
-                                >
-                                  {switchOn
-                                    ? value.accountType === 'test'
-                                      ? UsNumberFormat(balances.testBalance)
-                                      : value.accountType === 'regular'
-                                        ? UsNumberFormat(balances.regularBalance)
-                                        : UsNumberFormat(balances.secureBalance)
-                                    : value.accountType === 'test'
-                                      ? UsNumberFormat(balances.testBalance)
-                                      : value.accountType === 'regular' &&
-                                        exchangeRates
-                                        ? (
-                                          (balances.regularBalance / 1e8) *
-                                          exchangeRates[CurrencyCode].last
-                                        ).toFixed(2)
-                                        : exchangeRates
-                                          ? (
-                                            (balances.secureBalance / 1e8) *
-                                            exchangeRates[CurrencyCode].last
-                                          ).toFixed(2)
-                                          : 0}
-                                </Text>
-                                <Text style={styles.cardAmountUnitText}>
-                                  {switchOn
-                                    ? value.unit
-                                    : value.accountType === 'test'
-                                      ? value.unit
-                                      : CurrencyCode.toLocaleLowerCase()}
-                                </Text>
-                              </View>
-                            </View>
-                          </CardView>
-                        </TouchableOpacity>
-                      );
-                    }
-                  })}
-                </View>
-              );
-            }}
+            renderItem={(Items) =>
+              <HomeList
+                Items={Items}
+                navigation={props.navigation}
+                getIconByAccountType={getIconByAccountType}
+                switchOn={switchOn}
+                accounts={accounts}
+                CurrencyCode={CurrencyCode}
+                balances={balances}
+                exchangeRates={exchangeRates}
+              />
+            }
           />
         </View>
       </View>

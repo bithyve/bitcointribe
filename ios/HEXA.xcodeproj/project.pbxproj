@@ -1051,7 +1051,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Development";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = HEXA/Hexa.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 40;
 				DEVELOPMENT_TEAM = Y5TCB759QL;
@@ -1078,7 +1078,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.hexawallet.hexa.development;
 				PRODUCT_MODULE_NAME = Hexa;
 				PRODUCT_NAME = "Hexa Dev";
-				PROVISIONING_PROFILE_SPECIFIER = "Hexa Development Dist";
+				PROVISIONING_PROFILE_SPECIFIER = "Hexa Development Dev";
 				SWIFT_OBJC_BRIDGING_HEADER = "HEXA-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
