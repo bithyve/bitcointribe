@@ -41,11 +41,11 @@ import {
   FETCH_WALLET_IMAGE,
   fetchWalletImage,
   walletImageChecked,
-  GENERATE_PERSONAL_COPIES,
-  personalCopiesGenerated,
+  GENERATE_PERSONAL_COPY,
   SHARE_PERSONAL_COPY,
   personalCopyShared,
   pdfHealthCheckFailed,
+  personalCopyGenerated,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
@@ -438,19 +438,14 @@ export const downloadMetaShareWatcher = createWatcher(
   DOWNLOAD_MSHARE,
 );
 
-function* generatePersonalCopiesWorker() {
+function* generatePersonalCopyWorker({ payload }) {
   // yield put(switchS3Loader('generatePDF'));
-  const personalCopy1Index = 3; // corresponds to metaShare index
-  const personalCopy2Index = 4;
+  const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
+  const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const resPC1 = yield call(s3Service.createQR, personalCopy1Index);
-  if (resPC1.status !== 200) {
-    console.log({ err: resPC1.err });
-    return;
-  }
-  const resPC2 = yield call(s3Service.createQR, personalCopy2Index);
-  if (resPC2.status !== 200) {
-    console.log({ err: resPC2.err });
+  const res = yield call(s3Service.createQR, shareIndex);
+  if (res.status !== 200) {
+    console.log({ err: res.err });
     return;
   }
 
@@ -459,27 +454,19 @@ function* generatePersonalCopiesWorker() {
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   if (!secondaryMnemonic) {
-    yield put(personalCopiesGenerated(false));
     throw new Error(
       'Personal copies generation failed; secondary mnemonic missing',
     );
   }
-  const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
   const secureAssets = {
     secondaryMnemonic,
-    twoFASecret: secret,
-    twoFAQR: qrData,
     secondaryXpub: secondary,
     bhXpub: bh,
   };
 
-  const pc1PDFData = {
-    qrData: resPC1.data.qrData,
-    ...secureAssets,
-  };
-  const pc2PDFData = {
-    qrData: resPC2.data.qrData,
+  const pdfData = {
+    qrData: res.data.qrData,
     ...secureAssets,
   };
 
@@ -488,34 +475,69 @@ function* generatePersonalCopiesWorker() {
   );
 
   try {
-    const pc1PDFPath = yield call(
+    const pdfPath = yield call(
       generatePDF,
-      pc1PDFData,
-      `Hexa_${walletName}_Recovery_Secret_Personal_Copy_1.pdf`,
-      `Hexa Share ${personalCopy1Index + 1}`,
+      pdfData,
+      `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
+      `Hexa Share ${shareIndex + 1}`,
       security.answer,
     );
-    const pc2PDFPath = yield call(
-      generatePDF,
-      pc2PDFData,
-      `Hexa_${walletName}_Recovery_Secret_Personal_Copy_2.pdf`,
-      `Hexa Share  ${personalCopy2Index + 1}`,
-      security.answer,
+
+    let personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
     );
-    const personalCopyDetails = {
-      copy1: { path: pc1PDFPath, shared: false, sharingDetails: {} },
-      copy2: { path: pc2PDFPath, shared: false, sharingDetails: {} },
-    };
-    // console.log({ path });
+
+    if (!personalCopyDetails) {
+      personalCopyDetails = {
+        [selectedPersonalCopy.type]: {
+          path: pdfPath,
+          shared: false,
+          sharingDetails: {},
+        },
+      };
+    } else {
+      personalCopyDetails = JSON.parse(personalCopyDetails);
+      personalCopyDetails = {
+        ...personalCopyDetails,
+        [selectedPersonalCopy.type]: {
+          path: pdfPath,
+          shared: false,
+          sharingDetails: {},
+        },
+      };
+    }
+
     yield call(
       AsyncStorage.setItem,
       'personalCopyDetails',
       JSON.stringify(personalCopyDetails),
     );
-    // yield put(dbInsertedSSS(path));
 
-    const { removed } = secureAccount.removeSecondaryMnemonic(); // remove sec-mne post PDF gen
-    if (!removed) console.log('Failed to remove sec-mne');
+    // reset PDF health (if present) post reshare
+    let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    if (storedPDFHealth) {
+      const { pdfHealth } = s3Service.sss;
+      storedPDFHealth = JSON.parse(storedPDFHealth);
+      storedPDFHealth = {
+        ...storedPDFHealth,
+        [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
+      };
+
+      yield call(
+        AsyncStorage.setItem,
+        'PDF Health',
+        JSON.stringify(storedPDFHealth),
+      );
+    }
+
+    yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: true }));
+
+    if (Object.keys(personalCopyDetails).length == 2) {
+      // remove sec-mne once both the personal copies are generated
+      const { removed } = secureAccount.removeSecondaryMnemonic();
+      if (!removed) console.log('Failed to remove sec-mne');
+    }
 
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
@@ -527,13 +549,14 @@ function* generatePersonalCopiesWorker() {
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } catch (err) {
     console.log({ err });
+    yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: false }));
   }
   //yield put(switchS3Loader('generatePDF'));
 }
 
-export const generatePersonalCopiesWatcher = createWatcher(
-  generatePersonalCopiesWorker,
-  GENERATE_PERSONAL_COPIES,
+export const generatePersonalCopyWatcher = createWatcher(
+  generatePersonalCopyWorker,
+  GENERATE_PERSONAL_COPY,
 );
 
 function* sharePersonalCopyWorker({ payload }) {
@@ -545,8 +568,10 @@ function* sharePersonalCopyWorker({ payload }) {
       'personalCopyDetails',
     );
     if (!personalCopyDetails)
-      throw new Error('Personal copies not found/generated');
+      throw new Error('Personal copy not found/generated');
     personalCopyDetails = JSON.parse(personalCopyDetails);
+    if (!personalCopyDetails[selectedPersonalCopy.type])
+      throw new Error('Personal copy not found/generated');
 
     const { security } = yield select(
       (state) => state.storage.database.WALLET_SETUP,
@@ -670,10 +695,10 @@ function* sharePersonalCopyWorker({ payload }) {
       JSON.stringify(updatedPersonalCopyDetails),
     );
 
-    yield put(personalCopyShared(true));
+    yield put(personalCopyShared({ [selectedPersonalCopy.type]: true }));
   } catch (err) {
     console.log({ err });
-    yield put(personalCopyShared(false));
+    yield put(personalCopyShared({ [selectedPersonalCopy.type]: false }));
   }
 }
 

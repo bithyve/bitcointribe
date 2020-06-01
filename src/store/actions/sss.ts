@@ -7,7 +7,7 @@ export const PREPARE_MSHARES = 'PREPARE_MSHARES';
 export const UPLOAD_ENC_MSHARE = 'UPLOAD_ENC_MSHARES';
 export const UPLOAD_REQUESTED_SHARE = 'UPLOAD_REQUESTED_SHARE';
 export const DOWNLOAD_MSHARE = 'DOWNLOAD_MSHARE';
-export const GENERATE_PERSONAL_COPIES = 'GENERATE_PERSONAL_COPIES';
+export const GENERATE_PERSONAL_COPY = 'GENERATE_PERSONAL_COPY';
 export const SHARE_PERSONAL_COPY = 'SHARE_PERSONAL_COPY';
 export const UPDATE_MSHARES_HEALTH = 'UPDATE_MSHARES_HEALTH';
 export const CHECK_MSHARES_HEALTH = 'CHECK_MSHARES_HEALTH';
@@ -62,9 +62,10 @@ export const downloadMShare = (encryptedKey, otp?, downloadType?) => {
   };
 };
 
-export const generatePersonalCopies = () => {
+export const generatePersonalCopy = (selectedPersonalCopy) => {
   return {
-    type: GENERATE_PERSONAL_COPIES,
+    type: GENERATE_PERSONAL_COPY,
+    payload: { selectedPersonalCopy },
   };
 };
 
@@ -136,7 +137,7 @@ export const REQUESTED_SHARE_UPLOADED = 'REQUESTED_SHARE_UPLOADED';
 export const MNEMONIC_RECOVERED = 'MNEMONIC_RECOVERED';
 export const S3_LOADING = 'S3_LOADING';
 export const DOWNLOADED_MSHARE = 'DOWNLOADED_MSHARE';
-export const PERSONAL_COPIES_GENERATED = 'PERSONAL_COPIES_GENERATED';
+export const PERSONAL_COPY_GENERATED = 'PERSONAL_COPY_GENERATED';
 export const PERSONAL_COPY_SHARED = 'PERSONAL_COPY_SHARED';
 export const OVERALL_HEALTH_CALCULATED = 'OVERALL_HEALTH_CALCULATED';
 export const UPDATE_SHARE_HISTORY = 'UPDATE_SHARE_HISTORY';
@@ -167,11 +168,20 @@ export const downloadedMShare = (otp, status, err?) => {
   return { type: DOWNLOADED_MSHARE, payload: { otp, status, err } };
 };
 
-export const personalCopiesGenerated = (generated: Boolean) => {
-  return { type: PERSONAL_COPIES_GENERATED, payload: { generated } };
+export const personalCopyGenerated = (generated: {
+  copy1?: Boolean;
+  copy2?: Boolean;
+}) => {
+  return {
+    type: PERSONAL_COPY_GENERATED,
+    payload: { generated },
+  };
 };
 
-export const personalCopyShared = (shared: Boolean) => {
+export const personalCopyShared = (shared: {
+  copy1?: Boolean;
+  copy2?: Boolean;
+}) => {
   return {
     type: PERSONAL_COPY_SHARED,
     payload: { shared },
