@@ -90,7 +90,8 @@ export default function AddContactSendRequest(props) {
   };
 
   const dispatch = useDispatch();
-  useEffect(() => {
+
+  const createTrustedConntact = useCallback(() => {
     if (Contact && Contact.firstName) {
       const contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
@@ -108,27 +109,11 @@ export default function AddContactSendRequest(props) {
           };
           dispatch(updateEphemeralChannel(contactName, data));
         })();
-      } else {
-        updateTrustedContactsInfo(Contact); // Contact initialized to become TC
-        if (!trustedLink) createDeepLink();
-
-        if (!trustedQR) {
-          const publicKey =
-            trustedContacts.tc.trustedContacts[contactName].publicKey;
-
-          setTrustedQR(
-            JSON.stringify({
-              requester: WALLET_SETUP.walletName,
-              publicKey,
-              type: 'trustedContactQR',
-            }),
-          );
-        }
       }
     }
   }, [Contact, trustedContacts]);
 
-  const createDeepLink = useCallback(() => {
+  useEffect(() => {
     if (!Contact) {
       console.log('Err: Contact missing');
       return;
@@ -137,49 +122,68 @@ export default function AddContactSendRequest(props) {
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
     }`.toLowerCase();
-    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
-    const requester = WALLET_SETUP.walletName;
+    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
-    if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
-      const phoneNumber = Contact.phoneNumbers[0].number;
-      console.log({ phoneNumber });
-      const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-      const numHintType = 'num';
-      const numHint = number.slice(number.length - 3);
-      const numberEncPubKey = TrustedContactsService.encryptPub(
-        publicKey,
-        number,
-      ).encryptedPub;
-      const numberDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tc` +
-        `/${requester}` +
-        `/${numberEncPubKey}` +
-        `/${numHintType}` +
-        `/${numHint}`;
-      console.log({ numberDL });
-      setTrustedLink(numberDL);
-    } else if (Contact.emails && Contact.emails.length) {
-      const email = Contact.emails[0].email;
-      const emailInitials: string = email.split('@')[0];
-      const emailHintType = 'eml';
-      const emailHint = emailInitials.slice(emailInitials.length - 3);
-      const emailEncPubKey = TrustedContactsService.encryptPub(
-        publicKey,
-        emailInitials,
-      ).encryptedPub;
-      const emailDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tc` +
-        `/${requester}` +
-        `/${emailEncPubKey}` +
-        `/${emailHintType}` +
-        `/${emailHint}`;
-      console.log({ emailDL });
-      setTrustedLink(emailDL);
-    } else {
-      Alert.alert(
-        'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
-      );
+    if (trustedContact) {
+      const publicKey =
+        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const requester = WALLET_SETUP.walletName;
+
+      if (!trustedLink) {
+        if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+          const phoneNumber = Contact.phoneNumbers[0].number;
+          console.log({ phoneNumber });
+          const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          const numHintType = 'num';
+          const numHint = number.slice(number.length - 3);
+          const numberEncPubKey = TrustedContactsService.encryptPub(
+            publicKey,
+            number,
+          ).encryptedPub;
+          const numberDL =
+            `https://hexawallet.io/${config.APP_STAGE}/tc` +
+            `/${requester}` +
+            `/${numberEncPubKey}` +
+            `/${numHintType}` +
+            `/${numHint}`;
+          console.log({ numberDL });
+          setTrustedLink(numberDL);
+        } else if (Contact.emails && Contact.emails.length) {
+          const email = Contact.emails[0].email;
+          const emailInitials: string = email.split('@')[0];
+          const emailHintType = 'eml';
+          const emailHint = emailInitials.slice(emailInitials.length - 3);
+          const emailEncPubKey = TrustedContactsService.encryptPub(
+            publicKey,
+            emailInitials,
+          ).encryptedPub;
+          const emailDL =
+            `https://hexawallet.io/${config.APP_STAGE}/tc` +
+            `/${requester}` +
+            `/${emailEncPubKey}` +
+            `/${emailHintType}` +
+            `/${emailHint}`;
+          console.log({ emailDL });
+          setTrustedLink(emailDL);
+        } else {
+          Alert.alert(
+            'Invalid Contact',
+            'Cannot add a contact without phone-num/email as a trusted entity',
+          );
+          return;
+        }
+        updateTrustedContactsInfo(Contact); // Contact initialized to become TC
+      }
+
+      if (!trustedQR) {
+        setTrustedQR(
+          JSON.stringify({
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            type: 'trustedContactQR',
+          }),
+        );
+      }
     }
   }, [Contact, trustedContacts]);
 
@@ -291,7 +295,7 @@ export default function AddContactSendRequest(props) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => {}}
+              onPress={createTrustedConntact}
               style={{
                 height: wp('8%'),
                 width: wp('18%'),
@@ -462,6 +466,7 @@ export default function AddContactSendRequest(props) {
           >
             <TouchableOpacity
               onPress={() => {
+                createTrustedConntact();
                 if (SendViaLinkBottomSheet.current)
                   (SendViaLinkBottomSheet as any).current.snapTo(1);
               }}
@@ -479,6 +484,7 @@ export default function AddContactSendRequest(props) {
             <TouchableOpacity
               style={styles.buttonInnerView}
               onPress={() => {
+                createTrustedConntact();
                 if (SendViaQRBottomSheet.current)
                   (SendViaQRBottomSheet as any).current.snapTo(1);
               }}
