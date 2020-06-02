@@ -771,7 +771,7 @@ export default function SendToContact(props) {
                 )}
                 {/* )} */}
               </TouchableOpacity>
-              <TouchableOpacity
+              {serviceType != 'TEST_ACCOUNT' ? <TouchableOpacity
                 style={{
                   ...styles.confirmButtonView,
                   width: wp('30%'),
@@ -812,7 +812,7 @@ export default function SendToContact(props) {
                 <Text style={{ ...styles.buttonText, color: Colors.blue }}>
                   Add Recipient
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> : null}
             </View>
           </ScrollView>
         </View>

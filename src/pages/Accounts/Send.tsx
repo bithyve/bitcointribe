@@ -765,7 +765,7 @@ export default function Send(props) {
                       </Text>
                     </View>
                   ) : null}
-                  <View style={{ paddingTop: wp('3%') }}>
+                  {serviceType != TEST_ACCOUNT ? <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -855,8 +855,8 @@ export default function Send(props) {
                       />
                       </View>
                     )}
-                  </View>
-                  <View style={{ paddingTop: wp('3%') }}>
+                  </View> : null} 
+                  {serviceType != TEST_ACCOUNT ? <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -922,7 +922,7 @@ export default function Send(props) {
                         //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
-                  </View>
+                  </View>: null} 
                 </View>
               </View>
             </TouchableWithoutFeedback>
