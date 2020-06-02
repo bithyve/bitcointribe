@@ -47,7 +47,7 @@ export default function NotificationListContent(props) {
                 paddingTop: wp('4%'),
                 backgroundColor: value.read
                   ? Colors.white
-                  : Colors.lightBlue,
+                  : Colors.shadowBlue,
               }}
             >
               <View style={{ flexDirection: 'row' }}>
@@ -58,7 +58,7 @@ export default function NotificationListContent(props) {
                     source={
                       value.type == 'release'
                         ? require('../assets/images/icons/icon_hexa.png')
-                        : require('../assets/images/icons/recieve.png')
+                        : require('../assets/images/icons/icon_receive.png')
                     }
                     style={{
                       width: wp('8%'),
@@ -96,7 +96,7 @@ export default function NotificationListContent(props) {
                   {value.isMandatory ? (
                     <FontAwesome
                       name="star"
-                      color={Colors.blue}
+                      color={Colors.yellow}
                       size={17}
                     />
                   ) : (
