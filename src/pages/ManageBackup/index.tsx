@@ -88,38 +88,38 @@ export default function ManageBackup(props) {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Not Accessible',
+      title: 'Recovery Key Not Accessible',
       date: '19 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret Received',
+      title: 'Recovery Key Received',
       date: '1 June ‘19, 9:00am',
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret In-Transit',
+      title: 'Recovery Key In-Transit',
       date: '30 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret Accessible',
+      title: 'Recovery Key Accessible',
       date: '24 May ‘19, 5:00pm',
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 5,
-      title: 'Recovery Secret In-Transit',
+      title: 'Recovery Key In-Transit',
       date: '20 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 6,
-      title: 'Recovery Secret Not Accessible',
+      title: 'Recovery Key Not Accessible',
       date: '19 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
@@ -300,11 +300,11 @@ export default function ManageBackup(props) {
     return (
       <SecondaryDeviceHealthCheck
         data={secondaryDeviceHistory}
-        title={'Secondary Device'}
+        title={'Keeper Device'}
         time={selectedTime}
         status={selectedStatus}
         reshareInfo={
-          'Want to send the Recovery Secret again to the same destination? '
+          'Want to send the Recovery Key again to the same destination? '
         }
         onPressConfirm={() => {
           (ConfirmBottomSheet as any).current.snapTo(1);
@@ -339,7 +339,7 @@ export default function ManageBackup(props) {
         time={selectedTime}
         status={selectedStatus}
         reshareInfo={
-          'Want to send the Recovery Secret again to the same destination? '
+          'Want to send the Recovery Key again to the same destination? '
         }
         onPressConfirm={() => {
           (ConfirmBottomSheet as any).current.snapTo(1);
@@ -402,7 +402,7 @@ export default function ManageBackup(props) {
         title={'Change your\nTrusted Contact'}
         info={'Having problems with your Trusted Contact'}
         note={
-          'You can change the Trusted Contact you selected to share your Recovery Secret'
+          'You can change the Trusted Contact you selected to share your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -436,24 +436,24 @@ export default function ManageBackup(props) {
     let info = '';
     let note = '';
     if (SelectTypeToReshare == 'secondaryDevice') {
-      title = 'Reshare Recovery Secret\nwith Secondary Device';
-      info = 'Did your secondary device not receive the Recovery Secret?';
-      note = 'You can reshare the Recovery Secret with your \nSecondary Device';
+      title = 'Reshare Recovery Key\nwith Keeper Device';
+      info = 'Did your keeper device not receive the Recovery Key?';
+      note = 'You can reshare the Recovery Key with your \nKeeper Device';
     } else if (
       SelectTypeToReshare == 'contact1' ||
       SelectTypeToReshare == 'contact2'
     ) {
-      title = 'Reshare Recovery Secret\nwith Trusted Contact';
-      info = 'Did your contact not receive the Recovery Secret?';
+      title = 'Reshare Recovery Key\nwith Trusted Contact';
+      info = 'Did your contact not receive the Recovery Key?';
       note =
-        'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms';
+        'You can reshare the Recovery Key with your Trusted\nContact via Email or Sms';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
     ) {
-      title = 'Reshare Recovery Secret\nwith Personal Copy';
-      info = 'Did your personal Copies not receive the Recovery Secret?';
-      note = 'You can reshare the Recovery Secret with your \nPersonal Copy';
+      title = 'Reshare Recovery Key\nwith Personal Copy';
+      info = 'Did your personal Copies not receive the Recovery Key?';
+      note = 'You can reshare the Recovery Key with your \nPersonal Copy';
     }
     return (
       <ErrorModalContents
@@ -523,34 +523,34 @@ export default function ManageBackup(props) {
     let note = '';
     let proceedButtonText = '';
     if (SelectTypeToReshare == 'secondaryDevice') {
-      title = 'Confirm Recovery Secret\nwith Secondary Device';
-      info = 'Your Secondary Device seems away from their Hexa App';
+      title = 'Confirm Recovery Key\nwith Keeper Device';
+      info = 'Your Keeper Device seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Send a message';
     } else if (
       SelectTypeToReshare == 'contact1' ||
       SelectTypeToReshare == 'contact2'
     ) {
-      title = 'Confirm Recovery Secret\nwith Trusted Contact';
+      title = 'Confirm Recovery Key\nwith Trusted Contact';
       info = 'Your Trusted Contact seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
     ) {
-      title = 'Confirm Recovery Secret\nwith Personal Copy';
+      title = 'Confirm Recovery Key\nwith Personal Copy';
       info = 'Your Trusted Contact seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
     } else if (SelectTypeToReshare == 'security') {
-      title = 'Confirm Recovery Secret\nwith Security Question';
+      title = 'Confirm Recovery Key\nwith Security Question';
       info = 'Your Security Question seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
     }
     return (
@@ -1656,8 +1656,8 @@ export default function ManageBackup(props) {
                             item.type === 'contact2'
                               ? 'Friends and Family'
                               : item.type === 'copy1' || item.type === 'copy2'
-                              ? 'Personal Copies'
-                              : item.type === 'SecondaryDevice'
+                              ? 'Personal Copy'
+                              : item.type === 'secondaryDevice'
                               ? 'Keeper Device'
                               : item.title}
                           </Text>
@@ -1684,7 +1684,7 @@ export default function ManageBackup(props) {
                                 : 'Last Backup '
                               : item.type === 'copy1' || item.type === 'copy2'
                               ? item.status === 'Ugly'
-                                ? 'PDF as a Keeper for one of your Recovery Keys'
+                                ? 'Secure your Recovery Key as a file (pdf)'
                                 : 'The PDFs are locked with your Security Answers'
                               : 'Last Backup '}
                             {(item.type === 'security' ||

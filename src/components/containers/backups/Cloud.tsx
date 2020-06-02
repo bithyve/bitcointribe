@@ -63,7 +63,7 @@ const Cloud = props => {
               fontWeight: "bold"
             }}
           >
-            store recovery secret
+            store recovery key
           </Text>
         </Text>
         <View style={{ flex: 1 }}>

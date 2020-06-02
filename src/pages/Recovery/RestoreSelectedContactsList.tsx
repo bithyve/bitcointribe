@@ -310,7 +310,7 @@ export default function RestoreSelectedContactsList(props) {
       <LoaderModal
         headerText={message}
         messageText={
-          'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'
+          'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
         }
       />
     );
@@ -393,7 +393,7 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
-        title={'Recovery Secret Request'}
+        title={'Recovery Key Request'}
         titleNextLine={'from Cloud unsuccessful'}
         info={'There seems to a problem'}
         note={'You can choose to try again or select a different source'}
@@ -460,9 +460,9 @@ export default function RestoreSelectedContactsList(props) {
   }
   if (isErrorReceivingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
     }, 2);
     (ErrorBottomSheet1 as any).current.snapTo(1);
@@ -686,9 +686,9 @@ export default function RestoreSelectedContactsList(props) {
       >
         <HeaderTitle
           firstLineTitle={'Restore wallet using'}
-          secondLineTitle={'Recovery Secrets'}
+          secondLineTitle={'Recovery Keys'}
           infoTextNormal={
-            'These are the Recovery Secrets that you have stored in five places. '
+            'These are the Recovery Keys that you have stored in five places. '
           }
           infoTextBold={'You need three of them restore your wallet'}
         />
@@ -707,9 +707,9 @@ export default function RestoreSelectedContactsList(props) {
             source={require('../../assets/images/icons/icon_secondarydevice.png')}
           />
           <View style={styles.textInfoView}>
-            <Text style={styles.listElementsTitle}>Secondary Device (One)</Text>
+            <Text style={styles.listElementsTitle}>Keeper Device (One)</Text>
             <Text style={styles.listElementsInfo}>
-              You need your secondary device with you to scan the QR code
+              You need your keeper device with you to scan the QR code
             </Text>
           </View>
           <View style={styles.listElementIcon}>
@@ -990,7 +990,7 @@ export default function RestoreSelectedContactsList(props) {
               </Text>
               <Text style={styles.listElementsInfo}>
                 Select one or two of the sources where you have kept the
-                Recovery Secret
+                Recovery Key
               </Text>
             </View>
             <View style={styles.listElementIcon}>

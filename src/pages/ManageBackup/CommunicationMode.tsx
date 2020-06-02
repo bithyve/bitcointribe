@@ -111,7 +111,7 @@ export default function CommunicationMode(props) {
       setTimeout(() => {
         setErrorMessageHeader('Failed to share');
         setErrorMessage(
-          'There was some error while sharing the Recovery Secret, please try again',
+          'There was some error while sharing the Recovery Key, please try again',
         );
       }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
@@ -320,9 +320,9 @@ export default function CommunicationMode(props) {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);

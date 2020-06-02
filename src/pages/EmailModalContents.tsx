@@ -35,7 +35,7 @@ export default function EmailModalContents( props ) {
                 marginLeft: 20, color: Colors.textColorGrey,
                 fontFamily: Fonts.FiraSansRegular,
                 fontSize: RFValue( 12, 812 ),
-            } }>Select email to <Text style={ { fontFamily: Fonts.FiraSansMediumItalic } }>store recovery secret</Text></Text>
+            } }>Select email to <Text style={ { fontFamily: Fonts.FiraSansMediumItalic } }>store recovery key</Text></Text>
 
             <View style={ { flex: 1 } }>
                 <TouchableOpacity style={ styles.listElements } onPress={ () => props.onPressElement( 'cloud' ) }>

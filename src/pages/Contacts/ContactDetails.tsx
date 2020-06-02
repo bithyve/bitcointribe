@@ -32,26 +32,26 @@ export default function ContactDetails(props) {
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret created',
+      title: 'Recovery Key created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret in-transit',
+      title: 'Recovery Key in-transit',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret accessible',
+      title: 'Recovery Key accessible',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret not accessible',
+      title: 'Recovery Key not accessible',
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
@@ -453,7 +453,7 @@ export default function ContactDetails(props) {
                     fontFamily: Fonts.FiraSansRegular,
                   }}
                 >
-                  The history of your Recovery Secret will appear here
+                  The history of your Recovery Key will appear here
                 </Text>
               </View>
             </View>

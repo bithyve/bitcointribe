@@ -47,7 +47,7 @@ export default function SendShareModal(props) {
       <View style={{ height: '100%' }}>
         <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
           <Text style={styles.commModeModalHeaderText}>
-            Share Recovery Secret{'\n'}with trusted contact
+            Share Recovery Key{'\n'}with trusted contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
             Send share to Trusted Contact, you can change your trusted contact,

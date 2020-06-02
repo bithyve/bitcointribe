@@ -24,7 +24,7 @@ export default function CustodianRequestAcceptModalContents(props) {
             Secret Accepted{"\n"}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            Secret Successfully Accepted{"\n"}You are now a guardian for
+            Secret Successfully Accepted{"\n"}You are now a keeper for
           </Text>
         </View>
         <View style={styles.box}>
@@ -47,7 +47,7 @@ export default function CustodianRequestAcceptModalContents(props) {
           >
             <Text style={{ ...styles.modalInfoText }}>
               Associate the secret with a contact to better manage the{"\n"}
-              secrets you are guardian for
+              secrets you are keeper for
             </Text>
           </View>
         </View>

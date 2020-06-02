@@ -55,7 +55,7 @@ export default function AddressBookFilterModalContent(props) {
                             />
                         </AppBottomSheetTouchableWrapper>
                         <View style={{ flex:1, }}>
-                            <Text style={styles.subTitleText}>People I’m the guardian of</Text>
+                            <Text style={styles.subTitleText}>People I’m the keeper of</Text>
                             <Text style={styles.subInfoText}>Lorem ipsum dolor sit ametconsectetur adipiscing</Text>
                         </View>
                     </View>

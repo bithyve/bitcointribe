@@ -358,7 +358,7 @@ export default function AddressBookContents(props) {
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>I am the keeper of</Text>
+            <Text style={styles.pageTitle}>I am the Keeper of</Text>
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>

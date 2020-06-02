@@ -160,7 +160,7 @@ export default function RestoreByCloudQrCodeContents(props) {
 
   if(unableRecoverShareFromQR){
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
         'Invalid QR or error while receiving, please try again',
       );
@@ -183,7 +183,7 @@ export default function RestoreByCloudQrCodeContents(props) {
           </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
-              Enter Recovery Secret
+              Enter Recovery Key
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               {props.pageInfo}There are 8 QR codes in the {'\n'}PDF you have stored

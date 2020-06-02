@@ -1121,9 +1121,9 @@ export default function Home(props) {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
       setButtonText('Try again');
     }, 2);
@@ -1135,7 +1135,7 @@ export default function Home(props) {
     setTimeout(() => {
       setErrorMessageHeader('Sending successful');
       setErrorMessage(
-        'The Recovery Secret has been sent, the receiver needs to accept ',
+        'The Recovery Key has been sent, the receiver needs to accept ',
       );
       setButtonText('Done');
     }, 2);
@@ -1145,9 +1145,9 @@ export default function Home(props) {
 
   if (isErrorReceivingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
       setButtonText('Try again');
     }, 2);
@@ -1205,7 +1205,7 @@ export default function Home(props) {
         });
       }
       if ((secondaryDeviceOtp as any).type == 'secondaryDeviceQR') {
-        Toast('Recovery Secret received successfully');
+        Toast('Recovery Key received successfully');
         setSecondaryDeviceAddresses();
       }
       getAssociatedContact();

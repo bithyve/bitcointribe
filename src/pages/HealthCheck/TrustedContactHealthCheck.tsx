@@ -42,22 +42,22 @@ const TrustedContactHealthCheck = props => {
     );
     const [pageData, setPageData] = useState([
         {
-            id: 1, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery secret with your trusted contact"
+            id: 1, title: "Recovery Key Not Accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery key with your trusted contact"
         },
         {
-            id: 2, title: "Recovery Secret received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
+            id: 2, title: "Recovery Key received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
         },
         {
-            id: 3, title: "Recovery Secret In-Transit", date: "30 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+            id: 3, title: "Recovery Key In-Transit", date: "30 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
         },
         {
-            id: 4, title: "Recovery Secret Accessible", date: "24 May ‘19, 5:00pm", info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet"
+            id: 4, title: "Recovery Key Accessible", date: "24 May ‘19, 5:00pm", info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet"
         },
         {
-            id: 5, title: "Recovery Secret In-Transit", date: "20 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+            id: 5, title: "Recovery Key In-Transit", date: "20 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
         },
         {
-            id: 6, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+            id: 6, title: "Recovery Key Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
         }
     ]);
     const { loading } = useSelector(state => state.sss);
@@ -77,7 +77,7 @@ const TrustedContactHealthCheck = props => {
                 title={'Change your\nTrusted Contact'}
                 info={'Having problems with your Trusted Contact'}
                 note={
-                    'You can change the Trusted Contact you selected to share your Recovery Secret'
+                    'You can change the Trusted Contact you selected to share your Recovery Key'
                 }
                 proceedButtonText={'Change'}
                 cancelButtonText={'Back'}
@@ -107,10 +107,10 @@ const TrustedContactHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ReshareBottomSheet}
-                title={'Reshare Recovery Secret\nwith Trusted Contact'}
-                info={'Did your contact not receive the Recovery Secret?'}
+                title={'Reshare Recovery Key\nwith Trusted Contact'}
+                info={'Did your contact not receive the Recovery Key?'}
                 note={
-                    'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'
+                    'You can reshare the Recovery Key with your Trusted\nContact via Email or Sms'
                 }
                 proceedButtonText={'Reshare'}
                 cancelButtonText={'Back'}
@@ -140,10 +140,10 @@ const TrustedContactHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ConfirmBottomSheet}
-                title={'Confirm Recovery Secret\nwith Trusted Contact'}
+                title={'Confirm Recovery Key\nwith Trusted Contact'}
                 info={'Your Trusted Contact seems away from their Hexa App'}
                 note={
-                    'You can send them a reminder to open their app to\nensure they have your Recovery Secret'
+                    'You can send them a reminder to open their app to\nensure they have your Recovery Key'
                 }
                 proceedButtonText={'Confirm'}
                 cancelButtonText={'Back'}
