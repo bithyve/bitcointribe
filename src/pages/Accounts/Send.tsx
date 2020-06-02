@@ -35,10 +35,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
-import {
-  clearContactsAccountSendStorage,
-  storeContactsAccountToSend,
-} from '../../store/actions/send-action';
+import { clearSendDetails, saveSendDetails } from '../../store/actions/send';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { UsNumberFormat } from '../../common/utilities';
@@ -83,7 +80,7 @@ export default function Send(props) {
   });
   const [filterContactData, setFilterContactData] = useState([]);
   const accounts = useSelector((state) => state.accounts);
-  const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
+  const sendStorage = useSelector((state) => state.send.sendStorage);
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -108,26 +105,26 @@ export default function Send(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [accountData, setAccountData] = useState([
     {
-      id: '1',
+      id: 'checking account',
       account_name: 'Checking Account',
       type: REGULAR_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_regular_account.png'),
     },
     {
-      id: '2',
+      id: 'saving account',
       account_name: 'Saving Account',
       type: SECURE_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_secureaccount_white.png'),
     },
-    {
-      id: '3',
-      account_name: 'Test Account',
-      type: TEST_ACCOUNT,
-      checked: false,
-      image: require('../../assets/images/icons/icon_test_white.png'),
-    },
+    // {
+    //   id: '3',
+    //   account_name: 'Test Account',
+    //   type: TEST_ACCOUNT,
+    //   checked: false,
+    //   image: require('../../assets/images/icons/icon_test_white.png'),
+    // },
   ]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
@@ -315,7 +312,7 @@ export default function Send(props) {
     let isAddressValid = instance.isValidAddress(recipientAddress);
     if (isAddressValid) {
       let item = {
-        id: recipientAddress,
+        id: recipientAddress, // address serves as the id during manual addition
       };
       onSelectContact(item);
     }
@@ -448,7 +445,7 @@ export default function Send(props) {
         netBalance,
       });
       dispatch(
-        storeContactsAccountToSend({
+        saveSendDetails({
           selectedContact: item,
         }),
       );
@@ -469,7 +466,7 @@ export default function Send(props) {
           netBalance,
         });
         dispatch(
-          storeContactsAccountToSend({
+          saveSendDetails({
             selectedContact: item,
           }),
         );
@@ -678,7 +675,7 @@ export default function Send(props) {
                         if (getServiceType) {
                           getServiceType(serviceType);
                         }
-                        dispatch(clearContactsAccountSendStorage());
+                        dispatch(clearSendDetails());
                         props.navigation.goBack();
                       }}
                       style={{

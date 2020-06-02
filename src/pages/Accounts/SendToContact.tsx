@@ -26,9 +26,9 @@ import ToggleSwitch from '../../components/ToggleSwitch';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  storeContactsAccountToSend,
-  removeContactsAccountFromSend,
-} from '../../store/actions/send-action';
+  saveSendDetails,
+  removeFromSendDetails,
+} from '../../store/actions/send';
 import { transferST1 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -46,7 +46,7 @@ export default function SendToContact(props) {
   const [exchangeRates, setExchangeRates] = useState(
     accounts && accounts.exchangeRates,
   );
-  const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
+  const sendStorage = useSelector((state) => state.send.sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
@@ -97,7 +97,12 @@ export default function SendToContact(props) {
 
   useEffect(() => {
     if (!recipients.length) return;
-    if (transfer.executed === 'ST1') {
+    if (transfer.stage1.failed) {
+      setTimeout(() => {
+        setIsConfirmDisabled(false);
+      }, 10);
+      SendUnSuccessBottomSheet.current.snapTo(1);
+    } else if (transfer.executed === 'ST1') {
       props.navigation.navigate('SendConfirmation', {
         serviceType,
         sweepSecure,
@@ -105,26 +110,25 @@ export default function SendToContact(props) {
         recipients,
         averageTxFees,
       });
-    } else if (transfer.stage1.failed) {
-      setTimeout(() => {
-        setIsConfirmDisabled(false);
-      }, 10);
-      SendUnSuccessBottomSheet.current.snapTo(1);
     }
   }, [transfer, recipients]);
 
   const handleTrasferST1 = () => {
     const recipients = [];
-    const tempData = {
+    const currentRecipientInstance = {
       selectedContact,
       bitcoinAmount,
       currencyAmount,
       note,
     };
-    // let storage = [...sendStorage, tempData]; //TODO: resolve extra entry error
-    let storage = [tempData];
-    console.log({ storage });
-    storage.map((item) => {
+
+    const recipientsList = [];
+    sendStorage.forEach((instance) => {
+      if (instance.bitcoinAmount) recipientsList.push(instance);
+    });
+    recipientsList.push(currentRecipientInstance);
+
+    recipientsList.map((item) => {
       let data = {
         address: item.selectedContact.id,
         amount: parseInt(item.bitcoinAmount),
@@ -439,7 +443,7 @@ export default function SendToContact(props) {
           }}
           onPressDone={() => {
             setTimeout(() => {
-              dispatch(removeContactsAccountFromSend(removeItem));
+              dispatch(removeFromSendDetails(removeItem));
             }, 2);
             (RemoveBottomSheet as any).current.snapTo(0);
           }}
@@ -472,7 +476,7 @@ export default function SendToContact(props) {
           !sendStorage[i].selectedContact.hasOwnProperty('currencyAmount') &&
           selectedContact.id == sendStorage[i].selectedContact.id
         ) {
-          dispatch(removeContactsAccountFromSend(sendStorage[i]));
+          dispatch(removeFromSendDetails(sendStorage[i]));
         }
       }
     }
@@ -488,11 +492,11 @@ export default function SendToContact(props) {
       if (sendStorage && sendStorage.length) {
         for (let i = 0; i < sendStorage.length; i++) {
           if (sendStorage[i].selectedContact.id == selectedContact.id) {
-            dispatch(removeContactsAccountFromSend(sendStorage[i]));
+            dispatch(removeFromSendDetails(sendStorage[i]));
           }
         }
         dispatch(
-          storeContactsAccountToSend({
+          saveSendDetails({
             selectedContact,
             bitcoinAmount,
             currencyAmount,
@@ -731,11 +735,11 @@ export default function SendToContact(props) {
                       if (
                         sendStorage[i].selectedContact.id == selectedContact.id
                       ) {
-                        dispatch(removeContactsAccountFromSend(sendStorage[i]));
+                        dispatch(removeFromSendDetails(sendStorage[i]));
                       }
                     }
                     dispatch(
-                      storeContactsAccountToSend({
+                      saveSendDetails({
                         selectedContact,
                         bitcoinAmount,
                         currencyAmount,
