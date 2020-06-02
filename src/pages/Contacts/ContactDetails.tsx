@@ -64,41 +64,44 @@ export default function ContactDetails(props) {
   ]);
   useEffect(() => {
     setContact(Contact);
-    if (contactsType == 'My Keepers') saveInTransitHistory("inTransit");
+    if (contactsType == 'My Keepers') saveInTransitHistory('inTransit');
     else getHistoryForTrustedContacts();
   }, [Contact]);
 
-  const onPressSend = () =>{
-    if(contactsType == "My Keepers"){
-      saveInTransitHistory("isSent");
-    }
-    else{
+  const onPressSend = () => {
+    if (contactsType == 'My Keepers') {
+      saveInTransitHistory('isSent');
+    } else {
       storeTrustedContactsHistory();
     }
-    props.navigation.navigate('Send', { isFromAddressBook: true })
-  }
+    props.navigation.navigate('Send', { isFromAddressBook: true });
+  };
 
   const createId = (length) => {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    var result = '';
+    var characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
     var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
- }
+  };
 
-  const storeTrustedContactsHistory = async() =>{
+  const storeTrustedContactsHistory = async () => {
     let OtherTrustedContactsHistory = [];
-    if(contactsType=="Other Trusted Contacts"){
-      let OtherTrustedContactsHistoryArray = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
-      OtherTrustedContactsHistory = OtherTrustedContactsHistoryArray
+    if (contactsType == 'Other Trusted Contacts') {
+      let OtherTrustedContactsHistoryArray = JSON.parse(
+        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
+      );
+      OtherTrustedContactsHistory = OtherTrustedContactsHistoryArray;
+    } else {
+      let IMKeeperOfHistory = JSON.parse(
+        await AsyncStorage.getItem('IMKeeperOfHistory'),
+      );
+      OtherTrustedContactsHistory = IMKeeperOfHistory;
     }
-    else{
-      let IMKeeperOfHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
-      OtherTrustedContactsHistory = IMKeeperOfHistory
-    }
-    if(!OtherTrustedContactsHistory){
+    if (!OtherTrustedContactsHistory) {
       OtherTrustedContactsHistory = [];
     }
     let obj = {
@@ -106,36 +109,43 @@ export default function ContactDetails(props) {
       title: 'Sent Amount',
       date: moment(Date.now()).valueOf(),
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    }
+    };
     OtherTrustedContactsHistory.push(obj);
-    if(contactsType=="Other Trusted Contacts"){
-      await AsyncStorage.setItem('OtherTrustedContactsHistory', JSON.stringify(OtherTrustedContactsHistory));
+    if (contactsType == 'Other Trusted Contacts') {
+      await AsyncStorage.setItem(
+        'OtherTrustedContactsHistory',
+        JSON.stringify(OtherTrustedContactsHistory),
+      );
+    } else {
+      await AsyncStorage.setItem(
+        'IMKeeperOfHistory',
+        JSON.stringify(OtherTrustedContactsHistory),
+      );
     }
-    else{
-      await AsyncStorage.setItem('IMKeeperOfHistory', JSON.stringify(OtherTrustedContactsHistory));
-    }
-    console.log("obj", OtherTrustedContactsHistory)
+    console.log('obj', OtherTrustedContactsHistory);
     setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
-  }
+  };
 
-  const getHistoryForTrustedContacts = async() =>{
+  const getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = [];
-    if(contactsType=="Other Trusted Contacts"){
-      OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
+    if (contactsType == 'Other Trusted Contacts') {
+      OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
+      );
+    } else {
+      OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('IMKeeperOfHistory'),
+      );
     }
-    else{
-      OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
-    }
-    if(!OtherTrustedContactsHistory){
+    if (!OtherTrustedContactsHistory) {
       OtherTrustedContactsHistory = [];
     }
-    if(OtherTrustedContactsHistory.length>0){
+    if (OtherTrustedContactsHistory.length > 0) {
       setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
-    }
-    else{
+    } else {
       setTrustedContactHistory([]);
     }
-  }
+  };
 
   const sortedHistory = useCallback((history) => {
     const currentHistory = history.filter((element) => {
@@ -161,7 +171,8 @@ export default function ContactDetails(props) {
       if (shareHistory[index].accessible)
         updatedTrustedContactHistory[2].date = shareHistory[index].accessible;
       if (shareHistory[index].notAccessible)
-        updatedTrustedContactHistory[3].date = shareHistory[index].notAccessible;
+        updatedTrustedContactHistory[3].date =
+          shareHistory[index].notAccessible;
       if (shareHistory[index].inSent)
         updatedTrustedContactHistory[4].date = shareHistory[index].inSent;
       setTrustedContactHistory(updatedTrustedContactHistory);
@@ -169,29 +180,34 @@ export default function ContactDetails(props) {
     [trustedContactHistory],
   );
 
-  const saveInTransitHistory = useCallback(async (type) => {
-    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
-    if (shareHistory) {
-      const updatedShareHistory = [...shareHistory];
-      if(type=="inTransit"){
-        updatedShareHistory[index] = {
-          ...updatedShareHistory[index],
-          inTransit: Date.now(),
-        };
-      }
-      if(type=="isSent"){
-        updatedShareHistory[index] = {
-          ...updatedShareHistory[index],
-          inSent: Date.now(),
-        };
-      }
-      updateHistory(updatedShareHistory);
-      await AsyncStorage.setItem(
-        'shareHistory',
-        JSON.stringify(updatedShareHistory),
+  const saveInTransitHistory = useCallback(
+    async (type) => {
+      const shareHistory = JSON.parse(
+        await AsyncStorage.getItem('shareHistory'),
       );
-    }
-  }, [updateHistory]);
+      if (shareHistory) {
+        const updatedShareHistory = [...shareHistory];
+        if (type == 'inTransit') {
+          updatedShareHistory[index] = {
+            ...updatedShareHistory[index],
+            inTransit: Date.now(),
+          };
+        }
+        if (type == 'isSent') {
+          updatedShareHistory[index] = {
+            ...updatedShareHistory[index],
+            inSent: Date.now(),
+          };
+        }
+        updateHistory(updatedShareHistory);
+        await AsyncStorage.setItem(
+          'shareHistory',
+          JSON.stringify(updatedShareHistory),
+        );
+      }
+    },
+    [updateHistory],
+  );
 
   const getImageIcon = (item) => {
     if (item) {
@@ -269,13 +285,41 @@ export default function ContactDetails(props) {
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            <TouchableOpacity style={styles.filterButton} onPress={() => {}}>
-              <Entypo
-                name={'dots-three-horizontal'}
-                size={RFValue(20)}
-                color={Colors.borderColor}
-              />
-            </TouchableOpacity>
+            {Contact.hasXpub && (
+              <TouchableOpacity
+                style={{
+                  width: wp('15%'),
+                  height: wp('6%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.lightBlue,
+                  marginLeft: 'auto',
+                  marginBottom: 10,
+                  borderRadius: 4,
+                  flexDirection: 'row',
+                  alignSelf: 'flex-end',
+                }}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                  style={{
+                    height: wp('4%'),
+                    width: wp('4%'),
+                    resizeMode: 'contain',
+                  }}
+                />
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontFamily: Fonts.FiraSansMedium,
+                    fontSize: RFValue(10),
+                    marginLeft: 2,
+                  }}
+                >
+                  Send
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         {sortedHistory(trustedContactHistory).length > 0 ? (
@@ -459,49 +503,38 @@ export default function ContactDetails(props) {
             </View>
           </View>
         )}
-        <View>
-          <View style={styles.bottomButton}>
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <TouchableOpacity style={styles.buttonInnerView}>
-                <Image
-                  source={require('../../assets/images/icons/openlink.png')}
-                  style={styles.buttonImage}
-                />
-                <Text style={styles.buttonText}>Help restore</Text>
-              </TouchableOpacity>
-            )}
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <View
-                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-              />
-            )}
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <TouchableOpacity style={styles.buttonInnerView}>
-                <Image
-                  source={require('../../assets/images/icons/openlink.png')}
-                  style={styles.buttonImage}
-                />
-                <Text style={styles.buttonText}>Reshare</Text>
-              </TouchableOpacity>
-            )}
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <View
-                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-              />
-            )}
-            <TouchableOpacity onPress={()=>onPressSend()} style={styles.buttonInnerView}>
+        {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              backgroundColor: Colors.white,
+              paddingTop: wp('3%'), paddingBottom:wp('4%'),
+              height: wp('30')
+            }}
+          >
+            <TouchableOpacity style={styles.bottomButton}>
               <Image
-                source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                source={require('../../assets/images/icons/icon_sell.png')}
                 style={styles.buttonImage}
               />
-              <Text style={styles.buttonText}>Send BTC</Text>
+              <View>
+                <Text style={styles.buttonText}>Help Restore</Text>
+                <Text numberOfLines={1} style={styles.buttonInfo}>Lorem ipsum dolor</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bottomButton}>
+              <Image
+                source={require('../../assets/images/icons/icon_buy.png')}
+                style={styles.buttonImage}
+              />
+              <View>
+                <Text style={styles.buttonText}>Request Key</Text>
+                <Text numberOfLines={1} style={styles.buttonInfo}>Lorem ipsum dolor</Text>
+              </View>
             </TouchableOpacity>
           </View>
-        </View>
+        )}
       </View>
     </View>
   );
@@ -585,29 +618,34 @@ const styles = StyleSheet.create({
     width: wp('30%'),
   },
   buttonImage: {
-    width: wp('4%'),
-    height: wp('4%'),
+    width: wp('10%'),
+    height: wp('10%'),
     resizeMode: 'contain',
-    tintColor: Colors.white,
+    tintColor: Colors.blue,
   },
   buttonText: {
-    color: Colors.white,
-    fontSize: RFValue(12),
+    color: Colors.black,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansMedium,
+    marginLeft: 10,
+  },
+  buttonInfo: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: 5,
     marginLeft: 10,
   },
   bottomButton: {
     flexDirection: 'row',
-    backgroundColor: Colors.blue,
-    height: 60,
+    backgroundColor: Colors.white,
+    height: wp('17%'),
+    width: wp('40%'),
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: hp('4%'),
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 15, height: 15 },
+    borderWidth: 0.5,
+    borderColor: Colors.borderColor,
+    alignSelf:'center'
   },
 });
