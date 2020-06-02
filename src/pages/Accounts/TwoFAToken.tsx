@@ -28,11 +28,20 @@ import {
 } from '../../store/actions/accounts';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import BottomSheet from 'reanimated-bottom-sheet';
+import ModalHeader from '../../components/ModalHeader';
+import SendConfirmationContent from './SendConfirmationContent';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
   const serviceType = props.navigation.getParam('serviceType');
   const recipientAddress = props.navigation.getParam('recipientAddress');
+  const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const { transfer, loading } = useSelector(
+    (state) => state.accounts[serviceType],
+  );
 
   function onPressNumber(text) {
     let tmpToken = token;
@@ -67,9 +76,48 @@ export default function TwoFAToken(props) {
     />
   );
 
-  const { transfer, loading } = useSelector(
-    (state) => state.accounts[serviceType],
-  );
+  useEffect(() => {
+    if (transfer.stage2.failed) {
+      SendUnSuccessBottomSheet.current.snapTo(1);
+    }
+  }, [transfer]);
+
+  const renderSendUnSuccessContents = () => {
+    return (
+      <SendConfirmationContent
+        title={'Sent Unsuccessful'}
+        info={'There seems to be a problem'}
+        userInfo={transfer.details}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        onPressCancel={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        isUnSuccess={true}
+      />
+    );
+  };
+
+  const renderSendUnSuccessHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          //  dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   if (transfer.txid) return renderSuccessStatusContents();
   return (
@@ -316,6 +364,16 @@ export default function TwoFAToken(props) {
             <Text>I am having problems with my 2FA</Text>
           </TouchableOpacity>
         </View> */}
+        <BottomSheet
+          onCloseStart={() => {
+            SendUnSuccessBottomSheet.current.snapTo(0);
+          }}
+          enabledInnerScrolling={true}
+          ref={SendUnSuccessBottomSheet}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={renderSendUnSuccessContents}
+          renderHeader={renderSendUnSuccessHeader}
+        />
       </View>
     </SafeAreaView>
   );

@@ -254,6 +254,7 @@ export default class BaseAccount {
   public getDerivativeAccAddress = async (
     accountType: string,
     accountNumber?: number,
+    contactName?: string,
   ): Promise<
     | {
         status: number;
@@ -274,6 +275,7 @@ export default class BaseAccount {
         data: await this.hdWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
+          contactName,
         ),
       };
     } catch (err) {

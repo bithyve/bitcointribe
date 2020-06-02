@@ -108,14 +108,14 @@ export default function Send(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [accountData, setAccountData] = useState([
     {
-      id: 'checking account',
+      id: REGULAR_ACCOUNT,
       account_name: 'Checking Account',
       type: REGULAR_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_regular_account.png'),
     },
     {
-      id: 'saving account',
+      id: SECURE_ACCOUNT,
       account_name: 'Saving Account',
       type: SECURE_ACCOUNT,
       checked: false,
