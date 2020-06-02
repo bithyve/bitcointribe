@@ -40,13 +40,13 @@ const TransactionsContent = ({ transactions, TransactionDetailsBottomSheet, AtCl
                                 <AppBottomSheetTouchableWrapper
                                     onPress={
                                         () => {
-                                            (TransactionDetailsBottomSheet as any).current.snapTo(1);
+                                            debugger
+                                            (TransactionDetailsBottomSheet as any).snapTo(1);
                                             setTimeout(() => {
                                                 setTransactionItem(item);
                                                 setTabBarZIndex(0);
                                             }, 10);
                                         }
-                                        //props.navigation.navigate('TransactionDetails', { item })
                                     }
                                     style={{
                                         ...styles.transactionModalElementView,

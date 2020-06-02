@@ -52,38 +52,27 @@ export default function TransactionDetails(props) {
     })();
   }, [txDetails]);
 
+  if (!txDetails) {
+    return null
+  }
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          {/* <TouchableOpacity
-                onPress={() => {
-                  if (getServiceType && serviceType) {
-                    getServiceType(serviceType);
-                  }
-                  props.navigation.goBack();
-                }}
-                style={{ height: 30, width: 30, justifyContent: 'center' }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity> */}
           <Text style={styles.modalHeaderTitleText}>
             {'Transaction Details'}
           </Text>
           {serviceType && serviceType == TEST_ACCOUNT ? (
-            <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto',}}onPress={() => props.onPressKnowMore()}>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                marginLeft: 'auto',
-              }}
-            >
-              Know more
+            <AppBottomSheetTouchableWrapper style={{ marginLeft: 'auto', }} onPress={() => props.onPressKnowMore()}>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  marginLeft: 'auto',
+                }}
+              >
+                Know more
             </Text>
             </AppBottomSheetTouchableWrapper>
           ) : null}

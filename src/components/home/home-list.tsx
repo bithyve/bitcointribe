@@ -19,8 +19,6 @@ import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
 
 const HomeList = ({ Items, navigation, getIconByAccountType, switchOn, accounts, CurrencyCode, balances, exchangeRates }) => {
-    console.log("Called HomeList");
-
     return (
         <View style={{ flexDirection: 'column' }}>
             {Items.item.map((value) => {
