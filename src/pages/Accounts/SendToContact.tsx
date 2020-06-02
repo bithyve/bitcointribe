@@ -39,6 +39,7 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import RemoveSelectedTransaction from './RemoveSelectedTrasaction';
 import SendConfirmationContent from './SendConfirmationContent';
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
@@ -135,17 +136,34 @@ export default function SendToContact(props) {
       const recipientId = item.selectedContact.id;
       const isValidAddress = instance.isValidAddress(recipientId);
       if (isValidAddress) {
+        // recipient: explicit address
         recipients.push({
           id: recipientId,
           address: recipientId,
           amount: parseInt(item.bitcoinAmount),
         });
       } else {
-        recipients.push({
-          id: recipientId,
-          address: null,
-          amount: parseInt(item.bitcoinAmount),
-        });
+        if (
+          recipientId === REGULAR_ACCOUNT ||
+          recipientId === REGULAR_ACCOUNT
+        ) {
+          // recipient: sibling account
+          recipients.push({
+            id: recipientId,
+            address: null,
+            amount: parseInt(item.bitcoinAmount),
+          });
+        } else {
+          // recipient: trusted contact
+          const contactName = `${item.selectedContact.firstName} ${
+            item.selectedContact.lastName ? item.selectedContact.lastName : ''
+          }`.toLowerCase();
+          recipients.push({
+            id: contactName,
+            address: null,
+            amount: parseInt(item.bitcoinAmount),
+          });
+        }
       }
     });
     setRecipients(recipients);

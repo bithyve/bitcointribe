@@ -44,11 +44,14 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   FAST_BITCOINS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -348,19 +351,32 @@ function* processRecipients(
   recipients: [{ id: string; address: string; amount: number }],
 ) {
   const addressedRecipients = [];
+  const regularAccount: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const secureAccount: SecureAccount = yield select(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
   for (const recipient of recipients) {
     if (recipient.address) addressedRecipients.push(recipient);
-    // recipient: manual
+    // recipient: explicit address
     else {
       if (!recipient.id) throw new Error('Invalid recipient');
       if (recipient.id === REGULAR_ACCOUNT || recipient.id === SECURE_ACCOUNT) {
-        // recipient: self account
-        const service = yield select(
-          (state) => state.accounts[recipient.id].service,
-        );
-        let { receivingAddress } = service.hdWallet || service.secureHDWallet; // available based on serviceType
+        // recipient: sibling account
+        const instance =
+          recipient.id === REGULAR_ACCOUNT ? regularAccount : secureAccount;
+        const subInstance =
+          recipient.id === REGULAR_ACCOUNT
+            ? regularAccount.hdWallet
+            : secureAccount.secureHDWallet;
+        let { receivingAddress } = subInstance; // available based on serviceType
         if (!receivingAddress) {
-          const res = yield call(service.getAddress);
+          const res = yield call(instance.getAddress);
           if (res.status === 200) {
             receivingAddress = res.data.address;
           } else {
@@ -373,6 +389,24 @@ function* processRecipients(
         addressedRecipients.push(recipient);
       } else {
         // recipient: Trusted Contact
+        const contactName = recipient.id;
+
+        const res = yield call(
+          regularAccount.getDerivativeAccAddress,
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        console.log({ res });
+        if (res.status === 200) {
+          const receivingAddress = res.data.address;
+          recipient.address = receivingAddress;
+          addressedRecipients.push(recipient);
+        } else {
+          throw new Error(
+            `Failed to generate receiving address for recipient: ${recipient.id}`,
+          );
+        }
       }
     }
   }
@@ -385,7 +419,12 @@ function* transferST1Worker({ payload }) {
   let { recipients, averageTxFees } = payload;
   console.log({ recipients });
 
-  recipients = yield call(processRecipients, recipients);
+  try {
+    recipients = yield call(processRecipients, recipients);
+  } catch (err) {
+    yield put(failedST1(payload.serviceType));
+    return;
+  }
   console.log({ recipients });
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
