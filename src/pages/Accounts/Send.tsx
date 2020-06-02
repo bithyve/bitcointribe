@@ -49,6 +49,7 @@ import {
   addTransferDetails,
   clearTransfer,
 } from '../../store/actions/accounts';
+import BottomInfoBox from '../../components/BottomInfoBox';
 
 export default function Send(props) {
   const dispatch = useDispatch();
@@ -334,6 +335,8 @@ export default function Send(props) {
   const renderQRCodeThumbnail = () => {
     if (openCameraFlag) {
       return (
+        <View style={{justifyContent: 'center',
+        alignItems: 'center',}}>
         <View style={styles.cameraView}>
           <RNCamera
             ref={(ref) => {
@@ -343,7 +346,7 @@ export default function Send(props) {
             onBarCodeRead={barcodeRecognized}
             captureAudio={false}
           >
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1,}}>
               <View style={styles.topCornerView}>
                 <View style={styles.topLeftCornerView} />
                 <View style={styles.topRightCornerView} />
@@ -355,15 +358,17 @@ export default function Send(props) {
             </View>
           </RNCamera>
         </View>
+        </View>
       );
     }
 
     return (
-      <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
+      <TouchableOpacity style={{justifyContent: 'center',
+      alignItems: 'center',}} onPress={() => setOpenCameraFlag(true)}>
         <ImageBackground
           source={require('../../assets/images/icons/iPhone-QR.png')}
           style={{
-            width: wp('100%'),
+            width: wp('90%'),
             height: wp('70%'),
             overflow: 'hidden',
             borderRadius: 20,
@@ -788,53 +793,68 @@ export default function Send(props) {
                         />
                       </TouchableOpacity>
                     </View>
-                    <View
-                      style={{
-                        ...styles.textBoxView,
-                        flexDirection: 'column',
-                        height: 90,
-                        justifyContent: 'center',
-                        backgroundColor: Colors.backgroundColor,
-                        borderColor: Colors.backgroundColor,
-                      }}
-                    >
+                    {trustedContacts.length ? (
                       <View
                         style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
+                          ...styles.textBoxView,
+                          flexDirection: 'column',
+                          height: 90,
+                          justifyContent: 'center',
+                          backgroundColor: Colors.backgroundColor,
+                          borderColor: Colors.backgroundColor,
                         }}
                       >
-                        <TouchableOpacity
+                        <View
                           style={{
-                            backgroundColor: Colors.white,
-                            height: wp('12%'),
-                            width: wp('6%'),
-                            justifyContent: 'center',
+                            flex: 1,
+                            flexDirection: 'row',
                             alignItems: 'center',
-                            alignSelf: 'center',
-                            borderRadius: 5,
-                            marginLeft: 10,
-                            marginRight: 15,
                           }}
                         >
-                          <Ionicons
-                            name={'ios-arrow-back'}
-                            size={RFValue(20)}
-                            color={Colors.borderColor}
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: Colors.white,
+                              height: wp('12%'),
+                              width: wp('6%'),
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignSelf: 'center',
+                              borderRadius: 5,
+                              marginLeft: 10,
+                              marginRight: 15,
+                            }}
+                          >
+                            <Ionicons
+                              name={'ios-arrow-back'}
+                              size={RFValue(20)}
+                              color={Colors.borderColor}
+                            />
+                          </TouchableOpacity>
+                          <FlatList
+                            horizontal
+                            nestedScrollEnabled={true}
+                            showsHorizontalScrollIndicator={false}
+                            data={trustedContacts}
+                            renderItem={renderContacts}
+                            extraData={transfer.details}
+                            keyExtractor={(item, index) => index.toString()}
                           />
-                        </TouchableOpacity>
-                        <FlatList
-                          horizontal
-                          nestedScrollEnabled={true}
-                          showsHorizontalScrollIndicator={false}
-                          data={trustedContacts}
-                          renderItem={renderContacts}
-                          extraData={transfer.details}
-                          keyExtractor={(item, index) => index.toString()}
-                        />
+                        </View>
                       </View>
-                    </View>
+                    ) : (
+                      <View style={{marginBottom: -25,
+                        padding: -20,
+                        marginLeft: -20,
+                        marginRight: -20,}}>
+                      <BottomInfoBox
+                        titleColor={Colors.black1}
+                        title={'You have not added any Trusted Contact'}
+                        infoText={
+                          'Add a Trusted Contact to send them sats without having to scan an address'
+                        }
+                      />
+                      </View>
+                    )}
                   </View>
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
@@ -1003,14 +1023,14 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   cameraView: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
     overflow: 'hidden',
     borderRadius: 20,
   },
   camera: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
   },
   topCornerView: {
     flexDirection: 'row',

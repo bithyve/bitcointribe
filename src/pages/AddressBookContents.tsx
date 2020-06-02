@@ -20,6 +20,7 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { trustedChannelXpubUpload } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
@@ -29,6 +30,7 @@ import {
 import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
 import { nameToInitials } from '../common/CommonFunctions';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function AddressBookContents(props) {
   let [MyKeeper, setMyKeeper] = useState([]);
@@ -45,6 +47,9 @@ export default function AddressBookContents(props) {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
       'TrustedContactsInfo',
     );
+    let myKeepers = [];
+    let imKeepers = [];
+    let otherTrustedContact = [];
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
@@ -92,19 +97,14 @@ export default function AddressBookContents(props) {
             isWard,
             ...contactInfo,
           });
-        }
-        let myKeepers = [];
-        let imKeepers = [];
-        let otherTrustedContact = [];
-        for (let i = 0; i < trustedContacts.length; i++) {
-          const element = trustedContacts[i];
-          if(element.isGuardian){
+          const element = trustedContacts[index];
+          if (element.isGuardian) {
             myKeepers.push(element);
           }
-          if(element.isWard){
+          if (element.isWard) {
             imKeepers.push(element);
           }
-          if(!element.isWard && !element.isGuardian){
+          if (!element.isWard && !element.isGuardian) {
             otherTrustedContact.push(element);
           }
         }
@@ -182,7 +182,7 @@ export default function AddressBookContents(props) {
           props.navigation.navigate('ContactDetails', {
             contactsType,
             contact,
-            index
+            index,
           });
         }}
         style={styles.selectedContactsView}
@@ -291,16 +291,18 @@ export default function AddressBookContents(props) {
                 size={17}
               />
             </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>{'Friends and Family'}</Text>
+            <Text style={styles.modalHeaderTitleText}>
+              {'Friends and Family'}
+            </Text>
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
-            Contacts who can help me restore my wallet.
+              Contacts who can help me restore my wallet.
             </Text>
-            {MyKeeper && MyKeeper ? (
+            {MyKeeper && MyKeeper.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {MyKeeper.map((item, index) => {
@@ -330,10 +332,39 @@ export default function AddressBookContents(props) {
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who I can pay directly.
-            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <View>
+                <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
+                <Text style={styles.pageInfoText}>
+                  Contacts who I can pay directly.
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={{
+                  width: wp('25%'),
+                  height: wp('8%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.blue,
+                  marginLeft: 'auto',
+                  marginRight: 15,
+                  borderRadius: 8,
+                  flexDirection: 'row',
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontFamily: Fonts.FiraSansMedium,
+                    fontSize: RFValue(10),
+                    marginRight: 3,
+                  }}
+                >
+                  Add Contact
+                </Text>
+                <Entypo name={'plus'} size={RFValue(12)} color={Colors.white} />
+              </TouchableOpacity>
+            </View>
             {OtherTrustedContact && OtherTrustedContact.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
@@ -346,6 +377,16 @@ export default function AddressBookContents(props) {
               getWaterMark()
             )}
           </View>
+          {OtherTrustedContact.length == 0 &&
+            IMKeeper.length == 0 &&
+            MyKeeper.length == 0 && (
+              <BottomInfoBox
+                title={'Note'}
+                infoText={
+                  'All your contacts appear here when added to Hexa wallet'
+                }
+              />
+            )}
         </ScrollView>
       </View>
     </View>
@@ -424,7 +465,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: 5
+    marginTop: 3,
   },
   watermarkViewBigText: {
     backgroundColor: Colors.backgroundColor,
