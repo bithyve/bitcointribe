@@ -11,7 +11,7 @@ import sssReducer from './reducers/sss';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
-import sendReducer from './reducers/sendReducer';
+import sendReducer from './reducers/send';
 
 import {
   initDBWatcher,
@@ -219,7 +219,7 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
-  sendReducer,
+  send: sendReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();
