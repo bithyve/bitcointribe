@@ -364,7 +364,7 @@ export default function SendToContact(props) {
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           placeholder={
-            switchOn ? 'Enter Amount in Sats' : 'Converted Amount in Sats'
+            switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
           }
           editable={switchOn}
           value={bitcoinAmount}
@@ -416,7 +416,7 @@ export default function SendToContact(props) {
           style={{ ...styles.textBox, paddingLeft: 10 }}
           editable={!switchOn}
           placeholder={
-            switchOn ? 'Converted Amount in Dollars' : 'Enter Amount in Dollars'
+            switchOn ? 'Converted amount in dollars' : 'Enter amount in dollars'
           }
           value={currencyAmount}
           returnKeyLabel="Done"
