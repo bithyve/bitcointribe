@@ -47,6 +47,7 @@ import io.fabric.sdk.android.Fabric;
 import io.hexawallet.hexa.PdfPasswordPackage;
 
 import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
 import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
 import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
 
@@ -69,7 +70,7 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(new MainReactPackage(),
             new ReactNativeConfigPackage(),
-            new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),
+            new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),new RNFirebaseAnalyticsPackage(),
           new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
           new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
           new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),

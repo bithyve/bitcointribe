@@ -9,7 +9,6 @@ import {
   StatusBar,
   AsyncStorage,
   Image,
-  Platform,
   ScrollView,
 } from 'react-native';
 import {
@@ -21,11 +20,6 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import ModalHeader from '../components/ModalHeader';
-import AddressBookFilterModalContent from './Contacts/AddressBookFilterModalContent';
-import DeviceInfo from 'react-native-device-info';
-import BottomSheet from 'reanimated-bottom-sheet';
-import BottomInfoBox from '../components/BottomInfoBox';
 import { trustedChannelXpubUpload } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
@@ -37,10 +31,6 @@ import { nameToInitials } from '../common/CommonFunctions';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 
 export default function AddressBookContents(props) {
-  let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
-    React.createRef(),
-  );
-  let [trustedContacts, setTrustedContacts] = useState([]);
   let [MyKeeper, setMyKeeper] = useState([]);
   let [IMKeeper, setIMKeeper] = useState([]);
   let [OtherTrustedContact, setOtherTrustedContact] = useState([]);
@@ -121,7 +111,6 @@ export default function AddressBookContents(props) {
         setMyKeeper(myKeepers);
         setIMKeeper(imKeepers);
         setOtherTrustedContact(otherTrustedContact);
-        setTrustedContacts(trustedContacts);
       }
     }
   };
@@ -134,28 +123,6 @@ export default function AddressBookContents(props) {
   useEffect(() => {
     dispatch(trustedChannelXpubUpload());
   }, []);
-
-  function renderFilterModalContent() {
-    return (
-      <AddressBookFilterModalContent
-        modalRef={FilterModalBottomSheet}
-        onPressBack={() => {
-          (FilterModalBottomSheet.current as any).snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const renderFilterModalHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (FilterModalBottomSheet.current as any).snapTo(0);
-        }}
-        backgroundColor={Colors.backgroundColor1}
-      />
-    );
-  };
 
   const getImageIcon = (item) => {
     if (item) {
@@ -324,26 +291,14 @@ export default function AddressBookContents(props) {
                 size={17}
               />
             </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>{'Address Book'}</Text>
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={() => {
-                (FilterModalBottomSheet.current as any).snapTo(1);
-              }}
-            >
-              <Text style={styles.filterButtonText}>Filter</Text>
-              <Image
-                style={styles.filterButtonImage}
-                source={require('../assets/images/icons/filter.png')}
-              />
-            </TouchableOpacity>
+            <Text style={styles.modalHeaderTitleText}>{'Friends and Family'}</Text>
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing
+            Contacts who can help me restore my wallet.
             </Text>
             {MyKeeper && MyKeeper ? (
               <View style={{ marginBottom: 15 }}>
@@ -360,7 +315,7 @@ export default function AddressBookContents(props) {
           <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>I am the keeper of</Text>
             <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing
+              Contacts who I can help restore their wallets.
             </Text>
             {IMKeeper && IMKeeper.length ? (
               <View style={{ marginBottom: 15 }}>
@@ -368,19 +323,6 @@ export default function AddressBookContents(props) {
                   {IMKeeper.map((item, index) => {
                     return getElement(item, index, "I'm Keeper of");
                   })}
-                  {/* {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
-                    <View>
-                      {SecondaryDeviceAddress.map((item, index) => {
-                        return (
-                          <View style={styles.selectedContactsView}>
-                            <Text style={styles.contactText}>
-                              {item.requester}
-                            </Text>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  ) : null} */}
                 </View>
               </View>
             ) : (
@@ -390,7 +332,7 @@ export default function AddressBookContents(props) {
           <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
             <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing
+              Contacts who I can pay directly.
             </Text>
             {OtherTrustedContact && OtherTrustedContact.length ? (
               <View style={{ marginBottom: 15 }}>
@@ -404,24 +346,8 @@ export default function AddressBookContents(props) {
               getWaterMark()
             )}
           </View>
-          <BottomInfoBox
-            title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-            }
-          />
         </ScrollView>
       </View>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={FilterModalBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
-        ]}
-        renderContent={renderFilterModalContent}
-        renderHeader={renderFilterModalHeader}
-      />
     </View>
   );
 }
@@ -487,11 +413,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  shareButtonText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
-  },
   pageTitle: {
     marginLeft: 30,
     color: Colors.blue,
@@ -503,6 +424,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: 5
   },
   watermarkViewBigText: {
     backgroundColor: Colors.backgroundColor,
@@ -530,33 +452,5 @@ const styles = StyleSheet.create({
     height: wp('3%'),
     width: wp('3%'),
     borderRadius: wp('3%') / 2,
-  },
-  cardImage: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-  },
-  filterButton: {
-    height: wp('8%'),
-    width: wp('20%'),
-    backgroundColor: Colors.lightBlue,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 7,
-    marginLeft: 'auto',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  filterButtonText: {
-    color: Colors.white,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  filterButtonImage: {
-    width: 12,
-    height: 12,
-    resizeMode: 'contain',
-    marginLeft: 5,
   },
 });
