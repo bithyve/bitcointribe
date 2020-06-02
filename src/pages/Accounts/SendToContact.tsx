@@ -13,6 +13,7 @@ import {
   StatusBar,
   BackHandler,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -26,10 +27,10 @@ import ToggleSwitch from '../../components/ToggleSwitch';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  saveSendDetails,
-  removeFromSendDetails,
-} from '../../store/actions/send';
-import { transferST1 } from '../../store/actions/accounts';
+  transferST1,
+  addTransferDetails,
+  removeTransferDetails,
+} from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -46,7 +47,6 @@ export default function SendToContact(props) {
   const [exchangeRates, setExchangeRates] = useState(
     accounts && accounts.exchangeRates,
   );
-  const sendStorage = useSelector((state) => state.send.sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
@@ -67,7 +67,8 @@ export default function SendToContact(props) {
     React.createRef<BottomSheet>(),
   );
   const [recipients, setRecipients] = useState([]);
-  const { transfer } = useSelector((state) => state.accounts[serviceType]);
+  const loading = useSelector((state) => state.accounts[serviceType].loading);
+  const transfer = useSelector((state) => state.accounts[serviceType].transfer);
 
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -123,7 +124,7 @@ export default function SendToContact(props) {
     };
 
     const recipientsList = [];
-    sendStorage.forEach((instance) => {
+    transfer.details.forEach((instance) => {
       if (instance.bitcoinAmount) recipientsList.push(instance);
     });
     recipientsList.push(currentRecipientInstance);
@@ -309,7 +310,7 @@ export default function SendToContact(props) {
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
         info={'There seems to be a problem'}
-        userInfo={sendStorage}
+        userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
@@ -443,7 +444,7 @@ export default function SendToContact(props) {
           }}
           onPressDone={() => {
             setTimeout(() => {
-              dispatch(removeFromSendDetails(removeItem));
+              dispatch(removeTransferDetails(serviceType, removeItem));
             }, 2);
             (RemoveBottomSheet as any).current.snapTo(0);
           }}
@@ -469,14 +470,18 @@ export default function SendToContact(props) {
   }, []);
 
   const checkRecordsHavingPrice = () => {
-    if (sendStorage && sendStorage.length) {
-      for (let i = 0; i < sendStorage.length; i++) {
+    if (transfer.details && transfer.details.length) {
+      for (let i = 0; i < transfer.details.length; i++) {
         if (
-          !sendStorage[i].selectedContact.hasOwnProperty('bitcoinAmount') &&
-          !sendStorage[i].selectedContact.hasOwnProperty('currencyAmount') &&
-          selectedContact.id == sendStorage[i].selectedContact.id
+          !transfer.details[i].selectedContact.hasOwnProperty(
+            'bitcoinAmount',
+          ) &&
+          !transfer.details[i].selectedContact.hasOwnProperty(
+            'currencyAmount',
+          ) &&
+          selectedContact.id == transfer.details[i].selectedContact.id
         ) {
-          dispatch(removeFromSendDetails(sendStorage[i]));
+          dispatch(removeTransferDetails(serviceType, transfer.details[i]));
         }
       }
     }
@@ -489,14 +494,14 @@ export default function SendToContact(props) {
       setIsConfirmDisabled(true);
     } else {
       setIsConfirmDisabled(false);
-      if (sendStorage && sendStorage.length) {
-        for (let i = 0; i < sendStorage.length; i++) {
-          if (sendStorage[i].selectedContact.id == selectedContact.id) {
-            dispatch(removeFromSendDetails(sendStorage[i]));
+      if (transfer.details && transfer.details.length) {
+        for (let i = 0; i < transfer.details.length; i++) {
+          if (transfer.details[i].selectedContact.id == selectedContact.id) {
+            dispatch(removeTransferDetails(serviceType, transfer.details[i]));
           }
         }
         dispatch(
-          saveSendDetails({
+          addTransferDetails(serviceType, {
             selectedContact,
             bitcoinAmount,
             currencyAmount,
@@ -545,9 +550,9 @@ export default function SendToContact(props) {
         </View>
       </View>
       <View style={{ width: wp('85%'), alignSelf: 'center' }}>
-        {sendStorage && sendStorage.length > 0 ? (
+        {transfer.details && transfer.details.length > 0 ? (
           <ScrollView horizontal={true}>
-            {sendStorage.map((item) => renderMultipleContacts(item))}
+            {transfer.details.map((item) => renderMultipleContacts(item))}
           </ScrollView>
         ) : null}
       </View>
@@ -701,7 +706,7 @@ export default function SendToContact(props) {
                 onPress={() => {
                   checkBalance();
                 }}
-                disabled={isConfirmDisabled}
+                disabled={isConfirmDisabled || loading.transfer}
                 style={{
                   ...styles.confirmButtonView,
                   backgroundColor: Colors.blue,
@@ -715,7 +720,11 @@ export default function SendToContact(props) {
                 {/* {loading.transfer && !isInvalidBalance ? (
                         <ActivityIndicator size="small" color={Colors.white} />
                       ) : ( */}
-                <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                {loading.transfer ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
+                )}
                 {/* )} */}
               </TouchableOpacity>
               <TouchableOpacity
@@ -724,22 +733,28 @@ export default function SendToContact(props) {
                   width: wp('30%'),
                   marginLeft: 10,
                 }}
-                disabled={isConfirmDisabled}
+                disabled={isConfirmDisabled || loading.transfer}
                 onPress={() => {
                   // dispatch(clearTransfer(serviceType));
                   // if (getServiceType) {
                   //   getServiceType(serviceType);
                   // }
-                  if (sendStorage && sendStorage.length) {
-                    for (let i = 0; i < sendStorage.length; i++) {
+                  if (transfer.details && transfer.details.length) {
+                    for (let i = 0; i < transfer.details.length; i++) {
                       if (
-                        sendStorage[i].selectedContact.id == selectedContact.id
+                        transfer.details[i].selectedContact.id ==
+                        selectedContact.id
                       ) {
-                        dispatch(removeFromSendDetails(sendStorage[i]));
+                        dispatch(
+                          removeTransferDetails(
+                            serviceType,
+                            transfer.details[i],
+                          ),
+                        );
                       }
                     }
                     dispatch(
-                      saveSendDetails({
+                      addTransferDetails(serviceType, {
                         selectedContact,
                         bitcoinAmount,
                         currencyAmount,

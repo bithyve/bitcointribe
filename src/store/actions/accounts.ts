@@ -8,6 +8,8 @@ export const TRANSFER_ST2 = 'TRANSFER_ST2';
 export const ALTERNATE_TRANSFER_ST2 = 'ALTERNATE_TRANSFER_ST2';
 export const TRANSFER_ST3 = 'TRANSFER_ST3';
 export const GET_TESTCOINS = 'GET_TESTCOINS';
+export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS';
+export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS';
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
@@ -71,6 +73,20 @@ export const transferST3 = (serviceType, token) => {
 export const getTestcoins = (serviceType) => {
   // Test account specific
   return { type: GET_TESTCOINS, payload: { serviceType } };
+};
+
+export const addTransferDetails = (serviceType, recipientData) => {
+  return {
+    type: ADD_TRANSFER_DETAILS,
+    payload: { serviceType, recipientData },
+  };
+};
+
+export const removeTransferDetails = (serviceType, recipientData) => {
+  return {
+    type: REMOVE_TRANSFER_DETAILS,
+    payload: { serviceType, recipientData },
+  };
 };
 
 export const clearTransfer = (serviceType) => {

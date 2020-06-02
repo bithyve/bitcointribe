@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -19,7 +20,12 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
-import { transferST1, transferST2 } from '../../store/actions/accounts';
+import {
+  transferST1,
+  transferST2,
+  clearTransfer,
+  fetchBalanceTx,
+} from '../../store/actions/accounts';
 import { UsNumberFormat } from '../../common/utilities';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Slider from 'react-native-slider';
@@ -38,11 +44,11 @@ export default function SendConfirmation(props) {
     if (accounts && accounts.exchangeRates)
       setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
-  const sendStorage = useSelector((state) => state.send.sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
-  const { transfer } = useSelector((state) => state.accounts[serviceType]);
+  const loading = useSelector((state) => state.accounts[serviceType].loading);
+  const transfer = useSelector((state) => state.accounts[serviceType].transfer);
 
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
@@ -82,7 +88,7 @@ export default function SendConfirmation(props) {
   // }, [sliderValueText]);
 
   useEffect(() => {
-    if (transfer.stage2.failed || transfer.stage3.failed) {
+    if (transfer.stage2.failed) {
       SendUnSuccessBottomSheet.current.snapTo(1);
     } else if (transfer.txid) {
       SendSuccessBottomSheet.current.snapTo(1);
@@ -168,7 +174,7 @@ export default function SendConfirmation(props) {
 
   const getTotalAmount = () => {
     let totalAmount = 0;
-    sendStorage.map((item) => {
+    transfer.details.map((item) => {
       totalAmount += parseInt(item.bitcoinAmount);
     });
     return totalAmount;
@@ -219,7 +225,7 @@ export default function SendConfirmation(props) {
       <SendConfirmationContent
         title={'Sent Successfully'}
         info={'Bitcoins successfully sent to Contact'}
-        userInfo={sendStorage}
+        userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
@@ -227,7 +233,15 @@ export default function SendConfirmation(props) {
         onPressOk={() => {
           if (SendSuccessBottomSheet.current)
             SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.replace('Accounts', { serviceType: serviceType });
+
+          dispatch(clearTransfer(serviceType));
+          // dispatch(fetchTransactions(serviceType));
+          dispatch(
+            fetchBalanceTx(serviceType, {
+              loader: true,
+            }),
+          );
+          props.navigation.navigate('Accounts');
         }}
         isSuccess={true}
       />
@@ -251,7 +265,7 @@ export default function SendConfirmation(props) {
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
         info={'There seems to be a problem'}
-        userInfo={sendStorage}
+        userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
@@ -391,9 +405,9 @@ export default function SendConfirmation(props) {
             </Text>
           </Text>
         </View>
-        {sendStorage && sendStorage.length > 0 ? (
+        {transfer.details && transfer.details.length > 0 ? (
           <ScrollView>
-            {sendStorage.map((item) => renderContacts(item))}
+            {transfer.details.map((item) => renderContacts(item))}
           </ScrollView>
         ) : null}
 
@@ -586,6 +600,7 @@ export default function SendConfirmation(props) {
         >
           <TouchableOpacity
             onPress={onConfirm}
+            disabled={loading.transfer}
             style={{
               ...styles.confirmButtonView,
               backgroundColor: Colors.blue,
@@ -595,7 +610,11 @@ export default function SendConfirmation(props) {
               shadowOffset: { width: 15, height: 15 },
             }}
           >
-            <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+            {loading.transfer ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={{
