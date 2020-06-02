@@ -35,10 +35,6 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
-import {
-  clearContactsAccountSendStorage,
-  storeContactsAccountToSend,
-} from '../../store/actions/send-action';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { UsNumberFormat } from '../../common/utilities';
@@ -49,6 +45,10 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import {
+  addTransferDetails,
+  clearTransfer,
+} from '../../store/actions/accounts';
 
 export default function Send(props) {
   const dispatch = useDispatch();
@@ -64,9 +64,10 @@ export default function Send(props) {
   );
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
-  const { transfer, loading, service } = useSelector(
-    (state) => state.accounts[serviceType],
-  );
+
+  const service = useSelector((state) => state.accounts[serviceType].service);
+  const transfer = useSelector((state) => state.accounts[serviceType].transfer);
+
   const getServiceType = props.navigation.getParam('getServiceType')
     ? props.navigation.getParam('getServiceType')
     : null;
@@ -83,7 +84,6 @@ export default function Send(props) {
   });
   const [filterContactData, setFilterContactData] = useState([]);
   const accounts = useSelector((state) => state.accounts);
-  const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
@@ -108,26 +108,26 @@ export default function Send(props) {
   const [isEditable, setIsEditable] = useState(true);
   const [accountData, setAccountData] = useState([
     {
-      id: '1',
+      id: 'checking account',
       account_name: 'Checking Account',
       type: REGULAR_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_regular_account.png'),
     },
     {
-      id: '2',
+      id: 'saving account',
       account_name: 'Saving Account',
       type: SECURE_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_secureaccount_white.png'),
     },
-    {
-      id: '3',
-      account_name: 'Test Account',
-      type: TEST_ACCOUNT,
-      checked: false,
-      image: require('../../assets/images/icons/icon_test_white.png'),
-    },
+    // {
+    //   id: '3',
+    //   account_name: 'Test Account',
+    //   type: TEST_ACCOUNT,
+    //   checked: false,
+    //   image: require('../../assets/images/icons/icon_test_white.png'),
+    // },
   ]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
@@ -181,7 +181,7 @@ export default function Send(props) {
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
-        let trustedContacts = [];
+        const sendableTrustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
           const contactInfo = trustedContactsInfo[index];
           if (!contactInfo) continue;
@@ -217,32 +217,38 @@ export default function Send(props) {
               .isWard;
 
           const isGuardian = index < 3 ? true : false;
-          trustedContacts.push({
-            contactName,
-            connectedVia,
-            hasXpub,
-            isGuardian,
-            isWard,
-            ...contactInfo,
-          });
-        }
-        let tempTrustedContact = [];
-        for (let i = 0; i < trustedContacts.length; i++) {
-          const element = trustedContacts[i];
-          if (element.contactName != 'Secondary Device' && element.id) {
-            tempTrustedContact.push(element);
+          if (hasXpub) {
+            // sendable
+            sendableTrustedContacts.push({
+              contactName,
+              connectedVia,
+              hasXpub,
+              isGuardian,
+              isWard,
+              ...contactInfo,
+            });
           }
         }
-        let filteredTrustedContacts = tempTrustedContact.sort(function (a, b) {
-          if (a.contactName && b.contactName) {
-            if (a.contactName.toLowerCase() < b.contactName.toLowerCase())
+
+        let sortedTrustedContacts = sendableTrustedContacts.sort(function (
+          contactA,
+          contactB,
+        ) {
+          if (contactA.contactName && contactB.contactName) {
+            if (
+              contactA.contactName.toLowerCase() <
+              contactB.contactName.toLowerCase()
+            )
               return -1;
-            if (a.contactName.toLowerCase() > b.contactName.toLowerCase())
+            if (
+              contactA.contactName.toLowerCase() >
+              contactB.contactName.toLowerCase()
+            )
               return 1;
           }
           return 0;
         });
-        setTrustedContacts(filteredTrustedContacts);
+        setTrustedContacts(sortedTrustedContacts);
       }
     }
   };
@@ -250,7 +256,6 @@ export default function Send(props) {
   useEffect(() => {
     updateAddressBook();
   }, [regularAccount.hdWallet.derivativeAccounts]);
-
 
   const checkNShowHelperModal = async () => {
     let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
@@ -310,7 +315,7 @@ export default function Send(props) {
     let isAddressValid = instance.isValidAddress(recipientAddress);
     if (isAddressValid) {
       let item = {
-        id: recipientAddress,
+        id: recipientAddress, // address serves as the id during manual addition
       };
       onSelectContact(item);
     }
@@ -434,7 +439,16 @@ export default function Send(props) {
 
   const onSelectContact = (item) => {
     let isNavigate = true;
-    if (sendStorage && sendStorage.length === 0) {
+    console.log({ details: transfer.details });
+    if (transfer.details && transfer.details.length === 0) {
+      console.log('dispatching');
+      dispatch(
+        addTransferDetails(serviceType, {
+          selectedContact: item,
+        }),
+      );
+      setRecipientAddress('');
+
       props.navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
@@ -442,20 +456,20 @@ export default function Send(props) {
         sweepSecure,
         netBalance,
       });
-      dispatch(
-        storeContactsAccountToSend({
-          selectedContact: item,
-        }),
-      );
-      setRecipientAddress('');
     } else {
-      sendStorage &&
-        sendStorage.map((contact) => {
+      transfer.details.length &&
+        transfer.details.map((contact) => {
           if (contact.selectedContact.id === item.id) {
             return (isNavigate = false);
           }
         });
       if (isNavigate) {
+        dispatch(
+          addTransferDetails(serviceType, {
+            selectedContact: item,
+          }),
+        );
+        setRecipientAddress('');
         props.navigation.navigate('SendToContact', {
           selectedContact: item,
           serviceType,
@@ -463,12 +477,6 @@ export default function Send(props) {
           sweepSecure,
           netBalance,
         });
-        dispatch(
-          storeContactsAccountToSend({
-            selectedContact: item,
-          }),
-        );
-        setRecipientAddress('');
       }
     }
   };
@@ -516,9 +524,9 @@ export default function Send(props) {
     return (
       <TouchableOpacity onPress={() => onSelectContact(item)}>
         <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
-          {sendStorage &&
-            sendStorage.length > 0 &&
-            sendStorage.map((contact) => {
+          {transfer.details &&
+            transfer.details.length > 0 &&
+            transfer.details.map((contact) => {
               if (contact.selectedContact.id === item.id) {
                 return (
                   <Image
@@ -540,8 +548,8 @@ export default function Send(props) {
 
   const renderAccounts = ({ item, index }) => {
     let checked = false;
-    for (let i = 0; i < sendStorage.length; i++) {
-      const element = sendStorage[i].selectedContact;
+    for (let i = 0; i < transfer.details.length; i++) {
+      const element = transfer.details[i].selectedContact;
       if (element.id == item.id) {
         checked = true;
       }
@@ -673,7 +681,7 @@ export default function Send(props) {
                         if (getServiceType) {
                           getServiceType(serviceType);
                         }
-                        dispatch(clearContactsAccountSendStorage());
+                        dispatch(clearTransfer(serviceType));
                         props.navigation.goBack();
                       }}
                       style={{
@@ -822,7 +830,7 @@ export default function Send(props) {
                           showsHorizontalScrollIndicator={false}
                           data={trustedContacts}
                           renderItem={renderContacts}
-                          extraData={{ sendStorage }}
+                          extraData={transfer.details}
                           keyExtractor={(item, index) => index.toString()}
                         />
                       </View>
@@ -890,7 +898,7 @@ export default function Send(props) {
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
                         renderItem={renderAccounts}
-                        extraData={{ sendStorage }}
+                        extraData={transfer.details}
                         //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>

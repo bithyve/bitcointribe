@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Image,
@@ -67,16 +67,11 @@ export default function TwoFAToken(props) {
     />
   );
 
-  const { transfer, loading, service } = useSelector(
-    state => state.accounts[serviceType],
+  const { transfer, loading } = useSelector(
+    (state) => state.accounts[serviceType],
   );
 
-  if (transfer.txid) {
-    return renderSuccessStatusContents();
-  }
-
-  // Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
-
+  if (transfer.txid) return renderSuccessStatusContents();
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -116,7 +111,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput = input;
                 }}
                 style={[
@@ -124,11 +119,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput2.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
                   }
@@ -140,7 +135,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput2 = input;
                 }}
                 style={[
@@ -148,11 +143,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput3.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
                   }
@@ -164,7 +159,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput3 = input;
                 }}
                 style={[
@@ -172,11 +167,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput4.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput2.focus();
                   }
@@ -188,7 +183,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput4 = input;
                 }}
                 style={[
@@ -196,11 +191,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput5.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput3.focus();
                   }
@@ -212,7 +207,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput5 = input;
                 }}
                 style={[
@@ -220,11 +215,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput6.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
                   }
@@ -235,7 +230,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput6 = input;
                 }}
                 style={[
@@ -243,10 +238,10 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
                   }
@@ -282,28 +277,28 @@ export default function TwoFAToken(props) {
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => {
-                  props.navigation.navigate('ResetTwoFAHelp');
-                }}
+              onPress={() => {
+                props.navigation.navigate('ResetTwoFAHelp');
+              }}
+              style={{
+                width: wp('30%'),
+                height: wp('13%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                marginLeft: 5,
+              }}
+            >
+              <Text
                 style={{
-                  width: wp('30%'),
-                  height: wp('13%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  marginLeft: 5
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  Need Help?
-                </Text>
-              </TouchableOpacity>
+                Need Help?
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         {/* <View
