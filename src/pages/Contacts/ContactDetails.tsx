@@ -280,12 +280,12 @@ export default function ContactDetails(props) {
               >
                 {contactsType}
               </Text>
-              <Text style={styles.contactText}>{contact.contactName}</Text>
+              <Text style={styles.contactText}>{Contact.contactName == "Secondary Device" ? "Keeper Device" : contact.contactName}</Text>
               {contact.connectedVia ? (
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.hasXpub && (
+            {Contact.hasXpub && Contact.contactName != "Secondary Device" && (
               <TouchableOpacity
                 style={{
                   width: wp('15%'),

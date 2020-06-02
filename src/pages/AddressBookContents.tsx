@@ -190,13 +190,13 @@ export default function AddressBookContents(props) {
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.contactName && contact.contactName.split(' ')[0]
+            {contact.contactName && contact.contactName.split(' ')[0] && contact.contactName != "Secondary Device"
               ? contact.contactName.split(' ')[0]
-              : ''}{' '}
+              : 'Keeper'}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.contactName && contact.contactName.split(' ')[1]
+              {contact.contactName && contact.contactName.split(' ')[1] && contact.contactName != "Secondary Device"
                 ? contact.contactName.split(' ')[1]
-                : ''}
+                : 'Device'}
             </Text>
           </Text>
           {contact.connectedVia ? (
