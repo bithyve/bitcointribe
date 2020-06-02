@@ -67,6 +67,8 @@ require_relative '../node_modules/react-native-unimodules/cocoapods'
 
   pod 'react-native-config', :path => '../node_modules/react-native-config'
 
+  pod 'GoogleIDFASupport', '~> 3.14.0'
+  
 target 'HEXA' do 
 end
 
