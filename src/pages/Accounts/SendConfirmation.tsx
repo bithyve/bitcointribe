@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Image,
@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -19,7 +20,12 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
-import { transferST1 } from '../../store/actions/accounts';
+import {
+  transferST1,
+  transferST2,
+  clearTransfer,
+  fetchBalanceTx,
+} from '../../store/actions/accounts';
 import { UsNumberFormat } from '../../common/utilities';
 import BottomSheet from 'reanimated-bottom-sheet';
 import Slider from 'react-native-slider';
@@ -28,7 +34,7 @@ import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
 import RecipientComponent from './RecipientComponent';
 
-export default function SendToContact(props) {
+export default function SendConfirmation(props) {
   const dispatch = useDispatch();
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(
@@ -38,12 +44,11 @@ export default function SendToContact(props) {
     if (accounts && accounts.exchangeRates)
       setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
-  const sendStorage = useSelector((state) => state.sendReducer.sendStorage);
-  console.log('sendStorage', sendStorage);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
-  console.log("averageTxFees",averageTxFees);
+  const loading = useSelector((state) => state.accounts[serviceType].loading);
+  const transfer = useSelector((state) => state.accounts[serviceType].transfer);
 
   const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
@@ -59,29 +64,51 @@ export default function SendToContact(props) {
     React.createRef<BottomSheet>(),
   );
   const [SelectedContactId, setSelectedContactId] = useState(0);
-  const [amount, setAmount] = useState('');
+  // const [amount, setAmount] = useState('');
 
+  // useEffect(() => {
+  //   if (netBalance === 0) {
+  //     setAmount(`0`);
+  //   } else {
+  //     setAmount(
+  //       `${
+  //         netBalance -
+  //         Number(
+  //           averageTxFees[
+  //             sliderValueText === 'Low Fee'
+  //               ? 'low'
+  //               : sliderValueText === 'In the middle'
+  //               ? 'medium'
+  //               : 'high'
+  //           ].averageTxFee,
+  //         )
+  //       }`,
+  //     );
+  //   }
+  // }, [sliderValueText]);
 
   useEffect(() => {
-    if (netBalance === 0) {
-        setAmount(`0`);
-      } else {
-        setAmount(
-          `${
-            netBalance -
-            Number(
-              averageTxFees[
-                sliderValueText === 'Low Fee'
-                  ? 'low'
-                  : sliderValueText === 'In the middle'
-                  ? 'medium'
-                  : 'high'
-              ].averageTxFee,
-            )
-          }`,
-        );
-      }
-  }, [sliderValueText]);
+    if (transfer.stage2.failed) {
+      SendUnSuccessBottomSheet.current.snapTo(1);
+    } else if (transfer.txid) {
+      SendSuccessBottomSheet.current.snapTo(1);
+    } else if (!transfer.txid && transfer.executed === 'ST2') {
+      props.navigation.navigate('TwoFAToken', {
+        serviceType,
+        recipientAddress: '',
+      });
+    }
+  }, [transfer]);
+
+  const onConfirm = useCallback(() => {
+    const txPriority =
+      sliderValueText === 'Low Fee'
+        ? 'low'
+        : sliderValueText === 'In the middle'
+        ? 'medium'
+        : 'high';
+    dispatch(transferST2(serviceType, txPriority));
+  }, [serviceType, sliderValueText]);
 
   const tapSliderHandler = (evt) => {
     if (viewRef.current) {
@@ -147,7 +174,7 @@ export default function SendToContact(props) {
 
   const getTotalAmount = () => {
     let totalAmount = 0;
-    sendStorage.map((item) => {
+    transfer.details.map((item) => {
       totalAmount += parseInt(item.bitcoinAmount);
     });
     return totalAmount;
@@ -198,7 +225,7 @@ export default function SendToContact(props) {
       <SendConfirmationContent
         title={'Sent Successfully'}
         info={'Bitcoins successfully sent to Contact'}
-        userInfo={sendStorage}
+        userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
@@ -206,7 +233,15 @@ export default function SendToContact(props) {
         onPressOk={() => {
           if (SendSuccessBottomSheet.current)
             SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.replace('Accounts', { serviceType: serviceType });
+
+          dispatch(clearTransfer(serviceType));
+          // dispatch(fetchTransactions(serviceType));
+          dispatch(
+            fetchBalanceTx(serviceType, {
+              loader: true,
+            }),
+          );
+          props.navigation.navigate('Accounts');
         }}
         isSuccess={true}
       />
@@ -230,7 +265,7 @@ export default function SendToContact(props) {
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
         info={'There seems to be a problem'}
-        userInfo={sendStorage}
+        userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
@@ -370,9 +405,9 @@ export default function SendToContact(props) {
             </Text>
           </Text>
         </View>
-        {sendStorage && sendStorage.length > 0 ? (
+        {transfer.details && transfer.details.length > 0 ? (
           <ScrollView>
-            {sendStorage.map((item) => renderContacts(item))}
+            {transfer.details.map((item) => renderContacts(item))}
           </ScrollView>
         ) : null}
 
@@ -564,12 +599,8 @@ export default function SendToContact(props) {
           }}
         >
           <TouchableOpacity
-            onPress={() => {
-              // handleTransferST2();
-              // props.navigation.goBack();
-              SendUnSuccessBottomSheet.current.snapTo(1);
-              //SendSuccessBottomSheet.current.snapTo(1);
-            }}
+            onPress={onConfirm}
+            disabled={loading.transfer}
             style={{
               ...styles.confirmButtonView,
               backgroundColor: Colors.blue,
@@ -579,7 +610,11 @@ export default function SendToContact(props) {
               shadowOffset: { width: 15, height: 15 },
             }}
           >
-            <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+            {loading.transfer ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={{
@@ -715,5 +750,4 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
   },
- 
 });
