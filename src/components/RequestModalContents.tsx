@@ -97,8 +97,7 @@ export default function RequestModalContents(props) {
                   >
                     {Contact.phoneNumbers[0].digits}
                   </Text>
-                ) : null}
-                {Contact && Contact.emails && Contact.emails.length ? (
+                ) : Contact && Contact.emails && Contact.emails.length ? (
                   <Text
                     style={{
                       color: Colors.textColorGrey,

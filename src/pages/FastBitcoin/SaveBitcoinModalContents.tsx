@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,12 +22,27 @@ export default function SaveBitcoinModalContents(props) {
         type: 'voucher'
       },
       {
-        title: 'Existing Saving Methods',
+        title: 'Existing Buying Options',
         image: require('../../assets/images/icons/existing_saving_method.png'),
         info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
-        type: 'existingSavingMethods'
+        type: 'existingBuyingMethods'
       },
-	] )
+  ] )
+  
+//   function isEmpty(obj) {
+//     return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+//   }
+
+//   useEffect(() => {
+//     checkFastBitcoin();
+//   }, []);
+
+// const checkFastBitcoin = async () => {
+//   let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+//   console.log("getFBTCAccount", getFBTCAccount);
+//   setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+// };
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -53,8 +68,9 @@ export default function SaveBitcoinModalContents(props) {
             <View style={styles.separatorView} />
           </View>
         )}
-        renderItem={({ item }) => (
-          <AppBottomSheetTouchableWrapper
+        renderItem={({ item }) => {
+          if(item.type == 'existingBuyingMethods' && props.isExistingSavingMethod && props.isExistingSavingMethod){ return null;}
+           return (<AppBottomSheetTouchableWrapper
             onPress={() => props.onPressElements(item.type)}
             style={styles.addModalView}
           >
@@ -67,8 +83,8 @@ export default function SaveBitcoinModalContents(props) {
                 <Text style={styles.addModalInfoText}>{item.info}</Text>
               </View>
             </View>
-          </AppBottomSheetTouchableWrapper>
-        )}
+          </AppBottomSheetTouchableWrapper>)
+        }}
       />
     </View>
   );

@@ -80,6 +80,8 @@ import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContact';
 import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
+import ContactDetails from "../pages/Contacts/ContactDetails";
+import Receive from "../pages/Accounts/Receive";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -154,7 +156,12 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-    SendToContact,
+    SendToContact:{
+      screen: SendToContact,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     SendConfirmation,
     TwoFAToken,
     RecoveryRequestOTP,
@@ -200,6 +207,8 @@ const HomeNavigator = createStackNavigator(
     SendRequest,
     VoucherScanner,
     AddContactSendRequest,
+    ContactDetails,
+    Receive,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

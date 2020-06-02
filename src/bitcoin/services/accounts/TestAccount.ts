@@ -26,6 +26,7 @@ export default class TestAccount extends BaseAccount {
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
+      trustedContactToDA,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -43,6 +44,7 @@ export default class TestAccount extends BaseAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
     } = hdWallet;
 
     return new TestAccount(mnemonic, passphrase, purpose, {
@@ -59,6 +61,7 @@ export default class TestAccount extends BaseAccount {
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
+      trustedContactToDA,
     });
   };
 
@@ -80,6 +83,7 @@ export default class TestAccount extends BaseAccount {
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
     },
   ) {
     const network: bitcoinJS.Network = bitcoinJS.networks.testnet;

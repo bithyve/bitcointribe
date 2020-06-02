@@ -23,7 +23,11 @@ import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import { syncAccounts, calculateExchangeRate } from '../store/actions/accounts';
-import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
+import {
+  updateMSharesHealth,
+  checkMSharesHealth,
+  updateWalletImage,
+} from '../store/actions/sss';
 import JailMonkey from 'jail-monkey';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -31,7 +35,9 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Getting the latest details');
+  let [message, setMessage] = useState('While you wait...');
+  let [subTextMessage1, setSubTextMessage1] = useState('Hexa has a Test Account which has some test sats preloaded')
+  let [subTextMessage2, setSubTextMessage2] = useState('If you are new to Bitcoin, this is the best place to start learning')
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -208,7 +214,6 @@ export default function Login(props) {
       }
     });
 
-
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
         console.log('Release note', res.data.releases);
@@ -229,7 +234,7 @@ export default function Login(props) {
             releaseData: res.data.releases,
           });
         }
-        return
+        return;
       })
       .catch((error) => {
         console.error(error);
@@ -272,7 +277,7 @@ export default function Login(props) {
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
-            // calculate the exchangeRate
+            dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
               (loaderBottomSheet as any).current.snapTo(0);
@@ -293,10 +298,11 @@ export default function Login(props) {
     return (
       <LoaderModal
         headerText={message}
-        messageText={'This may take a few seconds'}
+        messageText={subTextMessage1}
+        messageText2={subTextMessage2}
       />
     );
-  }, [message]);
+  }, [message, subTextMessage1, subTextMessage2]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -409,8 +415,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -438,8 +444,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -467,8 +473,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -496,8 +502,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -511,6 +517,10 @@ export default function Login(props) {
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
                   (loaderBottomSheet as any).current.snapTo(1);
+                  setTimeout(() => {
+                    setSubTextMessage1('Did you know that 1 bitcoin = 100 million sats?')
+                    setSubTextMessage2('Hexa uses sats to make it easier to use bitcoins')
+                  }, 3000)
                   setTimeout(() => {
                     setElevation(0);
                   }, 2);
@@ -664,7 +674,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet as any}

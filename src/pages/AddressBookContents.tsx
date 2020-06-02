@@ -40,9 +40,10 @@ export default function AddressBookContents(props) {
   let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
     React.createRef(),
   );
-  let [AssociatedContact, setAssociatedContact] = useState([]);
-  let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
   let [trustedContacts, setTrustedContacts] = useState([]);
+  let [MyKeeper, setMyKeeper] = useState([]);
+  let [IMKeeper, setIMKeeper] = useState([]);
+  let [OtherTrustedContact, setOtherTrustedContact] = useState([]);
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -56,7 +57,6 @@ export default function AddressBookContents(props) {
     );
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
-      console.log({ trustedContactsInfo });
       if (trustedContactsInfo.length) {
         const trustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
@@ -103,7 +103,24 @@ export default function AddressBookContents(props) {
             ...contactInfo,
           });
         }
-        console.log({ trustedContacts });
+        let myKeepers = [];
+        let imKeepers = [];
+        let otherTrustedContact = [];
+        for (let i = 0; i < trustedContacts.length; i++) {
+          const element = trustedContacts[i];
+          if(element.isGuardian){
+            myKeepers.push(element);
+          }
+          if(element.isWard){
+            imKeepers.push(element);
+          }
+          if(!element.isWard && !element.isGuardian){
+            otherTrustedContact.push(element);
+          }
+        }
+        setMyKeeper(myKeepers);
+        setIMKeeper(imKeepers);
+        setOtherTrustedContact(otherTrustedContact);
         setTrustedContacts(trustedContacts);
       }
     }
@@ -142,7 +159,7 @@ export default function AddressBookContents(props) {
 
   const getImageIcon = (item) => {
     if (item) {
-      if (item.imageAvailable) {
+      if (item.image && item.image.uri) {
         return (
           <Image
             source={item.image}
@@ -191,23 +208,32 @@ export default function AddressBookContents(props) {
     }
   };
 
-  const getElement = (item, index) => {
+  const getElement = (contact, index, contactsType) => {
     return (
-      <TouchableOpacity onPress={() => {}} style={styles.selectedContactsView}>
-        {getImageIcon(item)}
+      <TouchableOpacity
+        onPress={() => {
+          props.navigation.navigate('ContactDetails', {
+            contactsType,
+            contact,
+            index
+          });
+        }}
+        style={styles.selectedContactsView}
+      >
+        {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {item.contactName && item.contactName.split(' ')[0]
-              ? item.contactName.split(' ')[0]
+            {contact.contactName && contact.contactName.split(' ')[0]
+              ? contact.contactName.split(' ')[0]
               : ''}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {item.contactName && item.contactName.split(' ')[1]
-                ? item.contactName.split(' ')[1]
+              {contact.contactName && contact.contactName.split(' ')[1]
+                ? contact.contactName.split(' ')[1]
                 : ''}
             </Text>
           </Text>
-          {item.connectedVia ? (
-            <Text style={styles.phoneText}>{item.connectedVia}</Text>
+          {contact.connectedVia ? (
+            <Text style={styles.phoneText}>{contact.connectedVia}</Text>
           ) : null}
         </View>
         <View
@@ -319,11 +345,11 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {trustedContacts && trustedContacts.length ? (
+            {MyKeeper && MyKeeper ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {trustedContacts.map((item, index) => {
-                    if (item.isGuardian) return getElement(item, index);
+                  {MyKeeper.map((item, index) => {
+                    return getElement(item, index, 'My Keepers');
                   })}
                 </View>
               </View>
@@ -336,11 +362,11 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {trustedContacts && trustedContacts.length ? (
+            {IMKeeper && IMKeeper.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {trustedContacts.map((item, index) => {
-                    if (item.isWard) return getElement(item, index);
+                  {IMKeeper.map((item, index) => {
+                    return getElement(item, index, "I'm Keeper of");
                   })}
                   {/* {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
                     <View>
@@ -366,12 +392,11 @@ export default function AddressBookContents(props) {
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
-            {trustedContacts && trustedContacts.length ? (
+            {OtherTrustedContact && OtherTrustedContact.length ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {trustedContacts.map((item, index) => {
-                    if (!item.isGuardian && !item.isWard)
-                      return getElement(item, index);
+                  {OtherTrustedContact.map((item, index) => {
+                    return getElement(item, index, 'Other Trusted Contacts');
                   })}
                 </View>
               </View>
@@ -379,13 +404,13 @@ export default function AddressBookContents(props) {
               getWaterMark()
             )}
           </View>
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+            }
+          />
         </ScrollView>
-        <BottomInfoBox
-          title={'Note'}
-          infoText={
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-          }
-        />
       </View>
       <BottomSheet
         enabledInnerScrolling={true}

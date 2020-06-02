@@ -838,7 +838,7 @@ export default function Accounts(props) {
             })}
           </View>
           <View style={{ backgroundColor: Colors.white }}>
-            <View
+            {/* <View
               style={{
                 margin: 15,
                 backgroundColor: Colors.backgroundColor,
@@ -868,7 +868,7 @@ export default function Accounts(props) {
               >
                 All recent transactions across your accounts appear here
             </Text>
-            </View>
+            </View> */}
           </View>
         </View>
       );
@@ -1607,7 +1607,7 @@ export default function Accounts(props) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      props.navigation.navigate('ReceivingAddress', {
+                      props.navigation.navigate('Receive', {
                         serviceType,
                         getServiceType: getServiceType,
                       });

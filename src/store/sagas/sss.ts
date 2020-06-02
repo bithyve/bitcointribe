@@ -21,7 +21,6 @@ import {
   DOWNLOAD_DYNAMIC_NONPMDD,
   RECOVER_WALLET,
   RESTORE_DYNAMIC_NONPMDD,
-  GENERATE_PDF,
   requestedShareUploaded,
   downloadedMShare,
   OVERALL_HEALTH,
@@ -33,15 +32,21 @@ import {
   UPDATE_SHARE_HISTORY,
   updateShareHistory,
   pdfHealthChecked,
-  QRChecked,
   UnableRecoverShareFromQR,
   walletRecoveryFailed,
   ErrorSending,
   UploadSuccessfully,
   ErrorReceiving,
+  UPDATE_WALLET_IMAGE,
+  FETCH_WALLET_IMAGE,
+  fetchWalletImage,
+  walletImageChecked,
+  GENERATE_PERSONAL_COPY,
+  SHARE_PERSONAL_COPY,
+  personalCopyShared,
+  pdfHealthCheckFailed,
+  personalCopyGenerated,
 } from '../actions/sss';
-import { dbInsertedSSS } from '../actions/storage';
-
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -57,17 +62,19 @@ import {
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
+  WalletImage,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
-import { AsyncStorage } from 'react-native';
-import { Alert } from 'react-native';
-import {
-  updateEphemeralChannel,
-  trustedChannelFetched,
-} from '../actions/trustedContacts';
+import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
+import { updateEphemeralChannel } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import crypto from 'crypto';
+import { insertDBWorker } from './storage';
+import Share from 'react-native-share';
+import RNPrint from 'react-native-print';
+var Mailer = require('NativeModules').RNMail;
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -80,6 +87,9 @@ function* generateMetaSharesWorker() {
 
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
   const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret;
+  if (!secondaryMnemonic || !twoFASecret) {
+    throw new Error('secure assets missing; staticNonPMDD');
+  }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
 
   const secureAssets = {
@@ -117,7 +127,7 @@ function* initHCWorker() {
 
   yield put(switchS3Loader('initHC'));
   if (!s3Service.sss.metaShares.length) {
-    s3Service = yield call(generateMetaSharesWorker);
+    s3Service = yield call(generateMetaSharesWorker); // executes once (during initial setup)
   }
   const res = yield call(s3Service.initializeHealthcheck);
   if (res.status === 200) {
@@ -428,88 +438,273 @@ export const downloadMetaShareWatcher = createWatcher(
   DOWNLOAD_MSHARE,
 );
 
-function* generatePDFWorker({ payload }) {
+function* generatePersonalCopyWorker({ payload }) {
   // yield put(switchS3Loader('generatePDF'));
+  const { selectedPersonalCopy } = payload; // corresponds to metaShare index (3/4)
+  const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const resQRPersonalCopy1 = yield call(
-    s3Service.createQR,
-    payload.personalcopy1 - 1,
-  );
-  if (resQRPersonalCopy1.status !== 200) {
-    console.log({ err: resQRPersonalCopy1.err });
+  const res = yield call(s3Service.createQR, shareIndex);
+  if (res.status !== 200) {
+    console.log({ err: res.err });
     return;
   }
-  const resQRPersonalCopy2 = yield call(
-    s3Service.createQR,
-    payload.personalcopy2 - 1,
-  );
-  if (resQRPersonalCopy2.status !== 200) {
-    console.log({ err: resQRPersonalCopy2.err });
-    return;
-  }
-
-  const { SERVICES } = yield select((state) => state.storage.database);
-  const updatedSERVICES = {
-    ...SERVICES,
-    S3_SERVICE: JSON.stringify(s3Service),
-  };
-
-  yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
 
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  const { qrData, secret } = secureAccount.secureHDWallet.twoFASetup;
+  if (!secondaryMnemonic) {
+    throw new Error(
+      'Personal copies generation failed; secondary mnemonic missing',
+    );
+  }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
   const secureAssets = {
     secondaryMnemonic,
-    twoFASecret: secret,
-    twoFAQR: qrData,
     secondaryXpub: secondary,
     bhXpub: bh,
   };
-  const pdfDataPersonalCopy1 = {
-    qrData: resQRPersonalCopy1.data.qrData,
+
+  const pdfData = {
+    qrData: res.data.qrData,
     ...secureAssets,
   };
-  const pdfDataPersonalCopy2 = {
-    qrData: resQRPersonalCopy2.data.qrData,
-    ...secureAssets,
-  };
+
   const { security, walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   );
+
   try {
-    const personalCopy1PdfPath = yield call(
+    const pdfPath = yield call(
       generatePDF,
-      pdfDataPersonalCopy1,
-      `Hexa_${walletName}_Recovery_Secret_Personal_Copy_1.pdf`,
-      `Hexa Share ${payload.personalcopy1}`,
+      pdfData,
+      `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
+      `Hexa Share ${shareIndex + 1}`,
       security.answer,
     );
-    const personalCopy2PdfPath = yield call(
-      generatePDF,
-      pdfDataPersonalCopy2,
-      `Hexa_${walletName}_Recovery_Secret_Personal_Copy_2.pdf`,
-      `Hexa Share  ${payload.personalcopy2}`,
-      security.answer,
+
+    let personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
     );
-    let path = {
-      copy1: { path: personalCopy1PdfPath, flagShare: false, shareDetails: {} },
-      copy2: { path: personalCopy2PdfPath, flagShare: false, shareDetails: {} },
+
+    if (!personalCopyDetails) {
+      personalCopyDetails = {
+        [selectedPersonalCopy.type]: {
+          path: pdfPath,
+          shared: false,
+          sharingDetails: {},
+        },
+      };
+    } else {
+      personalCopyDetails = JSON.parse(personalCopyDetails);
+      personalCopyDetails = {
+        ...personalCopyDetails,
+        [selectedPersonalCopy.type]: {
+          path: pdfPath,
+          shared: false,
+          sharingDetails: {},
+        },
+      };
+    }
+
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      JSON.stringify(personalCopyDetails),
+    );
+
+    // reset PDF health (if present) post reshare
+    let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    if (storedPDFHealth) {
+      const { pdfHealth } = s3Service.sss;
+      storedPDFHealth = JSON.parse(storedPDFHealth);
+      storedPDFHealth = {
+        ...storedPDFHealth,
+        [shareIndex]: { shareId: pdfHealth[shareIndex].shareId, updatedAt: 0 },
+      };
+
+      yield call(
+        AsyncStorage.setItem,
+        'PDF Health',
+        JSON.stringify(storedPDFHealth),
+      );
+    }
+
+    yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: true }));
+
+    if (Object.keys(personalCopyDetails).length == 2) {
+      // remove sec-mne once both the personal copies are generated
+      const { removed } = secureAccount.removeSecondaryMnemonic();
+      if (!removed) console.log('Failed to remove sec-mne');
+    }
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      SECURE_ACCOUNT: JSON.stringify(secureAccount),
+      S3_SERVICE: JSON.stringify(s3Service),
     };
-    // console.log({ path });
-    yield put(dbInsertedSSS(path));
+
+    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
   } catch (err) {
     console.log({ err });
+    yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: false }));
   }
   //yield put(switchS3Loader('generatePDF'));
 }
 
-export const generatePDFWatcher = createWatcher(
-  generatePDFWorker,
-  GENERATE_PDF,
+export const generatePersonalCopyWatcher = createWatcher(
+  generatePersonalCopyWorker,
+  GENERATE_PERSONAL_COPY,
+);
+
+function* sharePersonalCopyWorker({ payload }) {
+  const { shareVia, selectedPersonalCopy } = payload;
+
+  try {
+    let personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
+    );
+    if (!personalCopyDetails)
+      throw new Error('Personal copy not found/generated');
+    personalCopyDetails = JSON.parse(personalCopyDetails);
+    if (!personalCopyDetails[selectedPersonalCopy.type])
+      throw new Error('Personal copy not found/generated');
+
+    const { security } = yield select(
+      (state) => state.storage.database.WALLET_SETUP,
+    );
+
+    switch (shareVia) {
+      case 'Email':
+        yield call(
+          Mailer.mail,
+          {
+            subject: selectedPersonalCopy.title,
+            body: `<b>Please find attached the personal copy ${
+              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+            } share pdf, it is password protected by the answer to the security question.</b>`,
+            isHTML: true,
+            attachment: {
+              path:
+                Platform.OS == 'android'
+                  ? 'file://' +
+                    personalCopyDetails[selectedPersonalCopy.type].path
+                  : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
+              type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+              name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+            },
+          },
+          (err, event) => {
+            console.log({ event, err });
+            // on delayed error (rollback the changes that happened post switch case)
+            setTimeout(() => {
+              AsyncStorage.setItem(
+                'personalCopyDetails',
+                JSON.stringify(personalCopyDetails),
+              );
+            }, 1000);
+          },
+        );
+        break;
+
+      case 'Print':
+        let pdfDecr = {
+          path: personalCopyDetails[selectedPersonalCopy.type].path,
+          filename:
+            selectedPersonalCopy.type === 'copy1'
+              ? 'PersonalCopy1.pdf'
+              : 'PersonalCopy2.pdf',
+          password: security.answer,
+        };
+        if (Platform.OS == 'android') {
+          var PdfPassword = yield NativeModules.PdfPassword;
+          yield call(
+            PdfPassword.print,
+            JSON.stringify(pdfDecr),
+            (err: any) => {
+              console.log({ err });
+              // on delayed error (rollback the changes that happened post switch case)
+              setTimeout(() => {
+                AsyncStorage.setItem(
+                  'personalCopyDetails',
+                  JSON.stringify(personalCopyDetails),
+                );
+              }, 1000);
+            },
+            async (res: any) => {
+              await RNPrint.print({
+                filePath: 'file://' + res,
+              });
+              console.log({ res });
+            },
+          );
+        } else {
+          try {
+            yield call(RNPrint.print, {
+              filePath: personalCopyDetails[selectedPersonalCopy.type].path,
+            });
+          } catch (err) {
+            console.log(err);
+            throw new Error(`Print failed: ${err}`);
+          }
+        }
+        break;
+
+      case 'Other':
+        let shareOptions = {
+          title: selectedPersonalCopy.title,
+          message: `Please find attached the personal copy ${
+            selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+          } share pdf, it is password protected by the answer to the security question.`,
+          url:
+            Platform.OS == 'android'
+              ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+              : personalCopyDetails[selectedPersonalCopy.type].path,
+          type: 'application/pdf',
+          showAppsToView: true,
+          subject: selectedPersonalCopy.title,
+        };
+
+        try {
+          yield call(Share.open, shareOptions);
+        } catch (err) {
+          console.log({ err });
+          throw new Error(`Share failed: ${err}`);
+        }
+        break;
+
+      default:
+        throw new Error('Invalid sharing option');
+    }
+
+    const updatedPersonalCopyDetails = {
+      ...personalCopyDetails,
+      [selectedPersonalCopy.type]: {
+        ...personalCopyDetails[selectedPersonalCopy.type],
+        shared: true,
+        sharingDetails: { shareVia, sharedAt: Date.now() },
+      },
+    };
+
+    yield call(
+      AsyncStorage.setItem,
+      'personalCopyDetails',
+      JSON.stringify(updatedPersonalCopyDetails),
+    );
+
+    yield put(personalCopyShared({ [selectedPersonalCopy.type]: true }));
+  } catch (err) {
+    console.log({ err });
+    yield put(personalCopyShared({ [selectedPersonalCopy.type]: false }));
+  }
+}
+
+export const sharePersonalCopyWatcher = createWatcher(
+  sharePersonalCopyWorker,
+  SHARE_PERSONAL_COPY,
 );
 
 function* updateMSharesHealthWorker({ payload }) {
@@ -709,7 +904,7 @@ function* checkPDFHealthWorker({ payload }) {
     yield put(pdfHealthChecked('pdfHealthChecked'));
   } else {
     console.log({ pdfHealth, payload });
-    yield put(QRChecked(true));
+    yield put(pdfHealthCheckFailed(true));
     //Alert.alert('Invalid QR!', 'The scanned QR is wrong, please try again.');
   }
 
@@ -1071,6 +1266,7 @@ function* recoverWalletWorker({ payload }) {
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};
       if (encDynamicNonPMDD) {
+        // decentralized restoration of Wards
         const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
 
         if (res.status !== 200)
@@ -1099,7 +1295,10 @@ function* recoverWalletWorker({ payload }) {
         S3_SERVICE: JSON.stringify(s3Service),
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
-      yield put(insertIntoDB({ SERVICES, DECENTRALIZED_BACKUP }));
+      const payload = { SERVICES, DECENTRALIZED_BACKUP };
+      yield call(insertDBWorker, { payload });
+      yield delay(2000); // seconds delay prior to Wallet Image check
+      yield put(fetchWalletImage());
 
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
@@ -1125,4 +1324,136 @@ function* recoverWalletWorker({ payload }) {
 export const recoverWalletWatcher = createWatcher(
   recoverWalletWorker,
   RECOVER_WALLET,
+);
+
+const sha256 = crypto.createHash('sha256');
+const hash = (element) => {
+  return sha256.update(JSON.stringify(element)).digest('hex');
+};
+
+function* updateWalletImageWorker({ payload }) {
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  let walletImage: WalletImage = {};
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+    (state) => state.storage.database,
+  );
+
+  const walletImageHashes = yield call(AsyncStorage.getItem, 'WI_HASHES');
+  let hashesWI = JSON.parse(walletImageHashes);
+
+  if (walletImageHashes) {
+    const currentDBHash = hash(DECENTRALIZED_BACKUP);
+    if (
+      !hashesWI.DECENTRALIZED_BACKUP ||
+      currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
+    ) {
+      walletImage['DECENTRALIZED_BACKUP'] = DECENTRALIZED_BACKUP;
+      hashesWI.DECENTRALIZED_BACKUP = currentDBHash;
+    }
+
+    const currentSHash = hash(SERVICES);
+    if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
+      walletImage['SERVICES'] = SERVICES;
+      hashesWI.SERVICES = currentSHash;
+    }
+
+    const TrustedContactsInfo = yield call(
+      AsyncStorage.getItem,
+      'TrustedContactsInfo',
+    ); // use multiGet while fetching multiple items
+    if (TrustedContactsInfo) {
+      const ASYNC_DATA = { TrustedContactsInfo };
+      const currentAsyncHash = hash(ASYNC_DATA);
+      if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
+        walletImage['ASYNC_DATA'] = ASYNC_DATA;
+        hashesWI.ASYNC_DATA = currentAsyncHash;
+      }
+    }
+  } else {
+    walletImage = {
+      DECENTRALIZED_BACKUP,
+      SERVICES,
+    };
+
+    hashesWI = {
+      DECENTRALIZED_BACKUP: hash(DECENTRALIZED_BACKUP),
+      SERVICES: hash(SERVICES),
+    };
+
+    // ASYNC DATA to backup
+    const TrustedContactsInfo = yield call(
+      AsyncStorage.getItem,
+      'TrustedContactsInfo',
+    ); // use multiGet while fetching multiple items
+    if (TrustedContactsInfo) {
+      const ASYNC_DATA = { TrustedContactsInfo };
+      walletImage['ASYNC_DATA'] = ASYNC_DATA;
+      hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
+    }
+  }
+
+  console.log({ walletImage });
+
+  if (Object.keys(walletImage).length === 0) {
+    console.log('WI: nothing to update');
+    return;
+  }
+
+  const res = yield call(s3Service.updateWalletImage, walletImage);
+  if (res.status === 200) {
+    if (res.data.updated) console.log('Wallet Image updated');
+    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+  } else {
+    console.log({ err: res.err });
+    throw new Error('Failed to update Wallet Image');
+  }
+}
+
+export const updateWalletImageWatcher = createWatcher(
+  updateWalletImageWorker,
+  UPDATE_WALLET_IMAGE,
+);
+
+function* fetchWalletImageWorker({ payload }) {
+  const s3Service: S3Service = yield select((state) => state.sss.service);
+
+  const res = yield call(s3Service.fetchWalletImage);
+  console.log({ res });
+  if (res.status === 200) {
+    const walletImage: WalletImage = res.data.walletImage;
+    console.log({ walletImage });
+
+    if (!Object.keys(walletImage).length)
+      console.log('Failed fetch: Empty Wallet Image');
+
+    // update DB and Async
+    const { DECENTRALIZED_BACKUP, SERVICES, ASYNC_DATA } = walletImage;
+
+    if (ASYNC_DATA) {
+      for (const key of Object.keys(ASYNC_DATA)) {
+        console.log('restoring to async: ', key);
+        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+      }
+    }
+
+    const payload = { SERVICES, DECENTRALIZED_BACKUP };
+    yield call(insertDBWorker, { payload }); // synchronously update db
+
+    // update hashes
+    const hashesWI = {};
+    Object.keys(walletImage).forEach((key) => {
+      hashesWI[key] = hash(walletImage[key]);
+    });
+    yield call(AsyncStorage.setItem, 'WI_HASHES', JSON.stringify(hashesWI));
+  } else {
+    console.log({ err: res.err });
+    console.log('Failed to fetch Wallet Image');
+  }
+  yield put(walletImageChecked(true));
+}
+
+export const fetchWalletImageWatcher = createWatcher(
+  fetchWalletImageWorker,
+  FETCH_WALLET_IMAGE,
 );

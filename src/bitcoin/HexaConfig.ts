@@ -1,113 +1,123 @@
 import Client from 'bitcoin-core';
 import * as bitcoinJS from 'bitcoinjs-lib';
-import { DerivativeAccount, DerivativeAccounts, TrustedContactDerivativeAccount } from './utilities/Interface';
-import Config from "react-native-config";
+import {
+  DerivativeAccount,
+  DerivativeAccounts,
+  TrustedContactDerivativeAccount,
+} from './utilities/Interface';
+import Config from 'react-native-config';
 
 class HexaConfig {
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public BITCOIN_NODE: Client;
-  public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH;
-  public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH;
-  public TOKEN: string = Config.BIT_BLOCKCYPHER_API_URLS_TOKEN;
-  public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH;
-  public REQUEST_TIMEOUT: number = parseInt(Config.BIT_REQUEST_TIMEOUT, 10);
-  public GAP_LIMIT: number = parseInt(Config.BIT_GAP_LIMIT, 10);
+  public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH.trim();
+  public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH.trim();
+  public TOKEN: string = Config.BIT_BLOCKCYPHER_API_URLS_TOKEN.trim();
+  public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH.trim();
+  public REQUEST_TIMEOUT: number = parseInt(
+    Config.BIT_REQUEST_TIMEOUT.trim(),
+    10,
+  );
+  public GAP_LIMIT: number = parseInt(Config.BIT_GAP_LIMIT.trim(), 10);
   public CIPHER_SPEC: {
     algorithm: string;
     salt: string;
     iv: Buffer;
     keyLength: number;
   } = {
-    algorithm: Config.BIT_CIPHER_ALGORITHM,
-    salt: Config.BIT_CIPHER_SALT,
-    keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH, 10),
+    algorithm: Config.BIT_CIPHER_ALGORITHM.trim(),
+    salt: Config.BIT_CIPHER_SALT.trim(),
+    keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
     iv: Buffer.alloc(16, 0),
   };
   public BH_SERVERS = {
     LOCAL: {
-      RELAY: Config.BIT_API_URLS_RELAY_LOCAL,
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_LOCAL,
+      RELAY: Config.BIT_API_URLS_RELAY_LOCAL.trim(),
+      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_LOCAL.trim(),
     },
     DEV: {
-      RELAY: Config.BIT_API_URLS_RELAY_DEV,
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_DEV,
+      RELAY: Config.BIT_API_URLS_RELAY_DEV.trim(),
+      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_DEV.trim(),
     },
     STAGING: {
-      RELAY: Config.BIT_API_URLS_RELAY_STAGING,
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_STAGING,
+      RELAY: Config.BIT_API_URLS_RELAY_STAGING.trim(),
+      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_STAGING.trim(),
     },
     PROD: {
-      RELAY: Config.BIT_API_URLS_RELAY_PROD,
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_PROD,
+      RELAY: Config.BIT_API_URLS_RELAY_PROD.trim(),
+      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_PROD.trim(),
     },
   };
   public BSI = {
-    INIT_INDEX: parseInt(Config.BIT_BSI_INIT_INDEX, 10),
-    MAXUSEDINDEX: parseInt(Config.BIT_BSI_MAXUSEDINDEX, 10),
-    MINUNUSEDINDEX: parseInt(Config.BIT_BSI_MINUNUSEDINDEX, 10),
+    INIT_INDEX: parseInt(Config.BIT_BSI_INIT_INDEX.trim(), 10),
+    MAXUSEDINDEX: parseInt(Config.BIT_BSI_MAXUSEDINDEX.trim(), 10),
+    MINUNUSEDINDEX: parseInt(Config.BIT_BSI_MINUNUSEDINDEX.trim(), 10),
     DEPTH: {
-      INIT: parseInt(Config.BIT_BSI_DEPTH_INIT, 10),
-      LIMIT: parseInt(Config.BIT_BSI_DEPTH_LIMIT, 10),
+      INIT: parseInt(Config.BIT_BSI_DEPTH_INIT.trim(), 10),
+      LIMIT: parseInt(Config.BIT_BSI_DEPTH_LIMIT.trim(), 10),
     },
   };
-  public SSS_TOTAL: number = parseInt(Config.BIT_SSS_TOTAL, 10);
-  public SSS_THRESHOLD: number = parseInt(Config.BIT_SSS_THRESHOLD, 10);
-  public MSG_ID_LENGTH: number = parseInt(Config.BIT_MSG_ID_LENGTH, 10);
-  public SCHUNK_SIZE: number = parseInt(Config.BIT_SCHUNK_SIZE, 10);
-  public CHECKSUM_ITR: number = parseInt(Config.BIT_CHECKSUM_ITR, 10);
-  public HEXA_ID: string = Config.BIT_HEXA_ID;
-  public DPATH_PURPOSE: number = parseInt(Config.BIT_DPATH_PURPOSE, 10);
-  public SSS_METASHARE_SPLITS: number = parseInt(Config.BIT_SSS_METASHARE_SPLITS, 10);
+  public SSS_TOTAL: number = parseInt(Config.BIT_SSS_TOTAL.trim(), 10);
+  public SSS_THRESHOLD: number = parseInt(Config.BIT_SSS_THRESHOLD.trim(), 10);
+  public MSG_ID_LENGTH: number = parseInt(Config.BIT_MSG_ID_LENGTH.trim(), 10);
+  public SCHUNK_SIZE: number = parseInt(Config.BIT_SCHUNK_SIZE.trim(), 10);
+  public CHECKSUM_ITR: number = parseInt(Config.BIT_CHECKSUM_ITR.trim(), 10);
+  public HEXA_ID: string = Config.BIT_HEXA_ID.trim();
+  public DPATH_PURPOSE: number = parseInt(Config.BIT_DPATH_PURPOSE.trim(), 10);
+  public SSS_METASHARE_SPLITS: number = parseInt(
+    Config.BIT_SSS_METASHARE_SPLITS.trim(),
+    10,
+  );
   public STATUS = {
-    SUCCESS: parseInt(Config.BIT_SUCCESS_STATUS_CODE, 10),
-    ERROR: parseInt(Config.BIT_ERROR_STATUS_CODE, 10),
+    SUCCESS: parseInt(Config.BIT_SUCCESS_STATUS_CODE.trim(), 10),
+    ERROR: parseInt(Config.BIT_ERROR_STATUS_CODE.trim(), 10),
   };
   public STANDARD = {
-    BIP44: parseInt(Config.BIT_STANDARD_BIP44, 10),
-    BIP49: parseInt(Config.BIT_STANDARD_BIP49, 10),
-    BIP84: parseInt(Config.BIT_STANDARD_BIP84, 10),
+    BIP44: parseInt(Config.BIT_STANDARD_BIP44.trim(), 10),
+    BIP49: parseInt(Config.BIT_STANDARD_BIP49.trim(), 10),
+    BIP84: parseInt(Config.BIT_STANDARD_BIP84.trim(), 10),
   };
 
   public HEALTH_STATUS = {
     HEXA_HEALTH: {
-      STAGE1: Config.BIT_HEXA_HEALTH_STAGE1,
-      STAGE2: Config.BIT_HEXA_HEALTH_STAGE2,
-      STAGE3: Config.BIT_HEXA_HEALTH_STAGE3,
-      STAGE4: Config.BIT_HEXA_HEALTH_STAGE4,
-      STAGE5: Config.BIT_HEXA_HEALTH_STAGE5,
+      STAGE1: Config.BIT_HEXA_HEALTH_STAGE1.trim(),
+      STAGE2: Config.BIT_HEXA_HEALTH_STAGE2.trim(),
+      STAGE3: Config.BIT_HEXA_HEALTH_STAGE3.trim(),
+      STAGE4: Config.BIT_HEXA_HEALTH_STAGE4.trim(),
+      STAGE5: Config.BIT_HEXA_HEALTH_STAGE5.trim(),
     },
 
     ENTITY_HEALTH: {
-      STAGE1: Config.BIT_ENTITY_HEALTH_STAGE1,
-      STAGE2: Config.BIT_ENTITY_HEALTH_STAGE2,
-      STAGE3: Config.BIT_ENTITY_HEALTH_STAGE3,
+      STAGE1: Config.BIT_ENTITY_HEALTH_STAGE1.trim(),
+      STAGE2: Config.BIT_ENTITY_HEALTH_STAGE2.trim(),
+      STAGE3: Config.BIT_ENTITY_HEALTH_STAGE3.trim(),
     },
 
     TIME_SLOTS: {
-      SHARE_SLOT1: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT1_DEV, 10),
-      SHARE_SLOT2: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT2_DEV, 10),
+      SHARE_SLOT1: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT1_DEV.trim(), 10),
+      SHARE_SLOT2: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT2_DEV.trim(), 10),
     },
   };
 
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
-      MULTIBALANCE: Config.BIT_ESPLORA_TESTNET_MULTIBALANCE,
-      MULTIUTXO: Config.BIT_ESPLORA_TESTNET_MULTIUTXO,
-      MULTITXN: Config.BIT_ESPLORA_TESTNET_MULTITXN,
-      MULTIBALANCETXN: Config.BIT_ESPLORA_TESTNET_MULTIBALANCETXN,
-      TXN_FEE: Config.BIT_ESPLORA_TESTNET_TXNFEE,
-      TXNDETAILS: Config.BIT_ESPLORA_TESTNET_TXNDETAILS,
-      BROADCAST_TX: Config.BIT_ESPLORA_TESTNET_BROADCAST_TX,
+      MULTIBALANCE: Config.BIT_ESPLORA_TESTNET_MULTIBALANCE.trim(),
+      MULTIUTXO: Config.BIT_ESPLORA_TESTNET_MULTIUTXO.trim(),
+      MULTITXN: Config.BIT_ESPLORA_TESTNET_MULTITXN.trim(),
+      MULTIBALANCETXN: Config.BIT_ESPLORA_TESTNET_MULTIBALANCETXN.trim(),
+      TXN_FEE: Config.BIT_ESPLORA_TESTNET_TXNFEE.trim(),
+      TXNDETAILS: Config.BIT_ESPLORA_TESTNET_TXNDETAILS.trim(),
+      BROADCAST_TX: Config.BIT_ESPLORA_TESTNET_BROADCAST_TX.trim(),
     },
     MAINNET: {
-      MULTIBALANCE: Config.BIT_ESPLORA_MAINNET_MULTIBALANCE,
-      MULTIUTXO: Config.BIT_ESPLORA_MAINNET_MULTIUTXO,
-      MULTITXN: Config.BIT_ESPLORA_MAINNET_MULTITXN,
-      MULTIBALANCETXN: Config.BIT_ESPLORA_MAINNET_MULTIBALANCETXN,
-      TXN_FEE: Config.BIT_ESPLORA_MAINNET_TXNFEE,
-      TXNDETAILS: Config.BIT_ESPLORA_MAINNET_TXNDETAILS,
-      BROADCAST_TX: Config.BIT_ESPLORA_MAINNET_BROADCAST_TX,
+      MULTIBALANCE: Config.BIT_ESPLORA_MAINNET_MULTIBALANCE.trim(),
+      MULTIUTXO: Config.BIT_ESPLORA_MAINNET_MULTIUTXO.trim(),
+      MULTITXN: Config.BIT_ESPLORA_MAINNET_MULTITXN.trim(),
+      MULTIBALANCETXN: Config.BIT_ESPLORA_MAINNET_MULTIBALANCETXN.trim(),
+      TXN_FEE: Config.BIT_ESPLORA_MAINNET_TXNFEE.trim(),
+      TXNDETAILS: Config.BIT_ESPLORA_MAINNET_TXNDETAILS.trim(),
+      BROADCAST_TX: Config.BIT_ESPLORA_MAINNET_BROADCAST_TX.trim(),
     },
   };
 
@@ -117,47 +127,47 @@ class HexaConfig {
 
   public API_URLS = {
     TESTNET: {
-      BASE: Config.BIT_API_URLS_TESTNET_BASE,
-      BLOCKCHAIN_INFO_BASE: Config.BIT_API_URLS_BLOCKCHAIN_INFO_TESTNET_BASE,
-      BALANCE_CHECK: Config.BIT_API_URLS_TESTNET_BALANCE_CHECK,
-      UNSPENT_OUTPUTS: Config.BIT_API_URLS_TESTNET_UNSPENT_OUTPUTS,
-      BROADCAST: Config.BIT_API_URLS_TESTNET_BROADCAST,
-      TX_DECODE: Config.BIT_API_URLS_TESTNET_TX_DECODE,
+      BASE: Config.BIT_API_URLS_TESTNET_BASE.trim(),
+      BLOCKCHAIN_INFO_BASE: Config.BIT_API_URLS_BLOCKCHAIN_INFO_TESTNET_BASE.trim(),
+      BALANCE_CHECK: Config.BIT_API_URLS_TESTNET_BALANCE_CHECK.trim(),
+      UNSPENT_OUTPUTS: Config.BIT_API_URLS_TESTNET_UNSPENT_OUTPUTS.trim(),
+      BROADCAST: Config.BIT_API_URLS_TESTNET_BROADCAST.trim(),
+      TX_DECODE: Config.BIT_API_URLS_TESTNET_TX_DECODE.trim(),
       TX_FETCH: {
-        URL: Config.BIT_API_URLS_TESTNET_TX_FETCH_URL,
-        LIMIT: Config.BIT_API_URLS_TESTNET_TX_LIMIT,
+        URL: Config.BIT_API_URLS_TESTNET_TX_FETCH_URL.trim(),
+        LIMIT: Config.BIT_API_URLS_TESTNET_TX_LIMIT.trim(),
       },
       FUND: {
-        URL: Config.BIT_API_URLS_TESTNET_FUND_URL,
+        URL: Config.BIT_API_URLS_TESTNET_FUND_URL.trim(),
       },
     },
     MAINNET: {
-      BASE: Config.BIT_API_URLS_MAINNET_BASE,
-      BLOCKCHAIN_INFO_BASE: Config.BIT_API_URLS_BLOCKCHAIN_INFO_MAINNET_BASE,
-      BALANCE_CHECK: Config.BIT_API_URLS_MAINNET_BALANCE_CHECK,
-      UNSPENT_OUTPUTS: Config.BIT_API_URLS_MAINNET_UNSPENT_OUTPUTS,
-      BROADCAST: Config.BIT_API_URLS_MAINNET_BROADCAST,
-      TX_DECODE: Config.BIT_API_URLS_MAINNET_TX_DECODE,
+      BASE: Config.BIT_API_URLS_MAINNET_BASE.trim(),
+      BLOCKCHAIN_INFO_BASE: Config.BIT_API_URLS_BLOCKCHAIN_INFO_MAINNET_BASE.trim(),
+      BALANCE_CHECK: Config.BIT_API_URLS_MAINNET_BALANCE_CHECK.trim(),
+      UNSPENT_OUTPUTS: Config.BIT_API_URLS_MAINNET_UNSPENT_OUTPUTS.trim(),
+      BROADCAST: Config.BIT_API_URLS_MAINNET_BROADCAST.trim(),
+      TX_DECODE: Config.BIT_API_URLS_MAINNET_TX_DECODE.trim(),
       TX_FETCH: {
-        URL: Config.BIT_API_URLS_MAINNET_TX_FETCH_URL,
-        LIMIT: Config.BIT_API_URLS_MAINNET_TX_LIMIT,
+        URL: Config.BIT_API_URLS_MAINNET_TX_FETCH_URL.trim(),
+        LIMIT: Config.BIT_API_URLS_MAINNET_TX_LIMIT.trim(),
       },
     },
   };
 
   FAST_BITCOINS: DerivativeAccount = {
-    series: parseInt(Config.BIT_FAST_BITCOINS_SERIES, 10),
+    series: parseInt(Config.BIT_FAST_BITCOINS_SERIES.trim(), 10),
     instance: {
-      max: parseInt(Config.BIT_FAST_BITCOINS_INSTANCE_COUNT, 10),
+      max: parseInt(Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10),
       using: 0,
     },
   };
 
   TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
-    series: parseInt(Config.BIT_TRUSTED_CONTACTS_SERIES, 10),
+    series: parseInt(Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10),
     instance: {
-      max: parseInt(Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT, 10),
+      max: parseInt(Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10),
       using: 0,
     },
   };
@@ -170,17 +180,18 @@ class HexaConfig {
   constructor(env: string) {
     this.ENVIRONMENT = env;
     console.log({ env });
-    console.log(Config.BIT_SERVER_MODE);
+
+    console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
 
     if (Config.BIT_SERVER_MODE.trim() === 'PROD') {
       this.RELAY = this.BH_SERVERS.PROD.RELAY;
       this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
       this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = parseInt(
-        Config.BIT_SHARE_HEALTH_TIME_SLOT1_PROD,
+        Config.BIT_SHARE_HEALTH_TIME_SLOT1_PROD.trim(),
         10,
       );
       this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 = parseInt(
-        Config.BIT_SHARE_HEALTH_TIME_SLOT2_PROD,
+        Config.BIT_SHARE_HEALTH_TIME_SLOT2_PROD.trim(),
         10,
       );
     } else if (Config.BIT_SERVER_MODE.trim() === 'STA') {
@@ -194,21 +205,24 @@ class HexaConfig {
       this.SIGNING_SERVER = this.BH_SERVERS.LOCAL.SIGNING_SERVER;
     }
     console.log(this.HEALTH_STATUS.TIME_SLOTS);
-    console.log(Config.BIT_SERVER_MODE,this.RELAY, this.SIGNING_SERVER);
+    console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
 
     this.BITCOIN_NODE = new Client({
       network:
         this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
       timeout: 10000,
-      username: Config.BIT_RPC_USERNAME,
-      password: Config.BIT_RPC_PASSWORD,
-      host: Config.BIT_HOST_IP,
+      username: Config.BIT_RPC_USERNAME.trim(),
+      password: Config.BIT_RPC_PASSWORD.trim(),
+      host: Config.BIT_HOST_IP.trim(),
     });
 
-    if (Config.BIT_SERVER_MODE === 'LOCAL' || Config.BIT_SERVER_MODE === 'DEV') {
+    if (
+      Config.BIT_SERVER_MODE.trim() === 'LOCAL' ||
+      Config.BIT_SERVER_MODE.trim() === 'DEV'
+    ) {
       this.APP_STAGE = 'dev';
-    } else if (Config.BIT_SERVER_MODE === 'STA') {
+    } else if (Config.BIT_SERVER_MODE.trim() === 'STA') {
       this.APP_STAGE = 'sta';
     } else {
       this.APP_STAGE = 'app';
@@ -224,4 +238,4 @@ class HexaConfig {
   };
 }
 
-export default new HexaConfig(Config.BIT_ENVIRONMENT);
+export default new HexaConfig(Config.BIT_ENVIRONMENT.trim());

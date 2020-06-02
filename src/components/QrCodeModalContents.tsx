@@ -62,16 +62,16 @@ export default function QrCodeModalContents(props) {
 				<View style={styles.qrModalImageNTextInputView}>
 					{props.isOpenedFlag && openCameraFlag ?
 						(<View style={{
-							width: wp('100%'),
-							height: wp('100%'),
+							width: wp('90%'),
+							height: wp('90%'),
 							overflow: "hidden",
 							borderRadius: 20,
 						}}>
 							<RNCamera
 								ref={(ref) => { this.cameraRef = ref; }}
 								style={{
-									width: wp('100%'),
-									height: wp('100%')
+									width: wp('90%'),
+									height: wp('90%')
 								}}
 								onBarCodeRead={barcodeRecognized}
 								captureAudio={false}
@@ -88,8 +88,8 @@ export default function QrCodeModalContents(props) {
 						</View>) : (
 							<AppBottomSheetTouchableWrapper onPress={() => setOpenCameraFlag(true)} >
 								<ImageBackground source={require("../assets/images/icons/iPhone-QR.png")} style={{
-									width: wp('100%'),
-									height: wp('100%'),
+									width: wp('90%'),
+									height: wp('90%'),
 									overflow: "hidden",
 									borderRadius: 20,
 								}} >

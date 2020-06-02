@@ -25,7 +25,7 @@ export default function SettingsContents(props) {
         //     type:"JumbleKeyboard"
         // },
         {
-            title:"Manage Pin",
+            title:"Manage Passcode",
             info:"Change your passcode",
             image:require("../assets/images/icons/managepin.png"),
             type:"ManagePin"

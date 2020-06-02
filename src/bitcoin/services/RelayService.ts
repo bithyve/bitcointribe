@@ -1,6 +1,6 @@
 import Relay from '../utilities/Relay';
 import config from '../HexaConfig';
-import { INotification } from '../utilities/Interface';
+import { INotification, EncryptedImage } from '../utilities/Interface';
 
 export default class RelayServices {
   public static fetchReleases = async (

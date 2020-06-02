@@ -1,8 +1,8 @@
 import { AxiosResponse } from 'axios';
 import config from '../HexaConfig';
-import { INotification } from './Interface';
+import { INotification, EncryptedImage } from './Interface';
 import { BH_AXIOS } from '../../services/api';
-import idx from 'idx'
+import idx from 'idx';
 
 const { HEXA_ID } = config;
 export default class Relay {
@@ -21,7 +21,7 @@ export default class Relay {
       if (err.response) console.log(err.response.data.err);
       if (err.code) console.log(err.code);
     }
-    const { releases = [] } = idx(res, _ => _.data) || {};
+    const { releases = [] } = idx(res, (_) => _.data) || {};
     return { releases };
   };
 

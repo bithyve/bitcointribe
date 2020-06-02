@@ -489,9 +489,13 @@ export default function RestoreSelectedContactsList(props) {
     setSecondaryDeviceRS(META_SHARE);
   }, [META_SHARE]);
 
+  const walletImageChecked: Boolean = useSelector(
+    (state) => state.sss.walletImageChecked,
+  );
+
   useEffect(() => {
     (async () => {
-      if (SERVICES) {
+      if (SERVICES && walletImageChecked) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
         // props.navigation.navigate('Home');
@@ -513,10 +517,12 @@ export default function RestoreSelectedContactsList(props) {
         //   props.navigation.navigate('Home');
         // }, 4000);
 
-        dispatch(syncAccounts());
+        setTimeout(() => {
+          dispatch(syncAccounts()); // delaying as checkMSharesHealth is also a DB inserting saga
+        }, 2000);
       }
     })();
-  }, [SERVICES]);
+  }, [SERVICES, walletImageChecked]);
 
   if (accounts.accountsSynched) {
     (loaderBottomSheet as any).current.snapTo(0);

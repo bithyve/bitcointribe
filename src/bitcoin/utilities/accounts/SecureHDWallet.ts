@@ -108,7 +108,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.secondaryMnemonic =
       stateVars && stateVars.secondaryMnemonic
         ? stateVars.secondaryMnemonic
-        : bip39.generateMnemonic(256);
+        : null;
     this.consumedAddresses =
       stateVars && stateVars.consumedAddresses
         ? stateVars.consumedAddresses
@@ -190,8 +190,10 @@ export default class SecureHDWallet extends Bitcoin {
     return { walletId: hash.digest('hex') };
   };
 
-  public getSecondaryID = (secondaryMnemonic): { secondaryID: string } => {
-    if (!this.secondaryMnemonic) {
+  public getSecondaryID = (
+    secondaryMnemonic: string,
+  ): { secondaryID: string } => {
+    if (!secondaryMnemonic) {
       throw new Error(
         'SecondaryID generation failed; missing secondary mnemonic',
       );
@@ -202,8 +204,23 @@ export default class SecureHDWallet extends Bitcoin {
     return { secondaryID: hash.digest('hex') };
   };
 
-  public getSecondaryMnemonic = (): { secondaryMnemonic: string } => {
-    return { secondaryMnemonic: this.secondaryMnemonic };
+  public removeSecondaryMnemonic = () => {
+    this.secondaryMnemonic = null;
+    return { removed: !Boolean(this.secondaryMnemonic) };
+  };
+
+  public restoreSecondaryMnemonic = (
+    secondaryMnemonic: string,
+  ): {
+    restored: boolean;
+  } => {
+    const path = this.derivePath(this.xpubs.bh);
+    const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
+    if (currentXpub !== this.xpubs.secondary) {
+      return { restored: false };
+    }
+    this.secondaryMnemonic = secondaryMnemonic;
+    return { restored: true };
   };
 
   public getSecondaryXpub = (): { secondaryXpub: string } => {
@@ -593,11 +610,11 @@ export default class SecureHDWallet extends Bitcoin {
       bhXpub: string;
     };
   }> => {
+    // invoked once per wallet (during initial setup)
     let res: AxiosResponse;
+    this.secondaryMnemonic = bip39.generateMnemonic(256);
     const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
     try {
-      console.log({ SIGNING_SERVER });
-
       res = await SIGNING_AXIOS.post('setupSecureAccount', {
         HEXA_ID,
         walletID: this.walletID,
@@ -1105,6 +1122,10 @@ export default class SecureHDWallet extends Bitcoin {
       );
 
       if (!secondaryXpub) {
+        if (!this.secondaryMnemonic)
+          throw new Error(
+            'SecondaryXpub required; secondary mnemonic missing ',
+          );
         const path = this.derivePath(bhXpub);
         secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
       }

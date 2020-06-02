@@ -49,6 +49,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
+import KnowMoreButton from '../../components/KnowMoreButton';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -855,6 +856,7 @@ const TrustedContactHistory = (props) => {
           // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
           dispatch(uploadEncMShare(index, contactName, data, true));
           updateTrustedContactsInfo(chosenContact);
+          onOTPShare(index); // enables reshare
           setChangeContact(false);
         } else if (
           !SHARES_TRANSFER_DETAILS[index] ||
@@ -862,6 +864,7 @@ const TrustedContactHistory = (props) => {
         ) {
           dispatch(uploadEncMShare(index, contactName, data));
           updateTrustedContactsInfo(chosenContact);
+          onOTPShare(index); // enables reshare
         }
       } else {
         console.log({ chosenContact });
@@ -908,13 +911,11 @@ const TrustedContactHistory = (props) => {
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
             // setChosenContactIndex(index);
-            onOTPShare(index); // enables reshare
           }}
           onPressViaLink={(index) => {
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
             // setChosenContactIndex(index);
-            onOTPShare(index); // enables reshare
           }}
         />
       );
@@ -1047,6 +1048,15 @@ const TrustedContactHistory = (props) => {
                 </Text>
               </Text>
             </View>
+            <KnowMoreButton
+              onpress={() => {
+                (trustedContactsBottomSheet as any).current.snapTo(
+                  1,
+                );
+              }}
+              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              textStyle={{}}
+            />
             <Image
               style={{
                 width: shared || activateReshare ? 14 : 17,
