@@ -344,9 +344,49 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
 );
 
+function* processRecipients(
+  recipients: [{ id: string; address: string; amount: number }],
+) {
+  const addressedRecipients = [];
+  for (const recipient of recipients) {
+    if (recipient.address) addressedRecipients.push(recipient);
+    // recipient: manual
+    else {
+      if (!recipient.id) throw new Error('Invalid recipient');
+      if (recipient.id === REGULAR_ACCOUNT || recipient.id === SECURE_ACCOUNT) {
+        // recipient: self account
+        const service = yield select(
+          (state) => state.accounts[recipient.id].service,
+        );
+        let { receivingAddress } = service.hdWallet || service.secureHDWallet; // available based on serviceType
+        if (!receivingAddress) {
+          const res = yield call(service.getAddress);
+          if (res.status === 200) {
+            receivingAddress = res.data.address;
+          } else {
+            throw new Error(
+              `Failed to generate receiving address for recipient: ${recipient.id}`,
+            );
+          }
+        }
+        recipient.address = receivingAddress;
+        addressedRecipients.push(recipient);
+      } else {
+        // recipient: Trusted Contact
+      }
+    }
+  }
+
+  return addressedRecipients;
+}
+
 function* transferST1Worker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'transfer'));
-  const { recipients, averageTxFees } = payload;
+  let { recipients, averageTxFees } = payload;
+  console.log({ recipients });
+
+  recipients = yield call(processRecipients, recipients);
+  console.log({ recipients });
   const service = yield select(
     (state) => state.accounts[payload.serviceType].service,
   );
