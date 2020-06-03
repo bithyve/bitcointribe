@@ -1662,7 +1662,7 @@ export default function Accounts(props) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      props.navigation.navigate('Receive', {
+                      props.navigation.navigate('ReceivingAddress', {
                         serviceType,
                         getServiceType: getServiceType,
                       });

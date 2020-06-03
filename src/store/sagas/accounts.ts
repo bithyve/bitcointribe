@@ -748,6 +748,7 @@ function* accountsSyncWorker({ payload }) {
 
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     yield put(accountsSynched(true));
+    yield put(syncTrustedDerivativeAccounts());
   } catch (err) {
     console.log({ err });
     yield put(accountsSynched(false));

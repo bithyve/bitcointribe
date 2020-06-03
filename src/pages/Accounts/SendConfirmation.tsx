@@ -10,7 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
-  AsyncStorage
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -36,6 +36,7 @@ import SendConfirmationContent from './SendConfirmationContent';
 import RecipientComponent from './RecipientComponent';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -89,7 +90,7 @@ export default function SendConfirmation(props) {
   // }, [sliderValueText]);
 
   useEffect(() => {
-    console.log("transfer", transfer);
+    console.log('transfer', transfer);
     if (transfer.stage2.failed) {
       SendUnSuccessBottomSheet.current.snapTo(1);
     } else if (transfer.txid) {
@@ -104,9 +105,13 @@ export default function SendConfirmation(props) {
   }, [transfer]);
 
   const storeTrustedContactsHistory = async (details) => {
-    if(details && details.length>0){
-      let IMKeeperOfHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
-      let OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
+    if (details && details.length > 0) {
+      let IMKeeperOfHistory = JSON.parse(
+        await AsyncStorage.getItem('IMKeeperOfHistory'),
+      );
+      let OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
+      );
       for (let i = 0; i < details.length; i++) {
         const element = details[i];
         let obj = {
@@ -114,17 +119,26 @@ export default function SendConfirmation(props) {
           title: 'Sent Amount',
           date: moment(Date.now()).valueOf(),
           info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-          selectedContactInfo: element
+          selectedContactInfo: element,
         };
         if (element.selectedContact.isWard) {
-          if(!IMKeeperOfHistory) IMKeeperOfHistory = [];
+          if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
           IMKeeperOfHistory.push(obj);
-          await AsyncStorage.setItem('IMKeeperOfHistory',JSON.stringify(IMKeeperOfHistory));
+          await AsyncStorage.setItem(
+            'IMKeeperOfHistory',
+            JSON.stringify(IMKeeperOfHistory),
+          );
         }
-        if (!element.selectedContact.isWard && !element.selectedContact.isGuardian) {
-          if(!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
+        if (
+          !element.selectedContact.isWard &&
+          !element.selectedContact.isGuardian
+        ) {
+          if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
           OtherTrustedContactsHistory.push(obj);
-          await AsyncStorage.setItem('OtherTrustedContactsHistory', JSON.stringify(OtherTrustedContactsHistory));
+          await AsyncStorage.setItem(
+            'OtherTrustedContactsHistory',
+            JSON.stringify(OtherTrustedContactsHistory),
+          );
         }
       }
     }
@@ -269,6 +283,8 @@ export default function SendConfirmation(props) {
           dispatch(
             fetchBalanceTx(serviceType, {
               loader: true,
+              syncTrustedDerivative:
+                serviceType === REGULAR_ACCOUNT ? true : false,
             }),
           );
           props.navigation.navigate('Accounts');
