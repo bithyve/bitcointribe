@@ -94,7 +94,7 @@ function RecipientComponent(props) {
             </View>
           )}
         </View>
-        <View style={{ marginLeft: 10 }}>
+        <View style={{ marginLeft: 10, marginRight: 20 }}>
           <Text
             style={{
               color: Colors.textColorGrey,
@@ -106,7 +106,7 @@ function RecipientComponent(props) {
           >
             Sending to:
           </Text>
-          <Text style={styles.contactNameText}>
+          <Text style={styles.contactNameText} numberOfLines={1}>
             {props.item.selectedContact.name ||
               props.item.selectedContact.account_name ||
               props.item.selectedContact.id}
@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(20),
     fontFamily: Fonts.FiraSansRegular,
+    width: wp('50%'),
   },
   contactIconImage: {
     width: 20,
