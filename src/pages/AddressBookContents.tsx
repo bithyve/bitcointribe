@@ -33,6 +33,8 @@ import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function AddressBookContents(props) {
+  const [Loading, setLoading] = useState(true);
+  const [trustedContact, setTrustedContact] = useState([]);
   let [MyKeeper, setMyKeeper] = useState([]);
   let [IMKeeper, setIMKeeper] = useState([]);
   let [OtherTrustedContact, setOtherTrustedContact] = useState([]);
@@ -42,6 +44,12 @@ export default function AddressBookContents(props) {
   const trustedContactsService: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, [trustedContact]);
 
   const updateAddressBook = async () => {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
@@ -111,6 +119,7 @@ export default function AddressBookContents(props) {
         setMyKeeper(myKeepers);
         setIMKeeper(imKeepers);
         setOtherTrustedContact(otherTrustedContact);
+        setTrustedContact(trustedContacts);
       }
     }
   };
@@ -131,9 +140,9 @@ export default function AddressBookContents(props) {
           <Image
             source={item.image}
             style={{
-              width: 35,
-              height: 35,
-              borderRadius: 35 / 2,
+              width: wp('12%'),
+              height: wp('12%'),
+              borderRadius: wp('12%') / 2,
               resizeMode: 'contain',
             }}
           />
@@ -145,9 +154,9 @@ export default function AddressBookContents(props) {
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: Colors.shadowBlue,
-              width: 35,
-              height: 35,
-              borderRadius: 30,
+              width: wp('12%'),
+              height: wp('12%'),
+              borderRadius: wp('12%') / 2,
             }}
           >
             <Text
@@ -190,11 +199,15 @@ export default function AddressBookContents(props) {
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.contactName && contact.contactName.split(' ')[0] && contact.contactName != "Secondary Device"
+            {contact.contactName &&
+            contact.contactName.split(' ')[0] &&
+            contact.contactName != 'Secondary Device'
               ? contact.contactName.split(' ')[0]
               : 'Keeper'}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.contactName && contact.contactName.split(' ')[1] && contact.contactName != "Secondary Device"
+              {contact.contactName &&
+              contact.contactName.split(' ')[1] &&
+              contact.contactName != 'Secondary Device'
                 ? contact.contactName.split(' ')[1]
                 : 'Device'}
             </Text>
@@ -211,6 +224,29 @@ export default function AddressBookContents(props) {
             marginLeft: 'auto',
           }}
         >
+          {!contact.hasXpub && contact.contactName != 'Secondary Device' && (
+            <View
+              style={{
+                width: wp('15%'),
+                height: wp('6%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: Colors.borderColor,
+                marginRight: 10,
+                borderRadius: 5,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Pending
+              </Text>
+            </View>
+          )}
           <View
             style={{
               width: 10,
@@ -297,80 +333,87 @@ export default function AddressBookContents(props) {
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ marginTop: wp('2%') }}>
-            <Text style={styles.pageTitle}>My Keepers</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who can help me restore my wallet.
-            </Text>
-            {MyKeeper && MyKeeper.length ? (
-              <View style={{ marginBottom: 15 }}>
-                <View style={{ height: 'auto' }}>
-                  {MyKeeper.map((item, index) => {
-                    return getElement(item, index, 'My Keepers');
-                  })}
+          {(MyKeeper.length > 0 || Loading) && (
+            <View style={{ marginTop: wp('2%') }}>
+              <Text style={styles.pageTitle}>My Keepers</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who can help me restore my wallet.
+              </Text>
+              {!Loading ? (
+                <View style={{ marginBottom: 15 }}>
+                  <View style={{ height: 'auto' }}>
+                    {MyKeeper.map((item, index) => {
+                      return getElement(item, index, 'My Keepers');
+                    })}
+                  </View>
                 </View>
-              </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>I am the keeper of</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who I can help restore their wallets.
-            </Text>
-            {IMKeeper && IMKeeper.length ? (
-              <View style={{ marginBottom: 15 }}>
-                <View style={{ height: 'auto' }}>
-                  {IMKeeper.map((item, index) => {
-                    return getElement(item, index, "I'm Keeper of");
-                  })}
-                </View>
-              </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          <View style={{ marginTop: wp('5%') }}>
-            <View style={{ flexDirection: 'row' }}>
-              <View>
-                <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
-                <Text style={styles.pageInfoText}>
-                  Contacts who I can pay directly.
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={{
-                  width: wp('25%'),
-                  height: wp('8%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: Colors.blue,
-                  marginLeft: 'auto',
-                  marginRight: 15,
-                  borderRadius: 8,
-                  flexDirection: 'row',
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.white,
-                    fontFamily: Fonts.FiraSansMedium,
-                    fontSize: RFValue(10),
-                    marginRight: 3,
-                  }}
-                >
-                  Add Contact
-                </Text>
-                <Entypo name={'plus'} size={RFValue(12)} color={Colors.white} />
-              </TouchableOpacity>
+              ) : (
+                getWaterMark()
+              )}
             </View>
-            {OtherTrustedContact && OtherTrustedContact.length ? (
+          )}
+
+          {(IMKeeper.length > 0 || Loading) && (
+            <View style={{ marginTop: wp('5%') }}>
+              <Text style={styles.pageTitle}>I am the keeper of</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who I can help restore their wallets.
+              </Text>
+
+              {!Loading ? (
+                <View style={{ marginBottom: 15 }}>
+                  <View style={{ height: 'auto' }}>
+                    {IMKeeper.map((item, index) => {
+                      return getElement(item, index, "I'm Keeper of");
+                    })}
+                  </View>
+                </View>
+              ) : (
+                getWaterMark()
+              )}
+            </View>
+          )}
+          <View
+            style={{
+              marginTop:
+                IMKeeper.length == 0 &&
+                MyKeeper.length == 0
+                  ? wp('2%')
+                  : wp('5%'),
+            }}
+          >
+            <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
+            <Text style={styles.pageInfoText}>
+              Contacts who I can pay directly.
+            </Text>
+            {!Loading ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {OtherTrustedContact.map((item, index) => {
                     return getElement(item, index, 'Other Trusted Contacts');
                   })}
+                  <TouchableOpacity
+                    style={{
+                      ...styles.selectedContactsView,
+                      paddingBottom: 7,
+                      paddingTop: 7,
+                      marginTop: 0,
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: wp('10%'),
+                        height: wp('10%'),
+                        marginLeft: 5,
+                      }}
+                      source={require('../assets/images/icons/icon_add_grey.png')}
+                    />
+                    <View>
+                      <Text style={styles.contactText}>
+                        Add Trusted Contact
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             ) : (
