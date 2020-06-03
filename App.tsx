@@ -37,9 +37,12 @@ class App extends Component {
 
 
   unsubscribe = NetInfo.addEventListener(state => {
+
     if (state.isInternetReachable) {
       (this.NoInternetBottomSheet as any).current.snapTo(0);
     } else {
+      console.log("Internet", state);
+
       (this.NoInternetBottomSheet as any).current.snapTo(1);
     }
   });

@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, Component } from 'react';
+import React, { Component } from 'react';
 import {
     View,
     StyleSheet,
     StatusBar,
     Text,
-    Image,
     TouchableOpacity,
     FlatList,
     ImageBackground,
@@ -14,26 +13,19 @@ import {
     NativeModules,
     Alert,
 } from 'react-native';
-import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
-import ToggleSwitch from '../components/ToggleSwitch';
 import { RFValue } from 'react-native-responsive-fontsize';
-import CommonStyles from '../common/Styles';
-import NoInternetModalContents from '../components/NoInternetModalContents';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
-import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import HomePageShield from '../components/HomePageShield';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
@@ -85,120 +77,13 @@ import HomeList from '../components/home/home-list';
 import HomeHeader from '../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
+import { platform } from 'process';
+import { initialCardData } from '../stubs/initialCardData';
+import { initialTransactionData } from '../stubs/initialTransactionData';
 
-
-const initialCardData = [
-    {
-        id: 1,
-        title: 'Test Account',
-        unit: 't-sats',
-        amount: '400,000',
-        account: `Learn Bitcoin`,
-        accountType: 'test',
-        bitcoinicon: require('../assets/images/icons/icon_bitcoin_gray.png'),
-    },
-    {
-        id: 2,
-        title: 'Savings Account',
-        unit: 'sats',
-        amount: '60,000',
-        account: 'Multi-factor security',
-        accountType: 'secure',
-        bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
-    },
-    {
-        id: 3,
-        title: 'Checking Account',
-        unit: 'sats',
-        amount: '5,000',
-        account: 'Fast and easy',
-        accountType: 'regular',
-        bitcoinicon: require('../assets/images/icons/icon_bitcoin_test.png'),
-    },
-    {
-        id: 4,
-        title: 'Add Account',
-        unit: '',
-        amount: '',
-        account: '',
-        accountType: 'add',
-        bitcoinicon: require('../assets/images/icons/icon_add.png'),
-    },
-]
-
-
-const initialTransactionData = [
-    {
-        title: 'Spending accounts',
-        date: '30 November 2019',
-        time: '11:00 am',
-        price: '0.025',
-        transactionStatus: 'send',
-    },
-    {
-        title: 'Spending accounts',
-        date: '1 November 2019',
-        time: '11:00 am',
-        price: '0.015',
-        transactionStatus: 'receive',
-    },
-    {
-        title: 'Spending accounts',
-        date: '30 Jully 2019',
-        time: '10:00 am',
-        price: '0.125',
-        transactionStatus: 'receive',
-    },
-    {
-        title: 'Saving accounts',
-        date: '1 June 2019',
-        time: '12:00 am',
-        price: '0.5',
-        transactionStatus: 'receive',
-    },
-    {
-        title: 'Saving accounts',
-        date: '11 May 2019',
-        time: '1:00 pm',
-        price: '0.1',
-        transactionStatus: 'send',
-    },
-    {
-        title: 'Spending accounts',
-        date: '30 November 2019',
-        time: '11:00 am',
-        price: '0.025',
-        transactionStatus: 'send',
-    },
-    {
-        title: 'Spending accounts',
-        date: '1 November 2019',
-        time: '11:00 am',
-        price: '0.015',
-        transactionStatus: 'receive',
-    },
-    {
-        title: 'Spending accounts',
-        date: '30 Jully 2019',
-        time: '10:00 am',
-        price: '0.125',
-        transactionStatus: 'receive',
-    },
-    {
-        title: 'Saving accounts',
-        date: '1 June 2019',
-        time: '12:00 am',
-        price: '0.5',
-        transactionStatus: 'receive',
-    },
-    {
-        title: 'Saving accounts',
-        date: '12 May 2019',
-        time: '1:00 pm',
-        price: '0.1',
-        transactionStatus: 'send',
-    },
-]
+function isEmpty(obj) {
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+}
 
 
 const getIconByAccountType = (type) => {
@@ -293,7 +178,9 @@ interface HomeStateTypes {
     buttonText: string,
     familyAndFriendsBookBottomSheetsFlag: boolean,
     selectedContact: any[],
-    notificationDataChange: boolean
+    notificationDataChange: boolean,
+    appState: string,
+    fbBTCAccount: any
 
 }
 
@@ -303,12 +190,19 @@ interface HomePropsTypes {
     exchangeRates: any[],
     accounts: any[],
     walletName: string,
-    UNDER_CUSTODY: any
+    UNDER_CUSTODY: any,
+    fetchNotifications: any,
+    updateFCMTokens: any
+
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
+    focusListener: any
+    appStateListener: any
     constructor(props) {
         super(props);
+        this.focusListener = null
+        this.appStateListener = null
         this.state = {
             notificationData: [],
             cardData: [],
@@ -336,7 +230,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             buttonText: '',
             familyAndFriendsBookBottomSheetsFlag: false,
             selectedContact: [],
-            notificationDataChange: false
+            notificationDataChange: false,
+            appState: '',
+            fbBTCAccount: {}
         }
     }
 
@@ -428,11 +324,409 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         }
     };
 
+    scheduleNotification = async () => {
+        const notification = new firebase.notifications.Notification()
+            .setTitle('We have not seen you in a while!')
+            .setBody(
+                'Opening your app regularly ensures you get all the notifications and security updates',
+            )
+            .setNotificationId('1')
+            .setSound('default')
+            .setData({
+                title: 'We have not seen you in a while!',
+                body:
+                    'Opening your app regularly ensures you get all the notifications and security updates',
+            })
+            .android.setChannelId('reminder')
+            .android.setPriority(firebase.notifications.Android.Priority.High);
+
+        // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+        const date = new Date();
+        date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
+
+        // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
+        await firebase
+            .notifications()
+            .scheduleNotification(notification, {
+                fireDate: date.getTime(),
+                //repeatInterval: 'hour',
+            })
+            .then(() => { })
+            .catch(
+                (err) => { }, //console.log('err', err)
+            );
+        firebase
+            .notifications()
+            .getScheduledNotifications()
+            .then((notifications) => {
+                //console.log('logging notifications', notifications);
+            });
+    };
+
+
+    onAppStateChange = async (nextAppState) => {
+        const { appState } = this.state
+        try {
+            if (appState === nextAppState) return;
+            this.setState({
+                appState: nextAppState
+            }, () => {
+                if (nextAppState === 'active') {
+                    this.scheduleNotification()
+                }
+            })
+        } catch (error) { }
+    };
 
     componentDidMount = () => {
         this.updateAccountCardData()
         this.getBalances()
+        this.appStateListener = AppState.addEventListener('change', this.handleAppStateChange);
+        this.bootStrapNotifications()
+        Linking.addEventListener('url', this.handleDeepLink);
     };
+
+    componentWillUnmount() {
+        if (this.focusListener) {
+            this.focusListener()
+        }
+
+        if (this.appStateListener) {
+            this.appStateListener()
+        }
+    }
+
+
+    handleAppStateChange = async (nextAppState) => {
+        const { appState } = this.state
+        try {
+            if (appState === nextAppState) return;
+            this.setState({
+                appState: nextAppState
+            }, () => {
+                if (nextAppState === 'active') {
+                    this.scheduleNotification()
+                }
+            })
+        } catch (error) { }
+
+        let isContactOpen = false;
+        let isCameraOpen = false;
+        AsyncStorage.getItem('isContactOpen', (err, value) => {
+            if (err) console.log(err);
+            else {
+                isContactOpen = JSON.parse(value);
+            }
+        });
+        AsyncStorage.getItem('isCameraOpen', (err, value) => {
+            if (err) console.log(err);
+            else {
+                isCameraOpen = JSON.parse(value);
+            }
+        });
+        if (isCameraOpen) {
+            await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
+            return;
+        }
+        if (isContactOpen) {
+            await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
+            return;
+        }
+
+        if (Platform.OS === "ios" && nextAppState === 'active') {
+            this.props.navigation.navigate('ReLogin');
+        } else if (Platform.OS === "android" && nextAppState === 'background') {
+            this.props.navigation.navigate('ReLogin');
+        }
+
+    };
+
+
+    handleDeepLink = (event) => {
+        const splits = event.url.split('/');
+        const { navigation } = this.props
+
+        if (splits[5] === 'sss') {
+            const requester = splits[4];
+            if (splits[6] === 'ek') {
+                const custodyRequest = {
+                    requester,
+                    ek: splits[7],
+                    uploadedAt: splits[8],
+                };
+                navigation.navigate('Home', { custodyRequest });
+            } else if (splits[6] === 'rk') {
+                const recoveryRequest = { requester, rk: splits[7] };
+                navigation.navigate('Home', {
+                    recoveryRequest,
+                    trustedContactRequest: null,
+                });
+            }
+        } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
+            if (splits[3] !== config.APP_STAGE) {
+                Alert.alert(
+                    'Invalid deeplink',
+                    `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+                    splits[3]
+                    }`,
+                );
+            } else {
+                const trustedContactRequest = {
+                    isGuardian: splits[4] === 'tcg' ? true : false,
+                    requester: splits[5],
+                    encryptedKey: splits[6],
+                    hintType: splits[7],
+                    hint: splits[8],
+                    uploadedAt: splits[9],
+                };
+                navigation.navigate('Home', {
+                    trustedContactRequest,
+                    recoveryRequest: null,
+                });
+            }
+        } else if (splits[4] === 'rk') {
+            const recoveryRequest = {
+                isRecovery: true,
+                requester: splits[5],
+                encryptedKey: splits[6],
+                hintType: splits[7],
+                hint: splits[8],
+            };
+            navigation.navigate('Home', {
+                recoveryRequest,
+                trustedContactRequest: null,
+            });
+        }
+
+        if (event.url.includes('fastbitcoins')) {
+            const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
+            navigation.navigate('VoucherScanner', { userKey });
+        }
+    }
+
+    setUpFocusListener = () => {
+        const { navigation } = this.props
+        this.focusListener = navigation.addListener('didFocus', () => {
+            this.setCurrencyCodeFromAsync();
+            this.getAssociatedContact();
+            this.checkFastBitcoin();
+        });
+
+        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+        (this.refs.addTabBarBottomSheet as any).snapTo(0);
+        (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+        (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+
+        this.getAssociatedContact()
+        this.setCurrencyCodeFromAsync()
+        this.checkFastBitcoin()
+
+    }
+
+    checkFastBitcoin = async () => {
+        let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+        this.setState({ fbBTCAccount: getFBTCAccount })
+        return
+    };
+
+
+    getAssociatedContact = async () => {
+        // TODO -- need to check what happens here
+        let SelectedContacts = JSON.parse(
+            await AsyncStorage.getItem('SelectedContacts'),
+        );
+        // setSelectedContacts(SelectedContacts);
+        let AssociatedContact = JSON.parse(
+            await AsyncStorage.getItem('AssociatedContacts'),
+        );
+        // setAssociatedContact(AssociatedContact);
+        let SecondaryDeviceAddress = JSON.parse(
+            await AsyncStorage.getItem('secondaryDeviceAddress'),
+        );
+        // setSecondaryDeviceAddress(SecondaryDeviceAddress);
+    };
+
+    setCurrencyCodeFromAsync = async () => {
+        let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+        if (!currencyCodeTmp) {
+            const identifiers = ['io.hexawallet.hexa'];
+            NativeModules.InAppUtils.loadProducts(
+                identifiers,
+                async (error, products) => {
+                    await AsyncStorage.setItem(
+                        'currencyCode',
+                        products && products.length ? products[0].currencyCode : 'USD',
+                    );
+                    let currencyCode = idx(products, _ => _[0].currencyCode) || 'USD'
+                    this.setState({
+                        currencyCode
+                    })
+                },
+            );
+        } else {
+            this.setState({
+                currencyCode: currencyCodeTmp
+            })
+        }
+        let currencyToggleValueTmp = await AsyncStorage.getItem(
+            'currencyToggleValue',
+        );
+
+        // TODO
+        // setSwitchOn(currencyToggleValueTmp ? true : false);
+    };
+
+    bootStrapNotifications = async () => {
+        const enabled = await firebase.messaging().hasPermission();
+        if (!enabled) {
+            await firebase
+                .messaging()
+                .requestPermission()
+                .then(() => {
+                    // User has authorized
+                    this.createNotificationListeners()
+                    this.storeFCMToken();
+                    this.scheduleNotification();
+                })
+                .catch((error) => {
+                    // User has rejected permissions
+                    //console.log(
+                    // 'PERMISSION REQUEST :: notification permission rejected',
+                    //  error,
+                    //);
+                });
+        } else {
+            this.createNotificationListeners();
+            this.storeFCMToken();
+            this.scheduleNotification();
+        }
+    }
+
+    storeFCMToken = async () => {
+        const fcmToken = await firebase.messaging().getToken();
+        let fcmArray = [fcmToken];
+        let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
+        if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
+            await AsyncStorage.setItem('fcmToken', fcmToken);
+            this.props.updateFCMTokens(fcmArray)
+        } else if (!fcmTokenFromAsync) {
+            await AsyncStorage.setItem('fcmToken', fcmToken);
+            this.props.updateFCMTokens(fcmArray)
+        }
+    };
+
+    onNotificationArrives = async (notification) => {
+        this.props.fetchNotifications()
+        const { title, body } = notification;
+        const deviceTrayNotification = new firebase.notifications.Notification()
+            .setTitle(title)
+            .setBody(body)
+            .setNotificationId(notification.notificationId)
+            .setSound('default')
+            .android.setPriority(firebase.notifications.Android.Priority.High)
+            .android.setChannelId(
+                notification.android.channelId
+                    ? notification.android.channelId
+                    : 'foregroundNotification',
+            ) // previously created
+            .android.setAutoCancel(true); // To remove notification when tapped on it
+
+        const channelId = new firebase.notifications.Android.Channel(
+            notification.android.channelId,
+            notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+            firebase.notifications.Android.Importance.High,
+        );
+        firebase.notifications().android.createChannel(channelId);
+        firebase.notifications().displayNotification(deviceTrayNotification);
+    };
+
+    createNotificationListeners = async () => {
+        // TODO -- need to do garbage collection 
+        /*
+         * Triggered when a particular notification has been received in foreground
+         * */
+        firebase
+            .notifications()
+            .onNotification((notification) => {
+                this.onNotificationArrives(notification);
+            });
+
+        /*
+         * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+         * */
+        let notificationOpenedListener = firebase
+            .notifications()
+            .onNotificationOpened(async (notificationOpen) => {
+                const { title, body } = notificationOpen.notification;
+                this.props.fetchNotifications()
+                this.onNotificationOpen(notificationOpen.notification);
+            });
+
+        /*
+         * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+         * */
+        const notificationOpen = await firebase
+            .notifications()
+            .getInitialNotification();
+        if (notificationOpen) {
+            const { title, body } = notificationOpen.notification;
+
+            this.props.fetchNotifications()
+            this.onNotificationOpen(notificationOpen.notification)
+        }
+        /*
+         * Triggered for data only payload in foreground
+         * */
+        firebase.messaging().onMessage((message) => {
+            //process data message
+        });
+    };
+
+    onNotificationOpen = async (item) => {
+        let content = JSON.parse(item._data.content);
+        let asyncNotificationList = JSON.parse(
+            await AsyncStorage.getItem('notificationList'),
+        );
+        if (!asyncNotificationList) {
+            asyncNotificationList = [];
+        }
+        let readStatus = true;
+        if (content.notificationType == 'release') {
+            let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+            if (releaseCases.ignoreClick) {
+                readStatus = true;
+            } else if (releaseCases.remindMeLaterClick) {
+                readStatus = false;
+            } else {
+                readStatus = false;
+            }
+        }
+        let obj = {
+            type: content.notificationType,
+            isMandatory: false,
+            read: readStatus,
+            title: item.title,
+            time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+            date: new Date(),
+            info: item.body,
+            notificationId: content.notificationId,
+        };
+        asyncNotificationList.push(obj);
+        await AsyncStorage.setItem(
+            'notificationList',
+            JSON.stringify(asyncNotificationList),
+        );
+        asyncNotificationList.sort(function (left, right) {
+            return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+        });
+        this.setState({
+            notificationData: asyncNotificationList,
+            notificationDataChange: !this.state.notificationDataChange
+        })
+    };
+
+
+
 
     getBalances = () => {
         const { accounts } = this.props
@@ -542,6 +836,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 notificationDataChange: !this.state.notificationDataChange
             })
 
+        }
+    };
+
+    onPressSaveBitcoinElements = (type) => {
+        const { navigation } = this.props
+        if (type == 'voucher') {
+            navigation.navigate('VoucherScanner');
+        } else if (type == 'existingBuyingMethods') {
+            navigation.navigate('ExistingSavingMethods');
         }
     };
 
@@ -799,10 +1102,18 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         } else if (item.title == 'Wallet Settings') {
             this.setState({
                 tabBarIndex: 0
-            })
-            // (settingsBottomSheet as any).current.snapTo(1);
+            }, () => (this.refs.settingsBottomSheet as any).snapTo(1))
         }
     };
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (!prevState.addBottomSheetFlag && this.state.addBottomSheetFlag) {
+            if (this.refs.addBottomSheet) {
+                (this.refs.addBottomSheet as any).snapTo(1);
+            }
+        }
+    };
+
 
 
     render() {
@@ -826,7 +1137,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             addSubBottomSheetsFlag,
             selectedContact,
             familyAndFriendsBookBottomSheetsFlag,
-            notificationData
+            notificationData,
+            selectToAdd,
+            fbBTCAccount
         } = this.state
         const { navigation, notificationList, exchangeRates, accounts, walletName } = this.props
         const trustedContactRequest = navigation.getParam(
@@ -885,7 +1198,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     </View>
                 </View>
 
-                <CustomBottomTabs tabBarZIndex={999} selectTab={this.selectTab} selected={'Transactions'} />
+                <CustomBottomTabs tabBarZIndex={tabBarIndex} selectTab={this.selectTab} selected={'Transactions'} />
 
                 <BottomSheet
                     onOpenEnd={() => {
@@ -962,14 +1275,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     ]}
                     renderContent={() => <AddModalContents
                         onPressElements={(type) => {
+                            debugger
                             if (type == 'buyBitcoins') {
                                 this.setState({
                                     addBottomSheetFlag: true,
                                     tabBarIndex: 0,
                                     selectToAdd: type
-                                }, () => {
-                                    (this.refs.addBottomSheet as any).snapTo(1);
-                                })
+                                }
+                                )
 
                             } else if (type == 'addContact') {
                                 this.setState({
@@ -1081,30 +1394,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     </TouchableOpacity>}
                 />
 
-                <BottomSheet
-                    onCloseEnd={() => {
-                        this.setState({
-                            tabBarIndex: 999
-                        })
 
-                    }}
-                    enabledInnerScrolling={true}
-                    ref={"noInternetBottomSheet"}
-                    snapPoints={[-50, hp('60%')]}
-                    renderContent={() => <NoInternetModalContents
-                        onPressTryAgain={() => { }}
-                        onPressIgnore={() => {
-                            (this.refs.noInternetBottomSheet as any).snapTo(0)
-                        }}
-                    />}
-                    renderHeader={() => <TransparentHeaderModal
-                        onPressheader={() => {
-                            this.setState({
-                                tabBarIndex: 999
-                            }, () => (this.refs.noInternetBottomSheet as any).snapTo(0))
-                        }}
-                    />}
-                />
 
                 {/* // TODO need to integrate custodian modal */}
                 {/* <BottomSheet
@@ -1357,71 +1647,86 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 }
 
 
-                {
-                    addBottomSheetFlag ? (
-                        <BottomSheet
-                            onOpenEnd={() => {
-                                if (!deepLinkModalOpen) {
-                                    this.setState({
-                                        tabBarIndex: 0
-                                    })
-                                }
-                            }}
-                            onCloseEnd={() => {
-                                if (!deepLinkModalOpen) {
-                                    this.setState({
-                                        tabBarIndex: 999
-                                    })
-                                }
 
-                                this.setState({
-                                    addBottomSheetFlag: false
-                                })
+                <BottomSheet
+                    onOpenEnd={() => {
+                        if (!deepLinkModalOpen) {
+                            this.setState({
+                                tabBarIndex: 0
+                            })
+                        }
+                    }}
+                    onCloseEnd={() => {
+                        if (!deepLinkModalOpen) {
+                            this.setState({
+                                tabBarIndex: 999
+                            })
+                        }
 
-                            }}
-                            enabledInnerScrolling={true}
-                            ref={"addBottomSheet"}
-                            snapPoints={[
-                                -50,
-                                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                                    ? hp('65%')
-                                    : hp('64%'),
-                            ]}
-                            renderContent={() => <AddModalContents
-                                onPressElements={(type) => {
-                                    if (type == 'buyBitcoins') {
+                        this.setState({
+                            addBottomSheetFlag: false
+                        })
+
+                    }}
+                    enabledInnerScrolling={true}
+                    ref={"addBottomSheet"}
+                    snapPoints={[
+                        -50,
+                        Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                            ? hp('65%')
+                            : hp('64%'),
+                    ]}
+                    renderContent={() => {
+                        if (selectToAdd == 'buyBitcoins') {
+                            return (
+                                <SaveBitcoinModalContents
+                                    onPressBack={() => {
+                                        (this.refs.addBottomSheet as any).snapTo(0);
+                                    }}
+                                    onPressElements={(type) => this.onPressSaveBitcoinElements(type)}
+                                    isExistingSavingMethod={isEmpty(fbBTCAccount)}
+                                />
+                            );
+                        }
+                        else if (selectToAdd == 'addContact') {
+                            return (
+                                <AddContactsModalContents
+                                    onPressFriendAndFamily={() => {
                                         this.setState({
-                                            addBottomSheetFlag: true,
-                                            tabBarIndex: 0,
-                                            selectToAdd: type
-                                        }, () => {
-                                            (this.refs.addBottomSheet as any).snapTo(1);
-                                        })
-
-                                    } else if (type == 'addContact') {
+                                            familyAndFriendsBookBottomSheetsFlag: true
+                                        }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
+                                    }}
+                                    onPressBiller={() => {
+                                        this.setState({
+                                            familyAndFriendsBookBottomSheetsFlag: true
+                                        }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
+                                    }}
+                                    onPressBack={() => {
                                         this.setState({
                                             addSubBottomSheetsFlag: true,
-                                            addBottomSheetFlag: false,
-                                            tabBarIndex: 0,
-                                            selectToAdd: type
-                                        }, () => (this.refs.addTabBarBottomSheet as any).snapTo(1))
-                                    }
-                                }}
-                                addData={modalData}
-                            />}
-                            renderHeader={() => <ModalHeader
-                                onPressHeader={() => {
-                                    this.setState({
-                                        addSubBottomSheetsFlag: false,
-                                        tabBarIndex: 999
-                                    }, () => {
-                                        (this.refs.addBottomSheet as any).snapTo(0);
-                                    })
-                                }}
-                            />}
-                        />
-                    ) : null
-                }
+                                            tabBarIndex: 999
+                                        }, () => (this.refs.addBottomSheet as any).current.snapTo(0))
+
+                                    }}
+                                />
+                            );
+                        } else {
+                            return null;
+                        }
+                    }
+
+                    }
+                    renderHeader={() => <ModalHeader
+                        onPressHeader={() => {
+                            this.setState({
+                                addSubBottomSheetsFlag: false,
+                                tabBarIndex: 999
+                            }, () => {
+                                (this.refs.addBottomSheet as any).snapTo(0);
+                            })
+                        }}
+                    />}
+                />
 
 
                 <BottomSheet
@@ -1726,7 +2031,7 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, null)(HomeUpdated)
+export default connect(mapStateToProps, { fetchNotifications, updateFCMTokens })(HomeUpdated)
 
 const styles = StyleSheet.create({
     card: {

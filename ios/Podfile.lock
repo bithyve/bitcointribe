@@ -120,7 +120,7 @@ PODS:
     - React
   - react-native-camera/RN (3.26.0):
     - React
-  - react-native-config (1.1.0):
+  - react-native-config (1.2.0):
     - React
   - react-native-contacts (5.2.0):
     - React
@@ -128,7 +128,7 @@ PODS:
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-netinfo (5.9.1):
+  - react-native-netinfo (5.9.2):
     - React
   - react-native-print (0.6.0):
     - React
@@ -192,7 +192,7 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - RNDeviceInfo (5.6.0):
+  - RNDeviceInfo (5.6.1):
     - React
   - RNFirebase (5.3.1):
     - Firebase/Core
@@ -466,15 +466,15 @@ SPEC CHECKSUMS:
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 2b74be8edc1103c4c46d1f4e5f41723d9ff052cc
-  react-native-config: 313a1306066289211579b9655eb81d9a565462d0
+  react-native-config: 1ad4712773ff7e867b261be0aab293921d4498f9
   react-native-contacts: 439dd9c7ea7e0d86190f8370898b82cfb7cf4ef4
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-netinfo: 4284e9f4ade9fc498f313b2e9e3f7fd4fa6e3082
+  react-native-netinfo: cb74e17062b2af5a16a4b137f32495f241df1a8e
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
-  RNDeviceInfo: f7e473fc3cc0a7648d5c57c5413c7e875718a740
+  RNDeviceInfo: b6e650fbd234732c759544218657d549b4339038
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
@@ -497,4 +497,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: dd879d81ff46b3f33e8aee300c9fb1cf38f78d16
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
