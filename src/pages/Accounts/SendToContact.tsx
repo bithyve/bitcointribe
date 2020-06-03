@@ -51,7 +51,6 @@ export default function SendToContact(props) {
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
   const averageTxFees = props.navigation.getParam('averageTxFees');
-  const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
@@ -108,7 +107,6 @@ export default function SendToContact(props) {
     } else if (transfer.executed === 'ST1') {
       props.navigation.navigate('SendConfirmation', {
         serviceType,
-        sweepSecure,
         netBalance,
         recipients,
         averageTxFees,

@@ -12,12 +12,38 @@ import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper
 import { nameToInitials } from '../common/CommonFunctions';
 import { ScrollView } from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-svg';
+import {
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../common/constants/serviceTypes';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SendViaQR(props) {
   const [contactName, setContactName] = useState('');
   const amount = props.amount;
   const contact = props.contact;
-
+  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
+  const [dropdownBoxList, setDropdownBoxList] = useState([
+    {
+      id: '1',
+      account_name: 'Test Account',
+      type: TEST_ACCOUNT,
+    },
+    {
+      id: '2',
+      account_name: 'Checking Account',
+      type: REGULAR_ACCOUNT,
+    },
+    {
+      id: '3',
+      account_name: 'Saving Account',
+      type: SECURE_ACCOUNT,
+    },
+  ]);
+  const [serviceType, setServiceType] = useState(
+    props.serviceType ? props.serviceType : '',
+  );
   //console.log("amountCurrency", props.amountCurrency);
   const [Contact, setContact] = useState(props.contact ? props.contact : {});
   useEffect(() => {
@@ -25,6 +51,12 @@ export default function SendViaQR(props) {
       setContact(props.contact);
     }
   }, [contact]);
+
+  useEffect(() => {
+    if(props.serviceType){
+      setServiceType(props.serviceType)
+    }
+  }, [props.serviceType]);
 
   useEffect(() => {
     let contactName =
@@ -228,6 +260,86 @@ export default function SendViaQR(props) {
               </View>
             </View>
           }
+          {props.serviceType ? (
+            <AppBottomSheetTouchableWrapper
+              style={{
+                flexDirection: 'row',
+                paddingLeft: 20,
+                paddingRight: 20,
+                marginTop: 30,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              activeOpacity={10}
+              onPress={() => {
+                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textAlign: 'center',
+                }}
+              >
+                Receiving To:
+                <Text style={styles.boldItalicText}>
+                  {serviceType && serviceType == TEST_ACCOUNT
+                    ? '  Test Account'
+                    : serviceType && serviceType == REGULAR_ACCOUNT
+                    ? '  Checking Account'
+                    : serviceType && serviceType == SECURE_ACCOUNT
+                    ? '  Saving Account'
+                    : ''}
+                </Text>
+              </Text>
+              <Ionicons
+                style={{ marginRight: 10, marginLeft: 10 }}
+                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
+                size={20}
+                color={Colors.blue}
+              />
+            </AppBottomSheetTouchableWrapper>
+          ) : null}
+          <View style={{ position: 'relative' }}>
+            {props.serviceType
+              ? dropdownBoxOpenClose && (
+                  <View style={styles.dropdownBoxModal}>
+                    <ScrollView>
+                      {dropdownBoxList.map((value, index) => (
+                        <AppBottomSheetTouchableWrapper
+                          onPress={() => {
+                            setServiceType(value.type);
+
+                            setDropdownBoxOpenClose(false);
+                          }}
+                          style={{
+                            ...styles.dropdownBoxModalElementView,
+                            backgroundColor:
+                              serviceType == value.type
+                                ? Colors.lightBlue
+                                : Colors.white,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color:
+                                serviceType == value.type
+                                  ? Colors.blue
+                                  : Colors.black,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue(12),
+                            }}
+                          >
+                            {value.account_name}
+                          </Text>
+                        </AppBottomSheetTouchableWrapper>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )
+              : null}
           {props.amount && (
             <View style={styles.amountContainer}>
               <Text
@@ -292,6 +404,7 @@ export default function SendViaQR(props) {
               <QRCode value={props.QR} size={hp('27%')} />
             )}
           </View>
+        </View>
         </View>
       </ScrollView>
 
@@ -402,5 +515,32 @@ const styles = StyleSheet.create({
     width: wp('6%'),
     height: wp('6%'),
     resizeMode: 'contain',
+  },
+  dropdownBoxModal: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1%'),
+    width: wp('90%'),
+    height: hp('18%'),
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    zIndex: 9999,
+    overflow: 'hidden',
+  },
+  dropdownBoxModalElementView: {
+    height: 50,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingLeft: 15,
+  },
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontStyle: 'italic',
+    color: Colors.blue,
   },
 });

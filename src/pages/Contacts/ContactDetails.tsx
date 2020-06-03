@@ -22,8 +22,13 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Entypo from 'react-native-vector-icons/Entypo';
 import _ from 'underscore';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTransferDetails } from '../../store/actions/accounts';
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function ContactDetails(props) {
+  const dispatch = useDispatch();
+  const [Loading, setLoading] = useState(true);
   const Contact = props.navigation.state.params.contact;
   const contactsType = props.navigation.state.params.contactsType;
   const index = props.navigation.state.params.index;
@@ -62,68 +67,34 @@ export default function ContactDetails(props) {
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
+
   useEffect(() => {
     setContact(Contact);
     if (contactsType == 'My Keepers') saveInTransitHistory('inTransit');
     else getHistoryForTrustedContacts();
   }, [Contact]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, [trustedContactHistory]);
+
   const onPressSend = () => {
     if (contactsType == 'My Keepers') {
       saveInTransitHistory('isSent');
-    } else {
-      storeTrustedContactsHistory();
     }
-    props.navigation.navigate('Send', { isFromAddressBook: true });
-  };
-
-  const createId = (length) => {
-    var result = '';
-    var characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-    var charactersLength = characters.length;
-    for (var i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-  };
-
-  const storeTrustedContactsHistory = async () => {
-    let OtherTrustedContactsHistory = [];
-    if (contactsType == 'Other Trusted Contacts') {
-      let OtherTrustedContactsHistoryArray = JSON.parse(
-        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
-      );
-      OtherTrustedContactsHistory = OtherTrustedContactsHistoryArray;
-    } else {
-      let IMKeeperOfHistory = JSON.parse(
-        await AsyncStorage.getItem('IMKeeperOfHistory'),
-      );
-      OtherTrustedContactsHistory = IMKeeperOfHistory;
-    }
-    if (!OtherTrustedContactsHistory) {
-      OtherTrustedContactsHistory = [];
-    }
-    let obj = {
-      id: createId(10),
-      title: 'Sent Amount',
-      date: moment(Date.now()).valueOf(),
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    };
-    OtherTrustedContactsHistory.push(obj);
-    if (contactsType == 'Other Trusted Contacts') {
-      await AsyncStorage.setItem(
-        'OtherTrustedContactsHistory',
-        JSON.stringify(OtherTrustedContactsHistory),
-      );
-    } else {
-      await AsyncStorage.setItem(
-        'IMKeeperOfHistory',
-        JSON.stringify(OtherTrustedContactsHistory),
-      );
-    }
-    console.log('obj', OtherTrustedContactsHistory);
-    setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
+    dispatch(
+      addTransferDetails(REGULAR_ACCOUNT, {
+        selectedContact: Contact,
+      }),
+    );
+    props.navigation.navigate('SendToContact', {
+      selectedContact: Contact,
+      serviceType: REGULAR_ACCOUNT,
+      averageTxFees: 0,
+      netBalance: 10000,
+    });
   };
 
   const getHistoryForTrustedContacts = async () => {
@@ -137,8 +108,8 @@ export default function ContactDetails(props) {
         await AsyncStorage.getItem('IMKeeperOfHistory'),
       );
     }
-    if (!OtherTrustedContactsHistory) {
-      OtherTrustedContactsHistory = [];
+    if(OtherTrustedContactsHistory){
+      OtherTrustedContactsHistory = getHistoryByContactId(OtherTrustedContactsHistory);
     }
     if (OtherTrustedContactsHistory.length > 0) {
       setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
@@ -146,6 +117,19 @@ export default function ContactDetails(props) {
       setTrustedContactHistory([]);
     }
   };
+
+  const getHistoryByContactId = (history) =>{
+    let array = [];
+    if(history && history.length>0){
+      for (let i = 0; i < history.length; i++) {
+        const element = history[i];
+        if(element.selectedContactInfo && element.selectedContactInfo.selectedContact.id == Contact.id){
+          array.push(element);
+        }  
+      }
+    }
+    return array;
+  }
 
   const sortedHistory = useCallback((history) => {
     const currentHistory = history.filter((element) => {
@@ -280,13 +264,18 @@ export default function ContactDetails(props) {
               >
                 {contactsType}
               </Text>
-              <Text style={styles.contactText}>{Contact.contactName == "Secondary Device" ? "Keeper Device" : contact.contactName}</Text>
+              <Text style={styles.contactText}>
+                {Contact.contactName == 'Secondary Device'
+                  ? 'Keeper Device'
+                  : contact.contactName}
+              </Text>
               {contact.connectedVia ? (
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.hasXpub && Contact.contactName != "Secondary Device" && (
+            {Contact.hasXpub && Contact.contactName != 'Secondary Device' && (
               <TouchableOpacity
+                onPress={() => onPressSend()}
                 style={{
                   width: wp('15%'),
                   height: wp('6%'),
@@ -322,7 +311,7 @@ export default function ContactDetails(props) {
             )}
           </View>
         </View>
-        {sortedHistory(trustedContactHistory).length > 0 ? (
+        {!Loading ? (
           <ScrollView style={{ flex: 1 }}>
             {sortedHistory(trustedContactHistory).map((value) => {
               if (SelectedOption == value.id) {
@@ -509,8 +498,9 @@ export default function ContactDetails(props) {
               flexDirection: 'row',
               justifyContent: 'space-evenly',
               backgroundColor: Colors.white,
-              paddingTop: wp('3%'), paddingBottom:wp('4%'),
-              height: wp('30')
+              paddingTop: wp('3%'),
+              paddingBottom: wp('4%'),
+              height: wp('30'),
             }}
           >
             <TouchableOpacity style={styles.bottomButton}>
@@ -520,7 +510,9 @@ export default function ContactDetails(props) {
               />
               <View>
                 <Text style={styles.buttonText}>Help Restore</Text>
-                <Text numberOfLines={1} style={styles.buttonInfo}>Lorem ipsum dolor</Text>
+                <Text numberOfLines={1} style={styles.buttonInfo}>
+                  Lorem ipsum dolor
+                </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.bottomButton}>
@@ -530,7 +522,9 @@ export default function ContactDetails(props) {
               />
               <View>
                 <Text style={styles.buttonText}>Request Key</Text>
-                <Text numberOfLines={1} style={styles.buttonInfo}>Lorem ipsum dolor</Text>
+                <Text numberOfLines={1} style={styles.buttonInfo}>
+                  Lorem ipsum dolor
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -646,6 +640,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 0.5,
     borderColor: Colors.borderColor,
-    alignSelf:'center'
+    alignSelf: 'center',
   },
 });

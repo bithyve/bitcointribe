@@ -63,7 +63,6 @@ export default function Send(props) {
       ? props.navigation.getParam('serviceType')
       : REGULAR_ACCOUNT,
   );
-  const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
 
   const service = useSelector((state) => state.accounts[serviceType].service);
@@ -458,7 +457,6 @@ export default function Send(props) {
         selectedContact: item,
         serviceType,
         averageTxFees,
-        sweepSecure,
         netBalance,
       });
     } else {
@@ -479,7 +477,6 @@ export default function Send(props) {
           selectedContact: item,
           serviceType,
           averageTxFees,
-          sweepSecure,
           netBalance,
         });
       }
