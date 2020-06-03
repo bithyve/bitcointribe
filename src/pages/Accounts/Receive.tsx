@@ -41,15 +41,18 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
+  REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import BitcoinAddressSendSuccess from '../../components/BitcoinAddressSendSuccess';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function Receive(props) {
-  const [BitcoinAddressSendSuccessBottomSheet, setBitcoinAddressSendSuccessBottomSheet] = useState(
-    React.createRef(),
-  );
+  const [
+    BitcoinAddressSendSuccessBottomSheet,
+    setBitcoinAddressSendSuccessBottomSheet,
+  ] = useState(React.createRef());
   const [
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
@@ -70,7 +73,12 @@ export default function Receive(props) {
   const [trustedQR, setTrustedQR] = useState('Test');
   const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
-  const serviceType = props.navigation.getParam('serviceType');
+  const [serviceType, setServiceType] = useState(
+    props.navigation.getParam('serviceType')
+      ? props.navigation.getParam('serviceType')
+      : '',
+  );
+  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
 
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
@@ -86,9 +94,27 @@ export default function Receive(props) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
 
+  const [dropdownBoxList, setDropdownBoxList] = useState([
+    {
+      id: '1',
+      account_name: 'Test Account',
+      type: TEST_ACCOUNT,
+    },
+    {
+      id: '2',
+      account_name: 'Checking Account',
+      type: REGULAR_ACCOUNT,
+    },
+    {
+      id: '3',
+      account_name: 'Saving Account',
+      type: SECURE_ACCOUNT,
+    },
+  ]);
+
   useEffect(() => {
     if (AsTrustedContact)
-    (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
+      (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
   }, [AsTrustedContact]);
 
   const checkNShowHelperModal = async () => {
@@ -163,15 +189,19 @@ export default function Receive(props) {
   };
 
   const renderSendViaLinkContents = useCallback(() => {
+    console.log("serviceType sjkadhakhdksa", serviceType);
     return (
       <SendViaLink
-      headerText={'Recieve via Link'}
+        headerText={'Recieve via Link'}
         contactText={'Adding as a Trusted Contact:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
-        info={'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your Trusted Contact request.'}
+        info={
+          'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your Trusted Contact request.'
+        }
         amount={amount === '' ? null : amount}
         link={trustedLink}
+        serviceType={serviceType}
         onPressBack={() => {
           if (SendViaLinkBottomSheet.current)
             (SendViaLinkBottomSheet as any).current.snapTo(0);
@@ -181,7 +211,7 @@ export default function Receive(props) {
         }}
       />
     );
-  }, [selectedContact, trustedLink,amount]);
+  }, [selectedContact, trustedLink, amount, serviceType]);
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
@@ -203,6 +233,7 @@ export default function Receive(props) {
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
         QR={trustedQR}
+        serviceType={serviceType}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contactEmail={''}
         onPressBack={() => {
@@ -214,7 +245,7 @@ export default function Receive(props) {
         }}
       />
     );
-  }, [selectedContact, trustedQR, amount]);
+  }, [selectedContact, trustedQR, amount, serviceType]);
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
@@ -227,11 +258,10 @@ export default function Receive(props) {
     );
   }, []);
 
-
   const renderBitcoinAddressSendSuccessContents = useCallback(() => {
     return (
       <BitcoinAddressSendSuccess
-      contact={!isEmpty(selectedContact) ? selectedContact : null}
+        contact={!isEmpty(selectedContact) ? selectedContact : null}
         onPressSkip={() => {
           if (BitcoinAddressSendSuccessBottomSheet.current)
             (BitcoinAddressSendSuccessBottomSheet as any).current.snapTo(0);
@@ -401,179 +431,294 @@ export default function Receive(props) {
             (ReceiveHelperBottomSheet as any).current.snapTo(0);
         }}
       >
-       <KeyboardAvoidingView
+        <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == "ios" ? "padding" : ""}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-        
-        <View style={BackupStyles.modalContainer}>
-          <View style={BackupStyles.modalHeaderTitleView}>
-            <View
-              style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-            >
-              <TouchableOpacity
-                onPress={() => {
-                  if (getServiceType) {
-                    getServiceType(serviceType);
-                  }
-                  props.navigation.goBack();
-                }}
-                style={{ height: 30, width: 30, justifyContent: 'center' }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity>
-              <Text style={BackupStyles.modalHeaderTitleText}>
-                Receiving Address
-              </Text>
-              {serviceType == TEST_ACCOUNT ? (
-                <Text
-                  onPress={() => {
-                    AsyncStorage.setItem('isReceiveHelperDone', 'true');
-                    if (ReceiveHelperBottomSheet.current)
-                      (ReceiveHelperBottomSheet as any).current.snapTo(1);
-                  }}
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12),
-                    marginLeft: 'auto',
-                  }}
-                >
-                  Know more
-                </Text>
-              ) : null}
-            </View>
-          </View>
-          <ScrollView>
-          <View style={{flex:1, paddingLeft: 20, paddingRight: 20 }}>
-            <View style={styles.textBoxView}>
-              <View style={styles.amountInputImage}>
-                <Image
-                  style={styles.textBoxImage}
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                />
-              </View>
-              <TextInput
-                style={{ ...styles.textBox, paddingLeft: 10 }}
-                placeholder={'Enter Amount in sats'}
-                value={amount}
-                returnKeyLabel="Done"
-                returnKeyType="done"
-                keyboardType={'numeric'}
-                onChangeText={(value) => setAmount(value)}
-                placeholderTextColor={Colors.borderColor}
-              />
-            </View>
-            <TouchableOpacity
-              activeOpacity={10}
-              onPress={() => {
-                setAsTrustedContact(!AsTrustedContact);
-              }}
-              style={{
-                flexDirection: 'row',
-                borderRadius: 8,
-                backgroundColor: Colors.backgroundColor1,
-                alignItems: 'center',
-                paddingLeft: 20,
-                paddingRight: 20,
-                marginTop: 30,
-                height: wp('13%'),
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Add sender as Trusted Contact
-              </Text>
+          <View style={BackupStyles.modalContainer}>
+            <View style={BackupStyles.modalHeaderTitleView}>
               <View
-                style={{
-                  width: wp('7%'),
-                  height: wp('7%'),
-                  borderRadius: 7,
-                  backgroundColor: Colors.white,
-                  borderColor: Colors.borderColor,
-                  borderWidth: 1,
-                  marginLeft: 'auto',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+                style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
               >
-                {AsTrustedContact && (
-                  <Entypo
-                    name="check"
-                    size={RFValue(17)}
-                    color={Colors.green}
+                <TouchableOpacity
+                  onPress={() => {
+                    if (getServiceType) {
+                      getServiceType(serviceType);
+                    }
+                    props.navigation.goBack();
+                  }}
+                  style={{ height: 30, width: 30, justifyContent: 'center' }}
+                >
+                  <FontAwesome
+                    name="long-arrow-left"
+                    color={Colors.blue}
+                    size={17}
                   />
-                )}
-              </View>
-            </TouchableOpacity>
-            {!isEmpty(selectedContact) && (
-              <View style={styles.contactProfileView}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
+                </TouchableOpacity>
+                <Text style={BackupStyles.modalHeaderTitleText}>
+                  Receiving Address
+                </Text>
+                {serviceType == TEST_ACCOUNT ? (
+                  <Text
+                    onPress={() => {
+                      AsyncStorage.setItem('isReceiveHelperDone', 'true');
+                      if (ReceiveHelperBottomSheet.current)
+                        (ReceiveHelperBottomSheet as any).current.snapTo(1);
+                    }}
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      flex: 1,
-                      backgroundColor: Colors.backgroundColor1,
-                      height: 90,
-                      borderRadius: 10,
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      marginLeft: 'auto',
                     }}
                   >
-                    {selectedContact && selectedContact.imageAvailable ? (
-                      <View
-                        style={{
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
-                        }}
-                      >
-                        <Image
-                          source={selectedContact && selectedContact.image}
-                          style={{ ...styles.contactProfileImage }}
-                        />
+                    Know more
+                  </Text>
+                ) : null}
+              </View>
+            </View>
+            <ScrollView>
+              <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
+                <View style={styles.textBoxView}>
+                  <View style={styles.amountInputImage}>
+                    <Image
+                      style={styles.textBoxImage}
+                      source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                    />
+                  </View>
+                  <TextInput
+                    style={{ ...styles.textBox, paddingLeft: 10 }}
+                    placeholder={'Enter Amount in sats'}
+                    value={amount}
+                    returnKeyLabel="Done"
+                    returnKeyType="done"
+                    keyboardType={'numeric'}
+                    onChangeText={(value) => setAmount(value)}
+                    placeholderTextColor={Colors.borderColor}
+                  />
+                </View>
+                
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    marginTop: 30,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  activeOpacity={10}
+                  onPress={() => {
+                      setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                    }}
+                >
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                    }}
+                  >
+                    Receiving To: 
+                    <Text style={styles.boldItalicText}>
+                      {serviceType == TEST_ACCOUNT
+                        ? '  Test Account'
+                        : serviceType == REGULAR_ACCOUNT
+                        ? '  Checking Account'
+                        : '  Saving Account'}
+                    </Text>
+                  </Text>
+                  <Ionicons
+                    style={{ marginRight: 10, marginLeft: 10 }}
+                    name={
+                      dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
+                    }
+                    size={20}
+                    color={Colors.blue}
+                  />
+                </TouchableOpacity>
+                <View style={{ position: 'relative' }}>
+                    {dropdownBoxOpenClose && (
+                      <View style={styles.dropdownBoxModal}>
+                        <ScrollView>
+                          {dropdownBoxList.map((value, index) => (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setTimeout(() => {
+                                  console.log("setServiceType",value.type)
+                                  setServiceType(value.type);
+                                setDropdownBoxOpenClose(false);
+                                }, 2);
+                                
+                              }}
+                              style={{
+                                ...styles.dropdownBoxModalElementView,
+                                backgroundColor:
+                                  serviceType == value.type
+                                    ? Colors.lightBlue
+                                    : Colors.white,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color:
+                                    serviceType == value.type
+                                      ? Colors.blue
+                                      : Colors.black,
+                                  fontFamily: Fonts.FiraSansRegular,
+                                  fontSize: RFValue(12),
+                                }}
+                              >
+                                {value.account_name}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
                       </View>
-                    ) : (
+                    )}
+
+                <TouchableOpacity
+                  activeOpacity={10}
+                  onPress={() => {
+                    setAsTrustedContact(!AsTrustedContact);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    borderRadius: 8,
+                    backgroundColor: Colors.backgroundColor1,
+                    alignItems: 'center',
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    marginTop: 30,
+                    height: wp('13%'),
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    Add sender as Trusted Contact
+                  </Text>
+                  <View
+                    style={{
+                      width: wp('7%'),
+                      height: wp('7%'),
+                      borderRadius: 7,
+                      backgroundColor: Colors.white,
+                      borderColor: Colors.borderColor,
+                      borderWidth: 1,
+                      marginLeft: 'auto',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {AsTrustedContact && (
+                      <Entypo
+                        name="check"
+                        size={RFValue(17)}
+                        color={Colors.green}
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+                {!isEmpty(selectedContact) && (
+                  <View style={styles.contactProfileView}>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
                       <View
                         style={{
-                          marginLeft: 15,
-                          marginRight: 15,
+                          flexDirection: 'row',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          width: 70,
-                          height: 70,
-                          borderRadius: 70 / 2,
-                          shadowColor: Colors.shadowBlue,
-                          shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
+                          flex: 1,
+                          backgroundColor: Colors.backgroundColor1,
+                          height: 90,
+                          borderRadius: 10,
                         }}
                       >
-                        <Text
-                          style={{
-                            textAlign: 'center',
-                            fontSize: RFValue(20),
-                            lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                          }}
-                        >
-                          {nameToInitials(
-                            selectedContact &&
-                              selectedContact.firstName &&
-                              selectedContact.lastName
-                              ? selectedContact.firstName +
-                                  ' ' +
+                        {selectedContact && selectedContact.imageAvailable ? (
+                          <View
+                            style={{
+                              marginLeft: 15,
+                              marginRight: 15,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              shadowOpacity: 1,
+                              shadowOffset: { width: 2, height: 2 },
+                            }}
+                          >
+                            <Image
+                              source={selectedContact && selectedContact.image}
+                              style={{ ...styles.contactProfileImage }}
+                            />
+                          </View>
+                        ) : (
+                          <View
+                            style={{
+                              marginLeft: 15,
+                              marginRight: 15,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: Colors.backgroundColor,
+                              width: 70,
+                              height: 70,
+                              borderRadius: 70 / 2,
+                              shadowColor: Colors.shadowBlue,
+                              shadowOpacity: 1,
+                              shadowOffset: { width: 2, height: 2 },
+                            }}
+                          >
+                            <Text
+                              style={{
+                                textAlign: 'center',
+                                fontSize: RFValue(20),
+                                lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                              }}
+                            >
+                              {nameToInitials(
+                                selectedContact &&
+                                  selectedContact.firstName &&
                                   selectedContact.lastName
+                                  ? selectedContact.firstName +
+                                      ' ' +
+                                      selectedContact.lastName
+                                  : selectedContact &&
+                                    selectedContact.firstName &&
+                                    !selectedContact.lastName
+                                  ? selectedContact.firstName
+                                  : selectedContact &&
+                                    !selectedContact.firstName &&
+                                    selectedContact.lastName
+                                  ? selectedContact.lastName
+                                  : '',
+                              )}
+                            </Text>
+                          </View>
+                        )}
+                        <View>
+                          <Text
+                            style={{
+                              color: Colors.textColorGrey,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue(11),
+                              marginLeft: 5,
+                              paddingTop: 5,
+                              paddingBottom: 3,
+                            }}
+                          >
+                            Adding as a Trusted Contact:
+                          </Text>
+                          <Text style={styles.contactNameText}>
+                            {selectedContact &&
+                            selectedContact.firstName &&
+                            selectedContact.lastName
+                              ? selectedContact.firstName +
+                                ' ' +
+                                selectedContact.lastName
                               : selectedContact &&
                                 selectedContact.firstName &&
                                 !selectedContact.lastName
@@ -582,148 +727,125 @@ export default function Receive(props) {
                                 !selectedContact.firstName &&
                                 selectedContact.lastName
                               ? selectedContact.lastName
-                              : '',
-                          )}
-                        </Text>
+                              : ''}
+                          </Text>
+                          {selectedContact &&
+                          selectedContact.phoneNumbers &&
+                          selectedContact.phoneNumbers.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 5,
+                                paddingTop: 3,
+                              }}
+                            >
+                              {selectedContact.phoneNumbers[0].digits}
+                            </Text>
+                          ) : selectedContact &&
+                            selectedContact.emails &&
+                            selectedContact.emails.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 5,
+                                paddingTop: 3,
+                                paddingBottom: 5,
+                              }}
+                            >
+                              {selectedContact &&
+                                selectedContact.emails[0].email}
+                            </Text>
+                          ) : null}
+                        </View>
                       </View>
-                    )}
-                    <View>
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(11),
-                          marginLeft: 5,
-                          paddingTop: 5,
-                          paddingBottom: 3,
-                        }}
-                      >
-                        Adding as a Trusted Contact:
-                      </Text>
-                      <Text style={styles.contactNameText}>
-                        {selectedContact &&
-                        selectedContact.firstName &&
-                        selectedContact.lastName
-                          ? selectedContact.firstName +
-                            ' ' +
-                            selectedContact.lastName
-                          : selectedContact &&
-                            selectedContact.firstName &&
-                            !selectedContact.lastName
-                          ? selectedContact.firstName
-                          : selectedContact &&
-                            !selectedContact.firstName &&
-                            selectedContact.lastName
-                          ? selectedContact.lastName
-                          : ''}
-                      </Text>
-                      {selectedContact &&
-                      selectedContact.phoneNumbers &&
-                      selectedContact.phoneNumbers.length ? (
-                        <Text
-                          style={{
-                            color: Colors.textColorGrey,
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(10),
-                            marginLeft: 5,
-                            paddingTop: 3,
-                          }}
-                        >
-                          {selectedContact.phoneNumbers[0].digits}
-                        </Text>
-                      ) : selectedContact &&
-                        selectedContact.emails &&
-                        selectedContact.emails.length ? (
-                        <Text
-                          style={{
-                            color: Colors.textColorGrey,
-                            fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(10),
-                            marginLeft: 5,
-                            paddingTop: 3,
-                            paddingBottom: 5,
-                          }}
-                        >
-                          {selectedContact && selectedContact.emails[0].email}
-                        </Text>
-                      ) : null}
                     </View>
                   </View>
-                </View>
+                )}
               </View>
-            )}
-          </View>
-          </ScrollView>
-          <View style={{ marginTop: 'auto', marginBottom: hp('3%'), paddingTop: 10 }}>
-            <View style={{ marginBottom: hp('1%') }}>
-              <BottomInfoBox
-                backgroundColor={Colors.backgroundColor1}
-                title={'Note'}
-                infoText={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-                }
-              />
-            </View>
+              </View>
+            </ScrollView>
             <View
               style={{
-                flexDirection: 'row',
-                backgroundColor: Colors.blue,
-                height: 60,
-                borderRadius: 10,
-                marginLeft: 25,
-                marginRight: 25,
-                justifyContent: 'space-evenly',
-                alignItems: 'center',
-                shadowColor: Colors.shadowBlue,
-                shadowOpacity: 1,
-                shadowOffset: { width: 15, height: 15 },
+                marginTop: 'auto',
+                marginBottom: hp('3%'),
+                paddingTop: 10,
               }}
             >
-              <AppBottomSheetTouchableWrapper
-                onPress={() => {
-                  if (SendViaLinkBottomSheet.current)
-                    (SendViaLinkBottomSheet as any).current.snapTo(1);
-                }}
-                disabled={loading.uploadMetaShare}
-                style={styles.buttonInnerView}
-              >
-                {loading.uploadMetaShare ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Image
-                    source={require('../../assets/images/icons/openlink.png')}
-                    style={styles.buttonImage}
-                  />
-                )}
-                <Text style={styles.buttonText}>Via Link</Text>
-              </AppBottomSheetTouchableWrapper>
+              <View style={{ marginBottom: hp('1%') }}>
+                <BottomInfoBox
+                  backgroundColor={Colors.backgroundColor1}
+                  title={'Note'}
+                  infoText={
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+                  }
+                />
+              </View>
               <View
-                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-              />
-              <AppBottomSheetTouchableWrapper
-                style={styles.buttonInnerView}
-                disabled={loading.uploadMetaShare}
-                onPress={() => {
-                  if (SendViaQRBottomSheet.current)
-                    (SendViaQRBottomSheet as any).current.snapTo(1);
+                style={{
+                  flexDirection: 'row',
+                  backgroundColor: Colors.blue,
+                  height: 60,
+                  borderRadius: 10,
+                  marginLeft: 25,
+                  marginRight: 25,
+                  justifyContent: 'space-evenly',
+                  alignItems: 'center',
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 15, height: 15 },
                 }}
               >
-                {loading.uploadMetaShare ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Image
-                    source={require('../../assets/images/icons/qr-code.png')}
-                    style={styles.buttonImage}
-                  />
-                )}
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => {
+                    if (SendViaLinkBottomSheet.current)
+                      (SendViaLinkBottomSheet as any).current.snapTo(1);
+                  }}
+                  disabled={loading.uploadMetaShare}
+                  style={styles.buttonInnerView}
+                >
+                  {loading.uploadMetaShare ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Image
+                      source={require('../../assets/images/icons/openlink.png')}
+                      style={styles.buttonImage}
+                    />
+                  )}
+                  <Text style={styles.buttonText}>Via Link</Text>
+                </AppBottomSheetTouchableWrapper>
+                <View
+                  style={{
+                    width: 1,
+                    height: 30,
+                    backgroundColor: Colors.white,
+                  }}
+                />
+                <AppBottomSheetTouchableWrapper
+                  style={styles.buttonInnerView}
+                  disabled={loading.uploadMetaShare}
+                  onPress={() => {
+                    if (SendViaQRBottomSheet.current)
+                      (SendViaQRBottomSheet as any).current.snapTo(1);
+                  }}
+                >
+                  {loading.uploadMetaShare ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Image
+                      source={require('../../assets/images/icons/qr-code.png')}
+                      style={styles.buttonImage}
+                    />
+                  )}
 
-                <Text style={styles.buttonText}>Via QR</Text>
-              </AppBottomSheetTouchableWrapper>
+                  <Text style={styles.buttonText}>Via QR</Text>
+                </AppBottomSheetTouchableWrapper>
+              </View>
             </View>
           </View>
-         
-        </View>
-        
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
       <BottomSheet
@@ -804,6 +926,11 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
+  },
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontStyle: 'italic',
+    color: Colors.blue,
   },
   modalHeaderContainer: {
     backgroundColor: Colors.white,
@@ -924,5 +1051,60 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+  },dropdownBox: {
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: Colors.borderColor,
+    height: 50,
+    paddingLeft: 15,
+    paddingRight: 15,
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+  },
+  dropdownBoxOpened: {
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: Colors.borderColor,
+    height: 50,
+    paddingLeft: 15,
+    paddingRight: 15,
+    elevation: 10,
+    shadowColor: Colors.borderColor,
+    shadowOpacity: 10,
+    shadowOffset: { width: 2, height: 2 },
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+  },
+  dropdownBoxText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(13),
+  },
+  dropdownBoxModal: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1%'),
+    width: wp('90%'),
+    height: hp('18%'),
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    zIndex: 9999,
+    overflow: 'hidden',
+  },
+  dropdownBoxModalElementView: {
+    height: 50,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingLeft: 15,
   },
 });
