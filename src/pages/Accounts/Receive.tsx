@@ -145,7 +145,7 @@ export default function Receive(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
-        modalTitle="Select a Trusted Contact"
+        modalTitle="Select a Contact"
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
@@ -166,10 +166,10 @@ export default function Receive(props) {
     return (
       <SendViaLink
       headerText={'Recieve via Link'}
-        contactText={'Adding as a Trusted Contact:'}
+        contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
-        info={'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your Trusted Contact request.'}
+        info={'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'}
         amount={amount === '' ? null : amount}
         link={trustedLink}
         onPressBack={() => {
@@ -199,7 +199,7 @@ export default function Receive(props) {
     return (
       <SendViaQR
         headerText={'Recieve via QR'}
-        contactText={'Adding as a Trusted Contact:'}
+        contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
         QR={trustedQR}
@@ -261,7 +261,7 @@ export default function Receive(props) {
         topButtonText={'Receiving Bitcoins'}
         image={require('../../assets/images/icons/receive.png')}
         helperInfo={
-          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from a “Trusted Contact”, the app does all this for you and you don’t need to send a new address every time'
+          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from “Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -491,7 +491,7 @@ export default function Receive(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Add sender as Trusted Contact
+                Add sender to Friends and Family
               </Text>
               <View
                 style={{
@@ -598,7 +598,7 @@ export default function Receive(props) {
                           paddingBottom: 3,
                         }}
                       >
-                        Adding as a Trusted Contact:
+                        Adding to Friends and Family:
                       </Text>
                       <Text style={styles.contactNameText}>
                         {selectedContact &&

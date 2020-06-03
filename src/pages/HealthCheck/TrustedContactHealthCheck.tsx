@@ -74,10 +74,10 @@ const TrustedContactHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ChangeBottomSheet}
-                title={'Change your\nTrusted Contact'}
-                info={'Having problems with your Trusted Contact'}
+                title={'Change your\nKeeper'}
+                info={'Having problems with your Keeper'}
                 note={
-                    'You can change the Trusted Contact you selected to share your Recovery Key'
+                    'You can change the Keeper you selected to share your Recovery Key'
                 }
                 proceedButtonText={'Change'}
                 cancelButtonText={'Back'}
@@ -107,10 +107,10 @@ const TrustedContactHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ReshareBottomSheet}
-                title={'Reshare Recovery Key\nwith Trusted Contact'}
+                title={'Reshare Recovery Key\nwith Keeper'}
                 info={'Did your contact not receive the Recovery Key?'}
                 note={
-                    'You can reshare the Recovery Key with your Trusted\nContact via Email or Sms'
+                    'You can reshare the Recovery Key with your Keeper\n via Email or Sms'
                 }
                 proceedButtonText={'Reshare'}
                 cancelButtonText={'Back'}
@@ -140,8 +140,8 @@ const TrustedContactHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ConfirmBottomSheet}
-                title={'Confirm Recovery Key\nwith Trusted Contact'}
-                info={'Your Trusted Contact seems away from their Hexa App'}
+                title={'Confirm Recovery Key\nwith Keeper'}
+                info={'Your Keeper seems away from their Hexa App'}
                 note={
                     'You can send them a reminder to open their app to\nensure they have your Recovery Key'
                 }
@@ -216,7 +216,7 @@ const TrustedContactHealthCheck = props => {
                 <View style={{ justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
                     <Text style={styles.bottomBoxText}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Reshare</Text></Text>
 
-                    <Text style={styles.bottomBoxText}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Change Trusted Contact</Text></Text>
+                    <Text style={styles.bottomBoxText}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={styles.bottomBoxTextUnderline}>Change Keeper</Text></Text>
 
                     <TouchableOpacity onPress={()=>{ConfirmBottomSheet.current.snapTo(1)}} style={{ backgroundColor: Colors.blue, height: wp('13%'), width: wp('40%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginTop: hp('3%'), marginBottom: hp('3%') }}><Text style={{ color: Colors.white, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMedium, }}>Confirm</Text></TouchableOpacity>
                 </View> : null

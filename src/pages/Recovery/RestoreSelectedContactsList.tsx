@@ -796,7 +796,7 @@ export default function RestoreSelectedContactsList(props) {
             />
             <View style={styles.textInfoView}>
               <Text style={styles.listElementsTitle}>
-                Trusted Contacts (Two)
+                Keepers (Two)
               </Text>
               <Text style={styles.listElementsInfo}>
                 Select one or two contacts with whom you have stored your

@@ -30,7 +30,7 @@ export default function AddressBookFilterModalContent(props) {
             <View style={{flex:1}}>
                 <AppBottomSheetTouchableWrapper onPress={()=>{setTrustedContactFilterOption(!TrustedContactFilterOption)}} style={{ flexDirection:'row', paddingLeft:wp('12%'), paddingRight:wp('7%'), paddingTop:wp('7%'), paddingBottom:wp('7%'), alignItems:'center'}}>
                     <View style={{ flex:1, marginRight:wp('7%') }}>
-                        <Text style={styles.TitleText}>My Trusted Contacts <Text style={{...styles.TitleText, fontFamily: Fonts.FiraSansMediumItalic}}>Except</Text></Text>
+                        <Text style={styles.TitleText}>My Friends and Family <Text style={{...styles.TitleText, fontFamily: Fonts.FiraSansMediumItalic}}>Except</Text></Text>
                         <Text style={styles.infoText}>Display all your contacts except the category you select</Text>
                     </View>
                     <Ionicons

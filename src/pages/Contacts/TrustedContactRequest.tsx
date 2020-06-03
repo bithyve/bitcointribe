@@ -218,7 +218,7 @@ export default function TrustedContactRequest(props) {
           <View style={styles.successModalHeaderView}>
             {!props.isRecovery ? (
               <Text style={styles.modalTitleText}>
-                Trusted Contact{'\n'}Request{' '}
+                Friends and Family{'\n'}Request{' '}
                 {props.isGuardian ? '(Guardian)' : null}
               </Text>
             ) : (

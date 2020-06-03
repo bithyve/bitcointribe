@@ -388,7 +388,7 @@ export default function AddressBookContents(props) {
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
+            <Text style={styles.pageTitle}>Other Contacts</Text>
             <Text style={styles.pageInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing
             </Text>
@@ -396,7 +396,7 @@ export default function AddressBookContents(props) {
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {OtherTrustedContact.map((item, index) => {
-                    return getElement(item, index, 'Other Trusted Contacts');
+                    return getElement(item, index, 'Other Contacts');
                   })}
                 </View>
               </View>

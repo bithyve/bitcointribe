@@ -399,10 +399,10 @@ export default function ManageBackup(props) {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
-        title={'Change your\nTrusted Contact'}
-        info={'Having problems with your Trusted Contact'}
+        title={'Change your\nKeeper'}
+        info={'Having problems with your Keeper?'}
         note={
-          'You can change the Trusted Contact you selected to share your Recovery Key'
+          'You can change the Keeper you selected to share your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -443,10 +443,10 @@ export default function ManageBackup(props) {
       SelectTypeToReshare == 'contact1' ||
       SelectTypeToReshare == 'contact2'
     ) {
-      title = 'Reshare Recovery Key\nwith Trusted Contact';
-      info = 'Did your contact not receive the Recovery Key?';
+      title = 'Reshare Recovery Key\nwith Keeper';
+      info = 'Did your Keeper not receive the Recovery Key?';
       note =
-        'You can reshare the Recovery Key with your Trusted\nContact via Email or Sms';
+        'You can reshare the Recovery Key with your Keeper\n via Email or Sms';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
@@ -532,8 +532,8 @@ export default function ManageBackup(props) {
       SelectTypeToReshare == 'contact1' ||
       SelectTypeToReshare == 'contact2'
     ) {
-      title = 'Confirm Recovery Key\nwith Trusted Contact';
-      info = 'Your Trusted Contact seems away from their Hexa App';
+      title = 'Confirm Recovery Key\nwith Keeper';
+      info = 'Your Keeper seems away from their Hexa App';
       note =
         'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
@@ -542,7 +542,7 @@ export default function ManageBackup(props) {
       SelectTypeToReshare == 'copy2'
     ) {
       title = 'Confirm Recovery Key\nwith Personal Copy';
-      info = 'Your Trusted Contact seems away from their Hexa App';
+      info = 'Your Keeper seems away from their Hexa App';
       note =
         'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
@@ -1677,7 +1677,7 @@ export default function ManageBackup(props) {
                                     item.personalInfo.lastName
                                   ? item.personalInfo.lastName
                                   : ''
-                                : 'Select a Trusted Contact as a Keeper'
+                                : 'Select a Friend or Family member as a Keeper'
                               : item.type === 'secondaryDevice'
                               ? item.status === 'Ugly'
                                 ? 'Another device running Hexa app that you own'

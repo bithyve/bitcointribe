@@ -394,7 +394,7 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ConfirmBottomSheet}
-        title={'Confirm Recovery Key\nwith Trusted Contact'}
+        title={'Confirm Recovery Key\nwith Keeper'}
         note={
           'Your Recovery Keys with contacts get confirmed automatically when the contact opens their app.\nSimply remind them to open their Hexa app and login to confirm your Recovery Key'
         }
@@ -539,10 +539,10 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ReshareBottomSheet}
-        title={'Reshare Recovery Key\nwith Trusted Contact'}
-        info={'Did your contact not receive the Recovery Key?'}
+        title={'Reshare Recovery Key\nwith Keeper'}
+        info={'Did your Keeper not receive the Recovery Key?'}
         note={
-          'You can reshare the Recovery Key with your Trusted\nContact via Email or Sms'
+          'You can reshare the Recovery Key with your Keeper\n via Email or Sms'
         }
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
@@ -572,10 +572,10 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
-        title={'Change your\nTrusted Contact'}
-        info={'Having problems with your Trusted Contact'}
+        title={'Change your\nKeeper'}
+        info={'Having problems with your Keeper'}
         note={
-          'You can change the Trusted Contact you selected to share your Recovery Key'
+          'You can change the Keeper you selected to share your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -936,7 +936,7 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaLink
-          contactText={'Adding as a Trusted Contact(Keeper):'}
+          contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
           link={trustedLink}
@@ -967,7 +967,7 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaQR
-          contactText={'Adding as a Trusted Contact:'}
+          contactText={'Adding to Friends and Family:'}
           contact={chosenContact ? chosenContact : null}
           QR={trustedQR}
           contactEmail={''}

@@ -147,7 +147,7 @@ const Contacts = props => {
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('2%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>Friends and Family</Text>
           <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image

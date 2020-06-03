@@ -50,7 +50,7 @@ export default function SendShareModal(props) {
             Share Recovery Key{'\n'}with trusted contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Send share to Trusted Contact, you can change your trusted contact,
+            Send share to Keeper, you can change your Keeper,
             or their primary mode of contact
           </Text>
         </View>

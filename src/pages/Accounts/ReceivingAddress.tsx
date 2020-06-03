@@ -104,7 +104,7 @@ const ReceivingAddress = props => {
         topButtonText={'Receiving Bitcoins'}
         image={require('../../assets/images/icons/receive.png')}
         helperInfo={
-          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from a “Trusted Contact”, the app does all this for you and you don’t need to send a new address every time'
+          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from  "Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -315,7 +315,7 @@ const ReceivingAddress = props => {
             )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
             <TouchableOpacity activeOpacity={10} onPress={()=>{setAsTrustedContact(!AsTrustedContact)}} style={{flexDirection:'row', borderRadius:8, backgroundColor:Colors.backgroundColor,  alignItems:'center', marginLeft:15, marginRight:15, paddingLeft: 20, paddingRight: 15, marginTop: 30, width:wp('86%'), height:wp('13%')}}>
-              <Text style={{color: Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Add sender as Trusted Contact</Text>
+              <Text style={{color: Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Add sender to Friends and Family</Text>
               <View style={{ width:wp('7%'), height: wp('7%'), borderRadius:7, backgroundColor:Colors.white, borderColor:Colors.borderColor, borderWidth:1, marginLeft:'auto', alignItems:'center', justifyContent:'center'}} >
                 {AsTrustedContact && 
                   <Entypo name="check" size={RFValue(17)} color={Colors.green} />

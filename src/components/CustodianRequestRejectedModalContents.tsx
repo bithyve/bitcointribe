@@ -62,7 +62,7 @@ export default function CustodianRequestRejectedModalContents(props) {
             onPress={() => props.onPressViewThrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
+            <Text style={styles.proceedButtonText}>View Friends and Family</Text>
           </AppBottomSheetTouchableWrapper>
           <Image
             source={require("../assets/images/icons/reject.png")}
