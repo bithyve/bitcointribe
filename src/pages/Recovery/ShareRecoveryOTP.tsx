@@ -52,7 +52,7 @@ export default function ShareRecoveryOTP(props) {
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
                 Please provide this OTP to your trusted contact in order for
-                them to send you the recovery secret
+                them to send you the recovery key
               </Text>
             </View>
           </View>

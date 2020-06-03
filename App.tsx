@@ -12,6 +12,8 @@ import {
 import NetInfo from '@react-native-community/netinfo';
 import { getVersion, getBuildId } from 'react-native-device-info'
 import { setApiHeaders } from "./src/services/api";
+import firebase from 'react-native-firebase';
+import { NavigationState } from "react-navigation";
 
 const prefix = 'hexa://'
 
@@ -20,6 +22,7 @@ class App extends Component {
 
   constructor(props) {
     super(props);
+    firebase.analytics().setAnalyticsCollectionEnabled(true);
     this.NoInternetBottomSheet = React.createRef();
     this.unsubscribe = null
   }
@@ -52,12 +55,31 @@ class App extends Component {
       this.unsubscribe()
     }
   }
-
+  
+  getActiveRouteName(navigationState: NavigationState) {
+    if (!navigationState) {
+      return null;
+    }
+    const route = navigationState.routes[navigationState.index];
+    // Dive into nested navigators
+    if (route.routes) {
+      return this.getActiveRouteName(route);
+    }
+    return route.routeName;
+  }
 
   render() {
     return (
       <Provider store={store} uriPrefix={prefix}>
-        <Navigator />
+        <Navigator 
+        onNavigationStateChange={(prevState, currentState) => {
+          const currentScreen = this.getActiveRouteName(currentState);
+          const prevScreen = this.getActiveRouteName(prevState);
+          if (prevScreen !== currentScreen) {
+              firebase.analytics().setCurrentScreen(currentScreen);
+          }
+      }}
+        />
         <BottomSheet
           onCloseEnd={() => { }}
           enabledInnerScrolling={true}

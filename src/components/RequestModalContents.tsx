@@ -39,11 +39,10 @@ export default function RequestModalContents(props) {
       <View style={{ height: '100%' }}>
         <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
           <Text style={styles.commModeModalHeaderText}>
-            Request Recovery Secret{'\n'}from trusted contact
+            Request Recovery Key{'\n'}from Friends and Family
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Request share from Trusted Contact, you can change your trusted
-            contact, or their primary mode of contact
+            Request share from Friends and Family, you can change your Keeper, or their primary mode of contact
           </Text>
         </View>
         <View style={styles.contactProfileView}>

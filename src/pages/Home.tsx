@@ -43,6 +43,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
@@ -80,6 +81,7 @@ import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
+import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -220,29 +222,72 @@ export default function Home(props) {
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
       accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
+
+    let regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+        .transactionDetails
+      : [];
+
+    const trustedAccounts: TrustedContactDerivativeAccount =
+      accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+      TRUSTED_CONTACTS
+      ];
+    if (trustedAccounts.instance.using) {
+      for (
+        let accountNumber = 1;
+        accountNumber <= trustedAccounts.instance.using;
+        accountNumber++
+      ) {
+        // console.log({
+        //   accountNumber,
+        //   balances: trustedAccounts[accountNumber].balances,
+        //   transactions: trustedAccounts[accountNumber].transactions,
+        // });
+        if (trustedAccounts[accountNumber].balances) {
+          regularBalance +=
+            trustedAccounts[accountNumber].balances.balance +
+            trustedAccounts[accountNumber].balances.unconfirmedBalance;
+        }
+
+        if (trustedAccounts[accountNumber].transactions) {
+          trustedAccounts[
+            accountNumber
+          ].transactions.transactionDetails.forEach((tx) => {
+            let include = true;
+            for (const currentTx of regularTransactions) {
+              if (tx.txid === currentTx.txid) {
+                include = false;
+                break;
+              }
+            }
+            if (include) regularTransactions.push(tx);
+          });
+        }
+      }
+    }
+
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
       accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
         .unconfirmedBalance
       : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
-
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : [];
-    const regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
-      : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
         .transactionDetails
       : [];
+
+    const accumulativeBalance = regularBalance + secureBalance;
+
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
@@ -885,9 +930,9 @@ export default function Home(props) {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        (err) => { }, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -1026,9 +1071,9 @@ export default function Home(props) {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
       setButtonText('Try again');
     }, 2);
@@ -1040,7 +1085,7 @@ export default function Home(props) {
     setTimeout(() => {
       setErrorMessageHeader('Sending successful');
       setErrorMessage(
-        'The Recovery Secret has been sent, the receiver needs to accept ',
+        'The Recovery Key has been sent, the receiver needs to accept ',
       );
       setButtonText('Done');
     }, 2);
@@ -1050,9 +1095,9 @@ export default function Home(props) {
 
   if (isErrorReceivingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
       setButtonText('Try again');
     }, 2);
@@ -1110,7 +1155,7 @@ export default function Home(props) {
         });
       }
       if ((secondaryDeviceOtp as any).type == 'secondaryDeviceQR') {
-        Toast('Recovery Secret received successfully');
+        Toast('Recovery Key received successfully');
         setSecondaryDeviceAddresses();
       }
       getAssociatedContact();

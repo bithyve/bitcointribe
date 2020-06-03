@@ -590,6 +590,11 @@ export default class SecureAccount {
       // amount = Math.round(amount * 1e8); // converting into sats
       // amount = Math.round(amount);
 
+      recipients = recipients.map((recipient) => {
+        recipient.amount = Math.round(recipient.amount);
+        return recipient;
+      });
+
       const {
         fee,
         balance,

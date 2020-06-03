@@ -191,7 +191,7 @@ export default function QrScanner(props) {
       <BottomInfoBox
         title={"Note"}
         infoText={
-          "Secondary Mnemonic This can be found on page of your pdf Recovery Secret. Please scan it to reset your 2FA"
+          "Secondary Mnemonic This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA"
         }
       /> : null}
       </View>

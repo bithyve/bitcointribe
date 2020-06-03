@@ -190,7 +190,7 @@ export default function AddContactSendRequest(props) {
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
-        contactText={'Adding as a Trusted Contact:'}
+        contactText={'Adding to Friends and Family:'}
         contact={Contact}
         link={trustedLink}
         contactEmail={''}
@@ -219,7 +219,7 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRContents = useCallback(() => {
     return (
       <SendViaQR
-        contactText={'Adding as a Trusted Contact:'}
+        contactText={'Adding to Friends and Family:'}
         contact={Contact}
         QR={trustedQR}
         contactEmail={''}
@@ -343,7 +343,7 @@ export default function AddContactSendRequest(props) {
                     paddingBottom: 3,
                   }}
                 >
-                  Adding as a Trusted Contact:
+                  Adding to Friends and Family:
                 </Text>
                 <Text style={styles.contactNameText}>
                   {Contact.firstName && Contact.lastName

@@ -73,7 +73,7 @@ const Contacts = props => {
           [selectedContactMode.info],
           null,
           null,
-          'Guardian request',
+          'Keeper request',
           deepLink,
         );
         break;
@@ -134,9 +134,9 @@ const Contacts = props => {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
@@ -147,7 +147,7 @@ const Contacts = props => {
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp('2%') }}>
-          <Text style={BackupStyles.modalHeaderTitleText}>Trusted Contact</Text>
+          <Text style={BackupStyles.modalHeaderTitleText}>Friends and Family</Text>
           <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
@@ -172,7 +172,7 @@ const Contacts = props => {
               fontWeight: 'bold',
             }}
           >
-            send recovery secret
+            send recovery key
           </Text>
         </Text>
         <ContactList

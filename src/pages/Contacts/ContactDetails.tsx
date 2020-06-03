@@ -22,8 +22,13 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Entypo from 'react-native-vector-icons/Entypo';
 import _ from 'underscore';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTransferDetails } from '../../store/actions/accounts';
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function ContactDetails(props) {
+  const dispatch = useDispatch();
+  const [Loading, setLoading] = useState(true);
   const Contact = props.navigation.state.params.contact;
   const contactsType = props.navigation.state.params.contactsType;
   const index = props.navigation.state.params.index;
@@ -32,26 +37,26 @@ export default function ContactDetails(props) {
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret created',
+      title: 'Recovery Key created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret in-transit',
+      title: 'Recovery Key in-transit',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret accessible',
+      title: 'Recovery Key accessible',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret not accessible',
+      title: 'Recovery Key not accessible',
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
@@ -62,79 +67,68 @@ export default function ContactDetails(props) {
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
+
   useEffect(() => {
     setContact(Contact);
-    if (contactsType == 'My Keepers') saveInTransitHistory("inTransit");
+    if (contactsType == 'My Keepers') saveInTransitHistory('inTransit');
     else getHistoryForTrustedContacts();
   }, [Contact]);
 
-  const onPressSend = () =>{
-    if(contactsType == "My Keepers"){
-      saveInTransitHistory("isSent");
-    }
-    else{
-      storeTrustedContactsHistory();
-    }
-    props.navigation.navigate('Send', { isFromAddressBook: true })
-  }
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, [trustedContactHistory]);
 
-  const createId = (length) => {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  const onPressSend = () => {
+    if (contactsType == 'My Keepers') {
+      saveInTransitHistory('isSent');
     }
-    return result;
- }
+    dispatch(
+      addTransferDetails(REGULAR_ACCOUNT, {
+        selectedContact: Contact,
+      }),
+    );
+    props.navigation.navigate('SendToContact', {
+      selectedContact: Contact,
+      serviceType: REGULAR_ACCOUNT,
+      averageTxFees: 0,
+      netBalance: 10000,
+    });
+  };
 
-  const storeTrustedContactsHistory = async() =>{
+  const getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = [];
-    if(contactsType=="Other Trusted Contacts"){
-      let OtherTrustedContactsHistoryArray = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
-      OtherTrustedContactsHistory = OtherTrustedContactsHistoryArray
+    if (contactsType == 'Other Trusted Contacts') {
+      OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
+      );
+    } else {
+      OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('IMKeeperOfHistory'),
+      );
     }
-    else{
-      let IMKeeperOfHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
-      OtherTrustedContactsHistory = IMKeeperOfHistory
+    if(OtherTrustedContactsHistory){
+      OtherTrustedContactsHistory = getHistoryByContactId(OtherTrustedContactsHistory);
     }
-    if(!OtherTrustedContactsHistory){
-      OtherTrustedContactsHistory = [];
-    }
-    let obj = {
-      id: createId(10),
-      title: 'Sent Amount',
-      date: moment(Date.now()).valueOf(),
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    }
-    OtherTrustedContactsHistory.push(obj);
-    if(contactsType=="Other Trusted Contacts"){
-      await AsyncStorage.setItem('OtherTrustedContactsHistory', JSON.stringify(OtherTrustedContactsHistory));
-    }
-    else{
-      await AsyncStorage.setItem('IMKeeperOfHistory', JSON.stringify(OtherTrustedContactsHistory));
-    }
-    console.log("obj", OtherTrustedContactsHistory)
-    setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
-  }
-
-  const getHistoryForTrustedContacts = async() =>{
-    let OtherTrustedContactsHistory = [];
-    if(contactsType=="Other Trusted Contacts"){
-      OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
-    }
-    else{
-      OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
-    }
-    if(!OtherTrustedContactsHistory){
-      OtherTrustedContactsHistory = [];
-    }
-    if(OtherTrustedContactsHistory.length>0){
+    if (OtherTrustedContactsHistory.length > 0) {
       setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
-    }
-    else{
+    } else {
       setTrustedContactHistory([]);
     }
+  };
+
+  const getHistoryByContactId = (history) =>{
+    let array = [];
+    if(history && history.length>0){
+      for (let i = 0; i < history.length; i++) {
+        const element = history[i];
+        if(element.selectedContactInfo && element.selectedContactInfo.selectedContact.id == Contact.id){
+          array.push(element);
+        }  
+      }
+    }
+    return array;
   }
 
   const sortedHistory = useCallback((history) => {
@@ -161,7 +155,8 @@ export default function ContactDetails(props) {
       if (shareHistory[index].accessible)
         updatedTrustedContactHistory[2].date = shareHistory[index].accessible;
       if (shareHistory[index].notAccessible)
-        updatedTrustedContactHistory[3].date = shareHistory[index].notAccessible;
+        updatedTrustedContactHistory[3].date =
+          shareHistory[index].notAccessible;
       if (shareHistory[index].inSent)
         updatedTrustedContactHistory[4].date = shareHistory[index].inSent;
       setTrustedContactHistory(updatedTrustedContactHistory);
@@ -169,29 +164,34 @@ export default function ContactDetails(props) {
     [trustedContactHistory],
   );
 
-  const saveInTransitHistory = useCallback(async (type) => {
-    const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
-    if (shareHistory) {
-      const updatedShareHistory = [...shareHistory];
-      if(type=="inTransit"){
-        updatedShareHistory[index] = {
-          ...updatedShareHistory[index],
-          inTransit: Date.now(),
-        };
-      }
-      if(type=="isSent"){
-        updatedShareHistory[index] = {
-          ...updatedShareHistory[index],
-          inSent: Date.now(),
-        };
-      }
-      updateHistory(updatedShareHistory);
-      await AsyncStorage.setItem(
-        'shareHistory',
-        JSON.stringify(updatedShareHistory),
+  const saveInTransitHistory = useCallback(
+    async (type) => {
+      const shareHistory = JSON.parse(
+        await AsyncStorage.getItem('shareHistory'),
       );
-    }
-  }, [updateHistory]);
+      if (shareHistory) {
+        const updatedShareHistory = [...shareHistory];
+        if (type == 'inTransit') {
+          updatedShareHistory[index] = {
+            ...updatedShareHistory[index],
+            inTransit: Date.now(),
+          };
+        }
+        if (type == 'isSent') {
+          updatedShareHistory[index] = {
+            ...updatedShareHistory[index],
+            inSent: Date.now(),
+          };
+        }
+        updateHistory(updatedShareHistory);
+        await AsyncStorage.setItem(
+          'shareHistory',
+          JSON.stringify(updatedShareHistory),
+        );
+      }
+    },
+    [updateHistory],
+  );
 
   const getImageIcon = (item) => {
     if (item) {
@@ -264,21 +264,54 @@ export default function ContactDetails(props) {
               >
                 {contactsType}
               </Text>
-              <Text style={styles.contactText}>{contact.contactName}</Text>
+              <Text style={styles.contactText}>
+                {Contact.contactName == 'Secondary Device'
+                  ? 'Keeper Device'
+                  : contact.contactName}
+              </Text>
               {contact.connectedVia ? (
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            <TouchableOpacity style={styles.filterButton} onPress={() => {}}>
-              <Entypo
-                name={'dots-three-horizontal'}
-                size={RFValue(20)}
-                color={Colors.borderColor}
-              />
-            </TouchableOpacity>
+            {Contact.hasXpub && Contact.contactName != 'Secondary Device' && (
+              <TouchableOpacity
+                onPress={() => onPressSend()}
+                style={{
+                  width: wp('15%'),
+                  height: wp('6%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.lightBlue,
+                  marginLeft: 'auto',
+                  marginBottom: 10,
+                  borderRadius: 4,
+                  flexDirection: 'row',
+                  alignSelf: 'flex-end',
+                }}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                  style={{
+                    height: wp('4%'),
+                    width: wp('4%'),
+                    resizeMode: 'contain',
+                  }}
+                />
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontFamily: Fonts.FiraSansMedium,
+                    fontSize: RFValue(10),
+                    marginLeft: 2,
+                  }}
+                >
+                  Send
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
-        {sortedHistory(trustedContactHistory).length > 0 ? (
+        {!Loading ? (
           <ScrollView style={{ flex: 1 }}>
             {sortedHistory(trustedContactHistory).map((value) => {
               if (SelectedOption == value.id) {
@@ -453,55 +486,49 @@ export default function ContactDetails(props) {
                     fontFamily: Fonts.FiraSansRegular,
                   }}
                 >
-                  The history of your Recovery Secret will appear here
+                  The history of your Recovery Key will appear here
                 </Text>
               </View>
             </View>
           </View>
         )}
-        <View>
-          <View style={styles.bottomButton}>
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <TouchableOpacity style={styles.buttonInnerView}>
-                <Image
-                  source={require('../../assets/images/icons/openlink.png')}
-                  style={styles.buttonImage}
-                />
-                <Text style={styles.buttonText}>Help restore</Text>
-              </TouchableOpacity>
-            )}
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <View
-                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-              />
-            )}
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <TouchableOpacity style={styles.buttonInnerView}>
-                <Image
-                  source={require('../../assets/images/icons/openlink.png')}
-                  style={styles.buttonImage}
-                />
-                <Text style={styles.buttonText}>Reshare</Text>
-              </TouchableOpacity>
-            )}
-            {(contactsType == 'My Keepers' ||
-              contactsType == "I'm Keeper of") && (
-              <View
-                style={{ width: 1, height: 30, backgroundColor: Colors.white }}
-              />
-            )}
-            <TouchableOpacity onPress={()=>onPressSend()} style={styles.buttonInnerView}>
+        {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              backgroundColor: Colors.white,
+              paddingTop: wp('3%'),
+              paddingBottom: wp('4%'),
+              height: wp('30'),
+            }}
+          >
+            <TouchableOpacity style={styles.bottomButton}>
               <Image
-                source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                source={require('../../assets/images/icons/icon_sell.png')}
                 style={styles.buttonImage}
               />
-              <Text style={styles.buttonText}>Send BTC</Text>
+              <View>
+                <Text style={styles.buttonText}>Help Restore</Text>
+                <Text numberOfLines={1} style={styles.buttonInfo}>
+                  Lorem ipsum dolor
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bottomButton}>
+              <Image
+                source={require('../../assets/images/icons/icon_buy.png')}
+                style={styles.buttonImage}
+              />
+              <View>
+                <Text style={styles.buttonText}>Request Key</Text>
+                <Text numberOfLines={1} style={styles.buttonInfo}>
+                  Lorem ipsum dolor
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
-        </View>
+        )}
       </View>
     </View>
   );
@@ -585,29 +612,34 @@ const styles = StyleSheet.create({
     width: wp('30%'),
   },
   buttonImage: {
-    width: wp('4%'),
-    height: wp('4%'),
+    width: wp('10%'),
+    height: wp('10%'),
     resizeMode: 'contain',
-    tintColor: Colors.white,
+    tintColor: Colors.blue,
   },
   buttonText: {
-    color: Colors.white,
-    fontSize: RFValue(12),
+    color: Colors.black,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansMedium,
+    marginLeft: 10,
+  },
+  buttonInfo: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: 5,
     marginLeft: 10,
   },
   bottomButton: {
     flexDirection: 'row',
-    backgroundColor: Colors.blue,
-    height: 60,
+    backgroundColor: Colors.white,
+    height: wp('17%'),
+    width: wp('40%'),
     borderRadius: 10,
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: hp('4%'),
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 15, height: 15 },
+    borderWidth: 0.5,
+    borderColor: Colors.borderColor,
+    alignSelf: 'center',
   },
 });

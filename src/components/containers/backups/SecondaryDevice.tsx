@@ -81,23 +81,23 @@ const SecondaryDevice = props => {
     );
   }, []);
 
-  if (isErrorSendingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
-      setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
-      );
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorSending(null));
-  }
-  
+if(isErrorSendingFailed){
+  setTimeout(() => {
+    setErrorMessageHeader('Error sending Recovery Key');
+    setErrorMessage(
+      'There was an error while sending your Recovery Key, please try again in a little while',
+    );
+  }, 2);
+  (ErrorBottomSheet as any).current.snapTo(1);
+  dispatch(ErrorSending(null));
+}
+
   return (
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>
         <View style={{ marginTop: hp("2%") }}>
           <Text style={BackupStyles.modalHeaderTitleText}>
-            Secondary Device
+            Keeper Device
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             Last backup{" "}
@@ -129,7 +129,7 @@ const SecondaryDevice = props => {
       <BottomInfoBox
         title={"Note"}
         infoText={
-          "Share your Recovery Secret Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR"
+          "Share your Recovery Key Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR"
         }
       />
       <BottomSheet

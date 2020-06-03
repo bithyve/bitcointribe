@@ -54,7 +54,7 @@ export default function RestoreSelectedContactsList(props) {
             firstLineTitle={'Restore wallet using'}
             secondLineTitle={'Documents'}
             infoTextNormal={'Sources where you have kept a document '}
-            infoTextBold={'copy of the Recovery Secret'}
+            infoTextBold={'copy of the Recovery Key'}
           />
         </View>
         <View style={{ flex: 8 }}>

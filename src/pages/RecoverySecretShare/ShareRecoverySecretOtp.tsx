@@ -75,11 +75,11 @@ const ShareRecoverySecretOtp = props => {
             <View style={{ height: '100%' }}>
               <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
                 <Text style={styles.commModeModalHeaderText}>
-                  {'Share Recovery Secret\nto trusted contact'}
+                  {'Share Recovery Key\nto trusted contact'}
                 </Text>
                 <Text style={styles.commModeModalInfoText}>
                   {
-                    'Share Recovery Secret to Trusted Contact, this will enable\nthem to restore their Hexa Wallet'
+                    'Share Recovery Key to Contact, this will enable\nthem to restore their Hexa Wallet'
                   }
                 </Text>
               </View>

@@ -162,7 +162,7 @@ export default function RecoveryCommunication(props) {
           [selectedContactMode.info],
           null,
           null,
-          'Guardian request',
+          'Keeper request',
           emailDL,
         );
         // props.navigation.navigate('ShareRecoveryOTP', {

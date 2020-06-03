@@ -9,7 +9,6 @@ import {
   StatusBar,
   AsyncStorage,
   Image,
-  Platform,
   ScrollView,
 } from 'react-native';
 import {
@@ -21,11 +20,7 @@ import Fonts from '../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import ModalHeader from '../components/ModalHeader';
-import AddressBookFilterModalContent from './Contacts/AddressBookFilterModalContent';
-import DeviceInfo from 'react-native-device-info';
-import BottomSheet from 'reanimated-bottom-sheet';
-import BottomInfoBox from '../components/BottomInfoBox';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { trustedChannelXpubUpload } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
@@ -35,12 +30,11 @@ import {
 import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/Interface';
 import { nameToInitials } from '../common/CommonFunctions';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function AddressBookContents(props) {
-  let [FilterModalBottomSheet, setFilterModalBottomSheet] = useState(
-    React.createRef(),
-  );
-  let [trustedContacts, setTrustedContacts] = useState([]);
+  const [Loading, setLoading] = useState(true);
+  const [trustedContact, setTrustedContact] = useState([]);
   let [MyKeeper, setMyKeeper] = useState([]);
   let [IMKeeper, setIMKeeper] = useState([]);
   let [OtherTrustedContact, setOtherTrustedContact] = useState([]);
@@ -51,10 +45,19 @@ export default function AddressBookContents(props) {
     (state) => state.trustedContacts.service,
   );
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, [trustedContact]);
+
   const updateAddressBook = async () => {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
       'TrustedContactsInfo',
     );
+    let myKeepers = [];
+    let imKeepers = [];
+    let otherTrustedContact = [];
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
@@ -94,34 +97,29 @@ export default function AddressBookContents(props) {
               .isWard;
 
           const isGuardian = index < 3 ? true : false;
-          trustedContacts.push({
+          const element = {
             contactName,
             connectedVia,
             hasXpub,
             isGuardian,
             isWard,
             ...contactInfo,
-          });
-        }
-        let myKeepers = [];
-        let imKeepers = [];
-        let otherTrustedContact = [];
-        for (let i = 0; i < trustedContacts.length; i++) {
-          const element = trustedContacts[i];
-          if(element.isGuardian){
+          };
+          trustedContacts.push(element);
+          if (element.isGuardian) {
             myKeepers.push(element);
           }
-          if(element.isWard){
+          if (element.isWard) {
             imKeepers.push(element);
           }
-          if(!element.isWard && !element.isGuardian){
+          if (!element.isWard && !element.isGuardian) {
             otherTrustedContact.push(element);
           }
         }
         setMyKeeper(myKeepers);
         setIMKeeper(imKeepers);
         setOtherTrustedContact(otherTrustedContact);
-        setTrustedContacts(trustedContacts);
+        setTrustedContact(trustedContacts);
       }
     }
   };
@@ -135,28 +133,6 @@ export default function AddressBookContents(props) {
     dispatch(trustedChannelXpubUpload());
   }, []);
 
-  function renderFilterModalContent() {
-    return (
-      <AddressBookFilterModalContent
-        modalRef={FilterModalBottomSheet}
-        onPressBack={() => {
-          (FilterModalBottomSheet.current as any).snapTo(0);
-        }}
-      />
-    );
-  }
-
-  const renderFilterModalHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (FilterModalBottomSheet.current as any).snapTo(0);
-        }}
-        backgroundColor={Colors.backgroundColor1}
-      />
-    );
-  };
-
   const getImageIcon = (item) => {
     if (item) {
       if (item.image && item.image.uri) {
@@ -164,9 +140,9 @@ export default function AddressBookContents(props) {
           <Image
             source={item.image}
             style={{
-              width: 35,
-              height: 35,
-              borderRadius: 35 / 2,
+              width: wp('12%'),
+              height: wp('12%'),
+              borderRadius: wp('12%') / 2,
               resizeMode: 'contain',
             }}
           />
@@ -178,9 +154,9 @@ export default function AddressBookContents(props) {
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: Colors.shadowBlue,
-              width: 35,
-              height: 35,
-              borderRadius: 30,
+              width: wp('12%'),
+              height: wp('12%'),
+              borderRadius: wp('12%') / 2,
             }}
           >
             <Text
@@ -215,7 +191,7 @@ export default function AddressBookContents(props) {
           props.navigation.navigate('ContactDetails', {
             contactsType,
             contact,
-            index
+            index,
           });
         }}
         style={styles.selectedContactsView}
@@ -223,13 +199,17 @@ export default function AddressBookContents(props) {
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.contactName && contact.contactName.split(' ')[0]
+            {contact.contactName &&
+            contact.contactName.split(' ')[0] &&
+            contact.contactName != 'Secondary Device'
               ? contact.contactName.split(' ')[0]
-              : ''}{' '}
+              : 'Keeper'}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.contactName && contact.contactName.split(' ')[1]
+              {contact.contactName &&
+              contact.contactName.split(' ')[1] &&
+              contact.contactName != 'Secondary Device'
                 ? contact.contactName.split(' ')[1]
-                : ''}
+                : 'Device'}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -244,6 +224,29 @@ export default function AddressBookContents(props) {
             marginLeft: 'auto',
           }}
         >
+          {!contact.hasXpub && contact.contactName != 'Secondary Device' && (
+            <View
+              style={{
+                width: wp('15%'),
+                height: wp('6%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: Colors.borderColor,
+                marginRight: 10,
+                borderRadius: 5,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Pending
+              </Text>
+            </View>
+          )}
           <View
             style={{
               width: 10,
@@ -324,104 +327,111 @@ export default function AddressBookContents(props) {
                 size={17}
               />
             </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>{'Address Book'}</Text>
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={() => {
-                (FilterModalBottomSheet.current as any).snapTo(1);
-              }}
-            >
-              <Text style={styles.filterButtonText}>Filter</Text>
-              <Image
-                style={styles.filterButtonImage}
-                source={require('../assets/images/icons/filter.png')}
-              />
-            </TouchableOpacity>
+            <Text style={styles.modalHeaderTitleText}>
+              {'Friends and Family'}
+            </Text>
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ marginTop: wp('2%') }}>
-            <Text style={styles.pageTitle}>My Keepers</Text>
-            <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing
-            </Text>
-            {MyKeeper && MyKeeper ? (
-              <View style={{ marginBottom: 15 }}>
-                <View style={{ height: 'auto' }}>
-                  {MyKeeper.map((item, index) => {
-                    return getElement(item, index, 'My Keepers');
-                  })}
+          {(MyKeeper.length > 0 || Loading) && (
+            <View style={{ marginTop: wp('2%') }}>
+              <Text style={styles.pageTitle}>My Keepers</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who can help me restore my wallet.
+              </Text>
+              {!Loading ? (
+                <View style={{ marginBottom: 15 }}>
+                  <View style={{ height: 'auto' }}>
+                    {MyKeeper.map((item, index) => {
+                      return getElement(item, index, 'My Keepers');
+                    })}
+                  </View>
                 </View>
-              </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>I am the keeper of</Text>
-            <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing
-            </Text>
-            {IMKeeper && IMKeeper.length ? (
-              <View style={{ marginBottom: 15 }}>
-                <View style={{ height: 'auto' }}>
-                  {IMKeeper.map((item, index) => {
-                    return getElement(item, index, "I'm Keeper of");
-                  })}
-                  {/* {SecondaryDeviceAddress && SecondaryDeviceAddress.length ? (
-                    <View>
-                      {SecondaryDeviceAddress.map((item, index) => {
-                        return (
-                          <View style={styles.selectedContactsView}>
-                            <Text style={styles.contactText}>
-                              {item.requester}
-                            </Text>
-                          </View>
-                        );
-                      })}
-                    </View>
-                  ) : null} */}
+              ) : (
+                getWaterMark()
+              )}
+            </View>
+          )}
+
+          {(IMKeeper.length > 0 || Loading) && (
+            <View style={{ marginTop: wp('5%') }}>
+              <Text style={styles.pageTitle}>I am the keeper of</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who I can help restore their wallets.
+              </Text>
+
+              {!Loading ? (
+                <View style={{ marginBottom: 15 }}>
+                  <View style={{ height: 'auto' }}>
+                    {IMKeeper.map((item, index) => {
+                      return getElement(item, index, "I'm Keeper of");
+                    })}
+                  </View>
                 </View>
-              </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          <View style={{ marginTop: wp('5%') }}>
+              ) : (
+                getWaterMark()
+              )}
+            </View>
+          )}
+          <View
+            style={{
+              marginTop:
+                IMKeeper.length == 0 &&
+                MyKeeper.length == 0
+                  ? wp('2%')
+                  : wp('5%'),
+            }}
+          >
             <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
             <Text style={styles.pageInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing
+              Contacts who I can pay directly.
             </Text>
-            {OtherTrustedContact && OtherTrustedContact.length ? (
+            {!Loading ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {OtherTrustedContact.map((item, index) => {
-                    return getElement(item, index, 'Other Trusted Contacts');
+                    return getElement(item, index, 'Other Contacts');
                   })}
+                  <TouchableOpacity
+                    style={{
+                      ...styles.selectedContactsView,
+                      paddingBottom: 7,
+                      paddingTop: 7,
+                      marginTop: 0,
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: wp('10%'),
+                        height: wp('10%'),
+                        marginLeft: 5,
+                      }}
+                      source={require('../assets/images/icons/icon_add_grey.png')}
+                    />
+                    <View>
+                      <Text style={styles.contactText}>
+                        Add Trusted Contact
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             ) : (
               getWaterMark()
             )}
           </View>
-          <BottomInfoBox
-            title={'Note'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-            }
-          />
+          {OtherTrustedContact.length == 0 &&
+            IMKeeper.length == 0 &&
+            MyKeeper.length == 0 && (
+              <BottomInfoBox
+                title={'Note'}
+                infoText={
+                  'All your contacts appear here when added to Hexa wallet'
+                }
+              />
+            )}
         </ScrollView>
       </View>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={FilterModalBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
-        ]}
-        renderContent={renderFilterModalContent}
-        renderHeader={renderFilterModalHeader}
-      />
     </View>
   );
 }
@@ -487,11 +497,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
   },
-  shareButtonText: {
-    fontSize: RFValue(10),
-    fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
-  },
   pageTitle: {
     marginLeft: 30,
     color: Colors.blue,
@@ -503,6 +508,7 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
+    marginTop: 3,
   },
   watermarkViewBigText: {
     backgroundColor: Colors.backgroundColor,
@@ -530,33 +536,5 @@ const styles = StyleSheet.create({
     height: wp('3%'),
     width: wp('3%'),
     borderRadius: wp('3%') / 2,
-  },
-  cardImage: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-  },
-  filterButton: {
-    height: wp('8%'),
-    width: wp('20%'),
-    backgroundColor: Colors.lightBlue,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 7,
-    marginLeft: 'auto',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  filterButtonText: {
-    color: Colors.white,
-    fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular,
-  },
-  filterButtonImage: {
-    width: 12,
-    height: 12,
-    resizeMode: 'contain',
-    marginLeft: 5,
   },
 });

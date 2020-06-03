@@ -43,7 +43,7 @@ const AddressBook = props => {
             </View>
             <View style={{ flex: 1 }}>
                 <View style={{ margin:30 }}>
-                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14) }}>You are the Guardian of</Text>
+                    <Text style={{ color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(14) }}>You are the Keeper of</Text>
                     <Text style={{ color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(10) }}>Lorem ipsum dolor sit amet, consectetur adipiscing</Text>
                 </View>
                 <View style={{ marginLeft: 30, marginRight:30, marginTop:10, marginBottom:10, flexDirection: "row", alignItems:'center' }}>

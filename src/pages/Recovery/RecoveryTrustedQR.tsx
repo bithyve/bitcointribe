@@ -82,9 +82,9 @@ export default function RecoveryTrustedQR(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
-        title={'Share your Recovery Secret'}
+        title={'Share your Recovery Key'}
         infoText={
-          'Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR'
+          'Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR'
         }
       />
     </View>

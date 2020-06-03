@@ -11,7 +11,6 @@ import sssReducer from './reducers/sss';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
-import sendReducer from './reducers/sendReducer';
 
 import {
   initDBWatcher,
@@ -47,6 +46,7 @@ import {
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
+  syncTrustedDerivativeAccountsWatcher,
 } from './sagas/accounts';
 
 import {
@@ -149,6 +149,7 @@ const rootSaga = function* () {
     fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
+    syncTrustedDerivativeAccountsWatcher,
     testWatcher,
 
     // sss watchers
@@ -219,7 +220,6 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
-  sendReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

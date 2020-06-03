@@ -94,9 +94,9 @@ const SecureScan = props => {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
@@ -132,7 +132,7 @@ const SecureScan = props => {
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             The authenticator app should be{'\n'}installed on another device
-            like your Secondary Device
+            like your Keeper Device
           </Text>
         </View>
       </View>
