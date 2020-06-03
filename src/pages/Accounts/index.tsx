@@ -141,9 +141,13 @@ export default function Accounts(props) {
     true,
   );
   const service = useSelector((state) => state.accounts[serviceType].service);
-  const loader = useSelector(
+  const balanceTxLoading = useSelector(
     (state) => state.accounts[serviceType].loading.balanceTx,
   );
+  const derivativeBalanceTxLoading = useSelector(
+    (state) => state.accounts[serviceType].loading.derivativeBalanceTx,
+  );
+
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   const [netBalance, setNetBalance] = useState(
@@ -1303,7 +1307,7 @@ export default function Accounts(props) {
             }}
             refreshControl={
               <RefreshControl
-                refreshing={loader}
+                refreshing={balanceTxLoading || derivativeBalanceTxLoading}
                 onRefresh={() => {
                   // dispatch(fetchTransactions(serviceType));
                   dispatch(

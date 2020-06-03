@@ -83,6 +83,7 @@ export interface BuddyStaticNonPMDD {
 
 export interface DerivativeAccountElements {
   xpub: string;
+  xpriv: string;
   ypub?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
@@ -115,6 +116,7 @@ export interface TrustedContactDerivativeAccountElements {
     nextFreeAddressIndex?: number;
   };
   xpub: string;
+  xpriv: string;
   ypub?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;

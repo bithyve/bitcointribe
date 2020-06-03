@@ -279,16 +279,15 @@ function* fetchBalanceTxWorker({ payload }) {
     }
 
     if (payload.options.syncTrustedDerivative) {
-      console.log('Synching trusted derivative accounts');
       try {
-        yield call(syncTrustedDerivativeAccountsWorker);
+        yield put(syncTrustedDerivativeAccounts());
       } catch (err) {
         console.log({ err });
       }
     }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error('Failed to fetch balance/transactions from the indexer');
+    console.log('Failed to fetch balance/transactions from the indexer');
   }
 
   if (payload.options.loader) {
@@ -358,6 +357,8 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
 );
 
 function* syncTrustedDerivativeAccountsWorker() {
+  yield put(switchLoader(REGULAR_ACCOUNT, 'derivativeBalanceTx'));
+
   const regularAccount: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -370,7 +371,6 @@ function* syncTrustedDerivativeAccountsWorker() {
     regularAccount.syncDerivativeAccountsBalanceTxs,
     TRUSTED_CONTACTS,
   );
-  console.log({ res });
 
   const postFetchTrustedDerivativeAccounts = JSON.stringify(
     regularAccount.hdWallet.derivativeAccounts[TRUSTED_CONTACTS],
@@ -389,8 +389,10 @@ function* syncTrustedDerivativeAccountsWorker() {
     }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    throw new Error('Failed to sync trusted derivative account');
+    console.log('Failed to sync trusted derivative account');
   }
+
+  yield put(switchLoader(REGULAR_ACCOUNT, 'derivativeBalanceTx'));
 }
 
 export const syncTrustedDerivativeAccountsWatcher = createWatcher(

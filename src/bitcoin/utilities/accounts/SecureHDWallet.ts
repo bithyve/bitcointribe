@@ -1473,10 +1473,14 @@ export default class SecureHDWallet extends Bitcoin {
         this.network === bitcoinJS.networks.bitcoin ? 0 : 1
       }'/${this.derivativeAccounts[accountType]['series'] + accountNumber}'`;
       console.log({ path });
-      const child = root.derivePath(path).neutered();
-      const xpub = child.toBase58();
+      const xpriv = root.derivePath(path).toBase58();
+      const xpub = root.derivePath(path).neutered().toBase58();
       const ypub = this.xpubToYpub(xpub, null, this.network);
-      this.derivativeAccounts[accountType][accountNumber] = { xpub, ypub };
+      this.derivativeAccounts[accountType][accountNumber] = {
+        xpub,
+        xpriv,
+        ypub,
+      };
       this.derivativeAccounts[accountType].instance.using++;
 
       return xpub;
