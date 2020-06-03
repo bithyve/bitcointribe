@@ -40,14 +40,19 @@ class App extends Component {
 
 
   unsubscribe = NetInfo.addEventListener(state => {
+    setTimeout(() => {
+      if (state.isInternetReachable === null) {
+        return
+      }
 
-    if (state.isInternetReachable) {
-      (this.NoInternetBottomSheet as any).current.snapTo(0);
-    } else {
-      console.log("Internet", state);
+      if (state.isInternetReachable) {
+        (this.NoInternetBottomSheet as any).current.snapTo(0);
+      } else {
 
-      (this.NoInternetBottomSheet as any).current.snapTo(1);
-    }
+        (this.NoInternetBottomSheet as any).current.snapTo(1);
+      }
+    }, 1000);
+
   });
 
   componentWillUnmount() {
@@ -55,7 +60,7 @@ class App extends Component {
       this.unsubscribe()
     }
   }
-  
+
   getActiveRouteName(navigationState: NavigationState) {
     if (!navigationState) {
       return null;
@@ -71,14 +76,14 @@ class App extends Component {
   render() {
     return (
       <Provider store={store} uriPrefix={prefix}>
-        <Navigator 
-        onNavigationStateChange={(prevState, currentState) => {
-          const currentScreen = this.getActiveRouteName(currentState);
-          const prevScreen = this.getActiveRouteName(prevState);
-          if (prevScreen !== currentScreen) {
+        <Navigator
+          onNavigationStateChange={(prevState, currentState) => {
+            const currentScreen = this.getActiveRouteName(currentState);
+            const prevScreen = this.getActiveRouteName(prevState);
+            if (prevScreen !== currentScreen) {
               firebase.analytics().setCurrentScreen(currentScreen);
-          }
-      }}
+            }
+          }}
         />
         <BottomSheet
           onCloseEnd={() => { }}
