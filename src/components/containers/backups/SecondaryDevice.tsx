@@ -91,7 +91,7 @@ const SecondaryDevice = props => {
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(ErrorSending(null));
   }
-  debugger
+  
   return (
     <View style={BackupStyles.modalContainer}>
       <View style={BackupStyles.modalHeaderTitleView}>

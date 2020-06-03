@@ -32,6 +32,7 @@ import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalcul
 import AddContactsModalContents from '../components/AddContactsModalContents';
 import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
 import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
+import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import { AppState } from 'react-native';
 import {
     TEST_ACCOUNT,
@@ -168,7 +169,7 @@ interface HomeStateTypes {
     selectToAdd: string,
     openModal: string,
     atCloseEnd: boolean,
-    loading: false,
+    loading: boolean,
     secondaryDeviceOtp: any,
     selectedTransactionItem: any,
     deepLinkModalOpen: boolean,
@@ -192,13 +193,16 @@ interface HomePropsTypes {
     walletName: string,
     UNDER_CUSTODY: any,
     fetchNotifications: any,
-    updateFCMTokens: any
+    updateFCMTokens: any,
+    downloadMShare: any
 
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     focusListener: any
     appStateListener: any
+    firebaseNotificationListener: any
+    notificationOpenedListener: any
     constructor(props) {
         super(props);
         this.focusListener = null
@@ -208,7 +212,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             cardData: [],
             switchOn: false,
             CurrencyCode: 'USD',
-            balances: null,
+            balances: {},
             qrBottomSheetsFlag: false,
             selectedBottomTab: 'Transactions',
             transactions: [],
@@ -238,7 +242,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 
     onPressNotifications = () => {
-        null
+        (this.refs.notificationsListBottomSheet as any).snapTo(1);
+    }
+
+
+    onSwitchToggle = (switchOn) => {
+        this.setState({
+            switchOn
+        })
     }
 
 
@@ -394,6 +405,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         if (this.appStateListener) {
             this.appStateListener()
         }
+
+        if (this.firebaseNotificationListener) {
+            this.firebaseNotificationListener()
+        }
+        if (this.notificationOpenedListener) {
+            this.notificationOpenedListener()
+        }
     }
 
 
@@ -433,9 +451,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             return;
         }
 
-        if (Platform.OS === "ios" && nextAppState === 'active') {
+        if (Platform.OS === "ios" && nextAppState === 'active' && !isCameraOpen && !isContactOpen) {
             this.props.navigation.navigate('ReLogin');
-        } else if (Platform.OS === "android" && nextAppState === 'background') {
+        } else if (Platform.OS === "android" && nextAppState === 'background' && !isCameraOpen && !isContactOpen) {
             this.props.navigation.navigate('ReLogin');
         }
 
@@ -529,13 +547,33 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         return
     };
 
+    setSecondaryDeviceAddresses = async () => {
+        let secondaryDeviceOtpTemp = JSON.parse(
+            await AsyncStorage.getItem('secondaryDeviceAddress'),
+        );
+        if (!secondaryDeviceOtpTemp) {
+            secondaryDeviceOtpTemp = [];
+        }
+        if (
+            secondaryDeviceOtpTemp.findIndex(
+                (value) => value.otp == (this.state.secondaryDeviceOtp as any).otp,
+            ) == -1
+        ) {
+            secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
+            await AsyncStorage.setItem(
+                'secondaryDeviceAddress',
+                JSON.stringify(secondaryDeviceOtpTemp),
+            );
+        }
+    };
+
 
     getAssociatedContact = async () => {
-        // TODO -- need to check what happens here
         let SelectedContacts = JSON.parse(
             await AsyncStorage.getItem('SelectedContacts'),
         );
-        // setSelectedContacts(SelectedContacts);
+
+        // TODO -- need to check this
         let AssociatedContact = JSON.parse(
             await AsyncStorage.getItem('AssociatedContacts'),
         );
@@ -543,7 +581,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         let SecondaryDeviceAddress = JSON.parse(
             await AsyncStorage.getItem('secondaryDeviceAddress'),
         );
-        // setSecondaryDeviceAddress(SecondaryDeviceAddress);
+        this.setSecondaryDeviceAddresses()
+        this.setState({
+            selectedContact: SelectedContacts,
+        })
     };
 
     setCurrencyCodeFromAsync = async () => {
@@ -571,9 +612,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         let currencyToggleValueTmp = await AsyncStorage.getItem(
             'currencyToggleValue',
         );
-
-        // TODO
-        // setSwitchOn(currencyToggleValueTmp ? true : false);
+        this.setState({
+            switchOn: currencyToggleValueTmp ? true : false
+        })
     };
 
     bootStrapNotifications = async () => {
@@ -641,11 +682,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     };
 
     createNotificationListeners = async () => {
-        // TODO -- need to do garbage collection 
         /*
          * Triggered when a particular notification has been received in foreground
          * */
-        firebase
+        this.firebaseNotificationListener = firebase
             .notifications()
             .onNotification((notification) => {
                 this.onNotificationArrives(notification);
@@ -654,7 +694,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         /*
          * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
          * */
-        let notificationOpenedListener = firebase
+        this.notificationOpenedListener = firebase
             .notifications()
             .onNotificationOpened(async (notificationOpen) => {
                 const { title, body } = notificationOpen.notification;
@@ -1139,9 +1179,18 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             familyAndFriendsBookBottomSheetsFlag,
             notificationData,
             selectToAdd,
-            fbBTCAccount
+            fbBTCAccount,
+            loading
         } = this.state
-        const { navigation, notificationList, exchangeRates, accounts, walletName } = this.props
+        const {
+            navigation,
+            notificationList,
+            exchangeRates,
+            accounts,
+            walletName,
+            UNDER_CUSTODY,
+            downloadMShare
+        } = this.props
         const trustedContactRequest = navigation.getParam(
             'trustedContactRequest',
         );
@@ -1165,13 +1214,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         onPressNotifications={this.onPressNotifications}
                         notificationData={notificationList}
                         walletName={walletName}
-                        switchOn={false}
+                        switchOn={switchOn}
                         getCurrencyImageByRegion={getCurrencyImageByRegion}
-                        balances={null}
-                        exchangeRates={null}
-                        CurrencyCode={'USD'}
+                        balances={balances}
+                        exchangeRates={exchangeRates}
+                        CurrencyCode={CurrencyCode}
                         navigation={this.props.navigation}
                         overallHealth={null}
+                        onSwitchToggle={this.onSwitchToggle}
                     />
                 </View>
 
@@ -1275,7 +1325,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     ]}
                     renderContent={() => <AddModalContents
                         onPressElements={(type) => {
-                            debugger
                             if (type == 'buyBitcoins') {
                                 this.setState({
                                     addBottomSheetFlag: true,
@@ -1396,8 +1445,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 
 
-                {/* // TODO need to integrate custodian modal */}
-                {/* <BottomSheet
+                <BottomSheet
                     onCloseEnd={() => {
                         if (tabBarIndex === 0 && !deepLinkModalOpen) {
                             this.setState({
@@ -1418,9 +1466,77 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     enabledInnerScrolling={true}
                     ref={"custodianRequestBottomSheet"}
                     snapPoints={[-50, hp('60%')]}
-                    renderContent={renderCustodianRequestModalContent}
-                    renderHeader={renderCustodianRequestModalHeader}
-                /> */}
+                    renderContent={() => {
+                        if (!custodyRequest) {
+                            return null
+                        }
+
+                        return (
+                            <CustodianRequestModalContents
+                                loading={loading}
+                                userName={custodyRequest.requester}
+                                onPressAcceptSecret={() => {
+                                    this.setState({
+                                        loading: true,
+                                        tabBarIndex: 0,
+                                        deepLinkModalOpen: true
+                                    }, () => {
+                                        (this.refs.custodianRequestBottomSheet as any).snapTo(0)
+                                    })
+
+                                    if (Date.now() - custodyRequest.uploadedAt > 600000) {
+                                        Alert.alert(
+                                            'Request expired!',
+                                            'Please ask the sender to initiate a new request',
+                                        );
+                                        this.setState({
+                                            loading: false
+                                        })
+                                    } else {
+                                        if (UNDER_CUSTODY[custodyRequest.requester]) {
+                                            Alert.alert(
+                                                'Failed to store',
+                                                'You cannot custody multiple shares of the same user.',
+                                            );
+                                            this.setState({ loading: false })
+                                        } else {
+                                            if (custodyRequest.isQR) {
+                                                downloadMShare(custodyRequest.ek, custodyRequest.otp)
+                                                this.setState({
+                                                    loading: false
+                                                })
+                                            } else {
+                                                navigation.navigate('CustodianRequestOTP', {
+                                                    custodyRequest,
+                                                });
+                                                this.setState({
+                                                    loading: false
+                                                })
+                                            }
+                                        }
+                                    }
+                                }}
+                                onPressRejectSecret={() => {
+                                    this.setState({
+                                        tabBarIndex: 0
+                                    }, () => {
+                                        (this.refs.custodianRequestBottomSheet as any).snapTo(0);
+                                        (this.refs.custodianRequestRejectedBottomSheet as any).snapTo(1);
+                                    })
+                                }}
+                            />
+                        )
+
+                    }}
+                    renderHeader={() => <TransparentHeaderModal
+                        onPressheader={() => {
+                            this.setState({
+                                tabBarIndex: 999,
+                                deepLinkModalOpen: false
+                            }, () => (this.refs.custodianRequestBottomSheet as any).snapTo(0))
+                        }}
+                    />}
+                />
                 <BottomSheet
                     onCloseEnd={() => {
                         if (tabBarIndex === 0 && !deepLinkModalOpen) {
@@ -2031,7 +2147,7 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps, { fetchNotifications, updateFCMTokens })(HomeUpdated)
+export default connect(mapStateToProps, { fetchNotifications, updateFCMTokens, downloadMShare })(HomeUpdated)
 
 const styles = StyleSheet.create({
     card: {

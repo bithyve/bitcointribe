@@ -40,7 +40,6 @@ const TransactionsContent = ({ transactions, TransactionDetailsBottomSheet, AtCl
                                 <AppBottomSheetTouchableWrapper
                                     onPress={
                                         () => {
-                                            debugger
                                             (TransactionDetailsBottomSheet as any).snapTo(1);
                                             setTimeout(() => {
                                                 setTransactionItem(item);

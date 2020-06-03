@@ -30,7 +30,8 @@ const HomeHeader = ({
     exchangeRates,
     CurrencyCode,
     navigation,
-    overallHealth
+    overallHealth,
+    onSwitchToggle
 }) => {
     return (
         <View style={{ ...styles.headerViewContainer, flex: 1 }}>
@@ -134,10 +135,9 @@ const HomeHeader = ({
                     <ToggleSwitch
                         currencyCodeValue={CurrencyCode}
                         onpress={async () => {
-                            null
-                            // setSwitchOn(!switchOn);
-                            // let temp = !switchOn ? 'true' : '';
-                            // await AsyncStorage.setItem('currencyToggleValue', temp);
+                            onSwitchToggle(!switchOn)
+                            let temp = !switchOn ? 'true' : '';
+                            await AsyncStorage.setItem('currencyToggleValue', temp);
                         }}
                         toggle={switchOn}
                     />
