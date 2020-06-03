@@ -97,15 +97,15 @@ export default function AddressBookContents(props) {
               .isWard;
 
           const isGuardian = index < 3 ? true : false;
-          trustedContacts.push({
+          const element = {
             contactName,
             connectedVia,
             hasXpub,
             isGuardian,
             isWard,
             ...contactInfo,
-          });
-          const element = trustedContacts[index];
+          };
+          trustedContacts.push(element);
           if (element.isGuardian) {
             myKeepers.push(element);
           }
