@@ -115,8 +115,8 @@ const HistoryPageComponent = props => {
         {props.data.length<=1 ? 
         <View style={{ backgroundColor:Colors.backgroundColor, }}>
           <View style={{ margin:15, backgroundColor:Colors.white, padding:10, paddingTop:20, borderRadius:7}}>
-            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>No history found</Text>
-            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>The history of your Recovery Secret will appear here</Text>
+            <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>Recovery Key History</Text>
+            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>The history of your Recovery Key will appear here</Text>
           </View>
         </View>
           : null
@@ -138,7 +138,7 @@ const HistoryPageComponent = props => {
         <View style={{ backgroundColor:Colors.backgroundColor, }}>
           <View style={{ margin:15, backgroundColor:Colors.white, padding:10, paddingTop:20, borderRadius:7}}>
             <Text style={{color:Colors.black, fontSize:RFValue(13), fontFamily:Fonts.FiraSansRegular}}>No history</Text>
-            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>The history of your Recovery Secret will appear here</Text>
+            <Text style={{color:Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>The history of your Recovery Key will appear here</Text>
           </View>
         </View>
       </View>

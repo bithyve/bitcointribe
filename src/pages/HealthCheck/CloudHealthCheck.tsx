@@ -49,7 +49,7 @@ export default function CloudHealthCheck(props) {
             </View>
             <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 30, marginRight: 20, }}>
                 <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Text style={BackupStyles.modalHeaderTitleText}>Confirm Recovery Secret{"\n"}from Cloud</Text>
+                    <Text style={BackupStyles.modalHeaderTitleText}>Confirm Recovery Key{"\n"}from Cloud</Text>
                     <Text style={BackupStyles.modalHeaderInfoText}>
                         Scan the first QR code from the PDF{"\n"}you saved in your cloud storage
                     </Text>

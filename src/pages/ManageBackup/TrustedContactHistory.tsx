@@ -115,26 +115,26 @@ const TrustedContactHistory = (props) => {
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret created',
+      title: 'Recovery Key created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret in-transit',
+      title: 'Recovery Key in-transit',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret accessible',
+      title: 'Recovery Key accessible',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret not accessible',
+      title: 'Recovery Key not accessible',
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
@@ -394,9 +394,9 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ConfirmBottomSheet}
-        title={'Confirm Recovery Secret\nwith Trusted Contact'}
+        title={'Confirm Recovery Key\nwith Keeper'}
         note={
-          'Your Recovery Secrets with contacts get confirmed automatically when the contact opens their app.\nSimply remind them to open their Hexa app and login to confirm your Recovery Secret'
+          'Your Recovery Keys with contacts get confirmed automatically when the contact opens their app.\nSimply remind them to open their Hexa app and login to confirm your Recovery Key'
         }
         proceedButtonText={'Ok, got it'}
         onPressProceed={() => {
@@ -449,9 +449,9 @@ const TrustedContactHistory = (props) => {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
@@ -539,10 +539,10 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ReshareBottomSheet}
-        title={'Reshare Recovery Secret\nwith Trusted Contact'}
-        info={'Did your contact not receive the Recovery Secret?'}
+        title={'Reshare Recovery Key\nwith Keeper'}
+        info={'Did your Keeper not receive the Recovery Key?'}
         note={
-          'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'
+          'You can reshare the Recovery Key with your Keeper\n via Email or Sms'
         }
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
@@ -572,10 +572,10 @@ const TrustedContactHistory = (props) => {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
-        title={'Change your\nTrusted Contact'}
-        info={'Having problems with your Trusted Contact'}
+        title={'Change your\nKeeper'}
+        info={'Having problems with your Keeper'}
         note={
-          'You can change the Trusted Contact you selected to share your Recovery Secret'
+          'You can change the Keeper you selected to share your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -746,7 +746,7 @@ const TrustedContactHistory = (props) => {
       setTimeout(() => {
         setErrorMessageHeader('Failed to share');
         setErrorMessage(
-          'There was some error while sharing the Recovery Secret, please try again',
+          'There was some error while sharing the Recovery Key, please try again',
         );
       }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
@@ -936,7 +936,7 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaLink
-          contactText={'Adding as a Trusted Contact(Guardian):'}
+          contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
           link={trustedLink}
@@ -967,7 +967,7 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaQR
-          contactText={'Adding as a Trusted Contact:'}
+          contactText={'Adding to Friends and Family:'}
           contact={chosenContact ? chosenContact : null}
           QR={trustedQR}
           contactEmail={''}
@@ -1099,12 +1099,12 @@ const TrustedContactHistory = (props) => {
           data={sortedHistory(trustedContactHistory)}
           reshareInfo={
             shared || activateReshare
-              ? 'Want to send the Recovery Secret again to the same destination? '
+              ? 'Want to send the Recovery Key again to the same destination? '
               : null
           }
           changeInfo={
             shared || activateReshare
-              ? 'Want to share the Recovery Secret with another contact? '
+              ? 'Want to share the Recovery Key with another contact? '
               : null
           }
           onPressChange={() => {

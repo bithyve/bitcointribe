@@ -42,26 +42,26 @@ const SecondaryDeviceHistory = props => {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret created',
+      title: 'Recovery Key created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret in-transit',
+      title: 'Recovery Key in-transit',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret accessible',
+      title: 'Recovery Key accessible',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret not accessible',
+      title: 'Recovery Key not accessible',
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
@@ -143,9 +143,9 @@ const SecondaryDeviceHistory = props => {
     return (
       <ErrorModalContents
         modalRef={secondaryDeviceMessageBottomSheet}
-        title={`Secondary Device`}
+        title={`Keeper Device`}
         note={
-          'For confirming your Recovery Secret on the Secondary Device, simply open the app on that device and log in'
+          'For confirming your Recovery Key on the Keeper Device, simply open the app on that device and log in'
         }
         proceedButtonText={'Ok, got it'}
         onPressProceed={() => {
@@ -246,9 +246,9 @@ const SecondaryDeviceHistory = props => {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);

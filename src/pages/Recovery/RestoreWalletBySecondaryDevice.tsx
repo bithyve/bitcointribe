@@ -85,9 +85,9 @@ export default function RestoreWalletBySecondaryDevice(props) {
   }
   if (isErrorReceivingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
@@ -151,9 +151,9 @@ export default function RestoreWalletBySecondaryDevice(props) {
               isKnowMoreButton={true}
               onPressKnowMore={() => {}}
               firstLineTitle={'Restore wallet using'}
-              secondLineTitle={'Secondary Device'}
+              secondLineTitle={'Keeper Device'}
               infoTextNormal={
-                'Use the Recover Secret stored in your secondary device. '
+                'Use the Recover Secret stored in your keeper device. '
               }
               infoTextBold={'you will need to have the other device with you'}
             />

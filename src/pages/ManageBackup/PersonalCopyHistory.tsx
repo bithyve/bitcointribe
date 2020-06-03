@@ -59,26 +59,26 @@ const PersonalCopyHistory = (props) => {
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret created',
+      title: 'Recovery Key created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret in-transit',
+      title: 'Recovery Key in-transit',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret accessible',
+      title: 'Recovery Key accessible',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret not accessible',
+      title: 'Recovery Key not accessible',
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
@@ -261,7 +261,7 @@ const PersonalCopyHistory = (props) => {
       setTimeout(() => {
         setErrorMessageHeader('PDF Sharing failed');
         setErrorMessage(
-          'There was some error while sharing the Recovery Secret, please try again',
+          'There was some error while sharing the Recovery Key, please try again',
         );
       }, 2);
       (PersonalCopyShareBottomSheet as any).current.snapTo(0);
@@ -468,7 +468,7 @@ const PersonalCopyHistory = (props) => {
           data={sortedHistory(personalCopyHistory)}
           reshareInfo={
             pcShared
-              ? 'Want to send the Recovery Secret again to the same destination? '
+              ? 'Want to send the Recovery Key again to the same destination? '
               : null
           }
           onPressConfirm={() => {

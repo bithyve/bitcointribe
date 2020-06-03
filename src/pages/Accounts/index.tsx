@@ -978,7 +978,7 @@ export default function Accounts(props) {
         image={require('../../assets/images/icons/secure.png')}
         boldPara={''}
         helperInfo={
-          'The funds in this account are secured by two factor authentication (2FA) which should be set up on a secondary device\n\nUse this account to store funds that you will not require on a daily basis. Transactions from and to this account are costlier compared to the Checking Account'
+          'The funds in this account are secured by two factor authentication (2FA) which should be set up on the keeper device\n\nUse this account to store funds that you will not require on a daily basis. Transactions from and to this account are costlier compared to the Checking Account'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {

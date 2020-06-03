@@ -33,7 +33,7 @@ export default function ShareOtpWithTrustedContact(props) {
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               Please provide this OTP to your trusted contact in order for them
-              to send you the recovery secret
+              to send you the recovery key
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               Please make sure you use a different to channel to send the OTP

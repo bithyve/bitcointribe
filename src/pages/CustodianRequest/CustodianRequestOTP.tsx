@@ -147,9 +147,9 @@ export default function CustodianRequestOTP(props) {
   if (isErrorReceivingFailed) {
     setTimeout(() => {
       setIsConfirmDisabled(false);
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
       setButtonText('Try again');
     }, 2);

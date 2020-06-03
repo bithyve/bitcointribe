@@ -58,7 +58,7 @@ const TwoFASetup = props => {
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             The authenticator app should be installed on another device
-            like your Secondary Device
+            like your Keeper Device
           </Text>
         </View>
       </View>

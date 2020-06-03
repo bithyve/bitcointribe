@@ -24,7 +24,7 @@ export default function CustodianRequestRejectedModalContents(props) {
             Secret Rejected{"\n"}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            You have rejected the request to be a{"\n"}guardian for
+            You have rejected the request to be a{"\n"}keeper for
           </Text>
         </View>
         <View style={styles.box}>
@@ -47,7 +47,7 @@ export default function CustodianRequestRejectedModalContents(props) {
           >
             <Text style={{ ...styles.modalInfoText }}>
               The sender will be notified that you have rejected the{"\n"}
-              request to be a guardian
+              request to be a keeper
             </Text>
           </View>
         </View>
@@ -62,7 +62,7 @@ export default function CustodianRequestRejectedModalContents(props) {
             onPress={() => props.onPressViewThrustedContacts()}
             style={{ ...styles.successModalButtonView }}
           >
-            <Text style={styles.proceedButtonText}>View Trusted Contacts</Text>
+            <Text style={styles.proceedButtonText}>View Friends and Family</Text>
           </AppBottomSheetTouchableWrapper>
           <Image
             source={require("../assets/images/icons/reject.png")}

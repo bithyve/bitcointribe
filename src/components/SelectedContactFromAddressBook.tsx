@@ -51,7 +51,7 @@ export default function SelectedContactFromAddressBook(props) {
                     color: Colors.textColorGrey,
                     fontSize: RFValue(12),
                     fontFamily: Fonts.FiraSansMedium, marginLeft: 10
-                }}>Add as Trusted Contact</Text>
+                }}>Add to Friends and Family</Text>
             </View>
             <View style={{ marginTop: hp('3%'), marginBottom: hp('3%'), marginLeft: 50, }}>
                 <Text style={{

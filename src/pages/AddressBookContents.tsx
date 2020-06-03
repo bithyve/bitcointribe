@@ -390,7 +390,7 @@ export default function AddressBookContents(props) {
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {OtherTrustedContact.map((item, index) => {
-                    return getElement(item, index, 'Other Trusted Contacts');
+                    return getElement(item, index, 'Other Contacts');
                   })}
                   <TouchableOpacity
                     style={{
