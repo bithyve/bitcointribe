@@ -50,6 +50,7 @@ const ACCOUNT_VARS: {
     balances: Boolean;
     transactions: Boolean;
     balanceTx: Boolean;
+    derivativeBalanceTx: Boolean;
     transfer: Boolean;
     testcoins: Boolean;
   };
@@ -74,6 +75,7 @@ const ACCOUNT_VARS: {
     balances: false,
     transactions: false,
     balanceTx: false,
+    derivativeBalanceTx: false,
     transfer: false,
     testcoins: false,
   },

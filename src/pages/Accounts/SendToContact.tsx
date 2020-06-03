@@ -39,7 +39,10 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import RemoveSelectedTransaction from './RemoveSelectedTrasaction';
 import SendConfirmationContent from './SendConfirmationContent';
-import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
@@ -141,10 +144,7 @@ export default function SendToContact(props) {
           amount: parseInt(item.bitcoinAmount),
         });
       } else {
-        if (
-          recipientId === REGULAR_ACCOUNT ||
-          recipientId === REGULAR_ACCOUNT
-        ) {
+        if (recipientId === REGULAR_ACCOUNT || recipientId === SECURE_ACCOUNT) {
           // recipient: sibling account
           recipients.push({
             id: recipientId,
