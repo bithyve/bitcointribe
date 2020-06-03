@@ -54,6 +54,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
@@ -105,6 +106,7 @@ import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
+import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -256,29 +258,72 @@ export default function Home(props) {
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
         accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
+
+    let regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const trustedAccounts: TrustedContactDerivativeAccount =
+      accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        TRUSTED_CONTACTS
+      ];
+    if (trustedAccounts.instance.using) {
+      for (
+        let accountNumber = 1;
+        accountNumber <= trustedAccounts.instance.using;
+        accountNumber++
+      ) {
+        // console.log({
+        //   accountNumber,
+        //   balances: trustedAccounts[accountNumber].balances,
+        //   transactions: trustedAccounts[accountNumber].transactions,
+        // });
+        if (trustedAccounts[accountNumber].balances) {
+          regularBalance +=
+            trustedAccounts[accountNumber].balances.balance +
+            trustedAccounts[accountNumber].balances.unconfirmedBalance;
+        }
+
+        if (trustedAccounts[accountNumber].transactions) {
+          trustedAccounts[
+            accountNumber
+          ].transactions.transactionDetails.forEach((tx) => {
+            let include = true;
+            for (const currentTx of regularTransactions) {
+              if (tx.txid === currentTx.txid) {
+                include = false;
+                break;
+              }
+            }
+            if (include) regularTransactions.push(tx);
+          });
+        }
+      }
+    }
+
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
-
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : [];
-    const regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
-      : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
           .transactionDetails
       : [];
+
+    const accumulativeBalance = regularBalance + secureBalance;
+
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,

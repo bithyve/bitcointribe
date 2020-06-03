@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Image,
@@ -28,11 +28,20 @@ import {
 } from '../../store/actions/accounts';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import BottomSheet from 'reanimated-bottom-sheet';
+import ModalHeader from '../../components/ModalHeader';
+import SendConfirmationContent from './SendConfirmationContent';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
   const serviceType = props.navigation.getParam('serviceType');
   const recipientAddress = props.navigation.getParam('recipientAddress');
+  const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const { transfer, loading } = useSelector(
+    (state) => state.accounts[serviceType],
+  );
 
   function onPressNumber(text) {
     let tmpToken = token;
@@ -67,16 +76,50 @@ export default function TwoFAToken(props) {
     />
   );
 
-  const { transfer, loading, service } = useSelector(
-    state => state.accounts[serviceType],
-  );
+  useEffect(() => {
+    if (transfer.stage2.failed) {
+      SendUnSuccessBottomSheet.current.snapTo(1);
+    }
+  }, [transfer]);
 
-  if (transfer.txid) {
-    return renderSuccessStatusContents();
-  }
+  const renderSendUnSuccessContents = () => {
+    return (
+      <SendConfirmationContent
+        title={'Sent Unsuccessful'}
+        info={'There seems to be a problem'}
+        userInfo={transfer.details}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        onPressCancel={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        isUnSuccess={true}
+      />
+    );
+  };
 
-  // Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
+  const renderSendUnSuccessHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          //  dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
+  if (transfer.txid) return renderSuccessStatusContents();
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -116,7 +159,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput = input;
                 }}
                 style={[
@@ -124,11 +167,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput2.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
                   }
@@ -140,7 +183,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput2 = input;
                 }}
                 style={[
@@ -148,11 +191,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput3.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
                   }
@@ -164,7 +207,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput3 = input;
                 }}
                 style={[
@@ -172,11 +215,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput4.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput2.focus();
                   }
@@ -188,7 +231,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput4 = input;
                 }}
                 style={[
@@ -196,11 +239,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput5.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput3.focus();
                   }
@@ -212,7 +255,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput5 = input;
                 }}
                 style={[
@@ -220,11 +263,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput6.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
                   }
@@ -235,7 +278,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput6 = input;
                 }}
                 style={[
@@ -243,10 +286,10 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
                   }
@@ -282,28 +325,28 @@ export default function TwoFAToken(props) {
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => {
-                  props.navigation.navigate('ResetTwoFAHelp');
-                }}
+              onPress={() => {
+                props.navigation.navigate('ResetTwoFAHelp');
+              }}
+              style={{
+                width: wp('30%'),
+                height: wp('13%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                marginLeft: 5,
+              }}
+            >
+              <Text
                 style={{
-                  width: wp('30%'),
-                  height: wp('13%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  marginLeft: 5
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                <Text
-                  style={{
-                    color: Colors.blue,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  Need Help?
-                </Text>
-              </TouchableOpacity>
+                Need Help?
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         {/* <View
@@ -321,6 +364,16 @@ export default function TwoFAToken(props) {
             <Text>I am having problems with my 2FA</Text>
           </TouchableOpacity>
         </View> */}
+        <BottomSheet
+          onCloseStart={() => {
+            SendUnSuccessBottomSheet.current.snapTo(0);
+          }}
+          enabledInnerScrolling={true}
+          ref={SendUnSuccessBottomSheet}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={renderSendUnSuccessContents}
+          renderHeader={renderSendUnSuccessHeader}
+        />
       </View>
     </SafeAreaView>
   );

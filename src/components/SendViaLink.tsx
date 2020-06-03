@@ -19,12 +19,39 @@ import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper
 import { nameToInitials } from '../common/CommonFunctions';
 import { ScrollView } from 'react-native-gesture-handler';
 import Toast from '../components/Toast';
+import {
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../common/constants/serviceTypes';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SendViaLink(props) {
   const [contactName, setContactName] = useState('');
 
   const [shareLink, setShareLink] = useState('');
-
+  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
+  const [dropdownBoxList, setDropdownBoxList] = useState([
+    {
+      id: '1',
+      account_name: 'Test Account',
+      type: TEST_ACCOUNT,
+    },
+    {
+      id: '2',
+      account_name: 'Checking Account',
+      type: REGULAR_ACCOUNT,
+    },
+    {
+      id: '3',
+      account_name: 'Saving Account',
+      type: SECURE_ACCOUNT,
+    },
+  ]);
+  const [serviceType, setServiceType] = useState(
+    props.serviceType ? props.serviceType : '',
+  );
+  console.log("serviceType", serviceType);
   const [shareApps, setShareApps] = useState([
     {
       title: `WhatsApp`,
@@ -66,6 +93,12 @@ export default function SendViaLink(props) {
         : '';
     setContactName(contactName);
   }, [Contact]);
+
+  useEffect(() => {
+    if(props.serviceType){
+      setServiceType(props.serviceType)
+    }
+  }, [props.serviceType]);
 
   useEffect(() => {
     ////console.log("Contact SEND VIA LINK1 ", contact);
@@ -211,276 +244,362 @@ export default function SendViaLink(props) {
         </View>
       </View>
       <ScrollView style={{ marginTop: hp('1.7%') }}>
-      <View
+        <View
           style={{ marginLeft: 20, marginRight: 20, marginBottom: hp('1.7%') }}
         >
-          {contact &&
-        <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                backgroundColor: Colors.backgroundColor1,
-                height: 90,
-                position: 'relative',
-                borderRadius: 10,
-              }}
-            >
-              <View style={{ marginLeft: 70 }}>
-                {props.contactText ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(11),
-                      marginLeft: 25,
-                      paddingTop: 5,
-                      paddingBottom: 3,
-                    }}
-                  >
-                    {props.contactText}
-                  </Text>
-                ) : null}
-                {contactName ? (
-                  <Text style={styles.contactNameText}>{contactName}</Text>
-                ) : null}
-                {Contact &&
-                Contact.phoneNumbers &&
-                Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {Contact.phoneNumbers[0].digits}
-                  </Text>
-                ) : Contact && Contact.emails && Contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {Contact.emails[0].email}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            {Contact && Contact.imageAvailable ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Image
-                  source={Contact.image}
-                  style={{ ...styles.contactProfileImage }}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(contactName)}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>}
-        {props.amount && (
-            <View style={styles.amountContainer}>
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                  marginLeft: 5,
-                }}
-              >
-                Requested Amount
-              </Text>
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: 'flex-end',
-                  alignItems: 'flex-end',
-                }}
-              >
+          {contact && (
+            <View style={styles.contactProfileView}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <View
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'flex-end',
+                    flex: 1,
+                    backgroundColor: Colors.backgroundColor1,
+                    height: 90,
+                    position: 'relative',
+                    borderRadius: 10,
                   }}
                 >
-                  <View style={styles.amountInputImage}>
+                  <View style={{ marginLeft: 70 }}>
+                    {props.contactText ? (
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(11),
+                          marginLeft: 25,
+                          paddingTop: 5,
+                          paddingBottom: 3,
+                        }}
+                      >
+                        {props.contactText}
+                      </Text>
+                    ) : null}
+                    {contactName ? (
+                      <Text style={styles.contactNameText}>{contactName}</Text>
+                    ) : null}
+                    {Contact &&
+                    Contact.phoneNumbers &&
+                    Contact.phoneNumbers.length ? (
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(10),
+                          marginLeft: 25,
+                          paddingTop: 3,
+                        }}
+                      >
+                        {Contact.phoneNumbers[0].digits}
+                      </Text>
+                    ) : Contact && Contact.emails && Contact.emails.length ? (
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(10),
+                          marginLeft: 25,
+                          paddingTop: 3,
+                          paddingBottom: 5,
+                        }}
+                      >
+                        {Contact.emails[0].email}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+                {Contact && Contact.imageAvailable ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      marginLeft: 15,
+                      marginRight: 15,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      shadowOpacity: 1,
+                      shadowOffset: { width: 2, height: 2 },
+                    }}
+                  >
                     <Image
-                      style={styles.textBoxImage}
-                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                      source={Contact.image}
+                      style={{ ...styles.contactProfileImage }}
                     />
                   </View>
-                  {renderVerticalDivider()}
-                  <Text
+                ) : (
+                  <View
                     style={{
-                      color: Colors.black,
-                      fontSize: RFValue(20),
-                      fontFamily: Fonts.FiraSansRegular,
-                      marginLeft: 10,
+                      position: 'absolute',
+                      marginLeft: 15,
+                      marginRight: 15,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: Colors.backgroundColor,
+                      width: 70,
+                      height: 70,
+                      borderRadius: 70 / 2,
+                      shadowColor: Colors.shadowBlue,
+                      shadowOpacity: 1,
+                      shadowOffset: { width: 2, height: 2 },
                     }}
                   >
-                    {props.amount}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(13),
-                      fontFamily: Fonts.FiraSansRegular,
-                      marginRight: 5,
-                    }}
-                  >
-                    {props.amountCurrency ? " " + props.amountCurrency : ' sats'}
-                  </Text>
-                </View>
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontSize: RFValue(20),
+                        lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                      }}
+                    >
+                      {nameToInitials(contactName)}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           )}
-        </View>
-        <View style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(12),
-              fontFamily: Fonts.FiraSansRegular,
-              paddingTop: 5,
-            }}
-          >
-            {
-              props.info ? props.info : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
-            }
-          </Text>
-        </View>
+          {props.serviceType ? (
+            <AppBottomSheetTouchableWrapper
+              style={{
+                flexDirection: 'row',
+                paddingLeft: 20,
+                paddingRight: 20,
+                marginTop: 30,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              activeOpacity={10}
+              onPress={() => {
+                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textAlign: 'center',
+                }}
+              >
+                Receiving To:
+                <Text style={styles.boldItalicText}>
+                  {serviceType && serviceType == TEST_ACCOUNT
+                    ? '  Test Account'
+                    : serviceType && serviceType == REGULAR_ACCOUNT
+                    ? '  Checking Account'
+                    : serviceType && serviceType == SECURE_ACCOUNT
+                    ? '  Saving Account'
+                    : ''}
+                </Text>
+              </Text>
+              <Ionicons
+                style={{ marginRight: 10, marginLeft: 10 }}
+                name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
+                size={20}
+                color={Colors.blue}
+              />
+            </AppBottomSheetTouchableWrapper>
+          ) : null}
+          <View style={{ position: 'relative' }}>
+            {props.serviceType
+              ? dropdownBoxOpenClose && (
+                  <View style={styles.dropdownBoxModal}>
+                    <ScrollView>
+                      {dropdownBoxList.map((value, index) => (
+                        <AppBottomSheetTouchableWrapper
+                          onPress={() => {
+                            setServiceType(value.type);
 
-        <View
-          style={{
-            marginTop: 40,
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            backgroundColor: Colors.backgroundColor1,
-            height: 50,
-            borderRadius: 10,
-            marginLeft: 20,
-            marginRight: 20,
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.lightBlue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              paddingTop: 5,
-            }}
-          >
-            {shareLink ? shareLink : 'creating...'}
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            marginTop: 40,
-            marginBottom: hp('4%'),
-          }}
-        >
-          <ScrollView horizontal={true}>
-            {shareApps.map((item) => {
-              if (item.isAvailable) {
-                return (
-                  <AppBottomSheetTouchableWrapper
-                    onPress={() => {
-                      if (item.title == 'Copy Link') writeToClipboard();
-
-                      if (item.title == 'WhatsApp') openWhatsApp(item.url);
-                      if (item.title == 'Telegram') openTelegram(item.url);
-                      if (item.title == 'Messenger') openMessenger(item.url);
-                    }}
-                    style={{
-                      ...styles.addModalView,
-                      backgroundColor: Colors.white,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <View style={styles.modalElementInfoView}>
-                      <View
-                        style={{
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <View
+                            setDropdownBoxOpenClose(false);
+                          }}
                           style={{
-                            shadowColor: Colors.shadowBlue,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            width: 15,
-                            height: 15,
-                            shadowOpacity: 1,
-                            shadowOffset: { width: 5, height: 5 },
+                            ...styles.dropdownBoxModalElementView,
+                            backgroundColor:
+                              serviceType == value.type
+                                ? Colors.lightBlue
+                                : Colors.white,
                           }}
                         >
-                          <Image
-                            source={item.image}
-                            style={{ width: 50, height: 50 }}
-                          />
-                        </View>
-                        <Text style={styles.addModalInfoText}>
-                          {item.title}
-                        </Text>
-                      </View>
+                          <Text
+                            style={{
+                              color:
+                                serviceType == value.type
+                                  ? Colors.blue
+                                  : Colors.black,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue(12),
+                            }}
+                          >
+                            {value.account_name}
+                          </Text>
+                        </AppBottomSheetTouchableWrapper>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )
+              : null}
+            {props.amount && (
+              <View style={styles.amountContainer}>
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginLeft: 5,
+                  }}
+                >
+                  Requested Amount
+                </Text>
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'flex-end',
+                    alignItems: 'flex-end',
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <View style={styles.amountInputImage}>
+                      <Image
+                        style={styles.textBoxImage}
+                        source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                      />
                     </View>
-                  </AppBottomSheetTouchableWrapper>
-                );
-              }
-            })}
-          </ScrollView>
+                    {renderVerticalDivider()}
+                    <Text
+                      style={{
+                        color: Colors.black,
+                        fontSize: RFValue(20),
+                        fontFamily: Fonts.FiraSansRegular,
+                        marginLeft: 10,
+                      }}
+                    >
+                      {props.amount}
+                    </Text>
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(13),
+                        fontFamily: Fonts.FiraSansRegular,
+                        marginRight: 5,
+                      }}
+                    >
+                      {props.amountCurrency
+                        ? ' ' + props.amountCurrency
+                        : ' sats'}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )}
+
+            <View style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                  paddingTop: 5,
+                }}
+              >
+                {props.info
+                  ? props.info
+                  : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                marginTop: 40,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flex: 1,
+                backgroundColor: Colors.backgroundColor1,
+                height: 50,
+                borderRadius: 10,
+                marginLeft: 20,
+                marginRight: 20,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.lightBlue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                  paddingTop: 5,
+                }}
+              >
+                {shareLink ? shareLink : 'creating...'}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                marginLeft: 20,
+                marginRight: 20,
+                marginTop: 40,
+                marginBottom: hp('4%'),
+              }}
+            >
+              <ScrollView horizontal={true}>
+                {shareApps.map((item) => {
+                  if (item.isAvailable) {
+                    return (
+                      <AppBottomSheetTouchableWrapper
+                        onPress={() => {
+                          if (item.title == 'Copy Link') writeToClipboard();
+
+                          if (item.title == 'WhatsApp') openWhatsApp(item.url);
+                          if (item.title == 'Telegram') openTelegram(item.url);
+                          if (item.title == 'Messenger')
+                            openMessenger(item.url);
+                        }}
+                        style={{
+                          ...styles.addModalView,
+                          backgroundColor: Colors.white,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <View style={styles.modalElementInfoView}>
+                          <View
+                            style={{
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <View
+                              style={{
+                                shadowColor: Colors.shadowBlue,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                width: 15,
+                                height: 15,
+                                shadowOpacity: 1,
+                                shadowOffset: { width: 5, height: 5 },
+                              }}
+                            >
+                              <Image
+                                source={item.image}
+                                style={{ width: 50, height: 50 }}
+                              />
+                            </View>
+                            <Text style={styles.addModalInfoText}>
+                              {item.title}
+                            </Text>
+                          </View>
+                        </View>
+                      </AppBottomSheetTouchableWrapper>
+                    );
+                  }
+                })}
+              </ScrollView>
+            </View>
+          </View>
         </View>
       </ScrollView>
       <View style={{ marginTop: 'auto' }}>
@@ -592,6 +711,11 @@ const styles = StyleSheet.create({
     height: wp('6%'),
     resizeMode: 'contain',
   },
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontStyle: 'italic',
+    color: Colors.blue,
+  },
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -600,5 +724,27 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     paddingBottom: hp('1.5%'),
     paddingTop: hp('1.5%'),
+  },
+  dropdownBoxModal: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1%'),
+    width: wp('90%'),
+    height: hp('18%'),
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 10,
+    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: Colors.white,
+    position: 'absolute',
+    zIndex: 9999,
+    overflow: 'hidden',
+  },
+  dropdownBoxModalElementView: {
+    height: 50,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingLeft: 15,
   },
 });

@@ -254,6 +254,7 @@ export default class BaseAccount {
   public getDerivativeAccAddress = async (
     accountType: string,
     accountNumber?: number,
+    contactName?: string,
   ): Promise<
     | {
         status: number;
@@ -274,6 +275,7 @@ export default class BaseAccount {
         data: await this.hdWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
+          contactName,
         ),
       };
     } catch (err) {
@@ -338,6 +340,38 @@ export default class BaseAccount {
         err: err.message,
         message:
           "Failed to generate derivative account's balance and transactions",
+      };
+    }
+  };
+
+  public syncDerivativeAccountsBalanceTxs = async (
+    accountType: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          synched: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.syncDerivativeAccountsBalanceTxs(accountType),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: "Failed to sync derivative account's balance and transactions",
       };
     }
   };
@@ -566,6 +600,10 @@ export default class BaseAccount {
       // if (this.hdWallet.isValidAddress(recipientAddress)) {
       // amount = Math.round(amount * 1e8); // converting into sats
       // amount = Math.round(amount);
+      recipients = recipients.map((recipient) => {
+        recipient.amount = Math.round(recipient.amount);
+        return recipient;
+      });
 
       const {
         fee,

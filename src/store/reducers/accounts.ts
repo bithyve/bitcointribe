@@ -16,6 +16,8 @@ import {
   SECONDARY_XPRIV_GENERATED,
   ALTERNATE_TRANSFER_ST2_EXECUTED,
   TWO_FA_RESETTED,
+  ADD_TRANSFER_DETAILS,
+  REMOVE_TRANSFER_DETAILS,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -36,6 +38,7 @@ const ACCOUNT_VARS: {
   };
   transactions: any;
   transfer: {
+    details: any[];
     executed: string;
     stage1: any;
     stage2: any;
@@ -47,6 +50,7 @@ const ACCOUNT_VARS: {
     balances: Boolean;
     transactions: Boolean;
     balanceTx: Boolean;
+    derivativeBalanceTx: Boolean;
     transfer: Boolean;
     testcoins: Boolean;
   };
@@ -59,6 +63,7 @@ const ACCOUNT_VARS: {
   },
   transactions: {},
   transfer: {
+    details: [],
     executed: '',
     stage1: {},
     stage2: {},
@@ -70,6 +75,7 @@ const ACCOUNT_VARS: {
     balances: false,
     transactions: false,
     balanceTx: false,
+    derivativeBalanceTx: false,
     transfer: false,
     testcoins: false,
   },
@@ -176,6 +182,35 @@ export default (state = initialState, action) => {
           loading: {
             ...state[account].loading,
             transfer: false,
+          },
+        },
+      };
+
+    case ADD_TRANSFER_DETAILS:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            details: [
+              ...state[account].transfer.details,
+              action.payload.recipientData,
+            ],
+          },
+        },
+      };
+
+    case REMOVE_TRANSFER_DETAILS:
+      return {
+        ...state,
+        [account]: {
+          ...state[account],
+          transfer: {
+            ...state[account].transfer,
+            details: [...state[account].transfer.details].filter(
+              (item) => item !== action.payload.recipientData,
+            ),
           },
         },
       };
