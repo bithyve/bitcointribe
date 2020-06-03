@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   ActivityIndicator,
+  AsyncStorage
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -33,6 +34,8 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
 import RecipientComponent from './RecipientComponent';
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
+import moment from 'moment';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -49,8 +52,6 @@ export default function SendConfirmation(props) {
   const averageTxFees = props.navigation.getParam('averageTxFees');
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
-
-  const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
@@ -88,9 +89,11 @@ export default function SendConfirmation(props) {
   // }, [sliderValueText]);
 
   useEffect(() => {
+    console.log("transfer", transfer);
     if (transfer.stage2.failed) {
       SendUnSuccessBottomSheet.current.snapTo(1);
     } else if (transfer.txid) {
+      storeTrustedContactsHistory(transfer.details);
       SendSuccessBottomSheet.current.snapTo(1);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
@@ -99,6 +102,33 @@ export default function SendConfirmation(props) {
       });
     }
   }, [transfer]);
+
+  const storeTrustedContactsHistory = async (details) => {
+    if(details && details.length>0){
+      let IMKeeperOfHistory = JSON.parse(await AsyncStorage.getItem('IMKeeperOfHistory'));
+      let OtherTrustedContactsHistory = JSON.parse(await AsyncStorage.getItem('OtherTrustedContactsHistory'));
+      for (let i = 0; i < details.length; i++) {
+        const element = details[i];
+        let obj = {
+          id: createRandomString(36),
+          title: 'Sent Amount',
+          date: moment(Date.now()).valueOf(),
+          info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+          selectedContactInfo: element
+        };
+        if (element.selectedContact.isWard) {
+          if(!IMKeeperOfHistory) IMKeeperOfHistory = [];
+          IMKeeperOfHistory.push(obj);
+          await AsyncStorage.setItem('IMKeeperOfHistory',JSON.stringify(IMKeeperOfHistory));
+        }
+        if (!element.selectedContact.isWard && !element.selectedContact.isGuardian) {
+          if(!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
+          OtherTrustedContactsHistory.push(obj);
+          await AsyncStorage.setItem('OtherTrustedContactsHistory', JSON.stringify(OtherTrustedContactsHistory));
+        }
+      }
+    }
+  };
 
   const onConfirm = useCallback(() => {
     const txPriority =
