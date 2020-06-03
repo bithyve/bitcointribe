@@ -283,11 +283,11 @@ export default function Home(props) {
         accountNumber <= trustedAccounts.instance.using;
         accountNumber++
       ) {
-        console.log({
-          accountNumber,
-          balances: trustedAccounts[accountNumber].balances,
-          transactions: trustedAccounts[accountNumber].transactions,
-        });
+        // console.log({
+        //   accountNumber,
+        //   balances: trustedAccounts[accountNumber].balances,
+        //   transactions: trustedAccounts[accountNumber].transactions,
+        // });
         if (trustedAccounts[accountNumber].balances) {
           regularBalance +=
             trustedAccounts[accountNumber].balances.balance +
@@ -295,10 +295,18 @@ export default function Home(props) {
         }
 
         if (trustedAccounts[accountNumber].transactions) {
-          regularTransactions = [
-            ...regularTransactions,
-            ...trustedAccounts[accountNumber].transactions.transactionDetails,
-          ];
+          trustedAccounts[
+            accountNumber
+          ].transactions.transactionDetails.forEach((tx) => {
+            let include = true;
+            for (const currentTx of regularTransactions) {
+              if (tx.txid === currentTx.txid) {
+                include = false;
+                break;
+              }
+            }
+            if (include) regularTransactions.push(tx);
+          });
         }
       }
     }

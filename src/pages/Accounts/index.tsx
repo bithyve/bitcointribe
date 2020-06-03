@@ -153,7 +153,9 @@ export default function Accounts(props) {
   const [netBalance, setNetBalance] = useState(
     wallet.balances.balance + wallet.balances.unconfirmedBalance,
   );
-  const [transactions, setTransactions] = useState(wallet.transactions);
+  const [transactions, setTransactions] = useState(
+    wallet.transactions.transactionDetails,
+  );
   const [averageTxFees, setAverageTxFees] = useState();
 
   const accounts = useSelector((state) => state.accounts);
@@ -592,7 +594,7 @@ export default function Accounts(props) {
   };
 
   const renderTransactionsContent = () => {
-    return transactions.transactionDetails.length ? (
+    return transactions.length ? (
       <View style={styles.modalContentContainer}>
         <View style={{ marginLeft: 20, marginTop: 20 }}>
           <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
@@ -600,7 +602,7 @@ export default function Accounts(props) {
         <View style={{ flex: 1 }}>
           <View style={{ height: 'auto' }}>
             <FlatList
-              data={transactions.transactionDetails}
+              data={transactions}
               ItemSeparatorComponent={() => (
                 <View style={{ backgroundColor: Colors.white }}>
                   <View style={styles.separatorView} />
@@ -746,7 +748,7 @@ export default function Accounts(props) {
             />
           </View>
         </View>
-        {transactions.transactionDetails.length <= 1 ? (
+        {transactions.length <= 1 ? (
           <View style={{ backgroundColor: Colors.white }}>
             <View
               style={{
@@ -1136,7 +1138,7 @@ export default function Accounts(props) {
       let currentBalance =
         wallet.balances.balance + wallet.balances.unconfirmedBalance;
 
-      let currentTransactions: Transactions = wallet.transactions;
+      let currentTransactions = wallet.transactions.transactionDetails;
 
       if (serviceType === REGULAR_ACCOUNT) {
         const trustedAccounts: TrustedContactDerivativeAccount =
@@ -1159,27 +1161,24 @@ export default function Accounts(props) {
             }
 
             if (trustedAccounts[accountNumber].transactions) {
-              currentTransactions.totalTransactions +=
-                trustedAccounts[accountNumber].transactions.totalTransactions;
-              currentTransactions.confirmedTransactions +=
-                trustedAccounts[
-                  accountNumber
-                ].transactions.confirmedTransactions;
-              currentTransactions.unconfirmedTransactions +=
-                trustedAccounts[
-                  accountNumber
-                ].transactions.unconfirmedTransactions;
-              currentTransactions.transactionDetails = [
-                ...currentTransactions.transactionDetails,
-                ...trustedAccounts[accountNumber].transactions
-                  .transactionDetails,
-              ];
+              trustedAccounts[
+                accountNumber
+              ].transactions.transactionDetails.forEach((tx) => {
+                let include = true;
+                for (const currentTx of currentTransactions) {
+                  if (tx.txid === currentTx.txid) {
+                    include = false;
+                    break;
+                  }
+                }
+                if (include) currentTransactions.push(tx);
+              });
             }
           }
         }
       }
 
-      currentTransactions.transactionDetails.sort(function (left, right) {
+      currentTransactions.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNetBalance(currentBalance);
@@ -1400,7 +1399,7 @@ export default function Accounts(props) {
                 </View>
                 <View>
                   <FlatList
-                    data={transactions.transactionDetails.slice(0, 3)}
+                    data={transactions.slice(0, 3)}
                     ItemSeparatorComponent={() => (
                       <View style={{ backgroundColor: Colors.backgroundColor }}>
                         <View style={styles.separatorView} />

@@ -450,6 +450,7 @@ export default class HDSegwitWallet extends Bitcoin {
     } = await this.fetchBalanceTransactionsByAddresses(
       usedAddresses,
       accountType,
+      usedAddresses,
       contactName,
     );
 
@@ -1097,12 +1098,39 @@ export default class HDSegwitWallet extends Bitcoin {
       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
     }
 
+    const batchedDerivativeAddresses = [];
+    if (!this.isTest) {
+      const trustedAccounts = this.derivativeAccounts[TRUSTED_CONTACTS];
+      if (trustedAccounts.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= trustedAccounts.instance.using;
+          accountNumber++
+        ) {
+          const trustedAccount: TrustedContactDerivativeAccountElements =
+            trustedAccounts[accountNumber];
+          if (
+            trustedAccount.usedAddresses &&
+            trustedAccount.usedAddresses.length
+          ) {
+            batchedDerivativeAddresses.push(...trustedAccount.usedAddresses);
+          }
+        }
+      }
+    }
+
+    const ownedAddresses = [
+      ...this.usedAddresses,
+      ...batchedDerivativeAddresses,
+    ]; // owned addresses are used for apt tx categorization and transfer amount calculation
+
     const {
       balances,
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
       this.usedAddresses,
       this.isTest ? 'Test Account' : 'Checking Account',
+      ownedAddresses,
     );
 
     this.setNewTransactions(transactions);
@@ -1445,12 +1473,12 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }
 
-      const combinedAddresses = [
+      const ownedAddresses = [
         ...this.usedAddresses,
         ...batchedDerivativeAddresses,
       ];
-      console.log({ combinedAddresses });
-      const { UTXOs } = await this.multiFetchUnspentOutputs(combinedAddresses);
+      console.log({ ownedAddresses });
+      const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
       return UTXOs;
     } catch (err) {
       throw new Error(`Fetch UTXOs failed: ${err.message}`);

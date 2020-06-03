@@ -261,6 +261,7 @@ export default class Bitcoin {
   public fetchBalanceTransactionsByAddresses = async (
     addresses: string[],
     accountType: string,
+    ownedAddresses: string[],
     contactName?: string,
   ): Promise<{
     balances: { balance: number; unconfirmedBalance: number };
@@ -314,7 +315,7 @@ export default class Bitcoin {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
-            this.categorizeTx(tx, addresses, accountType);
+            this.categorizeTx(tx, ownedAddresses, accountType);
             transactions.transactionDetails.push({
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,

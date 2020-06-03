@@ -398,6 +398,7 @@ export default class SecureHDWallet extends Bitcoin {
     } = await this.fetchBalanceTransactionsByAddresses(
       this.consumedAddresses,
       'Savings Account',
+      this.consumedAddresses,
     );
 
     this.setNewTransactions(transactions);
@@ -571,6 +572,7 @@ export default class SecureHDWallet extends Bitcoin {
     } = await this.fetchBalanceTransactionsByAddresses(
       consumedAddresses,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
+      consumedAddresses,
     );
 
     const lastSyncTime =
