@@ -33,6 +33,7 @@ export interface TransactionDetails {
   transactionType: string;
   amount: number;
   accountType: string;
+  contactName?: string;
   recipientAddresses?: string[];
   senderAddresses?: string[];
   blockTime?: number;

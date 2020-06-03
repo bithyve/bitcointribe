@@ -8,6 +8,7 @@ import * as bitcoinJS from 'bitcoinjs-lib';
 import config from '../../HexaConfig';
 import { Transactions } from '../Interface';
 import bs58check from 'bs58check';
+import { TRUSTED_CONTACTS } from '../../../common/constants/serviceTypes';
 
 const { API_URLS, REQUEST_TIMEOUT } = config;
 const { TESTNET, MAINNET } = API_URLS;
@@ -260,6 +261,7 @@ export default class Bitcoin {
   public fetchBalanceTransactionsByAddresses = async (
     addresses: string[],
     accountType: string,
+    contactName?: string,
   ): Promise<{
     balances: { balance: number; unconfirmedBalance: number };
     transactions: Transactions;
@@ -296,6 +298,7 @@ export default class Bitcoin {
       };
 
       const addressesInfo = Txs;
+      console.log({ addressesInfo });
       const txMap = new Map();
       for (const addressInfo of addressesInfo) {
         if (addressInfo.TotalTransactions === 0) {
@@ -322,7 +325,13 @@ export default class Bitcoin {
                 : new Date(Date.now()).toUTCString(),
               transactionType: tx.transactionType,
               amount: tx.amount,
-              accountType: tx.accountType,
+              accountType:
+                tx.accountType === TRUSTED_CONTACTS
+                  ? contactName
+                      .split(' ')
+                      .map((word) => word[0].toUpperCase() + word.substring(1))
+                      .join(' ')
+                  : tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
               blockTime: tx.Status.block_time, // only available when tx is confirmed
@@ -330,7 +339,7 @@ export default class Bitcoin {
           }
         });
       }
-
+      console.log({ transactions });
       return { balances, transactions };
     } catch (err) {
       console.log(
@@ -1229,7 +1238,7 @@ export default class Bitcoin {
     return bip21.decode(paymentURI);
   };
 
-  private categorizeTx = (
+  public categorizeTx = (
     tx: any,
     inUseAddresses: string[],
     accountType: string,

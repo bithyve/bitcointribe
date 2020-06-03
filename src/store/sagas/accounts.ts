@@ -37,6 +37,8 @@ import {
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
+  SYNC_TRUSTED_DERIVATIVE_ACCOUNTS,
+  syncTrustedDerivativeAccounts,
 } from '../actions/accounts';
 import { insertIntoDB } from '../actions/storage';
 import {
@@ -51,7 +53,6 @@ import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -276,6 +277,15 @@ function* fetchBalanceTxWorker({ payload }) {
       };
       yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
     }
+
+    if (payload.options.syncTrustedDerivative) {
+      console.log('Synching trusted derivative accounts');
+      try {
+        yield call(syncTrustedDerivativeAccountsWorker);
+      } catch (err) {
+        console.log({ err });
+      }
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to fetch balance/transactions from the indexer');
@@ -345,6 +355,47 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
 export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   fetchDerivativeAccBalanceTxWorker,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
+);
+
+function* syncTrustedDerivativeAccountsWorker() {
+  const regularAccount: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const preFetchTrustedDerivativeAccounts = JSON.stringify(
+    regularAccount.hdWallet.derivativeAccounts[TRUSTED_CONTACTS],
+  );
+
+  const res = yield call(
+    regularAccount.syncDerivativeAccountsBalanceTxs,
+    TRUSTED_CONTACTS,
+  );
+  console.log({ res });
+
+  const postFetchTrustedDerivativeAccounts = JSON.stringify(
+    regularAccount.hdWallet.derivativeAccounts[TRUSTED_CONTACTS],
+  );
+
+  if (res.status === 200) {
+    if (
+      postFetchTrustedDerivativeAccounts !== preFetchTrustedDerivativeAccounts
+    ) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        [REGULAR_ACCOUNT]: JSON.stringify(regularAccount),
+      };
+      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    }
+  } else {
+    if (res.err === 'ECONNABORTED') requestTimedout();
+    throw new Error('Failed to sync trusted derivative account');
+  }
+}
+
+export const syncTrustedDerivativeAccountsWatcher = createWatcher(
+  syncTrustedDerivativeAccountsWorker,
+  SYNC_TRUSTED_DERIVATIVE_ACCOUNTS,
 );
 
 function* processRecipients(
