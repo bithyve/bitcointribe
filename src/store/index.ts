@@ -46,6 +46,7 @@ import {
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
+  syncTrustedDerivativeAccountsWatcher,
 } from './sagas/accounts';
 
 import {
@@ -148,6 +149,7 @@ const rootSaga = function* () {
     fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
+    syncTrustedDerivativeAccountsWatcher,
     testWatcher,
 
     // sss watchers

@@ -13,6 +13,8 @@ export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS';
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
+export const SYNC_TRUSTED_DERIVATIVE_ACCOUNTS =
+  'SYNC_TRUSTED_DERIVATIVE_ACCOUNTS';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
@@ -39,7 +41,13 @@ export const fetchTransactions = (serviceType, service?) => {
 
 export const fetchBalanceTx = (
   serviceType,
-  options?: { service?; loader?; restore?; shouldNotInsert? },
+  options?: {
+    service?;
+    loader?;
+    restore?;
+    shouldNotInsert?;
+    syncTrustedDerivative?;
+  },
 ) => {
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
@@ -99,6 +107,10 @@ export const accumulativeBalAndTx = () => {
 
 export const syncAccounts = (restore?) => {
   return { type: SYNC_ACCOUNTS, payload: { restore } };
+};
+
+export const syncTrustedDerivativeAccounts = () => {
+  return { type: SYNC_TRUSTED_DERIVATIVE_ACCOUNTS };
 };
 
 export const calculateExchangeRate = () => {
