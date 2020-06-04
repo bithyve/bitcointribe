@@ -1436,6 +1436,62 @@ export default function ManageBackup(props) {
     return <Image style={styles.cardImage} source={getImageByType(item)} />;
   };
 
+  const getCardTitle = (item) => {
+  
+    if (item.type === 'contact1' || item.type === 'contact2') {
+      if (item.personalInfo) {
+        if (item.personalInfo.firstName && item.personalInfo.lastName) {
+          return item.personalInfo.firstName + ' ' + item.personalInfo.lastName;
+        }
+        if (!item.personalInfo.firstName && item.personalInfo.lastName) {
+          return item.personalInfo.lastName;
+        }
+        if (item.personalInfo.firstName && !item.personalInfo.lastName) {
+          return item.personalInfo.firstName;
+        }
+        
+        return '';
+      }
+      else {
+        return 'Friends and Family';
+      }
+    }
+
+    if (item.type === 'copy1' || item.type === 'copy2') {
+      return 'Personal Copy'
+    }
+
+    if (item.type === 'secondaryDevice') {
+      return 'Keeper Device';
+    }
+
+    return item.title;
+  }
+
+  const getCardSubText = (item) => {
+
+    if (item.type === 'contact1' || item.type === 'contact2') {
+      if (item.personalInfo) {
+        return 'Friends and Family'
+      }
+      return 'Select a Friend or Family memeber as a Keeper'
+    }
+    if (item.type === 'secondaryDevice') {
+      if (item.status === 'Ugly') {
+        return 'Another device running Hexa app that you own'
+      }
+      return 'Last Backup '
+    }
+    if (item.type === 'copy1' || item.type === 'copy2') {
+      if (item.status === 'Ugly') {
+        return 'Secure your Recovery Key as a file (pdf)'
+      }
+      return 'The PDFs are locked with your Secutiry Answers'
+    }
+
+    return 'Last Backup '
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -1549,7 +1605,7 @@ export default function ManageBackup(props) {
                               {
                                 selectedStatus: item.status,
                                 selectedTime: getTime(item.time),
-                                selectedTitle: item.title,
+                                selectedTitle: getCardTitle(item),
                                 updateAutoHighlightFlags: () =>
                                   setAutoHighlightFlags({
                                     ...autoHighlightFlags,
@@ -1561,7 +1617,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('TrustedContactHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: item.title,
+                              selectedTitle: getCardTitle(item),
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
                                   ...autoHighlightFlags,
@@ -1574,7 +1630,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('TrustedContactHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: item.title,
+                              selectedTitle: getCardTitle(item),
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
                                   ...autoHighlightFlags,
@@ -1587,7 +1643,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('PersonalCopyHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: item.title,
+                              selectedTitle: getCardTitle(item),
                               selectedPersonalCopy: item,
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
@@ -1599,7 +1655,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('PersonalCopyHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: item.title,
+                              selectedTitle: getCardTitle(item),
                               selectedPersonalCopy: item,
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
@@ -1652,41 +1708,10 @@ export default function ManageBackup(props) {
                         {getImageIcon(item)}
                         <View style={{ marginLeft: 15 }}>
                           <Text style={styles.cardTitleText}>
-                            {item.type === 'contact1' ||
-                            item.type === 'contact2'
-                              ? 'Friends and Family'
-                              : item.type === 'copy1' || item.type === 'copy2'
-                              ? 'Personal Copy'
-                              : item.type === 'secondaryDevice'
-                              ? 'Keeper Device'
-                              : item.title}
+                            {getCardTitle(item)}
                           </Text>
                           <Text style={styles.cardTimeText}>
-                            {item.type === 'contact1' ||
-                            item.type === 'contact2'
-                              ? item.personalInfo
-                                ? item.personalInfo.firstName &&
-                                  item.personalInfo.lastName
-                                  ? item.personalInfo.firstName +
-                                    ' ' +
-                                    item.personalInfo.lastName
-                                  : item.personalInfo.firstName &&
-                                    !item.personalInfo.lastName
-                                  ? item.personalInfo.firstName
-                                  : !item.personalInfo.firstName &&
-                                    item.personalInfo.lastName
-                                  ? item.personalInfo.lastName
-                                  : ''
-                                : 'Select a Friend or Family member as a Keeper'
-                              : item.type === 'secondaryDevice'
-                              ? item.status === 'Ugly'
-                                ? 'Another device running Hexa app that you own'
-                                : 'Last Backup '
-                              : item.type === 'copy1' || item.type === 'copy2'
-                              ? item.status === 'Ugly'
-                                ? 'Secure your Recovery Key as a file (pdf)'
-                                : 'The PDFs are locked with your Security Answers'
-                              : 'Last Backup '}
+                            {getCardSubText(item)}
                             {(item.type === 'security' ||
                               (item.type === 'secondaryDevice' &&
                                 item.status !== 'Ugly')) && (
