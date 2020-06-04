@@ -48,7 +48,6 @@ import {
   personalCopyGenerated,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
-import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import {
   SECURE_ACCOUNT,
@@ -145,7 +144,7 @@ function* initHCWorker() {
       S3_SERVICE: JSON.stringify(s3Service),
     };
     console.log('Health Check Initialized');
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -230,12 +229,13 @@ function* uploadEncMetaShareWorker({ payload }) {
         },
       },
     };
-    yield put(
-      insertIntoDB({
+
+    yield call(insertDBWorker, {
+      payload: {
         DECENTRALIZED_BACKUP: updatedBackup,
         SERVICES: updatedSERVICES,
-      }),
-    );
+      },
+    });
 
     yield delay(2000); // delaying to allow data insertion and service enrichment prior to spinning a database inserting saga (updateEphemeralChannel)
     yield put(updateEphemeralChannel(payload.contactName, data));
@@ -278,7 +278,9 @@ function* requestShareWorker({ payload }) {
     },
   };
 
-  yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  yield call(insertDBWorker, {
+    payload: { DECENTRALIZED_BACKUP: updatedBackup },
+  });
 }
 
 export const requestShareWatcher = createWatcher(
@@ -416,7 +418,9 @@ function* downloadMetaShareWorker({ payload }) {
         RECOVERY_SHARES: updatedRecoveryShares,
       };
       // yield put(downloadedMShare(otp, true));
-      yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+      yield call(insertDBWorker, {
+        payload: { DECENTRALIZED_BACKUP: updatedBackup },
+      });
     }
     // yield put(
     //   insertIntoDB({
@@ -546,7 +550,7 @@ function* generatePersonalCopyWorker({ payload }) {
       S3_SERVICE: JSON.stringify(s3Service),
     };
 
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } catch (err) {
     console.log({ err });
     yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: false }));
@@ -751,7 +755,9 @@ function* updateMSharesHealthWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       UNDER_CUSTODY,
     };
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -841,7 +847,7 @@ function* checkMSharesHealthWorker() {
         REGULAR_ACCOUNT: JSON.stringify(regularService),
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
 
     // if (preInstance !== postInstance) {
@@ -1134,7 +1140,9 @@ function* restoreDynamicNonPMDDWorker() {
         META_SHARES: metaShares,
       },
     };
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);
@@ -1197,7 +1205,9 @@ function* restoreShareFromQRWorker({ payload }) {
       RECOVERY_SHARES,
     };
     console.log({ updatedBackup });
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
   } else {
     yield put(UnableRecoverShareFromQR(true));
     //Alert.alert('Unable to recover share from QR', res.err);
