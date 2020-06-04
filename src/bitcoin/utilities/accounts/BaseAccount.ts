@@ -132,30 +132,9 @@ export default class BaseAccount {
       label?: string;
       message?: string;
     },
-  ):
-    | {
-        status: number;
-        data: {
-          paymentURI: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.generatePaymentURI(address, options),
-      };
-    } catch (err) {
-      return { status: 103, err: err.message, message: ErrMap[103] };
-    }
-  };
+  ): {
+    paymentURI: string;
+  } => this.hdWallet.generatePaymentURI(address, options);
 
   public decodePaymentURI = (
     paymentURI: string,

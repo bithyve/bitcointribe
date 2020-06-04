@@ -124,10 +124,16 @@ export default function Receive(props) {
         : service.hdWallet;
 
     if (receivingAddress) {
-      setReceiveLink(receivingAddress);
-      setReceiveQR(receivingAddress);
+      let receiveAt = receivingAddress;
+      if (amount) {
+        receiveAt = service.getPaymentURI(receiveAt, {
+          amount: parseInt(amount),
+        }).paymentURI;
+      }
+      setReceiveLink(receiveAt);
+      setReceiveQR(receiveAt);
     }
-  }, [service]);
+  }, [service, amount]);
 
   useEffect(() => {
     dispatch(fetchAddress(serviceType));

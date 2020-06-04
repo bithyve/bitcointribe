@@ -352,6 +352,17 @@ export default class SecureAccount {
     }
   };
 
+  public getPaymentURI = (
+    address: string,
+    options?: {
+      amount: number;
+      label?: string;
+      message?: string;
+    },
+  ): {
+    paymentURI: string;
+  } => this.secureHDWallet.generatePaymentURI(address, options);
+
   public getAddress = async (): Promise<
     | {
         status: number;

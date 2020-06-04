@@ -51,7 +51,6 @@ export default function SendViaLink(props) {
   const [serviceType, setServiceType] = useState(
     props.serviceType ? props.serviceType : '',
   );
-  console.log("serviceType", serviceType);
   const [shareApps, setShareApps] = useState([
     {
       title: `WhatsApp`,
@@ -95,8 +94,8 @@ export default function SendViaLink(props) {
   }, [Contact]);
 
   useEffect(() => {
-    if(props.serviceType){
-      setServiceType(props.serviceType)
+    if (props.serviceType) {
+      setServiceType(props.serviceType);
     }
   }, [props.serviceType]);
 
