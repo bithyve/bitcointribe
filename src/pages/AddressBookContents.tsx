@@ -21,7 +21,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
-import { trustedChannelXpubUpload } from '../store/actions/trustedContacts';
+import { trustedChannelsSync } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -130,7 +130,7 @@ export default function AddressBookContents(props) {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(trustedChannelXpubUpload());
+    dispatch(trustedChannelsSync());
   }, []);
 
   const getImageIcon = (item) => {
@@ -376,8 +376,7 @@ export default function AddressBookContents(props) {
           <View
             style={{
               marginTop:
-                IMKeeper.length == 0 &&
-                MyKeeper.length == 0
+                IMKeeper.length == 0 && MyKeeper.length == 0
                   ? wp('2%')
                   : wp('5%'),
             }}

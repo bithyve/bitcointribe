@@ -12,7 +12,7 @@ export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
-export const TRUSTED_CHANNEL_XPUBS_UPLOAD = 'TRUSTED_CHANNEL_XPUBS_UPLOAD';
+export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
 
 export const initializeTrustedContact = (contactName: string) => {
   return {
@@ -76,9 +76,9 @@ export const fetchTrustedChannel = (contactName: string) => {
   };
 };
 
-export const trustedChannelXpubUpload = () => {
+export const trustedChannelsSync = () => {
   return {
-    type: TRUSTED_CHANNEL_XPUBS_UPLOAD,
+    type: TRUSTED_CHANNELS_SYNC,
   };
 };
 

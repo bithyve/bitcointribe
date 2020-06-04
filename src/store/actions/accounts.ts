@@ -12,6 +12,7 @@ export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS';
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS';
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
+export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
 export const SYNC_TRUSTED_DERIVATIVE_ACCOUNTS =
   'SYNC_TRUSTED_DERIVATIVE_ACCOUNTS';
@@ -103,6 +104,10 @@ export const clearTransfer = (serviceType) => {
 
 export const accumulativeBalAndTx = () => {
   return { type: ACCUMULATIVE_BAL_AND_TX };
+};
+
+export const startupSync = (restore?) => {
+  return { type: STARTUP_SYNC, payload: { restore } };
 };
 
 export const syncAccounts = (restore?) => {
