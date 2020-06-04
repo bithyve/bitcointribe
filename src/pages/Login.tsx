@@ -22,7 +22,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import { syncAccounts, calculateExchangeRate } from '../store/actions/accounts';
+import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
 import {
   updateMSharesHealth,
   checkMSharesHealth,
@@ -36,8 +36,12 @@ import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
   let [message, setMessage] = useState('While you wait...');
-  let [subTextMessage1, setSubTextMessage1] = useState('Hexa has a Test Account which has some test sats preloaded')
-  let [subTextMessage2, setSubTextMessage2] = useState('If you are new to Bitcoin, this is the best place to start learning')
+  let [subTextMessage1, setSubTextMessage1] = useState(
+    'Hexa has a Test Account which has some test sats preloaded',
+  );
+  let [subTextMessage2, setSubTextMessage2] = useState(
+    'If you are new to Bitcoin, this is the best place to start learning',
+  );
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
@@ -192,7 +196,7 @@ export default function Login(props) {
 
   useEffect(() => {
     if (JailMonkey.isJailBroken()) {
-      ErrorBottomSheet.current.snapTo(1);
+      (ErrorBottomSheet.current as any).snapTo(1);
       setTimeout(() => {
         setJailBrokenTitle(
           Platform.OS == 'ios'
@@ -204,7 +208,7 @@ export default function Login(props) {
     }
     DeviceInfo.isPinOrFingerprintSet().then((isPinOrFingerprintSet) => {
       if (!isPinOrFingerprintSet) {
-        ErrorBottomSheet.current.snapTo(1);
+        (ErrorBottomSheet.current as any).snapTo(1);
         setTimeout(() => {
           setJailBrokenTitle(
             "Your Phone don't have any Secure entry like Pin or Biometric",
@@ -287,7 +291,7 @@ export default function Login(props) {
                 trustedContactRequest,
               });
             }, 2500);
-            dispatch(syncAccounts());
+            dispatch(startupSync());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
@@ -518,9 +522,13 @@ export default function Login(props) {
                 onPress={() => {
                   (loaderBottomSheet as any).current.snapTo(1);
                   setTimeout(() => {
-                    setSubTextMessage1('Did you know that 1 bitcoin = 100 million sats?')
-                    setSubTextMessage2('Hexa uses sats to make it easier to use bitcoins')
-                  }, 3000)
+                    setSubTextMessage1(
+                      'Did you know that 1 bitcoin = 100 million sats?',
+                    );
+                    setSubTextMessage2(
+                      'Hexa uses sats to make it easier to use bitcoins',
+                    );
+                  }, 3000);
                   setTimeout(() => {
                     setElevation(0);
                   }, 2);
@@ -691,7 +699,7 @@ export default function Login(props) {
           setElevation(0);
         }}
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('25%') : hp('30%'),

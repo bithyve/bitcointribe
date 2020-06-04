@@ -13,7 +13,7 @@ import {
   trustedChannelFetched,
   FETCH_EPHEMERAL_CHANNEL,
   updateEphemeralChannel,
-  TRUSTED_CHANNEL_XPUBS_UPLOAD,
+  TRUSTED_CHANNELS_SYNC,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -268,7 +268,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 );
 
-function* trustedChannelXpubsUploadWorker({ payload }) {
+export function* trustedChannelsSyncWorker() {
   // TODO: simplify and optimise the saga
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
@@ -437,7 +437,7 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
   }
 }
 
-export const trustedChannelXpubsUploadWatcher = createWatcher(
-  trustedChannelXpubsUploadWorker,
-  TRUSTED_CHANNEL_XPUBS_UPLOAD,
+export const trustedChannelsSyncWatcher = createWatcher(
+  trustedChannelsSyncWorker,
+  TRUSTED_CHANNELS_SYNC,
 );

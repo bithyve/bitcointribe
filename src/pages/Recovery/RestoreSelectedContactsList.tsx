@@ -56,6 +56,7 @@ import {
   fetchTransactions,
   syncAccounts,
   calculateExchangeRate,
+  startupSync,
 } from '../../store/actions/accounts';
 import axios from 'axios';
 
@@ -518,7 +519,7 @@ export default function RestoreSelectedContactsList(props) {
         // }, 4000);
 
         setTimeout(() => {
-          dispatch(syncAccounts()); // delaying as checkMSharesHealth is also a DB inserting saga
+          dispatch(startupSync()); // delaying as checkMSharesHealth is also a DB inserting saga
         }, 2000);
       }
     })();
@@ -1214,7 +1215,7 @@ export default function RestoreSelectedContactsList(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet1}
+        ref={ErrorBottomSheet1 as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
