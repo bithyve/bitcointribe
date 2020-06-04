@@ -82,6 +82,7 @@ function* approveTrustedContactWorker({ payload }) {
           { publicKey: res.data.publicKey },
           true,
           trustedContacts,
+          true,
         ),
       );
     } else {
@@ -107,6 +108,9 @@ function* updateEphemeralChannelWorker({ payload }) {
 
   if (!trustedContacts)
     trustedContacts = yield select((state) => state.trustedContacts.service);
+  const regularService: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
 
   const { contactName, data, fetch } = payload;
 
@@ -120,10 +124,39 @@ function* updateEphemeralChannelWorker({ payload }) {
   if (res.status === 200) {
     yield put(ephemeralChannelUpdated(contactName, res.updated, res.data));
 
-    console.log({ trustedContacts });
+    if (payload.uploadXpub) {
+      console.log('Uploading xpub for: ', contactName);
+      const res = yield call(
+        regularService.getDerivativeAccXpub,
+        TRUSTED_CONTACTS,
+        null,
+        contactName,
+      );
+
+      if (res.status === 200) {
+        const xpub = res.data;
+        const data: TrustedDataElements = {
+          xpub,
+        };
+        const updateRes = yield call(
+          trustedContacts.updateTrustedChannel,
+          contactName,
+          data,
+          true,
+        );
+
+        if (updateRes.status === 200)
+          console.log('Xpub updated to TC for: ', contactName);
+        else console.log('Xpub updation to TC failed for: ', contactName);
+      } else {
+        console.log('Derivative xpub generation failed for: ', contactName);
+      }
+    }
+
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
+      REGULAR_ACCOUNT: JSON.stringify(regularService),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
     yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
@@ -347,13 +380,14 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
         if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactName);
 
-          if (updateRes.data) {
+          if (updateRes.data.data) {
             // received some data back from the channel; probably contact's xpub
             console.log('Received data from TC with: ', contactName);
 
             // update the xpub to the trusted contact derivative acc if contact's xpub is received
             const trustedChannel =
               trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+            console.log({ trustedChannel });
             if (trustedChannel.data.length === 2) {
               const contactsData = trustedChannel.data[1].data;
               if (contactsData && contactsData.xpub) {

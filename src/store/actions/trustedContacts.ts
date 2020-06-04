@@ -43,10 +43,11 @@ export const updateEphemeralChannel = (
   data: EphemeralData,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
+  uploadXpub?: Boolean,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch, trustedContacts },
+    payload: { contactName, data, fetch, trustedContacts, uploadXpub },
   };
 };
 

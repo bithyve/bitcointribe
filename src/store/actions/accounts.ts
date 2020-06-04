@@ -109,8 +109,8 @@ export const syncAccounts = (restore?) => {
   return { type: SYNC_ACCOUNTS, payload: { restore } };
 };
 
-export const syncTrustedDerivativeAccounts = () => {
-  return { type: SYNC_TRUSTED_DERIVATIVE_ACCOUNTS };
+export const syncTrustedDerivativeAccounts = (service) => {
+  return { type: SYNC_TRUSTED_DERIVATIVE_ACCOUNTS, payload: { service } };
 };
 
 export const calculateExchangeRate = () => {
