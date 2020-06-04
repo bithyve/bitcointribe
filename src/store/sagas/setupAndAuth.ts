@@ -18,8 +18,9 @@ import {
   credsChanged,
   pinChangedFailed,
 } from '../actions/setupAndAuth';
-import { insertIntoDB, keyFetched, fetchFromDB } from '../actions/storage';
+import { keyFetched, fetchFromDB } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
+import { insertDBWorker } from './storage';
 
 function* initSetupWorker({ payload }) {
   yield put(switchSetupLoader('initializing'));
@@ -49,8 +50,7 @@ function* initSetupWorker({ payload }) {
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     },
   };
-
-  yield put(insertIntoDB(initialDatabase));
+  yield call(insertDBWorker, { payload: initialDatabase });
   yield call(AsyncStorage.setItem, 'walletExists', 'true');
   yield put(setupInitialized());
 }
@@ -70,7 +70,7 @@ function* initRecoveryWorker({ payload }) {
     },
   };
 
-  yield put(insertIntoDB(initialDatabase));
+  yield call(insertDBWorker, { payload: initialDatabase });
   // yield call(AsyncStorage.setItem, "walletExists", "true");
   // yield put(setupInitialized());
 }

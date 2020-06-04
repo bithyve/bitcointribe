@@ -17,7 +17,6 @@ import {
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { insertIntoDB } from '../actions/storage';
 import {
   EphemeralData,
   DerivativeAccount,
@@ -32,6 +31,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
+import { insertDBWorker } from './storage';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -49,7 +49,7 @@ function* initializedTrustedContactWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -91,7 +91,7 @@ function* approveTrustedContactWorker({ payload }) {
         ...SERVICES,
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
   } else {
     console.log(res.err);
@@ -159,7 +159,7 @@ function* updateEphemeralChannelWorker({ payload }) {
       REGULAR_ACCOUNT: JSON.stringify(regularService),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
     const data: EphemeralData = res.data.data;
     if (data && data.shareTransferDetails) {
@@ -198,7 +198,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -230,7 +230,7 @@ function* updateTrustedChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -257,7 +257,7 @@ function* fetchTrustedChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -352,7 +352,9 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
             REGULAR_ACCOUNT: JSON.stringify(regularService),
             TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
           };
-          yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+          yield call(insertDBWorker, {
+            payload: { SERVICES: updatedSERVICES },
+          });
         }
       }
     } else {
@@ -424,7 +426,9 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
             REGULAR_ACCOUNT: JSON.stringify(regularService),
             TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
           };
-          yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+          yield call(insertDBWorker, {
+            payload: { SERVICES: updatedSERVICES },
+          });
         }
       } else {
         console.log(`Failed to generate xpub for ${contactName}`);
