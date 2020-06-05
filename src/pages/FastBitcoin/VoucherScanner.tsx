@@ -602,7 +602,7 @@ const VoucherScanner = (props) => {
     if (fBTCAccountData && fBTCAccountData.user_key && bitcoinAddress) {
       let data = {
         user_key: fBTCAccountData.user_key,
-        wallet_slug: 'bithyve',
+        wallet_slug: Config.WALLET_SLUG,
         quote_type: 'voucher',
         quote_token: quoteData.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
