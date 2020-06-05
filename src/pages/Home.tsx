@@ -1164,7 +1164,6 @@ export default function Home(props) {
 
   const getQrCodeData = (qrData) => {
     const scannedData = JSON.parse(qrData);
-    debugger
     switch (scannedData.type) {
       case 'trustedGuardian':
         const trustedGruardianRequest = {

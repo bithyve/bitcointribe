@@ -181,8 +181,7 @@ interface HomeStateTypes {
     selectedContact: any[],
     notificationDataChange: boolean,
     appState: string,
-    fbBTCAccount: any
-
+    fbBTCAccount: any,
 }
 
 interface HomePropsTypes {
@@ -236,7 +235,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             selectedContact: [],
             notificationDataChange: false,
             appState: '',
-            fbBTCAccount: {}
+            fbBTCAccount: {},
         }
     }
 
@@ -394,6 +393,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         this.getBalances()
         this.appStateListener = AppState.addEventListener('change', this.handleAppStateChange);
         this.bootStrapNotifications()
+        this.setUpFocusListener()
         Linking.addEventListener('url', this.handleDeepLink);
     };
 
@@ -1055,20 +1055,32 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     }
 
     openCloseModal = () => {
-        const { openModal } = this.state
+        const { openModal, selectedBottomTab } = this.state
         if (openModal === 'closed') {
             this.setState({
                 openModal: 'half'
+            }, () => {
+                if (selectedBottomTab === 'Transactions') {
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                }
             })
         }
         if (openModal === 'half') {
             this.setState({
                 openModal: 'full'
+            }, () => {
+                if (selectedBottomTab === 'Transactions') {
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(2);
+                }
             })
         }
         if (openModal === 'full') {
             this.setState({
                 openModal: 'closed'
+            }, () => {
+                if (selectedBottomTab === 'Transactions') {
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(0);
+                }
             })
         }
     }
@@ -1152,6 +1164,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 (this.refs.addBottomSheet as any).snapTo(1);
             }
         }
+
     };
 
 
@@ -1180,7 +1193,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             notificationData,
             selectToAdd,
             fbBTCAccount,
-            loading
+            loading,
+            atCloseEnd
         } = this.state
         const {
             navigation,
@@ -1286,13 +1300,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     renderContent={() => (
                         <TransactionsContent
                             transactions={transactions}
-                            AtCloseEnd={null}
+                            AtCloseEnd={atCloseEnd}
                             setTransactionItem={(item) => this.setState({ selectedTransactionItem: item })}
-                            setTabBarZIndex={null}
+                            setTabBarZIndex={(index) => this.setState({ tabBarIndex: index })}
                             TransactionDetailsBottomSheet={this.refs.transactionTabBarBottomSheet}
                         />
                     )}
-                    renderHeader={() => <TransactionHeader openCloseModal={null} />}
+                    renderHeader={() => <TransactionHeader openCloseModal={this.openCloseModal} />}
                 />
 
 
@@ -1339,7 +1353,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                                     addBottomSheetFlag: false,
                                     tabBarIndex: 0,
                                     selectToAdd: type
-                                }, () => (this.refs.addTabBarBottomSheet as any).snapTo(1))
+                                }, () => (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(1))
                             }
                         }}
                         addData={modalData}
@@ -1821,7 +1835,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                                         this.setState({
                                             addSubBottomSheetsFlag: true,
                                             tabBarIndex: 999
-                                        }, () => (this.refs.addBottomSheet as any).current.snapTo(0))
+                                        }, () => (this.refs.addBottomSheet as any).snapTo(0))
 
                                     }}
                                 />

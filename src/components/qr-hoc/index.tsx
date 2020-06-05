@@ -3,9 +3,15 @@ import QRCode from 'react-native-qrcode-svg';
 import { getVersion } from 'react-native-device-info'
 
 const generateQRCode = (value) => {
-    let parsedValue = JSON.parse(value)
-    let version = getVersion()
-    return JSON.stringify({ ...parsedValue, v: version })
+    try {
+        let parsedValue = JSON.parse(value)
+        let version = getVersion()
+        return JSON.stringify({ ...parsedValue, v: version })
+    } catch (error) {
+        let version = getVersion()
+        return JSON.stringify({ value, v: version })
+    }
+
 
 }
 

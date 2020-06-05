@@ -87,16 +87,16 @@ export default function Send(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
     setBalances({
       testBalance,
@@ -187,7 +187,7 @@ export default function Send(props) {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
+            }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -323,7 +323,8 @@ export default function Send(props) {
 
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
-      setRecipientAddress(barcodes.data);
+      let data = JSON.parse(barcodes.data)
+      setRecipientAddress(data.value);
       const instance = service.hdWallet || service.secureHDWallet;
       let isAddressValid = instance.isValidAddress(recipientAddress);
       setIsInvalidAddress(isAddressValid);
@@ -334,36 +335,40 @@ export default function Send(props) {
   const renderQRCodeThumbnail = () => {
     if (openCameraFlag) {
       return (
-        <View style={{justifyContent: 'center',
-        alignItems: 'center',}}>
-        <View style={styles.cameraView}>
-          <RNCamera
-            ref={(ref) => {
-              this.cameraRef = ref;
-            }}
-            style={styles.camera}
-            onBarCodeRead={barcodeRecognized}
-            captureAudio={false}
-          >
-            <View style={{ flex: 1,}}>
-              <View style={styles.topCornerView}>
-                <View style={styles.topLeftCornerView} />
-                <View style={styles.topRightCornerView} />
+        <View style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={styles.cameraView}>
+            <RNCamera
+              ref={(ref) => {
+                this.cameraRef = ref;
+              }}
+              style={styles.camera}
+              onBarCodeRead={barcodeRecognized}
+              captureAudio={false}
+            >
+              <View style={{ flex: 1, }}>
+                <View style={styles.topCornerView}>
+                  <View style={styles.topLeftCornerView} />
+                  <View style={styles.topRightCornerView} />
+                </View>
+                <View style={styles.bottomCornerView}>
+                  <View style={styles.bottomLeftCornerView} />
+                  <View style={styles.bottomRightCornerView} />
+                </View>
               </View>
-              <View style={styles.bottomCornerView}>
-                <View style={styles.bottomLeftCornerView} />
-                <View style={styles.bottomRightCornerView} />
-              </View>
-            </View>
-          </RNCamera>
-        </View>
+            </RNCamera>
+          </View>
         </View>
       );
     }
 
     return (
-      <TouchableOpacity style={{justifyContent: 'center',
-      alignItems: 'center',}} onPress={() => setOpenCameraFlag(true)}>
+      <TouchableOpacity style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }} onPress={() => setOpenCameraFlag(true)}>
         <ImageBackground
           source={require('../../assets/images/icons/iPhone-QR.png')}
           style={{
@@ -506,14 +511,14 @@ export default function Send(props) {
             >
               {item
                 ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
+                  item.firstName && item.lastName
+                    ? item.firstName + ' ' + item.lastName
+                    : item.firstName && !item.lastName
                       ? item.firstName
                       : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
+                        ? item.lastName
+                        : '',
+                )
                 : ''}
             </Text>
           </View>
@@ -775,7 +780,7 @@ export default function Send(props) {
                         Send to Contact
                       </Text>
                       <TouchableOpacity
-                        onPress={() => {}}
+                        onPress={() => { }}
                         style={{
                           height: 20,
                           width: 20,
@@ -839,20 +844,22 @@ export default function Send(props) {
                         </View>
                       </View>
                     ) : (
-                      <View style={{marginBottom: -25,
-                        padding: -20,
-                        marginLeft: -20,
-                        marginRight: -20,}}>
-                      <BottomInfoBox
-                        titleColor={Colors.black1}
-                        title={'You have not added any Trusted Contact'}
-                        infoText={
-                          'Add a Trusted Contact to send them sats without having to scan an address'
-                        }
-                      />
-                      </View>
-                    )}
-                  </View> : null} 
+                        <View style={{
+                          marginBottom: -25,
+                          padding: -20,
+                          marginLeft: -20,
+                          marginRight: -20,
+                        }}>
+                          <BottomInfoBox
+                            titleColor={Colors.black1}
+                            title={'You have not added any Trusted Contact'}
+                            infoText={
+                              'Add a Trusted Contact to send them sats without having to scan an address'
+                            }
+                          />
+                        </View>
+                      )}
+                  </View> : null}
                   {serviceType != TEST_ACCOUNT ? <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
@@ -866,7 +873,7 @@ export default function Send(props) {
                         Send to Account
                       </Text>
                       <TouchableOpacity
-                        onPress={() => {}}
+                        onPress={() => { }}
                         style={{
                           height: 20,
                           width: 20,
@@ -916,10 +923,10 @@ export default function Send(props) {
                         showsVerticalScrollIndicator={false}
                         renderItem={renderAccounts}
                         extraData={transfer.details}
-                        //keyExtractor={(item, index) => index.toString()}
+                      //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
-                  </View>: null} 
+                  </View> : null}
                 </View>
               </View>
             </TouchableWithoutFeedback>
