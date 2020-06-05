@@ -43,7 +43,9 @@ import SendConfirmationContent from './SendConfirmationContent';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
+import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 
 export default function SendToContact(props) {
   const dispatch = useDispatch();
@@ -57,7 +59,9 @@ export default function SendToContact(props) {
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
   );
-  let netBalance = props.navigation.getParam('netBalance');
+  const [netBalance, setNetBalance] = useState(
+    props.navigation.getParam('netBalance'),
+  );
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
@@ -82,6 +86,36 @@ export default function SendToContact(props) {
   useEffect(() => {
     if (bitcoinAmount) convertBitCoinToCurrency(bitcoinAmount);
     if (!averageTxFees) storeAverageTxFees();
+
+    if (netBalance !== 0 && !netBalance) {
+      const service = accounts[serviceType].service;
+      const instance = service.hdWallet || service.secureHDWallet;
+
+      let balance =
+        instance.balances.balance + instance.balances.unconfirmedBalance;
+
+      if (serviceType === REGULAR_ACCOUNT) {
+        const trustedAccounts: TrustedContactDerivativeAccount =
+          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ];
+        if (trustedAccounts.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= trustedAccounts.instance.using;
+            accountNumber++
+          ) {
+            if (trustedAccounts[accountNumber].balances) {
+              balance +=
+                trustedAccounts[accountNumber].balances.balance +
+                trustedAccounts[accountNumber].balances.unconfirmedBalance;
+            }
+          }
+        }
+      }
+
+      setNetBalance(balance);
+    }
   }, []);
 
   const storeAverageTxFees = async () => {
