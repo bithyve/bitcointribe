@@ -105,7 +105,10 @@ import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
-import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
+import {
+  fetchDerivativeAccBalTx,
+  addTransferDetails,
+} from '../store/actions/accounts';
 import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
 
 export default function Home(props) {
@@ -1258,6 +1261,58 @@ export default function Home(props) {
   }, [SecondaryDeviceStatus]);
 
   const getQrCodeData = (qrData) => {
+    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
+    const { type } = regularService.addressDiff(qrData);
+    if (type) {
+      const serviceType = REGULAR_ACCOUNT; // default service type
+      let item;
+      switch (type) {
+        case 'address':
+          const recipientAddress = qrData;
+          item = {
+            id: recipientAddress,
+          };
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
+
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+          });
+          break;
+
+        case 'paymentURI':
+          const { address, options } = regularService.decodePaymentURI(qrData);
+          item = {
+            id: address,
+          };
+
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
+
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+            bitcoinAmount: options.amount ? `${options.amount}` : '',
+          });
+          break;
+
+        default:
+          Alert.alert('Invalid QR');
+          break;
+      }
+
+      return;
+    }
+
     const scannedData = JSON.parse(qrData);
     switch (scannedData.type) {
       case 'trustedGuardian':

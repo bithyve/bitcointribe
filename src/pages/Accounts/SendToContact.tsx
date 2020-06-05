@@ -14,6 +14,7 @@ import {
   BackHandler,
   Alert,
   ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -53,12 +54,16 @@ export default function SendToContact(props) {
   );
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
-  const averageTxFees = props.navigation.getParam('averageTxFees');
+  const [averageTxFees, setAverageTxFees] = useState(
+    props.navigation.getParam('averageTxFees'),
+  );
   let netBalance = props.navigation.getParam('netBalance');
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
-  const [bitcoinAmount, setBitCoinAmount] = useState('');
+  const [bitcoinAmount, setBitCoinAmount] = useState(
+    props.navigation.getParam('bitcoinAmount'),
+  );
   const [currencyAmount, setCurrencyAmount] = useState('');
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [note, setNote] = useState('');
@@ -74,9 +79,30 @@ export default function SendToContact(props) {
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const service = useSelector((state) => state.accounts[serviceType].service);
 
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
+  useEffect(() => {
+    if (bitcoinAmount) convertBitCoinToCurrency(bitcoinAmount);
+    if (!averageTxFees) storeAverageTxFees();
+  }, []);
+
+  const storeAverageTxFees = async () => {
+    const storedAverageTxFees = await AsyncStorage.getItem(
+      'storedAverageTxFees',
+    );
+    if (storedAverageTxFees) {
+      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+      if (Date.now() - lastFetched < 1800000) {
+        setAverageTxFees(averageTxFees);
+        return;
+      } // maintaining a half an hour difference b/w fetches
+    }
+    const instance = service.hdWallet || service.secureHDWallet;
+    const averageTxFees = await instance.averageTransactionFee();
+    setAverageTxFees(averageTxFees);
+    await AsyncStorage.setItem(
+      'storedAverageTxFees',
+      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+    );
+  };
 
   useEffect(() => {
     if (accounts && accounts.exchangeRates)
@@ -115,7 +141,7 @@ export default function SendToContact(props) {
         averageTxFees,
       });
     }
-  }, [transfer, recipients]);
+  }, [transfer, recipients, averageTxFees]);
 
   const handleTrasferST1 = () => {
     const recipients = [];
@@ -769,48 +795,50 @@ export default function SendToContact(props) {
                 )}
                 {/* )} */}
               </TouchableOpacity>
-              {serviceType != 'TEST_ACCOUNT' ? <TouchableOpacity
-                style={{
-                  ...styles.confirmButtonView,
-                  width: wp('30%'),
-                  marginLeft: 10,
-                }}
-                disabled={isConfirmDisabled || loading.transfer}
-                onPress={() => {
-                  // dispatch(clearTransfer(serviceType));
-                  // if (getServiceType) {
-                  //   getServiceType(serviceType);
-                  // }
-                  if (transfer.details && transfer.details.length) {
-                    for (let i = 0; i < transfer.details.length; i++) {
-                      if (
-                        transfer.details[i].selectedContact.id ==
-                        selectedContact.id
-                      ) {
-                        dispatch(
-                          removeTransferDetails(
-                            serviceType,
-                            transfer.details[i],
-                          ),
-                        );
+              {serviceType != 'TEST_ACCOUNT' ? (
+                <TouchableOpacity
+                  style={{
+                    ...styles.confirmButtonView,
+                    width: wp('30%'),
+                    marginLeft: 10,
+                  }}
+                  disabled={isConfirmDisabled || loading.transfer}
+                  onPress={() => {
+                    // dispatch(clearTransfer(serviceType));
+                    // if (getServiceType) {
+                    //   getServiceType(serviceType);
+                    // }
+                    if (transfer.details && transfer.details.length) {
+                      for (let i = 0; i < transfer.details.length; i++) {
+                        if (
+                          transfer.details[i].selectedContact.id ==
+                          selectedContact.id
+                        ) {
+                          dispatch(
+                            removeTransferDetails(
+                              serviceType,
+                              transfer.details[i],
+                            ),
+                          );
+                        }
                       }
+                      dispatch(
+                        addTransferDetails(serviceType, {
+                          selectedContact,
+                          bitcoinAmount,
+                          currencyAmount,
+                          note,
+                        }),
+                      );
+                      props.navigation.goBack();
                     }
-                    dispatch(
-                      addTransferDetails(serviceType, {
-                        selectedContact,
-                        bitcoinAmount,
-                        currencyAmount,
-                        note,
-                      }),
-                    );
-                    props.navigation.goBack();
-                  }
-                }}
-              >
-                <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                  Add Recipient
-                </Text>
-              </TouchableOpacity> : null}
+                  }}
+                >
+                  <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                    Add Recipient
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
           </ScrollView>
         </View>
