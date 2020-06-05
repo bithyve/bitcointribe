@@ -135,7 +135,7 @@ export default function SendViaLink(props) {
   };
 
   useEffect(() => {
-    if (props.link) setShareLink(props.link);
+    setShareLink(props.link);
   }, [props.link]);
 
   const openWhatsApp = (appUrl) => {

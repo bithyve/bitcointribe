@@ -18,6 +18,7 @@ import {
   FlatList,
   CheckBox,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
@@ -48,6 +49,10 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import BitcoinAddressSendSuccess from '../../components/BitcoinAddressSendSuccess';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchAddress } from '../../store/actions/accounts';
+import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import config from '../../bitcoin/HexaConfig';
 
 export default function Receive(props) {
   const [
@@ -117,32 +122,199 @@ export default function Receive(props) {
     (state) => state.accounts[serviceType],
   );
 
-  useEffect(() => {
-    const { receivingAddress } =
-      serviceType === SECURE_ACCOUNT
-        ? service.secureHDWallet
-        : service.hdWallet;
+  const WALLET_SETUP = useSelector(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
 
-    if (receivingAddress) {
-      let receiveAt = receivingAddress;
-      if (amount) {
-        receiveAt = service.getPaymentURI(receiveAt, {
-          amount: parseInt(amount),
-        }).paymentURI;
+  useEffect(() => {
+    if (!AsTrustedContact) {
+      const { receivingAddress } =
+        serviceType === SECURE_ACCOUNT
+          ? service.secureHDWallet
+          : service.hdWallet;
+
+      if (receivingAddress) {
+        let receiveAt = receivingAddress;
+        if (amount) {
+          receiveAt = service.getPaymentURI(receiveAt, {
+            amount: parseInt(amount),
+          }).paymentURI;
+        }
+        setReceiveLink(receiveAt);
+        setReceiveQR(receiveAt);
       }
-      setReceiveLink(receiveAt);
-      setReceiveQR(receiveAt);
     }
-  }, [service, amount]);
+  }, [service, amount, AsTrustedContact]);
+
+  useEffect(() => {
+    if (AsTrustedContact) {
+      setTimeout(() => {
+        setReceiveLink('');
+        setReceiveQR('');
+      }, 200);
+      (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
+    }
+  }, [AsTrustedContact]);
 
   useEffect(() => {
     dispatch(fetchAddress(serviceType));
   }, []);
 
   useEffect(() => {
-    if (AsTrustedContact)
-      (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
-  }, [AsTrustedContact]);
+    if (!AsTrustedContact) return;
+    if (!selectedContact || !selectedContact.firstName) {
+      console.log('Err: Contact missing');
+      return;
+    }
+
+    const contactName = `${selectedContact.firstName} ${
+      selectedContact.lastName ? selectedContact.lastName : ''
+    }`.toLowerCase();
+    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+    if (trustedContact) {
+      const publicKey =
+        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const requester = WALLET_SETUP.walletName;
+
+      if (!receiveLink) {
+        if (
+          selectedContact.phoneNumbers &&
+          selectedContact.phoneNumbers.length
+        ) {
+          const phoneNumber = selectedContact.phoneNumbers[0].number;
+          console.log({ phoneNumber });
+          const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          const numHintType = 'num';
+          const numHint = number.slice(number.length - 3);
+          const numberEncPubKey = TrustedContactsService.encryptPub(
+            publicKey,
+            number,
+          ).encryptedPub;
+          const numberDL =
+            `https://hexawallet.io/${config.APP_STAGE}/ptc` +
+            `/${requester}` +
+            `/${numberEncPubKey}` +
+            `/${numHintType}` +
+            `/${numHint}`;
+          console.log({ numberDL });
+          setReceiveLink(numberDL);
+        } else if (selectedContact.emails && selectedContact.emails.length) {
+          const email = selectedContact.emails[0].email;
+          const emailInitials: string = email.split('@')[0];
+          const emailHintType = 'eml';
+          const emailHint = emailInitials.slice(emailInitials.length - 3);
+          const emailEncPubKey = TrustedContactsService.encryptPub(
+            publicKey,
+            emailInitials,
+          ).encryptedPub;
+          const emailDL =
+            `https://hexawallet.io/${config.APP_STAGE}/ptc` +
+            `/${requester}` +
+            `/${emailEncPubKey}` +
+            `/${emailHintType}` +
+            `/${emailHint}`;
+          console.log({ emailDL });
+          setReceiveLink(emailDL);
+        } else {
+          Alert.alert(
+            'Invalid Contact',
+            'Cannot add a contact without phone-num/email as a trusted entity',
+          );
+          return;
+        }
+        updateTrustedContactsInfo(selectedContact); // Contact initialized to become TC
+      }
+
+      if (!receiveQR) {
+        setReceiveQR(
+          JSON.stringify({
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            type: 'paymentTrustedContactQR',
+          }),
+        );
+      }
+    }
+  }, [
+    selectedContact,
+    trustedContacts,
+    AsTrustedContact,
+    receiveLink,
+    receiveQR,
+  ]);
+
+  const updateTrustedContactsInfo = async (contact) => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    console.log({ trustedContactsInfo });
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      if (
+        trustedContactsInfo.findIndex((value) => {
+          if (value && value.id) return value.id == contact.id;
+        }) == -1
+      ) {
+        trustedContactsInfo.push(contact);
+        // Toast('Trusted Contact added successfully');
+      } else {
+        // Toast('Trusted Contact already exists');
+      }
+    } else {
+      trustedContactsInfo = [];
+      trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
+    }
+    console.log({ trustedContactsInfo });
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
+  };
+
+  const createTrustedContact = useCallback(() => {
+    if (!AsTrustedContact) return;
+
+    if (selectedContact && selectedContact.firstName) {
+      const contactName = `${selectedContact.firstName} ${
+        selectedContact.lastName ? selectedContact.lastName : ''
+      }`.toLowerCase();
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+      if (!trustedContact) {
+        (async () => {
+          const walletID = await AsyncStorage.getItem('walletID');
+          const FCM = await AsyncStorage.getItem('fcmToken');
+
+          const { receivingAddress } =
+            serviceType === SECURE_ACCOUNT
+              ? service.secureHDWallet
+              : service.hdWallet;
+
+          let paymentURI;
+          if (amount) {
+            paymentURI = service.getPaymentURI(receivingAddress, {
+              amount: parseInt(amount),
+            }).paymentURI;
+          }
+
+          const data: EphemeralData = {
+            walletID,
+            FCM,
+            paymentDetails: {
+              address: receivingAddress,
+              paymentURI,
+            },
+          };
+          dispatch(updateEphemeralChannel(contactName, data));
+        })();
+      }
+    }
+  }, [selectedContact, trustedContacts, AsTrustedContact, amount, service]);
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem(
@@ -828,6 +1000,9 @@ export default function Receive(props) {
               >
                 <AppBottomSheetTouchableWrapper
                   onPress={() => {
+                    if (AsTrustedContact) {
+                      createTrustedContact();
+                    }
                     if (SendViaLinkBottomSheet.current)
                       (SendViaLinkBottomSheet as any).current.snapTo(1);
                   }}
@@ -849,6 +1024,9 @@ export default function Receive(props) {
                 <AppBottomSheetTouchableWrapper
                   style={styles.buttonInnerView}
                   onPress={() => {
+                    if (AsTrustedContact) {
+                      createTrustedContact();
+                    }
                     if (SendViaQRBottomSheet.current)
                       (SendViaQRBottomSheet as any).current.snapTo(1);
                   }}
