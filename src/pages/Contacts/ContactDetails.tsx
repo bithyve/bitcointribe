@@ -111,7 +111,7 @@ export default function ContactDetails(props) {
     if(OtherTrustedContactsHistory){
       OtherTrustedContactsHistory = getHistoryByContactId(OtherTrustedContactsHistory);
     }
-    if (OtherTrustedContactsHistory.length > 0) {
+    if (OtherTrustedContactsHistory && OtherTrustedContactsHistory.length > 0) {
       setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
     } else {
       setTrustedContactHistory([]);
@@ -420,9 +420,10 @@ export default function ContactDetails(props) {
         ) : (
           <View style={{ flex: 1 }}>
             <ScrollView>
-              {[1, 2, 3, 4, 5].map((value) => {
+              {[1, 2, 3, 4, 5].map((value, index) => {
                 return (
                   <View
+                    key={index}
                     style={{
                       margin: wp('3%'),
                       backgroundColor: Colors.white,

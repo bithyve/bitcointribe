@@ -10,6 +10,7 @@ import {
   AsyncStorage,
   Image,
   ScrollView,
+  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -31,8 +32,17 @@ import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/In
 import { nameToInitials } from '../common/CommonFunctions';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import BottomInfoBox from '../components/BottomInfoBox';
+import AddContactAddressBook from './Contacts/AddContactAddressBook';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ModalHeader from '../components/ModalHeader';
 
 export default function AddressBookContents(props) {
+  const [
+    AddContactAddressBookBookBottomSheet,
+    setAddContactAddressBookBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [SelectedContact, setSelectedContact] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [trustedContact, setTrustedContact] = useState([]);
   let [MyKeeper, setMyKeeper] = useState([]);
@@ -129,8 +139,13 @@ export default function AddressBookContents(props) {
   }, [regularAccount.hdWallet.derivativeAccounts]);
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(trustedChannelsSync());
+    useEffect(() => {
+      let focusListener = props.navigation.addListener('didFocus', () => {
+      dispatch(trustedChannelsSync());
+    });
+    return () => {
+      focusListener.remove();
+    };
   }, []);
 
   const getImageIcon = (item) => {
@@ -187,6 +202,7 @@ export default function AddressBookContents(props) {
   const getElement = (contact, index, contactsType) => {
     return (
       <TouchableOpacity
+        key={contact.id}
         onPress={() => {
           props.navigation.navigate('ContactDetails', {
             contactsType,
@@ -310,6 +326,37 @@ export default function AddressBookContents(props) {
     );
   };
 
+  const renderAddContactAddressBookContents = () => {
+    return (
+      <AddContactAddressBook
+        modalRef={AddContactAddressBookBookBottomSheet}
+        proceedButtonText={'Confirm & Proceed'}
+        onPressContinue={() => {
+          props.navigation.navigate('AddContactSendRequest', {
+            SelectedContact: SelectedContact,
+          });
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
+        }}
+        onPressBack={() => {
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderAddContactAddressBookHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -392,6 +439,7 @@ export default function AddressBookContents(props) {
                     return getElement(item, index, 'Other Contacts');
                   })}
                   <TouchableOpacity
+                    onPress={()=>AddContactAddressBookBookBottomSheet.current.snapTo(1)}
                     style={{
                       ...styles.selectedContactsView,
                       paddingBottom: 7,
@@ -431,6 +479,16 @@ export default function AddressBookContents(props) {
             )}
         </ScrollView>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={AddContactAddressBookBookBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+        ]}
+        renderContent={renderAddContactAddressBookContents}
+        renderHeader={renderAddContactAddressBookHeader}
+      />
     </View>
   );
 }

@@ -295,7 +295,7 @@ export default function AddContactSendRequest(props) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={createTrustedContact}
+              onPress={()=>{createTrustedContact(); props.navigation.goBack();}}
               style={{
                 height: wp('8%'),
                 width: wp('18%'),
