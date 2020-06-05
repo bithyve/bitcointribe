@@ -35,7 +35,7 @@ export default class SecureHDWallet extends Bitcoin {
     balance: 0,
     unconfirmedBalance: 0,
   };
-  public receivingAddress: string = '';
+  public receivingAddress: string;
   public transactions: Transactions = {
     totalTransactions: 0,
     confirmedTransactions: 0,
@@ -138,7 +138,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.receivingAddress =
       stateVars && stateVars.receivingAddress
         ? stateVars.receivingAddress
-        : this.receivingAddress;
+        : this.getInitialReceivingAddress();
     this.transactions =
       stateVars && stateVars.transactions
         ? stateVars.transactions
@@ -188,6 +188,10 @@ export default class SecureHDWallet extends Bitcoin {
     const seed = bip39.mnemonicToSeedSync(this.primaryMnemonic);
     hash.update(seed);
     return { walletId: hash.digest('hex') };
+  };
+
+  public getInitialReceivingAddress = (): string => {
+    if (this.xpubs) return this.createSecureMultiSig(0).address;
   };
 
   public getSecondaryID = (
@@ -1371,7 +1375,7 @@ export default class SecureHDWallet extends Bitcoin {
       return this.multiSigCache[childIndex];
     } // cache hit
 
-    console.log(`creating multiSig against index: ${childIndex}`);
+    // console.log(`creating multiSig against index: ${childIndex}`);
 
     let childPrimaryPub;
     if (!derivativeXpub)

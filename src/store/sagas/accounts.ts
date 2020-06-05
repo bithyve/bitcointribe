@@ -72,6 +72,12 @@ function* fetchAddrWorker({ payload }) {
     JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
   ) {
     yield put(addressFetched(payload.serviceType, postFetchAddress));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(switchLoader(payload.serviceType, 'receivingAddress'));

@@ -2131,15 +2131,12 @@ export default function Home(props) {
       <AddContactAddressBook
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={() => {
+        onPressContinue={(selectedContacts) => {
+          setSelectedContact(selectedContacts);
           props.navigation.navigate('AddContactSendRequest', {
-            SelectedContact: SelectedContact,
+            SelectedContact: selectedContacts,
           });
-          // props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-        onSelectContact={(selectedContact) => {
-          setSelectedContact(selectedContact);
         }}
         onPressBack={() => {
           setTimeout(() => {

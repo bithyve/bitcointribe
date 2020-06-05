@@ -172,6 +172,10 @@ export interface EphemeralData {
     otp: string;
     encryptedKey: string;
   };
+  paymentDetails?: {
+    address?: string;
+    paymentURI?: string;
+  };
 }
 
 export interface TrustedDataElements {

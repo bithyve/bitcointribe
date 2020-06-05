@@ -91,7 +91,7 @@ export default function AddContactSendRequest(props) {
 
   const dispatch = useDispatch();
 
-  const createTrustedConntact = useCallback(() => {
+  const createTrustedContact = useCallback(() => {
     if (Contact && Contact.firstName) {
       const contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
@@ -295,7 +295,7 @@ export default function AddContactSendRequest(props) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={createTrustedConntact}
+              onPress={createTrustedContact}
               style={{
                 height: wp('8%'),
                 width: wp('18%'),
@@ -466,7 +466,7 @@ export default function AddContactSendRequest(props) {
           >
             <TouchableOpacity
               onPress={() => {
-                createTrustedConntact();
+                createTrustedContact();
                 if (SendViaLinkBottomSheet.current)
                   (SendViaLinkBottomSheet as any).current.snapTo(1);
               }}
@@ -484,7 +484,7 @@ export default function AddContactSendRequest(props) {
             <TouchableOpacity
               style={styles.buttonInnerView}
               onPress={() => {
-                createTrustedConntact();
+                createTrustedContact();
                 if (SendViaQRBottomSheet.current)
                   (SendViaQRBottomSheet as any).current.snapTo(1);
               }}

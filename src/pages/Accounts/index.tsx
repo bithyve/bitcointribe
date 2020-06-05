@@ -153,9 +153,7 @@ export default function Accounts(props) {
   const [netBalance, setNetBalance] = useState(
     wallet.balances.balance + wallet.balances.unconfirmedBalance,
   );
-  const [transactions, setTransactions] = useState(
-    wallet.transactions.transactionDetails,
-  );
+  const [transactions, setTransactions] = useState([]);
   const [averageTxFees, setAverageTxFees] = useState();
 
   const accounts = useSelector((state) => state.accounts);
@@ -194,7 +192,7 @@ export default function Accounts(props) {
 
       setTimeout(() => {
         if (TestAccountHelperBottomSheet.current) {
-          TestAccountHelperBottomSheet.current.snapTo(1);
+          (TestAccountHelperBottomSheet.current as any).snapTo(1);
         }
       }, 1000);
     } else {
@@ -318,11 +316,11 @@ export default function Accounts(props) {
     setTimeout(() => {
       if (carousel.current) {
         if (serviceType == TEST_ACCOUNT) {
-          carousel.current.snapToItem(0, true, true);
+          (carousel.current as any).snapToItem(0, true, true);
         } else if (serviceType == REGULAR_ACCOUNT) {
-          carousel.current.snapToItem(1, true, true);
+          (carousel.current as any).snapToItem(1, true, true);
         } else if (serviceType == SECURE_ACCOUNT) {
-          carousel.current.snapToItem(2, true, true);
+          (carousel.current as any).snapToItem(2, true, true);
         }
       }
     }, 2000);
@@ -432,13 +430,15 @@ export default function Accounts(props) {
                   //console.log('item.accountType', item.accountType);
                   if (item.accountType == 'Test Account') {
                     if (TestAccountHelperBottomSheet.current)
-                      TestAccountHelperBottomSheet.current.snapTo(1);
+                      (TestAccountHelperBottomSheet as any).current.snapTo(1);
                   } else if (item.accountType == 'Savings Account') {
                     if (SecureAccountHelperBottomSheet.current)
-                      SecureAccountHelperBottomSheet.current.snapTo(1);
+                      (SecureAccountHelperBottomSheet as any).current.snapTo(1);
                   } else if (item.accountType == 'Checking Account') {
                     if (RegularAccountHelperBottomSheet.current)
-                      RegularAccountHelperBottomSheet.current.snapTo(1);
+                      (RegularAccountHelperBottomSheet as any).current.snapTo(
+                        1,
+                      );
                   }
                 }}
               >
@@ -1039,7 +1039,7 @@ export default function Accounts(props) {
       }, 10);
 
       setTimeout(() => {
-        TransactionDetailsHelperBottomSheet.current.snapTo(1);
+        (TransactionDetailsHelperBottomSheet.current as any).snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -1056,7 +1056,7 @@ export default function Accounts(props) {
         getServiceType={getServiceType}
         onPressKnowMore={() => {
           AsyncStorage.setItem('isTransactionHelperDone', 'true');
-          TransactionDetailsHelperBottomSheet.current.snapTo(1);
+          (TransactionDetailsHelperBottomSheet.current as any).snapTo(1);
         }}
       />
     );
@@ -1202,7 +1202,7 @@ export default function Accounts(props) {
           }, 10);
           setTimeout(() => {
             if (SecureAccountHelperBottomSheet.current) {
-              SecureAccountHelperBottomSheet.current.snapTo(1);
+              (SecureAccountHelperBottomSheet.current as any).snapTo(1);
             }
           }, 1000);
         } else {
@@ -1353,11 +1353,11 @@ export default function Accounts(props) {
             <TouchableWithoutFeedback
               onPress={() => {
                 if (TestAccountHelperBottomSheet.current)
-                  TestAccountHelperBottomSheet.current.snapTo(0);
+                  (TestAccountHelperBottomSheet.current as any).snapTo(0);
                 if (RegularAccountHelperBottomSheet.current)
-                  RegularAccountHelperBottomSheet.current.snapTo(0);
+                  (RegularAccountHelperBottomSheet.current as any).snapTo(0);
                 if (SecureAccountHelperBottomSheet.current)
-                  SecureAccountHelperBottomSheet.current.snapTo(0);
+                  (SecureAccountHelperBottomSheet.current as any).snapTo(0);
               }}
             >
               <View>
@@ -1612,11 +1612,11 @@ export default function Accounts(props) {
             <TouchableWithoutFeedback
               onPress={() => {
                 if (TestAccountHelperBottomSheet.current)
-                  TestAccountHelperBottomSheet.current.snapTo(0);
+                  (TestAccountHelperBottomSheet.current as any).snapTo(0);
                 if (RegularAccountHelperBottomSheet.current)
-                  RegularAccountHelperBottomSheet.current.snapTo(0);
+                  (RegularAccountHelperBottomSheet.current as any).snapTo(0);
                 if (SecureAccountHelperBottomSheet.current)
-                  SecureAccountHelperBottomSheet.current.snapTo(0);
+                  (SecureAccountHelperBottomSheet.current as any).snapTo(0);
               }}
             >
               <View style={{ marginTop: hp('2%') }}>
@@ -1662,7 +1662,7 @@ export default function Accounts(props) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      props.navigation.navigate('ReceivingAddress', {
+                      props.navigation.navigate('Receive', {
                         serviceType,
                         getServiceType: getServiceType,
                       });
@@ -1775,7 +1775,7 @@ export default function Accounts(props) {
 
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={bottomSheet}
+            ref={bottomSheet as any}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1804,7 +1804,7 @@ export default function Accounts(props) {
               // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
             }}
             enabledInnerScrolling={true}
-            ref={TestAccountHelperBottomSheet}
+            ref={TestAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
 
@@ -1818,7 +1818,7 @@ export default function Accounts(props) {
           />
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={SecureAccountHelperBottomSheet}
+            ref={SecureAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
 
@@ -1831,7 +1831,7 @@ export default function Accounts(props) {
           />
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={RegularAccountHelperBottomSheet}
+            ref={RegularAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
 
@@ -1844,7 +1844,7 @@ export default function Accounts(props) {
           />
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={TransactionDetailsBottomSheet}
+            ref={TransactionDetailsBottomSheet as any}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1857,7 +1857,7 @@ export default function Accounts(props) {
 
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={TransactionDetailsHelperBottomSheet}
+            ref={TransactionDetailsHelperBottomSheet as any}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()

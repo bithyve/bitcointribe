@@ -204,7 +204,7 @@ export default class TrustedContacts {
       );
     }
 
-    const { privateKey } = this.trustedContacts[contactName];
+    const { ephemeralChannel, privateKey } = this.trustedContacts[contactName];
     const keyPair = ec.keyFromPrivate(privateKey, 'hex');
     const symmetricKey = keyPair
       .derive(this.decodePublicKey(encodedPublicKey))
@@ -224,6 +224,7 @@ export default class TrustedContacts {
       ...this.trustedContacts[contactName],
       symmetricKey,
       ephemeralChannel: {
+        ...ephemeralChannel,
         address: ephemeralAddress,
       },
       trustedChannel: {
@@ -306,6 +307,8 @@ export default class TrustedContacts {
 
       const { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
+
+      this.processEphemeralChannelData(contactName, dataElements);
       if (data) {
         this.processEphemeralChannelData(contactName, data);
         return { updated, publicKey, data };
@@ -349,7 +352,7 @@ export default class TrustedContacts {
         let contactsPublicKey;
         this.trustedContacts[contactName].ephemeralChannel.data.forEach(
           (element: EphemeralData) => {
-            if (element.publicKey) {
+            if (element.publicKey !== publicKey) {
               contactsPublicKey = element.publicKey;
             }
           },

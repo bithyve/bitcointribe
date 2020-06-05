@@ -6,8 +6,9 @@ import {
   TextInput,
   Platform,
   AsyncStorage,
-  PermissionsAndroid
+  PermissionsAndroid,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,13 +29,17 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import * as Permissions from 'expo-permissions';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import Toast from '../../components/Toast';
 
 export default function AddContactAddressBook(props) {
   let [selectedContacts, setSelectedContacts] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [filterContactData, setFilterContactData] = useState([]);
   const [radioOnOff, setRadioOnOff] = useState(false);
-  const [contactPermissionAndroid, setContactPermissionAndroid] = useState(false);
+  const [contactPermissionAndroid, setContactPermissionAndroid] = useState(
+    false,
+  );
   const [contactPermissionIOS, setContactPermissionIOS] = useState(false);
   const [
     contactListErrorBottomSheet,
@@ -171,6 +176,27 @@ export default function AddContactAddressBook(props) {
     }
   };
 
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+  const [isTC, setIsTC] = useState(false);
+
+  const isTrustedContact = useCallback(
+    (selectedContact) => {
+      const contactName = `${selectedContact.firstName} ${
+        selectedContact.lastName ? selectedContact.lastName : ''
+      }`.toLowerCase();
+
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+      if (trustedContact && trustedContact.symmetricKey) {
+        // Trusted channel exists
+        return true;
+      }
+      return false;
+    },
+    [trustedContacts],
+  );
+
   async function onContactSelect(index) {
     let contacts = filterContactData;
     if (contacts[index].checked) {
@@ -178,6 +204,7 @@ export default function AddContactAddressBook(props) {
     } else {
       selectedContacts[0] = contacts[index];
     }
+
     setSelectedContacts(selectedContacts);
     for (let i = 0; i < contacts.length; i++) {
       if (
@@ -190,7 +217,12 @@ export default function AddContactAddressBook(props) {
     }
     setRadioOnOff(!radioOnOff);
     setFilterContactData(contacts);
-    props.onSelectContact(selectedContacts);
+
+    const isTrustedC = await isTrustedContact(selectedContacts[0]);
+    setIsTC(isTrustedC);
+    if (isTrustedC) {
+      Toast('Trusted Contact already exists');
+    }
   }
 
   async function onCancel(value) {
@@ -299,7 +331,9 @@ export default function AddContactAddressBook(props) {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', flex: 1 }}>
-            <Text style={styles.modalHeaderTitleText}>{props.modalTitle ? props.modalTitle: 'Add Contact'}</Text>
+            <Text style={styles.modalHeaderTitleText}>
+              {props.modalTitle ? props.modalTitle : 'Add Contact'}
+            </Text>
             <Text style={styles.modalHeaderInfoText}>
               {'Lorem ipsum dolor sit amet, consec'}
             </Text>
@@ -450,7 +484,8 @@ export default function AddContactAddressBook(props) {
               }}
             >
               <AppBottomSheetTouchableWrapper
-                onPress={() => props.onPressContinue()}
+                disabled={isTC}
+                onPress={() => props.onPressContinue(selectedContacts)}
                 style={styles.bottomButtonView}
               >
                 <Text style={styles.buttonText}>Confirm & Proceed</Text>
