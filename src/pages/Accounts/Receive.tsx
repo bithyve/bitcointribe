@@ -285,22 +285,22 @@ export default function Receive(props) {
       }`.toLowerCase();
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
+      const { receivingAddress } =
+        serviceType === SECURE_ACCOUNT
+          ? service.secureHDWallet
+          : service.hdWallet;
+
+      let paymentURI;
+      if (amount) {
+        paymentURI = service.getPaymentURI(receivingAddress, {
+          amount: parseInt(amount),
+        }).paymentURI;
+      }
+
       if (!trustedContact) {
         (async () => {
           const walletID = await AsyncStorage.getItem('walletID');
           const FCM = await AsyncStorage.getItem('fcmToken');
-
-          const { receivingAddress } =
-            serviceType === SECURE_ACCOUNT
-              ? service.secureHDWallet
-              : service.hdWallet;
-
-          let paymentURI;
-          if (amount) {
-            paymentURI = service.getPaymentURI(receivingAddress, {
-              amount: parseInt(amount),
-            }).paymentURI;
-          }
 
           const data: EphemeralData = {
             walletID,
@@ -312,9 +312,35 @@ export default function Receive(props) {
           };
           dispatch(updateEphemeralChannel(contactName, data));
         })();
+      } else if (
+        !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel
+      ) {
+        if (
+          trustedContact.ephemeralChannel.data[0].paymentDetails &&
+          trustedContact.ephemeralChannel.data[0].paymentDetails.address ===
+            receivingAddress &&
+          trustedContact.ephemeralChannel.data[0].paymentDetails.paymentURI ===
+            paymentURI
+        )
+          return;
+        const data: EphemeralData = {
+          paymentDetails: {
+            address: receivingAddress,
+            paymentURI,
+          },
+        };
+        dispatch(updateEphemeralChannel(contactName, data));
       }
     }
-  }, [selectedContact, trustedContacts, AsTrustedContact, amount, service]);
+  }, [
+    selectedContact,
+    trustedContacts,
+    AsTrustedContact,
+    amount,
+    serviceType,
+    service,
+  ]);
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem(
@@ -373,12 +399,9 @@ export default function Receive(props) {
         modalTitle="Select a Trusted Contact"
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={() => {
+        onPressContinue={(selectedContacts) => {
+          setSelectedContact(selectedContacts[0]);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
-        onSelectContact={(selectedContact) => {
-          setSelectedContact(selectedContact[0]);
-          // (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onPressBack={() => {
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);

@@ -306,6 +306,8 @@ export default class TrustedContacts {
 
       const { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
+
+      this.processEphemeralChannelData(contactName, dataElements);
       if (data) {
         this.processEphemeralChannelData(contactName, data);
         return { updated, publicKey, data };
@@ -349,7 +351,7 @@ export default class TrustedContacts {
         let contactsPublicKey;
         this.trustedContacts[contactName].ephemeralChannel.data.forEach(
           (element: EphemeralData) => {
-            if (element.publicKey) {
+            if (element.publicKey !== publicKey) {
               contactsPublicKey = element.publicKey;
             }
           },
