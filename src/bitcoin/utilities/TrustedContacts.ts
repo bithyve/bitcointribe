@@ -204,7 +204,7 @@ export default class TrustedContacts {
       );
     }
 
-    const { privateKey } = this.trustedContacts[contactName];
+    const { ephemeralChannel, privateKey } = this.trustedContacts[contactName];
     const keyPair = ec.keyFromPrivate(privateKey, 'hex');
     const symmetricKey = keyPair
       .derive(this.decodePublicKey(encodedPublicKey))
@@ -224,6 +224,7 @@ export default class TrustedContacts {
       ...this.trustedContacts[contactName],
       symmetricKey,
       ephemeralChannel: {
+        ...ephemeralChannel,
         address: ephemeralAddress,
       },
       trustedChannel: {

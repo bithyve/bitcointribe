@@ -400,7 +400,9 @@ export default function Receive(props) {
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={(selectedContacts) => {
-          setSelectedContact(selectedContacts[0]);
+          setTimeout(() => {
+            setSelectedContact(selectedContacts[0]);
+          }, 2);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onPressBack={() => {
