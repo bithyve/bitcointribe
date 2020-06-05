@@ -204,8 +204,8 @@ export default function AddContactAddressBook(props) {
     } else {
       selectedContacts[0] = contacts[index];
     }
-
     setSelectedContacts(selectedContacts);
+    props.onSelectContact(selectedContacts);
     for (let i = 0; i < contacts.length; i++) {
       if (
         selectedContacts.findIndex((value) => value.id == contacts[i].id) > -1
@@ -217,7 +217,6 @@ export default function AddContactAddressBook(props) {
     }
     setRadioOnOff(!radioOnOff);
     setFilterContactData(contacts);
-
     const isTrustedC = await isTrustedContact(selectedContacts[0]);
     setIsTC(isTrustedC);
     if (isTrustedC) {
