@@ -1313,59 +1313,78 @@ export default function Home(props) {
       return;
     }
 
-    const scannedData = JSON.parse(qrData);
-    switch (scannedData.type) {
-      case 'trustedGuardian':
-        const trustedGruardianRequest = {
-          isGuardian: scannedData.isGuardian,
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          uploadedAt: scannedData.uploadedAt,
-          type: scannedData.type,
-          isQR: true,
-        };
-        setLoading(false);
-        setSecondaryDeviceOtp(trustedGruardianRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: trustedGruardianRequest,
-          recoveryRequest: null,
-        });
-        break;
+    try {
+      const scannedData = JSON.parse(qrData);
+      switch (scannedData.type) {
+        case 'trustedGuardian':
+          const trustedGruardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(trustedGruardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: trustedGruardianRequest,
+            recoveryRequest: null,
+          });
+          break;
 
-      case 'secondaryDeviceGuardian':
-        const secondaryDeviceGuardianRequest = {
-          isGuardian: scannedData.isGuardian,
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          uploadedAt: scannedData.uploadedAt,
-          type: scannedData.type,
-          isQR: true,
-        };
+        case 'secondaryDeviceGuardian':
+          const secondaryDeviceGuardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
 
-        setLoading(false);
-        setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: secondaryDeviceGuardianRequest,
-          recoveryRequest: null,
-        });
-        break;
+          setLoading(false);
+          setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: secondaryDeviceGuardianRequest,
+            recoveryRequest: null,
+          });
+          break;
 
-      case 'recoveryQR':
-        const recoveryRequest = {
-          isRecovery: true,
-          requester: scannedData.requester,
-          publicKey: scannedData.KEY,
-          isQR: true,
-        };
-        setLoading(false);
-        props.navigation.navigate('Home', {
-          recoveryRequest,
-          trustedContactRequest: null,
-        });
-        break;
+        case 'trustedContactQR':
+          const tcRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: tcRequest,
+            recoveryRequest: null,
+          });
+          break;
 
-      default:
-        break;
+        case 'recoveryQR':
+          const recoveryRequest = {
+            isRecovery: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.KEY,
+            isQR: true,
+          };
+          setLoading(false);
+          props.navigation.navigate('Home', {
+            recoveryRequest,
+            trustedContactRequest: null,
+          });
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Alert.alert('Invalid QR');
     }
   };
 
@@ -2644,7 +2663,7 @@ export default function Home(props) {
             setDeepLinkModalOpen(false);
           }, 2);
           if (!isRecovery) {
-            if (Date.now() - uploadedAt > 600000) {
+            if (uploadedAt && Date.now() - uploadedAt > 600000) {
               Alert.alert(
                 `${isQR ? 'QR' : 'Link'} expired!`,
                 `Please ask the sender to initiate a new ${
