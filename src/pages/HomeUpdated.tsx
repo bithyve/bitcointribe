@@ -78,7 +78,6 @@ import HomeList from '../components/home/home-list';
 import HomeHeader from '../components/home/home-header';
 import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
-import { platform } from 'process';
 import { initialCardData } from '../stubs/initialCardData';
 import { initialTransactionData } from '../stubs/initialTransactionData';
 
@@ -163,7 +162,7 @@ interface HomeStateTypes {
     modalData: any,
     knowMoreBottomSheetsFlag: boolean,
     qrBottomSheetsFlag: boolean,
-    addBottomSheetFlag: boolean,
+    addBottomSheetsFlag: boolean,
     tabBarIndex: number,
     addSubBottomSheetsFlag: boolean,
     selectToAdd: string,
@@ -217,7 +216,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             transactions: [],
             knowMoreBottomSheetsFlag: false,
             modalData: initialTransactionData,
-            addBottomSheetFlag: false,
+            addBottomSheetsFlag: false,
             tabBarIndex: 999,
             addSubBottomSheetsFlag: false,
             selectToAdd: 'buyBitcoins',
@@ -591,19 +590,24 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
         if (!currencyCodeTmp) {
             const identifiers = ['io.hexawallet.hexa'];
-            NativeModules.InAppUtils.loadProducts(
-                identifiers,
-                async (error, products) => {
-                    await AsyncStorage.setItem(
-                        'currencyCode',
-                        products && products.length ? products[0].currencyCode : 'USD',
-                    );
-                    let currencyCode = idx(products, _ => _[0].currencyCode) || 'USD'
-                    this.setState({
-                        currencyCode
-                    })
-                },
-            );
+            let { loadProducts } = idx(NativeModules, _ => _.InAppUtils) || {}
+            if (loadProducts) {
+                loadProducts(
+                    identifiers,
+                    async (error, products) => {
+                        await AsyncStorage.setItem(
+                            'currencyCode',
+                            products && products.length ? products[0].currencyCode : 'USD',
+                        );
+                        let currencyCode = idx(products, _ => _[0].currencyCode) || 'USD'
+                        this.setState({
+                            currencyCode
+                        })
+                    },
+                );
+            }
+
+
         } else {
             this.setState({
                 currencyCode: currencyCodeTmp
@@ -1028,7 +1032,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         }
         if (tabTitle == 'Add') {
             this.setState({
-                addBottomSheetFlag: true,
+                addBottomSheetsFlag: true,
                 modalData: [],
                 selectedBottomTab: tabTitle
             }, () => {
@@ -1158,17 +1162,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         }
     };
 
-    componentDidUpdate = (prevProps, prevState) => {
-        if (!prevState.addBottomSheetFlag && this.state.addBottomSheetFlag) {
-            if (this.refs.addBottomSheet) {
-                (this.refs.addBottomSheet as any).snapTo(1);
-            }
-        }
-
-    };
-
-
-
     render() {
         const {
             cardData,
@@ -1183,7 +1176,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             tabBarIndex,
             deepLinkModalOpen,
             knowMoreBottomSheetsFlag,
-            addBottomSheetFlag,
+            addBottomSheetsFlag,
             errorMessageHeader,
             errorMessage,
             buttonText,
@@ -1341,16 +1334,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         onPressElements={(type) => {
                             if (type == 'buyBitcoins') {
                                 this.setState({
-                                    addBottomSheetFlag: true,
+                                    addBottomSheetsFlag: true,
                                     tabBarIndex: 0,
                                     selectToAdd: type
-                                }
-                                )
-
+                                }, () => {
+                                    (this.refs.addBottomSheet as any).snapTo(1)
+                                })
                             } else if (type == 'addContact') {
                                 this.setState({
                                     addSubBottomSheetsFlag: true,
-                                    addBottomSheetFlag: false,
+                                    addBottomSheetsFlag: false,
                                     tabBarIndex: 0,
                                     selectToAdd: type
                                 }, () => (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(1))
@@ -1778,85 +1771,87 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 
 
-                <BottomSheet
-                    onOpenEnd={() => {
-                        if (!deepLinkModalOpen) {
-                            this.setState({
-                                tabBarIndex: 0
-                            })
-                        }
-                    }}
-                    onCloseEnd={() => {
-                        if (!deepLinkModalOpen) {
-                            this.setState({
-                                tabBarIndex: 999
-                            })
-                        }
+                {
+                    addBottomSheetsFlag ?
+                        <BottomSheet
+                            onOpenEnd={() => {
+                                if (!deepLinkModalOpen) {
+                                    this.setState({
+                                        tabBarIndex: 0
+                                    })
+                                }
+                            }}
+                            onCloseEnd={() => {
+                                if (!deepLinkModalOpen) {
+                                    this.setState({
+                                        tabBarIndex: 999
+                                    })
+                                }
 
-                        this.setState({
-                            addBottomSheetFlag: false
-                        })
+                                this.setState({
+                                    addBottomSheetsFlag: false
+                                })
 
-                    }}
-                    enabledInnerScrolling={true}
-                    ref={"addBottomSheet"}
-                    snapPoints={[
-                        -50,
-                        Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                            ? hp('65%')
-                            : hp('64%'),
-                    ]}
-                    renderContent={() => {
-                        if (selectToAdd == 'buyBitcoins') {
-                            return (
-                                <SaveBitcoinModalContents
-                                    onPressBack={() => {
+                            }}
+                            enabledInnerScrolling={true}
+                            ref={"addBottomSheet"}
+                            snapPoints={[
+                                -50,
+                                Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                                    ? hp('65%')
+                                    : hp('64%'),
+                            ]}
+                            renderContent={() => {
+                                if (selectToAdd == 'buyBitcoins') {
+                                    return (
+                                        <SaveBitcoinModalContents
+                                            onPressBack={() => {
+                                                (this.refs.addBottomSheet as any).snapTo(0);
+                                            }}
+                                            onPressElements={(type) => this.onPressSaveBitcoinElements(type)}
+                                            isExistingSavingMethod={isEmpty(fbBTCAccount)}
+                                        />
+                                    );
+                                }
+                                else if (selectToAdd == 'addContact') {
+                                    return (
+                                        <AddContactsModalContents
+                                            onPressFriendAndFamily={() => {
+                                                this.setState({
+                                                    familyAndFriendsBookBottomSheetsFlag: true
+                                                }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
+                                            }}
+                                            onPressBiller={() => {
+                                                this.setState({
+                                                    familyAndFriendsBookBottomSheetsFlag: true
+                                                }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
+                                            }}
+                                            onPressBack={() => {
+                                                this.setState({
+                                                    addSubBottomSheetsFlag: true,
+                                                    tabBarIndex: 999
+                                                }, () => (this.refs.addBottomSheet as any).snapTo(0))
+
+                                            }}
+                                        />
+                                    );
+                                } else {
+                                    return null;
+                                }
+                            }
+
+                            }
+                            renderHeader={() => <ModalHeader
+                                onPressHeader={() => {
+                                    this.setState({
+                                        addSubBottomSheetsFlag: false,
+                                        tabBarIndex: 999
+                                    }, () => {
                                         (this.refs.addBottomSheet as any).snapTo(0);
-                                    }}
-                                    onPressElements={(type) => this.onPressSaveBitcoinElements(type)}
-                                    isExistingSavingMethod={isEmpty(fbBTCAccount)}
-                                />
-                            );
-                        }
-                        else if (selectToAdd == 'addContact') {
-                            return (
-                                <AddContactsModalContents
-                                    onPressFriendAndFamily={() => {
-                                        this.setState({
-                                            familyAndFriendsBookBottomSheetsFlag: true
-                                        }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
-                                    }}
-                                    onPressBiller={() => {
-                                        this.setState({
-                                            familyAndFriendsBookBottomSheetsFlag: true
-                                        }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
-                                    }}
-                                    onPressBack={() => {
-                                        this.setState({
-                                            addSubBottomSheetsFlag: true,
-                                            tabBarIndex: 999
-                                        }, () => (this.refs.addBottomSheet as any).snapTo(0))
-
-                                    }}
-                                />
-                            );
-                        } else {
-                            return null;
-                        }
-                    }
-
-                    }
-                    renderHeader={() => <ModalHeader
-                        onPressHeader={() => {
-                            this.setState({
-                                addSubBottomSheetsFlag: false,
-                                tabBarIndex: 999
-                            }, () => {
-                                (this.refs.addBottomSheet as any).snapTo(0);
-                            })
-                        }}
-                    />}
-                />
+                                    })
+                                }}
+                            />}
+                        /> : null}
 
 
                 <BottomSheet

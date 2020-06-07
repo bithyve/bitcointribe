@@ -113,15 +113,15 @@ PODS:
   - QRCoder (1.1.0)
   - React (0.59.10):
     - React/Core (= 0.59.10)
-  - react-native-camera (3.26.0):
+  - react-native-camera (3.28.0):
     - React
-    - react-native-camera/RCT (= 3.26.0)
-    - react-native-camera/RN (= 3.26.0)
-  - react-native-camera/RCT (3.26.0):
+    - react-native-camera/RCT (= 3.28.0)
+    - react-native-camera/RN (= 3.28.0)
+  - react-native-camera/RCT (3.28.0):
     - React
-  - react-native-camera/RN (3.26.0):
+  - react-native-camera/RN (3.28.0):
     - React
-  - react-native-config (1.2.0):
+  - react-native-config (1.2.1):
     - React
   - react-native-contacts (5.2.0):
     - React
@@ -469,8 +469,8 @@ SPEC CHECKSUMS:
   Protobuf: 176220c526ad8bd09ab1fb40a978eac3fef665f7
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
-  react-native-camera: 2b74be8edc1103c4c46d1f4e5f41723d9ff052cc
-  react-native-config: 1ad4712773ff7e867b261be0aab293921d4498f9
+  react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
+  react-native-config: ae9ef3bdbf539f2d14ebaf4ebeba508f766e066a
   react-native-contacts: 439dd9c7ea7e0d86190f8370898b82cfb7cf4ef4
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
