@@ -74,6 +74,7 @@ export default function NewWalletQuestion(props) {
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
+  const [confirmAnswerTextInput, setConfirmAnswerTextInput] = useState(React.createRef());
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector(state => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
@@ -466,9 +467,11 @@ export default function NewWalletQuestion(props) {
                       value={hideShowAnswer ? answerMasked : answer}
                       autoCompleteType="off"
                       textContentType="none"
+                      returnKeyType='next'
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
+                      onSubmitEditing={() => (confirmAnswerTextInput as any).current.focus()}
                       keyboardType={
                         Platform.OS == 'ios'
                           ? 'ascii-capable'
@@ -547,6 +550,7 @@ export default function NewWalletQuestion(props) {
                   >
                     <TextInput
                       style={styles.modalInputBox}
+                      ref={confirmAnswerTextInput}
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
                       value={
