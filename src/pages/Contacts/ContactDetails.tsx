@@ -92,8 +92,6 @@ export default function ContactDetails(props) {
     props.navigation.navigate('SendToContact', {
       selectedContact: Contact,
       serviceType: REGULAR_ACCOUNT,
-      averageTxFees: 0,
-      netBalance: 10000,
     });
   };
 
@@ -108,8 +106,10 @@ export default function ContactDetails(props) {
         await AsyncStorage.getItem('IMKeeperOfHistory'),
       );
     }
-    if(OtherTrustedContactsHistory){
-      OtherTrustedContactsHistory = getHistoryByContactId(OtherTrustedContactsHistory);
+    if (OtherTrustedContactsHistory) {
+      OtherTrustedContactsHistory = getHistoryByContactId(
+        OtherTrustedContactsHistory,
+      );
     }
     if (OtherTrustedContactsHistory && OtherTrustedContactsHistory.length > 0) {
       setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
@@ -118,18 +118,21 @@ export default function ContactDetails(props) {
     }
   };
 
-  const getHistoryByContactId = (history) =>{
+  const getHistoryByContactId = (history) => {
     let array = [];
-    if(history && history.length>0){
+    if (history && history.length > 0) {
       for (let i = 0; i < history.length; i++) {
         const element = history[i];
-        if(element.selectedContactInfo && element.selectedContactInfo.selectedContact.id == Contact.id){
+        if (
+          element.selectedContactInfo &&
+          element.selectedContactInfo.selectedContact.id == Contact.id
+        ) {
           array.push(element);
-        }  
+        }
       }
     }
     return array;
-  }
+  };
 
   const sortedHistory = useCallback((history) => {
     const currentHistory = history.filter((element) => {

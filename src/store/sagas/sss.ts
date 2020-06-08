@@ -781,75 +781,68 @@ function* checkMSharesHealthWorker() {
   // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
   if (res.status === 200) {
-    const { shareGuardianMapping } = res.data;
-    const trustedContacts: TrustedContactsService = yield select(
-      (state) => state.trustedContacts.service,
-    );
-
-    let approvedAny = false;
-    for (const index of Object.keys(shareGuardianMapping)) {
-      const { updatedAt, guardian } = shareGuardianMapping[index];
-      console.log({ updatedAt, guardian });
-      if (updatedAt > 0 && guardian) {
-        if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
-          const approveTC = true;
-          const res = yield call(
-            trustedContacts.fetchEphemeralChannel,
-            guardian,
-            approveTC,
-          );
-          if (res.status === 200) {
-            console.log('Trusted Channel create: ', guardian);
-
-            // generate a corresponding derivative acc and assign xpub
-            const res = yield call(
-              regularService.getDerivativeAccXpub,
-              TRUSTED_CONTACTS,
-              null,
-              guardian,
-            );
-
-            if (res.status === 200) {
-              const xpub = res.data;
-              // update the trusted channel with the xpub
-              const data: TrustedDataElements = {
-                xpub,
-              };
-
-              const updateRes = yield call(
-                trustedContacts.updateTrustedChannel,
-                guardian,
-                data,
-                true,
-              );
-              if (updateRes.status === 200) {
-                console.log('Xpub updated to trusted channel for: ', guardian);
-              } else {
-                console.log(
-                  `Failed to update xpub to trusted channel for ${guardian}`,
-                );
-              }
-            } else {
-              console.log(`Failed to generate xpub for ${guardian}`);
-            }
-
-            approvedAny = true;
-          }
-        }
-      }
-    }
-
-    if (approvedAny) {
-      // yield delay(1000);
-      const { SERVICES } = yield select((state) => state.storage.database);
-      const updatedSERVICES = {
-        ...SERVICES,
-        REGULAR_ACCOUNT: JSON.stringify(regularService),
-        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-      };
-      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-    }
-
+    // const { shareGuardianMapping } = res.data;
+    // const trustedContacts: TrustedContactsService = yield select(
+    //   (state) => state.trustedContacts.service,
+    // );
+    // let approvedAny = false;
+    // for (const index of Object.keys(shareGuardianMapping)) {
+    //   const { updatedAt, guardian } = shareGuardianMapping[index];
+    //   console.log({ updatedAt, guardian });
+    //   if (updatedAt > 0 && guardian) {
+    //     if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
+    //       const approveTC = true;
+    //       const res = yield call(
+    //         trustedContacts.fetchEphemeralChannel,
+    //         guardian,
+    //         approveTC,
+    //       );
+    //       if (res.status === 200) {
+    //         console.log('Trusted Channel create: ', guardian);
+    //         // generate a corresponding derivative acc and assign xpub
+    //         const res = yield call(
+    //           regularService.getDerivativeAccXpub,
+    //           TRUSTED_CONTACTS,
+    //           null,
+    //           guardian,
+    //         );
+    //         if (res.status === 200) {
+    //           const xpub = res.data;
+    //           // update the trusted channel with the xpub
+    //           const data: TrustedDataElements = {
+    //             xpub,
+    //           };
+    //           const updateRes = yield call(
+    //             trustedContacts.updateTrustedChannel,
+    //             guardian,
+    //             data,
+    //             true,
+    //           );
+    //           if (updateRes.status === 200) {
+    //             console.log('Xpub updated to trusted channel for: ', guardian);
+    //           } else {
+    //             console.log(
+    //               `Failed to update xpub to trusted channel for ${guardian}`,
+    //             );
+    //           }
+    //         } else {
+    //           console.log(`Failed to generate xpub for ${guardian}`);
+    //         }
+    //         approvedAny = true;
+    //       }
+    //     }
+    //   }
+    // }
+    // if (approvedAny) {
+    //   // yield delay(1000);
+    //   const { SERVICES } = yield select((state) => state.storage.database);
+    //   const updatedSERVICES = {
+    //     ...SERVICES,
+    //     REGULAR_ACCOUNT: JSON.stringify(regularService),
+    //     TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    //   };
+    //   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    // }
     // if (preInstance !== postInstance) {
     //   const { SERVICES } = yield select(state => state.storage.database);
     //   const updatedSERVICES = {

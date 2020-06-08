@@ -654,7 +654,7 @@ const TrustedContactHistory = (props) => {
 
   useEffect(() => {
     if (overallHealth) {
-      if (overallHealth.sharesInfo[2].updatedAt) {
+      if (overallHealth.sharesInfo[index].updatedAt) {
         setShared(true);
       }
     }
@@ -1050,11 +1050,13 @@ const TrustedContactHistory = (props) => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (trustedContactsBottomSheet as any).current.snapTo(
-                  1,
-                );
+                (trustedContactsBottomSheet as any).current.snapTo(1);
               }}
-              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
               textStyle={{}}
             />
             <Image

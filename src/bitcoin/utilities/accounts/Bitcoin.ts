@@ -965,9 +965,8 @@ export default class Bitcoin {
       return { type: 'paymentURI' };
     } else if (this.isValidAddress(scannedStr)) {
       return { type: 'address' };
-    } else {
-      throw new Error('Invalid QR: Neither an address nor paymentURI');
     }
+    return { type: null };
   };
 
   // public createTransaction = async (

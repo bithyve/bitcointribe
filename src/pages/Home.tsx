@@ -105,7 +105,10 @@ import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
-import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
+import {
+  fetchDerivativeAccBalTx,
+  addTransferDetails,
+} from '../store/actions/accounts';
 import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
 
 export default function Home(props) {
@@ -1258,59 +1261,130 @@ export default function Home(props) {
   }, [SecondaryDeviceStatus]);
 
   const getQrCodeData = (qrData) => {
-    const scannedData = JSON.parse(qrData);
-    switch (scannedData.type) {
-      case 'trustedGuardian':
-        const trustedGruardianRequest = {
-          isGuardian: scannedData.isGuardian,
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          uploadedAt: scannedData.uploadedAt,
-          type: scannedData.type,
-          isQR: true,
-        };
-        setLoading(false);
-        setSecondaryDeviceOtp(trustedGruardianRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: trustedGruardianRequest,
-          recoveryRequest: null,
-        });
-        break;
+    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
+    const { type } = regularService.addressDiff(qrData);
+    if (type) {
+      const serviceType = REGULAR_ACCOUNT; // default service type
+      let item;
+      switch (type) {
+        case 'address':
+          const recipientAddress = qrData;
+          item = {
+            id: recipientAddress,
+          };
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
 
-      case 'secondaryDeviceGuardian':
-        const secondaryDeviceGuardianRequest = {
-          isGuardian: scannedData.isGuardian,
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          uploadedAt: scannedData.uploadedAt,
-          type: scannedData.type,
-          isQR: true,
-        };
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+          });
+          break;
 
-        setLoading(false);
-        setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: secondaryDeviceGuardianRequest,
-          recoveryRequest: null,
-        });
-        break;
+        case 'paymentURI':
+          const { address, options } = regularService.decodePaymentURI(qrData);
+          item = {
+            id: address,
+          };
 
-      case 'recoveryQR':
-        const recoveryRequest = {
-          isRecovery: true,
-          requester: scannedData.requester,
-          publicKey: scannedData.KEY,
-          isQR: true,
-        };
-        setLoading(false);
-        props.navigation.navigate('Home', {
-          recoveryRequest,
-          trustedContactRequest: null,
-        });
-        break;
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
 
-      default:
-        break;
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+            bitcoinAmount: options.amount ? `${options.amount}` : '',
+          });
+          break;
+
+        default:
+          Alert.alert('Invalid QR');
+          break;
+      }
+
+      return;
+    }
+
+    try {
+      const scannedData = JSON.parse(qrData);
+      switch (scannedData.type) {
+        case 'trustedGuardian':
+          const trustedGruardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(trustedGruardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: trustedGruardianRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'secondaryDeviceGuardian':
+          const secondaryDeviceGuardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+
+          setLoading(false);
+          setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: secondaryDeviceGuardianRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'trustedContactQR':
+          const tcRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: tcRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'recoveryQR':
+          const recoveryRequest = {
+            isRecovery: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.KEY,
+            isQR: true,
+          };
+          setLoading(false);
+          props.navigation.navigate('Home', {
+            recoveryRequest,
+            trustedContactRequest: null,
+          });
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Alert.alert('Invalid QR');
     }
   };
 
@@ -2589,7 +2663,7 @@ export default function Home(props) {
             setDeepLinkModalOpen(false);
           }, 2);
           if (!isRecovery) {
-            if (Date.now() - uploadedAt > 600000) {
+            if (uploadedAt && Date.now() - uploadedAt > 600000) {
               Alert.alert(
                 `${isQR ? 'QR' : 'Link'} expired!`,
                 `Please ask the sender to initiate a new ${
