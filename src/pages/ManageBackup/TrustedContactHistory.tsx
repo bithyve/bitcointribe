@@ -1033,7 +1033,7 @@ const TrustedContactHistory = (props) => {
                   ? chosenContact.firstName
                   : !chosenContact.firstName && chosenContact.lastName
                   ? chosenContact.lastName
-                  : props.navigation.state.params.selectedTitle}
+                  : 'Friends and Family'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}

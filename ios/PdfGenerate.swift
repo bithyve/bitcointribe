@@ -335,7 +335,7 @@ import QRCoder
       
     
     txtTitle = UILabel();
-    txtTitle.text = "Secondary Mnemonic:"
+    txtTitle.text = "Exit Key:"
     txtTitle.lineBreakMode = .byWordWrapping
     txtTitle.numberOfLines = 0
     txtTitle.frame = CGRect(x:5,y:(txtMessage.frame.origin.y + txtMessage.frame.height),width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
