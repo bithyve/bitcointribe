@@ -80,6 +80,11 @@ export default function NewWalletName(props) {
               onBlur={() => {
                 setInputStyle(styles.inputBox);
               }}
+              onSubmitEditing={() => {
+                props.navigation.navigate('NewWalletQuestion', {
+                  walletName,
+                });
+              }}
             />
           </ScrollView>
 
