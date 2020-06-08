@@ -1617,7 +1617,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('TrustedContactHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: getCardTitle(item),
+                              selectedTitle: item.title,
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
                                   ...autoHighlightFlags,
@@ -1630,7 +1630,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('TrustedContactHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: getCardTitle(item),
+                              selectedTitle: item.title,
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
                                   ...autoHighlightFlags,
@@ -1643,7 +1643,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('PersonalCopyHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: getCardTitle(item),
+                              selectedTitle: item.title,
                               selectedPersonalCopy: item,
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
@@ -1655,7 +1655,7 @@ export default function ManageBackup(props) {
                             props.navigation.navigate('PersonalCopyHistory', {
                               selectedStatus: item.status,
                               selectedTime: getTime(item.time),
-                              selectedTitle: getCardTitle(item),
+                              selectedTitle: item.title,
                               selectedPersonalCopy: item,
                               updateAutoHighlightFlags: () =>
                                 setAutoHighlightFlags({
