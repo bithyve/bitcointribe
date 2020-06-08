@@ -603,8 +603,6 @@ export default function SendViaLink(props) {
       </ScrollView>
       <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
-          backgroundColor={Colors.backgroundColor1}
-          titleColor={Colors.black1}
           title={'Note'}
           infoText={
             'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'

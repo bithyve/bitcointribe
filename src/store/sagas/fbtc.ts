@@ -21,6 +21,7 @@ import { createWatcher } from '../utils/utilities';
 
 export function* accountSyncWorker({ payload }) {
   console.log("payload",payload.data)
+  try{
   let result = yield call(accountSync, payload.data);
 //   let result = {
 //     "data":{
@@ -55,6 +56,15 @@ console.log("result", result);
     }
   }
 }
+catch(err){
+  console.log("err", err);
+  let data={
+    accountSyncFail: true,
+    accountSyncFailMessage: 'Account sync fail'
+  }
+  yield put(accountSyncFail(data));
+}
+}
 
 export const accountSyncWatcher = createWatcher(
   accountSyncWorker,
@@ -63,6 +73,7 @@ export const accountSyncWatcher = createWatcher(
 
 function* getQuoteWorker({ payload }) {
   console.log('payload.data', payload.data);
+  try{
   const result = yield call(getQuote, payload.data);
   result.status = 200;
   console.log('result getQuoteWorker', result);
@@ -97,10 +108,20 @@ function* getQuoteWorker({ payload }) {
     }
   }
 }
+catch(err){
+  console.log("err", err);
+  let data={
+    getQuoteFail: true,
+    getQuoteFailMessage: 'Get Quote fail'
+  }
+  yield put(getQuoteFail(data));
+}
+}
 
 export const getQuoteWatcher = createWatcher(getQuoteWorker, GET_QUOTE);
 
 export function* executeOrderWorker({ payload }) {
+  try{
   const result = yield call(executeOrder, payload.data);
   if (!result || result.status !== 200) {
     let data={
@@ -125,7 +146,15 @@ export function* executeOrderWorker({ payload }) {
       yield put(executeOrderFail(data));
     }
    }
-  
+  }
+  catch(err){
+    console.log("err", err);
+    let data={
+      executeOrderFail: true,
+      executeOrderFailMessage: 'Order execution fail'
+    }
+    yield put(executeOrderFail(data));
+  }
 }
 
 export const executeOrderWatcher = createWatcher(

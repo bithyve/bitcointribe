@@ -135,7 +135,7 @@ export default function Receive(props) {
         serviceType === SECURE_ACCOUNT
           ? service.secureHDWallet
           : service.hdWallet;
-
+      console.log("receivingAddress", receivingAddress);
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -999,7 +999,6 @@ export default function Receive(props) {
             >
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
-                  backgroundColor={Colors.backgroundColor1}
                   title={'Note'}
                   infoText={
                     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
