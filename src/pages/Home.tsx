@@ -2138,6 +2138,9 @@ export default function Home(props) {
           });
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
+        }}
         onPressBack={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
