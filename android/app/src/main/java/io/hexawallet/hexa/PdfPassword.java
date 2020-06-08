@@ -267,7 +267,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         // Secondary Mnemonic and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
-                "Secondary Mnemonic:",
+                "Exit Key:",
                 catFont));
         document.add(preface);
         barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), 250, 250, null);
