@@ -344,6 +344,17 @@ const SecondaryDeviceHistory = props => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory(secondaryDeviceHistory)}
+          reshareInfo={
+            isReshare
+              ? 'Want to send the Recovery Key again to the same destination? '
+              : null
+          }
+          onPressReshare={async () => {
+            // setTimeout(() => {
+            //   setQRModalHeader('Reshare Personal Copy');
+            // }, 2);
+            (secondaryDeviceBottomSheet.current as any).snapTo(1);
+          }}
           onPressConfirm={() => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
           }}

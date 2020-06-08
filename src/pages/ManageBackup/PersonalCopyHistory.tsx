@@ -38,7 +38,7 @@ import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
 import moment from 'moment';
 import _ from 'underscore';
 import Toast from '../../components/Toast';
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
@@ -417,7 +417,7 @@ const PersonalCopyHistory = (props) => {
             />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {props.navigation.state.params.selectedTitle}
+                {'Personal Copy'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
