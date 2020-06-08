@@ -2728,7 +2728,10 @@ export default function Home(props) {
                   .decryptedPub;
               } catch (err) {
                 //console.log({ err });
-                Alert.alert('Decryption Failed', err.message);
+                Alert.alert(
+                  'Invalid Number/Email',
+                  'Decryption failed due to invalid input, try again.',
+                );
               }
             }
             if (publicKey && !rejected) {
@@ -2775,7 +2778,10 @@ export default function Home(props) {
                 .decryptedPub;
             } catch (err) {
               console.log({ err });
-              Alert.alert('Decryption Failed', err.message);
+              Alert.alert(
+                'Invalid Number/Email',
+                'Decryption failed due to invalid input, try again.',
+              );
             }
           }
           if (publicKey) {

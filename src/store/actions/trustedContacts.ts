@@ -51,10 +51,14 @@ export const updateEphemeralChannel = (
   };
 };
 
-export const fetchEphemeralChannel = (contactName: string) => {
+export const fetchEphemeralChannel = (
+  contactName?: string,
+  approveTC?: Boolean,
+  publicKey?: string,
+) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payload: { contactName },
+    payload: { contactName, approveTC, publicKey },
   };
 };
 
@@ -89,6 +93,8 @@ export const EPHEMERAL_CHANNEL_UPDATED = 'EPHEMERAL_CHANNEL_UPDATED';
 export const EPHEMERAL_CHANNEL_FETCHED = 'EPHEMERAL_CHANNEL_FETCHED';
 export const TRUSTED_CHANNEL_UPDATED = 'TRUSTED_CHANNEL_UPDATED';
 export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED';
+export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED';
+export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS';
 
 export const trustedContactInitialized = (
   contactName: string,
@@ -143,5 +149,18 @@ export const trustedChannelFetched = (contactName: string, data: any) => {
   return {
     type: TRUSTED_CHANNEL_FETCHED,
     payload: { contactName, data },
+  };
+};
+
+export const paymentDetailsFetched = (paymentDetails) => {
+  return {
+    type: PAYMENT_DETAILS_FETCHED,
+    payload: { paymentDetails },
+  };
+};
+
+export const clearPaymentDetails = () => {
+  return {
+    type: CLEAR_PAYMENT_DETAILS,
   };
 };
