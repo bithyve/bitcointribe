@@ -217,10 +217,14 @@ export default function TrustedContactRequest(props) {
         <View>
           <View style={styles.successModalHeaderView}>
             {!props.isRecovery ? (
-              <Text style={styles.modalTitleText}>
-                Friends and Family{'\n'}Request{' '}
-                {props.isGuardian ? '(Guardian)' : null}
-              </Text>
+              props.isPayment ? (
+                <Text style={styles.modalTitleText}>Payment Request </Text>
+              ) : (
+                <Text style={styles.modalTitleText}>
+                  Friends and Family{'\n'}Request{' '}
+                  {props.isGuardian ? '(Guardian)' : null}
+                </Text>
+              )
             ) : (
               <Text style={styles.modalTitleText}>Recovery Share Request</Text>
             )}
@@ -307,7 +311,15 @@ export default function TrustedContactRequest(props) {
               )}
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressReject()}
+              onPress={() => {
+                const key =
+                  props.inputType === 'phone'
+                    ? PhoneNumber
+                    : props.inputType === 'email'
+                    ? EmailId
+                    : null;
+                props.onPressReject(key);
+              }}
               style={{
                 height: wp('13%'),
                 width: wp('35%'),

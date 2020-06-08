@@ -100,7 +100,11 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import { approveTrustedContact } from '../store/actions/trustedContacts';
+import {
+  approveTrustedContact,
+  fetchEphemeralChannel,
+  clearPaymentDetails,
+} from '../store/actions/trustedContacts';
 import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import idx from 'idx';
@@ -109,7 +113,10 @@ import {
   fetchDerivativeAccBalTx,
   addTransferDetails,
 } from '../store/actions/accounts';
-import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
+import {
+  TrustedContactDerivativeAccount,
+  EphemeralData,
+} from '../bitcoin/utilities/Interface';
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -146,9 +153,10 @@ export default function Home(props) {
   );
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
-  let [AssociatedContact, setAssociatedContact] = useState([]);
-  let [SelectedContacts, setSelectedContacts] = useState([]);
-  let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  // let [AssociatedContact, setAssociatedContact] = useState([]);
+  // let [SelectedContacts, setSelectedContacts] = useState([]);
+  // let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  let [associatedContactName, setAssociatedContactName] = useState('');
   const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
   let SecondaryDeviceStatus = useSelector(
     (state) => state.sss.downloadedMShare,
@@ -167,13 +175,16 @@ export default function Home(props) {
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
   );
-  const { status } = useSelector((state) => state.sss);
   // alert(status);
   // const DECENTRALIZED_BACKUP = useSelector(
   //   state => state.storage.database.DECENTRALIZED_BACKUP,
   // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector((state) => state.accounts);
+
+  const paymentDetails = useSelector(
+    (state) => state.trustedContacts.paymentDetails,
+  );
   // const exchangeRate = props.navigation.state.params
   //   ? props.navigation.state.params.exchangeRates
   //   : null;
@@ -910,10 +921,10 @@ export default function Home(props) {
 
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
-      getAssociatedContact();
+      // getAssociatedContact();
       checkFastBitcoin();
     });
-    getAssociatedContact();
+    // getAssociatedContact();
     setCurrencyCodeFromAsync();
     updateAccountCardData();
     checkFastBitcoin();
@@ -1256,7 +1267,7 @@ export default function Home(props) {
         Toast('Recovery Key received successfully');
         setSecondaryDeviceAddresses();
       }
-      getAssociatedContact();
+      // getAssociatedContact();
     }
   }, [SecondaryDeviceStatus]);
 
@@ -1362,6 +1373,22 @@ export default function Home(props) {
           setSecondaryDeviceOtp(tcRequest);
           props.navigation.navigate('Home', {
             trustedContactRequest: tcRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'paymentTrustedContactQR':
+          const paymentTCRequest = {
+            isPaymentRequest: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: paymentTCRequest,
             recoveryRequest: null,
           });
           break;
@@ -1935,20 +1962,20 @@ export default function Home(props) {
     );
   };
 
-  const getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setSelectedContacts(SelectedContacts);
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
-    setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
-    setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  };
+  // const getAssociatedContact = async () => {
+  //   let SelectedContacts = JSON.parse(
+  //     await AsyncStorage.getItem('SelectedContacts'),
+  //   );
+  //   setSelectedContacts(SelectedContacts);
+  //   let AssociatedContact = JSON.parse(
+  //     await AsyncStorage.getItem('AssociatedContacts'),
+  //   );
+  //   setAssociatedContact(AssociatedContact);
+  //   let SecondaryDeviceAddress = JSON.parse(
+  //     await AsyncStorage.getItem('secondaryDeviceAddress'),
+  //   );
+  //   setSecondaryDeviceAddress(SecondaryDeviceAddress);
+  // };
 
   // const renderCustodianRequestOtpModalHeader = () => {
   //   return (
@@ -2332,7 +2359,11 @@ export default function Home(props) {
           trustedContactRequest: null,
         });
       }
-    } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
+    } else if (
+      splits[4] === 'tc' ||
+      splits[4] === 'tcg' ||
+      splits[4] === 'ptc'
+    ) {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
@@ -2343,6 +2374,7 @@ export default function Home(props) {
       } else {
         const trustedContactRequest = {
           isGuardian: splits[4] === 'tcg' ? true : false,
+          isPaymentRequest: splits[4] === 'ptc' ? true : false,
           requester: splits[5],
           encryptedKey: splits[6],
           hintType: splits[7],
@@ -2633,6 +2665,141 @@ export default function Home(props) {
     );
   }, [NotificationData, NotificationDataChange]);
 
+  useEffect(() => {
+    if (paymentDetails) {
+      const serviceType = REGULAR_ACCOUNT;
+      let { address, paymentURI } = paymentDetails;
+      let options: any = {};
+      if (paymentURI) {
+        const details = accounts[serviceType].service.decodePaymentURI(
+          paymentURI,
+        );
+        address = details.address;
+        options = details.options;
+      }
+
+      const item = {
+        id: address,
+      };
+      dispatch(
+        addTransferDetails(serviceType, {
+          selectedContact: item,
+        }),
+      );
+
+      dispatch(clearPaymentDetails());
+
+      props.navigation.navigate('SendToContact', {
+        selectedContact: item,
+        serviceType,
+        netBalance: balances.regularBalance,
+        bitcoinAmount: options.amount ? `${options.amount}` : '',
+      });
+    }
+  }, [paymentDetails]);
+
+  const processDLRequest = useCallback(
+    (key, rejected?) => {
+      let {
+        requester,
+        isGuardian,
+        encryptedKey,
+        publicKey,
+        isQR,
+        uploadedAt,
+        isRecovery,
+      } = trustedContactRequest || recoveryRequest;
+
+      if (!isRecovery) {
+        if (uploadedAt && Date.now() - uploadedAt > 600000) {
+          Alert.alert(
+            `${isQR ? 'QR' : 'Link'} expired!`,
+            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
+          );
+          setLoading(false);
+        } else {
+          if (isGuardian && UNDER_CUSTODY[requester]) {
+            Alert.alert(
+              'Failed to store',
+              'You cannot custody multiple shares of the same user.',
+            );
+            setLoading(false);
+          } else {
+            if (!publicKey) {
+              try {
+                publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                  .decryptedPub;
+              } catch (err) {
+                //console.log({ err });
+                Alert.alert(
+                  'Invalid Number/Email',
+                  'Decryption failed due to invalid input, try again.',
+                );
+              }
+            }
+            if (publicKey && !rejected) {
+              props.navigation.navigate('ContactsListForAssociateContact', {
+                postAssociation: (contact) => {
+                  const contactName = `${contact.firstName} ${
+                    contact.lastName ? contact.lastName : ''
+                  }`.toLowerCase();
+                  if (isGuardian) {
+                    dispatch(
+                      approveTrustedContact(
+                        contactName,
+                        publicKey,
+                        true,
+                        requester,
+                      ),
+                    );
+                  } else {
+                    dispatch(
+                      approveTrustedContact(contactName, publicKey, true),
+                    );
+                  }
+                  setAssociatedContactName(contactName);
+                },
+                isGuardian,
+              });
+            } else if (publicKey && rejected) {
+              // don't assoicate; only fetch the payment details from EC
+              dispatch(fetchEphemeralChannel(null, null, publicKey));
+            }
+          }
+        }
+      } else {
+        if (!UNDER_CUSTODY[requester]) {
+          Alert.alert(
+            'Failed to send!',
+            'You do not host any secret for this user.',
+          );
+          setLoading(false);
+        } else {
+          if (!publicKey) {
+            try {
+              publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                .decryptedPub;
+            } catch (err) {
+              console.log({ err });
+              Alert.alert(
+                'Invalid Number/Email',
+                'Decryption failed due to invalid input, try again.',
+              );
+            }
+          }
+          if (publicKey) {
+            dispatch(
+              uploadRequestedShare(recoveryRequest.requester, publicKey),
+            );
+          }
+        }
+      }
+
+      TrustedContactRequestBottomSheet.current.snapTo(0);
+    },
+    [trustedContactRequest, recoveryRequest],
+  );
+
   const renderTrustedContactRequestContent = useCallback(() => {
     if (!trustedContactRequest && !recoveryRequest) return;
     console.log({ trustedContactRequest, recoveryRequest });
@@ -2642,11 +2809,9 @@ export default function Home(props) {
       hintType,
       hint,
       isGuardian,
-      encryptedKey,
-      publicKey,
       isQR,
-      uploadedAt,
       isRecovery,
+      isPaymentRequest,
     } = trustedContactRequest || recoveryRequest;
 
     return (
@@ -2657,6 +2822,7 @@ export default function Home(props) {
         }
         isGuardian={isGuardian}
         isRecovery={isRecovery}
+        isPayment={isPaymentRequest}
         hint={hint}
         bottomSheetRef={TrustedContactRequestBottomSheet}
         trustedContactName={requester}
@@ -2665,95 +2831,15 @@ export default function Home(props) {
             setTabBarZIndex(999);
             setDeepLinkModalOpen(false);
           }, 2);
-          if (!isRecovery) {
-            if (uploadedAt && Date.now() - uploadedAt > 600000) {
-              Alert.alert(
-                `${isQR ? 'QR' : 'Link'} expired!`,
-                `Please ask the sender to initiate a new ${
-                  isQR ? 'QR' : 'Link'
-                }`,
-              );
-              setLoading(false);
-            } else {
-              if (isGuardian && UNDER_CUSTODY[requester]) {
-                Alert.alert(
-                  'Failed to store',
-                  'You cannot custody multiple shares of the same user.',
-                );
-                setLoading(false);
-              } else {
-                if (!publicKey) {
-                  try {
-                    publicKey = TrustedContactsService.decryptPub(
-                      encryptedKey,
-                      key,
-                    ).decryptedPub;
-                  } catch (err) {
-                    //console.log({ err });
-                    Alert.alert('Decryption Failed', err.message);
-                  }
-                }
-                if (publicKey) {
-                  props.navigation.navigate('ContactsListForAssociateContact', {
-                    postAssociation: (contact) => {
-                      const contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                      }`.toLowerCase();
-                      if (isGuardian) {
-                        dispatch(
-                          approveTrustedContact(
-                            contactName,
-                            publicKey,
-                            true,
-                            requester,
-                          ),
-                        );
-                      } else {
-                        dispatch(
-                          approveTrustedContact(contactName, publicKey, true),
-                        );
-                      }
-                    },
-                    isGuardian,
-                  });
-                }
-              }
-            }
-          } else {
-            if (!UNDER_CUSTODY[requester]) {
-              Alert.alert(
-                'Failed to send!',
-                'You do not host any secret for this user.',
-              );
-              setLoading(false);
-            } else {
-              if (!publicKey) {
-                try {
-                  publicKey = TrustedContactsService.decryptPub(
-                    encryptedKey,
-                    key,
-                  ).decryptedPub;
-                } catch (err) {
-                  console.log({ err });
-                  Alert.alert('Decryption Failed', err.message);
-                }
-              }
-              if (publicKey) {
-                dispatch(
-                  uploadRequestedShare(recoveryRequest.requester, publicKey),
-                );
-              }
-            }
-          }
-
-          TrustedContactRequestBottomSheet.current.snapTo(0);
+          processDLRequest(key);
         }}
-        onPressReject={() => {
+        onPressReject={(key) => {
           setTimeout(() => {
             setTabBarZIndex(999);
             setDeepLinkModalOpen(false);
           }, 2);
           TrustedContactRequestBottomSheet.current.snapTo(0);
+          processDLRequest(key, true);
         }}
       />
     );

@@ -8,7 +8,10 @@ import {
   EPHEMERAL_CHANNEL_UPDATED,
   TRUSTED_CHANNEL_UPDATED,
   TRUSTED_CHANNEL_FETCHED,
+  PAYMENT_DETAILS_FETCHED,
+  CLEAR_PAYMENT_DETAILS,
 } from '../actions/trustedContacts';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
 
 const initialState: {
   service: TrustedContactsService;
@@ -19,8 +22,14 @@ const initialState: {
       approved: Boolean;
     };
   };
-  ephemeralChannel: { [contactName: string]: { updated: Boolean; data?: any } };
+  ephemeralChannel: {
+    [contactName: string]: { updated: Boolean; data?: EphemeralData };
+  };
   trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
+  paymentDetails: {
+    address?: string;
+    paymentURI?: string;
+  };
 } = {
   service: null,
   serviceEnriched: false,
@@ -28,6 +37,7 @@ const initialState: {
   approvedTrustedContacts: null,
   ephemeralChannel: null,
   trustedChannel: null,
+  paymentDetails: null,
 };
 
 export default (state = initialState, action) => {
@@ -103,6 +113,18 @@ export default (state = initialState, action) => {
             data: action.payload.data,
           },
         },
+      };
+
+    case PAYMENT_DETAILS_FETCHED:
+      return {
+        ...state,
+        paymentDetails: action.payload.paymentDetails,
+      };
+
+    case CLEAR_PAYMENT_DETAILS:
+      return {
+        ...state,
+        paymentDetails: null,
       };
   }
 
