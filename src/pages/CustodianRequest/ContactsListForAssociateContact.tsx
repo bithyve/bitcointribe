@@ -28,18 +28,28 @@ const ContactsListForAssociateContact = (props) => {
         trustedContactsInfo.push(contacts[0]);
         Toast(
           // `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
-          `${isGuardian ? 'You have been successfully added as a Keeper' : 'Contact successfully added to Friends and Family'}`,
+          `${
+            isGuardian
+              ? 'You have been successfully added as a Keeper'
+              : 'Contact successfully added to Friends and Family'
+          }`,
         );
         postAssociation(contacts[0]);
         props.navigation.navigate('Home');
       } else {
-        // Toast('Trusted Contact already exists');
+        Toast('Trusted Contact already exists');
       }
     } else {
       trustedContactsInfo = [];
       trustedContactsInfo[3] = contacts[0];
       // Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
-      Toast(`${isGuardian ? 'You have been successfully added as a Kepper' : 'Contact successfully added to Friends and Family'}`)
+      Toast(
+        `${
+          isGuardian
+            ? 'You have been successfully added as a Kepper'
+            : 'Contact successfully added to Friends and Family'
+        }`,
+      );
       postAssociation(contacts[0]);
       props.navigation.navigate('Home');
     }

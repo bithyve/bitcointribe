@@ -14,6 +14,7 @@ import {
   FETCH_EPHEMERAL_CHANNEL,
   updateEphemeralChannel,
   TRUSTED_CHANNELS_SYNC,
+  paymentDetailsFetched,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -122,7 +123,14 @@ function* updateEphemeralChannelWorker({ payload }) {
   );
   console.log({ res });
   if (res.status === 200) {
-    yield put(ephemeralChannelUpdated(contactName, res.updated, res.data));
+    const ephData: EphemeralData = res.data.data;
+    if (ephData && ephData.paymentDetails) {
+      yield put(paymentDetailsFetched(ephData.paymentDetails));
+    }
+
+    yield put(
+      ephemeralChannelUpdated(contactName, res.data.updated, res.data.data),
+    );
 
     if (payload.uploadXpub) {
       console.log('Uploading xpub for: ', contactName);
@@ -144,7 +152,6 @@ function* updateEphemeralChannelWorker({ payload }) {
           data,
           true,
         );
-
         if (updateRes.status === 200)
           console.log('Xpub updated to TC for: ', contactName);
         else console.log('Xpub updation to TC failed for: ', contactName);
@@ -182,11 +189,21 @@ function* fetchEphemeralChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName } = payload;
-
-  const res = yield call(trustedContacts.fetchEphemeralChannel, contactName);
+  const { contactName, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
+  const res = yield call(
+    trustedContacts.fetchEphemeralChannel,
+    contactName,
+    approveTC,
+    publicKey,
+  );
   if (res.status === 200) {
     const data: EphemeralData = res.data.data;
+    if (publicKey) {
+      if (data && data.paymentDetails)
+        yield put(paymentDetailsFetched(data.paymentDetails));
+      return;
+    }
+
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       downloadMShare(encryptedKey, otp);
@@ -301,7 +318,7 @@ export function* trustedChannelsSyncWorker() {
       }
     }
 
-    if (trustedChannel.data) {
+    if (trustedChannel.data && trustedChannel.data.length) {
       if (trustedChannel.data.length !== 2) {
         // implies missing trusted data from the counter party
         const res = yield call(
@@ -312,7 +329,8 @@ export function* trustedChannelsSyncWorker() {
         if (res.status === 200) {
           console.log('Attempted a fetch from TC with: ', contactName);
           const { data } = res.data;
-          if (data) console.log('Received data from TC with: ', contactName);
+          if (data)
+            console.log('Received data from TC with: ', contactName, data);
 
           // update the xpub to the trusted contact derivative acc if contact's xpub is received
           trustedChannel =
@@ -381,7 +399,6 @@ export function* trustedChannelsSyncWorker() {
 
         if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactName);
-
           if (updateRes.data.data) {
             // received some data back from the channel; probably contact's xpub
             console.log('Received data from TC with: ', contactName);
@@ -389,7 +406,6 @@ export function* trustedChannelsSyncWorker() {
             // update the xpub to the trusted contact derivative acc if contact's xpub is received
             const trustedChannel =
               trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
-            console.log({ trustedChannel });
             if (trustedChannel.data.length === 2) {
               const contactsData = trustedChannel.data[1].data;
               if (contactsData && contactsData.xpub) {
