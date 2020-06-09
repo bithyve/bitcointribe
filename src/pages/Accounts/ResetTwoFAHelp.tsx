@@ -96,16 +96,14 @@ const ResetTwoFAHelp = (props) => {
     (async () => {
       if (generatedSecureXPriv) {
         dispatch(clearTransfer(SECURE_ACCOUNT));
-        setTimeout(() => {
-          props.navigation.navigate('Send', {
-            serviceType: SECURE_ACCOUNT,
-            netBalance:
-              service.secureHDWallet.balances.balance +
-              service.secureHDWallet.balances.unconfirmedBalance,
-            sweepSecure: true,
-          });
-          dispatch(secondaryXprivGenerated(null));
-        }, 1000);
+        props.navigation.navigate('Send', {
+          serviceType: SECURE_ACCOUNT,
+          sweepSecure: true,
+          netBalance:
+            service.secureHDWallet.balances.balance +
+            service.secureHDWallet.balances.unconfirmedBalance,
+        });
+        dispatch(secondaryXprivGenerated(null));
       } else if (generatedSecureXPriv === false) {
         setTimeout(() => {
           setSuccessMessageHeader('Invalid Secondary Mnemonic');

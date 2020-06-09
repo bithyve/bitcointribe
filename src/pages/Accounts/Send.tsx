@@ -64,6 +64,7 @@ export default function Send(props) {
       ? props.navigation.getParam('serviceType')
       : REGULAR_ACCOUNT,
   );
+  const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
 
   const service = useSelector((state) => state.accounts[serviceType].service);
@@ -326,7 +327,6 @@ export default function Send(props) {
     if (barcodes.data) {
       const { type } = service.addressDiff(barcodes.data);
       if (type) {
-        const serviceType = REGULAR_ACCOUNT; // default service type
         let item;
         switch (type) {
           case 'address':
@@ -360,7 +360,13 @@ export default function Send(props) {
             props.navigation.navigate('SendToContact', {
               selectedContact: item,
               serviceType,
-              netBalance: balances.regularBalance,
+              sweepSecure,
+              netBalance:
+                serviceType === TEST_ACCOUNT
+                  ? balances.testBalance
+                  : serviceType === REGULAR_ACCOUNT
+                  ? balances.regularBalance
+                  : balances.secureBalance,
               bitcoinAmount: options.amount ? `${options.amount}` : '',
             });
             break;
@@ -504,6 +510,7 @@ export default function Send(props) {
         selectedContact: item,
         serviceType,
         averageTxFees,
+        sweepSecure,
         netBalance,
         bitcoinAmount,
       });
@@ -525,6 +532,7 @@ export default function Send(props) {
           selectedContact: item,
           serviceType,
           averageTxFees,
+          sweepSecure,
           netBalance,
           bitcoinAmount,
         });

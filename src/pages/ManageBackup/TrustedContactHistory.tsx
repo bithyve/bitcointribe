@@ -1138,7 +1138,7 @@ const TrustedContactHistory = (props) => {
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {
             setRenderTimer(false);
-            onOTPShare(index);
+            // onOTPShare(index); commented: causing intransit history to re-iterate
           }
         }}
         enabledInnerScrolling={true}

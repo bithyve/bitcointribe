@@ -783,11 +783,10 @@ export default class SecureAccount {
       console.log('---- Transaction Broadcasted ----');
       console.log({ txid });
 
+      this.secureHDWallet.removeSecondaryXpriv();
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {
       return { status: 107, err: err.message, message: ErrMap[107] };
-    } finally {
-      this.secureHDWallet.removeSecondaryXpriv();
     }
   };
 
