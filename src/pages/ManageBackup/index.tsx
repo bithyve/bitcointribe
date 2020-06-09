@@ -437,7 +437,7 @@ export default function ManageBackup(props) {
     let note = '';
     if (SelectTypeToReshare == 'secondaryDevice') {
       title = 'Reshare Recovery Key\nwith Keeper Device';
-      info = 'Did your keeper device not receive the Recovery Key?';
+      info = 'Did your Keeper device not receive the Recovery Key?';
       note = 'You can reshare the Recovery Key with your \nKeeper Device';
     } else if (
       SelectTypeToReshare == 'contact1' ||

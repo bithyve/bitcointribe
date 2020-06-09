@@ -136,7 +136,7 @@ export default function TrustedContactQr(props) {
       <BottomInfoBox
         title={'Share your Recovery Key'}
         infoText={
-          'Open the QR scanner at the bottom of the Home screen on your keeper Device and scan this QR'
+          'Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR'
         }
       />
     </View>

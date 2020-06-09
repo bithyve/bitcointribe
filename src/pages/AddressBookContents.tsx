@@ -402,7 +402,7 @@ export default function AddressBookContents(props) {
 
           {(IMKeeper.length > 0 || Loading) && (
             <View style={{ marginTop: wp('5%') }}>
-              <Text style={styles.pageTitle}>I am the keeper of</Text>
+              <Text style={styles.pageTitle}>I am the Keeper of</Text>
               <Text style={styles.pageInfoText}>
                 Contacts who I can help restore their wallets.
               </Text>
