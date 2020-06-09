@@ -361,7 +361,7 @@ import QRCoder
     txtPart.font = UIFont.systemFont(ofSize: 6.0)
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
-    v5.addSubView(txtPart)
+    v5.addSubview(txtPart)
 
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
