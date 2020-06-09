@@ -135,7 +135,7 @@ export default function Receive(props) {
         serviceType === SECURE_ACCOUNT
           ? service.secureHDWallet
           : service.hdWallet;
-      console.log("receivingAddress", receivingAddress);
+      console.log('receivingAddress', receivingAddress);
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
@@ -405,6 +405,9 @@ export default function Receive(props) {
           }, 2);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
+        }}
         onPressBack={() => {
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
@@ -415,11 +418,13 @@ export default function Receive(props) {
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
-      headerText={'Recieve via Link'}
+        headerText={'Recieve via Link'}
         contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
-        info={'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'}
+        info={
+          'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'
+        }
         amount={amount === '' ? null : amount}
         link={receiveLink}
         serviceType={serviceType}
