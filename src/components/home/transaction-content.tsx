@@ -155,6 +155,7 @@ const TransactionsContent = ({ transactions, TransactionDetailsBottomSheet, AtCl
                 {[1, 2, 3, 4, 5].map((value) => {
                     return (
                         <View
+                            key={value}
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
