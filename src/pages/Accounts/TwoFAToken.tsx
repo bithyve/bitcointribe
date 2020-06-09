@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  AsyncStorage
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -31,6 +32,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
+import moment from 'moment';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
@@ -76,9 +79,54 @@ export default function TwoFAToken(props) {
     />
   );
 
+  const storeTrustedContactsHistory = async (details) => {
+    if (details && details.length > 0) {
+      let IMKeeperOfHistory = JSON.parse(
+        await AsyncStorage.getItem('IMKeeperOfHistory'),
+      );
+      let OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
+      );
+      for (let i = 0; i < details.length; i++) {
+        const element = details[i];
+        if(element.selectedContact.contactName){
+          let obj = {
+            id: createRandomString(36),
+            title: 'Sent Amount',
+            date: moment(Date.now()).valueOf(),
+            info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            selectedContactInfo: element,
+          };
+          if (element.selectedContact.isWard) {
+            if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
+            IMKeeperOfHistory.push(obj);
+            await AsyncStorage.setItem(
+              'IMKeeperOfHistory',
+              JSON.stringify(IMKeeperOfHistory),
+            );
+          }
+          if (
+            !element.selectedContact.isWard &&
+            !element.selectedContact.isGuardian
+          ) {
+            if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
+            OtherTrustedContactsHistory.push(obj);
+            await AsyncStorage.setItem(
+              'OtherTrustedContactsHistory',
+              JSON.stringify(OtherTrustedContactsHistory),
+            );
+          }
+        }
+      }
+    }
+  };
+
   useEffect(() => {
     if (transfer.stage2.failed) {
       SendUnSuccessBottomSheet.current.snapTo(1);
+    }
+    if(transfer.txid){
+      storeTrustedContactsHistory(transfer.details);
     }
   }, [transfer]);
 
@@ -119,7 +167,7 @@ export default function TwoFAToken(props) {
     );
   };
 
-  if (transfer.txid) return renderSuccessStatusContents();
+  if (transfer.txid) { console.log("transfer transfer.txid", transfer); return renderSuccessStatusContents();}
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />

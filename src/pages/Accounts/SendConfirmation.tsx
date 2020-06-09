@@ -116,31 +116,33 @@ export default function SendConfirmation(props) {
       );
       for (let i = 0; i < details.length; i++) {
         const element = details[i];
-        let obj = {
-          id: createRandomString(36),
-          title: 'Sent Amount',
-          date: moment(Date.now()).valueOf(),
-          info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-          selectedContactInfo: element,
-        };
-        if (element.selectedContact.isWard) {
-          if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
-          IMKeeperOfHistory.push(obj);
-          await AsyncStorage.setItem(
-            'IMKeeperOfHistory',
-            JSON.stringify(IMKeeperOfHistory),
-          );
-        }
-        if (
-          !element.selectedContact.isWard &&
-          !element.selectedContact.isGuardian
-        ) {
-          if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
-          OtherTrustedContactsHistory.push(obj);
-          await AsyncStorage.setItem(
-            'OtherTrustedContactsHistory',
-            JSON.stringify(OtherTrustedContactsHistory),
-          );
+        if(element.selectedContact.contactName){
+          let obj = {
+            id: createRandomString(36),
+            title: 'Sent Amount',
+            date: moment(Date.now()).valueOf(),
+            info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            selectedContactInfo: element,
+          };
+          if (element.selectedContact.isWard) {
+            if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
+            IMKeeperOfHistory.push(obj);
+            await AsyncStorage.setItem(
+              'IMKeeperOfHistory',
+              JSON.stringify(IMKeeperOfHistory),
+            );
+          }
+          if (
+            !element.selectedContact.isWard &&
+            !element.selectedContact.isGuardian
+          ) {
+            if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
+            OtherTrustedContactsHistory.push(obj);
+            await AsyncStorage.setItem(
+              'OtherTrustedContactsHistory',
+              JSON.stringify(OtherTrustedContactsHistory),
+            );
+          }
         }
       }
     }
