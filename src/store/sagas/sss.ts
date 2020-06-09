@@ -884,13 +884,19 @@ function* checkPDFHealthWorker({ payload }) {
     if (!updatedPDFHealth[3]) {
       updatedPDFHealth = {
         ...updatedPDFHealth,
-        [3]: { shareId: pdfHealth[3].shareId, updatedAt: 0 },
+        [3]: {
+          shareId: pdfHealth[3] ? pdfHealth[3].shareId : 'placeHolderID3',
+          updatedAt: 0,
+        },
       };
     }
     if (!updatedPDFHealth[4]) {
       updatedPDFHealth = {
         ...updatedPDFHealth,
-        [4]: { shareId: pdfHealth[4].shareId, updatedAt: 0 },
+        [4]: {
+          shareId: pdfHealth[4] ? pdfHealth[4].shareId : 'placeHolderID4',
+          updatedAt: 0,
+        },
       };
     }
 
