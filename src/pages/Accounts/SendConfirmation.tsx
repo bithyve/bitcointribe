@@ -26,6 +26,7 @@ import {
   transferST2,
   clearTransfer,
   fetchBalanceTx,
+  alternateTransferST2,
 } from '../../store/actions/accounts';
 import { UsNumberFormat } from '../../common/utilities';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -53,7 +54,8 @@ export default function SendConfirmation(props) {
   const averageTxFees = props.navigation.getParam('averageTxFees');
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
-  let netBalance = props.navigation.getParam('netBalance');
+  const sweepSecure = props.navigation.getParam('sweepSecure');
+  const netBalance = props.navigation.getParam('netBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const viewRef = useRef(null);
@@ -151,8 +153,12 @@ export default function SendConfirmation(props) {
         : sliderValueText === 'In the middle'
         ? 'medium'
         : 'high';
-    dispatch(transferST2(serviceType, txPriority));
-  }, [serviceType, sliderValueText]);
+    if (sweepSecure) {
+      dispatch(alternateTransferST2(serviceType, txPriority));
+    } else {
+      dispatch(transferST2(serviceType, txPriority));
+    }
+  }, [serviceType, sliderValueText, sweepSecure]);
 
   const tapSliderHandler = (evt) => {
     if (viewRef.current) {

@@ -62,6 +62,7 @@ export default function SendToContact(props) {
   const [netBalance, setNetBalance] = useState(
     props.navigation.getParam('netBalance'),
   );
+  const sweepSecure = props.navigation.getParam('sweepSecure');
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
@@ -170,6 +171,7 @@ export default function SendToContact(props) {
     } else if (transfer.executed === 'ST1') {
       props.navigation.navigate('SendConfirmation', {
         serviceType,
+        sweepSecure,
         netBalance,
         recipients,
         averageTxFees,

@@ -587,7 +587,6 @@ function* alternateTransferST2Worker({ payload }) {
     txnPriority,
     nSequence,
   );
-  console.log({ res });
   if (res.status === 200) {
     yield put(alternateTransferST2Executed(serviceType, res.data.txid));
   } else {
