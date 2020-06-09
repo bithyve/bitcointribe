@@ -483,7 +483,8 @@ function* generatePersonalCopyWorker({ payload }) {
       generatePDF,
       pdfData,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
-      `Hexa Share ${shareIndex + 1}`,
+      // `Hexa Share ${shareIndex + 1}`,
+      `Hexa Recovery Key for ${walletName}'s Wallet`,
       security.answer,
     );
 

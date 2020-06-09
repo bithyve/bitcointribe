@@ -19,8 +19,8 @@ export default function LoaderModal(props) {
             </View>
             <View style={{marginLeft:wp('8%'), marginRight:wp('8%'), marginTop:wp('8%')}}>
                 <Text style={{color:Colors.blue, fontSize:RFValue(18), fontFamily:Fonts.FiraSansMedium}}>{props.headerText}</Text>
-                <Text style={{color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
-                <Text style={{color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText2 ? props.messageText2 : ''}</Text>
+                <Text style={{marginRight: wp('20%'), color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText}</Text>
+                <Text style={{marginRight: wp('20%'), color:Colors.textColorGrey, fontSize:RFValue(11), fontFamily:Fonts.FiraSansRegular, marginTop:wp('3%')}}>{props.messageText2 ? props.messageText2 : ''}</Text>
             </View>
             
         </View>

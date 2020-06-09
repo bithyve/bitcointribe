@@ -347,6 +347,12 @@ export default function Login(props) {
     }
   }, [authenticationFailed]);
 
+  useEffect(() => {
+    if (passcode.length == 4) {
+      proceedButton();
+    }
+  }, [passcode])
+
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
@@ -372,6 +378,22 @@ export default function Login(props) {
       />
     );
   }, []);
+
+  const proceedButton = () => {
+    (loaderBottomSheet as any).current.snapTo(1);
+    setTimeout(() => {
+      setSubTextMessage1(
+        'Did you know that 1 bitcoin = 100 million sats?',
+      );
+      setSubTextMessage2(
+        'Hexa uses sats to make it easier to use bitcoins',
+      );
+    }, 3000);
+    setTimeout(() => {
+      setElevation(0);
+    }, 2);
+    dispatch(credsAuth(passcode));
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -515,7 +537,7 @@ export default function Login(props) {
             </View>
           </View>
 
-          {passcode.length == 4 ? (
+          {/* {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
@@ -544,7 +566,7 @@ export default function Login(props) {
                 <Text style={styles.proceedButtonText}>Proceed</Text>
               </TouchableOpacity>
             </View>
-          ) : null}
+          ) : null} */}
         </View>
 
         <View style={{ marginTop: 'auto' }}>

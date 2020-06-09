@@ -828,7 +828,7 @@ const VoucherScanner = (props) => {
                 </RNCamera>
               </View>
             ) : (
-              <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
+              <TouchableOpacity onPress={() => setOpenCameraFlag(true)} style={{alignSelf: 'center'}}>
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
                   style={styles.cameraImage}
@@ -1062,14 +1062,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cameraView: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
     overflow: 'hidden',
     borderRadius: 20,
+    alignSelf: 'center',
   },
   camera: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
   },
   topCornerView: {
     flexDirection: 'row',
@@ -1121,8 +1122,8 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   cameraImage: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
     overflow: 'hidden',
     borderRadius: 20,
   },
