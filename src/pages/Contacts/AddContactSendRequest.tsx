@@ -219,6 +219,8 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRContents = useCallback(() => {
     return (
       <SendViaQR
+      headerText={'Friends and Family Request'}
+      subHeaderText={'Scan the QR from your contact’s Hexa app'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         QR={trustedQR}
@@ -440,8 +442,6 @@ export default function AddContactSendRequest(props) {
         <View style={{ marginTop: 'auto' }}>
           <View style={{ marginBottom: hp('1%') }}>
             <BottomInfoBox
-              backgroundColor={Colors.backgroundColor1}
-              titleColor={Colors.black1}
               title={'Note'}
               infoText={
                 'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'

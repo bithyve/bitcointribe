@@ -134,7 +134,7 @@ const VoucherScanner = (props) => {
   const accounts = [
     {
       accountType: '',
-      accountName: 'Choose the deposit Account',
+      accountName: 'Choose a deposit account',
       amount: '',
       image: require('../../assets/images/icons/icon_test.png'),
     },
@@ -152,10 +152,10 @@ const VoucherScanner = (props) => {
     },
   ];
   const [selectedAccount, setSelectedAccount] = useState({
-    accountType: '',
-    accountName: 'Choose the deposit Account',
-    amount: '',
-    image: require('../../assets/images/icons/icon_test.png'),
+    accountType: REGULAR_ACCOUNT,
+    accountName: 'Checking Account',
+    amount: '0',
+    image: require('../../assets/images/icons/icon_regular.png'),
   });
   let service = useSelector(
     (state) => state.accounts[selectedAccount.accountType],

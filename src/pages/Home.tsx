@@ -1441,9 +1441,7 @@ export default function Home(props) {
 
   const renderTransactionDetailsHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (TransactionDetailsBottomSheet.current)
             (TransactionDetailsBottomSheet as any).current.snapTo(0);
@@ -1458,15 +1456,16 @@ export default function Home(props) {
         onPressElements={(type) => {
           if (type == 'buyBitcoins') {
             setTimeout(() => {
-              setAddSubBottomSheetsFlag(true);
-              setTabBarZIndex(0);
+              // setAddSubBottomSheetsFlag(true);
+              // setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
-            (AddBottomSheet as any).current.snapTo(1);
+            props.navigation.navigate('VoucherScanner');
+            //(AddBottomSheet as any).current.snapTo(1);
           } else if (type == 'addContact') {
             setTimeout(() => {
-              setAddSubBottomSheetsFlag(true);
-              setAddBottomSheetsFlag(true);
+              //setAddSubBottomSheetsFlag(true);
+             // setAddBottomSheetsFlag(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
@@ -1921,9 +1920,7 @@ export default function Home(props) {
 
   const renderSettingsHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1949,9 +1946,7 @@ export default function Home(props) {
 
   const renderAllAccountsHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -2065,15 +2060,15 @@ export default function Home(props) {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
-            setTimeout(() => {
-              setFamilyAndFriendsBookBottomSheetsFlag(true);
-            }, 2);
+            // setTimeout(() => {
+            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
+            // }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
-            setTimeout(() => {
-              setFamilyAndFriendsBookBottomSheetsFlag(true);
-            }, 2);
+            // setTimeout(() => {
+            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
+            // }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
@@ -2144,9 +2139,7 @@ export default function Home(props) {
 
   const renderFastBitcoinSellCalculationHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
         }}
@@ -2156,9 +2149,7 @@ export default function Home(props) {
 
   const renderFastBitcoinRedeemCalculationHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
         }}
@@ -2186,9 +2177,7 @@ export default function Home(props) {
 
   const renderContactSelectedFromAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
         }}
@@ -2215,9 +2204,7 @@ export default function Home(props) {
 
   const renderContactSelectedFromAddressBookQrCodeHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
             0,
@@ -2230,7 +2217,8 @@ export default function Home(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
-        modalRef={AddContactAddressBookBookBottomSheet}
+      modalTitle={'Add contact to Friends and Family'}
+      modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={(selectedContacts) => {
           setSelectedContact(selectedContacts);
@@ -2238,6 +2226,9 @@ export default function Home(props) {
             SelectedContact: selectedContacts,
           });
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
         }}
         onPressBack={() => {
           setTimeout(() => {
@@ -2251,9 +2242,7 @@ export default function Home(props) {
 
   const renderAddContactAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
@@ -3577,7 +3566,7 @@ export default function Home(props) {
       <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
-          setFamilyAndFriendsBookBottomSheetsFlag(true);
+         // setFamilyAndFriendsBookBottomSheetsFlag(true);
         }}
         onOpenStart={() => {
           setTabBarZIndex(0);
@@ -3595,7 +3584,7 @@ export default function Home(props) {
         renderContent={renderAddContactAddressBookContents}
         renderHeader={renderAddContactAddressBookHeader}
       />
-      {familyAndFriendsBookBottomSheetsFlag ? (
+      {/* {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => {}}
           enabledInnerScrolling={true}
@@ -3624,7 +3613,7 @@ export default function Home(props) {
           renderContent={renderContactSelectedFromAddressBookQrCodeContents}
           renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
         />
-      ) : null}
+      ) : null} */}
 
       <BottomSheet
         onOpenEnd={() => {

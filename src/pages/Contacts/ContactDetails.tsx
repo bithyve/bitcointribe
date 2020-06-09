@@ -92,6 +92,7 @@ export default function ContactDetails(props) {
     props.navigation.navigate('SendToContact', {
       selectedContact: Contact,
       serviceType: REGULAR_ACCOUNT,
+      isFromAddressBook: true
     });
   };
 

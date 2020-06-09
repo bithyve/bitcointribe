@@ -46,9 +46,17 @@ import {
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AccountSelectionModalContents from './AccountSelectionModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function SendToContact(props) {
+  const [SelectedAccountType, setSelectedAccountType] = useState('');
   const dispatch = useDispatch();
+  const isFromAddressBook = props.navigation.getParam('isFromAddressBook')
+    ? props.navigation.getParam('isFromAddressBook')
+    : null;
+  const [isOpen, setIsOpen] = useState(false);
   const [RemoveBottomSheet, setRemoveBottomSheet] = useState(React.createRef());
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(
@@ -78,6 +86,10 @@ export default function SendToContact(props) {
   const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
+  const [
+    AccountSelectionBottomSheet,
+    setAccountSelectionBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
   const [recipients, setRecipients] = useState([]);
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
@@ -571,6 +583,33 @@ export default function SendToContact(props) {
     }
   }, []);
 
+  const renderAccountSelectionContents = useCallback(() => {
+    return (
+      <AccountSelectionModalContents
+        selectedContact={removeItem}
+        onPressBack={() => {
+          AccountSelectionBottomSheet.current.snapTo(0);
+        }}
+        onPressConfirm={(type) => {
+          AccountSelectionBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            setSelectedAccountType(type);
+          }, 2);
+        }}
+      />
+    );
+  }, []);
+
+  const renderAccountSelectionHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        onPressHeader={() => {
+          AccountSelectionBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   const checkRecordsHavingPrice = () => {
     if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
@@ -680,56 +719,74 @@ export default function SendToContact(props) {
         >
           {'Sending From: '}
         </Text>
-        <Text
-          style={{
-            color: Colors.blue,
-            fontSize: RFValue(12),
-            fontFamily: Fonts.FiraSansItalic,
+        <TouchableOpacity
+          activeOpacity={10}
+          onPress={() => {
+            if (isFromAddressBook)
+              AccountSelectionBottomSheet.current.snapTo(1);
           }}
+          style={{ flexDirection: 'row' }}
         >
-          {getServiceTypeAccount()}
-        </Text>
-        <Text
-          style={{
-            color: Colors.blue,
-            fontSize: RFValue(10),
-            fontFamily: Fonts.FiraSansItalic,
-            lineHeight: 15,
-            textAlign: 'center',
-          }}
-        >
-          {' (Availble to spend '}
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansItalic,
+            }}
+          >
+            {getServiceTypeAccount()}
+          </Text>
           <Text
             style={{
               color: Colors.blue,
               fontSize: RFValue(10),
               fontFamily: Fonts.FiraSansItalic,
+              lineHeight: 15,
+              textAlign: 'center',
             }}
           >
-            {serviceType == 'Test Account'
-              ? UsNumberFormat(netBalance)
-              : switchOn
-              ? UsNumberFormat(netBalance)
-              : exchangeRates
-              ? ((netBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(
-                  2,
-                )
-              : null}
+            {' (Availble to spend '}
+            <Text
+              style={{
+                color: Colors.blue,
+                fontSize: RFValue(10),
+                fontFamily: Fonts.FiraSansItalic,
+              }}
+            >
+              {serviceType == 'Test Account'
+                ? UsNumberFormat(netBalance)
+                : switchOn
+                ? UsNumberFormat(netBalance)
+                : exchangeRates
+                ? (
+                    (netBalance / 1e8) *
+                    exchangeRates[CurrencyCode].last
+                  ).toFixed(2)
+                : null}
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(7),
+                fontFamily: Fonts.FiraSansMediumItalic,
+              }}
+            >
+              {serviceType == 'Test Account'
+                ? ' t-sats )'
+                : switchOn
+                ? ' sats )'
+                : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+            </Text>
           </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(7),
-              fontFamily: Fonts.FiraSansMediumItalic,
-            }}
-          >
-            {serviceType == 'Test Account'
-              ? ' t-sats )'
-              : switchOn
-              ? ' sats )'
-              : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
-          </Text>
-        </Text>
+          {isFromAddressBook && (
+            <Ionicons
+              style={{ marginLeft: 5 }}
+              name={isOpen ? 'ios-arrow-up' : 'ios-arrow-down'}
+              size={RFValue(15)}
+              color={Colors.blue}
+            />
+          )}
+        </TouchableOpacity>
       </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -896,6 +953,16 @@ export default function SendToContact(props) {
         snapPoints={[-50, hp('65%')]}
         renderContent={renderSendUnSuccessContents}
         renderHeader={renderSendUnSuccessHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={AccountSelectionBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
+        renderContent={renderAccountSelectionContents}
+        renderHeader={renderAccountSelectionHeader}
       />
     </View>
   );

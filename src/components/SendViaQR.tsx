@@ -118,7 +118,7 @@ export default function SendViaQR(props) {
                 paddingTop: 5,
               }}
             >
-              Lorem ipsum dolor sit amet, consec
+              {props.subHeaderText ? props.subHeaderText : 'Scan the QR from your contact’s Hexa app'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
@@ -410,11 +410,9 @@ export default function SendViaQR(props) {
 
       <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
-          backgroundColor={Colors.backgroundColor1}
-          titleColor={Colors.black1}
           title={'Note'}
           infoText={
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+            'Use the scanner of your friends app to scan the QR and proceed with the Friends and Family request'
           }
         />
       </View>

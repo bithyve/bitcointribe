@@ -182,14 +182,14 @@ export default function AddressBookContents(props) {
               }}
             >
               {item
-                ? nameToInitials(
+                ? nameToInitials(item.firstName == "Secondary" && item.lastName == "Device" ? "Keeper Device" :
                     item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
                       ? item.firstName
                       : !item.firstName && item.lastName
                       ? item.lastName
-                      : '',
+                      : ''
                   )
                 : ''}
             </Text>
@@ -219,13 +219,13 @@ export default function AddressBookContents(props) {
             contact.contactName.split(' ')[0] &&
             contact.contactName != 'Secondary Device'
               ? contact.contactName.split(' ')[0]
-              : 'Keeper'}{' '}
+              : contact.contactName && contact.contactName == 'Secondary Device' ? 'Keeper' : ""}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.contactName &&
               contact.contactName.split(' ')[1] &&
               contact.contactName != 'Secondary Device'
                 ? contact.contactName.split(' ')[1]
-                : 'Device'}
+                : contact.contactName && contact.contactName == 'Secondary Device' ? 'Device' : ""}
             </Text>
           </Text>
           {contact.connectedVia ? (

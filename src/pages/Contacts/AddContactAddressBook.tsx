@@ -334,7 +334,7 @@ export default function AddContactAddressBook(props) {
               {props.modalTitle ? props.modalTitle : 'Add Contact'}
             </Text>
             <Text style={styles.modalHeaderInfoText}>
-              {'Lorem ipsum dolor sit amet, consec'}
+              {/* {'Lorem ipsum dolor sit amet, consec'} */}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
@@ -376,9 +376,9 @@ export default function AddContactAddressBook(props) {
             paddingTop: wp('5%'),
           }}
         >
-          <Text style={styles.modalHeaderInfoText}>
-            Add contacts from your address book, or add a new contact
-          </Text>
+          {/* <Text style={styles.modalHeaderInfoText}>
+            {'Add contacts from your address book, or add a new contact'}
+          </Text> */}
         </View>
         <View style={{ flex: 1, ...props.style }}>
           <View style={styles.selectedContactContainer}>
