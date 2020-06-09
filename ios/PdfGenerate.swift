@@ -65,6 +65,15 @@ import QRCoder
     txtTitle.textAlignment = .left
     txtTitle.sizeToFit()
     v1.addSubview(txtTitle)
+
+    txtPart.text = "Follow the instructions on the app to scan the 8 QRs below"
+    txtPart.lineBreakMode = .byWordWrapping
+    txtPart.numberOfLines = 0
+    txtPart.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.font = UIFont.systemFont(ofSize: 6.0)
+    txtPart.textAlignment = .left
+    txtPart.sizeToFit()
+    v1.addSubView(txtPart)
     
     //          let imageTitle:UIImage? = (title as String).image(withAttributes: [.font: UIFont.systemFont(ofSize: 80.0)])
     //          let imageViewTitle = UIImageView()
@@ -73,6 +82,7 @@ import QRCoder
     //          v1.addSubview(imageViewTitle)
     
     // part 1
+    txtPart = UILabel()
     txtPart.text = "Part 1:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
@@ -335,7 +345,7 @@ import QRCoder
       
     
     txtTitle = UILabel();
-    txtTitle.text = "Exit Key:"
+    txtTitle.text = "Exit/Regenerate 2FA Key:"
     txtTitle.lineBreakMode = .byWordWrapping
     txtTitle.numberOfLines = 0
     txtTitle.frame = CGRect(x:5,y:(txtMessage.frame.origin.y + txtMessage.frame.height),width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
@@ -343,6 +353,16 @@ import QRCoder
     txtTitle.textAlignment = .left
     txtTitle.sizeToFit()
     v5.addSubview(txtTitle)
+
+    txtPart.text = "Use this key to reset the 2FA if you have lost your authenticator/ Keeper app or for exiting your funds from Savings account if the BitHyve server is not responding"
+    txtPart.lineBreakMode = .byWordWrapping
+    txtPart.numberOfLines = 0
+    txtPart.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.font = UIFont.systemFont(ofSize: 6.0)
+    txtPart.textAlignment = .left
+    txtPart.sizeToFit()
+    v1.addSubView(txtPart)
+
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
     qrCodeImage.image = generator.createImage(value: secondaryMnemonic as String,size: CGSize(width: 80, height: 70))
