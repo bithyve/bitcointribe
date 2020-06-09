@@ -82,7 +82,7 @@ import QRCoder
     //          v1.addSubview(imageViewTitle)
     
     // part 1
-    txtPart = UILabel()
+    txtPart = UILabel();
     txtPart.text = "Part 1:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
@@ -361,7 +361,7 @@ import QRCoder
     txtPart.font = UIFont.systemFont(ofSize: 6.0)
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
-    v1.addSubView(txtPart)
+    v5.addSubView(txtPart)
 
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();

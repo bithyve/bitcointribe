@@ -710,7 +710,7 @@ export default function RestoreSelectedContactsList(props) {
           <View style={styles.textInfoView}>
             <Text style={styles.listElementsTitle}>Keeper Device (One)</Text>
             <Text style={styles.listElementsInfo}>
-              You need your keeper device with you to scan the QR code
+              You need your Keeper device with you to scan the QR code
             </Text>
           </View>
           <View style={styles.listElementIcon}>
