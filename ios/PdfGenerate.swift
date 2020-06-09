@@ -73,7 +73,7 @@ import QRCoder
     txtPart.font = UIFont.systemFont(ofSize: 6.0)
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
-    v1.addSubView(txtPart)
+    v1.addSubview(txtPart)
     
     //          let imageTitle:UIImage? = (title as String).image(withAttributes: [.font: UIFont.systemFont(ofSize: 80.0)])
     //          let imageViewTitle = UIImageView()
