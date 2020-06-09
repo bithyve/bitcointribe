@@ -20,13 +20,7 @@ export default function SaveBitcoinModalContents(props) {
         image: require('../../assets/images/icons/voucher.png'),
         info: 'Purchase a voucher or use a voucher you own',
         type: 'voucher'
-      },
-      {
-        title: 'Existing Buying Options',
-        image: require('../../assets/images/icons/existing_saving_method.png'),
-        info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
-        type: 'existingBuyingMethods'
-      },
+      }
   ] )
   
 //   function isEmpty(obj) {
@@ -69,7 +63,6 @@ export default function SaveBitcoinModalContents(props) {
           </View>
         )}
         renderItem={({ item }) => {
-          if(item.type == 'existingBuyingMethods' && props.isExistingSavingMethod && props.isExistingSavingMethod){ return null;}
            return (<AppBottomSheetTouchableWrapper
             onPress={() => props.onPressElements(item.type)}
             style={styles.addModalView}
