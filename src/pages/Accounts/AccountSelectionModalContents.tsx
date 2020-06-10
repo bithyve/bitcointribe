@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -12,23 +12,31 @@ import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/serviceT
 import RadioButton from '../../components/RadioButton';
 
 export default function AccountSelectionModalContents(props) {
+  let RegularBalance = props.RegularAccountBalance;
+  let SavingBalance = props.SavingAccountBalance;
   const [SelectedAccountType, setSelectedAccountType] = useState("");
-	const [accountData, setAccountData] = useState([
+	let [accountData, setAccountData] = useState([
     {
       accountName: 'Checking Account',
-      accountBalance: '2000',
+      accountBalance: props.RegularAccountBalance,
       accountImage: require('../../assets/images/icons/icon_regular_account.png'),
 			type: REGULAR_ACCOUNT,
 			isSelected: false
     },
     {
       accountName: 'Savings Account',
-      accountBalance: '1000',
+      accountBalance: props.SavingAccountBalance,
       accountImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
 			type: SECURE_ACCOUNT,
 			isSelected: false
     },
   ]);
+    
+  useEffect(()=>{
+    accountData[0].accountBalance = RegularBalance;
+    accountData[1].accountBalance = SavingBalance;
+    setAccountData(accountData);
+  },[RegularBalance, SavingBalance])
 
   const onAccountSelection = (item) =>{
     for (let i = 0; i < accountData.length; i++) {
@@ -60,7 +68,7 @@ export default function AccountSelectionModalContents(props) {
               onpress={() => onAccountSelection(item)} 
             />
           </View>
-          <View style={{flexDirection:'row', backgroundColor: Colors.backgroundColor1, width: wp('80%'), padding: wp('3%'), borderRadius: 10}}>
+          <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => onAccountSelection(item)}  style={{flexDirection:'row', backgroundColor: Colors.backgroundColor1, width: wp('80%'), padding: wp('3%'), borderRadius: 10}}>
             <View style={{width: wp('17%'), height: wp("17%"), backgroundColor: Colors.backgroundColor, borderRadius: wp('17%')/2, justifyContent:'center', alignItems:'center', borderWidth:2, borderColor: Colors.white, 
             shadowOffset: {
               width: 0,
@@ -78,7 +86,7 @@ export default function AccountSelectionModalContents(props) {
               <Text style={{color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(20)}}>{item.accountName}</Text>
               <Text style={{color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue(10), marginTop: 5}}>Available to spend {item.accountBalance} sats</Text>
             </View>
-          </View>
+          </AppBottomSheetTouchableWrapper>
         </View>
          })}
       </View>

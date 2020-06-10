@@ -1533,6 +1533,7 @@ export default function Home(props) {
     return (
       <MoreHomePageTabContents
         onPressElements={(item) => onPressElement(item)}
+        isExistingSavingMethod={isEmpty(FBTCAccount)}
       />
     );
   }
@@ -1883,6 +1884,9 @@ export default function Home(props) {
         setTabBarZIndex(0);
       }, 10);
     }
+    else if (item.title == 'Services') {
+      props.navigation.navigate('ExistingSavingMethods');
+    }
     // else if (item.title == 'All accounts and funds') {
     //   (AllAccountsBottomSheet as any).current.snapTo(1);
     //   setTimeout(() => {
@@ -2025,8 +2029,6 @@ export default function Home(props) {
   const onPressSaveBitcoinElements = (type) => {
     if (type == 'voucher') {
       props.navigation.navigate('VoucherScanner');
-    } else if (type == 'existingBuyingMethods') {
-      props.navigation.navigate('ExistingSavingMethods');
     }
   };
 
@@ -2038,7 +2040,6 @@ export default function Home(props) {
             (AddBottomSheet as any).current.snapTo(0);
           }}
           onPressElements={(type) => onPressSaveBitcoinElements(type)}
-          isExistingSavingMethod={isEmpty(FBTCAccount)}
         />
       );
     }

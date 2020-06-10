@@ -383,7 +383,6 @@ export default function Receive(props) {
   const renderAddContactAddressBookHeader = () => {
     return (
       <SmallHeaderModal
-        borderColor={Colors.white}
         backgroundColor={Colors.white}
         onPressHeader={() => {
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
