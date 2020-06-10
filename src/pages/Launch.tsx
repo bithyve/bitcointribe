@@ -116,6 +116,11 @@ export default function Launch(props) {
                   hint: splits[8],
                 };
                 props.navigation.replace('Login', { recoveryRequest });
+              } else if (splits[4] === 'rrk') {
+                Alert.alert(
+                  'Restoration link Identified',
+                  'Restoration links only works during restoration mode',
+                );
               } else {
                 const EmailToken = url.substr(url.lastIndexOf('/') + 1);
                 console.log('EmailToken', EmailToken);

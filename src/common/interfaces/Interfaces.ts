@@ -27,6 +27,10 @@ export interface DecentralizedBackup {
     [TAG: string]: {
       META_SHARE: MetaShare;
       ENC_DYNAMIC_NONPMDD: EncDynamicNonPMDD;
+      TRANSFER_DETAILS: {
+        KEY: string;
+        UPLOADED_AT: number;
+      };
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;
