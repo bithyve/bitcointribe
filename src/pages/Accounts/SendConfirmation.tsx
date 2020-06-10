@@ -94,7 +94,9 @@ export default function SendConfirmation(props) {
   useEffect(() => {
     console.log('transfer', transfer);
     if (transfer.stage2.failed) {
-      SendUnSuccessBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        SendUnSuccessBottomSheet.current.snapTo(1);
+      }, 2);
     } else if (transfer.txid) {
       storeTrustedContactsHistory(transfer.details);
       SendSuccessBottomSheet.current.snapTo(1);
@@ -328,9 +330,11 @@ export default function SendConfirmation(props) {
             SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
-          //dispatch(clearTransfer(serviceType));
+          dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
+
+          props.navigation.navigate('Accounts');
         }}
         isUnSuccess={true}
       />

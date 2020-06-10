@@ -31,6 +31,7 @@ import {
   transferST1,
   addTransferDetails,
   removeTransferDetails,
+  clearTransfer,
 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -423,9 +424,11 @@ export default function SendToContact(props) {
             SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
-          //dispatch(clearTransfer(serviceType));
+          dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
+
+          props.navigation.navigate('Accounts');
         }}
         isUnSuccess={true}
       />
