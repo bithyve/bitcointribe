@@ -117,6 +117,7 @@ import {
   TrustedContactDerivativeAccount,
   EphemeralData,
 } from '../bitcoin/utilities/Interface';
+import * as RNLocalize from "react-native-localize";
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -1113,21 +1114,16 @@ export default function Home(props) {
     }
   };
   const setCurrencyCodeFromAsync = async () => {
+    ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      const identifiers = ['io.hexawallet.hexa'];
-      NativeModules.InAppUtils.loadProducts(
-        identifiers,
-        async (error, products) => {
-          await AsyncStorage.setItem(
-            'currencyCode',
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-          setCurrencyCode(
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-        },
-      );
+      await AsyncStorage.setItem(
+              'currencyCode',
+              RNLocalize.getCurrencies()[0],
+            );
+            setCurrencyCode(
+              RNLocalize.getCurrencies()[0],
+            );
     } else {
       setCurrencyCode(currencyCodeTmp);
     }
