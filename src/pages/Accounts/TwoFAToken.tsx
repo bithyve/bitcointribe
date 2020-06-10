@@ -77,8 +77,10 @@ export default function TwoFAToken(props) {
   );
 
   useEffect(() => {
-    if (transfer.stage2.failed) {
-      SendUnSuccessBottomSheet.current.snapTo(1);
+    if (!transfer.txid && transfer.stage3.failed) {
+      setTimeout(() => {
+        SendUnSuccessBottomSheet.current.snapTo(1);
+      }, 2);
     }
   }, [transfer]);
 
@@ -99,8 +101,10 @@ export default function TwoFAToken(props) {
         }}
         onPressCancel={() => {
           //dispatch(clearTransfer(serviceType));
+          dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
+          props.navigation.navigate('Accounts');
         }}
         isUnSuccess={true}
       />
