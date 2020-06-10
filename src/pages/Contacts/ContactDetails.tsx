@@ -41,6 +41,7 @@ import {
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import config from '../../bitcoin/HexaConfig';
+import SendViaQR from '../../components/SendViaQR';
 
 export default function ContactDetails(props) {
   const dispatch = useDispatch();
@@ -50,7 +51,10 @@ export default function ContactDetails(props) {
   const index = props.navigation.state.params.index;
   const [contact, setContact] = useState(Contact ? Contact : Object);
   const [SelectedOption, setSelectedOption] = useState(0);
-  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  // const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  //   React.createRef(),
+  // );
+  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
   const [trustedContactHistory, setTrustedContactHistory] = useState([
@@ -91,7 +95,9 @@ export default function ContactDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const [trustedLink, setTrustedLink] = useState('');
+  // const [trustedLink, setTrustedLink] = useState('');
+  const [trustedQR, setTrustedQR] = useState('');
+
   const [key, setKey] = useState('');
   const uploading = useSelector(
     (state) => state.sss.loading.uploadRequestedShare,
@@ -308,53 +314,67 @@ export default function ContactDetails(props) {
     ) {
       const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
 
-      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
-        const phoneNumber = Contact.phoneNumbers[0].number;
-        console.log({ phoneNumber });
-        const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-        const numHintType = 'num';
-        const numHint = number.slice(number.length - 3);
-        const numberEncKey = TrustedContactsService.encryptPub(KEY, number)
-          .encryptedPub;
-        const numberDL =
-          `https://hexawallet.io/${config.APP_STAGE}/rrk` +
-          `/${requester}` +
-          `/${numberEncKey}` +
-          `/${numHintType}` +
-          `/${numHint}` +
-          `/${UPLOADED_AT}`;
-        console.log({ numberDL });
-        setTrustedLink(numberDL);
-        setTimeout(() => {
-          (SendViaLinkBottomSheet as any).current.snapTo(1);
-        }, 2);
-      } else if (Contact.emails && Contact.emails.length) {
-        const email = Contact.emails[0].email;
-        const emailInitials: string = email.split('@')[0];
-        const emailHintType = 'eml';
-        const emailHint = emailInitials.slice(emailInitials.length - 3);
-        const emailEncKey = TrustedContactsService.encryptPub(
-          KEY,
-          emailInitials,
-        ).encryptedPub;
-        const emailDL =
-          `https://hexawallet.io/${config.APP_STAGE}/rrk` +
-          `/${requester}` +
-          `/${emailEncKey}` +
-          `/${emailHintType}` +
-          `/${emailHint}` +
-          `/${UPLOADED_AT}`;
-        console.log({ emailDL });
-        setTrustedLink(emailDL);
-        setTimeout(() => {
-          (SendViaLinkBottomSheet as any).current.snapTo(1);
-        }, 2);
-      } else {
-        Alert.alert(
-          'Invalid Contact',
-          'Cannot add a contact without phone-num/email as a trusted entity',
-        );
-      }
+      // if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+      //   const phoneNumber = Contact.phoneNumbers[0].number;
+      //   console.log({ phoneNumber });
+      //   const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      //   const numHintType = 'num';
+      //   const numHint = number.slice(number.length - 3);
+      //   const numberEncKey = TrustedContactsService.encryptPub(KEY, number)
+      //     .encryptedPub;
+      //   const numberDL =
+      //     `https://hexawallet.io/${config.APP_STAGE}/rrk` +
+      //     `/${requester}` +
+      //     `/${numberEncKey}` +
+      //     `/${numHintType}` +
+      //     `/${numHint}` +
+      //     `/${UPLOADED_AT}`;
+      //   console.log({ numberDL });
+      //   setTrustedLink(numberDL);
+      //   setTimeout(() => {
+      //     (SendViaLinkBottomSheet as any).current.snapTo(1);
+      //   }, 2);
+      // } else if (Contact.emails && Contact.emails.length) {
+      //   const email = Contact.emails[0].email;
+      //   const emailInitials: string = email.split('@')[0];
+      //   const emailHintType = 'eml';
+      //   const emailHint = emailInitials.slice(emailInitials.length - 3);
+      //   const emailEncKey = TrustedContactsService.encryptPub(
+      //     KEY,
+      //     emailInitials,
+      //   ).encryptedPub;
+      //   const emailDL =
+      //     `https://hexawallet.io/${config.APP_STAGE}/rrk` +
+      //     `/${requester}` +
+      //     `/${emailEncKey}` +
+      //     `/${emailHintType}` +
+      //     `/${emailHint}` +
+      //     `/${UPLOADED_AT}`;
+      //   console.log({ emailDL });
+      //   setTrustedLink(emailDL);
+      //   setTimeout(() => {
+      //     (SendViaLinkBottomSheet as any).current.snapTo(1);
+      //   }, 2);
+      // } else {
+      //   Alert.alert(
+      //     'Invalid Contact',
+      //     'Cannot add a contact without phone-num/email as a trusted entity',
+      //   );
+      // }
+
+      setTrustedQR(
+        JSON.stringify({
+          requester: requester,
+          publicKey: KEY,
+          uploadedAt: UPLOADED_AT,
+          type: 'ReverseRecoveryQR',
+        }),
+      );
+
+      setTimeout(() => {
+        (SendViaQRBottomSheet as any).current.snapTo(1);
+      }, 2);
+
       dispatch(UploadSuccessfully(null));
     }
   }, [Contact, UNDER_CUSTODY]);
@@ -395,7 +415,7 @@ export default function ContactDetails(props) {
       dispatch(uploadRequestedShare(requester, encryptionKey));
     } else {
       setTimeout(() => {
-        (SendViaLinkBottomSheet as any).current.snapTo(1);
+        (SendViaQRBottomSheet as any).current.snapTo(1);
       }, 2);
     }
   }, [Contact, UNDER_CUSTODY]);
@@ -414,30 +434,61 @@ export default function ContactDetails(props) {
     }
   }, [errorSending]);
 
-  const renderSendViaLinkContents = useCallback(() => {
+  // const renderSendViaLinkContents = useCallback(() => {
+  //   return (
+  //     <SendViaLink
+  //       contactText={'Send Recovery Secret'}
+  //       contact={Contact}
+  //       link={trustedLink}
+  //       contactEmail={''}
+  //       onPressBack={() => {
+  //         if (SendViaLinkBottomSheet.current)
+  //           (SendViaLinkBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       onPressDone={() => {
+  //         (SendViaLinkBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, [Contact, trustedLink]);
+
+  // const renderSendViaLinkHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         if (SendViaLinkBottomSheet.current)
+  //           (SendViaLinkBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
+
+  const renderSendViaQRContents = useCallback(() => {
     return (
-      <SendViaLink
-        contactText={'Send Recovery Secret'}
+      <SendViaQR
+        headerText={'Send Recovery Secret'}
+        subHeaderText={'Your ward should scan the QR to restore'}
+        contactText={''}
         contact={Contact}
-        link={trustedLink}
+        QR={trustedQR}
         contactEmail={''}
         onPressBack={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
+          if (SendViaQRBottomSheet.current)
+            (SendViaQRBottomSheet as any).current.snapTo(0);
         }}
         onPressDone={() => {
-          (SendViaLinkBottomSheet as any).current.snapTo(0);
+          (SendViaQRBottomSheet as any).current.snapTo(0);
         }}
       />
     );
-  }, [Contact, trustedLink]);
+  }, [Contact, trustedQR]);
 
-  const renderSendViaLinkHeader = useCallback(() => {
+  const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
+          if (SendViaQRBottomSheet.current)
+            (SendViaQRBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -740,7 +791,10 @@ export default function ContactDetails(props) {
               height: wp('30'),
             }}
           >
-            <TouchableOpacity style={styles.bottomButton}>
+            <TouchableOpacity
+              style={styles.bottomButton}
+              onPress={onHelpRestore}
+            >
               <Image
                 source={require('../../assets/images/icons/icon_sell.png')}
                 style={styles.buttonImage}
@@ -771,7 +825,7 @@ export default function ContactDetails(props) {
           </View>
         )}
       </View>
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -780,6 +834,16 @@ export default function ContactDetails(props) {
         ]}
         renderContent={renderSendViaLinkContents}
         renderHeader={renderSendViaLinkHeader}
+      /> */}
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendViaQRBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+        ]}
+        renderContent={renderSendViaQRContents}
+        renderHeader={renderSendViaQRHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}

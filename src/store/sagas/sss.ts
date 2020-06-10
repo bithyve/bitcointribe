@@ -340,11 +340,9 @@ function* uploadRequestedShareWorker({ payload }) {
       },
     };
 
-    yield put(
-      insertIntoDB({
-        DECENTRALIZED_BACKUP: updatedBackup,
-      }),
-    );
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
 
     yield put(requestedShareUploaded(tag, true));
     yield put(UploadSuccessfully(true));
