@@ -145,7 +145,7 @@ export const CHECKED_PDF_HEALTH = 'CHECKED_PDF_HEALTH';
 export const PDF_HEALTH_CHECK_FAILED = 'PDF_HEALTH_CHECK_FAILED';
 export const UNABLE_RECOVER_SHARE_FROM_QR = 'UNABLE_RECOVER_SHARE_FROM_QR';
 export const WALLET_RECOVERY_FAILED = 'WALLET_RECOVERY_FAILED';
-export const UPLOAD_SUCCEFULLY = 'UPLOAD_SUCCEFULLY';
+export const UPLOAD_SUCCESSFULLY = 'UPLOAD_SUCCESSFULLY';
 export const WALLET_IMAGE_CHECKED = 'WALLET_IMAGE_CHECKED';
 
 export const healthCheckInitialized = () => {
@@ -225,7 +225,7 @@ export const ErrorSending = (isFailed) => {
 };
 
 export const UploadSuccessfully = (isUploaded) => {
-  return { type: UPLOAD_SUCCEFULLY, payload: { isUploaded } };
+  return { type: UPLOAD_SUCCESSFULLY, payload: { isUploaded } };
 };
 
 export const ErrorReceiving = (isFailed) => {

@@ -1190,29 +1190,33 @@ export default function Home(props) {
     dispatch(ErrorSending(null));
   }
 
-  if (isUploadSuccessfully) {
-    setTimeout(() => {
-      setErrorMessageHeader('Sending successful');
-      setErrorMessage(
-        'The Recovery Key has been sent, the receiver needs to accept ',
-      );
-      setButtonText('Done');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(UploadSuccessfully(null));
-  }
+  useEffect(() => {
+    if (isUploadSuccessfully) {
+      setTimeout(() => {
+        setErrorMessageHeader('Sending successful');
+        setErrorMessage(
+          'The Recovery Secret has been sent, the receiver needs to accept ',
+        );
+        setButtonText('Done');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(UploadSuccessfully(null));
+    }
+  }, [isUploadSuccessfully]);
 
-  if (isErrorReceivingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Key');
-      setErrorMessage(
-        'There was an error while receiving your Recovery Key, please try again',
-      );
-      setButtonText('Try again');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorReceiving(null));
-  }
+  useEffect(() => {
+    if (isErrorReceivingFailed) {
+      setTimeout(() => {
+        setErrorMessageHeader('Error sending Recovery Secret');
+        setErrorMessage(
+          'There was an error while sending your Recovery Secret, please try again in a little while',
+        );
+        setButtonText('Try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(ErrorSending(null));
+    }
+  }, [isErrorReceivingFailed]);
 
   const updateAccountCardData = () => {
     let newArrayFinal = [];
@@ -1407,6 +1411,13 @@ export default function Home(props) {
           });
           break;
 
+        case 'restorationQR':
+          Alert.alert(
+            'Restoration QR Identified',
+            'Restoration QR only works during restoration mode',
+          );
+          break;
+
         default:
           break;
       }
@@ -1465,7 +1476,7 @@ export default function Home(props) {
           } else if (type == 'addContact') {
             setTimeout(() => {
               //setAddSubBottomSheetsFlag(true);
-             // setAddBottomSheetsFlag(true);
+              // setAddBottomSheetsFlag(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
@@ -2218,8 +2229,8 @@ export default function Home(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
-      modalTitle={'Add contact to Friends and Family'}
-      modalRef={AddContactAddressBookBookBottomSheet}
+        modalTitle={'Add contact to Friends and Family'}
+        modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={(selectedContacts) => {
           setSelectedContact(selectedContacts);
@@ -2385,6 +2396,11 @@ export default function Home(props) {
         recoveryRequest,
         trustedContactRequest: null,
       });
+    } else if (splits[4] === 'rrk') {
+      Alert.alert(
+        'Restoration link Identified',
+        'Restoration links only works during restoration mode',
+      );
     }
 
     if (event.url.includes('fastbitcoins')) {
@@ -3567,7 +3583,7 @@ export default function Home(props) {
       <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
-         // setFamilyAndFriendsBookBottomSheetsFlag(true);
+          // setFamilyAndFriendsBookBottomSheetsFlag(true);
         }}
         onOpenStart={() => {
           setTabBarZIndex(0);

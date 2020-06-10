@@ -11,7 +11,7 @@ import {
   UNABLE_RECOVER_SHARE_FROM_QR,
   WALLET_RECOVERY_FAILED,
   ERROR_SENDING,
-  UPLOAD_SUCCEFULLY,
+  UPLOAD_SUCCESSFULLY,
   ERROR_RECEIVING,
   WALLET_IMAGE_CHECKED,
   GENERATE_PERSONAL_COPY,
@@ -241,11 +241,13 @@ export default (state = initialState, action) => {
         ...state,
         errorSending: action.payload.isFailed,
       };
-    case UPLOAD_SUCCEFULLY:
+
+    case UPLOAD_SUCCESSFULLY:
       return {
         ...state,
         uploadSuccessfully: action.payload.isUploaded,
       };
+
     case ERROR_RECEIVING:
       return {
         ...state,

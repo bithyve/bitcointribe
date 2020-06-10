@@ -135,7 +135,6 @@ export default function Receive(props) {
         serviceType === SECURE_ACCOUNT
           ? service.secureHDWallet
           : service.hdWallet;
-      console.log('receivingAddress', receivingAddress);
       if (receivingAddress) {
         let receiveAt = receivingAddress;
         if (amount) {
