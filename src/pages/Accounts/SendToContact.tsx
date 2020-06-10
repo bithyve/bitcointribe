@@ -45,6 +45,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -65,7 +66,9 @@ export default function SendToContact(props) {
     accounts && accounts.exchangeRates,
   );
   const selectedContact = props.navigation.getParam('selectedContact');
-  const [serviceType, setServiceType]= useState(props.navigation.getParam('serviceType'));
+  const [serviceType, setServiceType] = useState(
+    props.navigation.getParam('serviceType'),
+  );
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
   );
@@ -106,7 +109,8 @@ export default function SendToContact(props) {
       const element = accountTypeArray[i];
       const service = accounts[element].service;
       const instance = service.hdWallet || service.secureHDWallet;
-      let balance = instance.balances.balance + instance.balances.unconfirmedBalance;
+      let balance =
+        instance.balances.balance + instance.balances.unconfirmedBalance;
       if (element === REGULAR_ACCOUNT) {
         const trustedAccounts: TrustedContactDerivativeAccount =
           accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
@@ -126,14 +130,14 @@ export default function SendToContact(props) {
           }
         }
       }
-      if(element == REGULAR_ACCOUNT) setRegularAccountBalance(balance)
-      if(element == SECURE_ACCOUNT) setSavingAccountBalance(balance)
+      if (element == REGULAR_ACCOUNT) setRegularAccountBalance(balance);
+      if (element == SECURE_ACCOUNT) setSavingAccountBalance(balance);
     }
   }, []);
 
   useEffect(() => {
     dispatch(clearTransfer(serviceType));
-    dispatch(addTransferDetails(serviceType, {selectedContact}));
+    dispatch(addTransferDetails(serviceType, { selectedContact }));
 
     if (netBalance !== 0 && !netBalance) {
       const service = accounts[serviceType].service;
@@ -622,7 +626,7 @@ export default function SendToContact(props) {
   }, []);
 
   const renderAccountSelectionContents = useCallback(() => {
-    console.log("SavingAccountBalance", SavingAccountBalance)
+    console.log('SavingAccountBalance', SavingAccountBalance);
     return (
       <AccountSelectionModalContents
         RegularAccountBalance={RegularAccountBalance}
@@ -633,7 +637,7 @@ export default function SendToContact(props) {
         onPressConfirm={(type) => {
           AccountSelectionBottomSheet.current.snapTo(0);
           setTimeout(() => {
-            setServiceType(type)
+            setServiceType(type);
           }, 2);
         }}
       />
@@ -694,6 +698,29 @@ export default function SendToContact(props) {
         handleTrasferST1();
       }, 10);
     }
+  };
+
+  const getBalanceText = () => {
+    let balance = netBalance;
+    if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
+    if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
+    return (
+      <Text
+        style={{
+          color: Colors.blue,
+          fontSize: RFValue(10),
+          fontFamily: Fonts.FiraSansItalic,
+        }}
+      >
+        {serviceType == TEST_ACCOUNT
+          ? UsNumberFormat(balance)
+          : switchOn
+          ? UsNumberFormat(balance)
+          : exchangeRates
+          ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          : null}
+      </Text>
+    );
   };
 
   return (
@@ -786,24 +813,7 @@ export default function SendToContact(props) {
             }}
           >
             {' (Availble to spend '}
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansItalic,
-              }}
-            >
-              {serviceType == 'Test Account'
-                ? UsNumberFormat(netBalance)
-                : switchOn
-                ? UsNumberFormat(netBalance)
-                : exchangeRates
-                ? (
-                    (netBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
-            </Text>
+            {getBalanceText()}
             <Text
               style={{
                 color: Colors.textColorGrey,
@@ -811,7 +821,7 @@ export default function SendToContact(props) {
                 fontFamily: Fonts.FiraSansMediumItalic,
               }}
             >
-              {serviceType == 'Test Account'
+              {serviceType == TEST_ACCOUNT
                 ? ' t-sats )'
                 : switchOn
                 ? ' sats )'

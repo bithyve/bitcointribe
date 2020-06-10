@@ -203,20 +203,44 @@ export default function TrustedContactRequest(props) {
     }
   };
 
-  const checkForValidation = (text) =>{
-    if(props.inputType=="phone"){
-      if(text.length==0) {setWrongInputError(""); setIsDisabled(true)}
-      else if(text.length!=0 && (text.length<10 || text.length>10)) {setWrongInputError("Incorrect Phone Number, try again"); setIsDisabled(true)}
-      else if(!text.match(/^[0-9]+$/)){ setWrongInputError("Incorrect Phone Number, try again"); setIsDisabled(true)}
-      else if(text.length>=3 && text.substr(text.length - 3)!=props.hint){setWrongInputError("Incorrect Phone Number, try again"); setIsDisabled(true)}
-      else{ setWrongInputError(""); setIsDisabled(false)}
+  const checkForValidation = (text) => {
+    if (props.inputType == 'phone') {
+      if (text.length == 0) {
+        setWrongInputError('');
+        setIsDisabled(true);
+      } else if (text.length != 0 && text.length < 10) {
+        setWrongInputError('Incorrect Phone Number, try again');
+        setIsDisabled(true);
+      } else if (!text.match(/^[0-9]+$/)) {
+        setWrongInputError('Incorrect Phone Number, try again');
+        setIsDisabled(true);
+      } else if (
+        text.length >= 3 &&
+        text.substr(text.length - 3) != props.hint
+      ) {
+        setWrongInputError('Incorrect Phone Number, try again');
+        setIsDisabled(true);
+      } else {
+        setWrongInputError('');
+        setIsDisabled(false);
+      }
     }
-    if(props.inputType=="email"){
-      if(text.length==0) {setWrongInputError("Please enter Email, try again"); setIsDisabled(true)}
-      else if(text.length>=3 && text.substr(text.length - 3)!=props.hint){setWrongInputError("Incorrect Email, try again"); setIsDisabled(true)}
-      else{setWrongInputError(""); setIsDisabled(false) }
+    if (props.inputType == 'email') {
+      if (text.length == 0) {
+        setWrongInputError('Please enter Email, try again');
+        setIsDisabled(true);
+      } else if (
+        text.length >= 3 &&
+        text.substr(text.length - 3) != props.hint
+      ) {
+        setWrongInputError('Incorrect Email, try again');
+        setIsDisabled(true);
+      } else {
+        setWrongInputError('');
+        setIsDisabled(false);
+      }
     }
-  }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -298,10 +322,12 @@ export default function TrustedContactRequest(props) {
           ) : null}
 
           {!props.isQR ? (
-            <View style={{ marginLeft: wp('8%'), marginRight: wp('8%'), }}>
-              <View style={{flexDirection: 'row'}}>
-              <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
-              <Text style={styles.inputErrorText}>{WrongInputError}</Text>
+            <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={styles.phoneNumberInfoText}>
+                  Enter Phone Number
+                </Text>
+                <Text style={styles.inputErrorText}>{WrongInputError}</Text>
               </View>
               {getInputBox()}
             </View>
@@ -324,11 +350,14 @@ export default function TrustedContactRequest(props) {
                     ? EmailId
                     : null;
                 setTimeout(() => {
-                  setPhoneNumber("");
+                  setPhoneNumber('');
                 }, 2);
                 props.onPressAccept(key);
               }}
-              style={{ ...styles.successModalButtonView,backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue }}
+              style={{
+                ...styles.successModalButtonView,
+                backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+              }}
             >
               {props.loading && props.loading == true ? (
                 <ActivityIndicator size="small" />
@@ -431,7 +460,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     color: Colors.red,
     marginBottom: wp('5%'),
-    marginLeft: 'auto'
+    marginLeft: 'auto',
   },
   textboxView: {
     flexDirection: 'row',
