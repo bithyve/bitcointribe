@@ -102,6 +102,7 @@ export default function SendToContact(props) {
   const service = useSelector((state) => state.accounts[serviceType].service);
 
   useEffect(() => {
+    setCurrencyCodeFromAsync();
     if (bitcoinAmount) convertBitCoinToCurrency(bitcoinAmount);
     if (!averageTxFees) storeAverageTxFees();
     let accountTypeArray = [REGULAR_ACCOUNT, SECURE_ACCOUNT];
@@ -134,6 +135,44 @@ export default function SendToContact(props) {
       if (element == SECURE_ACCOUNT) setSavingAccountBalance(balance);
     }
   }, []);
+
+  const setCurrencyCodeFromAsync = async () => {
+    let currencyToggleValueTmp = await AsyncStorage.getItem(
+      'currencyToggleValue',
+    );
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
+  };
+
+  const getCurrencyChar = (currencyCode) =>{
+    const currencyList = [
+      {
+        code: 'USD',
+        symbol: '$',
+        country: 'United State',
+      },
+      {
+        code: 'EUR',
+        symbol: '€',
+        country: 'Italy',
+      },
+      {
+        code: 'GBP',
+        symbol: '£',
+        country: 'United Kingdom',
+      },
+      {
+        code: 'INR',
+        symbol: '₹',
+        country: 'India',
+      },
+    ];
+    for (let i = 0; i < currencyList.length; i++) {
+      const element = currencyList[i];
+      if(CurrencyCode==element.code) return element.symbol;
+    }
+}
 
   useEffect(() => {
     dispatch(clearTransfer(serviceType));
@@ -404,8 +443,8 @@ export default function SendToContact(props) {
           }}
         >
           {switchOn
-            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} Sats`
-            : '$' +
+            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
+            : getCurrencyChar(CurrencyCode) +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
@@ -626,7 +665,6 @@ export default function SendToContact(props) {
   }, []);
 
   const renderAccountSelectionContents = useCallback(() => {
-    console.log('SavingAccountBalance', SavingAccountBalance);
     return (
       <AccountSelectionModalContents
         RegularAccountBalance={RegularAccountBalance}
@@ -868,6 +906,8 @@ export default function SendToContact(props) {
                   currencyCodeValue={CurrencyCode}
                   onpress={async () => {
                     setSwitchOn(!switchOn);
+                    let temp = !switchOn ? 'true' : '';
+                    await AsyncStorage.setItem('currencyToggleValue', temp);
                   }}
                   toggle={switchOn}
                   transform={true}
