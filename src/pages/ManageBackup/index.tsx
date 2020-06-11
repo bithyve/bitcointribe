@@ -236,7 +236,7 @@ export default function ManageBackup(props) {
     }
   };
 
-  const renderWalletBackupAndRecoveryContents = () => {
+  const renderWalletBackupAndRecoveryContents = useCallback(() => {
     return (
       <WalletBackupAndRecoveryContents
         onPressManageBackup={() => {
@@ -250,9 +250,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderWalletBackupAndRecoveryHeader = () => {
+  const renderWalletBackupAndRecoveryHeader = useCallback(() => {
     return (
       <ModalHeader
         borderColor={Colors.blue}
@@ -262,9 +262,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderRegenerateShareHelperContents = () => {
+  const renderRegenerateShareHelperContents = useCallback(() => {
     return (
       <RegenerateHealper
         topButtonText={'Regenerate Shares'}
@@ -283,8 +283,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
-  const renderRegenerateShareHelperHeader = () => {
+  }, []);
+
+  const renderRegenerateShareHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
         borderColor={Colors.blue}
@@ -294,9 +295,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderSecondaryDeviceHistoryContent = () => {
+  const renderSecondaryDeviceHistoryContent = useCallback(() => {
     return (
       <SecondaryDeviceHealthCheck
         data={secondaryDeviceHistory}
@@ -318,9 +319,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderSecondaryDeviceHistoryHeader = () => {
+  const renderSecondaryDeviceHistoryHeader = useCallback(() => {
     return (
       <ModalHeader
         backgroundColor={Colors.backgroundColor}
@@ -329,9 +330,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderPersonalCopyHistoryContent = () => {
+  const renderPersonalCopyHistoryContent = useCallback(() => {
     return (
       <SecondaryDeviceHealthCheck
         data={secondaryDeviceHistory}
@@ -353,9 +354,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderPersonalCopyHistoryHeader = () => {
+  const renderPersonalCopyHistoryHeader = useCallback(() => {
     return (
       <ModalHeader
         backgroundColor={Colors.backgroundColor}
@@ -364,9 +365,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderSecurityQuestionHistoryContent = () => {
+  const renderSecurityQuestionHistoryContent = useCallback(() => {
     return (
       <SecondaryDeviceHealthCheck
         data={secondaryDeviceHistory}
@@ -382,9 +383,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderSecurityQuestionHistoryHeader = () => {
+  const renderSecurityQuestionHistoryHeader = useCallback(() => {
     return (
       <ModalHeader
         backgroundColor={Colors.backgroundColor}
@@ -393,9 +394,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderChangeContent = () => {
+  const renderChangeContent = useCallback(() => {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
@@ -419,9 +420,9 @@ export default function ManageBackup(props) {
         isBottomImage={false}
       />
     );
-  };
+  }, []);
 
-  const renderChangeHeader = () => {
+  const renderChangeHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -429,9 +430,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderReshareContent = () => {
+  const renderReshareContent = useCallback(() => {
     let title = '';
     let info = '';
     let note = '';
@@ -473,7 +474,7 @@ export default function ManageBackup(props) {
         isBottomImage={false}
       />
     );
-  };
+  }, []);
 
   const onPressReshare = () => {
     setTimeout(() => {
@@ -507,7 +508,7 @@ export default function ManageBackup(props) {
     (ReshareBottomSheet as any).current.snapTo(0);
   };
 
-  const renderReshareHeader = () => {
+  const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -515,9 +516,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderConfirmContent = () => {
+  const renderConfirmContent = useCallback(() => {
     let title = '';
     let info = '';
     let note = '';
@@ -571,7 +572,7 @@ export default function ManageBackup(props) {
         isBottomImage={false}
       />
     );
-  };
+  }, []);
 
   const onPressConfirm = () => {
     if (SelectTypeToReshare == 'secondaryDevice') {
@@ -604,7 +605,7 @@ export default function ManageBackup(props) {
     (ConfirmBottomSheet as any).current.snapTo(0);
   };
 
-  const renderConfirmHeader = () => {
+  const renderConfirmHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -612,9 +613,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderPersonalCopyConfirmModalContent = () => {
+  const renderPersonalCopyConfirmModalContent = useCallback(() => {
     return (
       <CloudHealthCheck
         LoadCamera={LoadCamera}
@@ -637,9 +638,9 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderPersonalCopyConfirmModalHeader = () => {
+  const renderPersonalCopyConfirmModalHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -651,7 +652,7 @@ export default function ManageBackup(props) {
         }}
       />
     );
-  };
+  }, []);
 
   const getScannerData = (data) => {
     console.log('data', data);
@@ -784,7 +785,7 @@ export default function ManageBackup(props) {
     }
   };
 
-  const setContactsFromAsync = async () => {
+  const setContactsFromAsync = useCallback(async () => {
     let contactList = JSON.parse(
       await AsyncStorage.getItem('SelectedContacts'),
     );
@@ -810,7 +811,7 @@ export default function ManageBackup(props) {
       }
     }
     setPageData([...pageData]);
-  };
+  }, []);
 
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');

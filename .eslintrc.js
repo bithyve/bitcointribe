@@ -64,7 +64,7 @@ module.exports = {
     $FlowFixMe: false,
     $FixMe: false,
   },
-  extends: ['airbnb-base', 'prettier', 'plugin:react/recommended'],
+  extends: ['airbnb-base', 'prettier', 'plugin:react/recommended', 'plugin:react-hooks/recommended'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
@@ -76,7 +76,7 @@ module.exports = {
       modules: true,
     },
   },
-  plugins: ['@typescript-eslint', 'react', 'react-native', 'prettier'],
+  plugins: ['@typescript-eslint', 'react', 'react-native', 'prettier', 'react-hooks'],
   rules: {
     'prettier/prettier': ['error'],
     'react/jsx-filename-extension': [
@@ -281,5 +281,7 @@ module.exports = {
     'react/react-in-jsx-scope': 1,
     'react/self-closing-comp': 1,
     'react/wrap-multilines': 0,
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn'
   },
 };

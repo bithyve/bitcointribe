@@ -11,18 +11,15 @@ import {
   Platform,
   AsyncStorage,
   Linking,
-  NativeModules,
   Alert,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Fonts from './../common/Fonts';
 import BottomSheet from 'reanimated-bottom-sheet';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
 import ToggleSwitch from '../components/ToggleSwitch';
@@ -33,23 +30,14 @@ import TransparentHeaderModal from '../components/TransparentHeaderModal';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
-import SmallHeaderModal from '../components/SmallHeaderModal';
 import HomePageShield from '../components/HomePageShield';
-import TransactionDetailsContents from '../components/TransactionDetailsContents';
-import TransactionListModalContents from '../components/TransactionListModalContents';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
-import FastBitcoinModalContents from '../components/FastBitcoinModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
 import AddContactsModalContents from '../components/AddContactsModalContents';
-import FamilyandFriendsAddressBookModalContents from '../components/FamilyandFriendsAddressBookModalContents';
 import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
 import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
-import HealthCheckSecurityQuestionModalContents from '../components/HealthCheckSecurityQuestionModalContents';
-import HealthCheckGoogleAuthModalContents from '../components/HealthCheckGoogleAuthModalContents';
-import SettingManagePin from './SettingManagePin';
 import { AppState } from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -60,24 +48,17 @@ import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  checkMSharesHealth,
-  updateMSharesHealth,
   downloadMShare,
   initHealthCheck,
   uploadRequestedShare,
   ErrorSending,
-  ErrorReceiving,
   UploadSuccessfully,
 } from '../store/actions/sss';
-import RecoverySecretRequestModalContents from '../components/RecoverySecretRequestModalContesnts';
-import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretModalContents';
 import moment from 'moment';
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
   updateFCMTokens,
   fetchNotifications,
 } from '../store/actions/notifications';
-import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -107,7 +88,6 @@ import {
 } from '../store/actions/trustedContacts';
 import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
-import idx from 'idx';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import {
   fetchDerivativeAccBalTx,
@@ -115,7 +95,6 @@ import {
 } from '../store/actions/accounts';
 import {
   TrustedContactDerivativeAccount,
-  EphemeralData,
 } from '../bitcoin/utilities/Interface';
 import * as RNLocalize from "react-native-localize";
 
@@ -1150,7 +1129,7 @@ export default function Home(props) {
       dispatch(updateFCMTokens(fcmArray));
     }
   };
-  const setCurrencyCodeFromAsync = async () => {
+  const setCurrencyCodeFromAsync = useCallback(async () => {
     ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
@@ -1168,7 +1147,7 @@ export default function Home(props) {
       'currencyToggleValue',
     );
     setSwitchOn(currencyToggleValueTmp ? true : false);
-  };
+  }, [CurrencyCode, switchOn]);
 
   // const getOverAllHealthFromAsync = async () => {
   //   if (!overallHealth) {
@@ -1209,7 +1188,7 @@ export default function Home(props) {
         }}
       />
     );
-  }, []);
+  }, [ErrorBottomSheet]);
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
@@ -1494,7 +1473,7 @@ export default function Home(props) {
     );
   }, [transactionItem]);
 
-  function renderAddContent() {
+  const renderAddContent = useCallback(() => {
     return (
       <AddModalContents
         onPressElements={(type) => {
@@ -1519,9 +1498,9 @@ export default function Home(props) {
         addData={modaldata}
       />
     );
-  }
+  }, []);
 
-  function renderAddHeader() {
+  const renderAddHeader = useCallback(() => {
     return (
       <TouchableOpacity
         activeOpacity={10}
@@ -1532,9 +1511,9 @@ export default function Home(props) {
         <Text style={styles.modalHeaderTitleText}>{'Add'}</Text>
       </TouchableOpacity>
     );
-  }
+  }, []);
 
-  function renderQrContent() {
+  const renderQrContent = useCallback(() => {
     return (
       <QrCodeModalContents
         modalRef={QrTabBarBottomSheet}
@@ -1547,9 +1526,9 @@ export default function Home(props) {
         }}
       />
     );
-  }
+  }, []);
 
-  function renderQrHeader() {
+  const renderQrHeader = useCallback(() => {
     return (
       <TouchableOpacity
         activeOpacity={10}
@@ -1560,18 +1539,18 @@ export default function Home(props) {
         <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
       </TouchableOpacity>
     );
-  }
+  }, []);
 
-  function renderMoreContent() {
+  const renderMoreContent = useCallback(() => {
     return (
       <MoreHomePageTabContents
         onPressElements={(item) => onPressElement(item)}
         isExistingSavingMethod={isEmpty(FBTCAccount)}
       />
     );
-  }
+  }, [])
 
-  function renderMoreHeader() {
+  const renderMoreHeader = useCallback(() => {
     return (
       <TouchableOpacity
         activeOpacity={10}
@@ -1582,7 +1561,7 @@ export default function Home(props) {
         <Text style={styles.modalHeaderTitleText}>{'More'}</Text>
       </TouchableOpacity>
     );
-  }
+  }, []);
 
   function openCloseModal() {
     if (openmodal == 'closed') {
@@ -1949,7 +1928,7 @@ export default function Home(props) {
     }
   };
 
-  const renderSettingsContents = () => {
+  const renderSettingsContents = useCallback(() => {
     return (
       <SettingsContents
         currencyCode={CurrencyCode}
@@ -1964,9 +1943,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderSettingsHeader = () => {
+  const renderSettingsHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -1977,9 +1956,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderAllAccountsContents = () => {
+  const renderAllAccountsContents = useCallback(() => {
     return (
       <AllAccountsContents
         onPressBack={() => {
@@ -1990,9 +1969,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderAllAccountsHeader = () => {
+  const renderAllAccountsHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -2003,7 +1982,7 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
   // const getAssociatedContact = async () => {
   //   let SelectedContacts = JSON.parse(
@@ -2130,7 +2109,7 @@ export default function Home(props) {
     }
   };
 
-  const renderAddModalHeader = () => {
+  const renderAddModalHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -2142,9 +2121,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderFastBitcoinRedeemCalculationContents = () => {
+  const renderFastBitcoinRedeemCalculationContents = useCallback(() => {
     return (
       <FastBitcoinCalculationModalContents
         navigation={props.navigation}
@@ -2161,9 +2140,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderFastBitcoinSellCalculationContents = () => {
+  const renderFastBitcoinSellCalculationContents = useCallback(() => {
     return (
       <FastBitcoinCalculationModalContents
         navigation={props.navigation}
@@ -2180,9 +2159,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderFastBitcoinSellCalculationHeader = () => {
+  const renderFastBitcoinSellCalculationHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -2190,9 +2169,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
-  const renderFastBitcoinRedeemCalculationHeader = () => {
+  const renderFastBitcoinRedeemCalculationHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -2200,7 +2179,7 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
   const renderContactSelectedFromAddressBookContents = () => {
     return (
@@ -2259,7 +2238,7 @@ export default function Home(props) {
     );
   };
 
-  const renderAddContactAddressBookContents = () => {
+  const renderAddContactAddressBookContents = useCallback(() => {
     return (
       <AddContactAddressBook
         modalTitle={'Add contact to Friends and Family'}
@@ -2283,7 +2262,7 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, [SelectedContact]);
 
   const renderAddContactAddressBookHeader = () => {
     return (

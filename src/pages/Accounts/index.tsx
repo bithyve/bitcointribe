@@ -220,11 +220,11 @@ export default function Accounts(props) {
     getServiceType(serviceType);
   }, []);
 
-  const checkFastBitcoin = async () => {
+  const checkFastBitcoin = useCallback(async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     //console.log('getFBTCAccount', getFBTCAccount);
     setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
-  };
+  }, [FBTCAccount]);
   // useEffect(() => {
   //   const accountNumber = 0;
   //   const { derivativeAccounts } =
@@ -311,7 +311,7 @@ export default function Accounts(props) {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
 
-  const getServiceType = (serviceType) => {
+  const getServiceType = useCallback((serviceType) => {
     if (!serviceType) return;
     setServiceType(serviceType);
     //console.log('Service type', serviceType);
@@ -328,7 +328,7 @@ export default function Accounts(props) {
     }, 2000);
 
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
-  };
+  }, [serviceType]);
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
@@ -1011,7 +1011,7 @@ export default function Accounts(props) {
         }}
       />
     );
-  }, []);
+  }, [isSecureAccountHelperDone]);
 
   const renderRegularAccountsHelperContents = useCallback(() => {
     return (
@@ -1091,7 +1091,7 @@ export default function Accounts(props) {
       <TransactionHelperModalContents />
     );
   };
-  const renderHelperHeader = () => {
+  const renderHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
         borderColor={Colors.blue}
@@ -1109,7 +1109,7 @@ export default function Accounts(props) {
         }}
       />
     );
-  };
+  }, [isHelperDone]);
 
   const renderRegularAccountsHelperHeader = useCallback(() => {
     return (
@@ -1131,7 +1131,7 @@ export default function Accounts(props) {
         }}
       />
     );
-  }, []);
+  }, [isRegularAccountHelperDone]);
 
   useEffect(() => {
     const wallet =
