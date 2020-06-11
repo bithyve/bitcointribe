@@ -43,7 +43,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            The test account is designed as an account{'\n'}that enables people to experience Bitcoin without buying Bitcoin
+            The test account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying Bitcoin
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -59,7 +59,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                It comes preloaded with test bitcoins that{'\n'}you can send to other users on Bitcoin’s test network
+                It comes preloaded with test bitcoins{'\n'}that you can send to other users{'\n'}on Bitcoin’s test network
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -89,7 +89,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            Test bitcoins only exist on Bitcoin’s Testnet,{'\n'}and they can not be exchanged for real goods or Bitcoin.{'\n'}Test bitcoins can not be sent to{'\n'}wallets that only support bitcoin
+            Test bitcoins only exist on Bitcoin’s Testnet,{'\n'}and they can not be exchanged for real goods{'\n'}or Bitcoin. Test bitcoins can not be sent{'\n'}to wallets that only support bitcoin
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
