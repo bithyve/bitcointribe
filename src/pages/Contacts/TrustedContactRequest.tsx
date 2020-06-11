@@ -42,6 +42,7 @@ export default function TrustedContactRequest(props) {
 
   useEffect(()=>{
     if(!props.inputType) setIsDisabled(false);
+    else setIsDisabled(true);
   },[props.inputType])
 
   const getStyle = (i) => {
