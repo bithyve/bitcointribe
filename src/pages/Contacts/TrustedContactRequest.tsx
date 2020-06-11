@@ -40,12 +40,10 @@ export default function TrustedContactRequest(props) {
     }
   }
 
-  useEffect(() => {
-    if(!props.inputType){
-      setIsDisabled(false);
-    }
-  }, [props.inputType]);
-  
+  useEffect(()=>{
+    if(!props.inputType) setIsDisabled(false);
+  },[props.inputType])
+
   const getStyle = (i) => {
     if (i == 0) {
       return this.textInput && this.textInput.isFocused()
