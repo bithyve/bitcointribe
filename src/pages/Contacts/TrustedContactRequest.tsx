@@ -277,8 +277,7 @@ export default function TrustedContactRequest(props) {
               <Text style={styles.modalTitleText}>Recovery Share Request</Text>
             )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor
+              {props.inputType ? "Accept the request to add your contact to Friends and Family" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor" }
             </Text>
           </View>
           <View style={styles.box}>

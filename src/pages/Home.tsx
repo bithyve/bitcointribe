@@ -1908,7 +1908,7 @@ export default function Home(props) {
     if (item.title == 'Backup Health') {
       props.navigation.navigate('ManageBackup');
     }
-    if (item.title == 'Address Book') {
+    if (item.title == 'Friends and Family') {
       props.navigation.navigate('AddressBookContents');
     } else if (item.title == 'Wallet Settings') {
       (settingsBottomSheet as any).current.snapTo(1);
