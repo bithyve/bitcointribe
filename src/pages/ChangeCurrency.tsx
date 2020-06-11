@@ -18,35 +18,108 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BottomInfoBox from '../components/BottomInfoBox';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function ChangeCurrency(props) {
   const [currencyList, setCurrencyList] = useState([
     {
       code: 'USD',
       symbol: '$',
-      country: 'United State',
     },
     {
       code: 'EUR',
       symbol: '€',
-      country: 'Italy',
     },
     {
       code: 'GBP',
       symbol: '£',
-      country: 'United Kingdom',
     },
     {
       code: 'INR',
       symbol: '₹',
-      country: 'India',
+    },
+    {
+      code: 'AUD',
+      symbol: '$',
+    },
+    {
+      code: 'BRL',
+      symbol: 'R$',
+    },
+    {
+      code: 'CAD',
+      symbol: '$',
+    },
+    {
+      code: 'CHF',
+      symbol: 'CHF',
+    },
+    {
+      code: 'CLP',
+      symbol: '$',
+    },
+    {
+      code: 'CNY',
+      symbol: '¥',
+    },
+    {
+      code: 'DKK',
+      symbol: 'kr',
+    },
+    {
+      code: 'HKD',
+      symbol: '$',
+    },
+    {
+      code: 'ISK',
+      symbol: 'kr',
+    },
+    {
+      code: 'JPY',
+      symbol: '¥',
+    },
+    {
+      code: 'KRW',
+      symbol: '₩',
+    },
+    {
+      code: 'NZD',
+      symbol: '$',
+    },
+    {
+      code: 'PLN',
+      symbol: 'zł',
+    },
+    {
+      code: 'RUB',
+      symbol: 'RUB',
+    },
+    {
+      code: 'SEK',
+      symbol: 'kr',
+    },
+    {
+      code: 'SGD',
+      symbol: '$',
+    },
+    {
+      code: 'THB',
+      symbol: '฿',
+    },
+    {
+      code: 'TRY',
+      symbol: '₺',
+    },
+    {
+      code: 'TWD',
+      symbol: 'NT$',
     },
   ]);
+
   const [isVisible, setIsVisible] = useState(false);
   const [currency, setCurrency] = useState({
     code: 'USD',
     symbol: '$',
-    country: 'United State',
   });
 
   useEffect(() => {
@@ -161,6 +234,7 @@ export default function ChangeCurrency(props) {
             />
           </View>
         </TouchableOpacity>
+        <View style={{position: 'relative', flex: 1,}}>
         {isVisible && (
           <View
             style={{
@@ -171,8 +245,10 @@ export default function ChangeCurrency(props) {
               overflow: 'hidden',
               marginLeft: wp('10%'),
               marginRight: wp('10%'),
+              
             }}
           >
+            <ScrollView>
             {currencyList.map((item) => {
               return (
                 <TouchableOpacity
@@ -226,6 +302,7 @@ export default function ChangeCurrency(props) {
                 </TouchableOpacity>
               );
             })}
+            </ScrollView>
           </View>
         )}
       </View>
@@ -261,6 +338,7 @@ export default function ChangeCurrency(props) {
             Save Changes
           </Text>
         </TouchableOpacity>
+      </View>
       </View>
     </SafeAreaView>
   );
