@@ -93,7 +93,7 @@ import NotificationListContent from '../components/NotificationListContent';
 // const opacity = min( abs( sub( position, 1 ) ), 0.8 )
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
-import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+import { timeFormatter, createRandomString } from '../common/CommonFunctions/timeFormatter';
 import Config from 'react-native-config';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
@@ -117,6 +117,7 @@ import {
   TrustedContactDerivativeAccount,
   EphemeralData,
 } from '../bitcoin/utilities/Interface';
+import * as RNLocalize from "react-native-localize";
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -704,18 +705,24 @@ export default function Home(props) {
       }
       let tmpList = asyncNotificationList;
       let obj = {
-        type: 'transaction',
+        type: 'contact',
         isMandatory: false,
         read: false,
         title: 'New FastBitcoin Transactions',
         time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
         date: new Date(),
         info: newTransactions.length + ' New FBTC transactions',
-        notificationId: randomInteger(1, 1000),
+        notificationId: createRandomString(17),
       };
       tmpList.push(obj);
 
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+      let notificationDetails = {
+        id : obj.notificationId,
+        title: obj.title,
+        body: obj.info,
+      }
+      localNotification(notificationDetails)
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
@@ -1022,8 +1029,7 @@ export default function Home(props) {
       .setSound('default')
       .setData({
         title: 'We have not seen you in a while!',
-        body:
-          'Opening your app regularly ensures you get all the notifications and security updates',
+        body: 'Opening your app regularly ensures you get all the notifications and security updates',
       })
       .android.setChannelId('reminder')
       .android.setPriority(firebase.notifications.Android.Priority.High);
@@ -1048,6 +1054,37 @@ export default function Home(props) {
       .getScheduledNotifications()
       .then((notifications) => {
         //console.log('logging notifications', notifications);
+      });
+  };
+
+  const localNotification = async (notificationDetails) => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle(notificationDetails.title)
+      .setBody(notificationDetails.body)
+      .setNotificationId(notificationDetails.id)
+      .setSound('default')
+      .setData({
+        title: notificationDetails.title,
+        body: notificationDetails.body,
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setSeconds(date.getSeconds() + 1);
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+      })
+      .then(() => {})
+      .catch(
+        (err) => {},
+      );
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
       });
   };
 
@@ -1113,21 +1150,16 @@ export default function Home(props) {
     }
   };
   const setCurrencyCodeFromAsync = async () => {
+    ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      const identifiers = ['io.hexawallet.hexa'];
-      NativeModules.InAppUtils.loadProducts(
-        identifiers,
-        async (error, products) => {
-          await AsyncStorage.setItem(
-            'currencyCode',
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-          setCurrencyCode(
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-        },
-      );
+      await AsyncStorage.setItem(
+              'currencyCode',
+              RNLocalize.getCurrencies()[0],
+            );
+            setCurrencyCode(
+              RNLocalize.getCurrencies()[0],
+            );
     } else {
       setCurrencyCode(currencyCodeTmp);
     }
