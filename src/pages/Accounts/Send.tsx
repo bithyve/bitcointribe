@@ -51,6 +51,7 @@ import {
   clearTransfer,
 } from '../../store/actions/accounts';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import SendHelpContents from '../../components/Helper/SendHelpContents';
 
 export default function Send(props) {
   const dispatch = useDispatch();
@@ -279,16 +280,17 @@ export default function Send(props) {
 
   const renderSendHelperContents = () => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={`Sending Bitcoins`}
-        image={require('../../assets/images/icons/send.png')}
-        helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (SendHelperBottomSheet.current)
-            (SendHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Sending Bitcoins`}
+      //   image={require('../../assets/images/icons/send.png')}
+      //   helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (SendHelperBottomSheet.current)
+      //       (SendHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <SendHelpContents />
     );
   };
   const renderSendHelperHeader = () => {
@@ -996,7 +998,8 @@ export default function Send(props) {
         ref={SendHelperBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          hp('89%'),
+          // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderSendHelperContents}
         renderHeader={renderSendHelperHeader}

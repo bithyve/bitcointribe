@@ -62,6 +62,8 @@ import {
   TrustedContactDerivativeAccount,
   Transactions,
 } from '../../bitcoin/utilities/Interface';
+import TransactionHelperModalContents from '../../components/Helper/TransactionHelperModalContents';
+import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
 
 export default function Accounts(props) {
   const [FBTCAccount, setFBTCAccount] = useState({});
@@ -936,17 +938,18 @@ export default function Accounts(props) {
 
   const renderTestAccountsHelperContents = () => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={`Test Account`}
-        image={require('../../assets/images/icons/icon_test_white.png')}
-        boldPara={``}
-        helperInfo={`This account is designed for those who are new to Bitcoin, and for those who want to experiment with Bitcoin. It comes pre-loaded with test bitcoins that you can send to and receive from other Hexa test accounts`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (TestAccountHelperBottomSheet.current)
-            (TestAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Test Account`}
+      //   image={require('../../assets/images/icons/icon_test_white.png')}
+      //   boldPara={``}
+      //   helperInfo={`This account is designed for those who are new to Bitcoin, and for those who want to experiment with Bitcoin. It comes pre-loaded with test bitcoins that you can send to and receive from other Hexa test accounts`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (TestAccountHelperBottomSheet.current)
+      //       (TestAccountHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <TestAccountHelpContents />
     );
   };
   const renderTestAccountsHelperHeader = () => {
@@ -1077,14 +1080,15 @@ export default function Accounts(props) {
 
   const renderHelperContents = () => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={`Transaction Details`}
-        helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Transaction Details`}
+      //   helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <TransactionHelperModalContents />
     );
   };
   const renderHelperHeader = () => {
@@ -1807,10 +1811,10 @@ export default function Accounts(props) {
             ref={TestAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+              hp('89%'),
+              // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              //   ? hp('35%')
+              //   : hp('40%'),
               //Platform.OS == 'android' ? hp('50%') : hp('90%'),
             ]}
             renderContent={renderTestAccountsHelperContents}
@@ -1860,9 +1864,10 @@ export default function Accounts(props) {
             ref={TransactionDetailsHelperBottomSheet as any}
             snapPoints={[
               -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+              hp('89%'),
+              // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              //   ? hp('35%')
+              //   : hp('40%'),
             ]}
             renderContent={renderHelperContents}
             renderHeader={renderHelperHeader}

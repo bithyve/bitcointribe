@@ -53,6 +53,7 @@ import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import config from '../../bitcoin/HexaConfig';
+import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
 
 export default function Receive(props) {
   const [
@@ -511,24 +512,25 @@ export default function Receive(props) {
 
   const renderReceiveHelperContents = useCallback(() => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={'Receiving Bitcoins'}
-        image={require('../../assets/images/icons/receive.png')}
-        helperInfo={
-          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from “Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
-        }
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-            if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(0);
-            props.navigation.navigate('ReceivingAddress', {
-              serviceType,
-              getServiceType,
-            });
-          }
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={'Receiving Bitcoins'}
+      //   image={require('../../assets/images/icons/receive.png')}
+      //   helperInfo={
+      //     'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from “Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
+      //   }
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+      //       if (ReceiveHelperBottomSheet.current)
+      //         (ReceiveHelperBottomSheet as any).current.snapTo(0);
+      //       props.navigation.navigate('ReceivingAddress', {
+      //         serviceType,
+      //         getServiceType,
+      //       });
+      //     }
+      //   }}
+      // />
+      <ReceiveHelpContents />
     );
   }, [serviceType]);
 
@@ -1072,7 +1074,8 @@ export default function Receive(props) {
         ref={ReceiveHelperBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),
+          hp('89%'),
+          // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),
         ]}
         renderContent={renderReceiveHelperContents}
         renderHeader={renderReceiveHelperHeader}
