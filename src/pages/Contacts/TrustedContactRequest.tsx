@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -40,6 +40,12 @@ export default function TrustedContactRequest(props) {
     }
   }
 
+  useEffect(() => {
+    if(!props.inputType){
+      setIsDisabled(false);
+    }
+  }, [props.inputType]);
+  
   const getStyle = (i) => {
     if (i == 0) {
       return this.textInput && this.textInput.isFocused()
