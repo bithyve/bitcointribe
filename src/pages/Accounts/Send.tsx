@@ -908,7 +908,6 @@ export default function Send(props) {
                           }}
                         >
                           <BottomInfoBox
-                            titleColor={Colors.black1}
                             title={'You have not added any Trusted Contact'}
                             infoText={
                               'Add a Trusted Contact to send them sats without having to scan an address'

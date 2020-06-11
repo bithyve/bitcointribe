@@ -123,7 +123,7 @@ const TransactionsContent = ({ transactions, TransactionDetailsBottomSheet, AtCl
                     >
                         <Text
                             style={{
-                                color: Colors.black,
+                                color: Colors.blue,
                                 fontSize: RFValue(13),
                                 fontFamily: Fonts.FiraSansRegular,
                             }}
