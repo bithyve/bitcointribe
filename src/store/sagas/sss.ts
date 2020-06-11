@@ -73,6 +73,7 @@ import crypto from 'crypto';
 import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
+import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 
 function* generateMetaSharesWorker() {
@@ -258,10 +259,10 @@ function* requestShareWorker({ payload }) {
     (state) => state.storage.database,
   );
 
-  if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
-    console.log(DECENTRALIZED_BACKUP.RECOVERY_SHARES);
-    return;
-  } // capping to 3 shares reception
+  // if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
+  //   console.log(DECENTRALIZED_BACKUP.RECOVERY_SHARES);
+  //   return;
+  // } // capping to 3 shares reception
 
   const { key } = yield call(S3Service.generateRequestCreds);
 
@@ -424,22 +425,38 @@ function* downloadMetaShareWorker({ payload }) {
       yield put(updateMSharesHealth(updatedBackup));
     } else {
       const updatedRecoveryShares = {};
+      let updated = false;
       Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((objectKey) => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
-        if (!recoveryShare.REQUEST_DETAILS) {
-          updatedRecoveryShares[objectKey] = recoveryShare;
+        if (
+          recoveryShare.REQUEST_DETAILS &&
+          recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
+        ) {
+          updatedRecoveryShares[objectKey] = {
+            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          };
+          updated = true;
         } else {
-          if (recoveryShare.REQUEST_DETAILS.KEY === encryptedKey) {
-            updatedRecoveryShares[objectKey] = {
-              REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
-              META_SHARE: metaShare,
-              ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
-            };
-          } else {
-            updatedRecoveryShares[objectKey] = recoveryShare;
-          }
+          updatedRecoveryShares[objectKey] = recoveryShare;
         }
       });
+
+      if (!updated) {
+        if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
+          Alert.alert(
+            'Share Exists',
+            'Following share already exists for recovery',
+          );
+          return;
+        }
+        updatedRecoveryShares[metaShare.shareId] = {
+          META_SHARE: metaShare,
+          ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+        };
+        Toast('Share Downloaded');
+      }
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
@@ -1228,6 +1245,24 @@ function* restoreShareFromQRWorker({ payload }) {
       META_SHARE: metaShare,
     };
 
+    // let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    // if (storedPDFHealth) {
+    //   storedPDFHealth = JSON.parse(storedPDFHealth);
+    //   storedPDFHealth = {
+    //     ...storedPDFHealth,
+    //     [metaShare.meta.index]: {
+    //       shareId: metaShare.shareId,
+    //       updatedAt: Date.now(),
+    //     },
+    //   };
+
+    //   yield call(
+    //     AsyncStorage.setItem,
+    //     'PDF Health',
+    //     JSON.stringify(storedPDFHealth),
+    //   );
+    // }
+
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       RECOVERY_SHARES,
@@ -1260,29 +1295,47 @@ function* recoverWalletWorker({ payload }) {
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
     let encDynamicNonPMDD;
-    const metaShares = Array(5);
+    const mappedMetaShares: { [walletId: string]: MetaShare[] } = {};
     Object.keys(RECOVERY_SHARES).forEach((key) => {
       const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[key];
-      if (META_SHARE) metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
-      if (!encDynamicNonPMDD) {
-        encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
-      } else {
-        if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
-          encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      if (META_SHARE) {
+        // metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
+        const shares = mappedMetaShares[META_SHARE.meta.walletId]
+          ? mappedMetaShares[META_SHARE.meta.walletId]
+          : [];
+        let insert = true;
+        shares.forEach((share) => {
+          if (share.shareId === META_SHARE.shareId) insert = false;
+        }, []);
+
+        if (insert) {
+          shares.push(META_SHARE);
+          mappedMetaShares[META_SHARE.meta.walletId] = shares;
         }
       }
+      // if (!encDynamicNonPMDD) { // retired due to wallet image
+      //   encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      // } else {
+      //   if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
+      //     encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      //   }
+      // }
     });
 
-    if (Object.keys(metaShares).length !== 3) {
-      throw new Error(
-        `Insufficient number of shares to recover the wallet, ${
-          3 - metaShares.length
-        } more required`,
-      );
+    console.log({ mappedMetaShares });
+    let restorationShares = [];
+    Object.keys(mappedMetaShares).forEach((walletId) => {
+      if (mappedMetaShares[walletId].length >= 3)
+        restorationShares = mappedMetaShares[walletId];
+    });
+
+    if (Object.keys(restorationShares).length !== 3) {
+      Alert.alert('Insufficient compatible shares to recover the wallet');
+      throw new Error(`Insufficient compatible shares to recover the wallet`);
     }
 
-    const encryptedSecrets: string[] = Object.keys(metaShares).map(
-      (key) => metaShares[key].encryptedSecret,
+    const encryptedSecrets: string[] = restorationShares.map(
+      (share) => share.encryptedSecret,
     );
 
     const res = yield call(
@@ -1299,7 +1352,12 @@ function* recoverWalletWorker({ payload }) {
         secureAcc,
         s3Service,
         trustedContacts,
-      } = yield call(serviceGenerator, security.answer, mnemonic, metaShares);
+      } = yield call(
+        serviceGenerator,
+        security.answer,
+        mnemonic,
+        restorationShares,
+      );
 
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};

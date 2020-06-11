@@ -64,8 +64,8 @@ import SettingGetNewPin from '../pages/SettingGetNewPin';
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact';
 import LostTwoFA from '../pages/Accounts/LostTwoFA';
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage';
-import ExistingSavingMethods from "../pages/FastBitcoin/ExistingSavingMethods";
-import ExistingSavingMethodDetails from "../pages/FastBitcoin/ExistingSavingMethodDetails";
+import ExistingSavingMethods from '../pages/FastBitcoin/ExistingSavingMethods';
+import ExistingSavingMethodDetails from '../pages/FastBitcoin/ExistingSavingMethodDetails';
 import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp';
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret';
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds';
@@ -74,13 +74,13 @@ import ChangeCurrency from '../pages/ChangeCurrency';
 import UpdateApp from '../pages/UpdateApp';
 import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
-import SendRequest from "../pages/Contacts/SendRequest";
+import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContact';
 import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
-import ContactDetails from "../pages/Contacts/ContactDetails";
-import Receive from "../pages/Accounts/Receive";
+import ContactDetails from '../pages/Contacts/ContactDetails';
+import Receive from '../pages/Accounts/Receive';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -98,6 +98,7 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     ShareRecoveryOTP,
+    RecoveryQrScanner: QrScanner,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
@@ -155,7 +156,7 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-    SendToContact:{
+    SendToContact: {
       screen: SendToContact,
       navigationOptions: {
         gesturesEnabled: false,
@@ -228,7 +229,7 @@ const HomeNavigator = createStackNavigator(
     }),
     transitionConfig: (transitionProps, prevTransitionProps) => {
       const isModal = MODAL_ROUTES.some(
-        screenName =>
+        (screenName) =>
           screenName === transitionProps.scene.route.routeName ||
           (prevTransitionProps &&
             screenName === prevTransitionProps.scene.route.routeName),

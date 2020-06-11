@@ -1443,7 +1443,7 @@ export default function Home(props) {
           });
           break;
 
-        case 'restorationQR':
+        case 'ReverseRecoveryQR':
           Alert.alert(
             'Restoration QR Identified',
             'Restoration QR only works during restoration mode',
