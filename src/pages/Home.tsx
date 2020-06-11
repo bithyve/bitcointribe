@@ -939,7 +939,7 @@ export default function Home(props) {
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
     (moreTabBarBottomSheet as any).current.snapTo(0);
-    AppState.addEventListener('change', handleAppStateChange);
+    // AppState.addEventListener('change', handleAppStateChange);
 
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
@@ -961,11 +961,11 @@ export default function Home(props) {
 
   const checkFastBitcoin = async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    console.log('getFBTCAccount', getFBTCAccount);
     setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
   };
 
   const onAppStateChange = async (nextAppState) => {
+    handleAppStateChange(nextAppState)
     try {
       if (this.appState == nextAppState) return;
       this.appState = nextAppState;
@@ -1037,6 +1037,7 @@ export default function Home(props) {
     // Schedule the notification for 2hours on development and 2 weeks on Production in the future
     const date = new Date();
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
+    // date.setSeconds(date.getSeconds() + Number(Config.NOTIFICATION_HOUR));
 
     // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
     await firebase
@@ -2333,24 +2334,15 @@ export default function Home(props) {
   let isContactOpen = false;
   let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {
-    AsyncStorage.getItem('isContactOpen', (err, value) => {
-      if (err) console.log(err);
-      else {
-        isContactOpen = JSON.parse(value);
-      }
-    });
-    AsyncStorage.getItem('isCameraOpen', (err, value) => {
-      if (err) console.log(err);
-      else {
-        isCameraOpen = JSON.parse(value);
-      }
-    });
-    if (isCameraOpen) {
-      await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
-      return;
-    }
-    if (isContactOpen) {
-      await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
+    AsyncStorage.multiGet(["isContactOpen", "isCameraOpen"]).then(response => {
+      isContactOpen = JSON.parse(response[0][1]);
+      isCameraOpen = JSON.parse(response[1][1]);
+    })
+    let keyArray = [['isCameraOpen', JSON.stringify(true)], ['isContactOpen', JSON.stringify(true)]]
+    if(isCameraOpen) keyArray[0][1] = JSON.stringify(false);
+    if(isContactOpen) keyArray[1][1] = JSON.stringify(false);
+    if(isContactOpen || isContactOpen){
+      AsyncStorage.multiSet(keyArray, ()=>{});
       return;
     }
     var blockApp = setTimeout(() => {
@@ -2361,7 +2353,7 @@ export default function Home(props) {
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
-        : nextAppState == 'background'
+        : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
       clearTimeout(blockApp);
       isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
