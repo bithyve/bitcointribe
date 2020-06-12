@@ -33,6 +33,7 @@ import {
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import { insertDBWorker } from './storage';
+import { AsyncStorage } from 'react-native';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -77,13 +78,15 @@ function* approveTrustedContactWorker({ payload }) {
   if (res.status === 200) {
     yield put(trustedContactApproved(contactName, true));
     if (payload.updateEphemeralChannel) {
+      const uploadXpub = true;
+      const data = { publicKey: res.data.publicKey };
       yield put(
         updateEphemeralChannel(
           contactName,
-          { publicKey: res.data.publicKey },
+          data,
           true,
           trustedContacts,
-          true,
+          uploadXpub,
         ),
       );
     } else {
@@ -143,8 +146,13 @@ function* updateEphemeralChannelWorker({ payload }) {
 
       if (res.status === 200) {
         const xpub = res.data;
+        const walletID = yield call(AsyncStorage.getItem, 'walletID');
+        const FCM = yield call(AsyncStorage.getItem, 'fcmToken');
+
         const data: TrustedDataElements = {
           xpub,
+          walletID,
+          FCM,
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,

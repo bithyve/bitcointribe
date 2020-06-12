@@ -255,22 +255,23 @@ export default class TrustedContacts {
             ...ephemeralData[index],
             ...data,
           };
-          if (index == 1) {
-            // update counter-party's walletId and FCM
-            this.trustedContacts[contactName].walletID = data.walletID;
-            this.trustedContacts[contactName].FCMs = [
-              ...this.trustedContacts[contactName].FCMs,
-              data.FCM,
-            ];
-          }
           updated = true;
           break;
         }
       }
 
       if (!updated) {
-        // 2nd party data reception for the first time
+        // counterparty's data reception for the first time
         ephemeralData.push(data);
+        // update counterparty's walletId and FCM
+        data.walletID
+          ? (this.trustedContacts[contactName].walletID = data.walletID)
+          : null;
+
+        if (data.FCM)
+          this.trustedContacts[contactName].FCMs
+            ? this.trustedContacts[contactName].FCMs.push(data.FCM)
+            : (this.trustedContacts[contactName].FCMs = [data.FCM]);
       }
     } else {
       ephemeralData = [data];
@@ -314,6 +315,7 @@ export default class TrustedContacts {
       });
 
       const { updated, data } = res.data;
+      console.log({ updated, data });
       if (!updated) throw new Error('Failed to update ephemeral space');
 
       this.processEphemeralChannelData(contactName, dataElements);
@@ -407,7 +409,7 @@ export default class TrustedContacts {
       ? [...this.trustedContacts[contactName].trustedChannel.data]
       : [];
     let updatedTrustedData: TrustedData = newTrustedData;
-    if (trustedData) {
+    if (trustedData.length) {
       let updated = false;
       for (let index = 0; index < trustedData.length; index++) {
         if (trustedData[index].publicKey === newTrustedData.publicKey) {
@@ -422,8 +424,24 @@ export default class TrustedContacts {
       }
 
       if (!updated) {
-        // 2nd party data reception for the first time
+        // counterparty's data reception for the first time
         trustedData.push(newTrustedData);
+        console.log({ newTrustedData });
+        // update counterparty's walletId and FCM
+
+        newTrustedData.data.walletID
+          ? (this.trustedContacts[contactName].walletID =
+              newTrustedData.data.walletID)
+          : null;
+
+        if (newTrustedData.data.FCM)
+          this.trustedContacts[contactName].FCMs
+            ? this.trustedContacts[contactName].FCMs.push(
+                newTrustedData.data.FCM,
+              )
+            : (this.trustedContacts[contactName].FCMs = [
+                newTrustedData.data.FCM,
+              ]);
       }
     } else {
       trustedData = [newTrustedData];
@@ -557,7 +575,7 @@ export default class TrustedContacts {
       const { trustedChannel, symmetricKey, publicKey } = this.trustedContacts[
         contactName
       ];
-      console.log({ address: trustedChannel.address, publicKey });
+
       const res = await BH_AXIOS.post('fetchTrustedChannel', {
         HEXA_ID,
         address: trustedChannel.address,
