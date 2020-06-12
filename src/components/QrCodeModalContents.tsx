@@ -105,12 +105,12 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-						{ !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
+						{/* { !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
 						placeholderTextColor={Colors.borderColor} 
 						style={styles.qrModalTextInput} 
 						autoCorrect={false}
 						/> : null}
-					
+					 */}
 				</View>
 				{ !props.flag ? 
 				<BottomInfoBox

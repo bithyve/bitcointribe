@@ -9,7 +9,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
@@ -722,12 +721,6 @@ export default function Send(props) {
           enabled
         >
           <ScrollView nestedScrollEnabled={true}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                if (SendHelperBottomSheet.current)
-                  SendHelperBottomSheet.current.snapTo(0);
-              }}
-            >
               <View onStartShouldSetResponder={() => true}>
                 <View style={styles.modalHeaderTitleView}>
                   <View
@@ -814,6 +807,24 @@ export default function Send(props) {
                       }}
                     />
                   </View>
+                  {serviceType == TEST_ACCOUNT ? (
+                    <Text
+                      onPress={() => {
+                        setRecipientAddress(
+                          '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
+                        );
+                      }}
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(10),
+                        marginLeft: 'auto',
+                        fontFamily: Fonts.FiraSansItalic,
+                        marginTop: 10,
+                      }}
+                    >
+                      Send it to a sample address
+                    </Text>
+                  ) : null}
                   {isInvalidAddress ? (
                     <View style={{ marginLeft: 'auto' }}>
                       <Text style={styles.errorText}>
@@ -988,7 +999,6 @@ export default function Send(props) {
                   ) : null}
                 </View>
               </View>
-            </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>

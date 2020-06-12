@@ -222,7 +222,7 @@ export default function Accounts(props) {
 
   const checkFastBitcoin = async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    console.log('getFBTCAccount', getFBTCAccount);
+    //console.log('getFBTCAccount', getFBTCAccount);
     setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
   };
   // useEffect(() => {
@@ -250,7 +250,7 @@ export default function Accounts(props) {
   //       serviceType === REGULAR_ACCOUNT
   //         ? service.hdWallet
   //         : service.secureHDWallet;
-  //     console.log({
+  //     //console.log({
   //       balances:
   //         derivativeAccounts[derivativeAccountType][accountNumber].balances,
   //       transactions:
@@ -266,7 +266,7 @@ export default function Accounts(props) {
       const storedAverageTxFees = JSON.parse(
         await AsyncStorage.getItem('storedAverageTxFees'),
       );
-      console.log({ storedAverageTxFees });
+      //console.log({ storedAverageTxFees });
       if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
         const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
         if (Date.now() - lastFetched < 1800000) {
@@ -314,7 +314,7 @@ export default function Accounts(props) {
   const getServiceType = (serviceType) => {
     if (!serviceType) return;
     setServiceType(serviceType);
-    console.log('Service type', serviceType);
+    //console.log('Service type', serviceType);
     setTimeout(() => {
       if (carousel.current) {
         if (serviceType == TEST_ACCOUNT) {
@@ -333,7 +333,7 @@ export default function Accounts(props) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
   const renderFBTC = (FBTCAccount, accountType) => {
-    console.log('FBTCAccount, renderFBTC', isEmpty(FBTCAccount), accountType);
+    //console.log('FBTCAccount, renderFBTC', isEmpty(FBTCAccount), accountType);
     if (accountType) {
       if (accountType == 'Test Account')
         return (
@@ -1097,7 +1097,7 @@ export default function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log('isHelperDone', isHelperDone);
+          //console.log('isHelperDone', isHelperDone);
           if (isHelperDone) {
             (TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
@@ -1153,11 +1153,11 @@ export default function Accounts(props) {
             accountNumber <= trustedAccounts.instance.using;
             accountNumber++
           ) {
-            console.log({
-              accountNumber,
-              balances: trustedAccounts[accountNumber].balances,
-              transactions: trustedAccounts[accountNumber].transactions,
-            });
+            // console.log({
+            //   accountNumber,
+            //   balances: trustedAccounts[accountNumber].balances,
+            //   transactions: trustedAccounts[accountNumber].transactions,
+            // });
             if (trustedAccounts[accountNumber].balances) {
               currentBalance +=
                 trustedAccounts[accountNumber].balances.balance +
@@ -1235,7 +1235,7 @@ export default function Accounts(props) {
         }
       });
     }
-    //console.log('IN useEffect1');
+    ////console.log('IN useEffect1');
   }, [serviceType]);
 
   return (
@@ -1330,7 +1330,7 @@ export default function Accounts(props) {
                 data={carouselData}
                 firstItem={carouselInitIndex}
                 onBeforeSnapToItem={(index) => {
-                  console.log('onBeforeSnapToItem', index);
+                  //console.log('onBeforeSnapToItem', index);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
@@ -1669,6 +1669,7 @@ export default function Accounts(props) {
                       props.navigation.navigate('Receive', {
                         serviceType,
                         getServiceType: getServiceType,
+                        netBalance
                       });
                     }}
                     style={styles.bottomCardView}
