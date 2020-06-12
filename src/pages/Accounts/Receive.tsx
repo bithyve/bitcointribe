@@ -417,7 +417,9 @@ export default function Receive(props) {
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
-        headerText={'Recieve via Link'}
+        isFromReceive={true}
+        headerText={'Share'}
+        subHeaderText={!isEmpty(selectedContact) ? 'Share with your contact' : 'Share bitcoin address'}
         contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
@@ -453,7 +455,8 @@ export default function Receive(props) {
     //console.log(amount);
     return (
       <SendViaQR
-        headerText={'Recieve via QR'}
+      isFromReceive={true}
+        headerText={'QR'}
         contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
@@ -683,7 +686,7 @@ export default function Receive(props) {
                   />
                 </TouchableOpacity>
                 <Text style={BackupStyles.modalHeaderTitleText}>
-                  Receiving Address
+                Receive
                 </Text>
                 {serviceType == TEST_ACCOUNT ? (
                   <Text
@@ -705,6 +708,17 @@ export default function Receive(props) {
             </View>
             <ScrollView>
               <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
+              <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                      marginBottom: 10,
+                      marginTop: hp('1%'),
+                    }}
+                  >
+                    Requested amount:
+                    </Text>
                 <View style={styles.textBoxView}>
                   <View style={styles.amountInputImage}>
                     <Image
@@ -729,13 +743,13 @@ export default function Receive(props) {
                     flexDirection: 'row',
                     paddingLeft: 20,
                     paddingRight: 20,
-                    marginTop: 30,
+                    marginTop: 15,
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                   activeOpacity={10}
                   onPress={() => {
-                    setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                    //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
                   }}
                 >
                   <Text
@@ -746,7 +760,7 @@ export default function Receive(props) {
                       textAlign: 'center',
                     }}
                   >
-                    Receiving To:
+                    Receiving to:
                     <Text style={styles.boldItalicText}>
                       {serviceType == TEST_ACCOUNT
                         ? '  Test Account'
@@ -755,55 +769,16 @@ export default function Receive(props) {
                         : '  Saving Account'}
                     </Text>
                   </Text>
-                  <Ionicons
+                  {/* <Ionicons
                     style={{ marginRight: 10, marginLeft: 10 }}
                     name={
                       dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
                     }
                     size={20}
                     color={Colors.blue}
-                  />
+                  /> */}
                 </TouchableOpacity>
-                <View style={{ position: 'relative' }}>
-                  {dropdownBoxOpenClose && (
-                    <View style={styles.dropdownBoxModal}>
-                      <ScrollView>
-                        {dropdownBoxList.map((value, index) => (
-                          <TouchableOpacity
-                            onPress={() => {
-                              setTimeout(() => {
-                                console.log('setServiceType', value.type);
-                                setServiceType(value.type);
-                                setDropdownBoxOpenClose(false);
-                              }, 2);
-                            }}
-                            style={{
-                              ...styles.dropdownBoxModalElementView,
-                              backgroundColor:
-                                serviceType == value.type
-                                  ? Colors.lightBlue
-                                  : Colors.white,
-                            }}
-                          >
-                            <Text
-                              style={{
-                                color:
-                                  serviceType == value.type
-                                    ? Colors.blue
-                                    : Colors.black,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(12),
-                              }}
-                            >
-                              {value.account_name}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </View>
-                  )}
-
-                  <TouchableOpacity
+                <TouchableOpacity
                     activeOpacity={10}
                     onPress={() => {
                       setAsTrustedContact(!AsTrustedContact);
@@ -815,7 +790,7 @@ export default function Receive(props) {
                       alignItems: 'center',
                       paddingLeft: 20,
                       paddingRight: 20,
-                      marginTop: 30,
+                      marginTop: 15,
                       height: wp('13%'),
                     }}
                   >
@@ -992,7 +967,6 @@ export default function Receive(props) {
                       </View>
                     </View>
                   )}
-                </View>
               </View>
             </ScrollView>
             <View
@@ -1006,7 +980,7 @@ export default function Receive(props) {
                 <BottomInfoBox
                   title={'Note'}
                   infoText={
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+                    'Bitcoin Receiving Address. Generate bitcoin address and share via link or QR'
                   }
                 />
               </View>
@@ -1039,7 +1013,7 @@ export default function Receive(props) {
                     source={require('../../assets/images/icons/openlink.png')}
                     style={styles.buttonImage}
                   />
-                  <Text style={styles.buttonText}>Via Link</Text>
+                  <Text style={styles.buttonText}>Share</Text>
                 </AppBottomSheetTouchableWrapper>
                 <View
                   style={{
@@ -1062,7 +1036,7 @@ export default function Receive(props) {
                     source={require('../../assets/images/icons/qr-code.png')}
                     style={styles.buttonImage}
                   />
-                  <Text style={styles.buttonText}>Via QR</Text>
+                  <Text style={styles.buttonText}>QR</Text>
                 </AppBottomSheetTouchableWrapper>
               </View>
             </View>
@@ -1095,7 +1069,7 @@ export default function Receive(props) {
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
         ]}
         renderContent={renderSendViaLinkContents}
         renderHeader={renderSendViaLinkHeader}
@@ -1105,7 +1079,7 @@ export default function Receive(props) {
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
         ]}
         renderContent={renderSendViaQRContents}
         renderHeader={renderSendViaQRHeader}
@@ -1201,7 +1175,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.borderColor,
     height: 50,
-    marginTop: hp('5%'),
     marginBottom: hp('1%'),
   },
   textBoxImage: {

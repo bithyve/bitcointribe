@@ -148,8 +148,9 @@ export default function SendViaQR(props) {
       </View>
       <ScrollView>
         <View
-          style={{ marginLeft: 20, marginRight: 20, marginTop: hp('1.7%'), marginBottom: hp('1.7%') }}
+          style={{ marginLeft: 20, marginRight: 20, marginTop: props.isFromReceive ? hp('0.1%') : hp('1.7%'), marginBottom: hp('1.7%') }}
         >
+          {!props.isFromReceive ? <View>
           {contact &&
             <View style={styles.contactProfileView}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -272,7 +273,7 @@ export default function SendViaQR(props) {
               }}
               activeOpacity={10}
               onPress={() => {
-                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+               //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
               }}
             >
               <Text
@@ -283,7 +284,7 @@ export default function SendViaQR(props) {
                   textAlign: 'center',
                 }}
               >
-                Receiving To:
+                Receiving to:
                 <Text style={styles.boldItalicText}>
                   {serviceType && serviceType == TEST_ACCOUNT
                     ? '  Test Account'
@@ -294,52 +295,14 @@ export default function SendViaQR(props) {
                     : ''}
                 </Text>
               </Text>
-              <Ionicons
+              {/* <Ionicons
                 style={{ marginRight: 10, marginLeft: 10 }}
                 name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
                 size={20}
                 color={Colors.blue}
-              />
+              /> */}
             </AppBottomSheetTouchableWrapper>
           ) : null}
-          <View style={{ position: 'relative' }}>
-            {props.serviceType
-              ? dropdownBoxOpenClose && (
-                  <View style={styles.dropdownBoxModal}>
-                    <ScrollView>
-                      {dropdownBoxList.map((value, index) => (
-                        <AppBottomSheetTouchableWrapper
-                          onPress={() => {
-                            setServiceType(value.type);
-
-                            setDropdownBoxOpenClose(false);
-                          }}
-                          style={{
-                            ...styles.dropdownBoxModalElementView,
-                            backgroundColor:
-                              serviceType == value.type
-                                ? Colors.lightBlue
-                                : Colors.white,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color:
-                                serviceType == value.type
-                                  ? Colors.blue
-                                  : Colors.black,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(12),
-                            }}
-                          >
-                            {value.account_name}
-                          </Text>
-                        </AppBottomSheetTouchableWrapper>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )
-              : null}
           {props.amount && (
             <View style={styles.amountContainer}>
               <Text
@@ -397,6 +360,7 @@ export default function SendViaQR(props) {
               </View>
             </View>
           )}
+          </View> : null}
           <View style={styles.loader}>
             {!props.QR ? (
               <ActivityIndicator size="large" />
@@ -405,17 +369,16 @@ export default function SendViaQR(props) {
             )}
           </View>
         </View>
-        </View>
       </ScrollView>
 
-      <View style={{ marginTop: 'auto' }}>
+      {!props.isFromReceive ? <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
           title={'Note'}
           infoText={
             'Use the scanner of your friends app to scan the QR and proceed with the Friends and Family request'
           }
-        />
-      </View>
+        /> 
+      </View>: null}
     </View>
   );
 }
