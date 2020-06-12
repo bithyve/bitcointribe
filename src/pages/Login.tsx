@@ -37,10 +37,10 @@ import RelayServices from '../bitcoin/services/RelayService';
 export default function Login(props) {
   let [message, setMessage] = useState('While you wait...');
   let [subTextMessage1, setSubTextMessage1] = useState(
-    'Hexa has a Test Account which has some test sats preloaded',
+    'Hexa has a preloaded Test Account',
   );
   let [subTextMessage2, setSubTextMessage2] = useState(
-    'If you are new to Bitcoin, this is the best place to start learning',
+    'New to Bitcoin? This is the best place to start',
   );
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
