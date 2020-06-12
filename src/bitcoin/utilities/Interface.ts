@@ -200,6 +200,8 @@ export interface Contacts {
     contactsWalletName?: string;
     isWard?: Boolean;
     isGuardian?: Boolean;
+    walletID?: string;
+    FCMs?: string[];
     ephemeralChannel?: {
       address: string;
       data?: EphemeralData[];

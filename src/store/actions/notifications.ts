@@ -17,7 +17,7 @@ export const updateFCMTokens = (FCMs: string[]) => {
 };
 
 export const sendNotification = (
-  receiverWalletID: string,
+  contactName: string,
   notificationType: notificationType,
   title: string,
   body: string,
@@ -26,7 +26,7 @@ export const sendNotification = (
 ) => {
   return {
     type: SEND_NOTIFICATION,
-    payload: { receiverWalletID, notificationType, title, body, data, tag },
+    payload: { contactName, notificationType, title, body, data, tag },
   };
 };
 

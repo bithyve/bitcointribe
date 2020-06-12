@@ -255,6 +255,14 @@ export default class TrustedContacts {
             ...ephemeralData[index],
             ...data,
           };
+          if (index == 1) {
+            // update counter-party's walletId and FCM
+            this.trustedContacts[contactName].walletID = data.walletID;
+            this.trustedContacts[contactName].FCMs = [
+              ...this.trustedContacts[contactName].FCMs,
+              data.FCM,
+            ];
+          }
           updated = true;
           break;
         }

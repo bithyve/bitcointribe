@@ -8,9 +8,10 @@ import {
   FETCH_NOTIFICATIONS,
   notificationsFetched,
 } from '../actions/notifications';
-import { INotification } from '../../bitcoin/utilities/Interface';
+import { INotification, Contacts } from '../../bitcoin/utilities/Interface';
 import { AsyncStorage, Alert } from 'react-native';
 import RelayServices from '../../bitcoin/services/RelayService';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 function* updateFCMTokensWorker({ payload }) {
   const { FCMs } = payload;
@@ -42,14 +43,7 @@ export const updateFCMTokensWatcher = createWatcher(
 );
 
 function* sendNotificationWorker({ payload }) {
-  const {
-    receiverWalletID,
-    notificationType,
-    title,
-    body,
-    data,
-    tag,
-  } = payload;
+  const { contactName, notificationType, title, body, data, tag } = payload;
 
   const notification: INotification = {
     notificationType,
@@ -60,9 +54,25 @@ function* sendNotificationWorker({ payload }) {
     },
     tag,
   };
+
+  const trustedContacts: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  const contacts: Contacts = trustedContacts.tc.trustedContacts;
+  if (
+    !contacts[contactName] ||
+    !contactName[contactName].walletId ||
+    !contactName[contactName].FCMs
+  )
+    throw new Error('Failed to send notification; contact assets missing');
+
+  const receiverWalletID = contactName[contactName].walletId;
+  const receiverFCMs = contactName[contactName].FCMs;
+
   const res = yield call(
     RelayServices.sendNotification,
     receiverWalletID,
+    receiverFCMs,
     notification,
   );
   if (res.status === 200) {

@@ -100,6 +100,7 @@ export default class RelayServices {
 
   public static sendNotification = async (
     receiverWalletID: string,
+    receiverFCMs: string[],
     notification: INotification,
   ): Promise<
     | {
@@ -120,7 +121,11 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendNotification(receiverWalletID, notification),
+        data: await Relay.sendNotification(
+          receiverWalletID,
+          receiverFCMs,
+          notification,
+        ),
       };
     } catch (err) {
       return {
