@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -39,6 +39,11 @@ export default function TrustedContactRequest(props) {
       setPasscode(tmpPasscode.join(''));
     }
   }
+
+  useEffect(()=>{
+    if(!props.inputType) setIsDisabled(false);
+    else setIsDisabled(true);
+  },[props.inputType])
 
   const getStyle = (i) => {
     if (i == 0) {
@@ -272,8 +277,7 @@ export default function TrustedContactRequest(props) {
               <Text style={styles.modalTitleText}>Recovery Share Request</Text>
             )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor
+              {props.inputType ? "Accept the request to add your contact to Friends and Family" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor" }
             </Text>
           </View>
           <View style={styles.box}>

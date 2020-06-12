@@ -308,8 +308,7 @@ export default function ChangeCurrency(props) {
       </View>
       <View >
         <BottomInfoBox
-        backgroundColor={Colors.white}
-          title={'Note'}
+        title={'Note'}
           infoText={
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
           }

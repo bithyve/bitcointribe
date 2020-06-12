@@ -24,9 +24,9 @@ export default function MoreHomePageTabContents(props) {
       info: `Setup and manage your wallet backup`,
     },
     {
-      title: 'Address Book',
+      title: 'Friends and Family',
       image: require('../assets/images/icons/addressbook.png'),
-      info: `View and manage your trusted contacts `,
+      info: `View and manage your contacts`,
     },
     {
       title: 'Services',

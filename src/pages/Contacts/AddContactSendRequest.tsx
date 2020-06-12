@@ -283,7 +283,7 @@ export default function AddContactSendRequest(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Add Contact{' '}
+                Send Request{' '}
               </Text>
               <Text
                 style={{
@@ -293,7 +293,7 @@ export default function AddContactSendRequest(props) {
                   paddingTop: 5,
                 }}
               >
-                Lorem ipsum dolor sit amet, consec
+                Add contact to Friends and Family
               </Text>
             </View>
             <TouchableOpacity
@@ -444,7 +444,7 @@ export default function AddContactSendRequest(props) {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+                'Scan the QR on your contacts Hexa app or send a link to your contact'
               }
             />
           </View>
