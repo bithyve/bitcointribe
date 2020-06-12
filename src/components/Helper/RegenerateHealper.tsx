@@ -32,8 +32,8 @@ export default function RegenerateHealper( props ) {
                 <View style={ { justifyContent: 'center', alignItems: 'center' } }>
                     <Image source={ require( "../../assets/images/icons/testAccountHelperImage.png" ) } style={ { width: wp( "50%" ), height: wp( "50%" ), resizeMode: "contain" } } />
                 </View>
-                { array.map( ( value ) =>
-                    <View style={ { justifyContent: 'center', alignItems: 'center', marginLeft: wp( '10%' ), marginRight: wp( '10%' ), marginTop: hp( '2%' ), marginBottom: hp( '2%' ), flexDirection: 'row' } }>
+                { array.map(( value, index ) =>
+                    <View key={index.toString()+value} style={ { justifyContent: 'center', alignItems: 'center', marginLeft: wp( '10%' ), marginRight: wp( '10%' ), marginTop: hp( '2%' ), marginBottom: hp( '2%' ), flexDirection: 'row' } }>
                         <View style={ {
                             borderStyle: "dotted",
                             borderWidth: 2,

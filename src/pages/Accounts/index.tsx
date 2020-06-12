@@ -66,6 +66,7 @@ import TransactionHelperModalContents from '../../components/Helper/TransactionH
 import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
 
 export default function Accounts(props) {
+  const dispatch = useDispatch();
   const [FBTCAccount, setFBTCAccount] = useState({});
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
@@ -166,7 +167,8 @@ export default function Accounts(props) {
     setTransactionDetailsHelperBottomSheet,
   ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
-  const checkNHighlight = async () => {
+
+  const checkNHighlight = useCallback(async () => {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
 
@@ -202,7 +204,7 @@ export default function Accounts(props) {
         setIsTestHelperDone(false);
       }, 10);
     }
-  };
+  }, []);
 
   useEffect(() => {
     checkFastBitcoin();
@@ -299,14 +301,15 @@ export default function Accounts(props) {
     })();
   }, [serviceType]);
 
-  const setCurrencyCodeFromAsync = async () => {
+  const setCurrencyCodeFromAsync = useCallback(async () => {
     let currencyToggleValueTmp = await AsyncStorage.getItem(
       'currencyToggleValue',
     );
     setSwitchOn(currencyToggleValueTmp ? true : false);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
-  };
+  }, []);
+
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
@@ -329,9 +332,11 @@ export default function Accounts(props) {
 
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
   }, [serviceType]);
+
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
+
   const renderFBTC = (FBTCAccount, accountType) => {
     //console.log('FBTCAccount, renderFBTC', isEmpty(FBTCAccount), accountType);
     if (accountType) {
@@ -561,6 +566,7 @@ export default function Accounts(props) {
       </ImageBackground>
     );
   };
+  
   const scrollInterpolator = (index, carouselProps) => {
     const range = [1, 0, -1];
     const inputRange = getInputRangeFromIndexes(range, index, carouselProps);
@@ -793,9 +799,9 @@ export default function Accounts(props) {
             flex: 1,
           }}
         >
-          {[1, 2, 3, 4, 5].map((value) => {
+          {[1, 2, 3, 4, 5].map((value, index) => {
             return (
-              <View
+              <View key={index.toString()}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -898,7 +904,7 @@ export default function Accounts(props) {
     );
   };
 
-  const renderTransactionsHeader = () => {
+  const renderTransactionsHeader = useCallback(() => {
     return (
       <SmallHeaderModal
         borderColor={Colors.white}
@@ -908,7 +914,7 @@ export default function Accounts(props) {
         }}
       />
     );
-  };
+  }, []);
 
   // const renderBuyHelperContents = () => {
   //   return (
@@ -936,7 +942,7 @@ export default function Accounts(props) {
   //   );
   // };
 
-  const renderTestAccountsHelperContents = () => {
+  const renderTestAccountsHelperContents = useCallback(() => {
     return (
       // <TestAccountHelperModalContents
       //   topButtonText={`Test Account`}
@@ -951,8 +957,9 @@ export default function Accounts(props) {
       // />
       <TestAccountHelpContents />
     );
-  };
-  const renderTestAccountsHelperHeader = () => {
+  }, []);
+
+  const renderTestAccountsHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
         borderColor={Colors.blue}
@@ -972,7 +979,7 @@ export default function Accounts(props) {
         }}
       />
     );
-  };
+  }, []);
 
   const renderSecureAccountsHelperContents = useCallback(() => {
     return (
@@ -1031,7 +1038,7 @@ export default function Accounts(props) {
     );
   }, []);
 
-  const checkNShowHelperModal = async () => {
+  const checkNShowHelperModal = useCallback(async () => {
     let isSendHelperDone = await AsyncStorage.getItem(
       'isTransactionHelperDone',
     );
@@ -1049,7 +1056,7 @@ export default function Accounts(props) {
         setIsHelperDone(false);
       }, 10);
     }
-  };
+  }, []);
 
   const renderTransactionDetailsContents = useCallback(() => {
     return (
@@ -1078,7 +1085,7 @@ export default function Accounts(props) {
     );
   }, [transactionItem]);
 
-  const renderHelperContents = () => {
+  const renderHelperContents = useCallback(() => {
     return (
       // <TestAccountHelperModalContents
       //   topButtonText={`Transaction Details`}
@@ -1090,7 +1097,8 @@ export default function Accounts(props) {
       // />
       <TransactionHelperModalContents />
     );
-  };
+  }, []);
+
   const renderHelperHeader = useCallback(() => {
     return (
       <SmallHeaderModal
@@ -1190,7 +1198,6 @@ export default function Accounts(props) {
     }
   }, [service]);
 
-  const dispatch = useDispatch();
   useEffect(() => {
     // if (!netBalance) {
     //   // if (serviceType === TEST_ACCOUNT) dispatch(getTestcoins(serviceType));

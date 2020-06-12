@@ -34,7 +34,6 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import { fetchSSSFromDB } from '../../store/actions/storage';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthCheck';
@@ -190,7 +189,7 @@ export default function ManageBackup(props) {
   );
   const [is_initiated, setIs_initiated] = useState(false);
 
-  function getImageByType(item) {
+  const getImageByType = useCallback((item) => {
     let type = item.type;
     if (type == 'secondaryDevice') {
       return require('../../assets/images/icons/icon_secondarydevice.png');
@@ -224,9 +223,9 @@ export default function ManageBackup(props) {
     } else if (type == 'security') {
       return require('../../assets/images/icons/icon_securityquestion.png');
     }
-  }
+  }, [])
 
-  const getIconByStatus = (status) => {
+  const getIconByStatus = useCallback((status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -234,7 +233,7 @@ export default function ManageBackup(props) {
     } else if (status == 'Good') {
       return require('../../assets/images/icons/icon_check.png');
     }
-  };
+  }, []);
 
   const renderWalletBackupAndRecoveryContents = useCallback(() => {
     return (
@@ -267,6 +266,7 @@ export default function ManageBackup(props) {
   const renderRegenerateShareHelperContents = useCallback(() => {
     return (
       <RegenerateHealper
+        key={'Regenerate Shares'}
         topButtonText={'Regenerate Shares'}
         continueButtonText={'Continue'}
         quitButtonText={'Quit'}
@@ -300,6 +300,7 @@ export default function ManageBackup(props) {
   const renderSecondaryDeviceHistoryContent = useCallback(() => {
     return (
       <SecondaryDeviceHealthCheck
+        key={'Keeper Device'}
         data={secondaryDeviceHistory}
         title={'Keeper Device'}
         time={selectedTime}
@@ -335,6 +336,7 @@ export default function ManageBackup(props) {
   const renderPersonalCopyHistoryContent = useCallback(() => {
     return (
       <SecondaryDeviceHealthCheck
+        key={'Personal Copy'}
         data={secondaryDeviceHistory}
         title={'Personal Copy'}
         time={selectedTime}
@@ -370,6 +372,7 @@ export default function ManageBackup(props) {
   const renderSecurityQuestionHistoryContent = useCallback(() => {
     return (
       <SecondaryDeviceHealthCheck
+        key={'Security Question'}
         data={secondaryDeviceHistory}
         title={'Security Question'}
         time={selectedTime}
@@ -667,7 +670,7 @@ export default function ManageBackup(props) {
     securityAns: true,
   });
 
-  const autoHighlight = async () => {
+  const autoHighlight = useCallback(async () => {
     let {
       secondaryDevice,
       trustedContact1,
@@ -783,7 +786,7 @@ export default function ManageBackup(props) {
         }
       }
     }
-  };
+  }, []);
 
   const setContactsFromAsync = useCallback(async () => {
     let contactList = JSON.parse(
@@ -813,13 +816,13 @@ export default function ManageBackup(props) {
     setPageData([...pageData]);
   }, []);
 
-  const setAutoHighlightFlagsFromAsync = async () => {
+  const setAutoHighlightFlagsFromAsync = useCallback(async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
     if (highlightFlags) {
       console.log('Setting autoHighlight flags');
       setAutoHighlightFlags(JSON.parse(highlightFlags));
     }
-  };
+  }, []);
 
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
@@ -980,7 +983,7 @@ export default function ManageBackup(props) {
     }
   }, [overallHealth]);
 
-  const checkNShowHelperModal = async () => {
+  const checkNShowHelperModal = useCallback(async () => {
     let isManageBackupHelperDone = await AsyncStorage.getItem(
       'isManageBackupHelperDone',
     );
@@ -990,7 +993,7 @@ export default function ManageBackup(props) {
         (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(1);
       }, 1000);
     }
-  };
+  }, []);
 
   const nextStep = async () => {
     const {
@@ -1307,7 +1310,7 @@ export default function ManageBackup(props) {
     onContactsUpdate();
   }, [contacts]);
 
-  const onContactsUpdate = async () => {
+  const onContactsUpdate = useCallback(async () => {
     if (contacts.length) {
       if (
         contacts.findIndex((value) => value && value.type == 'contact1') != -1
@@ -1327,7 +1330,7 @@ export default function ManageBackup(props) {
       }
     }
     setPageData(pageData);
-  };
+  }, []);
 
   const getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
@@ -1379,12 +1382,13 @@ export default function ManageBackup(props) {
     return require('../../assets/images/icons/settings.png');
   };
 
-  const getImageIcon = (item) => {
+  const getImageIcon = (item, index) => {
     if (item.type == 'contact1' || item.type == 'contact2') {
       if (item.personalInfo) {
         if (item.personalInfo.imageAvailable) {
           return (
             <Image
+              key={index.toString()}
               source={item.personalInfo.image}
               style={{
                 width: 35,
@@ -1397,6 +1401,7 @@ export default function ManageBackup(props) {
         } else {
           return (
             <View
+              key={index.toString()}
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1434,7 +1439,7 @@ export default function ManageBackup(props) {
         }
       }
     }
-    return <Image style={styles.cardImage} source={getImageByType(item)} />;
+    return <Image key={index.toString()} style={styles.cardImage} source={getImageByType(item)} />;
   };
 
   const getCardTitle = (item) => {
@@ -1597,8 +1602,9 @@ export default function ManageBackup(props) {
               <View style={{ marginBottom: 10 }}>
                 {pageData.map((item, index) => {
                   return (
-                    <View style={{}}>
+                    <View style={{}} key={index.toString()}>
                       <TouchableOpacity
+                        key={index.toString()}
                         onPress={() => {
                           if (item.type == 'secondaryDevice') {
                             props.navigation.navigate(
@@ -1706,7 +1712,7 @@ export default function ManageBackup(props) {
                             selectedType && item.type == selectedType ? 10 : 0,
                         }}
                       >
-                        {getImageIcon(item)}
+                        {getImageIcon(item, index)}
                         <View style={{ marginLeft: 15 }}>
                           <Text style={styles.cardTitleText}>
                             {getCardTitle(item)}

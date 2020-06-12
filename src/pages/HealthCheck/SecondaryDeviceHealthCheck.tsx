@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
   Image,
-  SafeAreaView,
-  StatusBar,
-  TouchableOpacity,
-  Alert,
   ScrollView,
-  Platform,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -19,16 +13,9 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadEncMShare } from '../../store/actions/sss';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { RFValue } from 'react-native-responsive-fontsize';
-import TransparentHeaderModal from '../../components/TransparentHeaderModal';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../../components/ModalHeader';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 const SecondaryDeviceHealthCheck = props => {
@@ -75,10 +62,11 @@ const SecondaryDeviceHealthCheck = props => {
         </View>
       </View>
       <ScrollView style={{ flex: 1 }}>
-        {props.data.map(value => {
+        {props.data.map((value, index) => {
           if (SelectedOption == value.id) {
             return (
               <AppBottomSheetTouchableWrapper
+                key={index.toString()+props.key}
                 onPress={() => SelectOption(value.id)}
                 style={{
                   margin: wp('3%'),
@@ -126,6 +114,7 @@ const SecondaryDeviceHealthCheck = props => {
           }
           return (
             <AppBottomSheetTouchableWrapper
+              key={index.toString()}
               onPress={() => SelectOption(value.id)}
               style={{
                 margin: wp('3%'),

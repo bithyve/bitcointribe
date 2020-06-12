@@ -88,30 +88,30 @@ function AllAccountsContents(props) {
       </View>
       <ScrollView>
         {AllAccountData.map((value, index) => (
-          <View>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => {
-              props.navigation.navigate('Accounts', {
-                serviceType:
-                  value.accountType === 'test'
-                    ? TEST_ACCOUNT
-                    : value.accountType === 'regular'
-                    ? REGULAR_ACCOUNT
-                    : SECURE_ACCOUNT,
-                index:
-                  value.accountType === 'test'
-                    ? 0
-                    : value.accountType === 'regular'
-                    ? 1
-                    : 2,
-              });
-            }}
-            style={
-              index == 3 || index == 4
-                ? styles.listElements1
-                : styles.listElements
-            }
-          >
+          <View key={index.toString()}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => {
+                props.navigation.navigate('Accounts', {
+                  serviceType:
+                    value.accountType === 'test'
+                      ? TEST_ACCOUNT
+                      : value.accountType === 'regular'
+                      ? REGULAR_ACCOUNT
+                      : SECURE_ACCOUNT,
+                  index:
+                    value.accountType === 'test'
+                      ? 0
+                      : value.accountType === 'regular'
+                      ? 1
+                      : 2,
+                });
+              }}
+              style={
+                index == 3 || index == 4
+                  ? styles.listElements1
+                  : styles.listElements
+              }
+            >
             <Image style={styles.listElementsIconImage} source={value.image} />
             <View style={{ flex: 1 }}>
               <Text style={styles.listElementsTitle}>
@@ -128,14 +128,14 @@ function AllAccountsContents(props) {
               />
             </View>
             
-          </AppBottomSheetTouchableWrapper>
-          <View style={{ height: 1,
-          backgroundColor: Colors.borderColor,
-          marginLeft: 20,
-          marginRight: 20,
-          marginTop: 5,
-    marginBottom: 5,
-          }}/>
+            </AppBottomSheetTouchableWrapper>
+            <View style={{ height: 1,
+              backgroundColor: Colors.borderColor,
+              marginLeft: 20,
+              marginRight: 20,
+              marginTop: 5,
+              marginBottom: 5,
+            }}/>
           </View>
         ))}
       </ScrollView>

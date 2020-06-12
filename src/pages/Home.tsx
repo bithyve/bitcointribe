@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -108,19 +108,29 @@ export default function Home(props) {
   //   }, 4000); // letting other db insertion happen
   // }, []);
   // //console.log(trustedContacts.tc.trustedContacts['Blake']);
-  const [
-    TrustedContactRequestBottomSheet,
-    setTrustedContactRequestBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
+  const TrustedContactRequestBottomSheet = useRef(null);
+  const notificationsListBottomSheet = useRef(null);
+  const ErrorBottomSheet = useRef(null);
+  const ContactSelectedFromAddressBookQrCodeBottomSheet = useRef(null);
+  const ContactSelectedFromAddressBookBottomSheet = useRef(null);
+  const AddContactAddressBookBookBottomSheet = useRef(null);
+  const AddBottomSheet = useRef(null);
+  const fastBitcoinSellCalculationBottomSheet = useRef(null);
+  const fastBitcoinRedeemCalculationBottomSheet = useRef(null);
+  const AllAccountsBottomSheet = useRef(null);
+  const NoInternetBottomSheet = useRef(null);
+  const CustodianRequestBottomSheet = useRef(null);
+  const CustodianRequestRejectedBottomSheet = useRef(null);
+  const settingsBottomSheet = useRef(null);
+  const transactionTabBarBottomSheet = useRef(null);
+  const addTabBarBottomSheet = useRef(null);
+  const QrTabBarBottomSheet = useRef(null);
+  const TransactionDetailsBottomSheet = useRef(null);
+  const TransactionDetailsHelperBottomSheet = useRef(null);
 
   const [SelectedContact, setSelectedContact] = useState([]);
   const notificationList = useSelector((state) => state.notifications);
   const [NotificationList, setNotificationList] = useState([]);
-  const [
-    notificationsListBottomSheet,
-    setNotificationsListBottomSheet,
-  ] = useState(React.createRef());
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
@@ -194,7 +204,7 @@ export default function Home(props) {
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
 
-  const onNotificationClicked = async (value) => {
+  const onNotificationClicked = useCallback(async (value) => {
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -245,7 +255,7 @@ export default function Home(props) {
           console.error(error);
         });
     }
-  };
+  }, []);
 
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
@@ -401,73 +411,16 @@ export default function Home(props) {
   //   HealthCheckSecurityQuestionBottomSheet,
   //   setHealthCheckSecurityQuestionBottomSheet,
   // ] = useState(React.createRef());
-  const [
-    ContactSelectedFromAddressBookQrCodeBottomSheet,
-    setContactSelectedFromAddressBookQrCodeBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    ContactSelectedFromAddressBookBottomSheet,
-    setContactSelectedFromAddressBookBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    AddContactAddressBookBookBottomSheet,
-    setAddContactAddressBookBottomSheet,
-  ] = useState(React.createRef());
-  const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
-  const [
-    fastBitcoinSellCalculationBottomSheet,
-    setFastBitcoinSellCalculationBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    fastBitcoinRedeemCalculationBottomSheet,
-    setFastBitcoinRedeemCalculationBottomSheet,
-  ] = useState(React.createRef());
-  const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-    React.createRef(),
-  );
   // const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   // const [RecoveryRequestBottomSheet, setRecoveryRequestBottomSheet] = useState(
   //   React.createRef(),
   // );
-  const [
-    CustodianRequestBottomSheet,
-    setCustodianRequestBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    RecoverySecretRequestBottomSheet,
-    setRecoverySecretRequestBottomSheet,
-  ] = useState(React.createRef());
-
-  const [
-    CustodianRequestOtpBottomSheet,
-    setCustodianRequestOtpBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    CustodianRequestRejectedBottomSheet,
-    setCustodianRequestRejectedBottomSheet,
-  ] = useState(React.createRef());
   // const [
   //   CustodianRequestAcceptBottomSheet,
   //   setCustodianRequestAcceptBottomSheet,
   // ] = useState(React.createRef());
-  const [settingsBottomSheet, setSettingsBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [transactionTabBarBottomSheet, setTransactionBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [addTabBarBottomSheet, setAddTabBarBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [QrTabBarBottomSheet, setQrTabBarBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [moreTabBarBottomSheet, setMoreTabBarBottomSheet] = useState(
-    React.createRef(),
-  );
+  
+  const moreTabBarBottomSheet = useRef(null);
   const [newData, setNewData] = useState([]);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
@@ -587,15 +540,7 @@ export default function Home(props) {
     },
   ]);
   const [modaldata, setModaldata] = useState(transactionData);
-  const [
-    TransactionDetailsBottomSheet,
-    setTransactionDetailsBottomSheet,
-  ] = useState(React.createRef());
   const [transactionItem, setTransactionItem] = useState({});
-  const [
-    TransactionDetailsHelperBottomSheet,
-    setTransactionDetailsHelperBottomSheet,
-  ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
 
   function getIconByAccountType(type) {
@@ -612,6 +557,8 @@ export default function Home(props) {
     }
   }
 
+  // TODO: Why we are fetching notification data on focus event every time. I think mount state is enough.
+  // If my app is in foreground and any new notification will come we can fetch on that particular event.
   useEffect(() => {
     getNotificationList();
     getNewTransactionNotifications();
@@ -631,7 +578,7 @@ export default function Home(props) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  const getNewTransactionNotifications = async () => {
+  const getNewTransactionNotifications = useCallback(async () => {
     let newTransactions = [];
     const derivativeAccountType = 'FAST_BITCOINS';
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
@@ -710,17 +657,17 @@ export default function Home(props) {
         setNotificationDataChange(!NotificationDataChange);
       }, 2);
     }
-  };
+  }, []);
 
-  const getNotificationList = async () => {
+  const getNotificationList = useCallback(async () => {
     dispatch(fetchNotifications());
-  };
+  }, []);
 
   useEffect(() => {
     setupNotificationList();
   }, [notificationList]);
 
-  const onNotificationListOpen = async () => {
+  const onNotificationListOpen = useCallback(async () => {
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -743,9 +690,9 @@ export default function Home(props) {
       setNotificationData(asyncNotificationList);
       setNotificationDataChange(!NotificationDataChange);
     }
-  };
+  }, []);
 
-  const setupNotificationList = async () => {
+  const setupNotificationList = useCallback(async () => {
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -834,9 +781,9 @@ export default function Home(props) {
       setNotificationData(tmpList);
       setNotificationDataChange(!NotificationDataChange);
     }
-  };
+  }, []);
 
-  const onNotificationOpen = async (item) => {
+  const onNotificationOpen = useCallback(async (item) => {
     let content = JSON.parse(item._data.content);
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -875,7 +822,7 @@ export default function Home(props) {
     });
     setNotificationData(asyncNotificationList);
     setNotificationDataChange(!NotificationDataChange);
-  };
+  }, []);
 
   useEffect(function () {
     AppState.addEventListener('change', onAppStateChange);
@@ -917,8 +864,8 @@ export default function Home(props) {
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
-    (moreTabBarBottomSheet as any).current.snapTo(0);
-    // AppState.addEventListener('change', handleAppStateChange);
+    moreTabBarBottomSheet.current.snapTo(0);
+    AppState.addEventListener('change', handleAppStateChange);
 
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
@@ -938,13 +885,13 @@ export default function Home(props) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
 
-  const checkFastBitcoin = async () => {
+  const checkFastBitcoin = useCallback(async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
-  };
+  }, [FBTCAccount]);
 
-  const onAppStateChange = async (nextAppState) => {
-    handleAppStateChange(nextAppState)
+  const onAppStateChange = useCallback(async (nextAppState) => {
+    // handleAppStateChange(nextAppState)
     try {
       if (this.appState == nextAppState) return;
       this.appState = nextAppState;
@@ -952,7 +899,7 @@ export default function Home(props) {
         scheduleNotification();
       }
     } catch (error) {}
-  };
+  }, []);
 
   const createNotificationListeners = async () => {
     /*
@@ -1230,7 +1177,7 @@ export default function Home(props) {
     }
   }, [isErrorReceivingFailed]);
 
-  const updateAccountCardData = () => {
+  const updateAccountCardData = useCallback(() => {
     let newArrayFinal = [];
     let tempArray = [];
     for (let a = 0; a < data.length; a++) {
@@ -1246,9 +1193,9 @@ export default function Home(props) {
     if (newArrayFinal) {
       setNewData(newArrayFinal);
     }
-  };
+  }, [newData]);
 
-  const setSecondaryDeviceAddresses = async () => {
+  const setSecondaryDeviceAddresses = useCallback(async () => {
     let secondaryDeviceOtpTemp = JSON.parse(
       await AsyncStorage.getItem('secondaryDeviceAddress'),
     );
@@ -1266,7 +1213,7 @@ export default function Home(props) {
         JSON.stringify(secondaryDeviceOtpTemp),
       );
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (
@@ -1438,7 +1385,7 @@ export default function Home(props) {
     }
   };
 
-  function renderTransactionHeader() {
+  const renderTransactionHeader = useCallback(() => {
     return (
       <TouchableOpacity
         activeOpacity={10}
@@ -1449,7 +1396,7 @@ export default function Home(props) {
         <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
       </TouchableOpacity>
     );
-  }
+  }, []);
 
   const renderTransactionDetailsContents = useCallback(() => {
     return (
@@ -1563,7 +1510,7 @@ export default function Home(props) {
     );
   }, []);
 
-  function openCloseModal() {
+  const openCloseModal = useCallback(() => {
     if (openmodal == 'closed') {
       setOpenmodal('half');
     }
@@ -1573,7 +1520,7 @@ export default function Home(props) {
     if (openmodal == 'full') {
       setOpenmodal('closed');
     }
-  }
+  }, [openmodal]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -1614,15 +1561,15 @@ export default function Home(props) {
       }
     } else if (selected == 'More') {
       if (openmodal == 'closed') {
-        (moreTabBarBottomSheet as any).current.snapTo(1);
+        moreTabBarBottomSheet.current.snapTo(1);
       }
       if (openmodal == 'half' || openmodal == 'full') {
-        (moreTabBarBottomSheet as any).current.snapTo(2);
+        moreTabBarBottomSheet.current.snapTo(2);
       }
     }
   }, [openmodal]);
 
-  async function selectTab(tabTitle) {
+  const selectTab = useCallback(async (tabTitle) => {
     if (tabTitle == 'More') {
       setTimeout(() => {
         setKnowMoreBottomSheetsFlag(true);
@@ -1632,7 +1579,7 @@ export default function Home(props) {
       (transactionTabBarBottomSheet as any).current.snapTo(0);
       (addTabBarBottomSheet.current as any).snapTo(0);
       (QrTabBarBottomSheet.current as any).snapTo(0);
-      (moreTabBarBottomSheet.current as any).snapTo(2);
+      moreTabBarBottomSheet.current.snapTo(2);
     }
     if (tabTitle == 'Transactions') {
       setTimeout(() => {
@@ -1642,7 +1589,7 @@ export default function Home(props) {
       (transactionTabBarBottomSheet as any).current.snapTo(2);
       (addTabBarBottomSheet.current as any).snapTo(0);
       (QrTabBarBottomSheet.current as any).snapTo(0);
-      (moreTabBarBottomSheet.current as any).snapTo(0);
+      moreTabBarBottomSheet.current.snapTo(0);
     }
     if (tabTitle == 'Add') {
       setTimeout(() => {
@@ -1653,7 +1600,7 @@ export default function Home(props) {
       (transactionTabBarBottomSheet as any).current.snapTo(0);
       (addTabBarBottomSheet.current as any).snapTo(2);
       (QrTabBarBottomSheet.current as any).snapTo(0);
-      (moreTabBarBottomSheet.current as any).snapTo(0);
+      moreTabBarBottomSheet.current.snapTo(0);
     }
     if (tabTitle == 'QR') {
       setTimeout(() => {
@@ -1663,11 +1610,11 @@ export default function Home(props) {
       (transactionTabBarBottomSheet as any).current.snapTo(0);
       (addTabBarBottomSheet.current as any).snapTo(0);
       (QrTabBarBottomSheet.current as any).snapTo(2);
-      (moreTabBarBottomSheet.current as any).snapTo(0);
+      moreTabBarBottomSheet.current.snapTo(0);
     }
-  }
+  }, []);
 
-  const renderNoInternetModalContent = () => {
+  const renderNoInternetModalContent = useCallback(() => {
     return (
       <NoInternetModalContents
         onPressTryAgain={() => {}}
@@ -1676,9 +1623,9 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, [NoInternetBottomSheet]);
 
-  const renderNoInternetModalHeader = () => {
+  const renderNoInternetModalHeader = useCallback(() => {
     return (
       <TransparentHeaderModal
         onPressheader={() => {
@@ -1689,7 +1636,7 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, [NoInternetBottomSheet]);
 
   // const renderErrorModalContent = () => {
   //   return (
@@ -2199,44 +2146,44 @@ export default function Home(props) {
     );
   };
 
-  const renderContactSelectedFromAddressBookHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const renderContactSelectedFromAddressBookHeader = () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderContactSelectedFromAddressBookQrCodeContents = () => {
-    return (
-      <SelectedContactFromAddressBookQrCode
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-        onPressBack={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-      />
-    );
-  };
+  // const renderContactSelectedFromAddressBookQrCodeContents = () => {
+  //   return (
+  //     <SelectedContactFromAddressBookQrCode
+  //       onPressProceed={() => {
+  //         (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+  //           0,
+  //         );
+  //       }}
+  //       onPressBack={() => {
+  //         (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+  //           0,
+  //         );
+  //       }}
+  //     />
+  //   );
+  // };
 
-  const renderContactSelectedFromAddressBookQrCodeHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-      />
-    );
-  };
+  // const renderContactSelectedFromAddressBookQrCodeHeader = () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
+  //           0,
+  //         );
+  //       }}
+  //     />
+  //   );
+  // };
 
   const renderAddContactAddressBookContents = useCallback(() => {
     return (
@@ -2262,9 +2209,9 @@ export default function Home(props) {
         }}
       />
     );
-  }, [SelectedContact]);
+  }, []);
 
-  const renderAddContactAddressBookHeader = () => {
+  const renderAddContactAddressBookHeader = useCallback(() => {
     return (
       <ModalHeader
         onPressHeader={() => {
@@ -2275,7 +2222,7 @@ export default function Home(props) {
         }}
       />
     );
-  };
+  }, []);
 
   // const submitRecoveryQuestion = () => {
   //   (HealthCheckSecurityQuestionBottomSheet as any).current.snapTo(0);
@@ -3012,10 +2959,10 @@ export default function Home(props) {
             renderItem={(Items) => {
               return (
                 <View style={{ flexDirection: 'column' }}>
-                  {Items.item.map((value) => {
+                  {Items.item.map((value, index) => {
                     if (value.accountType === 'add') {
                       return (
-                        <TouchableOpacity disabled={true}>
+                        <TouchableOpacity disabled={true} key={index.toString()}>
                           <CardView
                             cornerRadius={10}
                             style={{
@@ -3050,6 +2997,7 @@ export default function Home(props) {
                     } else {
                       return (
                         <TouchableOpacity
+                          key={index.toString()}
                           onPress={() => {
                             props.navigation.navigate('Accounts', {
                               serviceType:
@@ -3292,13 +3240,13 @@ export default function Home(props) {
         onCloseEnd={() => {
           setQrBottomSheetsFlag(false);
           if (selected == 'More')
-            (moreTabBarBottomSheet as any).current.snapTo(1);
+            moreTabBarBottomSheet.current.snapTo(1);
         }}
         onCloseStart={() => {
           setQrBottomSheetsFlag(false);
         }}
         enabledInnerScrolling={true}
-        ref={moreTabBarBottomSheet as any}
+        ref={moreTabBarBottomSheet}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()

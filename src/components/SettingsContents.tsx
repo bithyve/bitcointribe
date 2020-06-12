@@ -51,8 +51,8 @@ export default function SettingsContents(props) {
             </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-            {PageData.map((item)=>{
-                return <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManagePin(item.type, currencycode)} style={styles.selectedContactsView}>
+            {PageData.map((item, index)=>{
+                return <AppBottomSheetTouchableWrapper key={index.toString()} onPress={()=>props.onPressManagePin(item.type, currencycode)} style={styles.selectedContactsView}>
                 <Image source={item.image} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: wp('3%'), marginRight: wp('3%') }} />
                 <View style={{ justifyContent: 'center', marginRight: 10, flex:1 }}>
                     <Text style={styles.titleText}>{item.title}</Text>
