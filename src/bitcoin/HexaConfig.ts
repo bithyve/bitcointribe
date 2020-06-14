@@ -32,22 +32,8 @@ class HexaConfig {
     iv: Buffer.alloc(16, 0),
   };
   public BH_SERVERS = {
-    LOCAL: {
-      RELAY: Config.BIT_API_URLS_RELAY_LOCAL.trim(),
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_LOCAL.trim(),
-    },
-    DEV: {
-      RELAY: Config.BIT_API_URLS_RELAY_DEV.trim(),
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_DEV.trim(),
-    },
-    STAGING: {
-      RELAY: Config.BIT_API_URLS_RELAY_STAGING.trim(),
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_STAGING.trim(),
-    },
-    PROD: {
-      RELAY: Config.BIT_API_URLS_RELAY_PROD.trim(),
-      SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER_PROD.trim(),
-    },
+    RELAY: Config.BIT_API_URLS_RELAY.trim(),
+    SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),
   };
   public BSI = {
     INIT_INDEX: parseInt(Config.BIT_BSI_INIT_INDEX.trim(), 10),
@@ -95,8 +81,8 @@ class HexaConfig {
     },
 
     TIME_SLOTS: {
-      SHARE_SLOT1: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT1_DEV.trim(), 10),
-      SHARE_SLOT2: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT2_DEV.trim(), 10),
+      SHARE_SLOT1: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10),
+      SHARE_SLOT2: parseInt(Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(), 10),
     },
   };
 
@@ -171,7 +157,7 @@ class HexaConfig {
       using: 0,
     },
   };
-
+  
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
@@ -183,27 +169,17 @@ class HexaConfig {
 
     console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
 
-    if (Config.BIT_SERVER_MODE.trim() === 'PROD') {
-      this.RELAY = this.BH_SERVERS.PROD.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.PROD.SIGNING_SERVER;
-      this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = parseInt(
-        Config.BIT_SHARE_HEALTH_TIME_SLOT1_PROD.trim(),
-        10,
-      );
-      this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 = parseInt(
-        Config.BIT_SHARE_HEALTH_TIME_SLOT2_PROD.trim(),
-        10,
-      );
-    } else if (Config.BIT_SERVER_MODE.trim() === 'STA') {
-      this.RELAY = this.BH_SERVERS.STAGING.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.STAGING.SIGNING_SERVER;
-    } else if (Config.BIT_SERVER_MODE.trim() === 'DEV') {
-      this.RELAY = this.BH_SERVERS.DEV.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.DEV.SIGNING_SERVER;
-    } else if (Config.BIT_SERVER_MODE.trim() === 'LOCAL') {
-      this.RELAY = this.BH_SERVERS.LOCAL.RELAY;
-      this.SIGNING_SERVER = this.BH_SERVERS.LOCAL.SIGNING_SERVER;
-    }
+    this.RELAY = this.BH_SERVERS.RELAY;
+    this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER;
+    this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = parseInt(
+      Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(),
+      10,
+    );
+    this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 = parseInt(
+      Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(),
+      10,
+    );
+  
     console.log(this.HEALTH_STATUS.TIME_SLOTS);
     console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
