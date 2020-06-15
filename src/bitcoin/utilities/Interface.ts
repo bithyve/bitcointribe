@@ -173,8 +173,14 @@ export interface EphemeralData {
     encryptedKey: string;
   };
   paymentDetails?: {
-    address?: string;
-    paymentURI?: string;
+    trusted?: {
+      address?: string;
+      paymentURI?: string;
+    };
+    alternate?: {
+      address?: string;
+      paymentURI?: string;
+    };
   };
 }
 

@@ -1771,6 +1771,9 @@ export default class HDSegwitWallet extends Bitcoin {
         this.derivativeAccounts[accountType][
           accountNumber
         ].contactName = contactName;
+        this.derivativeAccounts[accountType][
+          accountNumber
+        ].receivingAddress = this.getExternalAddressByIndex(0, xpub);
         this.trustedContactToDA[contactName] = accountNumber;
       }
 
