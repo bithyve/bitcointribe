@@ -43,6 +43,7 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
@@ -50,10 +51,15 @@ import BitcoinAddressSendSuccess from '../../components/BitcoinAddressSendSucces
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchAddress } from '../../store/actions/accounts';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralData,
+  TrustedContactDerivativeAccount,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import config from '../../bitcoin/HexaConfig';
 import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 
 export default function Receive(props) {
   const [
@@ -128,6 +134,9 @@ export default function Receive(props) {
   );
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
+  );
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
   useEffect(() => {
@@ -278,7 +287,7 @@ export default function Receive(props) {
     );
   };
 
-  const createTrustedContact = useCallback(() => {
+  const createTrustedContact = useCallback(async () => {
     if (!AsTrustedContact) return;
 
     if (selectedContact && selectedContact.firstName) {
@@ -301,6 +310,38 @@ export default function Receive(props) {
         }).paymentURI;
       }
 
+      let accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[contactName];
+      if (!accountNumber) {
+        // initialize a trusted derivative account against the following account
+        const res = await regularAccount.getDerivativeAccXpub(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        if (res.status !== 200) {
+          console.log(
+            'Err occured while generating trusted derivative account',
+          );
+        } else {
+          // refresh the account number
+          accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[contactName];
+        }
+      }
+
+      const trustedReceivingAddress = (regularAccount.hdWallet
+        .derivativeAccounts[TRUSTED_CONTACTS][
+        accountNumber
+      ] as TrustedContactDerivativeAccountElements).receivingAddress;
+
+      let trustedPaymentURI;
+      if (amount) {
+        trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
+          amount: parseInt(amount),
+        }).paymentURI;
+      }
+
       if (!trustedContact) {
         (async () => {
           const walletID = await AsyncStorage.getItem('walletID');
@@ -310,8 +351,14 @@ export default function Receive(props) {
             walletID,
             FCM,
             paymentDetails: {
-              address: receivingAddress,
-              paymentURI,
+              trusted: {
+                address: trustedReceivingAddress,
+                paymentURI: trustedPaymentURI,
+              },
+              alternate: {
+                address: receivingAddress,
+                paymentURI,
+              },
             },
           };
           dispatch(updateEphemeralChannel(contactName, data));
@@ -322,16 +369,22 @@ export default function Receive(props) {
       ) {
         if (
           trustedContact.ephemeralChannel.data[0].paymentDetails &&
-          trustedContact.ephemeralChannel.data[0].paymentDetails.address ===
-            receivingAddress &&
-          trustedContact.ephemeralChannel.data[0].paymentDetails.paymentURI ===
-            paymentURI
+          trustedContact.ephemeralChannel.data[0].paymentDetails.alternate
+            .address === receivingAddress &&
+          trustedContact.ephemeralChannel.data[0].paymentDetails.alternate
+            .paymentURI === paymentURI
         )
           return;
         const data: EphemeralData = {
           paymentDetails: {
-            address: receivingAddress,
-            paymentURI,
+            trusted: {
+              address: trustedReceivingAddress,
+              paymentURI: trustedPaymentURI,
+            },
+            alternate: {
+              address: receivingAddress,
+              paymentURI,
+            },
           },
         };
         dispatch(updateEphemeralChannel(contactName, data));
@@ -423,7 +476,11 @@ export default function Receive(props) {
       <SendViaLink
         isFromReceive={true}
         headerText={'Share'}
-        subHeaderText={!isEmpty(selectedContact) ? 'Share with your contact' : 'Share bitcoin address'}
+        subHeaderText={
+          !isEmpty(selectedContact)
+            ? 'Share with your contact'
+            : 'Share bitcoin address'
+        }
         contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
@@ -459,7 +516,7 @@ export default function Receive(props) {
     //console.log(amount);
     return (
       <SendViaQR
-      isFromReceive={true}
+        isFromReceive={true}
         headerText={'QR'}
         contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
@@ -689,9 +746,7 @@ export default function Receive(props) {
                     size={17}
                   />
                 </TouchableOpacity>
-                <Text style={BackupStyles.modalHeaderTitleText}>
-                Receive
-                </Text>
+                <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
                 {serviceType == TEST_ACCOUNT ? (
                   <Text
                     onPress={() => {
@@ -712,17 +767,17 @@ export default function Receive(props) {
             </View>
             <ScrollView>
               <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
-              <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                      marginBottom: 10,
-                      marginTop: hp('1%'),
-                    }}
-                  >
-                    Requested amount:
-                    </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginBottom: 10,
+                    marginTop: hp('1%'),
+                  }}
+                >
+                  Requested amount:
+                </Text>
                 <View style={styles.textBoxView}>
                   <View style={styles.amountInputImage}>
                     <Image
@@ -783,194 +838,192 @@ export default function Receive(props) {
                   /> */}
                 </TouchableOpacity>
                 <TouchableOpacity
-                    activeOpacity={10}
-                    onPress={() => {
-                      setAsTrustedContact(!AsTrustedContact);
-                    }}
+                  activeOpacity={10}
+                  onPress={() => {
+                    setAsTrustedContact(!AsTrustedContact);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    borderRadius: 8,
+                    backgroundColor: Colors.backgroundColor1,
+                    alignItems: 'center',
+                    paddingLeft: 20,
+                    paddingRight: 20,
+                    marginTop: 15,
+                    height: wp('13%'),
+                  }}
+                >
+                  <Text
                     style={{
-                      flexDirection: 'row',
-                      borderRadius: 8,
-                      backgroundColor: Colors.backgroundColor1,
-                      alignItems: 'center',
-                      paddingLeft: 20,
-                      paddingRight: 20,
-                      marginTop: 15,
-                      height: wp('13%'),
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
                     }}
                   >
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
-                    >
-                      Add sender as Trusted Contact
-                    </Text>
+                    Add sender as Trusted Contact
+                  </Text>
+                  <View
+                    style={{
+                      width: wp('7%'),
+                      height: wp('7%'),
+                      borderRadius: 7,
+                      backgroundColor: Colors.white,
+                      borderColor: Colors.borderColor,
+                      borderWidth: 1,
+                      marginLeft: 'auto',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {AsTrustedContact && (
+                      <Entypo
+                        name="check"
+                        size={RFValue(17)}
+                        color={Colors.green}
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+                {!isEmpty(selectedContact) && (
+                  <View style={styles.contactProfileView}>
                     <View
-                      style={{
-                        width: wp('7%'),
-                        height: wp('7%'),
-                        borderRadius: 7,
-                        backgroundColor: Colors.white,
-                        borderColor: Colors.borderColor,
-                        borderWidth: 1,
-                        marginLeft: 'auto',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
-                      {AsTrustedContact && (
-                        <Entypo
-                          name="check"
-                          size={RFValue(17)}
-                          color={Colors.green}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                  {!isEmpty(selectedContact) && (
-                    <View style={styles.contactProfileView}>
                       <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          flex: 1,
+                          backgroundColor: Colors.backgroundColor1,
+                          height: 90,
+                          borderRadius: 10,
+                        }}
                       >
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            flex: 1,
-                            backgroundColor: Colors.backgroundColor1,
-                            height: 90,
-                            borderRadius: 10,
-                          }}
-                        >
-                          {selectedContact && selectedContact.imageAvailable ? (
-                            <View
+                        {selectedContact && selectedContact.imageAvailable ? (
+                          <View
+                            style={{
+                              marginLeft: 15,
+                              marginRight: 15,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              shadowOpacity: 1,
+                              shadowOffset: { width: 2, height: 2 },
+                            }}
+                          >
+                            <Image
+                              source={selectedContact && selectedContact.image}
+                              style={{ ...styles.contactProfileImage }}
+                            />
+                          </View>
+                        ) : (
+                          <View
+                            style={{
+                              marginLeft: 15,
+                              marginRight: 15,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: Colors.backgroundColor,
+                              width: 70,
+                              height: 70,
+                              borderRadius: 70 / 2,
+                              shadowColor: Colors.shadowBlue,
+                              shadowOpacity: 1,
+                              shadowOffset: { width: 2, height: 2 },
+                            }}
+                          >
+                            <Text
                               style={{
-                                marginLeft: 15,
-                                marginRight: 15,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                shadowOpacity: 1,
-                                shadowOffset: { width: 2, height: 2 },
+                                textAlign: 'center',
+                                fontSize: RFValue(20),
+                                lineHeight: RFValue(20), //... One for top and one for bottom alignment
                               }}
                             >
-                              <Image
-                                source={
-                                  selectedContact && selectedContact.image
-                                }
-                                style={{ ...styles.contactProfileImage }}
-                              />
-                            </View>
-                          ) : (
-                            <View
-                              style={{
-                                marginLeft: 15,
-                                marginRight: 15,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: Colors.backgroundColor,
-                                width: 70,
-                                height: 70,
-                                borderRadius: 70 / 2,
-                                shadowColor: Colors.shadowBlue,
-                                shadowOpacity: 1,
-                                shadowOffset: { width: 2, height: 2 },
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  textAlign: 'center',
-                                  fontSize: RFValue(20),
-                                  lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                                }}
-                              >
-                                {nameToInitials(
-                                  selectedContact &&
-                                    selectedContact.firstName &&
-                                    selectedContact.lastName
-                                    ? selectedContact.firstName +
-                                        ' ' +
-                                        selectedContact.lastName
-                                    : selectedContact &&
-                                      selectedContact.firstName &&
-                                      !selectedContact.lastName
-                                    ? selectedContact.firstName
-                                    : selectedContact &&
-                                      !selectedContact.firstName &&
+                              {nameToInitials(
+                                selectedContact &&
+                                  selectedContact.firstName &&
+                                  selectedContact.lastName
+                                  ? selectedContact.firstName +
+                                      ' ' +
                                       selectedContact.lastName
-                                    ? selectedContact.lastName
-                                    : '',
-                                )}
-                              </Text>
-                            </View>
-                          )}
-                          <View>
+                                  : selectedContact &&
+                                    selectedContact.firstName &&
+                                    !selectedContact.lastName
+                                  ? selectedContact.firstName
+                                  : selectedContact &&
+                                    !selectedContact.firstName &&
+                                    selectedContact.lastName
+                                  ? selectedContact.lastName
+                                  : '',
+                              )}
+                            </Text>
+                          </View>
+                        )}
+                        <View>
+                          <Text
+                            style={{
+                              color: Colors.textColorGrey,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue(11),
+                              marginLeft: 5,
+                              paddingTop: 5,
+                              paddingBottom: 3,
+                            }}
+                          >
+                            Adding as a Trusted Contact:
+                          </Text>
+                          <Text style={styles.contactNameText}>
+                            {selectedContact &&
+                            selectedContact.firstName &&
+                            selectedContact.lastName
+                              ? selectedContact.firstName +
+                                ' ' +
+                                selectedContact.lastName
+                              : selectedContact &&
+                                selectedContact.firstName &&
+                                !selectedContact.lastName
+                              ? selectedContact.firstName
+                              : selectedContact &&
+                                !selectedContact.firstName &&
+                                selectedContact.lastName
+                              ? selectedContact.lastName
+                              : ''}
+                          </Text>
+                          {selectedContact &&
+                          selectedContact.phoneNumbers &&
+                          selectedContact.phoneNumbers.length ? (
                             <Text
                               style={{
                                 color: Colors.textColorGrey,
                                 fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(11),
+                                fontSize: RFValue(10),
                                 marginLeft: 5,
-                                paddingTop: 5,
-                                paddingBottom: 3,
+                                paddingTop: 3,
                               }}
                             >
-                              Adding as a Trusted Contact:
+                              {selectedContact.phoneNumbers[0].digits}
                             </Text>
-                            <Text style={styles.contactNameText}>
+                          ) : selectedContact &&
+                            selectedContact.emails &&
+                            selectedContact.emails.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 5,
+                                paddingTop: 3,
+                                paddingBottom: 5,
+                              }}
+                            >
                               {selectedContact &&
-                              selectedContact.firstName &&
-                              selectedContact.lastName
-                                ? selectedContact.firstName +
-                                  ' ' +
-                                  selectedContact.lastName
-                                : selectedContact &&
-                                  selectedContact.firstName &&
-                                  !selectedContact.lastName
-                                ? selectedContact.firstName
-                                : selectedContact &&
-                                  !selectedContact.firstName &&
-                                  selectedContact.lastName
-                                ? selectedContact.lastName
-                                : ''}
+                                selectedContact.emails[0].email}
                             </Text>
-                            {selectedContact &&
-                            selectedContact.phoneNumbers &&
-                            selectedContact.phoneNumbers.length ? (
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue(10),
-                                  marginLeft: 5,
-                                  paddingTop: 3,
-                                }}
-                              >
-                                {selectedContact.phoneNumbers[0].digits}
-                              </Text>
-                            ) : selectedContact &&
-                              selectedContact.emails &&
-                              selectedContact.emails.length ? (
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue(10),
-                                  marginLeft: 5,
-                                  paddingTop: 3,
-                                  paddingBottom: 5,
-                                }}
-                              >
-                                {selectedContact &&
-                                  selectedContact.emails[0].email}
-                              </Text>
-                            ) : null}
-                          </View>
+                          ) : null}
                         </View>
                       </View>
                     </View>
-                  )}
+                  </View>
+                )}
               </View>
             </ScrollView>
             <View

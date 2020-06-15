@@ -128,7 +128,9 @@ function* updateEphemeralChannelWorker({ payload }) {
   if (res.status === 200) {
     const ephData: EphemeralData = res.data.data;
     if (ephData && ephData.paymentDetails) {
-      yield put(paymentDetailsFetched(ephData.paymentDetails));
+      // using trusted details on TC approval
+      const { trusted } = ephData.paymentDetails;
+      yield put(paymentDetailsFetched({ ...trusted }));
     }
 
     yield put(
@@ -207,8 +209,12 @@ function* fetchEphemeralChannelWorker({ payload }) {
   if (res.status === 200) {
     const data: EphemeralData = res.data.data;
     if (publicKey) {
-      if (data && data.paymentDetails)
-        yield put(paymentDetailsFetched(data.paymentDetails));
+      if (data && data.paymentDetails) {
+        // using alternate details on TC rejection
+        const { alternate } = data.paymentDetails;
+        yield put(paymentDetailsFetched({ ...alternate }));
+      }
+
       return;
     }
 
