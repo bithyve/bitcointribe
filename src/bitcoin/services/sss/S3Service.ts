@@ -688,7 +688,7 @@ export default class S3Service {
       bhXpub: string;
     },
     tag: string,
-    version?: number,
+    version?: string,
   ):
     | {
         status: number;

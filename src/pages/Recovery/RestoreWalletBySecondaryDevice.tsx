@@ -64,6 +64,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
           ...REQUEST_DETAILS,
           requester: WALLET_SETUP.walletName,
           type: 'recoveryQR',
+          ver: DeviceInfo.getVersion(),
         }),
       )
     : null;
@@ -229,7 +230,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={ErrorBottomSheet}
+          ref={ErrorBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
