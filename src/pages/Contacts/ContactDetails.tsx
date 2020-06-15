@@ -290,7 +290,9 @@ export default function ContactDetails(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
 
     if (
       !trustedContacts.tc.trustedContacts[contactName] &&
@@ -387,7 +389,9 @@ export default function ContactDetails(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
 
     if (
       !trustedContacts.tc.trustedContacts[contactName] &&

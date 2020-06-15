@@ -45,7 +45,9 @@ export default function TrustedContactQr(props) {
 
         const contactName = `${contact.firstName} ${
           contact.lastName ? contact.lastName : ''
-        }`.toLowerCase();
+        }`
+          .toLowerCase()
+          .trim();
         const publicKey =
           trustedContacts.tc.trustedContacts[contactName].publicKey;
         console.log({ contactName });

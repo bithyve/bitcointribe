@@ -316,13 +316,13 @@ export function* trustedChannelsSyncWorker() {
 
       if (res.status !== 200) {
         console.log(
-          `Failed to setup channel for trusted contact ${contactName}`,
+          `Failed to setup trusted channel with contact ${contactName}`,
         );
         continue;
       } else {
         // refresh the trustedChannel object
         trustedChannel =
-          trustedContacts.tc.trustedContacts[contactName].trustedChannel;
+          trustedContacts.tc.trustedContacts[contactName.trim()].trustedChannel;
       }
     }
 
@@ -342,7 +342,8 @@ export function* trustedChannelsSyncWorker() {
 
           // update the xpub to the trusted contact derivative acc if contact's xpub is received
           trustedChannel =
-            trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+            trustedContacts.tc.trustedContacts[contactName.trim()]
+              .trustedChannel; // refresh trusted channel
           if (trustedChannel.data.length === 2) {
             const contactsData = trustedChannel.data[1].data;
             if (contactsData && contactsData.xpub) {
@@ -413,7 +414,8 @@ export function* trustedChannelsSyncWorker() {
 
             // update the xpub to the trusted contact derivative acc if contact's xpub is received
             const trustedChannel =
-              trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+              trustedContacts.tc.trustedContacts[contactName.trim()]
+                .trustedChannel; // refresh trusted channel
             if (trustedChannel.data.length === 2) {
               const contactsData = trustedChannel.data[1].data;
               if (contactsData && contactsData.xpub) {

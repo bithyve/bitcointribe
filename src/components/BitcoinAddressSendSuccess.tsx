@@ -50,15 +50,15 @@ export default function BitcoinAddressSendSuccess(props) {
               source={require('../assets/images/icons/icon_wallet.png')}
             />
             <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(11),
-                      paddingTop: 5,
-                      paddingBottom: 5,
-                    }}
-                  >
-                   Request Sent to:
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(11),
+                paddingTop: 5,
+                paddingBottom: 5,
+              }}
+            >
+              Request Sent to:
             </Text>
             <Text style={styles.successModalWalletNameText}>
               {contactName ? contactName : ''}

@@ -202,7 +202,8 @@ export default function Send(props) {
             trustedContactToDA,
             derivativeAccounts,
           } = regularAccount.hdWallet;
-          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          const accountNumber =
+            trustedContactToDA[contactName.toLowerCase().trim()];
           if (accountNumber) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
@@ -215,8 +216,9 @@ export default function Send(props) {
           }
 
           const isWard =
-            trustedContactsService.tc.trustedContacts[contactName.toLowerCase()]
-              .isWard;
+            trustedContactsService.tc.trustedContacts[
+              contactName.toLowerCase().trim()
+            ].isWard;
 
           const isGuardian = index < 3 ? true : false;
           if (hasXpub) {
@@ -238,13 +240,13 @@ export default function Send(props) {
         ) {
           if (contactA.contactName && contactB.contactName) {
             if (
-              contactA.contactName.toLowerCase() <
-              contactB.contactName.toLowerCase()
+              contactA.contactName.toLowerCase().trim() <
+              contactB.contactName.toLowerCase().trim()
             )
               return -1;
             if (
-              contactA.contactName.toLowerCase() >
-              contactB.contactName.toLowerCase()
+              contactA.contactName.toLowerCase().trim() >
+              contactB.contactName.toLowerCase().trim()
             )
               return 1;
           }

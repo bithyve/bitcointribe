@@ -90,7 +90,8 @@ export default function AddressBookContents(props) {
             trustedContactToDA,
             derivativeAccounts,
           } = regularAccount.hdWallet;
-          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          const accountNumber =
+            trustedContactToDA[contactName.toLowerCase().trim()];
           if (accountNumber) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
@@ -103,8 +104,9 @@ export default function AddressBookContents(props) {
           }
 
           const isWard =
-            trustedContactsService.tc.trustedContacts[contactName.toLowerCase()]
-              .isWard;
+            trustedContactsService.tc.trustedContacts[
+              contactName.toLowerCase().trim()
+            ].isWard;
 
           const isGuardian = index < 3 ? true : false;
           const element = {
@@ -139,8 +141,8 @@ export default function AddressBookContents(props) {
   }, [regularAccount.hdWallet.derivativeAccounts]);
 
   const dispatch = useDispatch();
-    useEffect(() => {
-      let focusListener = props.navigation.addListener('didFocus', () => {
+  useEffect(() => {
+    let focusListener = props.navigation.addListener('didFocus', () => {
       dispatch(trustedChannelsSync());
     });
     return () => {
@@ -182,14 +184,16 @@ export default function AddressBookContents(props) {
               }}
             >
               {item
-                ? nameToInitials(item.firstName == "Secondary" && item.lastName == "Device" ? "Keeper Device" :
-                    item.firstName && item.lastName
+                ? nameToInitials(
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
                       ? item.firstName
                       : !item.firstName && item.lastName
                       ? item.lastName
-                      : ''
+                      : '',
                   )
                 : ''}
             </Text>
@@ -219,13 +223,18 @@ export default function AddressBookContents(props) {
             contact.contactName.split(' ')[0] &&
             contact.contactName != 'Secondary Device'
               ? contact.contactName.split(' ')[0]
-              : contact.contactName && contact.contactName == 'Secondary Device' ? 'Keeper' : ""}{' '}
+              : contact.contactName && contact.contactName == 'Secondary Device'
+              ? 'Keeper'
+              : ''}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.contactName &&
               contact.contactName.split(' ')[1] &&
               contact.contactName != 'Secondary Device'
                 ? contact.contactName.split(' ')[1]
-                : contact.contactName && contact.contactName == 'Secondary Device' ? 'Device' : ""}
+                : contact.contactName &&
+                  contact.contactName == 'Secondary Device'
+                ? 'Device'
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -439,7 +448,9 @@ export default function AddressBookContents(props) {
                     return getElement(item, index, 'Other Contacts');
                   })}
                   <TouchableOpacity
-                    onPress={()=>AddContactAddressBookBookBottomSheet.current.snapTo(1)}
+                    onPress={() =>
+                      AddContactAddressBookBookBottomSheet.current.snapTo(1)
+                    }
                     style={{
                       ...styles.selectedContactsView,
                       paddingBottom: 7,

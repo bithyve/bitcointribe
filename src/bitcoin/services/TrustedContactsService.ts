@@ -64,7 +64,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.initializeContact(contactName.toLowerCase()),
+        data: this.tc.initializeContact(contactName.toLowerCase().trim()),
       };
     } catch (err) {
       return {
@@ -100,7 +100,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: this.tc.finalizeContact(
-          contactName.toLowerCase(),
+          contactName.toLowerCase().trim(),
           encodedPublicKey,
           contactsWalletName,
         ),
@@ -146,7 +146,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateEphemeralChannel(
-          contactName.toLowerCase(),
+          contactName.toLowerCase().trim(),
           dataElements,
           fetch,
         ),
@@ -184,7 +184,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.fetchEphemeralChannel(
-          contactName ? contactName.toLowerCase() : contactName,
+          contactName ? contactName.toLowerCase().trim() : contactName,
           approveTC,
           publicKey,
         ),
@@ -228,7 +228,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateTrustedChannel(
-          contactName.toLowerCase(),
+          contactName.toLowerCase().trim(),
           dataElements,
           fetch,
         ),
@@ -263,7 +263,9 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.fetchTrustedChannel(contactName.toLowerCase()),
+        data: await this.tc.fetchTrustedChannel(
+          contactName.toLowerCase().trim(),
+        ),
       };
     } catch (err) {
       return {

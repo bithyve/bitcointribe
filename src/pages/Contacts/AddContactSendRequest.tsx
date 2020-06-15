@@ -95,7 +95,9 @@ export default function AddContactSendRequest(props) {
     if (Contact && Contact.firstName) {
       const contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
-      }`.toLowerCase();
+      }`
+        .toLowerCase()
+        .trim();
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       if (!trustedContact) {
@@ -121,7 +123,9 @@ export default function AddContactSendRequest(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
     if (trustedContact) {
@@ -219,8 +223,8 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRContents = useCallback(() => {
     return (
       <SendViaQR
-      headerText={'Friends and Family Request'}
-      subHeaderText={'Scan the QR from your contact’s Hexa app'}
+        headerText={'Friends and Family Request'}
+        subHeaderText={'Scan the QR from your contact’s Hexa app'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         QR={trustedQR}
@@ -297,7 +301,10 @@ export default function AddContactSendRequest(props) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={()=>{createTrustedContact(); props.navigation.goBack();}}
+              onPress={() => {
+                createTrustedContact();
+                props.navigation.goBack();
+              }}
               style={{
                 height: wp('8%'),
                 width: wp('18%'),

@@ -205,7 +205,7 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     contactName: string,
   ): string => {
-    contactName = contactName.toLowerCase();
+    contactName = contactName.toLowerCase().trim();
     const trustedAccounts: TrustedContactDerivativeAccount = this
       .derivativeAccounts[accountType];
     const inUse = trustedAccounts.instance.using;
@@ -325,7 +325,7 @@ export default class HDSegwitWallet extends Bitcoin {
     contactName: string,
   ) => {
     // provides receiving address from the contact's xpub
-    contactName = contactName.toLowerCase();
+    contactName = contactName.toLowerCase().trim();
     const trustedAccounts: TrustedContactDerivativeAccount = this
       .derivativeAccounts[accountType];
     let account: TrustedContactDerivativeAccountElements;
@@ -410,7 +410,7 @@ export default class HDSegwitWallet extends Bitcoin {
       if (!contactName)
         throw new Error(`Required param: contactName for ${accountType}`);
 
-      contactName = contactName.toLowerCase();
+      contactName = contactName.toLowerCase().trim();
       accountNumber = this.trustedContactToDA[contactName];
 
       if (!accountNumber) {
