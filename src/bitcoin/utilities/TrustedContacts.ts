@@ -319,7 +319,7 @@ export default class TrustedContacts {
       if (!updated) throw new Error('Failed to update ephemeral space');
 
       this.processEphemeralChannelData(contactName, dataElements);
-      if (data) {
+      if (data && Object.keys(data).length) {
         this.processEphemeralChannelData(contactName, data);
         return { updated, publicKey, data };
       }
@@ -369,7 +369,7 @@ export default class TrustedContacts {
       }
       const { data } = res.data;
 
-      if (!publicKey && data) {
+      if (!publicKey && data && Object.keys(data).length) {
         this.processEphemeralChannelData(contactName, data);
       }
 
@@ -377,13 +377,16 @@ export default class TrustedContacts {
         let contactsPublicKey;
         this.trustedContacts[contactName].ephemeralChannel.data.forEach(
           (element: EphemeralData) => {
-            if (element.publicKey !== publicKey) {
+            if (
+              element.publicKey !== this.trustedContacts[contactName].publicKey
+            ) {
               contactsPublicKey = element.publicKey;
             }
           },
         ); // only one element would contain the public key (uploaded by the counterparty)
 
         if (!contactsPublicKey) {
+          console.log(`Approval failed, ${contactName}'s public key missing`);
           throw new Error(
             `Approval failed, ${contactName}'s public key missing`,
           );
