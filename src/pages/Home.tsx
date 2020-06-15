@@ -1557,7 +1557,7 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'Scan QR'}</Text>
       </TouchableOpacity>
     );
   }
