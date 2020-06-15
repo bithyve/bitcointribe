@@ -658,9 +658,9 @@ export default function NewWalletQuestion(props) {
             }}
           >
             <BottomInfoBox
-              title={'This answer is used to encrypt parts of your wallet'}
+              title={'This answer is used to encrypt your wallet'}
               infoText={'It is extremely important that only you'}
-              italicText={'know and remember the answer'}
+              italicText={' know and remember the answer'}
             />
           </View>
         ) : null}
