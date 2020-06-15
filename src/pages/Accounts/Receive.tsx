@@ -172,7 +172,9 @@ export default function Receive(props) {
 
     const contactName = `${selectedContact.firstName} ${
       selectedContact.lastName ? selectedContact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
     if (trustedContact) {
@@ -282,7 +284,9 @@ export default function Receive(props) {
     if (selectedContact && selectedContact.firstName) {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`.toLowerCase();
+      }`
+        .toLowerCase()
+        .trim();
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const { receivingAddress } =

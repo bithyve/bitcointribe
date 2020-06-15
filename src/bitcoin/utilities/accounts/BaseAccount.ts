@@ -176,7 +176,7 @@ export default class BaseAccount {
         data: this.hdWallet.getDerivativeAccXpub(
           accountType,
           accountNumber,
-          contactName,
+          contactName.toLowerCase().trim(),
         ),
       };
     } catch (err) {
@@ -212,7 +212,7 @@ export default class BaseAccount {
         data: await this.hdWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
-          contactName,
+          contactName.toLowerCase().trim(),
         ),
       };
     } catch (err) {

@@ -310,7 +310,6 @@ export default class Bitcoin {
         transactions.unconfirmedTransactions +=
           addressInfo.UnconfirmedTransactions;
 
-        console.log({ addressInfo });
         addressInfo.Transactions.forEach((tx) => {
           if (!txMap.has(tx.txid)) {
             // check for duplicate tx (fetched against sending and  then again for change address)
@@ -340,7 +339,7 @@ export default class Bitcoin {
           }
         });
       }
-      console.log({ transactions });
+
       return { balances, transactions };
     } catch (err) {
       console.log(

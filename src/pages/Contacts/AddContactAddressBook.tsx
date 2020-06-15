@@ -185,7 +185,9 @@ export default function AddContactAddressBook(props) {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`.toLowerCase();
+      }`
+        .toLowerCase()
+        .trim();
 
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       if (trustedContact && trustedContact.symmetricKey) {

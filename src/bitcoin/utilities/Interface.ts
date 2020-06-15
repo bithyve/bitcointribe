@@ -180,6 +180,8 @@ export interface EphemeralData {
 
 export interface TrustedDataElements {
   xpub?: string;
+  walletID?: string;
+  FCM?: string;
 }
 export interface TrustedData {
   publicKey: string;

@@ -71,9 +71,9 @@ export default function SecondaryDeviceModelContents(props) {
 
       const firstName = 'Secondary';
       const lastName = 'Device';
-      const contactName = `${firstName} ${
-        lastName ? lastName : ''
-      }`.toLowerCase();
+      const contactName = `${firstName} ${lastName ? lastName : ''}`
+        .toLowerCase()
+        .trim();
 
       const data: EphemeralData = {
         walletID,

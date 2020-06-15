@@ -33,6 +33,7 @@ import {
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import { insertDBWorker } from './storage';
+import { AsyncStorage } from 'react-native';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -77,13 +78,15 @@ function* approveTrustedContactWorker({ payload }) {
   if (res.status === 200) {
     yield put(trustedContactApproved(contactName, true));
     if (payload.updateEphemeralChannel) {
+      const uploadXpub = true;
+      const data = { publicKey: res.data.publicKey };
       yield put(
         updateEphemeralChannel(
           contactName,
-          { publicKey: res.data.publicKey },
+          data,
           true,
           trustedContacts,
-          true,
+          uploadXpub,
         ),
       );
     } else {
@@ -143,8 +146,13 @@ function* updateEphemeralChannelWorker({ payload }) {
 
       if (res.status === 200) {
         const xpub = res.data;
+        const walletID = yield call(AsyncStorage.getItem, 'walletID');
+        const FCM = yield call(AsyncStorage.getItem, 'fcmToken');
+
         const data: TrustedDataElements = {
           xpub,
+          walletID,
+          FCM,
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
@@ -308,13 +316,13 @@ export function* trustedChannelsSyncWorker() {
 
       if (res.status !== 200) {
         console.log(
-          `Failed to setup channel for trusted contact ${contactName}`,
+          `Failed to setup trusted channel with contact ${contactName}`,
         );
         continue;
       } else {
         // refresh the trustedChannel object
         trustedChannel =
-          trustedContacts.tc.trustedContacts[contactName].trustedChannel;
+          trustedContacts.tc.trustedContacts[contactName.trim()].trustedChannel;
       }
     }
 
@@ -334,7 +342,8 @@ export function* trustedChannelsSyncWorker() {
 
           // update the xpub to the trusted contact derivative acc if contact's xpub is received
           trustedChannel =
-            trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+            trustedContacts.tc.trustedContacts[contactName.trim()]
+              .trustedChannel; // refresh trusted channel
           if (trustedChannel.data.length === 2) {
             const contactsData = trustedChannel.data[1].data;
             if (contactsData && contactsData.xpub) {
@@ -405,7 +414,8 @@ export function* trustedChannelsSyncWorker() {
 
             // update the xpub to the trusted contact derivative acc if contact's xpub is received
             const trustedChannel =
-              trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+              trustedContacts.tc.trustedContacts[contactName.trim()]
+                .trustedChannel; // refresh trusted channel
             if (trustedChannel.data.length === 2) {
               const contactsData = trustedChannel.data[1].data;
               if (contactsData && contactsData.xpub) {

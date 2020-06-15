@@ -760,7 +760,9 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
 
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
@@ -847,7 +849,9 @@ const TrustedContactHistory = (props) => {
 
         const contactName = `${chosenContact.firstName} ${
           chosenContact.lastName ? chosenContact.lastName : ''
-        }`.toLowerCase();
+        }`
+          .toLowerCase()
+          .trim();
         const data: EphemeralData = {
           walletID,
           FCM,
@@ -880,7 +884,9 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`.toLowerCase();
+      }`
+        .toLowerCase()
+        .trim();
       console.log({ contactName });
       if (!trustedContacts.tc.trustedContacts[contactName]) return;
 
