@@ -159,7 +159,7 @@ const TransactionsContent = ({
                   <AppBottomSheetTouchableWrapper
                     onPress={
                       () => {
-                        (TransactionDetailsBottomSheet as any).current.snapTo(
+                        (TransactionDetailsBottomSheet as any).snapTo(
                           1,
                         );
                         setTimeout(() => {

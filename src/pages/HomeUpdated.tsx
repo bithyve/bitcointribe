@@ -181,6 +181,7 @@ interface HomeStateTypes {
     notificationDataChange: boolean,
     appState: string,
     fbBTCAccount: any,
+    transactionsLoading: boolean
 }
 
 interface HomePropsTypes {
@@ -235,6 +236,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             notificationDataChange: false,
             appState: '',
             fbBTCAccount: {},
+            transactionsLoading: true
         }
     }
 
@@ -394,6 +396,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         this.bootStrapNotifications()
         this.setUpFocusListener()
         Linking.addEventListener('url', this.handleDeepLink);
+        setTimeout(() => {
+            this.setState({
+                transactionsLoading: false
+            })
+        }, 1000);
     };
 
     componentWillUnmount() {
@@ -1187,7 +1194,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             selectToAdd,
             fbBTCAccount,
             loading,
-            atCloseEnd
+            atCloseEnd,
+            transactionsLoading
         } = this.state
         const {
             navigation,
@@ -1292,6 +1300,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     ]}
                     renderContent={() => (
                         <TransactionsContent
+                            transactionLoading={transactionsLoading}
                             transactions={transactions}
                             AtCloseEnd={atCloseEnd}
                             setTransactionItem={(item) => this.setState({ selectedTransactionItem: item })}
