@@ -8,6 +8,18 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
+export interface Services {
+  REGULAR_ACCOUNT: RegularAccount;
+  TEST_ACCOUNT: TestAccount;
+  SECURE_ACCOUNT: SecureAccount;
+  S3_SERVICE: S3Service;
+  TRUSTED_CONTACTS: TrustedContactsService;
+}
+
+export interface DynamicNonPMDD {
+  META_SHARES?: MetaShare[];
+}
+
 export interface DecentralizedBackup {
   RECOVERY_SHARES: {
     [SHARE_INDEX: string]: {
@@ -51,20 +63,5 @@ export interface Database {
   };
   DECENTRALIZED_BACKUP: DecentralizedBackup;
   SERVICES?: ServicesJSON;
-}
-
-export interface DatabaseManageBackup {
-  PDFDETAILS: {};
-}
-
-export interface Services {
-  REGULAR_ACCOUNT: RegularAccount;
-  TEST_ACCOUNT: TestAccount;
-  SECURE_ACCOUNT: SecureAccount;
-  S3_SERVICE: S3Service;
-  TRUSTED_CONTACTS: TrustedContactsService;
-}
-
-export interface DynamicNonPMDD {
-  META_SHARES?: MetaShare[];
+  VERSION: String;
 }

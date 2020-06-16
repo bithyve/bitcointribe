@@ -22,6 +22,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import config from '../bitcoin/HexaConfig';
+import { isCompatible } from './Home';
 
 export default function Launch(props) {
   const dispatch = useDispatch();
@@ -96,6 +97,11 @@ export default function Launch(props) {
                     }`,
                   );
                 } else {
+                  const version = splits.pop().slice(1);
+                  if (version) {
+                    if (!(await isCompatible(splits[4], version))) return;
+                  }
+
                   const trustedContactRequest = {
                     isGuardian: splits[4] === 'tcg' ? true : false,
                     isPaymentRequest: splits[4] === 'ptc' ? true : false,

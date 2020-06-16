@@ -93,7 +93,10 @@ import NotificationListContent from '../components/NotificationListContent';
 // const opacity = min( abs( sub( position, 1 ) ), 0.8 )
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
-import { timeFormatter, createRandomString } from '../common/CommonFunctions/timeFormatter';
+import {
+  timeFormatter,
+  createRandomString,
+} from '../common/CommonFunctions/timeFormatter';
 import Config from 'react-native-config';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
@@ -117,7 +120,32 @@ import {
   TrustedContactDerivativeAccount,
   EphemeralData,
 } from '../bitcoin/utilities/Interface';
-import * as RNLocalize from "react-native-localize";
+import * as RNLocalize from 'react-native-localize';
+
+export const isCompatible = async (method: string, version: string) => {
+  if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
+    // checking compatibility via Relay
+    const res = await RelayServices.checkCompatibility(method, version);
+    if (res.status !== 200) {
+      console.log('Failed to check compatibility');
+      return true;
+    }
+
+    const { compatible, alternatives } = res.data;
+    if (!compatible) {
+      if (alternatives) {
+        if (alternatives.update)
+          Alert.alert('Update your app inorder to process this link/QR');
+        else if (alternatives.message) Alert.alert(alternatives.message);
+      } else {
+        Alert.alert('Incompatible link/QR, updating your app might help');
+      }
+      return false;
+    }
+    return true;
+  }
+  return true;
+};
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -718,11 +746,11 @@ export default function Home(props) {
 
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
       let notificationDetails = {
-        id : obj.notificationId,
+        id: obj.notificationId,
         title: obj.title,
         body: obj.info,
-      }
-      localNotification(notificationDetails)
+      };
+      localNotification(notificationDetails);
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
@@ -965,7 +993,7 @@ export default function Home(props) {
   };
 
   const onAppStateChange = async (nextAppState) => {
-    handleAppStateChange(nextAppState)
+    handleAppStateChange(nextAppState);
     try {
       if (this.appState == nextAppState) return;
       this.appState = nextAppState;
@@ -1029,7 +1057,8 @@ export default function Home(props) {
       .setSound('default')
       .setData({
         title: 'We have not seen you in a while!',
-        body: 'Opening your app regularly ensures you get all the notifications and security updates',
+        body:
+          'Opening your app regularly ensures you get all the notifications and security updates',
       })
       .android.setChannelId('reminder')
       .android.setPriority(firebase.notifications.Android.Priority.High);
@@ -1079,14 +1108,11 @@ export default function Home(props) {
         fireDate: date.getTime(),
       })
       .then(() => {})
-      .catch(
-        (err) => {},
-      );
+      .catch((err) => {});
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {
-      });
+      .then((notifications) => {});
   };
 
   const onNotificationArrives = async (notification) => {
@@ -1154,13 +1180,8 @@ export default function Home(props) {
     ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      await AsyncStorage.setItem(
-              'currencyCode',
-              RNLocalize.getCurrencies()[0],
-            );
-            setCurrencyCode(
-              RNLocalize.getCurrencies()[0],
-            );
+      await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+      setCurrencyCode(RNLocalize.getCurrencies()[0]);
     } else {
       setCurrencyCode(currencyCodeTmp);
     }
@@ -1308,7 +1329,7 @@ export default function Home(props) {
     }
   }, [SecondaryDeviceStatus]);
 
-  const getQrCodeData = (qrData) => {
+  const processQRData = async (qrData) => {
     const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
     const { type } = regularService.addressDiff(qrData);
     if (type) {
@@ -1363,6 +1384,11 @@ export default function Home(props) {
 
     try {
       const scannedData = JSON.parse(qrData);
+
+      if (scannedData.ver) {
+        if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
+      }
+
       switch (scannedData.type) {
         case 'trustedGuardian':
           const trustedGruardianRequest = {
@@ -1539,10 +1565,10 @@ export default function Home(props) {
       <QrCodeModalContents
         modalRef={QrTabBarBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => getQrCodeData(qrData)}
+        onQrScan={(qrData) => processQRData(qrData)}
         onPressQrScanner={() => {
           props.navigation.navigate('QrScanner', {
-            scanedCode: getQrCodeData,
+            scanedCode: processQRData,
           });
         }}
       />
@@ -1916,8 +1942,7 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-    }
-    else if (item.title == 'Services') {
+    } else if (item.title == 'Services') {
       props.navigation.navigate('ExistingSavingMethods');
     }
     // else if (item.title == 'All accounts and funds') {
@@ -2206,7 +2231,7 @@ export default function Home(props) {
     return (
       <SelectedContactFromAddressBook
         onPressQrScanner={() => {
-          props.navigation.navigate('QrScanner', { scanedCode: getQrCodeData });
+          props.navigation.navigate('QrScanner', { scanedCode: processQRData });
         }}
         onPressProceed={() => {
           (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
@@ -2334,15 +2359,20 @@ export default function Home(props) {
   let isContactOpen = false;
   let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {
-    AsyncStorage.multiGet(["isContactOpen", "isCameraOpen"]).then(response => {
-      isContactOpen = JSON.parse(response[0][1]);
-      isCameraOpen = JSON.parse(response[1][1]);
-    })
-    let keyArray = [['isCameraOpen', JSON.stringify(true)], ['isContactOpen', JSON.stringify(true)]]
-    if(isCameraOpen) keyArray[0][1] = JSON.stringify(false);
-    if(isContactOpen) keyArray[1][1] = JSON.stringify(false);
-    if(isContactOpen || isContactOpen){
-      AsyncStorage.multiSet(keyArray, ()=>{});
+    AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
+      (response) => {
+        isContactOpen = JSON.parse(response[0][1]);
+        isCameraOpen = JSON.parse(response[1][1]);
+      },
+    );
+    let keyArray = [
+      ['isCameraOpen', JSON.stringify(true)],
+      ['isContactOpen', JSON.stringify(true)],
+    ];
+    if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
+    if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
+    if (isContactOpen || isContactOpen) {
+      AsyncStorage.multiSet(keyArray, () => {});
       return;
     }
     var blockApp = setTimeout(() => {
@@ -2362,7 +2392,7 @@ export default function Home(props) {
     }
   };
 
-  const handleDeepLink = useCallback((event) => {
+  const handleDeepLink = useCallback(async (event) => {
     const splits = event.url.split('/');
 
     if (splits[5] === 'sss') {
@@ -2394,6 +2424,11 @@ export default function Home(props) {
           }`,
         );
       } else {
+        const version = splits.pop().slice(1);
+        if (version) {
+          if (!(await isCompatible(splits[4], version))) return;
+        }
+
         const trustedContactRequest = {
           isGuardian: splits[4] === 'tcg' ? true : false,
           isPaymentRequest: splits[4] === 'ptc' ? true : false,

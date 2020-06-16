@@ -1,7 +1,7 @@
 import { call, put, select } from 'redux-saga/effects';
 import { createWatcher, serviceGenerator } from '../utils/utilities';
 import { AsyncStorage } from 'react-native';
-
+import DeviceInfo from 'react-native-device-info';
 import * as Cipher from '../../common/encryption';
 import * as SecureStore from '../../storage/secure-store';
 import {
@@ -49,6 +49,7 @@ function* initSetupWorker({ payload }) {
       S3_SERVICE: JSON.stringify(s3Service),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     },
+    VERSION: DeviceInfo.getVersion(),
   };
   yield call(insertDBWorker, { payload: initialDatabase });
   yield call(AsyncStorage.setItem, 'walletExists', 'true');
@@ -68,6 +69,7 @@ function* initRecoveryWorker({ payload }) {
       UNDER_CUSTODY: {},
       DYNAMIC_NONPMDD: {},
     },
+    VERSION: DeviceInfo.getVersion(),
   };
 
   yield call(insertDBWorker, { payload: initialDatabase });

@@ -142,9 +142,12 @@ export default class SSS {
     if (existingShares.length) {
       for (const share of existingShares) {
         if (share.meta.walletId === decryptedMetaShare.meta.walletId) {
-          if (share.meta.version >= decryptedMetaShare.meta.version) {
+          if (
+            parseFloat(share.meta.version) >=
+            parseFloat(decryptedMetaShare.meta.version)
+          ) {
             throw new Error(
-              'You cannot store multiple shares from the same user',
+              'You cannot store lower share version of the same share',
             );
           }
         }
@@ -892,7 +895,7 @@ export default class SSS {
       bhXpub: string;
     },
     tag: string,
-    version?: number,
+    version?: string,
   ): {
     metaShares: MetaShare[];
   } => {
@@ -921,7 +924,7 @@ export default class SSS {
           encryptedSecret,
           shareId: SSS.getShareId(encryptedSecret),
           meta: {
-            version: version ? version : 0,
+            version: version ? version : '0',
             validator: 'HEXA',
             index,
             walletId: this.walletId,
@@ -936,7 +939,7 @@ export default class SSS {
           encryptedSecret,
           shareId: SSS.getShareId(encryptedSecret),
           meta: {
-            version: version ? version : 0,
+            version: version ? version : '0',
             validator: 'HEXA',
             index,
             walletId: this.walletId,
