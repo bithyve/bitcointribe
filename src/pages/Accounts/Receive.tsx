@@ -746,7 +746,26 @@ export default function Receive(props) {
                     size={17}
                   />
                 </TouchableOpacity>
-                <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
+                <Image
+                  source={
+                    serviceType == TEST_ACCOUNT
+                      ? require('../../assets/images/icons/icon_test.png')
+                      : serviceType == REGULAR_ACCOUNT
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
+                  }
+                  style={{ width: wp('10%'), height: wp('10%') }}
+                />
+                <View style={{ marginLeft: wp('3%') }}>
+                  <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
+                  <Text style={BackupStyles.modalHeaderInfoText}>
+                    {serviceType == TEST_ACCOUNT
+                      ? 'Test Account'
+                      : serviceType == REGULAR_ACCOUNT
+                      ? 'Checking Account'
+                      : 'Saving Account'}
+                  </Text>
+                </View>
                 {serviceType == TEST_ACCOUNT ? (
                   <Text
                     onPress={() => {
@@ -1036,9 +1055,7 @@ export default function Receive(props) {
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
                   title={'Bitcoin Receiving Address'}
-                  infoText={
-                    'Generate bitcoin address and share via link or QR'
-                  }
+                  infoText={'Generate bitcoin address and share via link or QR'}
                 />
               </View>
               <View
