@@ -92,7 +92,7 @@ export default function ChangeCurrency(props) {
     },
     {
       code: 'RUB',
-      symbol: 'RUB',
+      symbol: '₽',
     },
     {
       code: 'SEK',
@@ -112,7 +112,7 @@ export default function ChangeCurrency(props) {
     },
     {
       code: 'TWD',
-      symbol: 'NT$',
+      symbol: '$',
     },
   ]);
 

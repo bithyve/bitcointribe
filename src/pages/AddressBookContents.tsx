@@ -389,54 +389,46 @@ export default function AddressBookContents(props) {
           </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          {(MyKeeper.length > 0 || Loading) && (
-            <View style={{ marginTop: wp('2%') }}>
-              <Text style={styles.pageTitle}>My Keepers</Text>
-              <Text style={styles.pageInfoText}>
-                Contacts who can help me restore my wallet.
-              </Text>
-              {!Loading ? (
-                <View style={{ marginBottom: 15 }}>
-                  <View style={{ height: 'auto' }}>
-                    {MyKeeper.map((item, index) => {
-                      return getElement(item, index, 'My Keepers');
-                    })}
-                  </View>
+          <View style={{ marginTop: wp('2%') }}>
+            <Text style={styles.pageTitle}>My Keepers</Text>
+            <Text style={styles.pageInfoText}>
+              Contacts who can help me restore my wallet.
+            </Text>
+            {!Loading ? (
+              <View style={{ marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                  {MyKeeper.length>0 ? MyKeeper.map((item, index) => {
+                    return getElement(item, index, 'My Keepers');
+                  }) : 
+                  <View style={{height: wp('22%')+30, }} />
+                  }
                 </View>
-              ) : (
-                getWaterMark()
-              )}
-            </View>
-          )}
+              </View>
+            ) : (
+              getWaterMark()
+            )}
+          </View>
+          <View style={{ marginTop: wp('5%') }}>
+            <Text style={styles.pageTitle}>I am the Keeper of</Text>
+            <Text style={styles.pageInfoText}>
+              Contacts who I can help restore their wallets.
+            </Text>
 
-          {(IMKeeper.length > 0 || Loading) && (
-            <View style={{ marginTop: wp('5%') }}>
-              <Text style={styles.pageTitle}>I am the Keeper of</Text>
-              <Text style={styles.pageInfoText}>
-                Contacts who I can help restore their wallets.
-              </Text>
-
-              {!Loading ? (
-                <View style={{ marginBottom: 15 }}>
-                  <View style={{ height: 'auto' }}>
-                    {IMKeeper.map((item, index) => {
-                      return getElement(item, index, "I'm Keeper of");
-                    })}
-                  </View>
+            {!Loading ? (
+              <View style={{ marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                  { IMKeeper.length>0 ? IMKeeper.map((item, index) => {
+                    return getElement(item, index, "I'm Keeper of");
+                  }) : 
+                  <View style={{height: wp('22%')+30}} />
+                  }
                 </View>
-              ) : (
-                getWaterMark()
-              )}
-            </View>
-          )}
-          <View
-            style={{
-              marginTop:
-                IMKeeper.length == 0 && MyKeeper.length == 0
-                  ? wp('2%')
-                  : wp('5%'),
-            }}
-          >
+              </View>
+            ) : (
+              getWaterMark()
+            )}
+          </View>
+          <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
             <Text style={styles.pageInfoText}>
               Contacts who I can pay directly.
@@ -444,9 +436,11 @@ export default function AddressBookContents(props) {
             {!Loading ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {OtherTrustedContact.map((item, index) => {
+                  {OtherTrustedContact.length>0 ? OtherTrustedContact.map((item, index) => {
                     return getElement(item, index, 'Other Contacts');
-                  })}
+                  }):
+                  <View style={{height: wp('22%')+30}} />
+                  }
                   <TouchableOpacity
                     onPress={() =>
                       AddContactAddressBookBookBottomSheet.current.snapTo(1)
@@ -509,7 +503,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: wp('15%'),
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

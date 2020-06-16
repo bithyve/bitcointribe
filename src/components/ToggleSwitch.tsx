@@ -3,8 +3,41 @@ import { View, Image, TouchableOpacity } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function ToggleSwitch(props) {
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+  function setCurrencyCode(currencyName, currencyColor) {
+    console.log('currencyColor', currencyColor);
+    return (
+      <MaterialCommunityIcons
+        name={currencyName}
+        color={currencyColor == 'gray' ? Colors.borderColor : Colors.blue}
+        size={wp('3.8%')}
+      />
+    );
+  }
+
+  const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+      case 'BRL':
+        return setCurrencyCode('currency-brl', color);
+      case 'CNY':
+      case 'JPY':
+        return setCurrencyCode('currency-cny', color);
+      case 'GBP':
+        return setCurrencyCode('currency-gbp', color);
+      case 'KRW':
+        return setCurrencyCode('currency-krw', color);
+      case 'RUB':
+        return setCurrencyCode('currency-rub', color);
+      case 'TRY':
+        return setCurrencyCode('currency-try', color);
+      default:
+        break;
+    }
+  };
+
   return (
     <TouchableOpacity
       activeOpacity={10}
@@ -30,7 +63,14 @@ export default function ToggleSwitch(props) {
               alignItems: 'center',
             }}
           >
-            {!props.isNotImage && (
+            {!props.isNotImage &&
+            currencyCode.includes(props.currencyCodeValue) ? (
+              props.inactiveOffImage ? (
+                props.inactiveOffImage
+              ) : (
+                getCurrencyImage(props.currencyCodeValue, 'gray')
+              )
+            ) : (
               <Image
                 source={
                   props.inactiveOffImage
@@ -89,10 +129,17 @@ export default function ToggleSwitch(props) {
               justifyContent: 'center',
               marginLeft: 2,
               marginRight: props.transform ? 4 : 0,
-              marginTop: props.transform ? 4 : 0
+              marginTop: props.transform ? 4 : 0,
             }}
           >
-            {!props.isNotImage && (
+            {!props.isNotImage &&
+            currencyCode.includes(props.currencyCodeValue) ? (
+              props.activeOffImage ? (
+                props.activeOffImage
+              ) : (
+                getCurrencyImage(props.currencyCodeValue, 'blue')
+              )
+            ) : (
               <Image
                 source={
                   props.activeOffImage
@@ -115,7 +162,7 @@ export default function ToggleSwitch(props) {
               alignItems: 'center',
               marginLeft: props.toggle ? 'auto' : props.transform ? 2 : 0,
               marginRight: props.transform ? 2 : -3,
-              marginTop:props.transform ? 0 : 0
+              marginTop: props.transform ? 0 : 0,
             }}
           >
             {!props.isNotImage && (
