@@ -12,7 +12,7 @@ export default class RelayServices {
         data: {
           compatible: boolean;
           alternatives: {
-            upgrade: boolean;
+            update: boolean;
             message: string;
           };
         };

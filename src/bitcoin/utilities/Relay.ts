@@ -12,7 +12,7 @@ export default class Relay {
   ): Promise<{
     compatible: boolean;
     alternatives: {
-      upgrade: boolean;
+      update: boolean;
       message: string;
     };
   }> => {

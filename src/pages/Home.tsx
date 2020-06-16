@@ -134,11 +134,11 @@ export const isCompatible = async (method: string, version: string) => {
     const { compatible, alternatives } = res.data;
     if (!compatible) {
       if (alternatives) {
-        if (alternatives.upgrade)
-          Alert.alert('Incompatible QR, upgrading your app might help');
-        if (alternatives.message) Alert.alert(alternatives.message);
+        if (alternatives.update)
+          Alert.alert('Update your app inorder to process this link/QR');
+        else if (alternatives.message) Alert.alert(alternatives.message);
       } else {
-        Alert.alert('Incompatible QR, upgrading your app might help');
+        Alert.alert('Incompatible link/QR, updating your app might help');
       }
       return false;
     }
