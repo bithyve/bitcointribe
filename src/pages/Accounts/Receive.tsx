@@ -88,8 +88,6 @@ export default function Receive(props) {
       ? props.navigation.getParam('serviceType')
       : '',
   );
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
@@ -103,24 +101,6 @@ export default function Receive(props) {
   function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
   }
-
-  const [dropdownBoxList, setDropdownBoxList] = useState([
-    {
-      id: '1',
-      account_name: 'Test Account',
-      type: TEST_ACCOUNT,
-    },
-    {
-      id: '2',
-      account_name: 'Checking Account',
-      type: REGULAR_ACCOUNT,
-    },
-    {
-      id: '3',
-      account_name: 'Saving Account',
-      type: SECURE_ACCOUNT,
-    },
-  ]);
 
   const dispatch = useDispatch();
   const [receiveLink, setReceiveLink] = useState('');
@@ -190,6 +170,7 @@ export default function Receive(props) {
       const publicKey =
         trustedContacts.tc.trustedContacts[contactName].publicKey;
       const requester = WALLET_SETUP.walletName;
+      const appVersion = DeviceInfo.getVersion();
 
       if (!receiveLink) {
         if (
@@ -210,7 +191,9 @@ export default function Receive(props) {
             `/${requester}` +
             `/${numberEncPubKey}` +
             `/${numHintType}` +
-            `/${numHint}`;
+            `/${numHint}` +
+            `/v${appVersion}`;
+
           console.log({ numberDL });
           setReceiveLink(numberDL);
         } else if (selectedContact.emails && selectedContact.emails.length) {
@@ -227,7 +210,9 @@ export default function Receive(props) {
             `/${requester}` +
             `/${emailEncPubKey}` +
             `/${emailHintType}` +
-            `/${emailHint}`;
+            `/${emailHint}` +
+            `/v${appVersion}`;
+
           console.log({ emailDL });
           setReceiveLink(emailDL);
         } else {
@@ -246,6 +231,7 @@ export default function Receive(props) {
             requester: WALLET_SETUP.walletName,
             publicKey,
             type: 'paymentTrustedContactQR',
+            ver: appVersion,
           }),
         );
       }
@@ -746,7 +732,26 @@ export default function Receive(props) {
                     size={17}
                   />
                 </TouchableOpacity>
-                <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
+                <Image
+                  source={
+                    serviceType == TEST_ACCOUNT
+                      ? require('../../assets/images/icons/icon_test.png')
+                      : serviceType == REGULAR_ACCOUNT
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
+                  }
+                  style={{ width: wp('10%'), height: wp('10%') }}
+                />
+                <View style={{ marginLeft: wp('3%') }}>
+                  <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
+                  <Text style={BackupStyles.modalHeaderInfoText}>
+                    {serviceType == TEST_ACCOUNT
+                      ? 'Test Account'
+                      : serviceType == REGULAR_ACCOUNT
+                      ? 'Checking Account'
+                      : 'Saving Account'}
+                  </Text>
+                </View>
                 {serviceType == TEST_ACCOUNT ? (
                   <Text
                     onPress={() => {
@@ -797,46 +802,6 @@ export default function Receive(props) {
                   />
                 </View>
 
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    marginTop: 15,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                  activeOpacity={10}
-                  onPress={() => {
-                    //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                      textAlign: 'center',
-                    }}
-                  >
-                    Receiving to:
-                    <Text style={styles.boldItalicText}>
-                      {serviceType == TEST_ACCOUNT
-                        ? '  Test Account'
-                        : serviceType == REGULAR_ACCOUNT
-                        ? '  Checking Account'
-                        : '  Saving Account'}
-                    </Text>
-                  </Text>
-                  {/* <Ionicons
-                    style={{ marginRight: 10, marginLeft: 10 }}
-                    name={
-                      dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
-                    }
-                    size={20}
-                    color={Colors.blue}
-                  /> */}
-                </TouchableOpacity>
                 <TouchableOpacity
                   activeOpacity={10}
                   onPress={() => {
@@ -1035,10 +1000,8 @@ export default function Receive(props) {
             >
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
-                  title={'Note'}
-                  infoText={
-                    'Bitcoin Receiving Address. Generate bitcoin address and share via link or QR'
-                  }
+                  title={'Bitcoin Receiving Address'}
+                  infoText={'Generate bitcoin address and share via link or QR'}
                 />
               </View>
               <View
@@ -1303,61 +1266,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-  },
-  dropdownBox: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-  },
-  dropdownBoxOpened: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: Colors.borderColor,
-    height: 50,
-    paddingLeft: 15,
-    paddingRight: 15,
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
-    backgroundColor: Colors.white,
-    alignItems: 'center',
-  },
-  dropdownBoxText: {
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
-  },
-  dropdownBoxModal: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    marginTop: hp('1%'),
-    width: wp('90%'),
-    height: hp('18%'),
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
-    backgroundColor: Colors.white,
-    position: 'absolute',
-    zIndex: 9999,
-    overflow: 'hidden',
-  },
-  dropdownBoxModalElementView: {
-    height: 50,
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 15,
   },
 });

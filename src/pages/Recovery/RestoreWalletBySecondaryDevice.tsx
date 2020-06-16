@@ -60,12 +60,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
-      JSON.stringify({
-        ...REQUEST_DETAILS,
-        requester: WALLET_SETUP.walletName,
-        type: 'recoveryQR',
-      }),
-    )
+        JSON.stringify({
+          ...REQUEST_DETAILS,
+          requester: WALLET_SETUP.walletName,
+          type: 'recoveryQR',
+          ver: DeviceInfo.getVersion(),
+        }),
+      )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
@@ -229,7 +230,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={ErrorBottomSheet}
+          ref={ErrorBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()

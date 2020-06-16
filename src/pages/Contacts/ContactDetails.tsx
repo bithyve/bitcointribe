@@ -307,7 +307,7 @@ export default function ContactDetails(props) {
 
     const requester =
       trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
-
+    const appVersion = DeviceInfo.getVersion();
     if (
       UNDER_CUSTODY[requester] &&
       UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
@@ -330,7 +330,8 @@ export default function ContactDetails(props) {
       //     `/${numberEncKey}` +
       //     `/${numHintType}` +
       //     `/${numHint}` +
-      //     `/${UPLOADED_AT}`;
+      //     `/${UPLOADED_AT}` +
+      //      `/v${appVersion}`;
       //   console.log({ numberDL });
       //   setTrustedLink(numberDL);
       //   setTimeout(() => {
@@ -351,7 +352,8 @@ export default function ContactDetails(props) {
       //     `/${emailEncKey}` +
       //     `/${emailHintType}` +
       //     `/${emailHint}` +
-      //     `/${UPLOADED_AT}`;
+      //     `/${UPLOADED_AT}`  +
+      //     `/v${appVersion}`;
       //   console.log({ emailDL });
       //   setTrustedLink(emailDL);
       //   setTimeout(() => {
@@ -370,6 +372,7 @@ export default function ContactDetails(props) {
           publicKey: KEY,
           uploadedAt: UPLOADED_AT,
           type: 'ReverseRecoveryQR',
+          ver: appVersion,
         }),
       );
 

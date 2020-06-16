@@ -47,8 +47,8 @@ export default function Login(props) {
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef<BottomSheet>());
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef<BottomSheet>());
   // const releases =[
   //       {
   //           "build": "40",
@@ -196,7 +196,7 @@ export default function Login(props) {
 
   useEffect(() => {
     if (JailMonkey.isJailBroken()) {
-      (ErrorBottomSheet.current as any).snapTo(1);
+      ErrorBottomSheet.current.snapTo(1);
       setTimeout(() => {
         setJailBrokenTitle(
           Platform.OS == 'ios'
@@ -208,7 +208,7 @@ export default function Login(props) {
     }
     DeviceInfo.isPinOrFingerprintSet().then((isPinOrFingerprintSet) => {
       if (!isPinOrFingerprintSet) {
-        (ErrorBottomSheet.current as any).snapTo(1);
+        ErrorBottomSheet.current.snapTo(1);
         setTimeout(() => {
           setJailBrokenTitle(
             "Your Phone don't have any Secure entry like Pin or Biometric",
@@ -284,7 +284,7 @@ export default function Login(props) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
-              (loaderBottomSheet as any).current.snapTo(0);
+              loaderBottomSheet.current.snapTo(0);
               props.navigation.navigate('Home', {
                 custodyRequest,
                 recoveryRequest,
@@ -327,7 +327,7 @@ export default function Login(props) {
   const checkPasscode = () => {
     if (checkAuth) {
       setTimeout(() => {
-        (loaderBottomSheet as any).current.snapTo(0);
+        loaderBottomSheet.current.snapTo(0);
       }, 2);
 
       return (
@@ -361,7 +361,7 @@ export default function Login(props) {
         info={''}
         proceedButtonText={'Ok'}
         onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          ErrorBottomSheet.current.snapTo(0);
         }}
         isBottomImage={true}
         bottomImage={require('../assets/images/icons/errorImage.png')}
@@ -373,14 +373,14 @@ export default function Login(props) {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          ErrorBottomSheet.current.snapTo(0);
         }}
       />
     );
   }, []);
 
   const proceedButton = () => {
-    (loaderBottomSheet as any).current.snapTo(1);
+    loaderBottomSheet.current.snapTo(1);
     setTimeout(() => {
       setSubTextMessage1(
         'Did you know that 1 bitcoin = 100 million sats?',
@@ -542,7 +542,7 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
-                  (loaderBottomSheet as any).current.snapTo(1);
+                  loaderBottomSheet.current.snapTo(1);
                   setTimeout(() => {
                     setSubTextMessage1(
                       'Did you know that 1 bitcoin = 100 million sats?',
@@ -707,7 +707,7 @@ export default function Login(props) {
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={loaderBottomSheet as any}
+          ref={loaderBottomSheet}
           snapPoints={[-50, hp('100%')]}
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
@@ -721,7 +721,7 @@ export default function Login(props) {
           setElevation(0);
         }}
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
+        ref={ErrorBottomSheet}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('25%') : hp('30%'),

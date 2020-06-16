@@ -12,6 +12,7 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadEncMShare } from '../../store/actions/sss';
+import DeviceInfo from 'react-native-device-info';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import Toast from '../../components/Toast';
@@ -109,6 +110,7 @@ export default function SecondaryDeviceModelContents(props) {
                 publicKey,
                 uploadedAt: SHARES_TRANSFER_DETAILS[0].UPLOADED_AT,
                 type: 'secondaryDeviceGuardian',
+                ver: DeviceInfo.getVersion(),
               }),
             );
           }

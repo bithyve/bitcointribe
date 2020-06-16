@@ -50,7 +50,7 @@ export interface MetaShare {
   encryptedSecret: string;
   shareId: string;
   meta: {
-    version: number;
+    version: string;
     validator: string;
     index: number;
     walletId: string;

@@ -766,7 +766,7 @@ const TrustedContactHistory = (props) => {
 
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
-
+    const appVersion = DeviceInfo.getVersion();
     if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
       const phoneNumber = chosenContact.phoneNumbers[0].number;
       console.log({ phoneNumber });
@@ -783,7 +783,8 @@ const TrustedContactHistory = (props) => {
         `/${numberEncPubKey}` +
         `/${numHintType}` +
         `/${numHint}` +
-        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}` +
+        `/v${appVersion}`;
       console.log({ numberDL });
       setTrustedLink(numberDL);
     } else if (chosenContact.emails && chosenContact.emails.length) {
@@ -801,7 +802,8 @@ const TrustedContactHistory = (props) => {
         `/${emailEncPubKey}` +
         `/${emailHintType}` +
         `/${emailHint}` +
-        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}`;
+        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}` +
+        `/v${appVersion}`;
       console.log({ emailDL });
       setTrustedLink(emailDL);
     } else {
@@ -900,6 +902,7 @@ const TrustedContactHistory = (props) => {
           publicKey,
           uploadedAt: SHARES_TRANSFER_DETAILS[index].UPLOADED_AT,
           type: 'trustedGuardian',
+          ver: DeviceInfo.getVersion(),
         }),
       );
     }
