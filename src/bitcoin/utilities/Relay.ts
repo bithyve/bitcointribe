@@ -6,6 +6,31 @@ import idx from 'idx';
 
 const { HEXA_ID } = config;
 export default class Relay {
+  public static checkCompatibility = async (
+    method: string,
+    version: string,
+  ): Promise<{
+    compatible: boolean;
+    alternatives: {
+      upgrade: boolean;
+      message: string;
+    };
+  }> => {
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('checkCompatibility', {
+        HEXA_ID,
+        method,
+        version,
+      });
+    } catch (err) {
+      if (err.response) console.log(err.response.data.err);
+      if (err.code) console.log(err.code);
+    }
+    const { compatible, alternatives } = res.data;
+    return { compatible, alternatives };
+  };
+
   public static fetchReleases = async (
     build: string,
   ): Promise<{
