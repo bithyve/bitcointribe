@@ -210,6 +210,7 @@ export default function Home(props) {
     accumulativeBalance: 0,
   });
   // const transactionsParam = props.navigation.getParam('transactions');
+  const [transactionLoading, setTransactionLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([]);
@@ -385,6 +386,12 @@ export default function Home(props) {
     //   setTransactions(accumulativeTransactions);
     // }
   }, [accounts]);
+
+  useEffect(()=>{
+    setTimeout(() => {
+      setTransactionLoading(false);
+    }, 1000);
+  },[transactions])
 
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
@@ -3244,6 +3251,7 @@ export default function Home(props) {
         ]}
         renderContent={() => (
           <TransactionsContent
+            transactionLoading={transactionLoading}
             transactions={transactions}
             AtCloseEnd={AtCloseEnd}
             setTransactionItem={setTransactionItem}
