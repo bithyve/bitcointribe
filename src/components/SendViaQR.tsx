@@ -196,35 +196,35 @@ export default function SendViaQR(props) {
                           </Text>
                         ) : null}
                         {Contact &&
-                        Contact.phoneNumbers &&
-                        Contact.phoneNumbers.length ? (
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
-                              marginLeft: 25,
-                              paddingTop: 3,
-                            }}
-                          >
-                            {Contact && Contact.phoneNumbers[0].digits}
-                          </Text>
-                        ) : Contact &&
-                          Contact.emails &&
-                          Contact.emails.length ? (
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
-                              marginLeft: 25,
-                              paddingTop: 3,
-                              paddingBottom: 5,
-                            }}
-                          >
-                            {Contact && Contact.emails[0].email}
-                          </Text>
-                        ) : null}
+                          Contact.phoneNumbers &&
+                          Contact.phoneNumbers.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 25,
+                                paddingTop: 3,
+                              }}
+                            >
+                              {Contact && Contact.phoneNumbers[0].digits}
+                            </Text>
+                          ) : Contact &&
+                            Contact.emails &&
+                            Contact.emails.length ? (
+                              <Text
+                                style={{
+                                  color: Colors.textColorGrey,
+                                  fontFamily: Fonts.FiraSansRegular,
+                                  fontSize: RFValue(10),
+                                  marginLeft: 25,
+                                  paddingTop: 3,
+                                  paddingBottom: 5,
+                                }}
+                              >
+                                {Contact && Contact.emails[0].email}
+                              </Text>
+                            ) : null}
                       </View>
                     </View>
                     {Contact && Contact.imageAvailable ? (
@@ -245,33 +245,33 @@ export default function SendViaQR(props) {
                         />
                       </View>
                     ) : (
-                      <View
-                        style={{
-                          position: 'absolute',
-                          marginLeft: 15,
-                          marginRight: 15,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          width: 70,
-                          height: 70,
-                          borderRadius: 70 / 2,
-                          shadowColor: Colors.shadowBlue,
-                          shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
-                        }}
-                      >
-                        <Text
+                        <View
                           style={{
-                            textAlign: 'center',
-                            fontSize: RFValue(20),
-                            lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                            position: 'absolute',
+                            marginLeft: 15,
+                            marginRight: 15,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: Colors.backgroundColor,
+                            width: 70,
+                            height: 70,
+                            borderRadius: 70 / 2,
+                            shadowColor: Colors.shadowBlue,
+                            shadowOpacity: 1,
+                            shadowOffset: { width: 2, height: 2 },
                           }}
                         >
-                          {nameToInitials(contactName)}
-                        </Text>
-                      </View>
-                    )}
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              fontSize: RFValue(20),
+                              lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                            }}
+                          >
+                            {nameToInitials(contactName)}
+                          </Text>
+                        </View>
+                      )}
                   </View>
                 </View>
               )}
@@ -303,10 +303,10 @@ export default function SendViaQR(props) {
                       {serviceType && serviceType == TEST_ACCOUNT
                         ? '  Test Account'
                         : serviceType && serviceType == REGULAR_ACCOUNT
-                        ? '  Checking Account'
-                        : serviceType && serviceType == SECURE_ACCOUNT
-                        ? '  Saving Account'
-                        : ''}
+                          ? '  Checking Account'
+                          : serviceType && serviceType == SECURE_ACCOUNT
+                            ? '  Saving Account'
+                            : ''}
                     </Text>
                   </Text>
                   {/* <Ionicons
@@ -382,8 +382,8 @@ export default function SendViaQR(props) {
             {!props.QR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={props.QR} size={hp('27%')} />
-            )}
+                <QRCodeWrapper value={props.QR} size={hp('27%')} />
+              )}
             <View style={styles.loader}>
               {!props.QR ? (
                 <ActivityIndicator size="large" />
