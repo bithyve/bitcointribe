@@ -42,11 +42,11 @@ import {
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
-  testWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   fetchDerivativeAccAddressWatcher,
   syncTrustedDerivativeAccountsWatcher,
+  startupSyncWatcher,
 } from './sagas/accounts';
 
 import {
@@ -93,7 +93,7 @@ import {
   fetchEphemeralChannelWatcher,
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
-  trustedChannelXpubsUploadWatcher,
+  trustedChannelsSyncWatcher,
 } from './sagas/trustedContacts';
 
 import { fromPrivateKey } from 'bip32';
@@ -150,7 +150,7 @@ const rootSaga = function* () {
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncTrustedDerivativeAccountsWatcher,
-    testWatcher,
+    startupSyncWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -193,7 +193,7 @@ const rootSaga = function* () {
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
-    trustedChannelXpubsUploadWatcher,
+    trustedChannelsSyncWatcher,
   ];
 
   yield all(

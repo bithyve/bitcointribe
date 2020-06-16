@@ -14,6 +14,7 @@ import {
   BackHandler,
   Alert,
   ActivityIndicator,
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -30,6 +31,7 @@ import {
   transferST1,
   addTransferDetails,
   removeTransferDetails,
+  clearTransfer,
 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -42,23 +44,44 @@ import SendConfirmationContent from './SendConfirmationContent';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interface';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import AccountSelectionModalContents from './AccountSelectionModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function SendToContact(props) {
+  const [RegularAccountBalance, setRegularAccountBalance] = useState(0);
+  const [SavingAccountBalance, setSavingAccountBalance] = useState(0);
   const dispatch = useDispatch();
+  const isFromAddressBook = props.navigation.getParam('isFromAddressBook')
+    ? props.navigation.getParam('isFromAddressBook')
+    : null;
+  const [isOpen, setIsOpen] = useState(false);
   const [RemoveBottomSheet, setRemoveBottomSheet] = useState(React.createRef());
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(
     accounts && accounts.exchangeRates,
   );
   const selectedContact = props.navigation.getParam('selectedContact');
-  const serviceType = props.navigation.getParam('serviceType');
-  const averageTxFees = props.navigation.getParam('averageTxFees');
-  let netBalance = props.navigation.getParam('netBalance');
+  const [serviceType, setServiceType] = useState(
+    props.navigation.getParam('serviceType'),
+  );
+  const [averageTxFees, setAverageTxFees] = useState(
+    props.navigation.getParam('averageTxFees'),
+  );
+  const [netBalance, setNetBalance] = useState(
+    props.navigation.getParam('netBalance'),
+  );
+  const sweepSecure = props.navigation.getParam('sweepSecure');
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
-  const [bitcoinAmount, setBitCoinAmount] = useState('');
+  const [bitcoinAmount, setBitCoinAmount] = useState(
+    props.navigation.getParam('bitcoinAmount'),
+  );
   const [currencyAmount, setCurrencyAmount] = useState('');
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [note, setNote] = useState('');
@@ -69,14 +92,141 @@ export default function SendToContact(props) {
   const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
+  const [
+    AccountSelectionBottomSheet,
+    setAccountSelectionBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
   const [recipients, setRecipients] = useState([]);
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const service = useSelector((state) => state.accounts[serviceType].service);
 
-  function isEmpty(obj) {
-    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
-  }
+  useEffect(() => {
+    setCurrencyCodeFromAsync();
+    if (bitcoinAmount) convertBitCoinToCurrency(bitcoinAmount);
+    if (!averageTxFees) storeAverageTxFees();
+    let accountTypeArray = [REGULAR_ACCOUNT, SECURE_ACCOUNT];
+    for (let i = 0; i < accountTypeArray.length; i++) {
+      const element = accountTypeArray[i];
+      const service = accounts[element].service;
+      const instance = service.hdWallet || service.secureHDWallet;
+      let balance =
+        instance.balances.balance + instance.balances.unconfirmedBalance;
+      if (element === REGULAR_ACCOUNT) {
+        const trustedAccounts: TrustedContactDerivativeAccount =
+          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ];
+        if (trustedAccounts.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= trustedAccounts.instance.using;
+            accountNumber++
+          ) {
+            if (trustedAccounts[accountNumber].balances) {
+              balance +=
+                trustedAccounts[accountNumber].balances.balance +
+                trustedAccounts[accountNumber].balances.unconfirmedBalance;
+            }
+          }
+        }
+      }
+      if (element == REGULAR_ACCOUNT) setRegularAccountBalance(balance);
+      if (element == SECURE_ACCOUNT) setSavingAccountBalance(balance);
+    }
+  }, []);
+
+  const setCurrencyCodeFromAsync = async () => {
+    let currencyToggleValueTmp = await AsyncStorage.getItem(
+      'currencyToggleValue',
+    );
+    setSwitchOn(currencyToggleValueTmp ? true : false);
+    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
+  };
+
+  const getCurrencyChar = (currencyCode) =>{
+    const currencyList = [
+      {
+        code: 'USD',
+        symbol: '$',
+        country: 'United State',
+      },
+      {
+        code: 'EUR',
+        symbol: '€',
+        country: 'Italy',
+      },
+      {
+        code: 'GBP',
+        symbol: '£',
+        country: 'United Kingdom',
+      },
+      {
+        code: 'INR',
+        symbol: '₹',
+        country: 'India',
+      },
+    ];
+    for (let i = 0; i < currencyList.length; i++) {
+      const element = currencyList[i];
+      if(CurrencyCode==element.code) return element.symbol;
+    }
+}
+
+  useEffect(() => {
+    dispatch(clearTransfer(serviceType));
+    dispatch(addTransferDetails(serviceType, { selectedContact }));
+
+    if (netBalance !== 0 && !netBalance) {
+      const service = accounts[serviceType].service;
+      const instance = service.hdWallet || service.secureHDWallet;
+
+      let balance =
+        instance.balances.balance + instance.balances.unconfirmedBalance;
+
+      if (serviceType === REGULAR_ACCOUNT) {
+        const trustedAccounts: TrustedContactDerivativeAccount =
+          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ];
+        if (trustedAccounts.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= trustedAccounts.instance.using;
+            accountNumber++
+          ) {
+            if (trustedAccounts[accountNumber].balances) {
+              balance +=
+                trustedAccounts[accountNumber].balances.balance +
+                trustedAccounts[accountNumber].balances.unconfirmedBalance;
+            }
+          }
+        }
+      }
+      setNetBalance(balance);
+    }
+  }, [serviceType]);
+
+  const storeAverageTxFees = async () => {
+    const storedAverageTxFees = await AsyncStorage.getItem(
+      'storedAverageTxFees',
+    );
+    if (storedAverageTxFees) {
+      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+      if (Date.now() - lastFetched < 1800000) {
+        setAverageTxFees(averageTxFees);
+        return;
+      } // maintaining a half an hour difference b/w fetches
+    }
+    const instance = service.hdWallet || service.secureHDWallet;
+    const averageTxFees = await instance.averageTransactionFee();
+    setAverageTxFees(averageTxFees);
+    await AsyncStorage.setItem(
+      'storedAverageTxFees',
+      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+    );
+  };
 
   useEffect(() => {
     if (accounts && accounts.exchangeRates)
@@ -110,12 +260,13 @@ export default function SendToContact(props) {
     } else if (transfer.executed === 'ST1') {
       props.navigation.navigate('SendConfirmation', {
         serviceType,
+        sweepSecure,
         netBalance,
         recipients,
         averageTxFees,
       });
     }
-  }, [transfer, recipients]);
+  }, [transfer, recipients, averageTxFees]);
 
   const handleTrasferST1 = () => {
     const recipients = [];
@@ -292,8 +443,8 @@ export default function SendToContact(props) {
           }}
         >
           {switchOn
-            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} Sats`
-            : '$' +
+            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
+            : getCurrencyChar(CurrencyCode) +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
@@ -349,9 +500,11 @@ export default function SendToContact(props) {
             SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
-          //dispatch(clearTransfer(serviceType));
+          dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
+
+          props.navigation.navigate('Accounts');
         }}
         isUnSuccess={true}
       />
@@ -511,6 +664,34 @@ export default function SendToContact(props) {
     }
   }, []);
 
+  const renderAccountSelectionContents = useCallback(() => {
+    return (
+      <AccountSelectionModalContents
+        RegularAccountBalance={RegularAccountBalance}
+        SavingAccountBalance={SavingAccountBalance}
+        onPressBack={() => {
+          AccountSelectionBottomSheet.current.snapTo(0);
+        }}
+        onPressConfirm={(type) => {
+          AccountSelectionBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            setServiceType(type);
+          }, 2);
+        }}
+      />
+    );
+  }, [SavingAccountBalance, RegularAccountBalance]);
+
+  const renderAccountSelectionHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        onPressHeader={() => {
+          AccountSelectionBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   const checkRecordsHavingPrice = () => {
     if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
@@ -555,6 +736,29 @@ export default function SendToContact(props) {
         handleTrasferST1();
       }, 10);
     }
+  };
+
+  const getBalanceText = () => {
+    let balance = netBalance;
+    if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
+    if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
+    return (
+      <Text
+        style={{
+          color: Colors.blue,
+          fontSize: RFValue(10),
+          fontFamily: Fonts.FiraSansItalic,
+        }}
+      >
+        {serviceType == TEST_ACCOUNT
+          ? UsNumberFormat(balance)
+          : switchOn
+          ? UsNumberFormat(balance)
+          : exchangeRates
+          ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+          : null}
+      </Text>
+    );
   };
 
   return (
@@ -620,56 +824,57 @@ export default function SendToContact(props) {
         >
           {'Sending From: '}
         </Text>
-        <Text
-          style={{
-            color: Colors.blue,
-            fontSize: RFValue(12),
-            fontFamily: Fonts.FiraSansItalic,
+        <TouchableOpacity
+          activeOpacity={10}
+          onPress={() => {
+            if (isFromAddressBook)
+              AccountSelectionBottomSheet.current.snapTo(1);
           }}
+          style={{ flexDirection: 'row' }}
         >
-          {getServiceTypeAccount()}
-        </Text>
-        <Text
-          style={{
-            color: Colors.blue,
-            fontSize: RFValue(10),
-            fontFamily: Fonts.FiraSansItalic,
-            lineHeight: 15,
-            textAlign: 'center',
-          }}
-        >
-          {' (Availble to spend '}
+          <Text
+            style={{
+              color: Colors.blue,
+              fontSize: RFValue(12),
+              fontFamily: Fonts.FiraSansItalic,
+            }}
+          >
+            {getServiceTypeAccount()}
+          </Text>
           <Text
             style={{
               color: Colors.blue,
               fontSize: RFValue(10),
               fontFamily: Fonts.FiraSansItalic,
+              lineHeight: 15,
+              textAlign: 'center',
             }}
           >
-            {serviceType == 'Test Account'
-              ? UsNumberFormat(netBalance)
-              : switchOn
-              ? UsNumberFormat(netBalance)
-              : exchangeRates
-              ? ((netBalance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(
-                  2,
-                )
-              : null}
+            {' (Availble to spend '}
+            {getBalanceText()}
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(7),
+                fontFamily: Fonts.FiraSansMediumItalic,
+              }}
+            >
+              {serviceType == TEST_ACCOUNT
+                ? ' t-sats )'
+                : switchOn
+                ? ' sats )'
+                : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+            </Text>
           </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(7),
-              fontFamily: Fonts.FiraSansMediumItalic,
-            }}
-          >
-            {serviceType == 'Test Account'
-              ? ' t-sats )'
-              : switchOn
-              ? ' sats )'
-              : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
-          </Text>
-        </Text>
+          {isFromAddressBook && (
+            <Ionicons
+              style={{ marginLeft: 5 }}
+              name={isOpen ? 'ios-arrow-up' : 'ios-arrow-down'}
+              size={RFValue(15)}
+              color={Colors.blue}
+            />
+          )}
+        </TouchableOpacity>
       </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -701,6 +906,8 @@ export default function SendToContact(props) {
                   currencyCodeValue={CurrencyCode}
                   onpress={async () => {
                     setSwitchOn(!switchOn);
+                    let temp = !switchOn ? 'true' : '';
+                    await AsyncStorage.setItem('currencyToggleValue', temp);
                   }}
                   toggle={switchOn}
                   transform={true}
@@ -769,48 +976,50 @@ export default function SendToContact(props) {
                 )}
                 {/* )} */}
               </TouchableOpacity>
-              {serviceType != 'TEST_ACCOUNT' ? <TouchableOpacity
-                style={{
-                  ...styles.confirmButtonView,
-                  width: wp('30%'),
-                  marginLeft: 10,
-                }}
-                disabled={isConfirmDisabled || loading.transfer}
-                onPress={() => {
-                  // dispatch(clearTransfer(serviceType));
-                  // if (getServiceType) {
-                  //   getServiceType(serviceType);
-                  // }
-                  if (transfer.details && transfer.details.length) {
-                    for (let i = 0; i < transfer.details.length; i++) {
-                      if (
-                        transfer.details[i].selectedContact.id ==
-                        selectedContact.id
-                      ) {
-                        dispatch(
-                          removeTransferDetails(
-                            serviceType,
-                            transfer.details[i],
-                          ),
-                        );
+              {serviceType != 'TEST_ACCOUNT' ? (
+                <TouchableOpacity
+                  style={{
+                    ...styles.confirmButtonView,
+                    width: wp('30%'),
+                    marginLeft: 10,
+                  }}
+                  disabled={isConfirmDisabled || loading.transfer}
+                  onPress={() => {
+                    // dispatch(clearTransfer(serviceType));
+                    // if (getServiceType) {
+                    //   getServiceType(serviceType);
+                    // }
+                    if (transfer.details && transfer.details.length) {
+                      for (let i = 0; i < transfer.details.length; i++) {
+                        if (
+                          transfer.details[i].selectedContact.id ==
+                          selectedContact.id
+                        ) {
+                          dispatch(
+                            removeTransferDetails(
+                              serviceType,
+                              transfer.details[i],
+                            ),
+                          );
+                        }
                       }
+                      dispatch(
+                        addTransferDetails(serviceType, {
+                          selectedContact,
+                          bitcoinAmount,
+                          currencyAmount,
+                          note,
+                        }),
+                      );
+                      props.navigation.goBack();
                     }
-                    dispatch(
-                      addTransferDetails(serviceType, {
-                        selectedContact,
-                        bitcoinAmount,
-                        currencyAmount,
-                        note,
-                      }),
-                    );
-                    props.navigation.goBack();
-                  }
-                }}
-              >
-                <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                  Add Recipient
-                </Text>
-              </TouchableOpacity> : null}
+                  }}
+                >
+                  <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                    Add Recipient
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
           </ScrollView>
         </View>
@@ -834,6 +1043,16 @@ export default function SendToContact(props) {
         snapPoints={[-50, hp('65%')]}
         renderContent={renderSendUnSuccessContents}
         renderHeader={renderSendUnSuccessHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={AccountSelectionBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
+        ]}
+        renderContent={renderAccountSelectionContents}
+        renderHeader={renderAccountSelectionHeader}
       />
     </View>
   );

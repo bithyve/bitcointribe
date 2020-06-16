@@ -48,7 +48,6 @@ import {
   personalCopyGenerated,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
-import { insertIntoDB } from '../actions/storage';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import {
   SECURE_ACCOUNT,
@@ -74,6 +73,7 @@ import crypto from 'crypto';
 import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
+import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
 
 function* generateMetaSharesWorker() {
@@ -145,7 +145,7 @@ function* initHCWorker() {
       S3_SERVICE: JSON.stringify(s3Service),
     };
     console.log('Health Check Initialized');
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -230,12 +230,13 @@ function* uploadEncMetaShareWorker({ payload }) {
         },
       },
     };
-    yield put(
-      insertIntoDB({
+
+    yield call(insertDBWorker, {
+      payload: {
         DECENTRALIZED_BACKUP: updatedBackup,
         SERVICES: updatedSERVICES,
-      }),
-    );
+      },
+    });
 
     yield delay(2000); // delaying to allow data insertion and service enrichment prior to spinning a database inserting saga (updateEphemeralChannel)
     yield put(updateEphemeralChannel(payload.contactName, data));
@@ -258,10 +259,10 @@ function* requestShareWorker({ payload }) {
     (state) => state.storage.database,
   );
 
-  if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
-    console.log(DECENTRALIZED_BACKUP.RECOVERY_SHARES);
-    return;
-  } // capping to 3 shares reception
+  // if (Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).length >= 3) {
+  //   console.log(DECENTRALIZED_BACKUP.RECOVERY_SHARES);
+  //   return;
+  // } // capping to 3 shares reception
 
   const { key } = yield call(S3Service.generateRequestCreds);
 
@@ -278,7 +279,9 @@ function* requestShareWorker({ payload }) {
     },
   };
 
-  yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+  yield call(insertDBWorker, {
+    payload: { DECENTRALIZED_BACKUP: updatedBackup },
+  });
 }
 
 export const requestShareWatcher = createWatcher(
@@ -289,16 +292,26 @@ export const requestShareWatcher = createWatcher(
 function* uploadRequestedShareWorker({ payload }) {
   // Transfer: Guardian >>> User
   const { tag, encryptedKey, otp } = payload;
-  const { UNDER_CUSTODY } = yield select(
-    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  const { DECENTRALIZED_BACKUP } = yield select(
+    (state) => state.storage.database,
   );
+  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
 
   if (!UNDER_CUSTODY[tag]) {
     yield put(ErrorSending(true));
     // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
   }
 
-  const { META_SHARE, ENC_DYNAMIC_NONPMDD } = UNDER_CUSTODY[tag];
+  const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS } = UNDER_CUSTODY[
+    tag
+  ];
+
+  // preventing re-uploads till expiry
+  if (TRANSFER_DETAILS) {
+    if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < 600000) {
+      return;
+    }
+  }
 
   // TODO: 10 min removal strategy
   yield put(switchS3Loader('uploadRequestedShare'));
@@ -314,6 +327,24 @@ function* uploadRequestedShareWorker({ payload }) {
   if (res.status === 200 && res.data.success === true) {
     // yield success
     console.log('Upload successful!');
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      UNDER_CUSTODY: {
+        ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+        [tag]: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[tag],
+          TRANSFER_DETAILS: {
+            KEY: encryptedKey,
+            UPLOADED_AT: Date.now(),
+          },
+        },
+      },
+    };
+
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
+
     yield put(requestedShareUploaded(tag, true));
     yield put(UploadSuccessfully(true));
     // Alert.alert(
@@ -394,29 +425,47 @@ function* downloadMetaShareWorker({ payload }) {
       yield put(updateMSharesHealth(updatedBackup));
     } else {
       const updatedRecoveryShares = {};
+      let updated = false;
       Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((objectKey) => {
         const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
-        if (!recoveryShare.REQUEST_DETAILS) {
-          updatedRecoveryShares[objectKey] = recoveryShare;
+        if (
+          recoveryShare.REQUEST_DETAILS &&
+          recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
+        ) {
+          updatedRecoveryShares[objectKey] = {
+            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+            META_SHARE: metaShare,
+            ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          };
+          updated = true;
         } else {
-          if (recoveryShare.REQUEST_DETAILS.KEY === encryptedKey) {
-            updatedRecoveryShares[objectKey] = {
-              REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
-              META_SHARE: metaShare,
-              ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
-            };
-          } else {
-            updatedRecoveryShares[objectKey] = recoveryShare;
-          }
+          updatedRecoveryShares[objectKey] = recoveryShare;
         }
       });
+
+      if (!updated) {
+        if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
+          Alert.alert(
+            'Share Exists',
+            'Following share already exists for recovery',
+          );
+          return;
+        }
+        updatedRecoveryShares[metaShare.shareId] = {
+          META_SHARE: metaShare,
+          ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+        };
+        Toast('Share Downloaded');
+      }
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         RECOVERY_SHARES: updatedRecoveryShares,
       };
       // yield put(downloadedMShare(otp, true));
-      yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+      yield call(insertDBWorker, {
+        payload: { DECENTRALIZED_BACKUP: updatedBackup },
+      });
     }
     // yield put(
     //   insertIntoDB({
@@ -479,7 +528,8 @@ function* generatePersonalCopyWorker({ payload }) {
       generatePDF,
       pdfData,
       `Hexa_${walletName}_Recovery_Secret_Personal_Copy${shareIndex - 2}.pdf`,
-      `Hexa Share ${shareIndex + 1}`,
+      // `Hexa Share ${shareIndex + 1}`,
+      `Hexa Recovery Key for ${walletName}'s Wallet`,
       security.answer,
     );
 
@@ -546,7 +596,7 @@ function* generatePersonalCopyWorker({ payload }) {
       S3_SERVICE: JSON.stringify(s3Service),
     };
 
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } catch (err) {
     console.log({ err });
     yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: false }));
@@ -751,7 +801,9 @@ function* updateMSharesHealthWorker({ payload }) {
       ...DECENTRALIZED_BACKUP,
       UNDER_CUSTODY,
     };
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -775,75 +827,68 @@ function* checkMSharesHealthWorker() {
   // const postInstance = JSON.stringify(s3Service);
   yield put(calculateOverallHealth(s3Service));
   if (res.status === 200) {
-    const { shareGuardianMapping } = res.data;
-    const trustedContacts: TrustedContactsService = yield select(
-      (state) => state.trustedContacts.service,
-    );
-
-    let approvedAny = false;
-    for (const index of Object.keys(shareGuardianMapping)) {
-      const { updatedAt, guardian } = shareGuardianMapping[index];
-      console.log({ updatedAt, guardian });
-      if (updatedAt > 0 && guardian) {
-        if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
-          const approveTC = true;
-          const res = yield call(
-            trustedContacts.fetchEphemeralChannel,
-            guardian,
-            approveTC,
-          );
-          if (res.status === 200) {
-            console.log('Trusted Channel create: ', guardian);
-
-            // generate a corresponding derivative acc and assign xpub
-            const res = yield call(
-              regularService.getDerivativeAccXpub,
-              TRUSTED_CONTACTS,
-              null,
-              guardian,
-            );
-
-            if (res.status === 200) {
-              const xpub = res.data;
-              // update the trusted channel with the xpub
-              const data: TrustedDataElements = {
-                xpub,
-              };
-
-              const updateRes = yield call(
-                trustedContacts.updateTrustedChannel,
-                guardian,
-                data,
-                true,
-              );
-              if (updateRes.status === 200) {
-                console.log('Xpub updated to trusted channel for: ', guardian);
-              } else {
-                console.log(
-                  `Failed to update xpub to trusted channel for ${guardian}`,
-                );
-              }
-            } else {
-              console.log(`Failed to generate xpub for ${guardian}`);
-            }
-
-            approvedAny = true;
-          }
-        }
-      }
-    }
-
-    if (approvedAny) {
-      // yield delay(1000);
-      const { SERVICES } = yield select((state) => state.storage.database);
-      const updatedSERVICES = {
-        ...SERVICES,
-        REGULAR_ACCOUNT: JSON.stringify(regularService),
-        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-      };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    }
-
+    // const { shareGuardianMapping } = res.data;
+    // const trustedContacts: TrustedContactsService = yield select(
+    //   (state) => state.trustedContacts.service,
+    // );
+    // let approvedAny = false;
+    // for (const index of Object.keys(shareGuardianMapping)) {
+    //   const { updatedAt, guardian } = shareGuardianMapping[index];
+    //   console.log({ updatedAt, guardian });
+    //   if (updatedAt > 0 && guardian) {
+    //     if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
+    //       const approveTC = true;
+    //       const res = yield call(
+    //         trustedContacts.fetchEphemeralChannel,
+    //         guardian,
+    //         approveTC,
+    //       );
+    //       if (res.status === 200) {
+    //         console.log('Trusted Channel create: ', guardian);
+    //         // generate a corresponding derivative acc and assign xpub
+    //         const res = yield call(
+    //           regularService.getDerivativeAccXpub,
+    //           TRUSTED_CONTACTS,
+    //           null,
+    //           guardian,
+    //         );
+    //         if (res.status === 200) {
+    //           const xpub = res.data;
+    //           // update the trusted channel with the xpub
+    //           const data: TrustedDataElements = {
+    //             xpub,
+    //           };
+    //           const updateRes = yield call(
+    //             trustedContacts.updateTrustedChannel,
+    //             guardian,
+    //             data,
+    //             true,
+    //           );
+    //           if (updateRes.status === 200) {
+    //             console.log('Xpub updated to trusted channel for: ', guardian);
+    //           } else {
+    //             console.log(
+    //               `Failed to update xpub to trusted channel for ${guardian}`,
+    //             );
+    //           }
+    //         } else {
+    //           console.log(`Failed to generate xpub for ${guardian}`);
+    //         }
+    //         approvedAny = true;
+    //       }
+    //     }
+    //   }
+    // }
+    // if (approvedAny) {
+    //   // yield delay(1000);
+    //   const { SERVICES } = yield select((state) => state.storage.database);
+    //   const updatedSERVICES = {
+    //     ...SERVICES,
+    //     REGULAR_ACCOUNT: JSON.stringify(regularService),
+    //     TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    //   };
+    //   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    // }
     // if (preInstance !== postInstance) {
     //   const { SERVICES } = yield select(state => state.storage.database);
     //   const updatedSERVICES = {
@@ -885,13 +930,19 @@ function* checkPDFHealthWorker({ payload }) {
     if (!updatedPDFHealth[3]) {
       updatedPDFHealth = {
         ...updatedPDFHealth,
-        [3]: { shareId: pdfHealth[3].shareId, updatedAt: 0 },
+        [3]: {
+          shareId: pdfHealth[3] ? pdfHealth[3].shareId : 'placeHolderID3',
+          updatedAt: 0,
+        },
       };
     }
     if (!updatedPDFHealth[4]) {
       updatedPDFHealth = {
         ...updatedPDFHealth,
-        [4]: { shareId: pdfHealth[4].shareId, updatedAt: 0 },
+        [4]: {
+          shareId: pdfHealth[4] ? pdfHealth[4].shareId : 'placeHolderID4',
+          updatedAt: 0,
+        },
       };
     }
 
@@ -1134,7 +1185,9 @@ function* restoreDynamicNonPMDDWorker() {
         META_SHARES: metaShares,
       },
     };
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error(res.err);
@@ -1192,12 +1245,32 @@ function* restoreShareFromQRWorker({ payload }) {
       META_SHARE: metaShare,
     };
 
+    // let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
+    // if (storedPDFHealth) {
+    //   storedPDFHealth = JSON.parse(storedPDFHealth);
+    //   storedPDFHealth = {
+    //     ...storedPDFHealth,
+    //     [metaShare.meta.index]: {
+    //       shareId: metaShare.shareId,
+    //       updatedAt: Date.now(),
+    //     },
+    //   };
+
+    //   yield call(
+    //     AsyncStorage.setItem,
+    //     'PDF Health',
+    //     JSON.stringify(storedPDFHealth),
+    //   );
+    // }
+
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       RECOVERY_SHARES,
     };
     console.log({ updatedBackup });
-    yield put(insertIntoDB({ DECENTRALIZED_BACKUP: updatedBackup }));
+    yield call(insertDBWorker, {
+      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+    });
   } else {
     yield put(UnableRecoverShareFromQR(true));
     //Alert.alert('Unable to recover share from QR', res.err);
@@ -1222,29 +1295,47 @@ function* recoverWalletWorker({ payload }) {
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
     let encDynamicNonPMDD;
-    const metaShares = Array(5);
+    const mappedMetaShares: { [walletId: string]: MetaShare[] } = {};
     Object.keys(RECOVERY_SHARES).forEach((key) => {
       const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[key];
-      if (META_SHARE) metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
-      if (!encDynamicNonPMDD) {
-        encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
-      } else {
-        if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
-          encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      if (META_SHARE) {
+        // metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
+        const shares = mappedMetaShares[META_SHARE.meta.walletId]
+          ? mappedMetaShares[META_SHARE.meta.walletId]
+          : [];
+        let insert = true;
+        shares.forEach((share) => {
+          if (share.shareId === META_SHARE.shareId) insert = false;
+        }, []);
+
+        if (insert) {
+          shares.push(META_SHARE);
+          mappedMetaShares[META_SHARE.meta.walletId] = shares;
         }
       }
+      // if (!encDynamicNonPMDD) { // retired due to wallet image
+      //   encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      // } else {
+      //   if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
+      //     encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
+      //   }
+      // }
     });
 
-    if (Object.keys(metaShares).length !== 3) {
-      throw new Error(
-        `Insufficient number of shares to recover the wallet, ${
-          3 - metaShares.length
-        } more required`,
-      );
+    console.log({ mappedMetaShares });
+    let restorationShares = [];
+    Object.keys(mappedMetaShares).forEach((walletId) => {
+      if (mappedMetaShares[walletId].length >= 3)
+        restorationShares = mappedMetaShares[walletId];
+    });
+
+    if (Object.keys(restorationShares).length !== 3) {
+      Alert.alert('Insufficient compatible shares to recover the wallet');
+      throw new Error(`Insufficient compatible shares to recover the wallet`);
     }
 
-    const encryptedSecrets: string[] = Object.keys(metaShares).map(
-      (key) => metaShares[key].encryptedSecret,
+    const encryptedSecrets: string[] = restorationShares.map(
+      (share) => share.encryptedSecret,
     );
 
     const res = yield call(
@@ -1261,7 +1352,12 @@ function* recoverWalletWorker({ payload }) {
         secureAcc,
         s3Service,
         trustedContacts,
-      } = yield call(serviceGenerator, security.answer, mnemonic, metaShares);
+      } = yield call(
+        serviceGenerator,
+        security.answer,
+        mnemonic,
+        restorationShares,
+      );
 
       const UNDER_CUSTODY = {};
       let DYNAMIC_NONPMDD = {};

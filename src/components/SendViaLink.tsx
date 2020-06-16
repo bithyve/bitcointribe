@@ -51,7 +51,6 @@ export default function SendViaLink(props) {
   const [serviceType, setServiceType] = useState(
     props.serviceType ? props.serviceType : '',
   );
-  console.log("serviceType", serviceType);
   const [shareApps, setShareApps] = useState([
     {
       title: `WhatsApp`,
@@ -95,8 +94,8 @@ export default function SendViaLink(props) {
   }, [Contact]);
 
   useEffect(() => {
-    if(props.serviceType){
-      setServiceType(props.serviceType)
+    if (props.serviceType) {
+      setServiceType(props.serviceType);
     }
   }, [props.serviceType]);
 
@@ -136,7 +135,7 @@ export default function SendViaLink(props) {
   };
 
   useEffect(() => {
-    if (props.link) setShareLink(props.link);
+    setShareLink(props.link);
   }, [props.link]);
 
   const openWhatsApp = (appUrl) => {
@@ -192,7 +191,7 @@ export default function SendViaLink(props) {
           marginBottom: hp('1.5%'),
         }}
       >
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressBack();
@@ -213,7 +212,7 @@ export default function SendViaLink(props) {
                 paddingTop: 5,
               }}
             >
-              Lorem ipsum dolor sit amet, consec
+              {props.subHeaderText ? props.subHeaderText : 'Send a link or Bitcoin address to your contact'}
             </Text>
           </View>
           {props.onPressDone && (
@@ -243,10 +242,11 @@ export default function SendViaLink(props) {
           )}
         </View>
       </View>
-      <ScrollView style={{ marginTop: hp('1.7%') }}>
+      <ScrollView style={{ marginTop: props.isFromReceive ? hp('0.1%') : hp('1.7%') }}>
         <View
           style={{ marginLeft: 20, marginRight: 20, marginBottom: hp('1.7%') }}
         >
+          {!props.isFromReceive ? <View>
           {contact && (
             <View style={styles.contactProfileView}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -369,7 +369,7 @@ export default function SendViaLink(props) {
               }}
               activeOpacity={10}
               onPress={() => {
-                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
               }}
             >
               <Text
@@ -380,7 +380,7 @@ export default function SendViaLink(props) {
                   textAlign: 'center',
                 }}
               >
-                Receiving To:
+                Receiving to:
                 <Text style={styles.boldItalicText}>
                   {serviceType && serviceType == TEST_ACCOUNT
                     ? '  Test Account'
@@ -391,52 +391,14 @@ export default function SendViaLink(props) {
                     : ''}
                 </Text>
               </Text>
-              <Ionicons
+              {/* <Ionicons
                 style={{ marginRight: 10, marginLeft: 10 }}
                 name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
                 size={20}
                 color={Colors.blue}
-              />
+              /> */}
             </AppBottomSheetTouchableWrapper>
           ) : null}
-          <View style={{ position: 'relative' }}>
-            {props.serviceType
-              ? dropdownBoxOpenClose && (
-                  <View style={styles.dropdownBoxModal}>
-                    <ScrollView>
-                      {dropdownBoxList.map((value, index) => (
-                        <AppBottomSheetTouchableWrapper
-                          onPress={() => {
-                            setServiceType(value.type);
-
-                            setDropdownBoxOpenClose(false);
-                          }}
-                          style={{
-                            ...styles.dropdownBoxModalElementView,
-                            backgroundColor:
-                              serviceType == value.type
-                                ? Colors.lightBlue
-                                : Colors.white,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color:
-                                serviceType == value.type
-                                  ? Colors.blue
-                                  : Colors.black,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(12),
-                            }}
-                          >
-                            {value.account_name}
-                          </Text>
-                        </AppBottomSheetTouchableWrapper>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )
-              : null}
             {props.amount && (
               <View style={styles.amountContainer}>
                 <Text
@@ -497,7 +459,7 @@ export default function SendViaLink(props) {
               </View>
             )}
 
-            <View style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}>
+            {/* <View style={{ marginTop: 40, marginLeft: 20, marginRight: 20 }}>
               <Text
                 style={{
                   color: Colors.textColorGrey,
@@ -510,19 +472,20 @@ export default function SendViaLink(props) {
                   ? props.info
                   : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'}
               </Text>
-            </View>
-
+            </View> */}
+            </View> : null}
             <View
               style={{
-                marginTop: 40,
+                marginTop: props.isFromReceive ? 0 : 40,
                 alignItems: 'center',
                 justifyContent: 'center',
                 flex: 1,
                 backgroundColor: Colors.backgroundColor1,
                 height: 50,
                 borderRadius: 10,
-                marginLeft: 20,
-                marginRight: 20,
+                marginLeft: 10,
+                marginRight: 10,
+                padding: 10
               }}
             >
               <Text
@@ -532,6 +495,7 @@ export default function SendViaLink(props) {
                   fontFamily: Fonts.FiraSansRegular,
                   paddingTop: 5,
                 }}
+                numberOfLines={2}
               >
                 {shareLink ? shareLink : 'creating...'}
               </Text>
@@ -541,8 +505,8 @@ export default function SendViaLink(props) {
               style={{
                 marginLeft: 20,
                 marginRight: 20,
-                marginTop: 40,
-                marginBottom: hp('4%'),
+                marginTop: props.isFromReceive ? 15 : 40,
+                marginBottom: props.isFromReceive ? hp('2%') : hp('4%'),
               }}
             >
               <ScrollView horizontal={true}>
@@ -599,19 +563,16 @@ export default function SendViaLink(props) {
                 })}
               </ScrollView>
             </View>
-          </View>
         </View>
       </ScrollView>
-      <View style={{ marginTop: 'auto' }}>
+      {!props.isFromReceive ? <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
-          backgroundColor={Colors.backgroundColor1}
-          titleColor={Colors.black1}
           title={'Note'}
           infoText={
-            'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+            'Sharing options. Use any of the methods shown to share the request link or Bitcoin address'
           }
         />
-      </View>
+      </View> : null}
     </View>
   );
 }

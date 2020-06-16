@@ -38,9 +38,9 @@ export default function NoInternetModalContents(props) {
                     onPress={() => props.onPressTryAgain()}
                     style={{ ...styles.successModalButtonView }}
                 >
-                    <Text style={styles.proceedButtonText}>Try Again</Text>
+                    <Text style={styles.proceedButtonText}>OK</Text>
                 </AppBottomSheetTouchableWrapper>
-                <AppBottomSheetTouchableWrapper
+                {/* <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressIgnore()}
                     style={{
                         height: wp('13%'),
@@ -50,7 +50,7 @@ export default function NoInternetModalContents(props) {
                     }}
                 >
                     <Text style={{...styles.proceedButtonText, color:Colors.blue, }}>Ignore</Text>
-                </AppBottomSheetTouchableWrapper>
+                </AppBottomSheetTouchableWrapper> */}
                 <Image source={require('../assets/images/icons/noInternet.png')} style={styles.successModalImage} />
             </View>
         </View>

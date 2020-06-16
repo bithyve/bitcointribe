@@ -134,7 +134,7 @@ const VoucherScanner = (props) => {
   const accounts = [
     {
       accountType: '',
-      accountName: 'Choose the deposit Account',
+      accountName: 'Choose a deposit account',
       amount: '',
       image: require('../../assets/images/icons/icon_test.png'),
     },
@@ -152,10 +152,10 @@ const VoucherScanner = (props) => {
     },
   ];
   const [selectedAccount, setSelectedAccount] = useState({
-    accountType: '',
-    accountName: 'Choose the deposit Account',
-    amount: '',
-    image: require('../../assets/images/icons/icon_test.png'),
+    accountType: REGULAR_ACCOUNT,
+    accountName: 'Checking Account',
+    amount: '0',
+    image: require('../../assets/images/icons/icon_regular.png'),
   });
   let service = useSelector(
     (state) => state.accounts[selectedAccount.accountType],
@@ -602,7 +602,7 @@ const VoucherScanner = (props) => {
     if (fBTCAccountData && fBTCAccountData.user_key && bitcoinAddress) {
       let data = {
         user_key: fBTCAccountData.user_key,
-        wallet_slug: 'bithyve',
+        wallet_slug: Config.WALLET_SLUG,
         quote_type: 'voucher',
         quote_token: quoteData.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
@@ -828,7 +828,7 @@ const VoucherScanner = (props) => {
                 </RNCamera>
               </View>
             ) : (
-              <TouchableOpacity onPress={() => setOpenCameraFlag(true)}>
+              <TouchableOpacity onPress={() => setOpenCameraFlag(true)} style={{alignSelf: 'center'}}>
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
                   style={styles.cameraImage}
@@ -1062,14 +1062,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cameraView: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
     overflow: 'hidden',
     borderRadius: 20,
+    alignSelf: 'center',
   },
   camera: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
   },
   topCornerView: {
     flexDirection: 'row',
@@ -1121,8 +1122,8 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   cameraImage: {
-    width: wp('100%'),
-    height: wp('100%'),
+    width: wp('90%'),
+    height: wp('90%'),
     overflow: 'hidden',
     borderRadius: 20,
   },

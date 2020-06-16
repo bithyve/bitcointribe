@@ -285,8 +285,7 @@ export default function QRModal(props) {
           </View>
           <View style={{marginTop: 'auto'}}>
           <BottomInfoBox
-            backgroundColor={Colors.backgroundColor1}
-              title={'Note'}
+            title={'Note'}
               infoText={
                 props.noteText
               }

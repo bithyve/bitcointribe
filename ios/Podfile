@@ -69,7 +69,18 @@ require_relative '../node_modules/react-native-unimodules/cocoapods'
 
   pod 'GoogleIDFASupport', '~> 3.14.0'
   
+  pod 'RNOS', :path => '../node_modules/react-native-os'
+
+  pod 'TcpSockets', :path => '../node_modules/react-native-tcp'
+
+  pod 'react-native-udp', :path => '../node_modules/react-native-udp'
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  pod 'RNLocalize', :path => '../node_modules/react-native-localize'
+
 target 'HEXA' do 
+  
 end
 
 target 'HEXA Dev' do

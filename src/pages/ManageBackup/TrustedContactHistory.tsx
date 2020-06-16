@@ -654,7 +654,7 @@ const TrustedContactHistory = (props) => {
 
   useEffect(() => {
     if (overallHealth) {
-      if (overallHealth.sharesInfo[2].updatedAt) {
+      if (overallHealth.sharesInfo[index].updatedAt) {
         setShared(true);
       }
     }
@@ -760,7 +760,9 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
 
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
@@ -847,7 +849,9 @@ const TrustedContactHistory = (props) => {
 
         const contactName = `${chosenContact.firstName} ${
           chosenContact.lastName ? chosenContact.lastName : ''
-        }`.toLowerCase();
+        }`
+          .toLowerCase()
+          .trim();
         const data: EphemeralData = {
           walletID,
           FCM,
@@ -880,7 +884,9 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`.toLowerCase();
+      }`
+        .toLowerCase()
+        .trim();
       console.log({ contactName });
       if (!trustedContacts.tc.trustedContacts[contactName]) return;
 
@@ -1033,7 +1039,7 @@ const TrustedContactHistory = (props) => {
                   ? chosenContact.firstName
                   : !chosenContact.firstName && chosenContact.lastName
                   ? chosenContact.lastName
-                  : props.navigation.state.params.selectedTitle}
+                  : 'Friends and Family'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -1050,11 +1056,13 @@ const TrustedContactHistory = (props) => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (trustedContactsBottomSheet as any).current.snapTo(
-                  1,
-                );
+                (trustedContactsBottomSheet as any).current.snapTo(1);
               }}
-              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
               textStyle={{}}
             />
             <Image
@@ -1136,7 +1144,7 @@ const TrustedContactHistory = (props) => {
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {
             setRenderTimer(false);
-            onOTPShare(index);
+            // onOTPShare(index); commented: causing intransit history to re-iterate
           }
         }}
         enabledInnerScrolling={true}

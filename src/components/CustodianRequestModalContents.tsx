@@ -27,7 +27,7 @@ export default function CustodianRequestModalContents(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            You have been selected as a{"\n"}keeper for Hexa Wallet
+            You have been selected as a{"\n"}Keeper for Hexa Wallet
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
             Please contact the sender to get{"\n"}the OTP and accept the secret

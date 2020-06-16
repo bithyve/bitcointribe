@@ -14,20 +14,28 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function SaveBitcoinModalContents(props) {
-  const [addData, setAddData] = useState([
-    {
-      title: 'Use a Voucher',
-      image: require('../../assets/images/icons/voucher.png'),
-      info: 'Purchase a voucher or use a voucher you own',
-      type: 'voucher'
-    },
-    {
-      title: 'Existing Buying Options',
-      image: require('../../assets/images/icons/existing_saving_method.png'),
-      info: 'Lorem ipsum dolor sit amet, consecteture adipiscing',
-      type: 'existingBuyingMethods'
-    },
-  ])
+    const [ addData, setAddData ] = useState( [
+      {
+        title: 'Use a Voucher',
+        image: require('../../assets/images/icons/voucher.png'),
+        info: 'Purchase a voucher or use a voucher you own',
+        type: 'voucher'
+      }
+  ] )
+  
+//   function isEmpty(obj) {
+//     return Object.keys(obj).every(k => !Object.keys(obj[k]).length)
+//   }
+
+//   useEffect(() => {
+//     checkFastBitcoin();
+//   }, []);
+
+// const checkFastBitcoin = async () => {
+//   let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+//   console.log("getFBTCAccount", getFBTCAccount);
+//   setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+// };
 
   return (
     <View style={styles.modalContainer}>
@@ -52,8 +60,7 @@ export default function SaveBitcoinModalContents(props) {
           </View>
         )}
         renderItem={({ item }) => {
-          if (item.type == 'existingBuyingMethods' && props.isExistingSavingMethod && props.isExistingSavingMethod) { return null; }
-          return (<AppBottomSheetTouchableWrapper
+           return (<AppBottomSheetTouchableWrapper
             onPress={() => props.onPressElements(item.type)}
             style={styles.addModalView}
           >

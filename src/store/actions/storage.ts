@@ -13,16 +13,16 @@ export const fetchFromDB = () => {
   return { type: FETCH_FROM_DB };
 };
 
-export const insertIntoDB = (data) => {
-  return { type: INSERT_INTO_DB, payload: { ...data } };
-};
+// export const insertIntoDB = (data) => {
+//   return { type: INSERT_INTO_DB, payload: { ...data } };
+// }; // disabled
 
 export const keyFetched = (key) => {
   return { type: KEY_FETCHED, payload: { key } };
 };
 
-export const enrichServices = (database) => {
-  return { type: ENRICH_SERVICES, payload: { database } };
+export const enrichServices = () => {
+  return { type: ENRICH_SERVICES };
 };
 
 // types and action creators (saga): dispatched by saga workers

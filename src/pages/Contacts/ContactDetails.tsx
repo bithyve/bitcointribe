@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
   Text,
@@ -9,6 +10,9 @@ import {
   Image,
   ScrollView,
   AsyncStorage,
+  Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -22,9 +26,22 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Entypo from 'react-native-vector-icons/Entypo';
 import _ from 'underscore';
 import moment from 'moment';
-import { useDispatch, useSelector } from 'react-redux';
 import { addTransferDetails } from '../../store/actions/accounts';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import BottomSheet from 'reanimated-bottom-sheet';
+import SendViaLink from '../../components/SendViaLink';
+import ModalHeader from '../../components/ModalHeader';
+import DeviceInfo from 'react-native-device-info';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import {
+  uploadRequestedShare,
+  ErrorSending,
+  UploadSuccessfully,
+} from '../../store/actions/sss';
+import S3Service from '../../bitcoin/services/sss/S3Service';
+import ErrorModalContents from '../../components/ErrorModalContents';
+import config from '../../bitcoin/HexaConfig';
+import SendViaQR from '../../components/SendViaQR';
 
 export default function ContactDetails(props) {
   const dispatch = useDispatch();
@@ -34,6 +51,12 @@ export default function ContactDetails(props) {
   const index = props.navigation.state.params.index;
   const [contact, setContact] = useState(Contact ? Contact : Object);
   const [SelectedOption, setSelectedOption] = useState(0);
+  // const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+  //   React.createRef(),
+  // );
+  const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+    React.createRef(),
+  );
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
@@ -68,6 +91,28 @@ export default function ContactDetails(props) {
     },
   ]);
 
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [errorMessage, setErrorMessage] = useState('');
+  const [buttonText, setButtonText] = useState('Try again');
+  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  // const [trustedLink, setTrustedLink] = useState('');
+  const [trustedQR, setTrustedQR] = useState('');
+
+  const [key, setKey] = useState('');
+  const uploading = useSelector(
+    (state) => state.sss.loading.uploadRequestedShare,
+  );
+  const errorSending = useSelector((state) => state.sss.errorSending);
+  const uploadSuccessfull = useSelector(
+    (state) => state.sss.uploadSuccessfully,
+  );
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+  const { UNDER_CUSTODY } = useSelector(
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+
   useEffect(() => {
     setContact(Contact);
     if (contactsType == 'My Keepers') saveInTransitHistory('inTransit');
@@ -92,8 +137,7 @@ export default function ContactDetails(props) {
     props.navigation.navigate('SendToContact', {
       selectedContact: Contact,
       serviceType: REGULAR_ACCOUNT,
-      averageTxFees: 0,
-      netBalance: 10000,
+      isFromAddressBook: true,
     });
   };
 
@@ -108,28 +152,33 @@ export default function ContactDetails(props) {
         await AsyncStorage.getItem('IMKeeperOfHistory'),
       );
     }
-    if(OtherTrustedContactsHistory){
-      OtherTrustedContactsHistory = getHistoryByContactId(OtherTrustedContactsHistory);
+    if (OtherTrustedContactsHistory) {
+      OtherTrustedContactsHistory = getHistoryByContactId(
+        OtherTrustedContactsHistory,
+      );
     }
-    if (OtherTrustedContactsHistory.length > 0) {
+    if (OtherTrustedContactsHistory && OtherTrustedContactsHistory.length > 0) {
       setTrustedContactHistory(sortedHistory(OtherTrustedContactsHistory));
     } else {
       setTrustedContactHistory([]);
     }
   };
 
-  const getHistoryByContactId = (history) =>{
+  const getHistoryByContactId = (history) => {
     let array = [];
-    if(history && history.length>0){
+    if (history && history.length > 0) {
       for (let i = 0; i < history.length; i++) {
         const element = history[i];
-        if(element.selectedContactInfo && element.selectedContactInfo.selectedContact.id == Contact.id){
+        if (
+          element.selectedContactInfo &&
+          element.selectedContactInfo.selectedContact.id == Contact.id
+        ) {
           array.push(element);
-        }  
+        }
       }
     }
     return array;
-  }
+  };
 
   const sortedHistory = useCallback((history) => {
     const currentHistory = history.filter((element) => {
@@ -232,6 +281,248 @@ export default function ContactDetails(props) {
       setSelectedOption(Id);
     }
   };
+
+  useEffect(() => {
+    if (!Contact) {
+      Alert.alert('Contact details missing');
+      return;
+    }
+
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
+
+    if (
+      !trustedContacts.tc.trustedContacts[contactName] &&
+      !trustedContacts.tc.trustedContacts[contactName].isWard
+    ) {
+      Alert.alert(
+        'Restore request failed',
+        'You are not a keeper of the selected contact',
+      );
+      return;
+    }
+
+    const requester =
+      trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
+
+    if (
+      UNDER_CUSTODY[requester] &&
+      UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
+      Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
+        600000
+    ) {
+      const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
+
+      // if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+      //   const phoneNumber = Contact.phoneNumbers[0].number;
+      //   console.log({ phoneNumber });
+      //   const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      //   const numHintType = 'num';
+      //   const numHint = number.slice(number.length - 3);
+      //   const numberEncKey = TrustedContactsService.encryptPub(KEY, number)
+      //     .encryptedPub;
+      //   const numberDL =
+      //     `https://hexawallet.io/${config.APP_STAGE}/rrk` +
+      //     `/${requester}` +
+      //     `/${numberEncKey}` +
+      //     `/${numHintType}` +
+      //     `/${numHint}` +
+      //     `/${UPLOADED_AT}`;
+      //   console.log({ numberDL });
+      //   setTrustedLink(numberDL);
+      //   setTimeout(() => {
+      //     (SendViaLinkBottomSheet as any).current.snapTo(1);
+      //   }, 2);
+      // } else if (Contact.emails && Contact.emails.length) {
+      //   const email = Contact.emails[0].email;
+      //   const emailInitials: string = email.split('@')[0];
+      //   const emailHintType = 'eml';
+      //   const emailHint = emailInitials.slice(emailInitials.length - 3);
+      //   const emailEncKey = TrustedContactsService.encryptPub(
+      //     KEY,
+      //     emailInitials,
+      //   ).encryptedPub;
+      //   const emailDL =
+      //     `https://hexawallet.io/${config.APP_STAGE}/rrk` +
+      //     `/${requester}` +
+      //     `/${emailEncKey}` +
+      //     `/${emailHintType}` +
+      //     `/${emailHint}` +
+      //     `/${UPLOADED_AT}`;
+      //   console.log({ emailDL });
+      //   setTrustedLink(emailDL);
+      //   setTimeout(() => {
+      //     (SendViaLinkBottomSheet as any).current.snapTo(1);
+      //   }, 2);
+      // } else {
+      //   Alert.alert(
+      //     'Invalid Contact',
+      //     'Cannot add a contact without phone-num/email as a trusted entity',
+      //   );
+      // }
+
+      setTrustedQR(
+        JSON.stringify({
+          requester: requester,
+          publicKey: KEY,
+          uploadedAt: UPLOADED_AT,
+          type: 'ReverseRecoveryQR',
+        }),
+      );
+
+      setTimeout(() => {
+        (SendViaQRBottomSheet as any).current.snapTo(1);
+      }, 2);
+
+      dispatch(UploadSuccessfully(null));
+    }
+  }, [Contact, UNDER_CUSTODY]);
+
+  const onHelpRestore = useCallback(() => {
+    if (!Contact) {
+      console.log('Err: Contact missing');
+      return;
+    }
+
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
+
+    if (
+      !trustedContacts.tc.trustedContacts[contactName] &&
+      !trustedContacts.tc.trustedContacts[contactName].isWard
+    ) {
+      Alert.alert(
+        'Restore request failed',
+        'You are not a keeper of the selected contact',
+      );
+      return;
+    }
+    const requester =
+      trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
+    const encryptionKey = S3Service.generateRequestCreds().key;
+
+    if (
+      !UNDER_CUSTODY[requester] ||
+      !UNDER_CUSTODY[requester].TRANSFER_DETAILS
+    ) {
+      dispatch(uploadRequestedShare(requester, encryptionKey));
+    } else if (
+      Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT >
+      600000
+    ) {
+      dispatch(uploadRequestedShare(requester, encryptionKey));
+    } else {
+      setTimeout(() => {
+        (SendViaQRBottomSheet as any).current.snapTo(1);
+      }, 2);
+    }
+  }, [Contact, UNDER_CUSTODY]);
+
+  useEffect(() => {
+    if (errorSending) {
+      setTimeout(() => {
+        setErrorMessageHeader('Error sending Recovery Secret');
+        setErrorMessage(
+          'There was an error while sending your Recovery Secret, please try again in a little while',
+        );
+        setButtonText('Try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(ErrorSending(null));
+    }
+  }, [errorSending]);
+
+  // const renderSendViaLinkContents = useCallback(() => {
+  //   return (
+  //     <SendViaLink
+  //       contactText={'Send Recovery Secret'}
+  //       contact={Contact}
+  //       link={trustedLink}
+  //       contactEmail={''}
+  //       onPressBack={() => {
+  //         if (SendViaLinkBottomSheet.current)
+  //           (SendViaLinkBottomSheet as any).current.snapTo(0);
+  //       }}
+  //       onPressDone={() => {
+  //         (SendViaLinkBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, [Contact, trustedLink]);
+
+  // const renderSendViaLinkHeader = useCallback(() => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         if (SendViaLinkBottomSheet.current)
+  //           (SendViaLinkBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, []);
+
+  const renderSendViaQRContents = useCallback(() => {
+    return (
+      <SendViaQR
+        headerText={'Send Recovery Secret'}
+        subHeaderText={'Your ward should scan the QR to restore'}
+        contactText={''}
+        contact={Contact}
+        QR={trustedQR}
+        contactEmail={''}
+        onPressBack={() => {
+          if (SendViaQRBottomSheet.current)
+            (SendViaQRBottomSheet as any).current.snapTo(0);
+        }}
+        onPressDone={() => {
+          (SendViaQRBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [Contact, trustedQR]);
+
+  const renderSendViaQRHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (SendViaQRBottomSheet.current)
+            (SendViaQRBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={errorMessageHeader}
+        info={errorMessage}
+        proceedButtonText={buttonText}
+        onPressProceed={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [errorMessage, errorMessageHeader, buttonText]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ErrorBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -420,9 +711,10 @@ export default function ContactDetails(props) {
         ) : (
           <View style={{ flex: 1 }}>
             <ScrollView>
-              {[1, 2, 3, 4, 5].map((value) => {
+              {[1, 2, 3, 4, 5].map((value, index) => {
                 return (
                   <View
+                    key={index}
                     style={{
                       margin: wp('3%'),
                       backgroundColor: Colors.white,
@@ -503,13 +795,20 @@ export default function ContactDetails(props) {
               height: wp('30'),
             }}
           >
-            <TouchableOpacity style={styles.bottomButton}>
+            <TouchableOpacity
+              style={styles.bottomButton}
+              onPress={onHelpRestore}
+            >
               <Image
                 source={require('../../assets/images/icons/icon_sell.png')}
                 style={styles.buttonImage}
               />
               <View>
-                <Text style={styles.buttonText}>Help Restore</Text>
+                {uploading ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>Help Restore</Text>
+                )}
                 <Text numberOfLines={1} style={styles.buttonInfo}>
                   Lorem ipsum dolor
                 </Text>
@@ -530,6 +829,36 @@ export default function ContactDetails(props) {
           </View>
         )}
       </View>
+      {/* <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendViaLinkBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+        ]}
+        renderContent={renderSendViaLinkContents}
+        renderHeader={renderSendViaLinkHeader}
+      /> */}
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SendViaQRBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+        ]}
+        renderContent={renderSendViaQRContents}
+        renderHeader={renderSendViaQRHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }

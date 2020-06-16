@@ -17,12 +17,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import QRCode from 'react-native-qrcode-svg';
 import CopyThisText from '../../components/CopyThisText';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import QRCodeWrapper from '../../components/qr-hoc';
 
 const NewTwoFASecret = props => {
   const [receivingAddress, setReceivingAddress] = useState('2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g');
@@ -88,7 +88,7 @@ const NewTwoFASecret = props => {
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-                <QRCodeWrapper value={receivingAddress} size={hp('27%')} />
+                <QRCode value={receivingAddress} size={hp('27%')} />
               )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
           </View>
@@ -125,7 +125,6 @@ const NewTwoFASecret = props => {
           }}
         >
           <BottomInfoBox
-            backgroundColor={Colors.backgroundColor1}
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'

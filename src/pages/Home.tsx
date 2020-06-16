@@ -69,19 +69,36 @@ import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
 import firebase from 'react-native-firebase';
 import NotificationListContent from '../components/NotificationListContent';
-import { timeFormatter } from '../common/CommonFunctions/timeFormatter';
+// const { Value, abs, sub, min } = Animated
+// const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
+// const position = new Value( 1 )
+// const opacity = min( abs( sub( position, 1 ) ), 0.8 )
+// const zeroIndex = snapPoints.length - 1
+// const height = snapPoints[ 0 ]
+import { timeFormatter, createRandomString } from '../common/CommonFunctions/timeFormatter';
 import Config from 'react-native-config';
 import RelayServices from '../bitcoin/services/RelayService';
 import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import { approveTrustedContact } from '../store/actions/trustedContacts';
+import {
+  approveTrustedContact,
+  fetchEphemeralChannel,
+  clearPaymentDetails,
+} from '../store/actions/trustedContacts';
 import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
-import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
-import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
+import {
+  fetchDerivativeAccBalTx,
+  addTransferDetails,
+} from '../store/actions/accounts';
+import {
+  TrustedContactDerivativeAccount,
+  EphemeralData,
+} from '../bitcoin/utilities/Interface';
+import * as RNLocalize from "react-native-localize";
 
 export default function Home(props) {
   // const trustedContacts: TrustedContactsService = useSelector(
@@ -118,6 +135,10 @@ export default function Home(props) {
   );
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
+  // let [AssociatedContact, setAssociatedContact] = useState([]);
+  // let [SelectedContacts, setSelectedContacts] = useState([]);
+  // let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  let [associatedContactName, setAssociatedContactName] = useState('');
   const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
   let SecondaryDeviceStatus = useSelector(
     (state) => state.sss.downloadedMShare,
@@ -136,9 +157,19 @@ export default function Home(props) {
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
   );
-  const { status } = useSelector((state) => state.sss);
+  // alert(status);
+  // const DECENTRALIZED_BACKUP = useSelector(
+  //   state => state.storage.database.DECENTRALIZED_BACKUP,
+  // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
   const accounts = useSelector((state) => state.accounts);
+
+  const paymentDetails = useSelector(
+    (state) => state.trustedContacts.paymentDetails,
+  );
+  // const exchangeRate = props.navigation.state.params
+  //   ? props.navigation.state.params.exchangeRates
+  //   : null;
   const dispatch = useDispatch();
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
   useEffect(() => {
@@ -595,18 +626,24 @@ export default function Home(props) {
       }
       let tmpList = asyncNotificationList;
       let obj = {
-        type: 'transaction',
+        type: 'contact',
         isMandatory: false,
         read: false,
         title: 'New FastBitcoin Transactions',
         time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
         date: new Date(),
         info: newTransactions.length + ' New FBTC transactions',
-        notificationId: randomInteger(1, 1000),
+        notificationId: createRandomString(17),
       };
       tmpList.push(obj);
 
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+      let notificationDetails = {
+        id : obj.notificationId,
+        title: obj.title,
+        body: obj.info,
+      }
+      localNotification(notificationDetails)
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
@@ -812,10 +849,10 @@ export default function Home(props) {
 
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
-      getAssociatedContact();
+      // getAssociatedContact();
       checkFastBitcoin();
     });
-    getAssociatedContact();
+    // getAssociatedContact();
     setCurrencyCodeFromAsync();
     updateAccountCardData();
     checkFastBitcoin();
@@ -823,7 +860,7 @@ export default function Home(props) {
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
     (moreTabBarBottomSheet as any).current.snapTo(0);
-    AppState.addEventListener('change', handleAppStateChange);
+    // AppState.addEventListener('change', handleAppStateChange);
 
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
@@ -845,11 +882,11 @@ export default function Home(props) {
 
   const checkFastBitcoin = async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    console.log('getFBTCAccount', getFBTCAccount);
     setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
   };
 
   const onAppStateChange = async (nextAppState) => {
+    handleAppStateChange(nextAppState)
     try {
       if (this.appState == nextAppState) return;
       this.appState = nextAppState;
@@ -913,8 +950,7 @@ export default function Home(props) {
       .setSound('default')
       .setData({
         title: 'We have not seen you in a while!',
-        body:
-          'Opening your app regularly ensures you get all the notifications and security updates',
+        body: 'Opening your app regularly ensures you get all the notifications and security updates',
       })
       .android.setChannelId('reminder')
       .android.setPriority(firebase.notifications.Android.Priority.High);
@@ -922,6 +958,7 @@ export default function Home(props) {
     // Schedule the notification for 2hours on development and 2 weeks on Production in the future
     const date = new Date();
     date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
+    // date.setSeconds(date.getSeconds() + Number(Config.NOTIFICATION_HOUR));
 
     // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
     await firebase
@@ -939,6 +976,37 @@ export default function Home(props) {
       .getScheduledNotifications()
       .then((notifications) => {
         //console.log('logging notifications', notifications);
+      });
+  };
+
+  const localNotification = async (notificationDetails) => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle(notificationDetails.title)
+      .setBody(notificationDetails.body)
+      .setNotificationId(notificationDetails.id)
+      .setSound('default')
+      .setData({
+        title: notificationDetails.title,
+        body: notificationDetails.body,
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setSeconds(date.getSeconds() + 1);
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+      })
+      .then(() => {})
+      .catch(
+        (err) => {},
+      );
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
       });
   };
 
@@ -1004,21 +1072,16 @@ export default function Home(props) {
     }
   };
   const setCurrencyCodeFromAsync = async () => {
+    ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      const identifiers = ['io.hexawallet.hexa'];
-      NativeModules.InAppUtils.loadProducts(
-        identifiers,
-        async (error, products) => {
-          await AsyncStorage.setItem(
-            'currencyCode',
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-          setCurrencyCode(
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-        },
-      );
+      await AsyncStorage.setItem(
+              'currencyCode',
+              RNLocalize.getCurrencies()[0],
+            );
+            setCurrencyCode(
+              RNLocalize.getCurrencies()[0],
+            );
     } else {
       setCurrencyCode(currencyCodeTmp);
     }
@@ -1081,29 +1144,33 @@ export default function Home(props) {
     dispatch(ErrorSending(null));
   }
 
-  if (isUploadSuccessfully) {
-    setTimeout(() => {
-      setErrorMessageHeader('Sending successful');
-      setErrorMessage(
-        'The Recovery Key has been sent, the receiver needs to accept ',
-      );
-      setButtonText('Done');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(UploadSuccessfully(null));
-  }
+  useEffect(() => {
+    if (isUploadSuccessfully) {
+      setTimeout(() => {
+        setErrorMessageHeader('Sending successful');
+        setErrorMessage(
+          'The Recovery Secret has been sent, the receiver needs to accept ',
+        );
+        setButtonText('Done');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(UploadSuccessfully(null));
+    }
+  }, [isUploadSuccessfully]);
 
-  if (isErrorReceivingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Key');
-      setErrorMessage(
-        'There was an error while receiving your Recovery Key, please try again',
-      );
-      setButtonText('Try again');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorReceiving(null));
-  }
+  useEffect(() => {
+    if (isErrorReceivingFailed) {
+      setTimeout(() => {
+        setErrorMessageHeader('Error sending Recovery Secret');
+        setErrorMessage(
+          'There was an error while sending your Recovery Secret, please try again in a little while',
+        );
+        setButtonText('Try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(ErrorSending(null));
+    }
+  }, [isErrorReceivingFailed]);
 
   const updateAccountCardData = () => {
     let newArrayFinal = [];
@@ -1158,67 +1225,158 @@ export default function Home(props) {
         Toast('Recovery Key received successfully');
         setSecondaryDeviceAddresses();
       }
-      getAssociatedContact();
+      // getAssociatedContact();
     }
   }, [SecondaryDeviceStatus]);
 
   const getQrCodeData = (qrData) => {
-    const scannedData = JSON.parse(qrData);
-    switch (scannedData.type) {
-      case 'trustedGuardian':
-        const trustedGruardianRequest = {
-          isGuardian: scannedData.isGuardian,
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          uploadedAt: scannedData.uploadedAt,
-          type: scannedData.type,
-          isQR: true,
-          v: scannedData.v || ""
-        };
-        setLoading(false);
-        setSecondaryDeviceOtp(trustedGruardianRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: trustedGruardianRequest,
-          recoveryRequest: null,
-        });
-        break;
+    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
+    const { type } = regularService.addressDiff(qrData);
+    if (type) {
+      const serviceType = REGULAR_ACCOUNT; // default service type
+      let item;
+      switch (type) {
+        case 'address':
+          const recipientAddress = qrData;
+          item = {
+            id: recipientAddress,
+          };
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
 
-      case 'secondaryDeviceGuardian':
-        const secondaryDeviceGuardianRequest = {
-          isGuardian: scannedData.isGuardian,
-          requester: scannedData.requester,
-          publicKey: scannedData.publicKey,
-          uploadedAt: scannedData.uploadedAt,
-          type: scannedData.type,
-          isQR: true,
-          v: scannedData.v || ""
-        };
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+          });
+          break;
 
-        setLoading(false);
-        setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
-        props.navigation.navigate('Home', {
-          trustedContactRequest: secondaryDeviceGuardianRequest,
-          recoveryRequest: null,
-        });
-        break;
+        case 'paymentURI':
+          const { address, options } = regularService.decodePaymentURI(qrData);
+          item = {
+            id: address,
+          };
 
-      case 'recoveryQR':
-        const recoveryRequest = {
-          isRecovery: true,
-          requester: scannedData.requester,
-          publicKey: scannedData.KEY,
-          isQR: true,
-          v: scannedData.v || ""
-        };
-        setLoading(false);
-        props.navigation.navigate('Home', {
-          recoveryRequest,
-          trustedContactRequest: null,
-        });
-        break;
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
 
-      default:
-        break;
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+            bitcoinAmount: options.amount ? `${options.amount}` : '',
+          });
+          break;
+
+        default:
+          Alert.alert('Invalid QR');
+          break;
+      }
+
+      return;
+    }
+
+    try {
+      const scannedData = JSON.parse(qrData);
+      switch (scannedData.type) {
+        case 'trustedGuardian':
+          const trustedGruardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(trustedGruardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: trustedGruardianRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'secondaryDeviceGuardian':
+          const secondaryDeviceGuardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+
+          setLoading(false);
+          setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: secondaryDeviceGuardianRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'trustedContactQR':
+          const tcRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: tcRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'paymentTrustedContactQR':
+          const paymentTCRequest = {
+            isPaymentRequest: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: paymentTCRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'recoveryQR':
+          const recoveryRequest = {
+            isRecovery: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.KEY,
+            isQR: true,
+          };
+          setLoading(false);
+          props.navigation.navigate('Home', {
+            recoveryRequest,
+            trustedContactRequest: null,
+          });
+          break;
+
+        case 'ReverseRecoveryQR':
+          Alert.alert(
+            'Restoration QR Identified',
+            'Restoration QR only works during restoration mode',
+          );
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Alert.alert('Invalid QR');
     }
   };
 
@@ -1248,9 +1406,7 @@ export default function Home(props) {
 
   const renderTransactionDetailsHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (TransactionDetailsBottomSheet.current)
             (TransactionDetailsBottomSheet as any).current.snapTo(0);
@@ -1265,15 +1421,16 @@ export default function Home(props) {
         onPressElements={(type) => {
           if (type == 'buyBitcoins') {
             setTimeout(() => {
-              setAddSubBottomSheetsFlag(true);
-              setTabBarZIndex(0);
+              // setAddSubBottomSheetsFlag(true);
+              // setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
-            (AddBottomSheet as any).current.snapTo(1);
+            props.navigation.navigate('VoucherScanner');
+            //(AddBottomSheet as any).current.snapTo(1);
           } else if (type == 'addContact') {
             setTimeout(() => {
-              setAddSubBottomSheetsFlag(true);
-              setAddBottomSheetsFlag(true);
+              //setAddSubBottomSheetsFlag(true);
+              // setAddBottomSheetsFlag(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
@@ -1321,7 +1478,7 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'Scan QR'}</Text>
       </TouchableOpacity>
     );
   }
@@ -1330,6 +1487,7 @@ export default function Home(props) {
     return (
       <MoreHomePageTabContents
         onPressElements={(item) => onPressElement(item)}
+        isExistingSavingMethod={isEmpty(FBTCAccount)}
       />
     );
   }
@@ -1562,7 +1720,7 @@ export default function Home(props) {
     if (item.title == 'Backup Health') {
       props.navigation.navigate('ManageBackup');
     }
-    if (item.title == 'Address Book') {
+    if (item.title == 'Friends and Family') {
       props.navigation.navigate('AddressBookContents');
     } else if (item.title == 'Wallet Settings') {
       (settingsBottomSheet as any).current.snapTo(1);
@@ -1570,6 +1728,15 @@ export default function Home(props) {
         setTabBarZIndex(0);
       }, 10);
     }
+    else if (item.title == 'Services') {
+      props.navigation.navigate('ExistingSavingMethods');
+    }
+    // else if (item.title == 'All accounts and funds') {
+    //   (AllAccountsBottomSheet as any).current.snapTo(1);
+    //   setTimeout(() => {
+    //     setTabBarZIndex(0);
+    //   }, 10);
+    // }
   };
 
   const managePinSuccessProceed = (pin) => {
@@ -1612,9 +1779,7 @@ export default function Home(props) {
 
   const renderSettingsHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1640,9 +1805,7 @@ export default function Home(props) {
 
   const renderAllAccountsHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1653,20 +1816,20 @@ export default function Home(props) {
     );
   };
 
-  const getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setSelectedContacts(SelectedContacts);
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
-    setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
-    setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  };
+  // const getAssociatedContact = async () => {
+  //   let SelectedContacts = JSON.parse(
+  //     await AsyncStorage.getItem('SelectedContacts'),
+  //   );
+  //   setSelectedContacts(SelectedContacts);
+  //   let AssociatedContact = JSON.parse(
+  //     await AsyncStorage.getItem('AssociatedContacts'),
+  //   );
+  //   setAssociatedContact(AssociatedContact);
+  //   let SecondaryDeviceAddress = JSON.parse(
+  //     await AsyncStorage.getItem('secondaryDeviceAddress'),
+  //   );
+  //   setSecondaryDeviceAddress(SecondaryDeviceAddress);
+  // };
 
 
 
@@ -1686,8 +1849,6 @@ export default function Home(props) {
   const onPressSaveBitcoinElements = (type) => {
     if (type == 'voucher') {
       props.navigation.navigate('VoucherScanner');
-    } else if (type == 'existingBuyingMethods') {
-      props.navigation.navigate('ExistingSavingMethods');
     }
   };
 
@@ -1699,7 +1860,6 @@ export default function Home(props) {
             (AddBottomSheet as any).current.snapTo(0);
           }}
           onPressElements={(type) => onPressSaveBitcoinElements(type)}
-          isExistingSavingMethod={isEmpty(FBTCAccount)}
         />
       );
     }
@@ -1707,15 +1867,15 @@ export default function Home(props) {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
-            setTimeout(() => {
-              setFamilyAndFriendsBookBottomSheetsFlag(true);
-            }, 2);
+            // setTimeout(() => {
+            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
+            // }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
-            setTimeout(() => {
-              setFamilyAndFriendsBookBottomSheetsFlag(true);
-            }, 2);
+            // setTimeout(() => {
+            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
+            // }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
@@ -1786,9 +1946,7 @@ export default function Home(props) {
 
   const renderFastBitcoinSellCalculationHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
         }}
@@ -1798,9 +1956,7 @@ export default function Home(props) {
 
   const renderFastBitcoinRedeemCalculationHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
         }}
@@ -1828,9 +1984,7 @@ export default function Home(props) {
 
   const renderContactSelectedFromAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
         }}
@@ -1857,9 +2011,7 @@ export default function Home(props) {
 
   const renderContactSelectedFromAddressBookQrCodeHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
             0,
@@ -1872,13 +2024,14 @@ export default function Home(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
+        modalTitle={'Add contact to Friends and Family'}
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={() => {
+        onPressContinue={(selectedContacts) => {
+          setSelectedContact(selectedContacts);
           props.navigation.navigate('AddContactSendRequest', {
-            SelectedContact: SelectedContact,
+            SelectedContact: selectedContacts,
           });
-          // props.navigation.navigate('SendRequest');
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onSelectContact={(selectedContact) => {
@@ -1896,9 +2049,7 @@ export default function Home(props) {
 
   const renderAddContactAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
@@ -1913,24 +2064,15 @@ export default function Home(props) {
   let isContactOpen = false;
   let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {
-    AsyncStorage.getItem('isContactOpen', (err, value) => {
-      if (err) console.log(err);
-      else {
-        isContactOpen = JSON.parse(value);
-      }
-    });
-    AsyncStorage.getItem('isCameraOpen', (err, value) => {
-      if (err) console.log(err);
-      else {
-        isCameraOpen = JSON.parse(value);
-      }
-    });
-    if (isCameraOpen) {
-      await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
-      return;
-    }
-    if (isContactOpen) {
-      await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
+    AsyncStorage.multiGet(["isContactOpen", "isCameraOpen"]).then(response => {
+      isContactOpen = JSON.parse(response[0][1]);
+      isCameraOpen = JSON.parse(response[1][1]);
+    })
+    let keyArray = [['isCameraOpen', JSON.stringify(true)], ['isContactOpen', JSON.stringify(true)]]
+    if(isCameraOpen) keyArray[0][1] = JSON.stringify(false);
+    if(isContactOpen) keyArray[1][1] = JSON.stringify(false);
+    if(isContactOpen || isContactOpen){
+      AsyncStorage.multiSet(keyArray, ()=>{});
       return;
     }
     var blockApp = setTimeout(() => {
@@ -1941,7 +2083,7 @@ export default function Home(props) {
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
-        : nextAppState == 'background'
+        : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
       clearTimeout(blockApp);
       isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
@@ -1969,7 +2111,11 @@ export default function Home(props) {
           trustedContactRequest: null,
         });
       }
-    } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
+    } else if (
+      splits[4] === 'tc' ||
+      splits[4] === 'tcg' ||
+      splits[4] === 'ptc'
+    ) {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
@@ -1980,6 +2126,7 @@ export default function Home(props) {
       } else {
         const trustedContactRequest = {
           isGuardian: splits[4] === 'tcg' ? true : false,
+          isPaymentRequest: splits[4] === 'ptc' ? true : false,
           requester: splits[5],
           encryptedKey: splits[6],
           hintType: splits[7],
@@ -2003,6 +2150,11 @@ export default function Home(props) {
         recoveryRequest,
         trustedContactRequest: null,
       });
+    } else if (splits[4] === 'rrk') {
+      Alert.alert(
+        'Restoration link Identified',
+        'Restoration links only works during restoration mode',
+      );
     }
 
     if (event.url.includes('fastbitcoins')) {
@@ -2270,6 +2422,141 @@ export default function Home(props) {
     );
   }, [NotificationData, NotificationDataChange]);
 
+  useEffect(() => {
+    if (paymentDetails) {
+      const serviceType = REGULAR_ACCOUNT;
+      let { address, paymentURI } = paymentDetails;
+      let options: any = {};
+      if (paymentURI) {
+        const details = accounts[serviceType].service.decodePaymentURI(
+          paymentURI,
+        );
+        address = details.address;
+        options = details.options;
+      }
+
+      const item = {
+        id: address,
+      };
+      dispatch(
+        addTransferDetails(serviceType, {
+          selectedContact: item,
+        }),
+      );
+
+      dispatch(clearPaymentDetails());
+
+      props.navigation.navigate('SendToContact', {
+        selectedContact: item,
+        serviceType,
+        netBalance: balances.regularBalance,
+        bitcoinAmount: options.amount ? `${options.amount}` : '',
+      });
+    }
+  }, [paymentDetails]);
+
+  const processDLRequest = useCallback(
+    (key, rejected?) => {
+      let {
+        requester,
+        isGuardian,
+        encryptedKey,
+        publicKey,
+        isQR,
+        uploadedAt,
+        isRecovery,
+      } = trustedContactRequest || recoveryRequest;
+
+      if (!isRecovery) {
+        if (uploadedAt && Date.now() - uploadedAt > 600000) {
+          Alert.alert(
+            `${isQR ? 'QR' : 'Link'} expired!`,
+            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
+          );
+          setLoading(false);
+        } else {
+          if (isGuardian && UNDER_CUSTODY[requester]) {
+            Alert.alert(
+              'Failed to store',
+              'You cannot custody multiple shares of the same user.',
+            );
+            setLoading(false);
+          } else {
+            if (!publicKey) {
+              try {
+                publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                  .decryptedPub;
+              } catch (err) {
+                //console.log({ err });
+                Alert.alert(
+                  'Invalid Number/Email',
+                  'Decryption failed due to invalid input, try again.',
+                );
+              }
+            }
+            if (publicKey && !rejected) {
+              props.navigation.navigate('ContactsListForAssociateContact', {
+                postAssociation: (contact) => {
+                  const contactName = `${contact.firstName} ${
+                    contact.lastName ? contact.lastName : ''
+                  }`.toLowerCase();
+                  if (isGuardian) {
+                    dispatch(
+                      approveTrustedContact(
+                        contactName,
+                        publicKey,
+                        true,
+                        requester,
+                      ),
+                    );
+                  } else {
+                    dispatch(
+                      approveTrustedContact(contactName, publicKey, true),
+                    );
+                  }
+                  setAssociatedContactName(contactName);
+                },
+                isGuardian,
+              });
+            } else if (publicKey && rejected) {
+              // don't assoicate; only fetch the payment details from EC
+              dispatch(fetchEphemeralChannel(null, null, publicKey));
+            }
+          }
+        }
+      } else {
+        if (!UNDER_CUSTODY[requester]) {
+          Alert.alert(
+            'Failed to send!',
+            'You do not host any secret for this user.',
+          );
+          setLoading(false);
+        } else {
+          if (!publicKey) {
+            try {
+              publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                .decryptedPub;
+            } catch (err) {
+              console.log({ err });
+              Alert.alert(
+                'Invalid Number/Email',
+                'Decryption failed due to invalid input, try again.',
+              );
+            }
+          }
+          if (publicKey) {
+            dispatch(
+              uploadRequestedShare(recoveryRequest.requester, publicKey),
+            );
+          }
+        }
+      }
+
+      TrustedContactRequestBottomSheet.current.snapTo(0);
+    },
+    [trustedContactRequest, recoveryRequest],
+  );
+
   const renderTrustedContactRequestContent = useCallback(() => {
     if (!trustedContactRequest && !recoveryRequest) return;
     console.log({ trustedContactRequest, recoveryRequest });
@@ -2279,11 +2566,9 @@ export default function Home(props) {
       hintType,
       hint,
       isGuardian,
-      encryptedKey,
-      publicKey,
       isQR,
-      uploadedAt,
       isRecovery,
+      isPaymentRequest,
     } = trustedContactRequest || recoveryRequest;
 
     return (
@@ -2294,6 +2579,7 @@ export default function Home(props) {
         }
         isGuardian={isGuardian}
         isRecovery={isRecovery}
+        isPayment={isPaymentRequest}
         hint={hint}
         bottomSheetRef={TrustedContactRequestBottomSheet}
         trustedContactName={requester}
@@ -2302,95 +2588,15 @@ export default function Home(props) {
             setTabBarZIndex(999);
             setDeepLinkModalOpen(false);
           }, 2);
-          if (!isRecovery) {
-            if (Date.now() - uploadedAt > 600000) {
-              Alert.alert(
-                `${isQR ? 'QR' : 'Link'} expired!`,
-                `Please ask the sender to initiate a new ${
-                isQR ? 'QR' : 'Link'
-                }`,
-              );
-              setLoading(false);
-            } else {
-              if (isGuardian && UNDER_CUSTODY[requester]) {
-                Alert.alert(
-                  'Failed to store',
-                  'You cannot custody multiple shares of the same user.',
-                );
-                setLoading(false);
-              } else {
-                if (!publicKey) {
-                  try {
-                    publicKey = TrustedContactsService.decryptPub(
-                      encryptedKey,
-                      key,
-                    ).decryptedPub;
-                  } catch (err) {
-                    //console.log({ err });
-                    Alert.alert('Decryption Failed', err.message);
-                  }
-                }
-                if (publicKey) {
-                  props.navigation.navigate('ContactsListForAssociateContact', {
-                    postAssociation: (contact) => {
-                      const contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                        }`.toLowerCase();
-                      if (isGuardian) {
-                        dispatch(
-                          approveTrustedContact(
-                            contactName,
-                            publicKey,
-                            true,
-                            requester,
-                          ),
-                        );
-                      } else {
-                        dispatch(
-                          approveTrustedContact(contactName, publicKey, true),
-                        );
-                      }
-                    },
-                    isGuardian,
-                  });
-                }
-              }
-            }
-          } else {
-            if (!UNDER_CUSTODY[requester]) {
-              Alert.alert(
-                'Failed to send!',
-                'You do not host any secret for this user.',
-              );
-              setLoading(false);
-            } else {
-              if (!publicKey) {
-                try {
-                  publicKey = TrustedContactsService.decryptPub(
-                    encryptedKey,
-                    key,
-                  ).decryptedPub;
-                } catch (err) {
-                  console.log({ err });
-                  Alert.alert('Decryption Failed', err.message);
-                }
-              }
-              if (publicKey) {
-                dispatch(
-                  uploadRequestedShare(recoveryRequest.requester, publicKey),
-                );
-              }
-            }
-          }
-
-          TrustedContactRequestBottomSheet.current.snapTo(0);
+          processDLRequest(key);
         }}
-        onPressReject={() => {
+        onPressReject={(key) => {
           setTimeout(() => {
             setTabBarZIndex(999);
             setDeepLinkModalOpen(false);
           }, 2);
           TrustedContactRequestBottomSheet.current.snapTo(0);
+          processDLRequest(key, true);
         }}
       />
     );
@@ -2896,7 +3102,7 @@ export default function Home(props) {
       <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
-          setFamilyAndFriendsBookBottomSheetsFlag(true);
+          // setFamilyAndFriendsBookBottomSheetsFlag(true);
         }}
         onOpenStart={() => {
           setTabBarZIndex(0);
@@ -2914,7 +3120,7 @@ export default function Home(props) {
         renderContent={renderAddContactAddressBookContents}
         renderHeader={renderAddContactAddressBookHeader}
       />
-      {familyAndFriendsBookBottomSheetsFlag ? (
+      {/* {familyAndFriendsBookBottomSheetsFlag ? (
         <BottomSheet
           onOpenEnd={() => { }}
           enabledInnerScrolling={true}
@@ -2943,7 +3149,7 @@ export default function Home(props) {
           renderContent={renderContactSelectedFromAddressBookQrCodeContents}
           renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
         />
-      ) : null}
+      ) : null} */}
 
       <BottomSheet
         onOpenEnd={() => {

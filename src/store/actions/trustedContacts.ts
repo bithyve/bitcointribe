@@ -12,7 +12,7 @@ export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
-export const TRUSTED_CHANNEL_XPUBS_UPLOAD = 'TRUSTED_CHANNEL_XPUBS_UPLOAD';
+export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
 
 export const initializeTrustedContact = (contactName: string) => {
   return {
@@ -43,17 +43,22 @@ export const updateEphemeralChannel = (
   data: EphemeralData,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
+  uploadXpub?: Boolean,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch, trustedContacts },
+    payload: { contactName, data, fetch, trustedContacts, uploadXpub },
   };
 };
 
-export const fetchEphemeralChannel = (contactName: string) => {
+export const fetchEphemeralChannel = (
+  contactName?: string,
+  approveTC?: Boolean,
+  publicKey?: string,
+) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payload: { contactName },
+    payload: { contactName, approveTC, publicKey },
   };
 };
 
@@ -75,9 +80,9 @@ export const fetchTrustedChannel = (contactName: string) => {
   };
 };
 
-export const trustedChannelXpubUpload = () => {
+export const trustedChannelsSync = () => {
   return {
-    type: TRUSTED_CHANNEL_XPUBS_UPLOAD,
+    type: TRUSTED_CHANNELS_SYNC,
   };
 };
 
@@ -88,6 +93,8 @@ export const EPHEMERAL_CHANNEL_UPDATED = 'EPHEMERAL_CHANNEL_UPDATED';
 export const EPHEMERAL_CHANNEL_FETCHED = 'EPHEMERAL_CHANNEL_FETCHED';
 export const TRUSTED_CHANNEL_UPDATED = 'TRUSTED_CHANNEL_UPDATED';
 export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED';
+export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED';
+export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS';
 
 export const trustedContactInitialized = (
   contactName: string,
@@ -142,5 +149,18 @@ export const trustedChannelFetched = (contactName: string, data: any) => {
   return {
     type: TRUSTED_CHANNEL_FETCHED,
     payload: { contactName, data },
+  };
+};
+
+export const paymentDetailsFetched = (paymentDetails) => {
+  return {
+    type: PAYMENT_DETAILS_FETCHED,
+    payload: { paymentDetails },
+  };
+};
+
+export const clearPaymentDetails = () => {
+  return {
+    type: CLEAR_PAYMENT_DETAILS,
   };
 };

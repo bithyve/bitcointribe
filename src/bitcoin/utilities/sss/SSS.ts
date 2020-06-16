@@ -568,7 +568,9 @@ export default class SSS {
     }
 
     let res: AxiosResponse;
-    this.metaShares[shareIndex].meta.guardian = contactName.toLowerCase();
+    this.metaShares[
+      shareIndex
+    ].meta.guardian = contactName.toLowerCase().trim();
     const metaShare: MetaShare = this.metaShares[shareIndex];
     const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
       metaShare,

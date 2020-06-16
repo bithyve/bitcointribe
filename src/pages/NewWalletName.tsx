@@ -58,12 +58,12 @@ export default function NewWalletName(props) {
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
               secondLineTitle={''}
-              infoTextNormal={'Please enter a name. Your contacts will use this to identify your wallet'}
+              infoTextNormal={'Please enter a display name. Your contacts will use this to identify your wallet'}
               // infoTextBold={'wallet'}
             />
             <TextInput
               style={inputStyle}
-              placeholder={'Enter wallet name'}
+              placeholder={'Enter display name'}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
               keyboardType={
@@ -79,6 +79,11 @@ export default function NewWalletName(props) {
               }}
               onBlur={() => {
                 setInputStyle(styles.inputBox);
+              }}
+              onSubmitEditing={() => {
+                props.navigation.navigate('NewWalletQuestion', {
+                  walletName,
+                });
               }}
             />
           </ScrollView>

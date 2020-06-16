@@ -9,12 +9,12 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   SafeAreaView,
   StatusBar,
   AsyncStorage,
   ImageBackground,
   FlatList,
+  Alert,
 } from 'react-native';
 import CardView from 'react-native-cardview';
 import Colors from '../../common/Colors';
@@ -50,6 +50,7 @@ import {
   clearTransfer,
 } from '../../store/actions/accounts';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import SendHelpContents from '../../components/Helper/SendHelpContents';
 
 export default function Send(props) {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ export default function Send(props) {
       ? props.navigation.getParam('serviceType')
       : REGULAR_ACCOUNT,
   );
+  const sweepSecure = props.navigation.getParam('sweepSecure');
   let netBalance = props.navigation.getParam('netBalance');
 
   const service = useSelector((state) => state.accounts[serviceType].service);
@@ -73,7 +75,7 @@ export default function Send(props) {
     : null;
   const [recipientAddress, setRecipientAddress] = useState('');
   const [isSendHelperDone, setIsSendHelperDone] = useState(true);
-  const [isInvalidAddress, setIsInvalidAddress] = useState(true);
+  const [isInvalidAddress, setIsInvalidAddress] = useState(false);
   const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
@@ -200,7 +202,8 @@ export default function Send(props) {
             trustedContactToDA,
             derivativeAccounts,
           } = regularAccount.hdWallet;
-          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          const accountNumber =
+            trustedContactToDA[contactName.toLowerCase().trim()];
           if (accountNumber) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
@@ -213,8 +216,9 @@ export default function Send(props) {
           }
 
           const isWard =
-            trustedContactsService.tc.trustedContacts[contactName.toLowerCase()]
-              .isWard;
+            trustedContactsService.tc.trustedContacts[
+              contactName.toLowerCase().trim()
+            ].isWard;
 
           const isGuardian = index < 3 ? true : false;
           if (hasXpub) {
@@ -236,13 +240,13 @@ export default function Send(props) {
         ) {
           if (contactA.contactName && contactB.contactName) {
             if (
-              contactA.contactName.toLowerCase() <
-              contactB.contactName.toLowerCase()
+              contactA.contactName.toLowerCase().trim() <
+              contactB.contactName.toLowerCase().trim()
             )
               return -1;
             if (
-              contactA.contactName.toLowerCase() >
-              contactB.contactName.toLowerCase()
+              contactA.contactName.toLowerCase().trim() >
+              contactB.contactName.toLowerCase().trim()
             )
               return 1;
           }
@@ -277,16 +281,17 @@ export default function Send(props) {
 
   const renderSendHelperContents = () => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={`Sending Bitcoins`}
-        image={require('../../assets/images/icons/send.png')}
-        helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (SendHelperBottomSheet.current)
-            (SendHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Sending Bitcoins`}
+      //   image={require('../../assets/images/icons/send.png')}
+      //   helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (SendHelperBottomSheet.current)
+      //       (SendHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <SendHelpContents />
     );
   };
   const renderSendHelperHeader = () => {
@@ -323,22 +328,68 @@ export default function Send(props) {
 
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
-      let data = JSON.parse(barcodes.data)
-      setRecipientAddress(data.value);
-      const instance = service.hdWallet || service.secureHDWallet;
-      let isAddressValid = instance.isValidAddress(recipientAddress);
-      setIsInvalidAddress(isAddressValid);
-      setOpenCameraFlag(false);
+      const { type } = service.addressDiff(barcodes.data);
+      if (type) {
+        let item;
+        switch (type) {
+          case 'address':
+            const recipientAddress = barcodes.data;
+            item = {
+              id: recipientAddress,
+            };
+            dispatch(
+              addTransferDetails(serviceType, {
+                selectedContact: item,
+              }),
+            );
+
+            onSelectContact(item);
+            break;
+
+          case 'paymentURI':
+            const { address, options } = service.decodePaymentURI(
+              barcodes.data,
+            );
+            item = {
+              id: address,
+            };
+
+            dispatch(
+              addTransferDetails(serviceType, {
+                selectedContact: item,
+              }),
+            );
+
+            props.navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+              sweepSecure,
+              netBalance:
+                serviceType === TEST_ACCOUNT
+                  ? balances.testBalance
+                  : serviceType === REGULAR_ACCOUNT
+                    ? balances.regularBalance
+                    : balances.secureBalance,
+              bitcoinAmount: options.amount ? `${options.amount}` : '',
+            });
+            break;
+
+          default:
+            Alert.alert('Invalid QR');
+            break;
+        }
+
+        setOpenCameraFlag(false);
+      } else {
+        setIsInvalidAddress(true);
+      }
     }
   };
 
   const renderQRCodeThumbnail = () => {
     if (openCameraFlag) {
       return (
-        <View style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View style={styles.cameraView}>
             <RNCamera
               ref={(ref) => {
@@ -348,7 +399,7 @@ export default function Send(props) {
               onBarCodeRead={barcodeRecognized}
               captureAudio={false}
             >
-              <View style={{ flex: 1, }}>
+              <View style={{ flex: 1 }}>
                 <View style={styles.topCornerView}>
                   <View style={styles.topLeftCornerView} />
                   <View style={styles.topRightCornerView} />
@@ -365,10 +416,10 @@ export default function Send(props) {
     }
 
     return (
-      <TouchableOpacity style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-      }} onPress={() => setOpenCameraFlag(true)}>
+      <TouchableOpacity
+        style={{ justifyContent: 'center', alignItems: 'center' }}
+        onPress={() => setOpenCameraFlag(true)}
+      >
         <ImageBackground
           source={require('../../assets/images/icons/iPhone-QR.png')}
           style={{
@@ -446,7 +497,7 @@ export default function Send(props) {
     );
   };
 
-  const onSelectContact = (item) => {
+  const onSelectContact = (item, bitcoinAmount?) => {
     let isNavigate = true;
     console.log({ details: transfer.details });
     if (transfer.details && transfer.details.length === 0) {
@@ -462,7 +513,9 @@ export default function Send(props) {
         selectedContact: item,
         serviceType,
         averageTxFees,
+        sweepSecure,
         netBalance,
+        bitcoinAmount,
       });
     } else {
       transfer.details.length &&
@@ -482,7 +535,9 @@ export default function Send(props) {
           selectedContact: item,
           serviceType,
           averageTxFees,
+          sweepSecure,
           netBalance,
+          bitcoinAmount,
         });
       }
     }
@@ -664,110 +719,123 @@ export default function Send(props) {
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
+          behavior={Platform.OS === 'ios' ? 'padding' : ''}
           enabled
         >
           <ScrollView nestedScrollEnabled={true}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                if (SendHelperBottomSheet.current)
-                  SendHelperBottomSheet.current.snapTo(0);
-              }}
-            >
-              <View onStartShouldSetResponder={() => true}>
-                <View style={styles.modalHeaderTitleView}>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (getServiceType) {
-                          getServiceType(serviceType);
-                        }
-                        dispatch(clearTransfer(serviceType));
-                        props.navigation.goBack();
-                      }}
-                      style={{
-                        height: 30,
-                        width: 30,
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <FontAwesome
-                        name="long-arrow-left"
-                        color={Colors.blue}
-                        size={17}
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
-                    {serviceType == TEST_ACCOUNT ? (
-                      <Text
-                        onPress={() => {
-                          AsyncStorage.setItem('isSendHelperDone', 'true');
-                          if (SendHelperBottomSheet.current)
-                            SendHelperBottomSheet.current.snapTo(1);
-                        }}
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue(12),
-                          marginLeft: 'auto',
-                        }}
-                      >
-                        Know more
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-                {renderQRCodeThumbnail()}
+            <View onStartShouldSetResponder={() => true}>
+              <View style={styles.modalHeaderTitleView}>
                 <View
                   style={{
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: wp('5%'),
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
                   }}
                 >
-                  <View style={styles.textBoxView}>
-                    <TextInput
-                      editable={isEditable}
-                      style={styles.textBox}
-                      placeholder={'Enter Address Manually'}
-                      keyboardType={
-                        Platform.OS == 'ios'
-                          ? 'ascii-capable'
-                          : 'visible-password'
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (getServiceType) {
+                        getServiceType(serviceType);
                       }
-                      value={recipientAddress}
-                      onChangeText={setRecipientAddress}
-                      placeholderTextColor={Colors.borderColor}
-                      onKeyPress={(e) => {
-                        if (e.nativeEvent.key === 'Backspace') {
-                          setTimeout(() => {
-                            setIsInvalidAddress(true);
-                          }, 10);
-                        }
-                      }}
-                      onBlur={() => {
-                        const instance =
-                          service.hdWallet || service.secureHDWallet;
-                        let isAddressValid = instance.isValidAddress(
-                          recipientAddress,
-                        );
-                        setIsInvalidAddress(isAddressValid);
-                      }}
+                      dispatch(clearTransfer(serviceType));
+                      props.navigation.goBack();
+                    }}
+                    style={{
+                      height: 30,
+                      width: 30,
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <FontAwesome
+                      name="long-arrow-left"
+                      color={Colors.blue}
+                      size={17}
                     />
-                  </View>
-                  {!isInvalidAddress ? (
-                    <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>
-                        Enter correct address
-                      </Text>
-                    </View>
+                  </TouchableOpacity>
+                  <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+                  {serviceType == TEST_ACCOUNT ? (
+                    <Text
+                      onPress={() => {
+                        AsyncStorage.setItem('isSendHelperDone', 'true');
+                        if (SendHelperBottomSheet.current)
+                          SendHelperBottomSheet.current.snapTo(1);
+                      }}
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(12),
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      Know more
+                    </Text>
                   ) : null}
-                  {serviceType != TEST_ACCOUNT ? <View style={{ paddingTop: wp('3%') }}>
+                </View>
+              </View>
+              {renderQRCodeThumbnail()}
+              <View
+                style={{
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: wp('5%'),
+                }}
+              >
+                <View style={styles.textBoxView}>
+                  <TextInput
+                    editable={isEditable}
+                    style={styles.textBox}
+                    placeholder={'Enter Address Manually'}
+                    keyboardType={
+                      Platform.OS == 'ios'
+                        ? 'ascii-capable'
+                        : 'visible-password'
+                    }
+                    value={recipientAddress}
+                    onChangeText={setRecipientAddress}
+                    placeholderTextColor={Colors.borderColor}
+                    onKeyPress={(e) => {
+                      if (e.nativeEvent.key === 'Backspace') {
+                        setTimeout(() => {
+                          setIsInvalidAddress(false);
+                        }, 10);
+                      }
+                    }}
+                    onBlur={() => {
+                      const instance =
+                        service.hdWallet || service.secureHDWallet;
+                      let isAddressValid = instance.isValidAddress(
+                        recipientAddress,
+                      );
+                      setIsInvalidAddress(!isAddressValid);
+                    }}
+                  />
+                </View>
+                {serviceType == TEST_ACCOUNT ? (
+                  <Text
+                    onPress={() => {
+                      setRecipientAddress(
+                        '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
+                      );
+                    }}
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(10),
+                      marginLeft: 'auto',
+                      fontFamily: Fonts.FiraSansItalic,
+                      marginTop: 10,
+                    }}
+                  >
+                    Send it to a sample address
+                  </Text>
+                ) : null}
+                {isInvalidAddress ? (
+                  <View style={{ marginLeft: 'auto' }}>
+                    <Text style={styles.errorText}>
+                      Enter correct address
+                      </Text>
+                  </View>
+                ) : null}
+                {serviceType != TEST_ACCOUNT ? (
+                  <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -778,7 +846,7 @@ export default function Send(props) {
                         }}
                       >
                         Send to Contact
-                      </Text>
+                        </Text>
                       <TouchableOpacity
                         onPress={() => { }}
                         style={{
@@ -844,14 +912,15 @@ export default function Send(props) {
                         </View>
                       </View>
                     ) : (
-                        <View style={{
-                          marginBottom: -25,
-                          padding: -20,
-                          marginLeft: -20,
-                          marginRight: -20,
-                        }}>
+                        <View
+                          style={{
+                            marginBottom: -25,
+                            padding: -20,
+                            marginLeft: -20,
+                            marginRight: -20,
+                          }}
+                        >
                           <BottomInfoBox
-                            titleColor={Colors.black1}
                             title={'You have not added any Trusted Contact'}
                             infoText={
                               'Add a Trusted Contact to send them sats without having to scan an address'
@@ -859,8 +928,10 @@ export default function Send(props) {
                           />
                         </View>
                       )}
-                  </View> : null}
-                  {serviceType != TEST_ACCOUNT ? <View style={{ paddingTop: wp('3%') }}>
+                  </View>
+                ) : null}
+                {serviceType != TEST_ACCOUNT ? (
+                  <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -871,7 +942,7 @@ export default function Send(props) {
                         }}
                       >
                         Send to Account
-                      </Text>
+                        </Text>
                       <TouchableOpacity
                         onPress={() => { }}
                         style={{
@@ -926,10 +997,10 @@ export default function Send(props) {
                       //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
-                  </View> : null}
-                </View>
+                  </View>
+                ) : null}
               </View>
-            </TouchableWithoutFeedback>
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
@@ -938,7 +1009,8 @@ export default function Send(props) {
         ref={SendHelperBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          hp('89%'),
+          // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderSendHelperContents}
         renderHeader={renderSendHelperHeader}

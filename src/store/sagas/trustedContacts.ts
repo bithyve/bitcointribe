@@ -13,11 +13,11 @@ import {
   trustedChannelFetched,
   FETCH_EPHEMERAL_CHANNEL,
   updateEphemeralChannel,
-  TRUSTED_CHANNEL_XPUBS_UPLOAD,
+  TRUSTED_CHANNELS_SYNC,
+  paymentDetailsFetched,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { insertIntoDB } from '../actions/storage';
 import {
   EphemeralData,
   DerivativeAccount,
@@ -32,6 +32,8 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
+import { insertDBWorker } from './storage';
+import { AsyncStorage } from 'react-native';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -49,7 +51,7 @@ function* initializedTrustedContactWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -76,12 +78,15 @@ function* approveTrustedContactWorker({ payload }) {
   if (res.status === 200) {
     yield put(trustedContactApproved(contactName, true));
     if (payload.updateEphemeralChannel) {
+      const uploadXpub = true;
+      const data = { publicKey: res.data.publicKey };
       yield put(
         updateEphemeralChannel(
           contactName,
-          { publicKey: res.data.publicKey },
+          data,
           true,
           trustedContacts,
+          uploadXpub,
         ),
       );
     } else {
@@ -90,7 +95,7 @@ function* approveTrustedContactWorker({ payload }) {
         ...SERVICES,
         TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
       };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
   } else {
     console.log(res.err);
@@ -107,6 +112,9 @@ function* updateEphemeralChannelWorker({ payload }) {
 
   if (!trustedContacts)
     trustedContacts = yield select((state) => state.trustedContacts.service);
+  const regularService: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
 
   const { contactName, data, fetch } = payload;
 
@@ -118,15 +126,57 @@ function* updateEphemeralChannelWorker({ payload }) {
   );
   console.log({ res });
   if (res.status === 200) {
-    yield put(ephemeralChannelUpdated(contactName, res.updated, res.data));
+    const ephData: EphemeralData = res.data.data;
+    if (ephData && ephData.paymentDetails) {
+      // using trusted details on TC approval
+      const { trusted } = ephData.paymentDetails;
+      yield put(paymentDetailsFetched({ ...trusted }));
+    }
 
-    console.log({ trustedContacts });
+    yield put(
+      ephemeralChannelUpdated(contactName, res.data.updated, res.data.data),
+    );
+
+    if (payload.uploadXpub) {
+      console.log('Uploading xpub for: ', contactName);
+      const res = yield call(
+        regularService.getDerivativeAccXpub,
+        TRUSTED_CONTACTS,
+        null,
+        contactName,
+      );
+
+      if (res.status === 200) {
+        const xpub = res.data;
+        const walletID = yield call(AsyncStorage.getItem, 'walletID');
+        const FCM = yield call(AsyncStorage.getItem, 'fcmToken');
+
+        const data: TrustedDataElements = {
+          xpub,
+          walletID,
+          FCM,
+        };
+        const updateRes = yield call(
+          trustedContacts.updateTrustedChannel,
+          contactName,
+          data,
+          true,
+        );
+        if (updateRes.status === 200)
+          console.log('Xpub updated to TC for: ', contactName);
+        else console.log('Xpub updation to TC failed for: ', contactName);
+      } else {
+        console.log('Derivative xpub generation failed for: ', contactName);
+      }
+    }
+
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
+      REGULAR_ACCOUNT: JSON.stringify(regularService),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
     const data: EphemeralData = res.data.data;
     if (data && data.shareTransferDetails) {
@@ -149,11 +199,25 @@ function* fetchEphemeralChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName } = payload;
-
-  const res = yield call(trustedContacts.fetchEphemeralChannel, contactName);
+  const { contactName, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
+  const res = yield call(
+    trustedContacts.fetchEphemeralChannel,
+    contactName,
+    approveTC,
+    publicKey,
+  );
   if (res.status === 200) {
     const data: EphemeralData = res.data.data;
+    if (publicKey) {
+      if (data && data.paymentDetails) {
+        // using alternate details on TC rejection
+        const { alternate } = data.paymentDetails;
+        yield put(paymentDetailsFetched({ ...alternate }));
+      }
+
+      return;
+    }
+
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       downloadMShare(encryptedKey, otp);
@@ -165,7 +229,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -197,7 +261,7 @@ function* updateTrustedChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -224,7 +288,7 @@ function* fetchTrustedChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     console.log(res.err);
   }
@@ -235,7 +299,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 );
 
-function* trustedChannelXpubsUploadWorker({ payload }) {
+export function* trustedChannelsSyncWorker() {
   // TODO: simplify and optimise the saga
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
@@ -258,17 +322,17 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
 
       if (res.status !== 200) {
         console.log(
-          `Failed to setup channel for trusted contact ${contactName}`,
+          `Failed to setup trusted channel with contact ${contactName}`,
         );
         continue;
       } else {
         // refresh the trustedChannel object
         trustedChannel =
-          trustedContacts.tc.trustedContacts[contactName].trustedChannel;
+          trustedContacts.tc.trustedContacts[contactName.trim()].trustedChannel;
       }
     }
 
-    if (trustedChannel.data) {
+    if (trustedChannel.data && trustedChannel.data.length) {
       if (trustedChannel.data.length !== 2) {
         // implies missing trusted data from the counter party
         const res = yield call(
@@ -279,11 +343,13 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
         if (res.status === 200) {
           console.log('Attempted a fetch from TC with: ', contactName);
           const { data } = res.data;
-          if (data) console.log('Received data from TC with: ', contactName);
+          if (data)
+            console.log('Received data from TC with: ', contactName, data);
 
           // update the xpub to the trusted contact derivative acc if contact's xpub is received
           trustedChannel =
-            trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+            trustedContacts.tc.trustedContacts[contactName.trim()]
+              .trustedChannel; // refresh trusted channel
           if (trustedChannel.data.length === 2) {
             const contactsData = trustedChannel.data[1].data;
             if (contactsData && contactsData.xpub) {
@@ -319,7 +385,9 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
             REGULAR_ACCOUNT: JSON.stringify(regularService),
             TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
           };
-          yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+          yield call(insertDBWorker, {
+            payload: { SERVICES: updatedSERVICES },
+          });
         }
       }
     } else {
@@ -346,14 +414,14 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
 
         if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactName);
-
-          if (updateRes.data) {
+          if (updateRes.data.data) {
             // received some data back from the channel; probably contact's xpub
             console.log('Received data from TC with: ', contactName);
 
             // update the xpub to the trusted contact derivative acc if contact's xpub is received
             const trustedChannel =
-              trustedContacts.tc.trustedContacts[contactName].trustedChannel; // refresh trusted channel
+              trustedContacts.tc.trustedContacts[contactName.trim()]
+                .trustedChannel; // refresh trusted channel
             if (trustedChannel.data.length === 2) {
               const contactsData = trustedChannel.data[1].data;
               if (contactsData && contactsData.xpub) {
@@ -390,7 +458,9 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
             REGULAR_ACCOUNT: JSON.stringify(regularService),
             TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
           };
-          yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+          yield call(insertDBWorker, {
+            payload: { SERVICES: updatedSERVICES },
+          });
         }
       } else {
         console.log(`Failed to generate xpub for ${contactName}`);
@@ -399,7 +469,7 @@ function* trustedChannelXpubsUploadWorker({ payload }) {
   }
 }
 
-export const trustedChannelXpubsUploadWatcher = createWatcher(
-  trustedChannelXpubsUploadWorker,
-  TRUSTED_CHANNEL_XPUBS_UPLOAD,
+export const trustedChannelsSyncWatcher = createWatcher(
+  trustedChannelsSyncWorker,
+  TRUSTED_CHANNELS_SYNC,
 );

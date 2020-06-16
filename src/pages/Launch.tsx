@@ -83,7 +83,11 @@ export default function Launch(props) {
                   const recoveryRequest = { requester, rk: splits[7] };
                   props.navigation.replace('Login', { recoveryRequest });
                 }
-              } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
+              } else if (
+                splits[4] === 'tc' ||
+                splits[4] === 'tcg' ||
+                splits[4] === 'ptc'
+              ) {
                 if (splits[3] !== config.APP_STAGE) {
                   Alert.alert(
                     'Invalid deeplink',
@@ -94,6 +98,7 @@ export default function Launch(props) {
                 } else {
                   const trustedContactRequest = {
                     isGuardian: splits[4] === 'tcg' ? true : false,
+                    isPaymentRequest: splits[4] === 'ptc' ? true : false,
                     requester: splits[5],
                     encryptedKey: splits[6],
                     hintType: splits[7],
@@ -111,6 +116,11 @@ export default function Launch(props) {
                   hint: splits[8],
                 };
                 props.navigation.replace('Login', { recoveryRequest });
+              } else if (splits[4] === 'rrk') {
+                Alert.alert(
+                  'Restoration link Identified',
+                  'Restoration links only works during restoration mode',
+                );
               } else {
                 const EmailToken = url.substr(url.lastIndexOf('/') + 1);
                 console.log('EmailToken', EmailToken);

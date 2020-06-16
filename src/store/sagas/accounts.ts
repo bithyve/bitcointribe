@@ -39,8 +39,8 @@ import {
   FETCH_DERIVATIVE_ACC_ADDRESS,
   SYNC_TRUSTED_DERIVATIVE_ACCOUNTS,
   syncTrustedDerivativeAccounts,
+  STARTUP_SYNC,
 } from '../actions/accounts';
-import { insertIntoDB } from '../actions/storage';
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -52,7 +52,8 @@ import { AsyncStorage, Alert } from 'react-native';
 import axios from 'axios';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { insertDBWorker } from './storage';
+import { trustedChannelsSyncWorker } from './trustedContacts';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -71,6 +72,12 @@ function* fetchAddrWorker({ payload }) {
     JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
   ) {
     yield put(addressFetched(payload.serviceType, postFetchAddress));
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [payload.serviceType]: JSON.stringify(service),
+    };
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -101,7 +108,7 @@ function* fetchDerivativeAccXpubWorker({ payload }) {
       ...SERVICES,
       [serivceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to generate derivative acc xpub');
@@ -140,7 +147,7 @@ function* fetchDerivativeAccAddressWorker({ payload }) {
       ...SERVICES,
       [serviceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to generate derivative acc address');
@@ -188,7 +195,7 @@ function* fetchBalanceWorker({ payload }) {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   }
 
   if (payload.options.loader) {
@@ -227,7 +234,7 @@ function* fetchTransactionsWorker({ payload }) {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     yield put(switchLoader(payload.serviceType, 'transactions'));
   }
@@ -275,12 +282,15 @@ function* fetchBalanceTxWorker({ payload }) {
         ...SERVICES,
         [payload.serviceType]: JSON.stringify(service),
       };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
 
-    if (payload.options.syncTrustedDerivative) {
+    if (
+      payload.options.syncTrustedDerivative &&
+      payload.serviceType === REGULAR_ACCOUNT
+    ) {
       try {
-        yield put(syncTrustedDerivativeAccounts());
+        yield put(syncTrustedDerivativeAccounts(service));
       } catch (err) {
         console.log({ err });
       }
@@ -344,7 +354,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
       ...SERVICES,
       [serviceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to fetch balance/transactions from the indexer');
@@ -356,12 +366,12 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
 );
 
-function* syncTrustedDerivativeAccountsWorker() {
+function* syncTrustedDerivativeAccountsWorker({ payload }) {
   yield put(switchLoader(REGULAR_ACCOUNT, 'derivativeBalanceTx'));
 
-  const regularAccount: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
+  const regularAccount: RegularAccount = payload.service
+    ? payload.service
+    : yield select((state) => state.accounts[REGULAR_ACCOUNT].service);
 
   const preFetchTrustedDerivativeAccounts = JSON.stringify(
     regularAccount.hdWallet.derivativeAccounts[TRUSTED_CONTACTS],
@@ -385,7 +395,7 @@ function* syncTrustedDerivativeAccountsWorker() {
         ...SERVICES,
         [REGULAR_ACCOUNT]: JSON.stringify(regularAccount),
       };
-      yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
@@ -409,9 +419,6 @@ function* processRecipients(
   );
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
-  );
-  const trustedContacts: TrustedContactsService = yield select(
-    (state) => state.trustedContacts.service,
   );
 
   for (const recipient of recipients) {
@@ -547,7 +554,7 @@ function* generateSecondaryXprivWorker({ payload }) {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     yield put(secondaryXprivGenerated(true));
   } else {
     yield put(secondaryXprivGenerated(false));
@@ -580,7 +587,6 @@ function* alternateTransferST2Worker({ payload }) {
     txnPriority,
     nSequence,
   );
-  console.log({ res });
   if (res.status === 200) {
     yield put(alternateTransferST2Executed(serviceType, res.data.txid));
   } else {
@@ -645,7 +651,7 @@ function* testcoinsWorker({ payload }) {
       ...SERVICES,
       [payload.serviceType]: JSON.stringify(service),
     };
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to get testcoins');
@@ -695,69 +701,6 @@ function* accumulativeTxAndBalWorker() {
 export const accumulativeTxAndBalWatcher = createWatcher(
   accumulativeTxAndBalWorker,
   ACCUMULATIVE_BAL_AND_TX,
-);
-
-function* accountsSyncWorker({ payload }) {
-  try {
-    const accounts = yield select((state) => state.accounts);
-
-    const testService = accounts[TEST_ACCOUNT].service;
-    const regularService = accounts[REGULAR_ACCOUNT].service;
-    const secureService = accounts[SECURE_ACCOUNT].service;
-
-    yield all([
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: TEST_ACCOUNT,
-          options: {
-            service: testService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: REGULAR_ACCOUNT,
-          options: {
-            service: regularService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-      fetchBalanceTxWorker({
-        payload: {
-          serviceType: SECURE_ACCOUNT,
-          options: {
-            service: secureService,
-            restore: payload.restore,
-            shouldNotInsert: true,
-          },
-        },
-      }),
-    ]);
-
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      [TEST_ACCOUNT]: JSON.stringify(testService),
-      [REGULAR_ACCOUNT]: JSON.stringify(regularService),
-      [SECURE_ACCOUNT]: JSON.stringify(secureService),
-    };
-
-    yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    yield put(accountsSynched(true));
-    yield put(syncTrustedDerivativeAccounts());
-  } catch (err) {
-    console.log({ err });
-    yield put(accountsSynched(false));
-  }
-}
-
-export const accountsSyncWatcher = createWatcher(
-  accountsSyncWorker,
-  SYNC_ACCOUNTS,
 );
 
 function* exchangeRateWorker() {
@@ -820,19 +763,92 @@ function* resetTwoFAWorker({ payload }) {
 
 export const resetTwoFAWatcher = createWatcher(resetTwoFAWorker, RESET_TWO_FA);
 
-function* testWorker({ payload }) {
-  console.log('---------Executing Test Saga---------');
+function* accountsSyncWorker({ payload }) {
+  try {
+    const accounts = yield select((state) => state.accounts);
 
-  const service: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
+    const testService = accounts[TEST_ACCOUNT].service;
+    const regularService = accounts[REGULAR_ACCOUNT].service;
+    const secureService = accounts[SECURE_ACCOUNT].service;
 
-  const res = yield call(
-    service.getDerivativeAccBalanceTransactions,
-    FAST_BITCOINS,
-  );
-  console.log({ res });
-  console.log('---------Executed Test Saga---------');
+    yield all([
+      fetchBalanceTxWorker({
+        payload: {
+          serviceType: TEST_ACCOUNT,
+          options: {
+            service: testService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
+        },
+      }),
+      fetchBalanceTxWorker({
+        payload: {
+          serviceType: REGULAR_ACCOUNT,
+          options: {
+            service: regularService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
+        },
+      }),
+      fetchBalanceTxWorker({
+        payload: {
+          serviceType: SECURE_ACCOUNT,
+          options: {
+            service: secureService,
+            restore: payload.restore,
+            shouldNotInsert: true,
+          },
+        },
+      }),
+    ]);
+
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      [TEST_ACCOUNT]: JSON.stringify(testService),
+      [REGULAR_ACCOUNT]: JSON.stringify(regularService),
+      [SECURE_ACCOUNT]: JSON.stringify(secureService),
+    };
+
+    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    yield put(accountsSynched(true));
+  } catch (err) {
+    console.log({ err });
+    yield put(accountsSynched(false));
+  }
 }
 
-export const testWatcher = createWatcher(testWorker, RUN_TEST);
+export const accountsSyncWatcher = createWatcher(
+  accountsSyncWorker,
+  SYNC_ACCOUNTS,
+);
+
+function* startupSyncWorker({ payload }) {
+  try {
+    console.log('Synching accounts...');
+    yield call(accountsSyncWorker, { payload });
+  } catch (err) {
+    console.log('Accounts sync failed: ', err);
+  }
+
+  try {
+    console.log('Synching derivative accounts...');
+    yield call(syncTrustedDerivativeAccountsWorker, { payload: {} });
+  } catch (err) {
+    console.log('Trusted Derivative accounts sync failed: ', err);
+  }
+
+  try {
+    console.log('Synching trusted channels...');
+    yield call(trustedChannelsSyncWorker);
+  } catch (err) {
+    console.log('Trusted Channels sync failed: ', err);
+  }
+}
+
+export const startupSyncWatcher = createWatcher(
+  startupSyncWorker,
+  STARTUP_SYNC,
+);

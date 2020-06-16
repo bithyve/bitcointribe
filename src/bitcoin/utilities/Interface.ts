@@ -172,10 +172,22 @@ export interface EphemeralData {
     otp: string;
     encryptedKey: string;
   };
+  paymentDetails?: {
+    trusted?: {
+      address?: string;
+      paymentURI?: string;
+    };
+    alternate?: {
+      address?: string;
+      paymentURI?: string;
+    };
+  };
 }
 
 export interface TrustedDataElements {
   xpub?: string;
+  walletID?: string;
+  FCM?: string;
 }
 export interface TrustedData {
   publicKey: string;
@@ -196,6 +208,8 @@ export interface Contacts {
     contactsWalletName?: string;
     isWard?: Boolean;
     isGuardian?: Boolean;
+    walletID?: string;
+    FCMs?: string[];
     ephemeralChannel?: {
       address: string;
       data?: EphemeralData[];

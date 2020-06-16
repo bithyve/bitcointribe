@@ -7,7 +7,6 @@ import {
   dbFetched,
   INSERT_INTO_DB,
   dbInserted,
-  enrichServices,
   ENRICH_SERVICES,
   servicesEnriched,
 } from '../actions/storage';
@@ -36,7 +35,7 @@ function* fetchDBWorker() {
     const database = yield call(dataManager.fetch, key);
     if (key && database) {
       yield put(dbFetched(database));
-      yield put(enrichServices(database));
+      yield call(servicesEnricherWorker, { payload: { database } });
     } else {
       console.log(
         'Failed to fetch the database; either key is missing or database is empty',
@@ -77,19 +76,20 @@ export function* insertDBWorker({ payload }) {
     }
     yield put(dbInserted(payload));
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
-    yield put(enrichServices(updatedDB));
+    yield call(servicesEnricherWorker, { payload: { database: updatedDB } });
   } catch (err) {
     console.log(err);
   }
 }
 export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
 
-function* servicesEnricherWorker() {
+function* servicesEnricherWorker({ payload }) {
   try {
-    const { database } = yield select((state) => state.storage);
+    const database = payload.database
+      ? payload.database
+      : yield select((state) => state.storage.database);
     if (!database) {
-      console.log('Database missing; services encrichment failed');
-      return;
+      throw new Error('Database missing; services encrichment failed');
     }
 
     const {

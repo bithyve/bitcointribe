@@ -38,13 +38,12 @@ import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
 import moment from 'moment';
 import _ from 'underscore';
 import Toast from '../../components/Toast';
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import QRModal from '../Accounts/QRModal';
-
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -220,13 +219,14 @@ const PersonalCopyHistory = (props) => {
       );
       if (!personalCopyDetails) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
+        saveInTransitHistory();
       } else {
         personalCopyDetails = JSON.parse(personalCopyDetails);
-        console.log({ personalCopyDetails });
 
-        if (!personalCopyDetails[selectedPersonalCopy.type])
+        if (!personalCopyDetails[selectedPersonalCopy.type]) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
-        else setPersonalCopyDetails(personalCopyDetails);
+          saveInTransitHistory();
+        } else setPersonalCopyDetails(personalCopyDetails);
       }
     })();
   }, [generated, shared]);
@@ -239,7 +239,6 @@ const PersonalCopyHistory = (props) => {
     ) {
       if (!pcShared) setPCShared(true);
       updateAutoHighlightFlags();
-      saveInTransitHistory();
     }
   }, [personalCopyDetails]);
 
@@ -326,7 +325,11 @@ const PersonalCopyHistory = (props) => {
     return (
       <QRModal
         QRModalHeader={QRModalHeader}
-        title={'Scan the Secondary Mnemonic'}
+        title={
+          QRModalHeader === 'Confirm Personal Copy'
+            ? 'Scan the 1st QR from Personal Copy'
+            : 'Scan the Secondary Mnemonic'
+        }
         infoText={
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
         }
@@ -344,6 +347,7 @@ const PersonalCopyHistory = (props) => {
             if (restored) {
               setPCShared(false);
               dispatch(generatePersonalCopy(selectedPersonalCopy));
+              saveInTransitHistory();
               (PersonalCopyShareBottomSheet as any).current.snapTo(1);
             } else {
               Alert.alert(
@@ -417,7 +421,7 @@ const PersonalCopyHistory = (props) => {
             />
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={BackupStyles.modalHeaderTitleText}>
-                {props.navigation.state.params.selectedTitle}
+                {'Personal Copy'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -434,11 +438,13 @@ const PersonalCopyHistory = (props) => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (PersonalCopyShareBottomSheet as any).current.snapTo(
-                  1,
-                );
+                (PersonalCopyShareBottomSheet as any).current.snapTo(1);
               }}
-              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
               textStyle={{}}
             />
             <Image

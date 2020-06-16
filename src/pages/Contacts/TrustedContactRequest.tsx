@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Image,
@@ -20,6 +20,8 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TrustedContactRequest(props) {
+  const [WrongInputError, setWrongInputError] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
   const [PhoneNumber, setPhoneNumber] = useState('');
   const [EmailId, setEmailId] = useState('');
   const [onBlurFocus, setOnBlurFocus] = useState(false);
@@ -37,6 +39,11 @@ export default function TrustedContactRequest(props) {
       setPasscode(tmpPasscode.join(''));
     }
   }
+
+  useEffect(()=>{
+    if(!props.inputType) setIsDisabled(false);
+    else setIsDisabled(true);
+  },[props.inputType])
 
   const getStyle = (i) => {
     if (i == 0) {
@@ -88,11 +95,12 @@ export default function TrustedContactRequest(props) {
               props.bottomSheetRef.current.snapTo(2);
             }}
             onBlur={() => {
+              checkForValidation(EmailId);
               setOnBlurFocus(false);
               props.bottomSheetRef.current.snapTo(1);
             }}
           />
-          <View style={styles.seperatorView} />
+          <View style={styles.separatorView} />
           <Text
             style={{
               ...styles.countryCodeText,
@@ -114,7 +122,7 @@ export default function TrustedContactRequest(props) {
           >
             +91
           </Text>
-          <View style={styles.seperatorView} />
+          <View style={styles.separatorView} />
           <TextInput
             keyboardType={'numeric'}
             placeholderTextColor={Colors.borderColor}
@@ -128,6 +136,7 @@ export default function TrustedContactRequest(props) {
               props.bottomSheetRef.current.snapTo(2);
             }}
             onBlur={() => {
+              checkForValidation(PhoneNumber);
               setOnBlurFocus(false);
               props.bottomSheetRef.current.snapTo(1);
             }}
@@ -199,6 +208,45 @@ export default function TrustedContactRequest(props) {
     }
   };
 
+  const checkForValidation = (text) => {
+    if (props.inputType == 'phone') {
+      if (text.length == 0) {
+        setWrongInputError('');
+        setIsDisabled(true);
+      } else if (text.length != 0 && text.length < 10) {
+        setWrongInputError('Incorrect Phone Number, try again');
+        setIsDisabled(true);
+      } else if (!text.match(/^[0-9]+$/)) {
+        setWrongInputError('Incorrect Phone Number, try again');
+        setIsDisabled(true);
+      } else if (
+        text.length >= 3 &&
+        text.substr(text.length - 3) != props.hint
+      ) {
+        setWrongInputError('Incorrect Phone Number, try again');
+        setIsDisabled(true);
+      } else {
+        setWrongInputError('');
+        setIsDisabled(false);
+      }
+    }
+    if (props.inputType == 'email') {
+      if (text.length == 0) {
+        setWrongInputError('Please enter Email, try again');
+        setIsDisabled(true);
+      } else if (
+        text.length >= 3 &&
+        text.substr(text.length - 3) != props.hint
+      ) {
+        setWrongInputError('Incorrect Email, try again');
+        setIsDisabled(true);
+      } else {
+        setWrongInputError('');
+        setIsDisabled(false);
+      }
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={{
@@ -217,16 +265,19 @@ export default function TrustedContactRequest(props) {
         <View>
           <View style={styles.successModalHeaderView}>
             {!props.isRecovery ? (
-              <Text style={styles.modalTitleText}>
-                Friends and Family{'\n'}Request{' '}
-                {props.isGuardian ? '(Guardian)' : null}
-              </Text>
+              props.isPayment ? (
+                <Text style={styles.modalTitleText}>Payment Request </Text>
+              ) : (
+                <Text style={styles.modalTitleText}>
+                  Friends and Family{'\n'}Request{' '}
+                  {props.isGuardian ? '(Guardian)' : null}
+                </Text>
+              )
             ) : (
                 <Text style={styles.modalTitleText}>Recovery Share Request</Text>
               )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor
+              {props.inputType ? "Accept the request to add your contact to Friends and Family" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor" }
             </Text>
           </View>
           <View style={styles.box}>
@@ -276,7 +327,12 @@ export default function TrustedContactRequest(props) {
 
           {!props.isQR ? (
             <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
-              <Text style={styles.phoneNumberInfoText}>Enter Phone Number</Text>
+              <View style={{ flexDirection: 'row' }}>
+                <Text style={styles.phoneNumberInfoText}>
+                  Enter Phone Number
+                </Text>
+                <Text style={styles.inputErrorText}>{WrongInputError}</Text>
+              </View>
               {getInputBox()}
             </View>
           ) : null}
@@ -289,16 +345,23 @@ export default function TrustedContactRequest(props) {
             }}
           >
             <AppBottomSheetTouchableWrapper
+              disabled={isDisabled}
               onPress={() => {
                 const key =
                   props.inputType === 'phone'
                     ? PhoneNumber
                     : props.inputType === 'email'
-                      ? EmailId
-                      : null;
+                    ? EmailId
+                    : null;
+                setTimeout(() => {
+                  setPhoneNumber('');
+                }, 2);
                 props.onPressAccept(key);
               }}
-              style={{ ...styles.successModalButtonView }}
+              style={{
+                ...styles.successModalButtonView,
+                backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
+              }}
             >
               {props.loading && props.loading == true ? (
                 <ActivityIndicator size="small" />
@@ -307,7 +370,15 @@ export default function TrustedContactRequest(props) {
                 )}
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressReject()}
+              onPress={() => {
+                const key =
+                  props.inputType === 'phone'
+                    ? PhoneNumber
+                    : props.inputType === 'email'
+                    ? EmailId
+                    : null;
+                props.onPressReject(key);
+              }}
               style={{
                 height: wp('13%'),
                 width: wp('35%'),
@@ -366,7 +437,6 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
     alignSelf: 'center',
     marginLeft: wp('8%'),
   },
@@ -389,6 +459,13 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     marginBottom: wp('5%'),
   },
+  inputErrorText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontSize: RFValue(10),
+    color: Colors.red,
+    marginBottom: wp('5%'),
+    marginLeft: 'auto',
+  },
   textboxView: {
     flexDirection: 'row',
     paddingLeft: 15,
@@ -404,7 +481,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     paddingRight: 15,
   },
-  seperatorView: {
+  separatorView: {
     marginRight: 15,
     height: 25,
     width: 2,

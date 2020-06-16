@@ -135,6 +135,8 @@ PODS:
     - React
   - react-native-randombytes (3.5.3):
     - React
+  - react-native-udp (2.7.0):
+    - React
   - react-native-video (5.0.2):
     - React
     - react-native-video/Video (= 5.0.2)
@@ -200,6 +202,10 @@ PODS:
     - React
   - RNGestureHandler (1.3.0):
     - React
+  - RNLocalize (1.4.0):
+    - React
+  - RNOS (1.2.6):
+    - React
   - RNReanimated (1.4.0):
     - React
   - RNScreens (1.0.0-alpha.23):
@@ -207,6 +213,10 @@ PODS:
   - RNShare (1.2.1):
     - React
   - RNSVG (9.13.6):
+    - React
+  - RNVectorIcons (6.6.0):
+    - React
+  - TcpSockets (3.3.2):
     - React
   - UMBarCodeScannerInterface (4.0.0)
   - UMCameraInterface (4.0.0)
@@ -258,6 +268,7 @@ DEPENDENCIES:
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
+  - react-native-udp (from `../node_modules/react-native-udp`)
   - react-native-video (from `../node_modules/react-native-video`)
   - React/Core (from `../node_modules/react-native`)
   - React/CxxBridge (from `../node_modules/react-native`)
@@ -276,10 +287,14 @@ DEPENDENCIES:
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios/RNFirebase.podspec`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler/RNGestureHandler.podspec`)
+  - RNLocalize (from `../node_modules/react-native-localize`)
+  - RNOS (from `../node_modules/react-native-os`)
   - RNReanimated (from `../node_modules/react-native-reanimated/RNReanimated.podspec`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - TcpSockets (from `../node_modules/react-native-tcp`)
   - UMBarCodeScannerInterface (from `../node_modules/expo/node_modules/unimodules-barcode-scanner-interface/ios`)
   - UMCameraInterface (from `../node_modules/expo/node_modules/unimodules-camera-interface/ios`)
   - UMConstantsInterface (from `../node_modules/expo/node_modules/unimodules-constants-interface/ios`)
@@ -379,6 +394,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-print"
   react-native-randombytes:
     :path: "../node_modules/react-native-randombytes"
+  react-native-udp:
+    :path: "../node_modules/react-native-udp"
   react-native-video:
     :path: "../node_modules/react-native-video"
   RNDeviceInfo:
@@ -387,6 +404,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-firebase/ios/RNFirebase.podspec"
   RNGestureHandler:
     :podspec: "../node_modules/react-native-gesture-handler/RNGestureHandler.podspec"
+  RNLocalize:
+    :path: "../node_modules/react-native-localize"
+  RNOS:
+    :path: "../node_modules/react-native-os"
   RNReanimated:
     :podspec: "../node_modules/react-native-reanimated/RNReanimated.podspec"
   RNScreens:
@@ -395,6 +416,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-share"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNVectorIcons:
+    :path: "../node_modules/react-native-vector-icons"
+  TcpSockets:
+    :path: "../node_modules/react-native-tcp"
   UMBarCodeScannerInterface:
     :path: !ruby/object:Pathname
     path: "../node_modules/expo/node_modules/unimodules-barcode-scanner-interface/ios"
@@ -477,14 +502,19 @@ SPEC CHECKSUMS:
   react-native-netinfo: cb74e17062b2af5a16a4b137f32495f241df1a8e
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
+  react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
   RNDeviceInfo: b6e650fbd234732c759544218657d549b4339038
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
+  RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
+  RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
+  RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
   UMBarCodeScannerInterface: d5a6fdc98ed6241225b0a8432a7f4e2b397668bc
   UMCameraInterface: 68870a3197fee85bd5afca5609ba4a5b7257d19d
   UMConstantsInterface: d25b8e8887ca7aaf568c06caf08f4d40734ee4ef
@@ -499,6 +529,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 1e70fe58b872355f0ecb44fb81bb1a16484047f0
   yoga: 684513b14b03201579ba3cee20218c9d1298b0cc
 
-PODFILE CHECKSUM: ef0eafcac0afc21312a038f4d9caea4cd5883083
+PODFILE CHECKSUM: ee84328f93944edd163ed35f7bf5ce0383faa559
 
 COCOAPODS: 1.8.4

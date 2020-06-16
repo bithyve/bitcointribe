@@ -91,11 +91,13 @@ export default function AddContactSendRequest(props) {
 
   const dispatch = useDispatch();
 
-  const createTrustedConntact = useCallback(() => {
+  const createTrustedContact = useCallback(() => {
     if (Contact && Contact.firstName) {
       const contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
-      }`.toLowerCase();
+      }`
+        .toLowerCase()
+        .trim();
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       if (!trustedContact) {
@@ -121,7 +123,9 @@ export default function AddContactSendRequest(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-    }`.toLowerCase();
+    }`
+      .toLowerCase()
+      .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
     if (trustedContact) {
@@ -219,6 +223,8 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRContents = useCallback(() => {
     return (
       <SendViaQR
+        headerText={'Friends and Family Request'}
+        subHeaderText={'Scan the QR from your contact’s Hexa app'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         QR={trustedQR}
@@ -281,7 +287,7 @@ export default function AddContactSendRequest(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Add Contact{' '}
+                Send Request{' '}
               </Text>
               <Text
                 style={{
@@ -291,11 +297,14 @@ export default function AddContactSendRequest(props) {
                   paddingTop: 5,
                 }}
               >
-                Lorem ipsum dolor sit amet, consec
+                Add contact to Friends and Family
               </Text>
             </View>
             <TouchableOpacity
-              onPress={createTrustedConntact}
+              onPress={() => {
+                createTrustedContact();
+                props.navigation.goBack();
+              }}
               style={{
                 height: wp('8%'),
                 width: wp('18%'),
@@ -440,11 +449,9 @@ export default function AddContactSendRequest(props) {
         <View style={{ marginTop: 'auto' }}>
           <View style={{ marginBottom: hp('1%') }}>
             <BottomInfoBox
-              backgroundColor={Colors.backgroundColor1}
-              titleColor={Colors.black1}
               title={'Note'}
               infoText={
-                'Lorem ipsum dolor sit amet consectetur adipisicing elit Lorem ipsum dolor'
+                'Scan the QR on your contacts Hexa app or send a link to your contact'
               }
             />
           </View>
@@ -466,7 +473,7 @@ export default function AddContactSendRequest(props) {
           >
             <TouchableOpacity
               onPress={() => {
-                createTrustedConntact();
+                createTrustedContact();
                 if (SendViaLinkBottomSheet.current)
                   (SendViaLinkBottomSheet as any).current.snapTo(1);
               }}
@@ -484,7 +491,7 @@ export default function AddContactSendRequest(props) {
             <TouchableOpacity
               style={styles.buttonInnerView}
               onPress={() => {
-                createTrustedConntact();
+                createTrustedContact();
                 if (SendViaQRBottomSheet.current)
                   (SendViaQRBottomSheet as any).current.snapTo(1);
               }}

@@ -112,6 +112,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 
         Paragraph preface = new Paragraph();
         preface.add(new Paragraph(jsonObj.getString("title"), catFont));
+        preface.add(new Paragraph("Follow the instructions on the app to scan the 8 QRs below", subFont));
         document.add(preface);
         addEmptyLine(preface, 1);
         // part 1
@@ -267,8 +268,11 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         // Secondary Mnemonic and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
-                "Secondary Mnemonic:",
+                "Exit/Regenerate 2FA Key:",
                 catFont));
+        preface.add(new Paragraph(
+                "Use this key to reset the 2FA if you have lost your authenticator/ Keeper app or for exiting your funds from Savings account if the BitHyve server is not responding",
+                smallBold));
         document.add(preface);
         barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), 250, 250, null);
         codeQrImage = barcodeQRCode.getImage();

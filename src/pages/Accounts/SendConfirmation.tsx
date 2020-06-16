@@ -26,6 +26,7 @@ import {
   transferST2,
   clearTransfer,
   fetchBalanceTx,
+  alternateTransferST2,
 } from '../../store/actions/accounts';
 import { UsNumberFormat } from '../../common/utilities';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -53,7 +54,8 @@ export default function SendConfirmation(props) {
   const averageTxFees = props.navigation.getParam('averageTxFees');
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
-  let netBalance = props.navigation.getParam('netBalance');
+  const sweepSecure = props.navigation.getParam('sweepSecure');
+  const netBalance = props.navigation.getParam('netBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const viewRef = useRef(null);
@@ -92,7 +94,9 @@ export default function SendConfirmation(props) {
   useEffect(() => {
     console.log('transfer', transfer);
     if (transfer.stage2.failed) {
-      SendUnSuccessBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        SendUnSuccessBottomSheet.current.snapTo(1);
+      }, 2);
     } else if (transfer.txid) {
       storeTrustedContactsHistory(transfer.details);
       SendSuccessBottomSheet.current.snapTo(1);
@@ -114,31 +118,33 @@ export default function SendConfirmation(props) {
       );
       for (let i = 0; i < details.length; i++) {
         const element = details[i];
-        let obj = {
-          id: createRandomString(36),
-          title: 'Sent Amount',
-          date: moment(Date.now()).valueOf(),
-          info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-          selectedContactInfo: element,
-        };
-        if (element.selectedContact.isWard) {
-          if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
-          IMKeeperOfHistory.push(obj);
-          await AsyncStorage.setItem(
-            'IMKeeperOfHistory',
-            JSON.stringify(IMKeeperOfHistory),
-          );
-        }
-        if (
-          !element.selectedContact.isWard &&
-          !element.selectedContact.isGuardian
-        ) {
-          if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
-          OtherTrustedContactsHistory.push(obj);
-          await AsyncStorage.setItem(
-            'OtherTrustedContactsHistory',
-            JSON.stringify(OtherTrustedContactsHistory),
-          );
+        if(element.selectedContact.contactName){
+          let obj = {
+            id: createRandomString(36),
+            title: 'Sent Amount',
+            date: moment(Date.now()).valueOf(),
+            info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            selectedContactInfo: element,
+          };
+          if (element.selectedContact.isWard) {
+            if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
+            IMKeeperOfHistory.push(obj);
+            await AsyncStorage.setItem(
+              'IMKeeperOfHistory',
+              JSON.stringify(IMKeeperOfHistory),
+            );
+          }
+          if (
+            !element.selectedContact.isWard &&
+            !element.selectedContact.isGuardian
+          ) {
+            if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
+            OtherTrustedContactsHistory.push(obj);
+            await AsyncStorage.setItem(
+              'OtherTrustedContactsHistory',
+              JSON.stringify(OtherTrustedContactsHistory),
+            );
+          }
         }
       }
     }
@@ -151,8 +157,12 @@ export default function SendConfirmation(props) {
         : sliderValueText === 'In the middle'
         ? 'medium'
         : 'high';
-    dispatch(transferST2(serviceType, txPriority));
-  }, [serviceType, sliderValueText]);
+    if (sweepSecure) {
+      dispatch(alternateTransferST2(serviceType, txPriority));
+    } else {
+      dispatch(transferST2(serviceType, txPriority));
+    }
+  }, [serviceType, sliderValueText, sweepSecure]);
 
   const tapSliderHandler = (evt) => {
     if (viewRef.current) {
@@ -322,9 +332,11 @@ export default function SendConfirmation(props) {
             SendUnSuccessBottomSheet.current.snapTo(0);
         }}
         onPressCancel={() => {
-          //dispatch(clearTransfer(serviceType));
+          dispatch(clearTransfer(serviceType));
           if (SendUnSuccessBottomSheet.current)
             SendUnSuccessBottomSheet.current.snapTo(0);
+
+          props.navigation.navigate('Accounts');
         }}
         isUnSuccess={true}
       />

@@ -352,6 +352,17 @@ export default class SecureAccount {
     }
   };
 
+  public getPaymentURI = (
+    address: string,
+    options?: {
+      amount: number;
+      label?: string;
+      message?: string;
+    },
+  ): {
+    paymentURI: string;
+  } => this.secureHDWallet.generatePaymentURI(address, options);
+
   public getAddress = async (): Promise<
     | {
         status: number;
@@ -772,11 +783,10 @@ export default class SecureAccount {
       console.log('---- Transaction Broadcasted ----');
       console.log({ txid });
 
+      this.secureHDWallet.removeSecondaryXpriv();
       return { status: config.STATUS.SUCCESS, data: { txid } };
     } catch (err) {
       return { status: 107, err: err.message, message: ErrMap[107] };
-    } finally {
-      this.secureHDWallet.removeSecondaryXpriv();
     }
   };
 

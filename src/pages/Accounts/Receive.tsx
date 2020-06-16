@@ -18,6 +18,7 @@ import {
   FlatList,
   CheckBox,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
@@ -42,11 +43,23 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import BitcoinAddressSendSuccess from '../../components/BitcoinAddressSendSuccess';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { fetchAddress } from '../../store/actions/accounts';
+import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import {
+  EphemeralData,
+  TrustedContactDerivativeAccount,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import config from '../../bitcoin/HexaConfig';
+import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 
 export default function Receive(props) {
   const [
@@ -68,9 +81,6 @@ export default function Receive(props) {
   const [showContacts, setShowContacts] = useState(false);
   const [LoadContacts, setLoadContacts] = useState(false);
   const [selectedContact, setSelectedContact] = useState(Object);
-  const { loading } = useSelector((state) => state.sss);
-  const [trustedLink, setTrustedLink] = useState('');
-  const [trustedQR, setTrustedQR] = useState('Test');
   const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
   const [serviceType, setServiceType] = useState(
@@ -112,10 +122,282 @@ export default function Receive(props) {
     },
   ]);
 
+  const dispatch = useDispatch();
+  const [receiveLink, setReceiveLink] = useState('');
+  const [receiveQR, setReceiveQR] = useState('');
+  const { loading, service } = useSelector(
+    (state) => state.accounts[serviceType],
+  );
+
+  const WALLET_SETUP = useSelector(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
   useEffect(() => {
-    if (AsTrustedContact)
+    if (!AsTrustedContact) {
+      const { receivingAddress } =
+        serviceType === SECURE_ACCOUNT
+          ? service.secureHDWallet
+          : service.hdWallet;
+      if (receivingAddress) {
+        let receiveAt = receivingAddress;
+        if (amount) {
+          receiveAt = service.getPaymentURI(receiveAt, {
+            amount: parseInt(amount),
+          }).paymentURI;
+        }
+        setReceiveLink(receiveAt);
+        setReceiveQR(receiveAt);
+      }
+    }
+  }, [service, amount, AsTrustedContact]);
+
+  useEffect(() => {
+    if (AsTrustedContact) {
+      setTimeout(() => {
+        setReceiveLink('');
+        setReceiveQR('');
+      }, 200);
       (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
+    }
   }, [AsTrustedContact]);
+
+  useEffect(() => {
+    dispatch(fetchAddress(serviceType));
+  }, []);
+
+  useEffect(() => {
+    if (!AsTrustedContact) return;
+    if (!selectedContact || !selectedContact.firstName) {
+      console.log('Err: Contact missing');
+      return;
+    }
+
+    const contactName = `${selectedContact.firstName} ${
+      selectedContact.lastName ? selectedContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
+    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+    if (trustedContact) {
+      const publicKey =
+        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const requester = WALLET_SETUP.walletName;
+
+      if (!receiveLink) {
+        if (
+          selectedContact.phoneNumbers &&
+          selectedContact.phoneNumbers.length
+        ) {
+          const phoneNumber = selectedContact.phoneNumbers[0].number;
+          console.log({ phoneNumber });
+          const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          const numHintType = 'num';
+          const numHint = number.slice(number.length - 3);
+          const numberEncPubKey = TrustedContactsService.encryptPub(
+            publicKey,
+            number,
+          ).encryptedPub;
+          const numberDL =
+            `https://hexawallet.io/${config.APP_STAGE}/ptc` +
+            `/${requester}` +
+            `/${numberEncPubKey}` +
+            `/${numHintType}` +
+            `/${numHint}`;
+          console.log({ numberDL });
+          setReceiveLink(numberDL);
+        } else if (selectedContact.emails && selectedContact.emails.length) {
+          const email = selectedContact.emails[0].email;
+          const emailInitials: string = email.split('@')[0];
+          const emailHintType = 'eml';
+          const emailHint = emailInitials.slice(emailInitials.length - 3);
+          const emailEncPubKey = TrustedContactsService.encryptPub(
+            publicKey,
+            emailInitials,
+          ).encryptedPub;
+          const emailDL =
+            `https://hexawallet.io/${config.APP_STAGE}/ptc` +
+            `/${requester}` +
+            `/${emailEncPubKey}` +
+            `/${emailHintType}` +
+            `/${emailHint}`;
+          console.log({ emailDL });
+          setReceiveLink(emailDL);
+        } else {
+          Alert.alert(
+            'Invalid Contact',
+            'Cannot add a contact without phone-num/email as a trusted entity',
+          );
+          return;
+        }
+        updateTrustedContactsInfo(selectedContact); // Contact initialized to become TC
+      }
+
+      if (!receiveQR) {
+        setReceiveQR(
+          JSON.stringify({
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            type: 'paymentTrustedContactQR',
+          }),
+        );
+      }
+    }
+  }, [
+    selectedContact,
+    trustedContacts,
+    AsTrustedContact,
+    receiveLink,
+    receiveQR,
+  ]);
+
+  const updateTrustedContactsInfo = async (contact) => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    console.log({ trustedContactsInfo });
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      if (
+        trustedContactsInfo.findIndex((value) => {
+          if (value && value.id) return value.id == contact.id;
+        }) == -1
+      ) {
+        trustedContactsInfo.push(contact);
+        // Toast('Trusted Contact added successfully');
+      } else {
+        // Toast('Trusted Contact already exists');
+      }
+    } else {
+      trustedContactsInfo = [];
+      trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
+    }
+    console.log({ trustedContactsInfo });
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
+  };
+
+  const createTrustedContact = useCallback(async () => {
+    if (!AsTrustedContact) return;
+
+    if (selectedContact && selectedContact.firstName) {
+      const contactName = `${selectedContact.firstName} ${
+        selectedContact.lastName ? selectedContact.lastName : ''
+      }`
+        .toLowerCase()
+        .trim();
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+      const { receivingAddress } =
+        serviceType === SECURE_ACCOUNT
+          ? service.secureHDWallet
+          : service.hdWallet;
+
+      let paymentURI;
+      if (amount) {
+        paymentURI = service.getPaymentURI(receivingAddress, {
+          amount: parseInt(amount),
+        }).paymentURI;
+      }
+
+      let accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[contactName];
+      if (!accountNumber) {
+        // initialize a trusted derivative account against the following account
+        const res = await regularAccount.getDerivativeAccXpub(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        if (res.status !== 200) {
+          console.log(
+            'Err occured while generating trusted derivative account',
+          );
+        } else {
+          // refresh the account number
+          accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[contactName];
+        }
+      }
+
+      const trustedReceivingAddress = (regularAccount.hdWallet
+        .derivativeAccounts[TRUSTED_CONTACTS][
+        accountNumber
+      ] as TrustedContactDerivativeAccountElements).receivingAddress;
+
+      let trustedPaymentURI;
+      if (amount) {
+        trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
+          amount: parseInt(amount),
+        }).paymentURI;
+      }
+
+      if (!trustedContact) {
+        (async () => {
+          const walletID = await AsyncStorage.getItem('walletID');
+          const FCM = await AsyncStorage.getItem('fcmToken');
+
+          const data: EphemeralData = {
+            walletID,
+            FCM,
+            paymentDetails: {
+              trusted: {
+                address: trustedReceivingAddress,
+                paymentURI: trustedPaymentURI,
+              },
+              alternate: {
+                address: receivingAddress,
+                paymentURI,
+              },
+            },
+          };
+          dispatch(updateEphemeralChannel(contactName, data));
+        })();
+      } else if (
+        !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel
+      ) {
+        if (
+          trustedContact.ephemeralChannel.data[0].paymentDetails &&
+          trustedContact.ephemeralChannel.data[0].paymentDetails.alternate
+            .address === receivingAddress &&
+          trustedContact.ephemeralChannel.data[0].paymentDetails.alternate
+            .paymentURI === paymentURI
+        )
+          return;
+        const data: EphemeralData = {
+          paymentDetails: {
+            trusted: {
+              address: trustedReceivingAddress,
+              paymentURI: trustedPaymentURI,
+            },
+            alternate: {
+              address: receivingAddress,
+              paymentURI,
+            },
+          },
+        };
+        dispatch(updateEphemeralChannel(contactName, data));
+      }
+    }
+  }, [
+    selectedContact,
+    trustedContacts,
+    AsTrustedContact,
+    amount,
+    serviceType,
+    service,
+  ]);
 
   const checkNShowHelperModal = async () => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem(
@@ -159,7 +441,6 @@ export default function Receive(props) {
   const renderAddContactAddressBookHeader = () => {
     return (
       <SmallHeaderModal
-        borderColor={Colors.white}
         backgroundColor={Colors.white}
         onPressHeader={() => {
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
@@ -174,12 +455,14 @@ export default function Receive(props) {
         modalTitle="Select a Contact"
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={() => {
+        onPressContinue={(selectedContacts) => {
+          setTimeout(() => {
+            setSelectedContact(selectedContacts[0]);
+          }, 2);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
         onSelectContact={(selectedContact) => {
-          setSelectedContact(selectedContact[0]);
-          // (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+          setSelectedContact(selectedContact);
         }}
         onPressBack={() => {
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
@@ -189,16 +472,23 @@ export default function Receive(props) {
   };
 
   const renderSendViaLinkContents = useCallback(() => {
-    console.log("serviceType sjkadhakhdksa", serviceType);
     return (
       <SendViaLink
-      headerText={'Recieve via Link'}
+        isFromReceive={true}
+        headerText={'Share'}
+        subHeaderText={
+          !isEmpty(selectedContact)
+            ? 'Share with your contact'
+            : 'Share bitcoin address'
+        }
         contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
-        info={'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'}
+        info={
+          'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'
+        }
         amount={amount === '' ? null : amount}
-        link={trustedLink}
+        link={receiveLink}
         serviceType={serviceType}
         onPressBack={() => {
           if (SendViaLinkBottomSheet.current)
@@ -209,7 +499,7 @@ export default function Receive(props) {
         }}
       />
     );
-  }, [selectedContact, trustedLink, amount, serviceType]);
+  }, [selectedContact, receiveLink, amount, serviceType]);
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
@@ -226,11 +516,12 @@ export default function Receive(props) {
     //console.log(amount);
     return (
       <SendViaQR
-        headerText={'Recieve via QR'}
+        isFromReceive={true}
+        headerText={'QR'}
         contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
-        QR={trustedQR}
+        QR={receiveQR}
         serviceType={serviceType}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contactEmail={''}
@@ -243,7 +534,7 @@ export default function Receive(props) {
         }}
       />
     );
-  }, [selectedContact, trustedQR, amount, serviceType]);
+  }, [selectedContact, receiveQR, amount, serviceType]);
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
@@ -285,24 +576,25 @@ export default function Receive(props) {
 
   const renderReceiveHelperContents = useCallback(() => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={'Receiving Bitcoins'}
-        image={require('../../assets/images/icons/receive.png')}
-        helperInfo={
-          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from “Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
-        }
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
-            if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(0);
-            props.navigation.navigate('ReceivingAddress', {
-              serviceType,
-              getServiceType,
-            });
-          }
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={'Receiving Bitcoins'}
+      //   image={require('../../assets/images/icons/receive.png')}
+      //   helperInfo={
+      //     'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from “Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
+      //   }
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (props.navigation.getParam('serviceType') == TEST_ACCOUNT) {
+      //       if (ReceiveHelperBottomSheet.current)
+      //         (ReceiveHelperBottomSheet as any).current.snapTo(0);
+      //       props.navigation.navigate('ReceivingAddress', {
+      //         serviceType,
+      //         getServiceType,
+      //       });
+      //     }
+      //   }}
+      // />
+      <ReceiveHelpContents />
     );
   }, [serviceType]);
 
@@ -343,7 +635,7 @@ export default function Receive(props) {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your keeper device), you'll require the 2FA token in order to send bitcoins from the savings account."
+                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoins from the savings account."
               }
             />
 
@@ -454,9 +746,7 @@ export default function Receive(props) {
                     size={17}
                   />
                 </TouchableOpacity>
-                <Text style={BackupStyles.modalHeaderTitleText}>
-                  Receiving Address
-                </Text>
+                <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
                 {serviceType == TEST_ACCOUNT ? (
                   <Text
                     onPress={() => {
@@ -477,6 +767,17 @@ export default function Receive(props) {
             </View>
             <ScrollView>
               <View style={{ flex: 1, paddingLeft: 20, paddingRight: 20 }}>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginBottom: 10,
+                    marginTop: hp('1%'),
+                  }}
+                >
+                  Requested amount:
+                </Text>
                 <View style={styles.textBoxView}>
                   <View style={styles.amountInputImage}>
                     <Image
@@ -495,20 +796,20 @@ export default function Receive(props) {
                     placeholderTextColor={Colors.borderColor}
                   />
                 </View>
-                
+
                 <TouchableOpacity
                   style={{
                     flexDirection: 'row',
                     paddingLeft: 20,
                     paddingRight: 20,
-                    marginTop: 30,
+                    marginTop: 15,
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}
                   activeOpacity={10}
                   onPress={() => {
-                      setDropdownBoxOpenClose(!dropdownBoxOpenClose);
-                    }}
+                    //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                  }}
                 >
                   <Text
                     style={{
@@ -518,7 +819,7 @@ export default function Receive(props) {
                       textAlign: 'center',
                     }}
                   >
-                    Receiving To: 
+                    Receiving to:
                     <Text style={styles.boldItalicText}>
                       {serviceType == TEST_ACCOUNT
                         ? '  Test Account'
@@ -527,55 +828,15 @@ export default function Receive(props) {
                         : '  Saving Account'}
                     </Text>
                   </Text>
-                  <Ionicons
+                  {/* <Ionicons
                     style={{ marginRight: 10, marginLeft: 10 }}
                     name={
                       dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
                     }
                     size={20}
                     color={Colors.blue}
-                  />
+                  /> */}
                 </TouchableOpacity>
-                <View style={{ position: 'relative' }}>
-                    {dropdownBoxOpenClose && (
-                      <View style={styles.dropdownBoxModal}>
-                        <ScrollView>
-                          {dropdownBoxList.map((value, index) => (
-                            <TouchableOpacity
-                              onPress={() => {
-                                setTimeout(() => {
-                                  console.log("setServiceType",value.type)
-                                  setServiceType(value.type);
-                                setDropdownBoxOpenClose(false);
-                                }, 2);
-                                
-                              }}
-                              style={{
-                                ...styles.dropdownBoxModalElementView,
-                                backgroundColor:
-                                  serviceType == value.type
-                                    ? Colors.lightBlue
-                                    : Colors.white,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  color:
-                                    serviceType == value.type
-                                      ? Colors.blue
-                                      : Colors.black,
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue(12),
-                                }}
-                              >
-                                {value.account_name}
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                        </ScrollView>
-                      </View>
-                    )}
-
                 <TouchableOpacity
                   activeOpacity={10}
                   onPress={() => {
@@ -588,7 +849,7 @@ export default function Receive(props) {
                     alignItems: 'center',
                     paddingLeft: 20,
                     paddingRight: 20,
-                    marginTop: 30,
+                    marginTop: 15,
                     height: wp('13%'),
                   }}
                 >
@@ -764,7 +1025,6 @@ export default function Receive(props) {
                   </View>
                 )}
               </View>
-              </View>
             </ScrollView>
             <View
               style={{
@@ -775,10 +1035,9 @@ export default function Receive(props) {
             >
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
-                  backgroundColor={Colors.backgroundColor1}
                   title={'Note'}
                   infoText={
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+                    'Bitcoin Receiving Address. Generate bitcoin address and share via link or QR'
                   }
                 />
               </View>
@@ -799,21 +1058,19 @@ export default function Receive(props) {
               >
                 <AppBottomSheetTouchableWrapper
                   onPress={() => {
+                    if (AsTrustedContact) {
+                      createTrustedContact();
+                    }
                     if (SendViaLinkBottomSheet.current)
                       (SendViaLinkBottomSheet as any).current.snapTo(1);
                   }}
-                  disabled={loading.uploadMetaShare}
                   style={styles.buttonInnerView}
                 >
-                  {loading.uploadMetaShare ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Image
-                      source={require('../../assets/images/icons/openlink.png')}
-                      style={styles.buttonImage}
-                    />
-                  )}
-                  <Text style={styles.buttonText}>Via Link</Text>
+                  <Image
+                    source={require('../../assets/images/icons/openlink.png')}
+                    style={styles.buttonImage}
+                  />
+                  <Text style={styles.buttonText}>Share</Text>
                 </AppBottomSheetTouchableWrapper>
                 <View
                   style={{
@@ -824,22 +1081,19 @@ export default function Receive(props) {
                 />
                 <AppBottomSheetTouchableWrapper
                   style={styles.buttonInnerView}
-                  disabled={loading.uploadMetaShare}
                   onPress={() => {
+                    if (AsTrustedContact) {
+                      createTrustedContact();
+                    }
                     if (SendViaQRBottomSheet.current)
                       (SendViaQRBottomSheet as any).current.snapTo(1);
                   }}
                 >
-                  {loading.uploadMetaShare ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Image
-                      source={require('../../assets/images/icons/qr-code.png')}
-                      style={styles.buttonImage}
-                    />
-                  )}
-
-                  <Text style={styles.buttonText}>Via QR</Text>
+                  <Image
+                    source={require('../../assets/images/icons/qr-code.png')}
+                    style={styles.buttonImage}
+                  />
+                  <Text style={styles.buttonText}>QR</Text>
                 </AppBottomSheetTouchableWrapper>
               </View>
             </View>
@@ -851,7 +1105,8 @@ export default function Receive(props) {
         ref={ReceiveHelperBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),
+          hp('89%'),
+          // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('42%'),
         ]}
         renderContent={renderReceiveHelperContents}
         renderHeader={renderReceiveHelperHeader}
@@ -871,7 +1126,7 @@ export default function Receive(props) {
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
         ]}
         renderContent={renderSendViaLinkContents}
         renderHeader={renderSendViaLinkHeader}
@@ -881,7 +1136,7 @@ export default function Receive(props) {
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
         ]}
         renderContent={renderSendViaQRContents}
         renderHeader={renderSendViaQRHeader}
@@ -977,7 +1232,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.borderColor,
     height: 50,
-    marginTop: hp('5%'),
     marginBottom: hp('1%'),
   },
   textBoxImage: {
@@ -1049,7 +1303,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-  },dropdownBox: {
+  },
+  dropdownBox: {
     marginTop: hp('1%'),
     marginBottom: hp('1%'),
     flexDirection: 'row',

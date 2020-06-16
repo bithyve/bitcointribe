@@ -10,6 +10,7 @@ import {
   AsyncStorage,
   Image,
   ScrollView,
+  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -21,7 +22,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
-import { trustedChannelXpubUpload } from '../store/actions/trustedContacts';
+import { trustedChannelsSync } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -31,8 +32,17 @@ import { TrustedContactDerivativeAccountElements } from '../bitcoin/utilities/In
 import { nameToInitials } from '../common/CommonFunctions';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import BottomInfoBox from '../components/BottomInfoBox';
+import AddContactAddressBook from './Contacts/AddContactAddressBook';
+import BottomSheet from 'reanimated-bottom-sheet';
+import DeviceInfo from 'react-native-device-info';
+import ModalHeader from '../components/ModalHeader';
 
 export default function AddressBookContents(props) {
+  const [
+    AddContactAddressBookBookBottomSheet,
+    setAddContactAddressBookBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+  const [SelectedContact, setSelectedContact] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [trustedContact, setTrustedContact] = useState([]);
   let [MyKeeper, setMyKeeper] = useState([]);
@@ -80,7 +90,8 @@ export default function AddressBookContents(props) {
             trustedContactToDA,
             derivativeAccounts,
           } = regularAccount.hdWallet;
-          const accountNumber = trustedContactToDA[contactName.toLowerCase()];
+          const accountNumber =
+            trustedContactToDA[contactName.toLowerCase().trim()];
           if (accountNumber) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
@@ -93,8 +104,9 @@ export default function AddressBookContents(props) {
           }
 
           const isWard =
-            trustedContactsService.tc.trustedContacts[contactName.toLowerCase()]
-              .isWard;
+            trustedContactsService.tc.trustedContacts[
+              contactName.toLowerCase().trim()
+            ].isWard;
 
           const isGuardian = index < 3 ? true : false;
           const element = {
@@ -130,7 +142,12 @@ export default function AddressBookContents(props) {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(trustedChannelXpubUpload());
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      dispatch(trustedChannelsSync());
+    });
+    return () => {
+      focusListener.remove();
+    };
   }, []);
 
   const getImageIcon = (item) => {
@@ -168,7 +185,9 @@ export default function AddressBookContents(props) {
             >
               {item
                 ? nameToInitials(
-                    item.firstName && item.lastName
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
                       ? item.firstName
@@ -187,6 +206,7 @@ export default function AddressBookContents(props) {
   const getElement = (contact, index, contactsType) => {
     return (
       <TouchableOpacity
+        key={contact.id}
         onPress={() => {
           props.navigation.navigate('ContactDetails', {
             contactsType,
@@ -203,13 +223,18 @@ export default function AddressBookContents(props) {
             contact.contactName.split(' ')[0] &&
             contact.contactName != 'Secondary Device'
               ? contact.contactName.split(' ')[0]
-              : 'Keeper'}{' '}
+              : contact.contactName && contact.contactName == 'Secondary Device'
+              ? 'Keeper'
+              : ''}{' '}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.contactName &&
               contact.contactName.split(' ')[1] &&
               contact.contactName != 'Secondary Device'
                 ? contact.contactName.split(' ')[1]
-                : 'Device'}
+                : contact.contactName &&
+                  contact.contactName == 'Secondary Device'
+                ? 'Device'
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -310,6 +335,37 @@ export default function AddressBookContents(props) {
     );
   };
 
+  const renderAddContactAddressBookContents = () => {
+    return (
+      <AddContactAddressBook
+        modalRef={AddContactAddressBookBookBottomSheet}
+        proceedButtonText={'Confirm & Proceed'}
+        onPressContinue={() => {
+          props.navigation.navigate('AddContactSendRequest', {
+            SelectedContact: SelectedContact,
+          });
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
+        }}
+        onPressBack={() => {
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderAddContactAddressBookHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <SafeAreaView style={{ flex: 0 }} />
@@ -355,7 +411,7 @@ export default function AddressBookContents(props) {
 
           {(IMKeeper.length > 0 || Loading) && (
             <View style={{ marginTop: wp('5%') }}>
-              <Text style={styles.pageTitle}>I am the keeper of</Text>
+              <Text style={styles.pageTitle}>I am the Keeper of</Text>
               <Text style={styles.pageInfoText}>
                 Contacts who I can help restore their wallets.
               </Text>
@@ -376,8 +432,7 @@ export default function AddressBookContents(props) {
           <View
             style={{
               marginTop:
-                IMKeeper.length == 0 &&
-                MyKeeper.length == 0
+                IMKeeper.length == 0 && MyKeeper.length == 0
                   ? wp('2%')
                   : wp('5%'),
             }}
@@ -393,6 +448,9 @@ export default function AddressBookContents(props) {
                     return getElement(item, index, 'Other Contacts');
                   })}
                   <TouchableOpacity
+                    onPress={() =>
+                      AddContactAddressBookBookBottomSheet.current.snapTo(1)
+                    }
                     style={{
                       ...styles.selectedContactsView,
                       paddingBottom: 7,
@@ -432,6 +490,16 @@ export default function AddressBookContents(props) {
             )}
         </ScrollView>
       </View>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={AddContactAddressBookBookBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+        ]}
+        renderContent={renderAddContactAddressBookContents}
+        renderHeader={renderAddContactAddressBookHeader}
+      />
     </View>
   );
 }

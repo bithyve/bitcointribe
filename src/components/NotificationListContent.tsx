@@ -33,6 +33,7 @@ export default function NotificationListContent(props) {
         {props.NotificationData.map((value, index) => {
           return (
             <AppBottomSheetTouchableWrapper
+              key={index}
               onPress={() => props.onNotificationClicked(value)}
               style={{
                 ...styles.notificationElement,
@@ -101,7 +102,7 @@ export default function NotificationListContent(props) {
       </View>
       {[1, 2, 3, 4].map((value) => {
         return (
-          <View style={styles.EmptyListLoaderView}>
+          <View key={value} style={styles.EmptyListLoaderView}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View style={styles.EmptyListLoaderCircle} />
               <View>

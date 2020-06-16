@@ -132,89 +132,26 @@ export default class BaseAccount {
       label?: string;
       message?: string;
     },
-  ):
-    | {
-        status: number;
-        data: {
-          paymentURI: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.generatePaymentURI(address, options),
-      };
-    } catch (err) {
-      return { status: 103, err: err.message, message: ErrMap[103] };
-    }
-  };
+  ): {
+    paymentURI: string;
+  } => this.hdWallet.generatePaymentURI(address, options);
 
   public decodePaymentURI = (
     paymentURI: string,
-  ):
-    | {
-        status: number;
-        data: {
-          address: string;
-          options: {
-            amount?: number;
-            label?: string;
-            message?: string;
-          };
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.decodePaymentURI(paymentURI),
-      };
-    } catch (err) {
-      return { status: 104, err: err.message, message: ErrMap[104] };
-    }
-  };
+  ): {
+    address: string;
+    options: {
+      amount?: number;
+      label?: string;
+      message?: string;
+    };
+  } => this.hdWallet.decodePaymentURI(paymentURI);
 
   public addressDiff = (
     scannedStr: string,
-  ):
-    | {
-        status: number;
-        data: {
-          type: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.addressDiff(scannedStr),
-      };
-    } catch (err) {
-      return { status: 105, err: err.message, message: ErrMap[105] };
-    }
-  };
+  ): {
+    type: string;
+  } => this.hdWallet.addressDiff(scannedStr);
 
   public getDerivativeAccXpub = (
     accountType: string,
@@ -239,7 +176,7 @@ export default class BaseAccount {
         data: this.hdWallet.getDerivativeAccXpub(
           accountType,
           accountNumber,
-          contactName,
+          contactName.toLowerCase().trim(),
         ),
       };
     } catch (err) {
@@ -275,7 +212,7 @@ export default class BaseAccount {
         data: await this.hdWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
-          contactName,
+          contactName.toLowerCase().trim(),
         ),
       };
     } catch (err) {

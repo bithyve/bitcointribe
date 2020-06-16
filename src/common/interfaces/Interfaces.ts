@@ -11,7 +11,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 export interface DecentralizedBackup {
   RECOVERY_SHARES: {
     [SHARE_INDEX: string]: {
-      REQUEST_DETAILS: { TAG: string; KEY: string };
+      REQUEST_DETAILS?: { TAG: string; KEY: string };
       META_SHARE?: MetaShare;
       ENC_DYNAMIC_NONPMDD?: EncDynamicNonPMDD;
     };
@@ -27,6 +27,10 @@ export interface DecentralizedBackup {
     [TAG: string]: {
       META_SHARE: MetaShare;
       ENC_DYNAMIC_NONPMDD: EncDynamicNonPMDD;
+      TRANSFER_DETAILS: {
+        KEY: string;
+        UPLOADED_AT: number;
+      };
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;
