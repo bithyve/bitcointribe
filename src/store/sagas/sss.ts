@@ -70,6 +70,7 @@ import { updateEphemeralChannel } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import crypto from 'crypto';
+import DeviceInfo from 'react-native-device-info';
 import { insertDBWorker } from './storage';
 import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
@@ -99,8 +100,15 @@ function* generateMetaSharesWorker() {
     bhXpub: bh,
   };
 
+  const appVersion = DeviceInfo.getVersion();
+
   if (s3Service.sss.metaShares.length) return;
-  const res = yield call(s3Service.createMetaShares, secureAssets, walletName);
+  const res = yield call(
+    s3Service.createMetaShares,
+    secureAssets,
+    walletName,
+    appVersion,
+  );
   if (res.status === 200) {
     return s3Service;
     // const { SERVICES } = yield select(state => state.storage.database);

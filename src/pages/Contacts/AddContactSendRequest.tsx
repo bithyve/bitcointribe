@@ -132,7 +132,7 @@ export default function AddContactSendRequest(props) {
       const publicKey =
         trustedContacts.tc.trustedContacts[contactName].publicKey;
       const requester = WALLET_SETUP.walletName;
-
+      const appVersion = DeviceInfo.getVersion();
       if (!trustedLink) {
         if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
           const phoneNumber = Contact.phoneNumbers[0].number;
@@ -149,7 +149,9 @@ export default function AddContactSendRequest(props) {
             `/${requester}` +
             `/${numberEncPubKey}` +
             `/${numHintType}` +
-            `/${numHint}`;
+            `/${numHint}` +
+            `/v${appVersion}`;
+
           console.log({ numberDL });
           setTrustedLink(numberDL);
         } else if (Contact.emails && Contact.emails.length) {
@@ -166,7 +168,9 @@ export default function AddContactSendRequest(props) {
             `/${requester}` +
             `/${emailEncPubKey}` +
             `/${emailHintType}` +
-            `/${emailHint}`;
+            `/${emailHint}` +
+            `/v${appVersion}`;
+
           console.log({ emailDL });
           setTrustedLink(emailDL);
         } else {
@@ -185,6 +189,7 @@ export default function AddContactSendRequest(props) {
             requester: WALLET_SETUP.walletName,
             publicKey,
             type: 'trustedContactQR',
+            ver: appVersion,
           }),
         );
       }

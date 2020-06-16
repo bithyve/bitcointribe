@@ -14,6 +14,7 @@ import {
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
+import DeviceInfo from 'react-native-device-info';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -109,13 +110,14 @@ export default function RecoveryCommunication(props) {
           ...REQUEST_DETAILS,
           requester: WALLET_SETUP.walletName,
           type: 'recoveryQR',
+          ver: DeviceInfo.getVersion(),
         }),
       )
     : null;
 
   const communicate = async (selectedContactMode) => {
     const requester = WALLET_SETUP.walletName;
-
+    const appVersion = DeviceInfo.getVersion();
     switch (selectedContactMode.type) {
       case 'number':
         const number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
@@ -132,7 +134,8 @@ export default function RecoveryCommunication(props) {
           `/${requester}` +
           `/${numberEncKey}` +
           `/${numHintType}` +
-          `/${numHint}`;
+          `/${numHint}` +
+          `/v${appVersion}`;
 
         textWithoutEncoding(selectedContactMode.info, numberDL);
         // props.navigation.navigate('ShareRecoveryOTP', {
@@ -156,7 +159,8 @@ export default function RecoveryCommunication(props) {
           `/${requester}` +
           `/${emailEncPubKey}` +
           `/${emailHintType}` +
-          `/${emailHint}`;
+          `/${emailHint}` +
+          `/v${appVersion}`;
 
         email(
           [selectedContactMode.info],
