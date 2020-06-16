@@ -121,6 +121,7 @@ import {
   EphemeralData,
 } from '../bitcoin/utilities/Interface';
 import * as RNLocalize from 'react-native-localize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const isCompatible = async (method: string, version: string) => {
   if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
@@ -243,6 +244,42 @@ export default function Home(props) {
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
+  const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY'];
+
+  function setCurrencyCodeToImage(currencyName, currencyColor) {
+    console.log("currencyColor", currencyColor);
+    return (
+      <View style={{
+      marginRight: 5,
+      marginBottom: wp('0.7%'),}}>
+      <MaterialCommunityIcons
+        name={currencyName}
+        color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
+        size={wp('3.5%')}
+      />
+      </View>
+    );
+  }
+
+  const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+      case 'BRL':
+        return setCurrencyCodeToImage('currency-brl', color);
+      case 'CNY':
+      case 'JPY':
+        return setCurrencyCodeToImage('currency-cny', color);
+      case 'GBP':
+        return setCurrencyCodeToImage('currency-gbp', color);
+      case 'KRW':
+        return setCurrencyCodeToImage('currency-krw', color);
+      case 'RUB':
+        return setCurrencyCodeToImage('currency-rub', color);
+      case 'TRY':
+        return setCurrencyCodeToImage('currency-try', color);
+      default:
+        break;
+    }
+  };
 
   const onNotificationClicked = async (value) => {
     let asyncNotifications = JSON.parse(
@@ -2991,7 +3028,9 @@ export default function Home(props) {
                       }}
                       source={require('../assets/images/icons/icon_bitcoin_light.png')}
                     />
-                  ) : (
+                  ) : currencyCode.includes(CurrencyCode) ? (
+              getCurrencyImage(CurrencyCode, 'light')
+            ) : (
                     <Image
                       style={{
                         ...styles.cardBitCoinImage,
@@ -3186,6 +3225,8 @@ export default function Home(props) {
                                     style={styles.cardBitCoinImage}
                                     source={value.bitcoinicon}
                                   />
+                                ) : (currencyCode.includes(CurrencyCode)) ? (
+                                  getCurrencyImage(CurrencyCode, 'light_blue')
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}

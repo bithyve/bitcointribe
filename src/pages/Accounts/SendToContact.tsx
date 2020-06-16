@@ -792,7 +792,7 @@ export default function SendToContact(props) {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={styles.modalHeaderTitleText}>{'Send To Contact'}</Text>
+          <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
         </View>
       </View>
       <View style={{ width: wp('85%'), alignSelf: 'center' }}>

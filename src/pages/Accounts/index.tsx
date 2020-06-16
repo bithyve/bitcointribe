@@ -63,6 +63,7 @@ import {
 } from '../../bitcoin/utilities/Interface';
 import TransactionHelperModalContents from '../../components/Helper/TransactionHelperModalContents';
 import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Accounts(props) {
   const [FBTCAccount, setFBTCAccount] = useState({});
@@ -166,6 +167,39 @@ export default function Accounts(props) {
     setTransactionDetailsHelperBottomSheet,
   ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+
+  function setCurrencyCodeToImage(currencyName, currencyColor) {
+    console.log('currencyColor', currencyColor);
+    return (
+      <MaterialCommunityIcons
+        name={currencyName}
+        color={currencyColor == 'light' ? Colors.white : Colors.blue}
+        size={wp('3.5%')}
+      />
+    );
+  }
+
+  const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+      case 'BRL':
+        return setCurrencyCodeToImage('currency-brl', color);
+      case 'CNY':
+      case 'JPY':
+        return setCurrencyCodeToImage('currency-cny', color);
+      case 'GBP':
+        return setCurrencyCodeToImage('currency-gbp', color);
+      case 'KRW':
+        return setCurrencyCodeToImage('currency-krw', color);
+      case 'RUB':
+        return setCurrencyCodeToImage('currency-rub', color);
+      case 'TRY':
+        return setCurrencyCodeToImage('currency-try', color);
+      default:
+        break;
+    }
+  };
+
   const checkNHighlight = async () => {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
@@ -531,6 +565,17 @@ export default function Accounts(props) {
                 style={styles.cardBitCoinImage}
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
               />
+            ) : currencyCode.includes(CurrencyCode) ? (
+              <View
+                style={{
+                  marginRight: 5,
+                  marginTop: 'auto',
+                  marginLeft: 'auto',
+                  marginBottom: wp('1.2%'),
+                }}
+              >
+                {getCurrencyImage(CurrencyCode, 'light')}
+              </View>
             ) : (
               <Image
                 style={styles.cardBitCoinImage}
@@ -1310,8 +1355,16 @@ export default function Accounts(props) {
               currencyCodeValue={CurrencyCode}
               activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
               inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-              activeOffImage={getCurrencyImageByRegion(CurrencyCode, 'light')}
-              inactiveOffImage={getCurrencyImageByRegion(CurrencyCode, 'dark')}
+              activeOffImage={
+                currencyCode.includes(CurrencyCode)
+                  ? getCurrencyImage(CurrencyCode, 'light')
+                  : getCurrencyImageByRegion(CurrencyCode, 'light')
+              }
+              inactiveOffImage={
+                currencyCode.includes(CurrencyCode)
+                  ? getCurrencyImage(CurrencyCode, 'light')
+                  : getCurrencyImageByRegion(CurrencyCode, 'dark')
+              }
               toggleColor={Colors.lightBlue}
               toggleCircleColor={Colors.blue}
               onpress={async () => {
