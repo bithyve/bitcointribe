@@ -194,6 +194,9 @@ export default function AddContactSendRequest(props) {
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
+      isFromReceive={true}
+      headerText={'Share'}
+      subHeaderText={'Share with your contact'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         link={trustedLink}
@@ -223,6 +226,7 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRContents = useCallback(() => {
     return (
       <SendViaQR
+      isFromReceive={true}
         headerText={'Friends and Family Request'}
         subHeaderText={'Scan the QR from your contact’s Hexa app'}
         contactText={'Adding to Friends and Family:'}
@@ -287,7 +291,7 @@ export default function AddContactSendRequest(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Send Request{' '}
+                Add Contact{' '}
               </Text>
               <Text
                 style={{
@@ -297,7 +301,7 @@ export default function AddContactSendRequest(props) {
                   paddingTop: 5,
                 }}
               >
-                Add contact to Friends and Family
+                 Send a Friends and Family request
               </Text>
             </View>
             <TouchableOpacity
@@ -449,9 +453,9 @@ export default function AddContactSendRequest(props) {
         <View style={{ marginTop: 'auto' }}>
           <View style={{ marginBottom: hp('1%') }}>
             <BottomInfoBox
-              title={'Note'}
+              title={'Friends and Family request'}
               infoText={
-                'Scan the QR on your contacts Hexa app or send a link to your contact'
+                'Your contact will have to accept your request to add them'
               }
             />
           </View>
@@ -483,7 +487,7 @@ export default function AddContactSendRequest(props) {
                 source={require('../../assets/images/icons/openlink.png')}
                 style={styles.buttonImage}
               />
-              <Text style={styles.buttonText}>Via Link</Text>
+              <Text style={styles.buttonText}>Share</Text>
             </TouchableOpacity>
             <View
               style={{ width: 1, height: 30, backgroundColor: Colors.white }}
@@ -500,7 +504,7 @@ export default function AddContactSendRequest(props) {
                 source={require('../../assets/images/icons/qr-code.png')}
                 style={styles.buttonImage}
               />
-              <Text style={styles.buttonText}>Via QR</Text>
+              <Text style={styles.buttonText}>QR</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -509,9 +513,7 @@ export default function AddContactSendRequest(props) {
           ref={SendViaLinkBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('83%')
-              : hp('85%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
           ]}
           renderContent={renderSendViaLinkContents}
           renderHeader={renderSendViaLinkHeader}
@@ -521,9 +523,7 @@ export default function AddContactSendRequest(props) {
           ref={SendViaQRBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('83%')
-              : hp('85%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
           ]}
           renderContent={renderSendViaQRContents}
           renderHeader={renderSendViaQRHeader}

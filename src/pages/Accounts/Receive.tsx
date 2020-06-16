@@ -1035,9 +1035,9 @@ export default function Receive(props) {
             >
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
-                  title={'Note'}
+                  title={'Bitcoin Receiving Address'}
                   infoText={
-                    'Bitcoin Receiving Address. Generate bitcoin address and share via link or QR'
+                    'Generate bitcoin address and share via link or QR'
                   }
                 />
               </View>

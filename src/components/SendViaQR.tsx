@@ -150,13 +150,15 @@ export default function SendViaQR(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center'}}>
         <View
           style={{
             marginLeft: 20,
             marginRight: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
             marginTop: props.isFromReceive ? hp('0.1%') : hp('1.7%'),
-            marginBottom: hp('1.7%'),
+            marginBottom: props.isFromReceive ? hp('0.1%') : hp('1.7%'),
           }}
         >
           {!props.isFromReceive ? (
@@ -378,14 +380,21 @@ export default function SendViaQR(props) {
               )}
             </View>
           ) : null}
-          <View style={styles.loader}>
+          <View style={{
+            height: hp('27%'),
+            justifyContent: 'center',
+            marginLeft: 20,
+            marginRight: 20,
+            alignItems: 'center',
+            marginTop: props.isFromReceive ? hp('0.1%') : hp('4%')
+          }}>
             {!props.QR ? (
               <ActivityIndicator size="large" />
             ) : (
               <QRCode value={props.QR} size={hp('27%')} />
             )}
           </View>
-        </View>
+          </View>
       </ScrollView>
 
       {!props.isFromReceive ? (
@@ -402,14 +411,6 @@ export default function SendViaQR(props) {
   );
 }
 const styles = StyleSheet.create({
-  loader: {
-    height: hp('27%'),
-    justifyContent: 'center',
-    marginLeft: 20,
-    marginRight: 20,
-    alignItems: 'center',
-    marginTop: hp('4%'),
-  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),

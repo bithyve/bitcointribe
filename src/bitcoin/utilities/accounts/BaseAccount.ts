@@ -212,7 +212,7 @@ export default class BaseAccount {
         data: await this.hdWallet.getDerivativeAccReceivingAddress(
           accountType,
           accountNumber,
-          contactName.toLowerCase().trim(),
+          contactName ? contactName.toLowerCase().trim() : null,
         ),
       };
     } catch (err) {
