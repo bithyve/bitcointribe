@@ -398,7 +398,6 @@ export default function Login(props) {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar />
-      <SafeAreaView style={{ flex: 0 }} />
       <View style={{ flex: 1 }}>
         <View style={{}}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
