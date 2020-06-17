@@ -246,7 +246,6 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     });
 
-    yield delay(2000); // delaying to allow data insertion and service enrichment prior to spinning a database inserting saga (updateEphemeralChannel)
     yield put(updateEphemeralChannel(payload.contactName, data));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();

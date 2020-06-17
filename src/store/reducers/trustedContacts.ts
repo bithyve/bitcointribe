@@ -10,6 +10,7 @@ import {
   TRUSTED_CHANNEL_FETCHED,
   PAYMENT_DETAILS_FETCHED,
   CLEAR_PAYMENT_DETAILS,
+  SWITCH_TC_LOADING,
 } from '../actions/trustedContacts';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 
@@ -30,6 +31,10 @@ const initialState: {
     address?: string;
     paymentURI?: string;
   };
+
+  loading: {
+    updateEphemeralChannel: Boolean;
+  };
 } = {
   service: null,
   serviceEnriched: false,
@@ -38,6 +43,9 @@ const initialState: {
   ephemeralChannel: null,
   trustedChannel: null,
   paymentDetails: null,
+  loading: {
+    updateEphemeralChannel: false,
+  },
 };
 
 export default (state = initialState, action) => {
@@ -125,6 +133,17 @@ export default (state = initialState, action) => {
       return {
         ...state,
         paymentDetails: null,
+      };
+
+    case SWITCH_TC_LOADING:
+      return {
+        ...state,
+        loading: {
+          ...state.loading,
+          [action.payload.beingLoaded]: !state.loading[
+            action.payload.beingLoaded
+          ],
+        },
       };
   }
 

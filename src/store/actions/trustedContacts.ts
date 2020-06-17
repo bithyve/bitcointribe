@@ -95,6 +95,7 @@ export const TRUSTED_CHANNEL_UPDATED = 'TRUSTED_CHANNEL_UPDATED';
 export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED';
 export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED';
 export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS';
+export const SWITCH_TC_LOADING = 'SWITCH_TC_LOADING';
 
 export const trustedContactInitialized = (
   contactName: string,
@@ -162,5 +163,12 @@ export const paymentDetailsFetched = (paymentDetails) => {
 export const clearPaymentDetails = () => {
   return {
     type: CLEAR_PAYMENT_DETAILS,
+  };
+};
+
+export const switchTCLoading = (beingLoaded) => {
+  return {
+    type: SWITCH_TC_LOADING,
+    payload: { beingLoaded },
   };
 };
