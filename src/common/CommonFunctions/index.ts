@@ -21,7 +21,7 @@ export const getCurrencyImageByRegion = (currencyCode, type) => {
     } else if (type == 'dark') {
       return require('../../assets/images/currencySymbols/icon_dollar_dark.png');
     } else if (type == 'gray') {
-      return require('../../assets/images/currencySymbols/icon_dollar_light.png');
+      return require('../../assets/images/currencySymbols/dollar_grey.png');
     } else if (type == 'light_blue') {
       return require('../../assets/images/currencySymbols/icon_dollar_lightblue.png');
     }

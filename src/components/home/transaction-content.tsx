@@ -202,10 +202,29 @@ const TransactionsContent = ({
                       </View>
                     </View>
                     <View style={styles.transactionModalAmountView}>
-                      {/* <Image
-                                                source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                                                style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                                            /> */}
+                      {item.accountType == 'FAST_BITCOINS' && (
+                        <View
+                          style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderColor: Colors.borderColor,
+                            borderWidth: 0.5,
+                            borderRadius: wp('8%') / 2,
+                            width: wp('8%'),
+                            height: wp('8%'),
+                            backgroundColor: Colors.white,
+                          }}
+                        >
+                          <Image
+                            source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+                            style={{
+                              width: wp('5%'),
+                              height: wp('5%'),
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        </View>
+                      )}
                       <Text
                         style={{
                           ...styles.transactionModalAmountText,
