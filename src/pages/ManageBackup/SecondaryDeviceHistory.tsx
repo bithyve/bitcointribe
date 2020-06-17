@@ -36,6 +36,7 @@ import { uploadEncMShare } from '../../store/actions/sss';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import config from '../../bitcoin/HexaConfig';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -176,7 +177,8 @@ const SecondaryDeviceHistory = (props) => {
     } else {
       if (
         !SHARES_TRANSFER_DETAILS[0] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000
+        Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT >
+          config.TC_REQUEST_EXPIRY
       ) {
         dispatch(uploadEncMShare(0, contactName, data));
         updateTrustedContactsInfo({ firstName, lastName });
@@ -185,7 +187,8 @@ const SecondaryDeviceHistory = (props) => {
         !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt > 600000
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+          config.TC_REQUEST_EXPIRY
       ) {
         dispatch(
           updateEphemeralChannel(

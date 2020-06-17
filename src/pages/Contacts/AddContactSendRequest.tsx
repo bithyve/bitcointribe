@@ -117,7 +117,8 @@ export default function AddContactSendRequest(props) {
         !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt > 600000
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+          config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(

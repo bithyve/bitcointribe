@@ -517,7 +517,7 @@ const TrustedContactHistory = (props) => {
   // useEffect(() => {
   //   if (
   //     !SHARES_TRANSFER_DETAILS[index] ||
-  //     Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+  //     Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >   config.TC_REQUEST_EXPIRY;
   //   )
   //     dispatch(uploadEncMShare(index));
   //   else {
@@ -899,7 +899,8 @@ const TrustedContactHistory = (props) => {
         setChangeContact(false);
       } else if (
         !SHARES_TRANSFER_DETAILS[index] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+          config.TC_REQUEST_EXPIRY
       ) {
         dispatch(uploadEncMShare(index, contactName, data));
         updateTrustedContactsInfo(chosenContact);
@@ -911,7 +912,8 @@ const TrustedContactHistory = (props) => {
         !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt > 600000
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+          config.TC_REQUEST_EXPIRY
       ) {
         dispatch(
           updateEphemeralChannel(

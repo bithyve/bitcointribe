@@ -76,6 +76,7 @@ import Share from 'react-native-share';
 import RNPrint from 'react-native-print';
 import Toast from '../../components/Toast';
 var Mailer = require('NativeModules').RNMail;
+import config from '../../bitcoin/HexaConfig';
 
 function* generateMetaSharesWorker() {
   const s3Service: S3Service = yield select((state) => state.sss.service);
@@ -181,7 +182,7 @@ function* uploadEncMetaShareWorker({ payload }) {
         Date.now() -
           DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]
             .UPLOADED_AT <
-        600000
+        config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
         return;
@@ -315,7 +316,7 @@ function* uploadRequestedShareWorker({ payload }) {
 
   // preventing re-uploads till expiry
   if (TRANSFER_DETAILS) {
-    if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < 600000) {
+    if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
       return;
     }
   }
