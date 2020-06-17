@@ -820,6 +820,7 @@ export default function SendToContact(props) {
             color: Colors.textColorGrey,
             fontSize: RFValue(12),
             fontFamily: Fonts.FiraSansRegular,
+            alignSelf: "flex-end"
           }}
         >
           {'Sending From: '}
@@ -830,7 +831,7 @@ export default function SendToContact(props) {
             if (isFromAddressBook)
               AccountSelectionBottomSheet.current.snapTo(1);
           }}
-          style={{ flexDirection: 'row' }}
+          style={{ flexDirection: 'row', alignItems:'flex-end' }}
         >
           <Text
             style={{
@@ -1155,5 +1156,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
+    elevation: 10
   },
 });
