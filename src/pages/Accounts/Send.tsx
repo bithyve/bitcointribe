@@ -118,7 +118,7 @@ export default function Send(props) {
     },
     {
       id: SECURE_ACCOUNT,
-      account_name: 'Saving Account',
+      account_name: 'Savings Account',
       type: SECURE_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_secureaccount_white.png'),
@@ -752,7 +752,32 @@ export default function Send(props) {
                       size={17}
                     />
                   </TouchableOpacity>
-                  <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+                  <Image
+                    source={
+                      serviceType == TEST_ACCOUNT
+                        ? require('../../assets/images/icons/icon_test.png')
+                        : serviceType == REGULAR_ACCOUNT
+                        ? require('../../assets/images/icons/icon_regular.png')
+                        : require('../../assets/images/icons/icon_secureaccount.png')
+                    }
+                    style={{ width: wp('10%'), height: wp('10%') }}
+                  />
+                  <View style={{ marginLeft: wp('2.5%') }}>
+                    <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue(12),
+                      }}
+                    >
+                      {serviceType == TEST_ACCOUNT
+                        ? 'Test Account'
+                        : serviceType == REGULAR_ACCOUNT
+                        ? 'Checking Account'
+                        : 'Savings Account'}
+                    </Text>
+                  </View>
                   {serviceType == TEST_ACCOUNT ? (
                     <Text
                       onPress={() => {
@@ -829,9 +854,7 @@ export default function Send(props) {
                 ) : null}
                 {isInvalidAddress ? (
                   <View style={{ marginLeft: 'auto' }}>
-                    <Text style={styles.errorText}>
-                      Enter correct address
-                      </Text>
+                    <Text style={styles.errorText}>Enter correct address</Text>
                   </View>
                 ) : null}
                 {serviceType != TEST_ACCOUNT ? (
@@ -846,9 +869,9 @@ export default function Send(props) {
                         }}
                       >
                         Send to Contact
-                        </Text>
+                      </Text>
                       <TouchableOpacity
-                        onPress={() => { }}
+                        onPress={() => {}}
                         style={{
                           height: 20,
                           width: 20,
@@ -867,8 +890,9 @@ export default function Send(props) {
                       <View
                         style={{
                           ...styles.textBoxView,
-                          flexDirection: 'column',
-                          height: 90,
+                          paddingTop: hp('1%'),
+                          paddingBottom: hp('1%'),
+                          height: hp('15%'),
                           justifyContent: 'center',
                           backgroundColor: Colors.backgroundColor,
                           borderColor: Colors.backgroundColor,
@@ -876,13 +900,9 @@ export default function Send(props) {
                       >
                         <View
                           style={{
-                            ...styles.textBoxView,
-                            paddingTop: hp('1%'),
-                            paddingBottom: hp('1%'),
-                            height: hp('15%'),
-                            justifyContent: 'center',
-                            backgroundColor: Colors.backgroundColor,
-                            borderColor: Colors.backgroundColor,
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
                           }}
                         >
                           <TouchableOpacity
@@ -916,22 +936,22 @@ export default function Send(props) {
                         </View>
                       </View>
                     ) : (
-                        <View
-                          style={{
-                            marginBottom: -25,
-                            padding: -20,
-                            marginLeft: -20,
-                            marginRight: -20,
-                          }}
-                        >
-                          <BottomInfoBox
-                            title={'You have not added any Trusted Contact'}
-                            infoText={
-                              'Add a Trusted Contact to send them sats without having to scan an address'
-                            }
-                          />
-                        </View>
-                      )}
+                      <View
+                        style={{
+                          marginBottom: -25,
+                          padding: -20,
+                          marginLeft: -20,
+                          marginRight: -20,
+                        }}
+                      >
+                        <BottomInfoBox
+                          title={'You have not added any Trusted Contact'}
+                          infoText={
+                            'Add a Trusted Contact to send them sats without having to scan an address'
+                          }
+                        />
+                      </View>
+                    )}
                   </View>
                 ) : null}
                 {serviceType != TEST_ACCOUNT ? (
@@ -946,9 +966,9 @@ export default function Send(props) {
                         }}
                       >
                         Send to Account
-                        </Text>
+                      </Text>
                       <TouchableOpacity
-                        onPress={() => { }}
+                        onPress={() => {}}
                         style={{
                           height: 20,
                           width: 20,
@@ -998,7 +1018,7 @@ export default function Send(props) {
                         showsVerticalScrollIndicator={false}
                         renderItem={renderAccounts}
                         extraData={transfer.details}
-                      //keyExtractor={(item, index) => index.toString()}
+                        //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
                   </View>
@@ -1039,7 +1059,6 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -1099,7 +1118,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     zIndex: 999,
-    elevation: 10
+    elevation: 10,
   },
   cameraView: {
     width: wp('90%'),

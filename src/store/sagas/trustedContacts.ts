@@ -15,6 +15,7 @@ import {
   updateEphemeralChannel,
   TRUSTED_CHANNELS_SYNC,
   paymentDetailsFetched,
+  switchTCLoading,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -108,6 +109,8 @@ export const approveTrustedContactWatcher = createWatcher(
 );
 
 function* updateEphemeralChannelWorker({ payload }) {
+  yield put(switchTCLoading('updateEphemeralChannel'));
+
   let trustedContacts: TrustedContactsService = payload.trustedContacts;
 
   if (!trustedContacts)
@@ -187,6 +190,7 @@ function* updateEphemeralChannelWorker({ payload }) {
   } else {
     console.log(res.err);
   }
+  yield put(switchTCLoading('updateEphemeralChannel'));
 }
 
 export const updateEphemeralChannelWatcher = createWatcher(

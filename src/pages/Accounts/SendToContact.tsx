@@ -51,6 +51,10 @@ import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interfa
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AccountSelectionModalContents from './AccountSelectionModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import Currencies from '../../common/Currencies';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 
 export default function SendToContact(props) {
   const [RegularAccountBalance, setRegularAccountBalance] = useState(0);
@@ -79,6 +83,7 @@ export default function SendToContact(props) {
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
+  const [CurrencySymbol, setCurrencySymbol] = useState('$');
   const [bitcoinAmount, setBitCoinAmount] = useState(
     props.navigation.getParam('bitcoinAmount'),
   );
@@ -143,36 +148,54 @@ export default function SendToContact(props) {
     setSwitchOn(currencyToggleValueTmp ? true : false);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
+    for (let i = 0; i < Currencies.length; i++) {
+      if (Currencies[i].code.includes(currencyCodeTmp)) {
+        setCurrencySymbol(Currencies[i].symbol);
+      }
+    }
   };
 
-  const getCurrencyChar = (currencyCode) =>{
-    const currencyList = [
-      {
-        code: 'USD',
-        symbol: '$',
-        country: 'United State',
-      },
-      {
-        code: 'EUR',
-        symbol: '€',
-        country: 'Italy',
-      },
-      {
-        code: 'GBP',
-        symbol: '£',
-        country: 'United Kingdom',
-      },
-      {
-        code: 'INR',
-        symbol: '₹',
-        country: 'India',
-      },
-    ];
-    for (let i = 0; i < currencyList.length; i++) {
-      const element = currencyList[i];
-      if(CurrencyCode==element.code) return element.symbol;
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+
+  function setCurrencyCodeToImage(currencyName, currencyColor) {
+    console.log('currencyColor', currencyColor);
+    return (
+      <View
+        style={{
+          width: wp('6%'),
+          height: wp('6%'),
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <MaterialCommunityIcons
+          name={currencyName}
+          color={Colors.currencyGray}
+          size={wp('6%')}
+        />
+      </View>
+    );
+  }
+
+  const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+      case 'BRL':
+        return setCurrencyCodeToImage('currency-brl', color);
+      case 'CNY':
+      case 'JPY':
+        return setCurrencyCodeToImage('currency-cny', color);
+      case 'GBP':
+        return setCurrencyCodeToImage('currency-gbp', color);
+      case 'KRW':
+        return setCurrencyCodeToImage('currency-krw', color);
+      case 'RUB':
+        return setCurrencyCodeToImage('currency-rub', color);
+      case 'TRY':
+        return setCurrencyCodeToImage('currency-try', color);
+      default:
+        break;
     }
-}
+  };
 
   useEffect(() => {
     dispatch(clearTransfer(serviceType));
@@ -330,7 +353,7 @@ export default function SendToContact(props) {
     if (serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
     } else if (serviceType == 'SECURE_ACCOUNT') {
-      return 'Secure Account';
+      return 'Savings Account';
     } else if (serviceType == 'REGULAR_ACCOUNT') {
       return 'Checking Account';
     } else if (serviceType == 'S3_SERVICE') {
@@ -346,7 +369,7 @@ export default function SendToContact(props) {
             source={
               item.account_name === 'Checking Account'
                 ? require('../../assets/images/icons/icon_regular.png')
-                : item.account_name === 'Saving Account'
+                : item.account_name === 'Savings Account'
                 ? require('../../assets/images/icons/icon_secureaccount.png')
                 : item.account_name === 'Test Account'
                 ? require('../../assets/images/icons/icon_test_white.png')
@@ -444,7 +467,7 @@ export default function SendToContact(props) {
         >
           {switchOn
             ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
-            : getCurrencyChar(CurrencyCode) +
+            : CurrencySymbol +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
@@ -587,17 +610,28 @@ export default function SendToContact(props) {
         }}
       >
         <View style={styles.amountInputImage}>
-          <Image
+          {currencyCode.includes(CurrencyCode) ? 
+            getCurrencyImage(CurrencyCode, 'gray')
+           : <Image
+              style={{
+                ...styles.textBoxImage,
+              }}
+              source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
+            />
+          }
+          {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
-          />
+          /> */}
         </View>
         {renderVerticalDivider()}
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           editable={!switchOn}
           placeholder={
-            switchOn ? 'Converted amount in dollars' : 'Enter amount in dollars'
+            switchOn
+              ? 'Converted amount in ' + CurrencyCode
+              : 'Enter amount in ' + CurrencyCode
           }
           value={currencyAmount}
           returnKeyLabel="Done"
@@ -792,46 +826,52 @@ export default function SendToContact(props) {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+          <Image
+            source={
+              serviceType == TEST_ACCOUNT
+                ? require('../../assets/images/icons/icon_test.png')
+                : serviceType == REGULAR_ACCOUNT
+                ? require('../../assets/images/icons/icon_regular.png')
+                : require('../../assets/images/icons/icon_secureaccount.png')
+            }
+            style={{ width: wp('10%'), height: wp('10%') }}
+          />
+          <View style={{ marginLeft: wp('2.5%') }}>
+            <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              {serviceType == TEST_ACCOUNT
+                ? 'Test Account'
+                : serviceType == REGULAR_ACCOUNT
+                ? 'Checking Account'
+                : 'Savings Account'}
+            </Text>
+          </View>
         </View>
-      </View>
-      <View style={{ width: wp('85%'), alignSelf: 'center' }}>
-        {transfer.details && transfer.details.length > 0 ? (
-          <ScrollView horizontal={true}>
-            {transfer.details.map((item) => renderMultipleContacts(item))}
-          </ScrollView>
-        ) : null}
       </View>
       <View
         style={{
           alignSelf: 'center',
           width: wp('90%'),
-          borderBottomWidth: 1,
-          borderColor: Colors.borderColor,
-          marginBottom: hp('1%'),
+          marginBottom: hp('2%'),
           marginTop: hp('2%'),
           flexDirection: 'row',
           paddingBottom: hp('1.5%'),
           paddingTop: hp('1%'),
         }}
       >
-        <Text
-          style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue(12),
-            fontFamily: Fonts.FiraSansRegular,
-            alignSelf: "flex-end"
-          }}
-        >
-          {'Sending From: '}
-        </Text>
         <TouchableOpacity
           activeOpacity={10}
           onPress={() => {
             if (isFromAddressBook)
               AccountSelectionBottomSheet.current.snapTo(1);
           }}
-          style={{ flexDirection: 'row', alignItems:'flex-end' }}
+          style={{ flexDirection: 'row', alignItems: 'flex-end' }}
         >
           <Text
             style={{
@@ -877,6 +917,23 @@ export default function SendToContact(props) {
           )}
         </TouchableOpacity>
       </View>
+      <View style={{ width: wp('85%'), alignSelf: 'center' }}>
+        {transfer.details && transfer.details.length > 0 ? (
+          <ScrollView horizontal={true}>
+            {transfer.details.map((item) => renderMultipleContacts(item))}
+          </ScrollView>
+        ) : null}
+      </View>
+      <View
+        style={{
+          alignSelf: 'center',
+          width: wp('90%'),
+          borderBottomWidth: 1,
+          borderColor: Colors.borderColor,
+          marginBottom: hp('1%'),
+          marginTop: hp('2%'),
+        }}
+      />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
@@ -915,6 +972,28 @@ export default function SendToContact(props) {
                 />
               </View>
             </View>
+            {serviceType == TEST_ACCOUNT ? (
+              <View
+                style={{
+                  marginTop: wp('1.5%'),
+                  marginBottom: -25,
+                  padding: -20,
+                  marginLeft: -20,
+                  marginRight: -20,
+                }}
+              >
+                <BottomInfoBox
+                  title={'Value of your test-sats'}
+                  infoText={
+                    'The corresponding ' +
+                    CurrencySymbol +
+                    ' value shown here is for illustration only. Test-sats have no ' +
+                    CurrencySymbol +
+                    ' value'
+                  }
+                />
+              </View>
+            ) : null}
             <View
               style={{
                 ...InputStyleNote,
@@ -1064,7 +1143,6 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -1074,6 +1152,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
     alignItems: 'center',
     alignSelf: 'center',
     flexDirection: 'row',
@@ -1156,6 +1236,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    elevation: 10
+    elevation: 10,
   },
 });

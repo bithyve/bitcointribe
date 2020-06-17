@@ -12,7 +12,7 @@ export default function ToggleSwitch(props) {
     return (
       <MaterialCommunityIcons
         name={currencyName}
-        color={currencyColor == 'gray' ? Colors.borderColor : Colors.blue}
+        color={currencyColor == 'gray' ? Colors.currencyGray : Colors.blue}
         size={wp('3.8%')}
       />
     );

@@ -18,4 +18,5 @@ export default {
   black1: '#3A3A3C',
   buttonText:'#626262',
   lightTextColor: '#8B8B8B',
+  currencyGray: '#d0d0d0'
 };

@@ -52,8 +52,37 @@ export default function TransactionDetails(props) {
     })();
   }, [txDetails]);
 
-  if (!txDetails) {
-    return null
+  const getImageByAccountType = (accountType) =>{
+    if(accountType == 'FAST_BITCOINS'){
+      return <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderColor: Colors.borderColor,
+          borderWidth: 0.5,
+          borderRadius: wp('12%') / 2,
+          width: wp('12%'),
+          height: wp('12%'),
+          backgroundColor: Colors.white,
+        }}
+      >
+        <Image
+          source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+          style={{
+            width: wp('8%'),
+            height: wp('8%'),
+            resizeMode: 'contain',
+          }}
+        />
+      </View>
+    }else if(accountType == "Savings Account" || accountType == "Test Account" || accountType == "Checking Account"){
+      return <View>
+          <Image
+            source={accountType == "Savings Account" ? require('../../assets/images/icons/icon_secureaccount.png') : accountType == "Test Account" ? require('../../assets/images/icons/icon_test.png') : require('../../assets/images/icons/icon_regular.png') }
+            style={{ width: wp('12%'), height: wp('12%') }}
+          />
+        </View>
+    }
   }
 
   return (
@@ -88,12 +117,7 @@ export default function TransactionDetails(props) {
           paddingBottom: hp('2%'),
         }}
       >
-        <View>
-          <Image
-            source={require('../../assets/images/icons/icon_regular.png')}
-            style={{ width: wp('12%'), height: wp('12%') }}
-          />
-        </View>
+        {getImageByAccountType(txDetails.accountType)}
         <View
           style={{
             flex: 1,

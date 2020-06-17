@@ -61,6 +61,7 @@ import {
 import axios from 'axios';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
+import config from '../../bitcoin/HexaConfig';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
@@ -592,7 +593,10 @@ export default function RestoreSelectedContactsList(props) {
           //   return;
           // }
 
-          if (Date.now() - recoveryRequest.uploadedAt > 600000) {
+          if (
+            Date.now() - recoveryRequest.uploadedAt >
+            config.TC_REQUEST_EXPIRY
+          ) {
             Alert.alert(
               `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
               `Please ask your Guardian to initiate a new ${
