@@ -32,13 +32,32 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
+import { uploadEncMShare } from '../../store/actions/sss';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 
-const SecondaryDeviceHistory = props => {
+const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
+  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
+  const SHARES_TRANSFER_DETAILS = useSelector(
+    (state) =>
+      state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+  );
+
+  const WALLET_SETUP = useSelector(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  const dispatch = useDispatch();
+  const [changeContact, setChangeContact] = useState(false);
+  const [secondaryQR, setSecondaryQR] = useState('');
+
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -86,6 +105,12 @@ const SecondaryDeviceHistory = props => {
     setSecondaryDeviceMessageBottomSheet,
   ] = useState(React.createRef());
   const [isReshare, setIsReshare] = useState(false);
+  const uploadMetaShare = useSelector(
+    (state) => state.sss.loading.uploadMetaShare,
+  );
+  const updateEphemeralChannelLoader = useSelector(
+    (state) => state.trustedContacts.loading.updateEphemeralChannel,
+  );
 
   const updateAutoHighlightFlags = props.navigation.getParam(
     'updateAutoHighlightFlags',
@@ -107,10 +132,115 @@ const SecondaryDeviceHistory = props => {
       );
     }
   };
-  const dispatch = useDispatch();
+
+  const updateTrustedContactsInfo = useCallback(async (contact) => {
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
+    );
+    console.log({ trustedContactsInfo });
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      trustedContactsInfo[0] = contact;
+    } else {
+      trustedContactsInfo = [];
+      trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+      trustedContactsInfo[0] = contact;
+    }
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
+  }, []);
+
+  const createGuardian = useCallback(async () => {
+    const walletID = await AsyncStorage.getItem('walletID');
+    const FCM = await AsyncStorage.getItem('fcmToken');
+
+    const firstName = 'Secondary';
+    const lastName = 'Device';
+    const contactName = `${firstName} ${lastName ? lastName : ''}`
+      .toLowerCase()
+      .trim();
+
+    let data: EphemeralData = {
+      walletID,
+      FCM,
+    };
+    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+    if (changeContact) {
+      dispatch(uploadEncMShare(0, contactName, data, true));
+      updateTrustedContactsInfo({ firstName, lastName });
+      setChangeContact(false);
+    } else {
+      if (
+        !SHARES_TRANSFER_DETAILS[0] ||
+        Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT > 600000
+      ) {
+        dispatch(uploadEncMShare(0, contactName, data));
+        updateTrustedContactsInfo({ firstName, lastName });
+      } else if (
+        trustedContact &&
+        !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel &&
+        trustedContact.ephemeralChannel.initiatedAt &&
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt > 600000
+      ) {
+        dispatch(
+          updateEphemeralChannel(
+            contactName,
+            trustedContact.ephemeralChannel.data[0],
+          ),
+        );
+      }
+    }
+  }, [SHARES_TRANSFER_DETAILS, changeContact, trustedContacts]);
+
+  useEffect(() => {
+    console.log(uploadMetaShare, updateEphemeralChannelLoader);
+    if (uploadMetaShare || updateEphemeralChannelLoader) {
+      if (secondaryQR) setSecondaryQR('');
+      return;
+    }
+
+    const firstName = 'Secondary';
+    const lastName = 'Device';
+    const contactName = `${firstName} ${lastName ? lastName : ''}`
+      .toLowerCase()
+      .trim();
+
+    if (
+      trustedContacts.tc.trustedContacts[contactName] &&
+      trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+    ) {
+      const publicKey =
+        trustedContacts.tc.trustedContacts[contactName].publicKey;
+
+      setSecondaryQR(
+        JSON.stringify({
+          isGuardian: true,
+          requester: WALLET_SETUP.walletName,
+          publicKey,
+          uploadedAt:
+            trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+              .initiatedAt,
+          type: 'secondaryDeviceGuardian',
+          ver: DeviceInfo.getVersion(),
+        }),
+      );
+    }
+  }, [
+    SHARES_TRANSFER_DETAILS,
+    trustedContacts,
+    uploadMetaShare,
+    updateEphemeralChannelLoader,
+  ]);
+
   const renderSecondaryDeviceContents = useCallback(() => {
     return (
       <SecondaryDevice
+        secondaryQR={secondaryQR}
         onPressOk={async () => {
           updateAutoHighlightFlags();
           saveInTransitHistory();
@@ -128,7 +258,7 @@ const SecondaryDeviceHistory = props => {
         }}
       />
     );
-  }, []);
+  }, [secondaryQR]);
 
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
@@ -175,13 +305,13 @@ const SecondaryDeviceHistory = props => {
     if (next) (secondaryDeviceBottomSheet as any).current.snapTo(1);
   }, [next]);
 
-  const sortedHistory = history => {
-    const currentHistory = history.filter(element => {
+  const sortedHistory = (history) => {
+    const currentHistory = history.filter((element) => {
       if (element.date) return element;
     });
 
     const sortedHistory = _.sortBy(currentHistory, 'date');
-    sortedHistory.forEach(element => {
+    sortedHistory.forEach((element) => {
       element.date = moment(element.date)
         .utc()
         .local()
@@ -191,7 +321,7 @@ const SecondaryDeviceHistory = props => {
     return sortedHistory;
   };
 
-  const updateHistory = shareHistory => {
+  const updateHistory = (shareHistory) => {
     const updatedSecondaryHistory = [...secondaryDeviceHistory];
     if (shareHistory[0].createdAt)
       updatedSecondaryHistory[0].date = shareHistory[0].createdAt;
@@ -313,11 +443,13 @@ const SecondaryDeviceHistory = props => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (secondaryDeviceMessageBottomSheet as any).current.snapTo(
-                  1,
-                );
+                (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
               }}
-              containerStyle={{ marginTop: 'auto', marginBottom:'auto', marginRight: 10 }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
               textStyle={{}}
             />
             <Image
@@ -359,26 +491,27 @@ const SecondaryDeviceHistory = props => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
           }}
           onPressContinue={() => {
+            createGuardian();
             (secondaryDeviceBottomSheet as any).current.snapTo(1);
           }}
         />
       </View>
       <BottomSheet
         onCloseStart={() => {
-          secondaryDeviceBottomSheet.current.snapTo(0);
+          (secondaryDeviceBottomSheet.current as any).snapTo(0);
         }}
         enabledInnerScrolling={true}
-        ref={secondaryDeviceBottomSheet}
+        ref={secondaryDeviceBottomSheet as any}
         snapPoints={[-30, hp('85%')]}
         renderContent={renderSecondaryDeviceContents}
         renderHeader={renderSecondaryDeviceHeader}
       />
       <BottomSheet
         onCloseStart={() => {
-          secondaryDeviceMessageBottomSheet.current.snapTo(0);
+          (secondaryDeviceMessageBottomSheet.current as any).snapTo(0);
         }}
         enabledInnerScrolling={true}
-        ref={secondaryDeviceMessageBottomSheet}
+        ref={secondaryDeviceMessageBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
@@ -388,7 +521,7 @@ const SecondaryDeviceHistory = props => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
