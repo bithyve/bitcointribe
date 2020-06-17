@@ -19,7 +19,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import QRCodeWrapper from '../../components/qr-hoc';
+import QRCode from 'react-native-qrcode-svg';
+
 
 const SendRequest = (props) => {
   const [receivingAddress, setReceivingAddress] = useState('test');
@@ -95,7 +96,7 @@ const SendRequest = (props) => {
               <ActivityIndicator size="large" />
             </View>
           ) : (
-              <QRCodeWrapper value={receivingAddress} size={hp('27%')} />
+              <QRCode value={receivingAddress} size={hp('27%')} />
             )}
           {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
         </View>

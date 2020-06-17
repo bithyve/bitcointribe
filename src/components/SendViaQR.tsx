@@ -11,13 +11,14 @@ import BottomInfoBox from './BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../common/CommonFunctions';
 import { ScrollView } from 'react-native-gesture-handler';
-import QRCodeWrapper from './qr-hoc';
+
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../common/constants/serviceTypes';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import QRCode from 'react-native-qrcode-svg';
 
 export default function SendViaQR(props) {
   const [contactName, setContactName] = useState('');
@@ -150,7 +151,7 @@ export default function SendViaQR(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center'}}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
         <View
           style={{
             marginLeft: 20,
@@ -391,17 +392,17 @@ export default function SendViaQR(props) {
             {!props.QR ? (
               <ActivityIndicator size="large" />
             ) : (
-                <QRCodeWrapper value={props.QR} size={hp('27%')} />
+                <QRCode value={props.QR} size={hp('27%')} />
               )}
             <View style={styles.loader}>
               {!props.QR ? (
                 <ActivityIndicator size="large" />
               ) : (
-                  <QRCodeWrapper value={props.QR} size={hp('27%')} />
+                  <QRCode value={props.QR} size={hp('27%')} />
                 )}
             </View>
           </View>
-          </View>
+        </View>
       </ScrollView>
 
       {!props.isFromReceive ? (

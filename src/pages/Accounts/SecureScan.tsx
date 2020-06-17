@@ -26,7 +26,8 @@ import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
-import QRCodeWrapper from '../../components/qr-hoc';
+import QRCode from 'react-native-qrcode-svg';
+
 
 const SecureScan = props => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -142,7 +143,7 @@ const SecureScan = props => {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-            <QRCodeWrapper value={secondaryQR} size={hp('27%')} />
+            <QRCode value={secondaryQR} size={hp('27%')} />
           )}
         {deepLink ? <CopyThisText text={deepLink} /> : null}
       </View>

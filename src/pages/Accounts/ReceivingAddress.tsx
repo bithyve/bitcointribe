@@ -37,7 +37,9 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import QRCodeWrapper from '../../components/qr-hoc';
+import QRCode from 'react-native-qrcode-svg';
+
+
 
 const ReceivingAddress = props => {
   const [AsTrustedContact, setAsTrustedContact] = useState(false);
@@ -261,7 +263,7 @@ const ReceivingAddress = props => {
       <TouchableWithoutFeedback
         onPress={() => {
           if (ReceiveHelperBottomSheet.current)
-            ReceiveHelperBottomSheet.current.snapTo(0);
+            (ReceiveHelperBottomSheet.current as any).snapTo(0);
         }}
       >
         <View style={BackupStyles.modalContainer}>
@@ -292,7 +294,7 @@ const ReceivingAddress = props => {
                   onPress={() => {
                     AsyncStorage.setItem('isReceiveHelperDone', 'true');
                     if (ReceiveHelperBottomSheet.current)
-                      ReceiveHelperBottomSheet.current.snapTo(1);
+                      (ReceiveHelperBottomSheet.current as any).snapTo(1);
                   }}
                   style={{
                     color: Colors.textColorGrey,
@@ -311,13 +313,13 @@ const ReceivingAddress = props => {
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-                <QRCodeWrapper value={receivingAddress} size={hp('27%')} />
+                <QRCode value={receivingAddress} size={hp('27%')} />
               )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
-            <TouchableOpacity activeOpacity={10} onPress={()=>{setAsTrustedContact(!AsTrustedContact)}} style={{flexDirection:'row', borderRadius:8, backgroundColor:Colors.backgroundColor,  alignItems:'center', marginLeft:15, marginRight:15, paddingLeft: 20, paddingRight: 15, marginTop: 30, width:wp('86%'), height:wp('13%')}}>
-              <Text style={{color: Colors.textColorGrey, fontSize:RFValue(12), fontFamily:Fonts.FiraSansRegular}}>Add sender to Friends and Family</Text>
-              <View style={{ width:wp('7%'), height: wp('7%'), borderRadius:7, backgroundColor:Colors.white, borderColor:Colors.borderColor, borderWidth:1, marginLeft:'auto', alignItems:'center', justifyContent:'center'}} >
-                {AsTrustedContact && 
+            <TouchableOpacity activeOpacity={10} onPress={() => { setAsTrustedContact(!AsTrustedContact) }} style={{ flexDirection: 'row', borderRadius: 8, backgroundColor: Colors.backgroundColor, alignItems: 'center', marginLeft: 15, marginRight: 15, paddingLeft: 20, paddingRight: 15, marginTop: 30, width: wp('86%'), height: wp('13%') }}>
+              <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Add sender to Friends and Family</Text>
+              <View style={{ width: wp('7%'), height: wp('7%'), borderRadius: 7, backgroundColor: Colors.white, borderColor: Colors.borderColor, borderWidth: 1, marginLeft: 'auto', alignItems: 'center', justifyContent: 'center' }} >
+                {AsTrustedContact &&
                   <Entypo name="check" size={RFValue(17)} color={Colors.green} />
                 }
               </View>

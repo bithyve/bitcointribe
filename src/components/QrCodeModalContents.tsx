@@ -24,7 +24,7 @@ export default function QrCodeModalContents(props) {
 	const barcodeRecognized = async (barcodes) => {
 		if (barcodes.data) {
 			setOpenCameraFlag(false);
-			props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
+			props.modalRef ? props.modalRef.snapTo(1) : ''; // closes modal
 			props.onQrScan(getFormattedString(barcodes.data));
 		}
 	};
@@ -106,33 +106,33 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-						{/* { !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
+					{/* { !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
 						placeholderTextColor={Colors.borderColor} 
 						style={styles.qrModalTextInput} 
 						autoCorrect={false}
 						/> : null}
 					 */}
 				</View>
-				{ !props.flag ? 
-				<BottomInfoBox
-				title={'What can you scan?'}
-				infoText={
-				  "Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request or a restore request"
-				}
-			  />
-				// <View style={styles.qrModalInfoView}>
-				// 	<View style={{ marginRight: 15 }}>
-				// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
-				// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
-				// 	</View>
-				// 	<Ionicons
-				// 		name="ios-arrow-forward"
-				// 		color={Colors.textColorGrey}
-				// 		size={15}
-				// 		style={{ alignSelf: 'center' }}
-				// 	/>
-				// </View>
-				 : null }
+				{!props.flag ?
+					<BottomInfoBox
+						title={'What can you scan?'}
+						infoText={
+							"Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request or a restore request"
+						}
+					/>
+					// <View style={styles.qrModalInfoView}>
+					// 	<View style={{ marginRight: 15 }}>
+					// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
+					// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
+					// 	</View>
+					// 	<Ionicons
+					// 		name="ios-arrow-forward"
+					// 		color={Colors.textColorGrey}
+					// 		size={15}
+					// 		style={{ alignSelf: 'center' }}
+					// 	/>
+					// </View>
+					: null}
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
@@ -150,11 +150,11 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.FiraSansRegular,
 		marginLeft: 15,
 		marginBottom: 20,
-	  },
+	},
 	qrModalScrollView: {
 		display: 'flex',
 		backgroundColor: Colors.white,
-		marginTop:hp('1%')
+		marginTop: hp('1%')
 	},
 	qrModalImageNTextInputView: {
 		marginBottom: 10,

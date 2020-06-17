@@ -14,7 +14,8 @@ import ErrorModalContents from '../../../components/ErrorModalContents';
 import ModalHeader from '../../../components/ModalHeader';
 import DeviceInfo from "react-native-device-info";
 import BottomSheet from "reanimated-bottom-sheet";
-import QRCodeWrapper from "../../qr-hoc";
+import QRCode from "react-native-qrcode-svg";
+
 
 const SecondaryDevice = props => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -81,16 +82,16 @@ const SecondaryDevice = props => {
     );
   }, []);
 
-if(isErrorSendingFailed){
-  setTimeout(() => {
-    setErrorMessageHeader('Error sending Recovery Key');
-    setErrorMessage(
-      'There was an error while sending your Recovery Key, please try again in a little while',
-    );
-  }, 2);
-  (ErrorBottomSheet as any).current.snapTo(1);
-  dispatch(ErrorSending(null));
-}
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Key');
+      setErrorMessage(
+        'There was an error while sending your Recovery Key, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
 
   return (
     <View style={BackupStyles.modalContainer}>
@@ -122,7 +123,7 @@ if(isErrorSendingFailed){
             <ActivityIndicator size="large" />
           </View>
         ) : (
-            <QRCodeWrapper value={secondaryQR} size={hp("27%")} />
+            <QRCode value={secondaryQR} size={hp("27%")} />
           )}
         {secondaryQR ? <CopyThisText text={secondaryQR} /> : null}
       </View>

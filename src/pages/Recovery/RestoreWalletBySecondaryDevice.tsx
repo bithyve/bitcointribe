@@ -39,7 +39,8 @@ import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import QRCodeWrapper from '../../components/qr-hoc';
+import QRCode from 'react-native-qrcode-svg';
+
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -60,13 +61,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
-        JSON.stringify({
-          ...REQUEST_DETAILS,
-          requester: WALLET_SETUP.walletName,
-          type: 'recoveryQR',
-          ver: DeviceInfo.getVersion(),
-        }),
-      )
+      JSON.stringify({
+        ...REQUEST_DETAILS,
+        requester: WALLET_SETUP.walletName,
+        type: 'recoveryQR',
+        ver: DeviceInfo.getVersion(),
+      }),
+    )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
@@ -165,7 +166,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-                <QRCodeWrapper value={secondaryQR} size={hp('27%')} />
+                <QRCode value={secondaryQR} size={hp('27%')} />
               )}
             {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>

@@ -21,7 +21,8 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { uploadEncMShare } from '../../store/actions/sss';
-import QRCodeWrapper from '../../components/qr-hoc';
+import QRCode from 'react-native-qrcode-svg';
+
 
 const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam('twoFASetup');
@@ -63,7 +64,7 @@ const TwoFASetup = props => {
         </View>
       </View>
       <View style={BackupStyles.modalContentView}>
-        <QRCodeWrapper value={qrData} size={hp('27%')} />
+        <QRCode value={qrData} size={hp('27%')} />
         <CopyThisText text={secret} />
       </View>
       <View style={{ margin: 20 }}>

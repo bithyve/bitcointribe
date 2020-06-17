@@ -32,6 +32,9 @@ import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetT
 
 export default function TransactionDetails(props) {
   const txDetails = props.item;
+  if (!txDetails) {
+    return null
+  }
   const getServiceType = props.getServiceType ? props.getServiceType : null;
   const serviceType = props.serviceType ? props.serviceType : null;
   const [description, setDescription] = useState('');
@@ -52,8 +55,8 @@ export default function TransactionDetails(props) {
     })();
   }, [txDetails]);
 
-  const getImageByAccountType = (accountType) =>{
-    if(accountType == 'FAST_BITCOINS'){
+  const getImageByAccountType = (accountType) => {
+    if (accountType == 'FAST_BITCOINS') {
       return <View
         style={{
           justifyContent: 'center',
@@ -75,13 +78,13 @@ export default function TransactionDetails(props) {
           }}
         />
       </View>
-    }else if(accountType == "Savings Account" || accountType == "Test Account" || accountType == "Checking Account"){
+    } else if (accountType == "Savings Account" || accountType == "Test Account" || accountType == "Checking Account") {
       return <View>
-          <Image
-            source={accountType == "Savings Account" ? require('../../assets/images/icons/icon_secureaccount.png') : accountType == "Test Account" ? require('../../assets/images/icons/icon_test.png') : require('../../assets/images/icons/icon_regular.png') }
-            style={{ width: wp('12%'), height: wp('12%') }}
-          />
-        </View>
+        <Image
+          source={accountType == "Savings Account" ? require('../../assets/images/icons/icon_secureaccount.png') : accountType == "Test Account" ? require('../../assets/images/icons/icon_test.png') : require('../../assets/images/icons/icon_regular.png')}
+          style={{ width: wp('12%'), height: wp('12%') }}
+        />
+      </View>
     }
   }
 
