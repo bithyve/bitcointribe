@@ -426,19 +426,9 @@ export default function SendConfirmation(props) {
             marginBottom: hp('1%'),
             marginTop: hp('1%'),
             flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-end'
           }}
         >
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(12),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            {'Sending From: '}
-          </Text>
           <Text
             style={{
               color: Colors.blue,

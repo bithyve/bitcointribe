@@ -820,36 +820,17 @@ export default function SendToContact(props) {
           </View>
         </View>
       </View>
-      <View style={{ width: wp('85%'), alignSelf: 'center' }}>
-        {transfer.details && transfer.details.length > 0 ? (
-          <ScrollView horizontal={true}>
-            {transfer.details.map((item) => renderMultipleContacts(item))}
-          </ScrollView>
-        ) : null}
-      </View>
       <View
         style={{
           alignSelf: 'center',
           width: wp('90%'),
-          borderBottomWidth: 1,
-          borderColor: Colors.borderColor,
-          marginBottom: hp('1%'),
+          marginBottom: hp('2%'),
           marginTop: hp('2%'),
           flexDirection: 'row',
           paddingBottom: hp('1.5%'),
           paddingTop: hp('1%'),
         }}
       >
-        <Text
-          style={{
-            color: Colors.textColorGrey,
-            fontSize: RFValue(12),
-            fontFamily: Fonts.FiraSansRegular,
-            alignSelf: 'flex-end',
-          }}
-        >
-          {'Sending From: '}
-        </Text>
         <TouchableOpacity
           activeOpacity={10}
           onPress={() => {
@@ -902,6 +883,23 @@ export default function SendToContact(props) {
           )}
         </TouchableOpacity>
       </View>
+      <View style={{ width: wp('85%'), alignSelf: 'center' }}>
+        {transfer.details && transfer.details.length > 0 ? (
+          <ScrollView horizontal={true}>
+            {transfer.details.map((item) => renderMultipleContacts(item))}
+          </ScrollView>
+        ) : null}
+      </View>
+      <View
+        style={{
+          alignSelf: 'center',
+          width: wp('90%'),
+          borderBottomWidth: 1,
+          borderColor: Colors.borderColor,
+          marginBottom: hp('1%'),
+          marginTop: hp('2%'),
+        }}
+      />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
@@ -1098,6 +1096,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
     alignItems: 'center',
     alignSelf: 'center',
     flexDirection: 'row',

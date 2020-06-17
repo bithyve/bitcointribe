@@ -755,7 +755,7 @@ export default function Receive(props) {
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
                       ? 'Checking Account'
-                      : 'Saving Account'}
+                      : 'Savings Account'}
                   </Text>
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
