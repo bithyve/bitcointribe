@@ -37,7 +37,7 @@ import SendConfirmationContent from './SendConfirmationContent';
 import RecipientComponent from './RecipientComponent';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
-import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
+import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -118,12 +118,13 @@ export default function SendConfirmation(props) {
       );
       for (let i = 0; i < details.length; i++) {
         const element = details[i];
-        if(element.selectedContact.contactName){
+        if (element.selectedContact.contactName) {
           let obj = {
             id: createRandomString(36),
             title: 'Sent Amount',
             date: moment(Date.now()).valueOf(),
-            info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            info:
+              'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
             selectedContactInfo: element,
           };
           if (element.selectedContact.isWard) {
@@ -385,7 +386,34 @@ export default function SendConfirmation(props) {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={styles.modalHeaderTitleText}>{'Send Confirmation'}</Text>
+          <Image
+            source={
+              serviceType == TEST_ACCOUNT
+                ? require('../../assets/images/icons/icon_test.png')
+                : serviceType == REGULAR_ACCOUNT
+                ? require('../../assets/images/icons/icon_regular.png')
+                : require('../../assets/images/icons/icon_secureaccount.png')
+            }
+            style={{ width: wp('10%'), height: wp('10%') }}
+          />
+          <View style={{ marginLeft: wp('2.5%') }}>
+            <Text style={styles.modalHeaderTitleText}>
+              {'Send Confirmation'}
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              {serviceType == TEST_ACCOUNT
+                ? 'Test Account'
+                : serviceType == REGULAR_ACCOUNT
+                ? 'Checking Account'
+                : 'Saving Account'}
+            </Text>
+          </View>
         </View>
       </View>
       <ScrollView>
@@ -721,7 +749,6 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

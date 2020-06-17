@@ -64,7 +64,6 @@ export default function MoreHomePageTabContents(props) {
             </View>
           )}
           renderItem={({ item }) => {
-            if(item.title == 'Services' && props.isExistingSavingMethod && props.isExistingSavingMethod){ return null;}
             return <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressElements(item)}
               style={styles.addModalView}

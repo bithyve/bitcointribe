@@ -723,285 +723,308 @@ export default function Send(props) {
           enabled
         >
           <ScrollView nestedScrollEnabled={true}>
-              <View onStartShouldSetResponder={() => true}>
-                <View style={styles.modalHeaderTitleView}>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        if (getServiceType) {
-                          getServiceType(serviceType);
-                        }
-                        dispatch(clearTransfer(serviceType));
-                        props.navigation.goBack();
-                      }}
-                      style={{
-                        height: 30,
-                        width: 30,
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <FontAwesome
-                        name="long-arrow-left"
-                        color={Colors.blue}
-                        size={17}
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
-                    {serviceType == TEST_ACCOUNT ? (
-                      <Text
-                        onPress={() => {
-                          AsyncStorage.setItem('isSendHelperDone', 'true');
-                          if (SendHelperBottomSheet.current)
-                            SendHelperBottomSheet.current.snapTo(1);
-                        }}
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue(12),
-                          marginLeft: 'auto',
-                        }}
-                      >
-                        Know more
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-                {renderQRCodeThumbnail()}
+            <View onStartShouldSetResponder={() => true}>
+              <View style={styles.modalHeaderTitleView}>
                 <View
                   style={{
-                    paddingLeft: 20,
-                    paddingRight: 20,
-                    paddingTop: wp('5%'),
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
                   }}
                 >
-                  <View style={styles.textBoxView}>
-                    <TextInput
-                      editable={isEditable}
-                      style={styles.textBox}
-                      placeholder={'Enter Address Manually'}
-                      keyboardType={
-                        Platform.OS == 'ios'
-                          ? 'ascii-capable'
-                          : 'visible-password'
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (getServiceType) {
+                        getServiceType(serviceType);
                       }
-                      value={recipientAddress}
-                      onChangeText={setRecipientAddress}
-                      placeholderTextColor={Colors.borderColor}
-                      onKeyPress={(e) => {
-                        if (e.nativeEvent.key === 'Backspace') {
-                          setTimeout(() => {
-                            setIsInvalidAddress(false);
-                          }, 10);
-                        }
-                      }}
-                      onBlur={() => {
-                        const instance =
-                          service.hdWallet || service.secureHDWallet;
-                        let isAddressValid = instance.isValidAddress(
-                          recipientAddress,
-                        );
-                        setIsInvalidAddress(!isAddressValid);
-                      }}
+                      dispatch(clearTransfer(serviceType));
+                      props.navigation.goBack();
+                    }}
+                    style={{
+                      height: 30,
+                      width: 30,
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <FontAwesome
+                      name="long-arrow-left"
+                      color={Colors.blue}
+                      size={17}
                     />
+                  </TouchableOpacity>
+                  <Image
+                    source={
+                      serviceType == TEST_ACCOUNT
+                        ? require('../../assets/images/icons/icon_test.png')
+                        : serviceType == REGULAR_ACCOUNT
+                        ? require('../../assets/images/icons/icon_regular.png')
+                        : require('../../assets/images/icons/icon_secureaccount.png')
+                    }
+                    style={{ width: wp('10%'), height: wp('10%') }}
+                  />
+                  <View style={{ marginLeft: wp('2.5%') }}>
+                    <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue(12),
+                      }}
+                    >
+                      {serviceType == TEST_ACCOUNT
+                        ? 'Test Account'
+                        : serviceType == REGULAR_ACCOUNT
+                        ? 'Checking Account'
+                        : 'Saving Account'}
+                    </Text>
                   </View>
                   {serviceType == TEST_ACCOUNT ? (
                     <Text
                       onPress={() => {
-                        setRecipientAddress(
-                          '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
-                        );
+                        AsyncStorage.setItem('isSendHelperDone', 'true');
+                        if (SendHelperBottomSheet.current)
+                          SendHelperBottomSheet.current.snapTo(1);
                       }}
                       style={{
                         color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
+                        fontSize: RFValue(12),
                         marginLeft: 'auto',
-                        fontFamily: Fonts.FiraSansItalic,
-                        marginTop: 10,
                       }}
                     >
-                      Send it to a sample address
+                      Know more
                     </Text>
-                  ) : null}
-                  {isInvalidAddress ? (
-                    <View style={{ marginLeft: 'auto' }}>
-                      <Text style={styles.errorText}>
-                        Enter correct address
-                      </Text>
-                    </View>
-                  ) : null}
-                  {serviceType != TEST_ACCOUNT ? (
-                    <View style={{ paddingTop: wp('3%') }}>
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text
-                          style={{
-                            color: Colors.blue,
-                            fontSize: RFValue(13),
-                            fontFamily: Fonts.FiraSansRegular,
-                            marginBottom: wp('3%'),
-                          }}
-                        >
-                          Send to Contact
-                        </Text>
-                        <TouchableOpacity
-                          onPress={() => {}}
-                          style={{
-                            height: 20,
-                            width: 20,
-                            justifyContent: 'center',
-                            marginLeft: 'auto',
-                          }}
-                        >
-                          <SimpleLineIcons
-                            name="options-vertical"
-                            color={Colors.blue}
-                            size={RFValue(13)}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      {trustedContacts.length ? (
-                        <View
-                          style={{
-                            ...styles.textBoxView,
-                            paddingTop: hp('1%'),
-                            paddingBottom: hp('1%'),
-                            height: hp('15%'),
-                            justifyContent: 'center',
-                            backgroundColor: Colors.backgroundColor,
-                            borderColor: Colors.backgroundColor,
-                          }}
-                        >
-                          <View
-                            style={{
-                              flex: 1,
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                            }}
-                          >
-                            <TouchableOpacity
-                              style={{
-                                backgroundColor: Colors.white,
-                                height: wp('12%'),
-                                width: wp('6%'),
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                alignSelf: 'center',
-                                borderRadius: 5,
-                                marginLeft: 10,
-                                marginRight: 15,
-                              }}
-                            >
-                              <Ionicons
-                                name={'ios-arrow-back'}
-                                size={RFValue(20)}
-                                color={Colors.borderColor}
-                              />
-                            </TouchableOpacity>
-                            <FlatList
-                              horizontal
-                              nestedScrollEnabled={true}
-                              showsHorizontalScrollIndicator={false}
-                              data={trustedContacts}
-                              renderItem={renderContacts}
-                              extraData={transfer.details}
-                              keyExtractor={(item, index) => index.toString()}
-                            />
-                          </View>
-                        </View>
-                      ) : (
-                        <View
-                          style={{
-                            marginBottom: -25,
-                            padding: -20,
-                            marginLeft: -20,
-                            marginRight: -20,
-                          }}
-                        >
-                          <BottomInfoBox
-                            title={'You have not added any Trusted Contact'}
-                            infoText={
-                              'Add a Trusted Contact to send them sats without having to scan an address'
-                            }
-                          />
-                        </View>
-                      )}
-                    </View>
-                  ) : null}
-                  {serviceType != TEST_ACCOUNT ? (
-                    <View style={{ paddingTop: wp('3%') }}>
-                      <View style={{ flexDirection: 'row' }}>
-                        <Text
-                          style={{
-                            color: Colors.blue,
-                            fontSize: RFValue(13),
-                            fontFamily: Fonts.FiraSansRegular,
-                            marginBottom: wp('3%'),
-                          }}
-                        >
-                          Send to Account
-                        </Text>
-                        <TouchableOpacity
-                          onPress={() => {}}
-                          style={{
-                            height: 20,
-                            width: 20,
-                            justifyContent: 'center',
-                            marginLeft: 'auto',
-                          }}
-                        >
-                          <SimpleLineIcons
-                            name="options-vertical"
-                            color={Colors.blue}
-                            size={RFValue(13)}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          borderRadius: 10,
-                          height: wp('40%'),
-                          alignItems: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                        }}
-                      >
-                        <TouchableOpacity
-                          style={{
-                            backgroundColor: Colors.white,
-                            height: wp('12%'),
-                            width: wp('6%'),
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            alignSelf: 'center',
-                            borderRadius: 5,
-                            marginLeft: 10,
-                          }}
-                        >
-                          <Ionicons
-                            name={'ios-arrow-back'}
-                            size={RFValue(20)}
-                            color={Colors.borderColor}
-                          />
-                        </TouchableOpacity>
-                        <FlatList
-                          data={accountData}
-                          horizontal
-                          nestedScrollEnabled={true}
-                          showsHorizontalScrollIndicator={false}
-                          showsVerticalScrollIndicator={false}
-                          renderItem={renderAccounts}
-                          extraData={transfer.details}
-                          //keyExtractor={(item, index) => index.toString()}
-                        />
-                      </View>
-                    </View>
                   ) : null}
                 </View>
               </View>
+              {renderQRCodeThumbnail()}
+              <View
+                style={{
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: wp('5%'),
+                }}
+              >
+                <View style={styles.textBoxView}>
+                  <TextInput
+                    editable={isEditable}
+                    style={styles.textBox}
+                    placeholder={'Enter Address Manually'}
+                    keyboardType={
+                      Platform.OS == 'ios'
+                        ? 'ascii-capable'
+                        : 'visible-password'
+                    }
+                    value={recipientAddress}
+                    onChangeText={setRecipientAddress}
+                    placeholderTextColor={Colors.borderColor}
+                    onKeyPress={(e) => {
+                      if (e.nativeEvent.key === 'Backspace') {
+                        setTimeout(() => {
+                          setIsInvalidAddress(false);
+                        }, 10);
+                      }
+                    }}
+                    onBlur={() => {
+                      const instance =
+                        service.hdWallet || service.secureHDWallet;
+                      let isAddressValid = instance.isValidAddress(
+                        recipientAddress,
+                      );
+                      setIsInvalidAddress(!isAddressValid);
+                    }}
+                  />
+                </View>
+                {serviceType == TEST_ACCOUNT ? (
+                  <Text
+                    onPress={() => {
+                      setRecipientAddress(
+                        '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
+                      );
+                    }}
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(10),
+                      marginLeft: 'auto',
+                      fontFamily: Fonts.FiraSansItalic,
+                      marginTop: 10,
+                    }}
+                  >
+                    Send it to a sample address
+                  </Text>
+                ) : null}
+                {isInvalidAddress ? (
+                  <View style={{ marginLeft: 'auto' }}>
+                    <Text style={styles.errorText}>Enter correct address</Text>
+                  </View>
+                ) : null}
+                {serviceType != TEST_ACCOUNT ? (
+                  <View style={{ paddingTop: wp('3%') }}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          fontSize: RFValue(13),
+                          fontFamily: Fonts.FiraSansRegular,
+                          marginBottom: wp('3%'),
+                        }}
+                      >
+                        Send to Contact
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {}}
+                        style={{
+                          height: 20,
+                          width: 20,
+                          justifyContent: 'center',
+                          marginLeft: 'auto',
+                        }}
+                      >
+                        <SimpleLineIcons
+                          name="options-vertical"
+                          color={Colors.blue}
+                          size={RFValue(13)}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    {trustedContacts.length ? (
+                      <View
+                        style={{
+                          ...styles.textBoxView,
+                          paddingTop: hp('1%'),
+                          paddingBottom: hp('1%'),
+                          height: hp('15%'),
+                          justifyContent: 'center',
+                          backgroundColor: Colors.backgroundColor,
+                          borderColor: Colors.backgroundColor,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <TouchableOpacity
+                            style={{
+                              backgroundColor: Colors.white,
+                              height: wp('12%'),
+                              width: wp('6%'),
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              alignSelf: 'center',
+                              borderRadius: 5,
+                              marginLeft: 10,
+                              marginRight: 15,
+                            }}
+                          >
+                            <Ionicons
+                              name={'ios-arrow-back'}
+                              size={RFValue(20)}
+                              color={Colors.borderColor}
+                            />
+                          </TouchableOpacity>
+                          <FlatList
+                            horizontal
+                            nestedScrollEnabled={true}
+                            showsHorizontalScrollIndicator={false}
+                            data={trustedContacts}
+                            renderItem={renderContacts}
+                            extraData={transfer.details}
+                            keyExtractor={(item, index) => index.toString()}
+                          />
+                        </View>
+                      </View>
+                    ) : (
+                      <View
+                        style={{
+                          marginBottom: -25,
+                          padding: -20,
+                          marginLeft: -20,
+                          marginRight: -20,
+                        }}
+                      >
+                        <BottomInfoBox
+                          title={'You have not added any Trusted Contact'}
+                          infoText={
+                            'Add a Trusted Contact to send them sats without having to scan an address'
+                          }
+                        />
+                      </View>
+                    )}
+                  </View>
+                ) : null}
+                {serviceType != TEST_ACCOUNT ? (
+                  <View style={{ paddingTop: wp('3%') }}>
+                    <View style={{ flexDirection: 'row' }}>
+                      <Text
+                        style={{
+                          color: Colors.blue,
+                          fontSize: RFValue(13),
+                          fontFamily: Fonts.FiraSansRegular,
+                          marginBottom: wp('3%'),
+                        }}
+                      >
+                        Send to Account
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {}}
+                        style={{
+                          height: 20,
+                          width: 20,
+                          justifyContent: 'center',
+                          marginLeft: 'auto',
+                        }}
+                      >
+                        <SimpleLineIcons
+                          name="options-vertical"
+                          color={Colors.blue}
+                          size={RFValue(13)}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        borderRadius: 10,
+                        height: wp('40%'),
+                        alignItems: 'center',
+                        backgroundColor: Colors.backgroundColor,
+                      }}
+                    >
+                      <TouchableOpacity
+                        style={{
+                          backgroundColor: Colors.white,
+                          height: wp('12%'),
+                          width: wp('6%'),
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          alignSelf: 'center',
+                          borderRadius: 5,
+                          marginLeft: 10,
+                        }}
+                      >
+                        <Ionicons
+                          name={'ios-arrow-back'}
+                          size={RFValue(20)}
+                          color={Colors.borderColor}
+                        />
+                      </TouchableOpacity>
+                      <FlatList
+                        data={accountData}
+                        horizontal
+                        nestedScrollEnabled={true}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                        renderItem={renderAccounts}
+                        extraData={transfer.details}
+                        //keyExtractor={(item, index) => index.toString()}
+                      />
+                    </View>
+                  </View>
+                ) : null}
+              </View>
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </View>
@@ -1036,7 +1059,6 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -1096,7 +1118,7 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     zIndex: 999,
-    elevation: 10
+    elevation: 10,
   },
   cameraView: {
     width: wp('90%'),

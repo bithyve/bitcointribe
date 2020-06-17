@@ -145,7 +145,7 @@ export default function SendToContact(props) {
     setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
   };
 
-  const getCurrencyChar = (currencyCode) =>{
+  const getCurrencyChar = (currencyCode) => {
     const currencyList = [
       {
         code: 'USD',
@@ -170,9 +170,9 @@ export default function SendToContact(props) {
     ];
     for (let i = 0; i < currencyList.length; i++) {
       const element = currencyList[i];
-      if(CurrencyCode==element.code) return element.symbol;
+      if (CurrencyCode == element.code) return element.symbol;
     }
-}
+  };
 
   useEffect(() => {
     dispatch(clearTransfer(serviceType));
@@ -792,7 +792,32 @@ export default function SendToContact(props) {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
-          <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+          <Image
+            source={
+              serviceType == TEST_ACCOUNT
+                ? require('../../assets/images/icons/icon_test.png')
+                : serviceType == REGULAR_ACCOUNT
+                ? require('../../assets/images/icons/icon_regular.png')
+                : require('../../assets/images/icons/icon_secureaccount.png')
+            }
+            style={{ width: wp('10%'), height: wp('10%') }}
+          />
+          <View style={{ marginLeft: wp('2.5%') }}>
+            <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+              }}
+            >
+              {serviceType == TEST_ACCOUNT
+                ? 'Test Account'
+                : serviceType == REGULAR_ACCOUNT
+                ? 'Checking Account'
+                : 'Saving Account'}
+            </Text>
+          </View>
         </View>
       </View>
       <View style={{ width: wp('85%'), alignSelf: 'center' }}>
@@ -820,7 +845,7 @@ export default function SendToContact(props) {
             color: Colors.textColorGrey,
             fontSize: RFValue(12),
             fontFamily: Fonts.FiraSansRegular,
-            alignSelf: "flex-end"
+            alignSelf: 'flex-end',
           }}
         >
           {'Sending From: '}
@@ -831,7 +856,7 @@ export default function SendToContact(props) {
             if (isFromAddressBook)
               AccountSelectionBottomSheet.current.snapTo(1);
           }}
-          style={{ flexDirection: 'row', alignItems:'flex-end' }}
+          style={{ flexDirection: 'row', alignItems: 'flex-end' }}
         >
           <Text
             style={{
@@ -1064,7 +1089,6 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: 15,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
@@ -1156,6 +1180,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     right: 0,
-    elevation: 10
+    elevation: 10,
   },
 });

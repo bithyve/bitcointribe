@@ -742,9 +742,15 @@ export default function Receive(props) {
                   }
                   style={{ width: wp('10%'), height: wp('10%') }}
                 />
-                <View style={{ marginLeft: wp('3%') }}>
+                <View style={{ marginLeft: wp('2.5%') }}>
                   <Text style={BackupStyles.modalHeaderTitleText}>Receive</Text>
-                  <Text style={BackupStyles.modalHeaderInfoText}>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontFamily: Fonts.FiraSansRegular,
+                      fontSize: RFValue(12),
+                    }}
+                  >
                     {serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
