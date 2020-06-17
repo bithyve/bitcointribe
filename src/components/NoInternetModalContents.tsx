@@ -18,7 +18,7 @@ export default function NoInternetModalContents(props) {
         <View style={{ height: '100%' }}>
             <View style={styles.successModalHeaderView}>
                 <Text style={styles.modalTitleText}>No Internet{"\n"}Connection</Text>
-                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>Internet connection</Text></Text>
+                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>internet connection</Text></Text>
             </View>
             <View style={styles.successModalAmountView}>
                 <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>If the internet is not connected Hexa will not be able to</Text>
