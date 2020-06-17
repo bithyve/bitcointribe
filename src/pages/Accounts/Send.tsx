@@ -876,9 +876,13 @@ export default function Send(props) {
                       >
                         <View
                           style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
+                            ...styles.textBoxView,
+                            paddingTop: hp('1%'),
+                            paddingBottom: hp('1%'),
+                            height: hp('15%'),
+                            justifyContent: 'center',
+                            backgroundColor: Colors.backgroundColor,
+                            borderColor: Colors.backgroundColor,
                           }}
                         >
                           <TouchableOpacity
@@ -1055,8 +1059,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.borderColor,
     height: wp('13%'),
-    paddingTop: hp('1%'),
-    paddingBottom: hp('1%'),
   },
   textBox: {
     flex: 1,
@@ -1096,7 +1098,8 @@ const styles = StyleSheet.create({
     height: wp('5%'),
     top: 0,
     right: 0,
-    zIndex: 5,
+    zIndex: 999,
+    elevation: 10
   },
   cameraView: {
     width: wp('90%'),

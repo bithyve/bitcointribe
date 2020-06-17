@@ -58,8 +58,9 @@ export default function NewWalletName(props) {
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
               secondLineTitle={''}
-              infoTextNormal={'Please enter a display name. Your contacts will use this to identify your wallet'}
-              // infoTextBold={'wallet'}
+              infoTextNormal={'Please enter a '}
+              infoTextBold={'display name.'}
+              infoTextNormal1={'Your contacts will use this to identify your wallet'}
             />
             <TextInput
               style={inputStyle}

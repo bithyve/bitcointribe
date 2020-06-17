@@ -35,12 +35,12 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
-  let [message, setMessage] = useState('While you wait...');
+  let [message, setMessage] = useState('Sats the standard');
   let [subTextMessage1, setSubTextMessage1] = useState(
-    'Hexa has a preloaded Test Account',
+    '1 bitcoin = 100 million satoshis or sats',
   );
   let [subTextMessage2, setSubTextMessage2] = useState(
-    'New to Bitcoin? This is the best place to start',
+    'Hexa uses sats to make using bitcoin easier',
   );
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
@@ -382,11 +382,14 @@ export default function Login(props) {
   const proceedButton = () => {
     loaderBottomSheet.current.snapTo(1);
     setTimeout(() => {
+      setMessage(
+        'Hexa Test Account'
+      );
       setSubTextMessage1(
-        'Did you know that 1 bitcoin = 100 million sats?',
+        'Test Account comes preloaded with test-sats',
       );
       setSubTextMessage2(
-        'Hexa uses sats to make it easier to use bitcoins',
+        'Best place to start if you are new to Bitcoin',
       );
     }, 3000);
     setTimeout(() => {
@@ -398,7 +401,6 @@ export default function Login(props) {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar />
-      <SafeAreaView style={{ flex: 0 }} />
       <View style={{ flex: 1 }}>
         <View style={{}}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
