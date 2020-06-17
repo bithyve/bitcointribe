@@ -118,7 +118,7 @@ export default function Send(props) {
     },
     {
       id: SECURE_ACCOUNT,
-      account_name: 'Saving Account',
+      account_name: 'Savings Account',
       type: SECURE_ACCOUNT,
       checked: false,
       image: require('../../assets/images/icons/icon_secureaccount_white.png'),
@@ -775,7 +775,7 @@ export default function Send(props) {
                         ? 'Test Account'
                         : serviceType == REGULAR_ACCOUNT
                         ? 'Checking Account'
-                        : 'Saving Account'}
+                        : 'Savings Account'}
                     </Text>
                   </View>
                   {serviceType == TEST_ACCOUNT ? (

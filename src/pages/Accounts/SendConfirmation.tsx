@@ -188,7 +188,7 @@ export default function SendConfirmation(props) {
     if (serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
     } else if (serviceType == 'SECURE_ACCOUNT') {
-      return 'Secure Account';
+      return 'Savings Account';
     } else if (serviceType == 'REGULAR_ACCOUNT') {
       return 'Checking Account';
     } else if (serviceType == 'S3_SERVICE') {
@@ -411,7 +411,7 @@ export default function SendConfirmation(props) {
                 ? 'Test Account'
                 : serviceType == REGULAR_ACCOUNT
                 ? 'Checking Account'
-                : 'Saving Account'}
+                : 'Savings Account'}
             </Text>
           </View>
         </View>

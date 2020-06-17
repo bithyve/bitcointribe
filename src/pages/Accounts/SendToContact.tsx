@@ -330,7 +330,7 @@ export default function SendToContact(props) {
     if (serviceType == 'TEST_ACCOUNT') {
       return 'Test Account';
     } else if (serviceType == 'SECURE_ACCOUNT') {
-      return 'Secure Account';
+      return 'Savings Account';
     } else if (serviceType == 'REGULAR_ACCOUNT') {
       return 'Checking Account';
     } else if (serviceType == 'S3_SERVICE') {
@@ -346,7 +346,7 @@ export default function SendToContact(props) {
             source={
               item.account_name === 'Checking Account'
                 ? require('../../assets/images/icons/icon_regular.png')
-                : item.account_name === 'Saving Account'
+                : item.account_name === 'Savings Account'
                 ? require('../../assets/images/icons/icon_secureaccount.png')
                 : item.account_name === 'Test Account'
                 ? require('../../assets/images/icons/icon_test_white.png')
@@ -815,7 +815,7 @@ export default function SendToContact(props) {
                 ? 'Test Account'
                 : serviceType == REGULAR_ACCOUNT
                 ? 'Checking Account'
-                : 'Saving Account'}
+                : 'Savings Account'}
             </Text>
           </View>
         </View>
