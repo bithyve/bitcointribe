@@ -128,6 +128,9 @@ export default function Receive(props) {
   const { loading, service } = useSelector(
     (state) => state.accounts[serviceType],
   );
+  const updateEphemeralChannelLoader = useSelector(
+    (state) => state.trustedContacts.loading.updateEphemeralChannel,
+  );
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -178,7 +181,11 @@ export default function Receive(props) {
       console.log('Err: Contact missing');
       return;
     }
-
+    if (updateEphemeralChannelLoader) {
+      if (receiveLink) setReceiveLink('');
+      if (receiveQR) setReceiveQR('');
+      return;
+    }
     const contactName = `${selectedContact.firstName} ${
       selectedContact.lastName ? selectedContact.lastName : ''
     }`
@@ -187,6 +194,14 @@ export default function Receive(props) {
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
     if (trustedContact) {
+      if (!trustedContact.ephemeralChannel) {
+        console.log(
+          'Err: Ephemeral Channel does not exists for contact: ',
+          contactName,
+        );
+        return;
+      }
+
       const publicKey =
         trustedContacts.tc.trustedContacts[contactName].publicKey;
       const requester = WALLET_SETUP.walletName;
@@ -212,6 +227,7 @@ export default function Receive(props) {
             `/${numberEncPubKey}` +
             `/${numHintType}` +
             `/${numHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
           console.log({ numberDL });
@@ -231,6 +247,7 @@ export default function Receive(props) {
             `/${emailEncPubKey}` +
             `/${emailHintType}` +
             `/${emailHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
           console.log({ emailDL });
@@ -250,6 +267,7 @@ export default function Receive(props) {
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'paymentTrustedContactQR',
             ver: appVersion,
           }),
@@ -371,9 +389,24 @@ export default function Receive(props) {
         })();
       } else if (
         !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel &&
+        trustedContact.ephemeralChannel.initiatedAt &&
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt > 600000
+      ) {
+        // re-initiating expired EC
+
+        dispatch(
+          updateEphemeralChannel(
+            contactName,
+            trustedContact.ephemeralChannel.data[0],
+          ),
+        );
+      } else if (
+        !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel
       ) {
         if (
+          trustedContact.ephemeralChannel.data &&
           trustedContact.ephemeralChannel.data[0].paymentDetails &&
           trustedContact.ephemeralChannel.data[0].paymentDetails.alternate
             .address === receivingAddress &&

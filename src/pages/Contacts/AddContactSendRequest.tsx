@@ -59,6 +59,9 @@ export default function AddContactSendRequest(props) {
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
+  const updateEphemeralChannelLoader = useSelector(
+    (state) => state.trustedContacts.loading.updateEphemeralChannel,
+  );
 
   const updateTrustedContactsInfo = async (contact) => {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
@@ -91,7 +94,7 @@ export default function AddContactSendRequest(props) {
 
   const dispatch = useDispatch();
 
-  const createTrustedContact = useCallback(() => {
+  const createTrustedContact = useCallback(async () => {
     if (Contact && Contact.firstName) {
       const contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
@@ -100,22 +103,40 @@ export default function AddContactSendRequest(props) {
         .trim();
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
-      if (!trustedContact) {
-        (async () => {
-          const walletID = await AsyncStorage.getItem('walletID');
-          const FCM = await AsyncStorage.getItem('fcmToken');
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
 
-          const data: EphemeralData = {
-            walletID,
-            FCM,
-          };
-          dispatch(updateEphemeralChannel(contactName, data));
-        })();
+      const data: EphemeralData = {
+        walletID,
+        FCM,
+      };
+
+      if (!trustedContact) {
+        dispatch(updateEphemeralChannel(contactName, data));
+      } else if (
+        !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel &&
+        trustedContact.ephemeralChannel.initiatedAt &&
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt > 600000
+      ) {
+        // re-initiating expired EC
+        dispatch(
+          updateEphemeralChannel(
+            contactName,
+            trustedContact.ephemeralChannel.data[0],
+          ),
+        );
       }
     }
   }, [Contact, trustedContacts]);
 
   useEffect(() => {
+    if (updateEphemeralChannelLoader) {
+      if (trustedLink) setTrustedLink('');
+      if (trustedQR) setTrustedQR('');
+      return;
+    }
+
     if (!Contact) {
       console.log('Err: Contact missing');
       return;
@@ -129,6 +150,14 @@ export default function AddContactSendRequest(props) {
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
     if (trustedContact) {
+      if (!trustedContact.ephemeralChannel) {
+        console.log(
+          'Err: Ephemeral Channel does not exists for contact: ',
+          contactName,
+        );
+        return;
+      }
+
       const publicKey =
         trustedContacts.tc.trustedContacts[contactName].publicKey;
       const requester = WALLET_SETUP.walletName;
@@ -150,6 +179,7 @@ export default function AddContactSendRequest(props) {
             `/${numberEncPubKey}` +
             `/${numHintType}` +
             `/${numHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
           console.log({ numberDL });
@@ -169,6 +199,7 @@ export default function AddContactSendRequest(props) {
             `/${emailEncPubKey}` +
             `/${emailHintType}` +
             `/${emailHint}` +
+            `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
           console.log({ emailDL });
@@ -188,13 +219,14 @@ export default function AddContactSendRequest(props) {
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'trustedContactQR',
             ver: appVersion,
           }),
         );
       }
     }
-  }, [Contact, trustedContacts]);
+  }, [Contact, trustedContacts, updateEphemeralChannelLoader]);
 
   const renderSendViaLinkContents = useCallback(() => {
     return (
