@@ -51,6 +51,10 @@ import { TrustedContactDerivativeAccount } from '../../bitcoin/utilities/Interfa
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AccountSelectionModalContents from './AccountSelectionModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import BottomInfoBox from '../../components/BottomInfoBox';
+import Currencies from '../../common/Currencies';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 
 export default function SendToContact(props) {
   const [RegularAccountBalance, setRegularAccountBalance] = useState(0);
@@ -79,6 +83,7 @@ export default function SendToContact(props) {
   const [removeItem, setRemoveItem] = useState({});
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
+  const [CurrencySymbol, setCurrencySymbol] = useState('$');
   const [bitcoinAmount, setBitCoinAmount] = useState(
     props.navigation.getParam('bitcoinAmount'),
   );
@@ -143,34 +148,52 @@ export default function SendToContact(props) {
     setSwitchOn(currencyToggleValueTmp ? true : false);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     setCurrencyCode(currencyCodeTmp ? currencyCodeTmp : 'USD');
+    for (let i = 0; i < Currencies.length; i++) {
+      if (Currencies[i].code.includes(currencyCodeTmp)) {
+        setCurrencySymbol(Currencies[i].symbol);
+      }
+    }
   };
 
-  const getCurrencyChar = (currencyCode) => {
-    const currencyList = [
-      {
-        code: 'USD',
-        symbol: '$',
-        country: 'United State',
-      },
-      {
-        code: 'EUR',
-        symbol: '€',
-        country: 'Italy',
-      },
-      {
-        code: 'GBP',
-        symbol: '£',
-        country: 'United Kingdom',
-      },
-      {
-        code: 'INR',
-        symbol: '₹',
-        country: 'India',
-      },
-    ];
-    for (let i = 0; i < currencyList.length; i++) {
-      const element = currencyList[i];
-      if (CurrencyCode == element.code) return element.symbol;
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+
+  function setCurrencyCodeToImage(currencyName, currencyColor) {
+    console.log('currencyColor', currencyColor);
+    return (
+      <View
+        style={{
+          width: wp('6%'),
+          height: wp('6%'),
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <MaterialCommunityIcons
+          name={currencyName}
+          color={Colors.currencyGray}
+          size={wp('6%')}
+        />
+      </View>
+    );
+  }
+
+  const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+      case 'BRL':
+        return setCurrencyCodeToImage('currency-brl', color);
+      case 'CNY':
+      case 'JPY':
+        return setCurrencyCodeToImage('currency-cny', color);
+      case 'GBP':
+        return setCurrencyCodeToImage('currency-gbp', color);
+      case 'KRW':
+        return setCurrencyCodeToImage('currency-krw', color);
+      case 'RUB':
+        return setCurrencyCodeToImage('currency-rub', color);
+      case 'TRY':
+        return setCurrencyCodeToImage('currency-try', color);
+      default:
+        break;
     }
   };
 
@@ -444,7 +467,7 @@ export default function SendToContact(props) {
         >
           {switchOn
             ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
-            : getCurrencyChar(CurrencyCode) +
+            : CurrencySymbol +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
@@ -587,17 +610,28 @@ export default function SendToContact(props) {
         }}
       >
         <View style={styles.amountInputImage}>
-          <Image
+          {currencyCode.includes(CurrencyCode) ? 
+            getCurrencyImage(CurrencyCode, 'gray')
+           : <Image
+              style={{
+                ...styles.textBoxImage,
+              }}
+              source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
+            />
+          }
+          {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
-          />
+          /> */}
         </View>
         {renderVerticalDivider()}
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           editable={!switchOn}
           placeholder={
-            switchOn ? 'Converted amount in dollars' : 'Enter amount in dollars'
+            switchOn
+              ? 'Converted amount in ' + CurrencyCode
+              : 'Enter amount in ' + CurrencyCode
           }
           value={currencyAmount}
           returnKeyLabel="Done"
@@ -938,6 +972,28 @@ export default function SendToContact(props) {
                 />
               </View>
             </View>
+            {serviceType == TEST_ACCOUNT ? (
+              <View
+                style={{
+                  marginTop: wp('1.5%'),
+                  marginBottom: -25,
+                  padding: -20,
+                  marginLeft: -20,
+                  marginRight: -20,
+                }}
+              >
+                <BottomInfoBox
+                  title={'Value of your test-sats'}
+                  infoText={
+                    'The corresponding ' +
+                    CurrencySymbol +
+                    ' value shown here is for illustration only. Test-sats have no ' +
+                    CurrencySymbol +
+                    ' value'
+                  }
+                />
+              </View>
+            ) : null}
             <View
               style={{
                 ...InputStyleNote,
