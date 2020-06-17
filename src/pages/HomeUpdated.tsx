@@ -197,11 +197,17 @@ interface HomePropsTypes {
 
 }
 
+let isNavigate = false;
+let isContactOpen = false;
+let isCameraOpen = false;
+
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     focusListener: any
     appStateListener: any
     firebaseNotificationListener: any
     notificationOpenedListener: any
+
+
     constructor(props) {
         super(props);
         this.focusListener = null
@@ -422,47 +428,37 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 
     handleAppStateChange = async (nextAppState) => {
-        const { appState } = this.state
-        try {
-            if (appState === nextAppState) return;
-            this.setState({
-                appState: nextAppState
-            }, () => {
-                if (nextAppState === 'active') {
-                    this.scheduleNotification()
-                }
-            })
-        } catch (error) { }
-
-        let isContactOpen = false;
-        let isCameraOpen = false;
-        AsyncStorage.getItem('isContactOpen', (err, value) => {
-            if (err) console.log(err);
-            else {
-                isContactOpen = JSON.parse(value);
-            }
-        });
-        AsyncStorage.getItem('isCameraOpen', (err, value) => {
-            if (err) console.log(err);
-            else {
-                isCameraOpen = JSON.parse(value);
-            }
-        });
-        if (isCameraOpen) {
-            await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
+        AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
+            (response) => {
+                isContactOpen = JSON.parse(response[0][1]);
+                isCameraOpen = JSON.parse(response[1][1]);
+            },
+        );
+        let keyArray = [
+            ['isCameraOpen', JSON.stringify(true)],
+            ['isContactOpen', JSON.stringify(true)],
+        ];
+        if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
+        if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
+        if (isContactOpen || isContactOpen) {
+            AsyncStorage.multiSet(keyArray, () => { });
             return;
         }
-        if (isContactOpen) {
-            await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
-            return;
+        var blockApp = setTimeout(() => {
+            if (isNavigate) {
+                this.props.navigation.navigate('ReLogin');
+            }
+        }, 15000);
+        if (
+            Platform.OS == 'android'
+                ? nextAppState == 'active'
+                : nextAppState == 'inactive' || nextAppState == 'background'
+        ) {
+            clearTimeout(blockApp);
+            isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
+        } else {
+            isNavigate = false;
         }
-
-        if (Platform.OS === "ios" && nextAppState === 'active' && !isCameraOpen && !isContactOpen) {
-            this.props.navigation.navigate('ReLogin');
-        } else if (Platform.OS === "android" && nextAppState === 'background' && !isCameraOpen && !isContactOpen) {
-            this.props.navigation.navigate('ReLogin');
-        }
-
     };
 
 
