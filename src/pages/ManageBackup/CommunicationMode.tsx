@@ -211,7 +211,8 @@ export default function CommunicationMode(props) {
         } else {
           if (
             !SHARES_TRANSFER_DETAILS[index] ||
-            Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+            Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+              config.TC_REQUEST_EXPIRY
           )
             dispatch(uploadEncMShare(index, contactName, data));
         }

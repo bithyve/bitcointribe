@@ -314,9 +314,13 @@ export default class TrustedContacts {
         fetch,
       });
 
-      const { updated, data } = res.data;
-      console.log({ updated, data });
+      const { updated, initiatedAt, data } = res.data;
+      console.log({ updated, initiatedAt, data });
       if (!updated) throw new Error('Failed to update ephemeral space');
+      if (initiatedAt)
+        this.trustedContacts[
+          contactName
+        ].ephemeralChannel.initiatedAt = initiatedAt;
 
       this.processEphemeralChannelData(contactName, dataElements);
       if (data && Object.keys(data).length) {

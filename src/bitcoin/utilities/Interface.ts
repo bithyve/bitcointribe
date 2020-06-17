@@ -212,6 +212,7 @@ export interface Contacts {
     FCMs?: string[];
     ephemeralChannel?: {
       address: string;
+      initiatedAt?: number;
       data?: EphemeralData[];
     };
     trustedChannel?: {
