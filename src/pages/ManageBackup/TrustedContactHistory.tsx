@@ -50,6 +50,7 @@ import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
+import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -111,6 +112,12 @@ const TrustedContactHistory = (props) => {
     (state) => state.storage.database,
   );
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
+  const uploadMetaShare = useSelector(
+    (state) => state.sss.loading.uploadMetaShare,
+  );
+  const updateEphemeralChannelLoader = useSelector(
+    (state) => state.trustedContacts.loading.updateEphemeralChannel,
+  );
 
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
@@ -510,7 +517,7 @@ const TrustedContactHistory = (props) => {
   // useEffect(() => {
   //   if (
   //     !SHARES_TRANSFER_DETAILS[index] ||
-  //     Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
+  //     Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >   config.TC_REQUEST_EXPIRY;
   //   )
   //     dispatch(uploadEncMShare(index));
   //   else {
@@ -742,6 +749,12 @@ const TrustedContactHistory = (props) => {
   const [trustedQR, setTrustedQR] = useState('');
 
   const createDeepLink = useCallback(() => {
+    console.log(uploadMetaShare, updateEphemeralChannelLoader);
+    if (uploadMetaShare || updateEphemeralChannelLoader) {
+      if (trustedLink) setTrustedLink('');
+      if (trustedQR) setTrustedQR('');
+      return;
+    }
     if (!SHARES_TRANSFER_DETAILS[index]) {
       setTimeout(() => {
         setErrorMessageHeader('Failed to share');
@@ -764,6 +777,17 @@ const TrustedContactHistory = (props) => {
       .toLowerCase()
       .trim();
 
+    if (
+      !trustedContacts.tc.trustedContacts[contactName] &&
+      !trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+    ) {
+      console.log(
+        'Err: Trusted Contact/Ephemeral Channel does not exists for contact: ',
+        contactName,
+      );
+      return;
+    }
+
     const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
     const requester = WALLET_SETUP.walletName;
     const appVersion = DeviceInfo.getVersion();
@@ -783,10 +807,11 @@ const TrustedContactHistory = (props) => {
         `/${numberEncPubKey}` +
         `/${numHintType}` +
         `/${numHint}` +
-        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}` +
+        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
         `/v${appVersion}`;
       console.log({ numberDL });
       setTrustedLink(numberDL);
+      setActivateReshare(true);
     } else if (chosenContact.emails && chosenContact.emails.length) {
       const email = chosenContact.emails[0].email;
       const emailInitials: string = email.split('@')[0];
@@ -802,17 +827,24 @@ const TrustedContactHistory = (props) => {
         `/${emailEncPubKey}` +
         `/${emailHintType}` +
         `/${emailHint}` +
-        `/${SHARES_TRANSFER_DETAILS[index].UPLOADED_AT}` +
+        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
         `/v${appVersion}`;
       console.log({ emailDL });
       setTrustedLink(emailDL);
+      setActivateReshare(true);
     } else {
       Alert.alert(
         'Invalid Contact',
         'Cannot add a contact without phone-num/email as a trusted entity',
       );
     }
-  }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
+  }, [
+    chosenContact,
+    trustedContacts,
+    SHARES_TRANSFER_DETAILS[index],
+    uploadMetaShare,
+    updateEphemeralChannelLoader,
+  ]);
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
@@ -837,49 +869,68 @@ const TrustedContactHistory = (props) => {
     [index],
   );
 
-  useEffect(() => {
-    (async () => {
-      if (!Object.keys(chosenContact).length) return;
-      if (
-        chosenContact.firstName &&
-        ((chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) ||
-          (chosenContact.emails && chosenContact.emails.length))
-      ) {
-        const walletID = await AsyncStorage.getItem('walletID');
-        const FCM = await AsyncStorage.getItem('fcmToken');
-        console.log({ walletID, FCM });
+  const createGuardian = useCallback(async () => {
+    if (!Object.keys(chosenContact).length) return;
+    if (
+      chosenContact.firstName &&
+      ((chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) ||
+        (chosenContact.emails && chosenContact.emails.length))
+    ) {
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
+      console.log({ walletID, FCM });
 
-        const contactName = `${chosenContact.firstName} ${
-          chosenContact.lastName ? chosenContact.lastName : ''
-        }`
-          .toLowerCase()
-          .trim();
-        const data: EphemeralData = {
-          walletID,
-          FCM,
-        };
-        if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
-          // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
-          dispatch(uploadEncMShare(index, contactName, data, true));
-          updateTrustedContactsInfo(chosenContact);
-          onOTPShare(index); // enables reshare
-          setChangeContact(false);
-        } else if (
-          !SHARES_TRANSFER_DETAILS[index] ||
-          Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT > 600000
-        ) {
-          dispatch(uploadEncMShare(index, contactName, data));
-          updateTrustedContactsInfo(chosenContact);
-          onOTPShare(index); // enables reshare
-        }
-      } else {
-        console.log({ chosenContact });
-        Alert.alert(
-          'Invalid Contact',
-          'Cannot add a contact without phone-num/email as a trusted entity',
+      const contactName = `${chosenContact.firstName} ${
+        chosenContact.lastName ? chosenContact.lastName : ''
+      }`
+        .toLowerCase()
+        .trim();
+      let data: EphemeralData = {
+        walletID,
+        FCM,
+      };
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+      if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
+        // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
+        dispatch(uploadEncMShare(index, contactName, data, true));
+        updateTrustedContactsInfo(chosenContact);
+        onOTPShare(index); // enables reshare
+        setChangeContact(false);
+      } else if (
+        !SHARES_TRANSFER_DETAILS[index] ||
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+          config.TC_REQUEST_EXPIRY
+      ) {
+        dispatch(uploadEncMShare(index, contactName, data));
+        updateTrustedContactsInfo(chosenContact);
+        onOTPShare(index); // enables reshare
+        setTrustedLink('');
+        setTrustedQR('');
+      } else if (
+        trustedContact &&
+        !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel &&
+        trustedContact.ephemeralChannel.initiatedAt &&
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+          config.TC_REQUEST_EXPIRY
+      ) {
+        dispatch(
+          updateEphemeralChannel(
+            contactName,
+            trustedContact.ephemeralChannel.data[0],
+          ),
         );
+        setTrustedLink('');
+        setTrustedQR('');
       }
-    })();
+    } else {
+      console.log({ chosenContact });
+      Alert.alert(
+        'Invalid Contact',
+        'Cannot add a contact without phone-num/email as a trusted entity',
+      );
+    }
   }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);
 
   useEffect(() => {
@@ -900,13 +951,21 @@ const TrustedContactHistory = (props) => {
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
-          uploadedAt: SHARES_TRANSFER_DETAILS[index].UPLOADED_AT,
+          uploadedAt:
+            trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+              .initiatedAt,
           type: 'trustedGuardian',
           ver: DeviceInfo.getVersion(),
         }),
       );
     }
-  }, [SHARES_TRANSFER_DETAILS[index], chosenContact, trustedContacts]);
+  }, [
+    SHARES_TRANSFER_DETAILS[index],
+    chosenContact,
+    trustedContacts,
+    uploadMetaShare,
+    updateEphemeralChannelLoader,
+  ]);
 
   const SendShareModalFunction = useCallback(() => {
     //console.log("chosenContact", chosenContact);
@@ -917,11 +976,13 @@ const TrustedContactHistory = (props) => {
           index={index}
           textHeader={'Sharing Secret with'}
           onPressViaQr={(index) => {
+            createGuardian();
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
             // setChosenContactIndex(index);
           }}
           onPressViaLink={(index) => {
+            createGuardian();
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
             // setChosenContactIndex(index);

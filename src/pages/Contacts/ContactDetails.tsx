@@ -312,7 +312,7 @@ export default function ContactDetails(props) {
       UNDER_CUSTODY[requester] &&
       UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
       Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
-        600000
+        config.TC_REQUEST_EXPIRY
     ) {
       const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
 
@@ -417,7 +417,7 @@ export default function ContactDetails(props) {
       dispatch(uploadRequestedShare(requester, encryptionKey));
     } else if (
       Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT >
-      600000
+      config.TC_REQUEST_EXPIRY
     ) {
       dispatch(uploadRequestedShare(requester, encryptionKey));
     } else {

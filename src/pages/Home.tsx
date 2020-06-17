@@ -1834,7 +1834,10 @@ export default function Home(props) {
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
 
-          if (Date.now() - custodyRequest.uploadedAt > 600000) {
+          if (
+            Date.now() - custodyRequest.uploadedAt >
+            config.TC_REQUEST_EXPIRY
+          ) {
             Alert.alert(
               'Request expired!',
               'Please ask the sender to initiate a new request',
@@ -2817,7 +2820,7 @@ export default function Home(props) {
       } = trustedContactRequest || recoveryRequest;
 
       if (!isRecovery) {
-        if (uploadedAt && Date.now() - uploadedAt > 600000) {
+        if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
           Alert.alert(
             `${isQR ? 'QR' : 'Link'} expired!`,
             `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,

@@ -86,6 +86,8 @@ class HexaConfig {
     },
   };
 
+  public TC_REQUEST_EXPIRY = parseInt(Config.BIT_TC_REQUEST_EXPIRY.trim(), 10);
+
   public ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: Config.BIT_ESPLORA_TESTNET_MULTIBALANCE.trim(),
@@ -157,7 +159,7 @@ class HexaConfig {
       using: 0,
     },
   };
-  
+
   public DERIVATIVE_ACC: DerivativeAccounts = {
     FAST_BITCOINS: this.FAST_BITCOINS,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
@@ -179,8 +181,10 @@ class HexaConfig {
       Config.BIT_SHARE_HEALTH_TIME_SLOT2.trim(),
       10,
     );
-  
+
     console.log(this.HEALTH_STATUS.TIME_SLOTS);
+    console.log({ tcExpiry: this.TC_REQUEST_EXPIRY });
+
     console.log(Config.BIT_SERVER_MODE.trim(), this.RELAY, this.SIGNING_SERVER);
     this.setNetwork();
 
