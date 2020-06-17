@@ -21,15 +21,20 @@ export default function NoInternetModalContents(props) {
                 <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>internet connection</Text></Text>
             </View>
             <View style={styles.successModalAmountView}>
-                <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>If the internet is not connected Hexa will not be able to</Text>
+                <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>Some of the features will not work as expected in your Hexa app, including:</Text>
                 <View style={{  }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                         <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={{ ...styles.modalInfoText, }}>update your recent transactions</Text>
+                        <Text style={{ ...styles.modalInfoText, }}>fetching your balance and transactions</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                         <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={styles.modalInfoText}>send or receive bitcoins</Text>
+                        <Text style={styles.modalInfoText}>sending sats</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                        <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
+                        <Text style={styles.modalInfoText}>contact requests
+</Text>
                     </View>
                 </View>
             </View>
