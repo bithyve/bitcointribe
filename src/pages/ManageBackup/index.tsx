@@ -1465,6 +1465,10 @@ export default function ManageBackup(props) {
       return 'Keeper Device';
     }
 
+    if (item.type === 'security') {
+      return 'Security Question'
+    }
+
     return item.title;
   }
 
@@ -1669,7 +1673,7 @@ export default function ManageBackup(props) {
                               {
                                 selectedStatus: item.status,
                                 selectedTime: getTime(item.time),
-                                selectedTitle: item.title,
+                                selectedTitle: getCardTitle(item),
                                 updateAutoHighlightFlags: () =>
                                   setAutoHighlightFlags({
                                     ...autoHighlightFlags,
