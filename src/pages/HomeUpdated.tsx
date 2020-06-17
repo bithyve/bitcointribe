@@ -34,6 +34,7 @@ import SelectedContactFromAddressBook from '../components/SelectedContactFromAdd
 import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import { AppState } from 'react-native';
+import * as RNLocalize from 'react-native-localize';
 import {
     TEST_ACCOUNT,
     REGULAR_ACCOUNT,
@@ -592,24 +593,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     setCurrencyCodeFromAsync = async () => {
         let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
         if (!currencyCodeTmp) {
-            const identifiers = ['io.hexawallet.hexa'];
-            let { loadProducts } = idx(NativeModules, _ => _.InAppUtils) || {}
-            if (loadProducts) {
-                loadProducts(
-                    identifiers,
-                    async (error, products) => {
-                        await AsyncStorage.setItem(
-                            'currencyCode',
-                            products && products.length ? products[0].currencyCode : 'USD',
-                        );
-                        let currencyCode = idx(products, _ => _[0].currencyCode) || 'USD'
-                        this.setState({
-                            currencyCode
-                        })
-                    },
-                );
-            }
-
+            await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+            this.setState({
+                currencyCode: RNLocalize.getCurrencies()[0]
+            })
 
         } else {
             this.setState({
@@ -619,6 +606,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         let currencyToggleValueTmp = await AsyncStorage.getItem(
             'currencyToggleValue',
         );
+
         this.setState({
             switchOn: currencyToggleValueTmp ? true : false
         })
@@ -1155,13 +1143,20 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         const { navigation } = this.props
         if (item.title == 'Backup Health') {
             navigation.navigate('ManageBackup');
+            return
         }
-        if (item.title == 'Address Book') {
+        if (item.title == 'Friends and Family') {
             navigation.navigate('AddressBookContents');
+            return
         } else if (item.title == 'Wallet Settings') {
-            this.setState({
-                tabBarIndex: 0
-            }, () => (this.refs.settingsBottomSheet as any).snapTo(1))
+            (this.refs.settingsBottomSheet as any).snapTo(1)
+            setTimeout(() => {
+                this.setState({
+                    tabBarIndex: 0
+                })
+            }, 10);
+        } else if (item.title == 'Services') {
+            navigation.navigate('ExistingSavingMethods');
         }
     };
 
@@ -1191,7 +1186,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             fbBTCAccount,
             loading,
             atCloseEnd,
-            transactionsLoading
+            transactionsLoading,
+            currencyCode
         } = this.state
         const {
             navigation,
@@ -1229,7 +1225,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         getCurrencyImageByRegion={getCurrencyImageByRegion}
                         balances={balances}
                         exchangeRates={exchangeRates}
-                        CurrencyCode={CurrencyCode}
+                        CurrencyCode={currencyCode}
                         navigation={this.props.navigation}
                         overallHealth={null}
                         onSwitchToggle={this.onSwitchToggle}
@@ -1250,7 +1246,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                                     getIconByAccountType={getIconByAccountType}
                                     switchOn={switchOn}
                                     accounts={accounts}
-                                    CurrencyCode={CurrencyCode}
+                                    CurrencyCode={currencyCode}
                                     balances={balances}
                                     exchangeRates={exchangeRates}
                                 />
@@ -1259,7 +1255,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     </View>
                 </View>
 
-                <CustomBottomTabs tabBarZIndex={tabBarIndex} selectTab={this.selectTab} selected={'Transactions'} />
+                <CustomBottomTabs tabBarZIndex={tabBarIndex} selectTab={this.selectTab} selected={selectedBottomTab} />
 
                 <BottomSheet
                     onOpenEnd={() => {

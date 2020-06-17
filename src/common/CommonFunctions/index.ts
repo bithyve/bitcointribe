@@ -13,8 +13,8 @@ export const validateEmail = email => {
 };
 
 export const getCurrencyImageByRegion = (currencyCode, type) => {
-  const dollarCurrency = ['USD','AUD','BBD','BSD','BZD','BMD','BND','KHR','CAD','KYD','XCD','FJD','GYD','HKD','JMD','LRD','NAD','NZD','SGD','SBD','SRD','TWD','TTD','TVD','ZWD']
-  const poundCurrency = ['EGP','FKP','GIP','GGP','IMP','JEP','SHP','SYP','GBP']
+  const dollarCurrency = ['USD', 'AUD', 'BBD', 'BSD', 'BZD', 'BMD', 'BND', 'KHR', 'CAD', 'KYD', 'XCD', 'FJD', 'GYD', 'HKD', 'JMD', 'LRD', 'NAD', 'NZD', 'SGD', 'SBD', 'SRD', 'TWD', 'TTD', 'TVD', 'ZWD']
+  const poundCurrency = ['EGP', 'FKP', 'GIP', 'GGP', 'IMP', 'JEP', 'SHP', 'SYP', 'GBP']
   if (dollarCurrency.includes(currencyCode)) {
     if (type == 'light') {
       return require('../../assets/images/currencySymbols/icon_dollar_white.png');

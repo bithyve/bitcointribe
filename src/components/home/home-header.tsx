@@ -17,8 +17,44 @@ import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import HomePageShield from '../../components/HomePageShield';
+const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
+const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+        case 'BRL':
+            return setCurrencyCodeToImage('currency-brl', color);
+        case 'CNY':
+        case 'JPY':
+            return setCurrencyCodeToImage('currency-cny', color);
+        case 'GBP':
+            return setCurrencyCodeToImage('currency-gbp', color);
+        case 'KRW':
+            return setCurrencyCodeToImage('currency-krw', color);
+        case 'RUB':
+            return setCurrencyCodeToImage('currency-rub', color);
+        case 'TRY':
+            return setCurrencyCodeToImage('currency-try', color);
+        default:
+            break;
+    }
+};
+
+function setCurrencyCodeToImage(currencyName, currencyColor) {
+    return (
+        <View style={{
+            marginRight: 5,
+            marginBottom: wp('0.7%'),
+        }}>
+            <MaterialCommunityIcons
+                name={currencyName}
+                color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
+                size={wp('3.5%')}
+            />
+        </View>
+    );
+}
 
 const HomeHeader = ({
     onPressNotifications,
@@ -83,15 +119,17 @@ const HomeHeader = ({
                                     }}
                                     source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                                 />
+                            ) : currencyCode.includes(CurrencyCode) ? (
+                                getCurrencyImage(CurrencyCode, 'light')
                             ) : (
-                                    <Image
-                                        style={{
-                                            ...styles.cardBitCoinImage,
-                                            marginBottom: wp('1.5%'),
-                                        }}
-                                        source={getCurrencyImageByRegion('USD', 'light')}
-                                    />
-                                )}
+                                        <Image
+                                            style={{
+                                                ...styles.cardBitCoinImage,
+                                                marginBottom: wp('1.5%'),
+                                            }}
+                                            source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                                        />
+                                    )}
                             <Text
                                 style={{
                                     ...CommonStyles.homepageAmountText,
