@@ -123,7 +123,7 @@ PODS:
     - React
   - react-native-config (1.2.1):
     - React
-  - react-native-contacts (5.2.0):
+  - react-native-contacts (5.2.1):
     - React
   - react-native-in-app-utils (6.0.2):
     - React
@@ -496,7 +496,7 @@ SPEC CHECKSUMS:
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
   react-native-config: ae9ef3bdbf539f2d14ebaf4ebeba508f766e066a
-  react-native-contacts: 439dd9c7ea7e0d86190f8370898b82cfb7cf4ef4
+  react-native-contacts: 5724ae28c660a021bf1028874993fac794f9c07a
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: cb74e17062b2af5a16a4b137f32495f241df1a8e

@@ -43,6 +43,8 @@ import {
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
 import { connect } from 'react-redux';
+import NoInternetModalContents from '../components/NoInternetModalContents';
+import NetInfo from '@react-native-community/netinfo';
 import {
     downloadMShare,
     initHealthCheck,
@@ -207,12 +209,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     appStateListener: any
     firebaseNotificationListener: any
     notificationOpenedListener: any
-
+    NoInternetBottomSheet: any
+    unsubscribe: any
 
     constructor(props) {
         super(props);
         this.focusListener = null
         this.appStateListener = null
+        this.NoInternetBottomSheet = React.createRef();
+        this.unsubscribe = null
         this.state = {
             notificationData: [],
             cardData: [],
@@ -408,12 +413,33 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 transactionsLoading: false
             })
         }, 1000);
+
+        this.unsubscribe = NetInfo.addEventListener(state => {
+            setTimeout(() => {
+                if (state.isInternetReachable === null) {
+                    return
+                }
+
+                if (state.isInternetReachable) {
+                    (this.NoInternetBottomSheet as any).current.snapTo(0);
+                } else {
+
+                    (this.NoInternetBottomSheet as any).current.snapTo(1);
+                }
+            }, 1000);
+
+        });
     };
 
     componentWillUnmount() {
         if (this.focusListener) {
             this.focusListener()
         }
+
+        if (this.unsubscribe) {
+            this.unsubscribe()
+        }
+
 
         if (this.appStateListener) {
             this.appStateListener()
@@ -425,6 +451,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         if (this.notificationOpenedListener) {
             this.notificationOpenedListener()
         }
+
+
+
     }
 
 
@@ -1159,6 +1188,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             navigation.navigate('ExistingSavingMethods');
         }
     };
+
+
 
     render() {
         const {
@@ -2139,7 +2170,23 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     />}
                 />
 
-
+                <BottomSheet
+                    onCloseEnd={() => { }}
+                    enabledInnerScrolling={true}
+                    ref={this.NoInternetBottomSheet}
+                    snapPoints={[-50, hp('60%')]}
+                    renderContent={() =>
+                        <NoInternetModalContents
+                            onPressTryAgain={() => { (this.NoInternetBottomSheet as any).current.snapTo(0) }}
+                            onPressIgnore={() => { (this.NoInternetBottomSheet as any).current.snapTo(0) }}
+                        />
+                    }
+                    renderHeader={() => <TransparentHeaderModal
+                        onPressheader={() => {
+                            (this.NoInternetBottomSheet as any).current.snapTo(0);
+                        }}
+                    />}
+                />
 
             </ImageBackground>
         )
