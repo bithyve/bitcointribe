@@ -17,7 +17,7 @@ import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import HomePageShield from '../../components/HomePageShield';
-const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY','INR','EUR'];
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
@@ -36,6 +36,10 @@ const getCurrencyImage = (currencyCodeValue, color) => {
             return setCurrencyCodeToImage('currency-rub', color);
         case 'TRY':
             return setCurrencyCodeToImage('currency-try', color);
+        case 'INR':
+            return setCurrencyCodeToImage('currency-inr', color);
+        case 'EUR':
+            return setCurrencyCodeToImage('currency-eur', color);
         default:
             break;
     }
