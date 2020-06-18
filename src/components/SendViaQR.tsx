@@ -150,15 +150,15 @@ export default function SendViaQR(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center'}}>
+      <ScrollView contentContainerStyle={{ flex: 1}}>
         <View
           style={{
             marginLeft: 20,
             marginRight: 20,
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: props.isFromReceive ? hp('0.1%') : hp('1.7%'),
-            marginBottom: props.isFromReceive ? hp('0.1%') : hp('1.7%'),
+            marginTop: props.isFromReceive ? 0 : hp('1.7%'),
+            marginBottom: props.isFromReceive ? 0 : hp('1.7%'),
           }}
         >
           {!props.isFromReceive ? (
@@ -386,7 +386,7 @@ export default function SendViaQR(props) {
             marginLeft: 20,
             marginRight: 20,
             alignItems: 'center',
-            marginTop: props.isFromReceive ? hp('0.1%') : hp('4%')
+            marginTop: props.isFromReceive ? 0 : hp('4%')
           }}>
             {!props.QR ? (
               <ActivityIndicator size="large" />

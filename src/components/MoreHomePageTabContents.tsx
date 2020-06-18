@@ -29,9 +29,9 @@ export default function MoreHomePageTabContents(props) {
       info: `View and manage your contacts`,
     },
     {
-      title: 'Services',
+      title: 'Funding Sources',
       image: require('../assets/images/icons/existing_saving_method.png'),
-      info: 'Services integrated in your wallet',
+      info: 'Buying methods integrated in your wallet',
     },
     {
       title: 'Wallet Settings',

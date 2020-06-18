@@ -264,7 +264,7 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRContents = useCallback(() => {
     return (
       <SendViaQR
-      isFromReceive={true}
+        isFromReceive={true}
         headerText={'Friends and Family Request'}
         subHeaderText={'Scan the QR from your contact’s Hexa app'}
         contactText={'Adding to Friends and Family:'}
@@ -561,7 +561,7 @@ export default function AddContactSendRequest(props) {
           ref={SendViaQRBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('46%') : hp('46%'),
           ]}
           renderContent={renderSendViaQRContents}
           renderHeader={renderSendViaQRHeader}
