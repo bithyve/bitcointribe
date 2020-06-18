@@ -347,12 +347,6 @@ export default function Login(props) {
     }
   }, [authenticationFailed]);
 
-  useEffect(() => {
-    if (passcode.length == 4) {
-      proceedButton();
-    }
-  }, [passcode])
-
   const renderErrorModalContent = useCallback(() => {
     return (
       <ErrorModalContents
@@ -539,7 +533,7 @@ export default function Login(props) {
             </View>
           </View>
 
-          {/* {passcode.length == 4 ? (
+          {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
@@ -568,7 +562,7 @@ export default function Login(props) {
                 <Text style={styles.proceedButtonText}>Proceed</Text>
               </TouchableOpacity>
             </View>
-          ) : null} */}
+          ) : null}
         </View>
 
         <View style={{ marginTop: 'auto' }}>

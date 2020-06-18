@@ -81,12 +81,6 @@ export default function PasscodeConfirm( props ) {
     }
   }, [ passcode, confirmPasscode ] );
 
-  useEffect(() => {
-    if (confirmPasscode.length == 4) {
-      dispatch( storeCreds( passcode ) ) 
-    }
-  }, [confirmPasscode]);
-
   const dispatch = useDispatch();
   const { hasCreds } = useSelector( state => state.setupAndAuth );
   if ( hasCreds ) props.navigation.replace( "RestoreAndRecoverWallet" );
@@ -414,7 +408,7 @@ export default function PasscodeConfirm( props ) {
                   </View>
                 </View>
               </View>
-              {/* <TouchableOpacity
+              <TouchableOpacity
                 disabled={ passcode == confirmPasscode ? false : true }
                 onPress={ () => dispatch( storeCreds( passcode ) ) }
                 style={ {
@@ -424,7 +418,7 @@ export default function PasscodeConfirm( props ) {
                 } }
               >
                 <Text style={ styles.proceedButtonText }>Proceed</Text>
-              </TouchableOpacity> */}
+              </TouchableOpacity>
             </View>
           ) : null }
         </View>

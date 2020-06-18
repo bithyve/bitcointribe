@@ -40,7 +40,7 @@ export default function NoInternetModalContents(props) {
             </View>
             <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems:'center' }} >
                 <AppBottomSheetTouchableWrapper
-                    onPress={() => props.onPressTryAgain()}
+                    onPress={() => props.onPressIgnore()}
                     style={{ ...styles.successModalButtonView }}
                 >
                     <Text style={styles.proceedButtonText}>OK</Text>
