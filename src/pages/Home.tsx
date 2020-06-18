@@ -506,6 +506,7 @@ export default function Home(props) {
     AddContactAddressBookBookBottomSheet,
     setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
+  const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
   const [
     fastBitcoinSellCalculationBottomSheet,
@@ -1428,11 +1429,9 @@ export default function Home(props) {
 
     try {
       const scannedData = JSON.parse(qrData);
-
       if (scannedData.ver) {
         if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
       }
-
       switch (scannedData.type) {
         case 'trustedGuardian':
           const trustedGruardianRequest = {
@@ -1580,6 +1579,7 @@ export default function Home(props) {
             setTimeout(() => {
               //setAddSubBottomSheetsFlag(true);
               // setAddBottomSheetsFlag(true);
+              setIsLoadContacts(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
@@ -2177,15 +2177,15 @@ export default function Home(props) {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
-            // setTimeout(() => {
-            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
-            // }, 2);
+            setTimeout(() => {
+              setIsLoadContacts(true);
+            }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
-            // setTimeout(() => {
-            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
-            // }, 2);
+            setTimeout(() => {
+              setIsLoadContacts(true);
+            }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
@@ -2334,6 +2334,7 @@ export default function Home(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
+        isLoadContacts={isLoadContacts}
         modalTitle={'Add contact to Friends and Family'}
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}

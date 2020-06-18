@@ -77,6 +77,7 @@ export default function Receive(props) {
     AddContactAddressBookBookBottomSheet,
     setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
+  const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [amount, setAmount] = useState('');
   const [showContacts, setShowContacts] = useState(false);
   const [LoadContacts, setLoadContacts] = useState(false);
@@ -146,6 +147,7 @@ export default function Receive(props) {
       setTimeout(() => {
         setReceiveLink('');
         setReceiveQR('');
+        setIsLoadContacts(true);
       }, 200);
       (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
     }
@@ -472,6 +474,7 @@ export default function Receive(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
+        isLoadContacts={isLoadContacts}
         modalTitle="Select a Contact"
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}

@@ -68,25 +68,31 @@ export default function AddContactAddressBook(props) {
     }
   };
 
+  useEffect(()=>{
+    getContactsAsync();
+  },[props.isLoadContacts]);
+
   const getContact = () => {
-    ExpoContacts.getContactsAsync().then(async ({ data }) => {
-      if (!data.length) {
-        setErrorMessage(
-          'No contacts found. Please add contacts to your address book and try again',
-        );
-        (contactListErrorBottomSheet as any).current.snapTo(1);
-      }
-      setContactData(data);
-      await AsyncStorage.setItem('ContactData', JSON.stringify(data));
-      const contactList = data.sort(function (a, b) {
-        if (a.name && b.name) {
-          if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-          if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+    if (props.isLoadContacts) {
+      ExpoContacts.getContactsAsync().then(async ({ data }) => {
+        if (!data.length) {
+          setErrorMessage(
+            'No contacts found. Please add contacts to your address book and try again',
+          );
+          (contactListErrorBottomSheet as any).current.snapTo(1);
         }
-        return 0;
+        setContactData(data);
+        await AsyncStorage.setItem('ContactData', JSON.stringify(data));
+        const contactList = data.sort(function (a, b) {
+          if (a.name && b.name) {
+            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
+            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+          }
+          return 0;
+        });
+        setFilterContactData(contactList);
       });
-      setFilterContactData(contactList);
-    });
+    }
   };
 
   const getContactsAsync = async () => {
@@ -151,7 +157,6 @@ export default function AddContactAddressBook(props) {
         await AsyncStorage.setItem('isContactOpen', JSON.stringify(true));
       }
     })();
-    getContactsAsync();
   }, []);
 
   const filterContacts = (keyword) => {

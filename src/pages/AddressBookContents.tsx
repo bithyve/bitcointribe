@@ -42,6 +42,7 @@ export default function AddressBookContents(props) {
     AddContactAddressBookBookBottomSheet,
     setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
+  const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [SelectedContact, setSelectedContact] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [trustedContact, setTrustedContact] = useState([]);
@@ -338,6 +339,7 @@ export default function AddressBookContents(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
+        isLoadContacts={isLoadContacts}
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
@@ -442,9 +444,12 @@ export default function AddressBookContents(props) {
                   <View style={{height: wp('22%')+30}} />
                   }
                   <TouchableOpacity
-                    onPress={() =>
-                      AddContactAddressBookBookBottomSheet.current.snapTo(1)
-                    }
+                    onPress={() =>{
+                      setTimeout(() => {
+                        setIsLoadContacts(true);
+                      }, 2);
+                      AddContactAddressBookBookBottomSheet.current.snapTo(1);
+                    }}
                     style={{
                       ...styles.selectedContactsView,
                       paddingBottom: 7,
