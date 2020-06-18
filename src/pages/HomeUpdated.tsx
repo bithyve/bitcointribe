@@ -458,12 +458,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 
     handleAppStateChange = async (nextAppState) => {
-        AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
-            (response) => {
-                isContactOpen = JSON.parse(response[0][1]);
-                isCameraOpen = JSON.parse(response[1][1]);
-            },
-        );
+        let response = await AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen'])
+        isContactOpen = JSON.parse(response[0][1]);
+        isCameraOpen = JSON.parse(response[1][1]);
         let keyArray = [
             ['isCameraOpen', JSON.stringify(true)],
             ['isContactOpen', JSON.stringify(true)],
@@ -1328,7 +1325,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                             AtCloseEnd={atCloseEnd}
                             setTransactionItem={(item) => this.setState({ selectedTransactionItem: item })}
                             setTabBarZIndex={(index) => this.setState({ tabBarIndex: index })}
-                            TransactionDetailsBottomSheet={this.refs.transactionTabBarBottomSheet}
+                            TransactionDetailsBottomSheet={this.refs.transactionDetailsBottomSheet}
                         />
                     )}
                     renderHeader={() => <TransactionHeader openCloseModal={this.openCloseModal} />}
