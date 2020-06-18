@@ -6,7 +6,7 @@ import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function ToggleSwitch(props) {
-  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR','EUR'];
   function setCurrencyCode(currencyName, currencyColor) {
     console.log('currencyColor', currencyColor);
     return (
@@ -33,6 +33,10 @@ export default function ToggleSwitch(props) {
         return setCurrencyCode('currency-rub', color);
       case 'TRY':
         return setCurrencyCode('currency-try', color);
+      case 'INR':
+        return setCurrencyCode('currency-inr', color);
+      case 'EUR':
+        return setCurrencyCode('currency-eur', color);  
       default:
         break;
     }

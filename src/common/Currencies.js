@@ -29,7 +29,7 @@ export default [
     },
     {
       code: 'CHF',
-      symbol: 'CHF',
+      symbol: '₣',
     },
     {
       code: 'CLP',

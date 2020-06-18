@@ -244,7 +244,7 @@ export default function Home(props) {
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
-  const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY'];
+  const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY','INR','EUR'];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
     console.log("currencyColor", currencyColor);
@@ -276,6 +276,10 @@ export default function Home(props) {
         return setCurrencyCodeToImage('currency-rub', color);
       case 'TRY':
         return setCurrencyCodeToImage('currency-try', color);
+      case 'INR':
+        return setCurrencyCodeToImage('currency-inr', color);
+      case 'EUR':
+        return setCurrencyCodeToImage('currency-eur', color);       
       default:
         break;
     }

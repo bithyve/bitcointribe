@@ -155,7 +155,7 @@ export default function SendToContact(props) {
     }
   };
 
-  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY','INR','EUR'];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
     console.log('currencyColor', currencyColor);
@@ -192,6 +192,10 @@ export default function SendToContact(props) {
         return setCurrencyCodeToImage('currency-rub', color);
       case 'TRY':
         return setCurrencyCodeToImage('currency-try', color);
+      case 'INR':
+        return setCurrencyCodeToImage('currency-inr', color);
+      case 'EUR':
+        return setCurrencyCodeToImage('currency-eur', color);     
       default:
         break;
     }
