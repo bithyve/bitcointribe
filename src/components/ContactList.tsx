@@ -8,6 +8,7 @@ import {
   Platform,
   TextInput,
   SafeAreaView,
+  Linking
 } from 'react-native';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
@@ -312,6 +313,7 @@ export default function ContactList(props) {
           proceedButtonText={'Open Setting'}
           isIgnoreButton={true}
           onPressProceed={() => {
+            Linking.openURL('app-settings:');
             (contactListErrorBottomSheet as any).current.snapTo(0);
           }}
           onPressIgnore={() => {

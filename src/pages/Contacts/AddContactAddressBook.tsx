@@ -7,6 +7,7 @@ import {
   Platform,
   AsyncStorage,
   PermissionsAndroid,
+  Linking
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import {
@@ -305,6 +306,7 @@ export default function AddContactAddressBook(props) {
         proceedButtonText={'Open Setting'}
         isIgnoreButton={true}
         onPressProceed={() => {
+          Linking.openURL('app-settings:');
           (contactListErrorBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
