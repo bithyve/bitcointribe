@@ -135,8 +135,12 @@ export const createWatcher = (worker, type) => {
 };
 
 export const requestTimedout = () => {
-  Alert.alert(
+  console.log(
     'Request Timeout!',
-    'Unable to get a response from server. Please, try again shortly.',
+    'Unable to get a response from server. Please, try again shortly',
   );
+  // Alert.alert( // retired timeout alert
+  //   'Request Timeout!',
+  //   'Unable to get a response from server. Please, try again shortly.',
+  // );
 };
