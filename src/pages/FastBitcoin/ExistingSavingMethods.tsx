@@ -34,67 +34,55 @@ import {
   FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
 import { fetchDerivativeAccBalTx } from '../../store/actions/accounts';
+import moment from 'moment';
 
 export default function ExistingSavingMethods(props) {
-  const [getBittrAccounts, setGetBittrAcounts] = useState([]);
-  const serviceRegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  const serviceSavingAccount = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
-  );
-  const dispatch = useDispatch();
+  const [FBTCAccount, setFBTCAccount] = useState([]);
+  const [FBTCAccountInfo, setFBTCAccountInfo] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, [FBTCAccount]);
 
   useEffect(() => {
     (async () => {
-      let getBittrAccounts = [];
-      let accounts = JSON.parse(await AsyncStorage.getItem('getBittrAccounts'));
-      console.log('accounts', accounts);
+      let FBTCAccount = [];
+      let accounts = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+      setFBTCAccountInfo(accounts);
       if (accounts) {
-        for (let i = 0; i < accounts.length; i++) {
-          const element = accounts[i];
-          const derivativeAccountType = FAST_BITCOINS;
-          let { derivativeAccount } =
-            accounts[i].accountType == REGULAR_ACCOUNT
-              ? serviceRegularAccount.hdWallet
-              : serviceSavingAccount.secureHDWallet;
-          for (let j = 0; j < element.getBitrrAccounts.length; j++) {
-            console.log(
-              'derivativeAccount[derivativeAccountType][j]',
-              derivativeAccount[derivativeAccountType][j],
-            );
-            if (derivativeAccount[derivativeAccountType][j].xpub)
-              dispatch(
-                fetchDerivativeAccBalTx(
-                  accounts[i].accountType,
-                  derivativeAccountType,
-                  j,
-                ),
-              );
-            console.log('ACOUNT NUMBER ', j);
-            console.log({
-              balances: derivativeAccount[derivativeAccountType][j].balances,
-              transactions:
-                derivativeAccount[derivativeAccountType][j].transactions,
-            });
-            const subElement = element.getBitrrAccounts[j];
+        if (accounts.checking_account.voucher.length) {
+          for (let i = 0; i < accounts.checking_account.voucher.length; i++) {
+            const element = accounts.checking_account.voucher[i];
             let obj = {
-              ...subElement,
-              accountType: accounts[i].accountType,
-              balances: derivativeAccount[derivativeAccountType][j].balances
-                ? derivativeAccount[derivativeAccountType][j].balances
-                : 0,
-              transactions: derivativeAccount[derivativeAccountType][j]
-                .transactions
-                ? derivativeAccount[derivativeAccountType][j].transactions
-                : {},
+              ...element,
+              accountType: REGULAR_ACCOUNT,
             };
-            getBittrAccounts.push(obj);
+            FBTCAccount.push(obj);
           }
         }
-        setGetBittrAcounts(getBittrAccounts ? getBittrAccounts : []);
+        if (accounts.saving_account.voucher.length) {
+          for (let i = 0; i < accounts.saving_account.voucher.length; i++) {
+            const element = accounts.saving_account.voucher[i];
+            let obj = {
+              ...element,
+              accountType: SECURE_ACCOUNT,
+            };
+            FBTCAccount.push(obj);
+          }
+        }
+        console.log('FBTCAccount', FBTCAccount);
+        FBTCAccount.sort(function (left, right) {
+          return (
+            moment.utc(right.orderData.date).unix() -
+            moment.utc(left.orderData.date).unix()
+          );
+        });
+        setFBTCAccount(FBTCAccount);
       }
-      console.log('accounts', getBittrAccounts);
+      console.log('accounts', FBTCAccount);
     })();
   }, []);
 
@@ -116,136 +104,300 @@ export default function ExistingSavingMethods(props) {
             >
               <FontAwesome
                 name="long-arrow-left"
-                color={Colors.black1}
+                color={Colors.blue}
                 size={17}
               />
             </TouchableOpacity>
             <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
               <Text style={styles.modalHeaderTitleText}>
-                {'Payment Source'}
+                {'Funding Sources'}
               </Text>
               <Text style={styles.modalHeaderSmallTitleText}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                View all your funding sources in one place
               </Text>
             </View>
           </View>
         </View>
       </View>
-      <ScrollView style={{ flex: 1 }}>
-        {getBittrAccounts.map((value) => {
-          return (
-            <TouchableOpacity
-              onPress={() => {
-                props.navigation.navigate('ExistingSavingMethodDetails', {
-                  getBittrAccount: value,
-                });
-              }}
-              style={{
-                marginLeft: 20,
-                marginRight: 20,
-                marginTop: 5,
-                marginBottom: 5,
-                flexDirection: 'row',
-                alignItems: 'center',
-                borderColor: Colors.borderColor,
-                borderWidth: 1,
-                borderRadius: 10,
-              }}
-            >
-              <View
-                style={{
-                  width: wp('10%'),
-                  height: wp('10%'),
-                  borderRadius: wp('10%') / 2,
-                  backgroundColor: Colors.backgroundColor,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginLeft: wp('3%'),
-                }}
-              >
-                <Image
-                  source={require('../../assets/images/icons/icon_getbitter.png')}
-                  style={{ width: wp('7%'), height: wp('7%') }}
-                />
-              </View>
-              <View
-                style={{ flex: 1, marginLeft: wp('3%'), marginRight: wp('3%') }}
-              >
-                <View style={{ padding: wp('3%') }}>
-                  <Text
+      {loading ? (
+        <ScrollView style={{ flex: 1 }}>
+          {loading ? (
+            <View style={{ flex: 1 }}>
+              {[1, 2, 3, 4].map(() => {
+                return (
+                  <View
                     style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(13),
+                      width: wp('70%'),
+                      height: wp('3%'),
+                      margin: 5,
+                      marginLeft: wp('5%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 5,
                     }}
-                  >
-                    Ref # {value.data.deposit_code}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(13),
-                      marginTop: 5,
-                    }}
-                  >
-                    {value.email}
-                  </Text>
-                </View>
-                <View
-                  style={{ height: 1, backgroundColor: Colors.borderColor }}
-                />
-                <View style={{ padding: wp('3%') }}>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(13),
-                    }}
-                  >
-                    Amount Saved
-                  </Text>
-                  <View style={styles.transactionModalAmountView}>
-                    <Image
-                      source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                    />
-                    <Text style={styles.transactionModalAmountText}>
-                      {value.balances.balance ? value.balances.balance : 0}
-                    </Text>
-                    <Text style={styles.transactionModalAmountUnitText}>
-                      sats
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={{
-                  width: wp('10%'),
-                  height: wp('10%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: wp('3%'),
-                }}
-              >
-                {/* <View style={{backgroundColor:Colors.green, borderRadius: wp('5%')/2, width:wp('5%'), height:wp('5%'), justifyContent:'center', alignItems:'center'}}>
-                        <Feather
-                            name={'check'}
-                            size={RFValue(13)}
-                            color={Colors.darkGreen}
+                  />
+                );
+              })}
+              <View style={{ flex: 1 }}>
+                {[1, 2, 3, 4].map(() => {
+                  return (
+                    <View style={{}}>
+                      <View
+                        style={{
+                          marginLeft: 20,
+                          marginRight: 20,
+                          marginTop: 5,
+                          marginBottom: 5,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          borderColor: Colors.borderColor,
+                          borderWidth: 1,
+                          borderRadius: 10,
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: wp('10%'),
+                            height: wp('10%'),
+                            borderRadius: wp('10%') / 2,
+                            backgroundColor: Colors.backgroundColor,
+                            marginLeft: wp('3%'),
+                          }}
                         />
-                    </View> */}
-                <Ionicons
-                  name="ios-arrow-forward"
-                  color={Colors.borderColor}
-                  size={RFValue(20)}
-                  style={{ alignSelf: 'center' }}
-                />
+                        <View
+                          style={{
+                            flex: 1,
+                            marginLeft: wp('3%'),
+                            marginRight: wp('3%'),
+                          }}
+                        >
+                          <View style={{ padding: wp('3%') }}>
+                            <View
+                              style={{
+                                width: wp('40%'),
+                                height: wp('5%'),
+                                backgroundColor: Colors.backgroundColor,
+                                borderRadius: 5,
+                              }}
+                            />
+                            <View
+                              style={{
+                                width: wp('30%'),
+                                height: wp('5%'),
+                                backgroundColor: Colors.backgroundColor,
+                                borderRadius: 5,
+                                marginTop: 5,
+                              }}
+                            />
+                          </View>
+                          <View
+                            style={{
+                              height: 1,
+                              backgroundColor: Colors.borderColor,
+                            }}
+                          />
+                          <View style={{ padding: wp('3%') }}>
+                            <View
+                              style={{
+                                width: wp('40%'),
+                                height: wp('5%'),
+                                backgroundColor: Colors.backgroundColor,
+                                borderRadius: 5,
+                              }}
+                            />
+                            <View
+                              style={{
+                                width: wp('30%'),
+                                height: wp('5%'),
+                                backgroundColor: Colors.backgroundColor,
+                                borderRadius: 5,
+                                marginTop: 5,
+                              }}
+                            />
+                          </View>
+                        </View>
+                        <View
+                          style={{
+                            width: wp('5%'),
+                            height: wp('5%'),
+                            marginRight: wp('3%'),
+                            backgroundColor: Colors.backgroundColor,
+                            borderRadius: wp('10%') / 2,
+                          }}
+                        />
+                      </View>
+                    </View>
+                  );
+                })}
               </View>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+            </View>
+          ) : null}
+        </ScrollView>
+      ) : FBTCAccountInfo ? (
+        <View style={{ flex: 1 }}>
+          <View
+            style={{
+              margin: wp('3%'),
+              marginLeft: wp('5%'),
+              marginRight: wp('5%'),
+              borderBottomColor: Colors.borderColor,
+              borderBottomWidth: 0.5,
+              paddingBottom: wp('4%'),
+            }}
+          >
+            {FBTCAccountInfo.user_key && (
+              <Text style={styles.accountInfo}>
+                <Text style={styles.accountInfoTitle}>User Key: </Text>
+                {FBTCAccountInfo.user_key}
+              </Text>
+            )}
+            {FBTCAccountInfo.hasOwnProperty('redeem_vouchers') && (
+              <Text style={styles.accountInfo}>
+                <Text style={styles.accountInfoTitle}>
+                  Has Redeem Permission:{' '}
+                </Text>
+                {FBTCAccountInfo.redeem_vouchers ? 'Yes' : 'No'}
+              </Text>
+            )}
+            {FBTCAccountInfo.hasOwnProperty('redeem_vouchers') && (
+              <Text style={styles.accountInfo}>
+                <Text style={styles.accountInfoTitle}>
+                  Has Exchange Balances Permission:{' '}
+                </Text>
+                {FBTCAccountInfo.exchange_balances ? 'Yes' : 'No'}
+              </Text>
+            )}
+            {FBTCAccountInfo.hasOwnProperty('sell_bitcoins') && (
+              <Text style={styles.accountInfo}>
+                <Text style={styles.accountInfoTitle}>
+                  Has Sell Bitcoin Permission:{' '}
+                </Text>
+                {FBTCAccountInfo.sell_bitcoins ? 'Yes' : 'No'}
+              </Text>
+            )}
+          </View>
+          <ScrollView style={{ flex: 1 }}>
+            {FBTCAccount.map((value) => {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    props.navigation.navigate('ExistingSavingMethodDetails', {
+                      getBittrAccount: value,
+                    });
+                  }}
+                  style={{
+                    marginLeft: 20,
+                    marginRight: 20,
+                    marginTop: 5,
+                    marginBottom: 5,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderColor: Colors.borderColor,
+                    borderWidth: 1,
+                    borderRadius: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: wp('10%'),
+                      height: wp('10%'),
+                      borderRadius: wp('10%') / 2,
+                      backgroundColor: Colors.backgroundColor,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginLeft: wp('3%'),
+                    }}
+                  >
+                    <Image
+                      source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+                      style={{ width: wp('5%'), height: wp('5%') }}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      marginLeft: wp('3%'),
+                      marginRight: wp('3%'),
+                    }}
+                  >
+                    <View style={{ padding: wp('3%') }}>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansMedium,
+                          fontSize: RFValue(13),
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: RFValue(11),
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}
+                        >
+                          Voucher Code
+                        </Text>{' '}
+                        #{value.voucherCode}
+                      </Text>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(13),
+                          marginTop: 5,
+                        }}
+                      >
+                        {value.accountType == REGULAR_ACCOUNT
+                          ? 'Checking Account'
+                          : 'Savings Account'}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: Colors.borderColor,
+                      }}
+                    />
+                    <View style={{ padding: wp('3%') }}>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontFamily: Fonts.FiraSansRegular,
+                          fontSize: RFValue(13),
+                        }}
+                      >
+                        Voucher Amount
+                      </Text>
+                      <View style={styles.transactionModalAmountView}>
+                        <Text style={styles.transactionModalAmountText}>
+                          {value.quotes.amount ? value.quotes.amount : 0}
+                        </Text>
+                        <Text style={styles.transactionModalAmountUnitText}>
+                          {value.quotes.currency}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      width: wp('10%'),
+                      height: wp('10%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: wp('3%'),
+                    }}
+                  >
+                    <Ionicons
+                      name="ios-arrow-forward"
+                      color={Colors.borderColor}
+                      size={RFValue(20)}
+                      style={{ alignSelf: 'center' }}
+                    />
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -259,10 +411,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginBottom: 10,
-    marginTop: hp('5%'),
+    marginTop: 10,
   },
   modalHeaderTitleText: {
-    color: Colors.black1,
+    color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
   },
@@ -272,17 +424,15 @@ const styles = StyleSheet.create({
   },
   modalHeaderSmallTitleText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
     marginBottom: 10,
   },
-
   transactionModalAmountView: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   transactionModalAmountText: {
-    marginLeft: 5,
     marginRight: 5,
     fontSize: RFValue(17),
     fontFamily: Fonts.OpenSans,
@@ -292,5 +442,14 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.OpenSans,
+    lineHeight: RFValue(18),
+  },
+  accountInfo: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(11),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  accountInfoTitle: {
+    fontFamily: Fonts.FiraSansRegular,
   },
 });
