@@ -262,6 +262,7 @@ export default function Receive(props) {
     AsTrustedContact,
     receiveLink,
     receiveQR,
+    updateEphemeralChannelLoader,
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
