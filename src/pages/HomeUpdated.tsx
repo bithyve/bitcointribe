@@ -184,7 +184,11 @@ interface HomeStateTypes {
     notificationDataChange: boolean,
     appState: string,
     fbBTCAccount: any,
-    transactionsLoading: boolean
+    transactionsLoading: boolean,
+    trustedContactRequest: any,
+    recoveryRequest: any,
+    custodyRequest: any,
+    isLoadContacts: boolean
 }
 
 interface HomePropsTypes {
@@ -248,7 +252,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             notificationDataChange: false,
             appState: '',
             fbBTCAccount: {},
-            transactionsLoading: true
+            transactionsLoading: true,
+            trustedContactRequest: null,
+            recoveryRequest: null,
+            custodyRequest: null,
+            isLoadContacts: false
         }
     }
 
@@ -281,11 +289,24 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 };
                 this.setState({
                     loading: false,
-                    secondaryDeviceOtp: trustedGruardianRequest
+                    secondaryDeviceOtp: trustedGruardianRequest,
+                    trustedContactRequest: trustedGruardianRequest,
+                    isLoadContacts: true
                 }, () => {
-                    navigation.navigate('Home', {
-                        trustedContactRequest: trustedGruardianRequest,
-                    });
+                    setTimeout(() => {
+                        (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                    }, 2);
+
+                    if (this.state.tabBarIndex === 999) {
+                        this.setState({
+                            tabBarIndex: 0,
+                            deepLinkModalOpen: true
+                        })
+                    }
+                    setTimeout(() => {
+                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    }, 2);
                 })
                 return
 
@@ -302,11 +323,25 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
                 this.setState({
                     loading: false,
-                    secondaryDeviceOtp: secondaryDeviceGuardianRequest
-                })
-                navigation.navigate('Home', {
+                    secondaryDeviceOtp: secondaryDeviceGuardianRequest,
                     trustedContactRequest: secondaryDeviceGuardianRequest,
-                });
+                }, () => {
+                    // TODO -- figure out why its not closing with out timeout
+                    setTimeout(() => {
+                        (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                    }, 2);
+
+                    if (this.state.tabBarIndex === 999) {
+                        this.setState({
+                            tabBarIndex: 0,
+                            deepLinkModalOpen: true
+                        })
+                    }
+                    setTimeout(() => {
+                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    }, 2);
+                })
                 break;
 
             case 'recoveryQR':
@@ -319,9 +354,24 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 };
 
                 this.setState({
-                    loading: false
+                    loading: false,
+                    recoveryRequest: recoveryRequest
+                }, () => {
+                    setTimeout(() => {
+                        (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                    }, 2);
+
+                    if (this.state.tabBarIndex === 999) {
+                        this.setState({
+                            tabBarIndex: 0,
+                            deepLinkModalOpen: true
+                        })
+                    }
+                    setTimeout(() => {
+                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    }, 2);
                 })
-                navigation.navigate('Home', { recoveryRequest });
             default:
                 break;
         }
@@ -501,13 +551,42 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     ek: splits[7],
                     uploadedAt: splits[8],
                 };
-                navigation.navigate('Home', { custodyRequest });
+                this.setState({
+                    custodyRequest
+                }, () => {
+                    if (this.state.tabBarIndex === 999) {
+                        this.setState({
+                            tabBarIndex: 0,
+                            deepLinkModalOpen: true
+                        })
+                    }
+                    setTimeout(() => {
+                        (this.refs.allAccountsBottomSheet as any).snapTo(0)
+                            (this.refs.settingsBottomSheet as any).snapTo(0)
+                            (this.refs.custodianRequestBottomSheet as any).snapTo(1)
+                            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    }, 2);
+
+                })
+                // navigation.navigate('Home', { custodyRequest });
             } else if (splits[6] === 'rk') {
                 const recoveryRequest = { requester, rk: splits[7] };
-                navigation.navigate('Home', {
+
+                this.setState({
                     recoveryRequest,
                     trustedContactRequest: null,
-                });
+                }, () => {
+                    if (this.state.tabBarIndex === 999) {
+                        this.setState({
+                            tabBarIndex: 0,
+                            deepLinkModalOpen: true
+                        })
+                    }
+                    setTimeout(() => {
+                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    }, 2);
+                })
             }
         } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
             if (splits[3] !== config.APP_STAGE) {
@@ -526,10 +605,24 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     hint: splits[8],
                     uploadedAt: splits[9],
                 };
-                navigation.navigate('Home', {
+
+
+                this.setState({
                     trustedContactRequest,
                     recoveryRequest: null,
-                });
+                }, () => {
+                    if (this.state.tabBarIndex === 999) {
+                        this.setState({
+                            tabBarIndex: 0,
+                            deepLinkModalOpen: true
+                        })
+                    }
+                    setTimeout(() => {
+                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                    }, 2);
+                })
+
             }
         } else if (splits[4] === 'rk') {
             const recoveryRequest = {
@@ -539,10 +632,23 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 hintType: splits[7],
                 hint: splits[8],
             };
-            navigation.navigate('Home', {
+
+
+            this.setState({
                 recoveryRequest,
                 trustedContactRequest: null,
-            });
+            }, () => {
+                if (this.state.tabBarIndex === 999) {
+                    this.setState({
+                        tabBarIndex: 0,
+                        deepLinkModalOpen: true
+                    })
+                }
+                setTimeout(() => {
+                    (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                }, 2);
+            })
         }
 
         if (event.url.includes('fastbitcoins')) {
@@ -910,12 +1016,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     };
 
     onTrustedContactRequestAccept = (key) => {
-        const { navigation, UNDER_CUSTODY } = this.props
-        const recoveryRequest = navigation.getParam('recoveryRequest');
-        const custodyRequest = navigation.getParam('custodyRequest');
-        const trustedContactRequest = navigation.getParam(
-            'trustedContactRequest',
-        );
+        const { UNDER_CUSTODY } = this.props
+        const { recoveryRequest, trustedContactRequest, custodyRequest } = this.state
         if (!trustedContactRequest && !recoveryRequest) return;
         let {
             requester,
@@ -1181,7 +1283,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     tabBarIndex: 0
                 })
             }, 10);
-        } else if (item.title == 'Services') {
+        } else if (item.title == 'Funding Sources') {
             navigation.navigate('ExistingSavingMethods');
         }
     };
@@ -1215,7 +1317,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             loading,
             atCloseEnd,
             transactionsLoading,
-            currencyCode
+            currencyCode,
+            trustedContactRequest,
+            recoveryRequest,
+            custodyRequest,
+            isLoadContacts
         } = this.state
         const {
             navigation,
@@ -1226,11 +1332,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             UNDER_CUSTODY,
             downloadMShare
         } = this.props
-        const trustedContactRequest = navigation.getParam(
-            'trustedContactRequest',
-        );
-        const recoveryRequest = navigation.getParam('recoveryRequest');
-        const custodyRequest = navigation.getParam('custodyRequest');
+
+        // const custodyRequest = navigation.getParam('custodyRequest');
         return (
             <ImageBackground
                 source={require('../assets/images/home-bg.png')}
@@ -1600,7 +1703,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     ]}
                     renderContent={() => {
                         if (!trustedContactRequest && !recoveryRequest) { return };
-
                         return (<TrustedContactRequestContent
                             trustedContactRequest={trustedContactRequest}
                             recoveryRequest={recoveryRequest}
@@ -1847,12 +1949,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                                         <AddContactsModalContents
                                             onPressFriendAndFamily={() => {
                                                 this.setState({
-                                                    familyAndFriendsBookBottomSheetsFlag: true
+                                                    isLoadContacts: true
                                                 }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
                                             }}
                                             onPressBiller={() => {
                                                 this.setState({
-                                                    familyAndFriendsBookBottomSheetsFlag: true
+                                                    isLoadContacts: true
                                                 }, () => (this.refs.AddContactAddressBookBookBottomSheet as any).snapTo(1))
                                             }}
                                             onPressBack={() => {
@@ -2033,6 +2135,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
                     ]}
                     renderContent={() => <AddContactAddressBook
+                        isLoadContacts={isLoadContacts}
                         modalRef={this.refs.addContactAddressBookBookBottomSheet}
                         proceedButtonText={'Confirm & Proceed'}
                         onPressContinue={() => {
