@@ -167,7 +167,7 @@ export default function Accounts(props) {
     setTransactionDetailsHelperBottomSheet,
   ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
-  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY'];
+  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR','EUR'];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
     console.log('currencyColor', currencyColor);
@@ -195,6 +195,10 @@ export default function Accounts(props) {
         return setCurrencyCodeToImage('currency-rub', color);
       case 'TRY':
         return setCurrencyCodeToImage('currency-try', color);
+      case 'INR':
+          return setCurrencyCodeToImage('currency-inr', color);
+      case 'EUR':
+          return setCurrencyCodeToImage('currency-eur', color);         
       default:
         break;
     }

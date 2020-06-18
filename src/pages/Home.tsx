@@ -244,7 +244,7 @@ export default function Home(props) {
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
-  const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY'];
+  const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY','INR','EUR'];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
     console.log("currencyColor", currencyColor);
@@ -276,6 +276,10 @@ export default function Home(props) {
         return setCurrencyCodeToImage('currency-rub', color);
       case 'TRY':
         return setCurrencyCodeToImage('currency-try', color);
+      case 'INR':
+        return setCurrencyCodeToImage('currency-inr', color);
+      case 'EUR':
+        return setCurrencyCodeToImage('currency-eur', color);       
       default:
         break;
     }
@@ -506,6 +510,7 @@ export default function Home(props) {
     AddContactAddressBookBookBottomSheet,
     setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
+  const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
   const [
     fastBitcoinSellCalculationBottomSheet,
@@ -1428,11 +1433,9 @@ export default function Home(props) {
 
     try {
       const scannedData = JSON.parse(qrData);
-
       if (scannedData.ver) {
         if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
       }
-
       switch (scannedData.type) {
         case 'trustedGuardian':
           const trustedGruardianRequest = {
@@ -1580,6 +1583,7 @@ export default function Home(props) {
             setTimeout(() => {
               //setAddSubBottomSheetsFlag(true);
               // setAddBottomSheetsFlag(true);
+              setIsLoadContacts(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
@@ -2177,15 +2181,15 @@ export default function Home(props) {
       return (
         <AddContactsModalContents
           onPressFriendAndFamily={() => {
-            // setTimeout(() => {
-            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
-            // }, 2);
+            setTimeout(() => {
+              setIsLoadContacts(true);
+            }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBiller={() => {
-            // setTimeout(() => {
-            //   setFamilyAndFriendsBookBottomSheetsFlag(true);
-            // }, 2);
+            setTimeout(() => {
+              setIsLoadContacts(true);
+            }, 2);
             (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }}
           onPressBack={() => {
@@ -2334,6 +2338,7 @@ export default function Home(props) {
   const renderAddContactAddressBookContents = () => {
     return (
       <AddContactAddressBook
+        isLoadContacts={isLoadContacts}
         modalTitle={'Add contact to Friends and Family'}
         modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
