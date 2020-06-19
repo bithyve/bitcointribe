@@ -58,6 +58,7 @@ import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import Config from 'react-native-config';
 
 import Toast from '../../components/Toast';
+import moment from 'moment';
 
 const VoucherScanner = (props) => {
   const [TextHideShow, setTextHideShow] = useState(true);
@@ -80,23 +81,19 @@ const VoucherScanner = (props) => {
   const accountSyncFailMessage = useSelector(
     (state) => state.fbtc.accountSyncFailMessage,
   );
-
   const IsGetQuoteFail = useSelector((state) => state.fbtc.getQuoteFail);
   const getQuoteFailMessage = useSelector(
     (state) => state.fbtc.getQuoteFailMessage,
   );
-
   const IsExecuteOrderFail = useSelector((state) => state.fbtc.accountSyncFail);
   const executeOrderFailMessage = useSelector(
     (state) => state.fbtc.accountSyncFailMessage,
   );
-
   const [exchangeRates, setExchangeRates] = useState(accounts1.exchangeRates);
   const dispatch = useDispatch();
   const accountSyncDetails = useSelector(
     (state) => state.fbtc.accountSyncDetails,
   );
-
   const [errorTitle, setErrorTitle] = useState('');
   const [errorInfo, setErrorInfo] = useState('');
   const [errorNote, setErrorNote] = useState('');
@@ -172,14 +169,14 @@ const VoucherScanner = (props) => {
           setSelectedAccount(voucherCodeTemp.selectedAccount);
         }
       }
-      let getFBTCAccount = JSON.parse(
-        await AsyncStorage.getItem('FBTCAccount'),
-      );
       let FBTCAccountData = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
       );
       if (FBTCAccountData && FBTCAccountData.user_key) {
         setIsUserRegistered(true);
+      }
+      if (!userKey) {
+        setUserKey(FBTCAccountData.user_key);
       }
     })();
   }, []);
@@ -406,7 +403,6 @@ const VoucherScanner = (props) => {
       user_key: FBTCAccountData.user_key,
       quote_type: 'voucher',
       currency: 'USD',
-      amount: 100.0,
       voucher_code: voucherData ? voucherData.voucher_code : '',
     };
     dispatch(getQuote(data));
@@ -541,13 +537,17 @@ const VoucherScanner = (props) => {
       await AsyncStorage.getItem('voucherData'),
     );
     if (fBTCAccountData) {
+      let obj={
+        ...executeOrderDetails,
+        date: moment(new Date()).valueOf()
+      }
       if (voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT) {
         for (let i = 0; i < fBTCAccountData.test_account.voucher.length; i++) {
           const element = fBTCAccountData.test_account.voucher[i];
           if (element.voucherCode == voucherFromAsync.voucher_code) {
             fBTCAccountData.test_account.voucher[
               i
-            ].orderData = executeOrderDetails;
+            ].orderData = obj;
             break;
           }
         }
@@ -562,7 +562,7 @@ const VoucherScanner = (props) => {
           if (element.voucherCode == voucherFromAsync.voucher_code) {
             fBTCAccountData.saving_account.voucher[
               i
-            ].orderData = executeOrderDetails;
+            ].orderData = obj;
             break;
           }
         }
@@ -577,7 +577,7 @@ const VoucherScanner = (props) => {
           if (element.voucherCode == voucherFromAsync.voucher_code) {
             fBTCAccountData.checking_account.voucher[
               i
-            ].orderData = executeOrderDetails;
+            ].orderData = obj;
             break;
           }
         }
@@ -828,7 +828,10 @@ const VoucherScanner = (props) => {
                 </RNCamera>
               </View>
             ) : (
-              <TouchableOpacity onPress={() => setOpenCameraFlag(true)} style={{alignSelf: 'center'}}>
+              <TouchableOpacity
+                onPress={() => setOpenCameraFlag(true)}
+                style={{ alignSelf: 'center' }}
+              >
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
                   style={styles.cameraImage}
@@ -857,8 +860,12 @@ const VoucherScanner = (props) => {
                   Keyboard.dismiss();
                 }
               }}
-              onFocus={()=>{setTextHideShow(false)}}
-              onBlur={()=>{setTextHideShow(true)}}
+              onFocus={() => {
+                setTextHideShow(false);
+              }}
+              onBlur={() => {
+                setTextHideShow(true);
+              }}
               value={voucherCode}
             />
           </View>
@@ -926,7 +933,7 @@ const VoucherScanner = (props) => {
         ) : null}
         <Text
           style={{
-            marginTop:'auto',
+            marginTop: 'auto',
             marginBottom: 10,
             paddingLeft: 20,
             paddingRight: 15,
@@ -935,7 +942,7 @@ const VoucherScanner = (props) => {
             color: Colors.textColorGrey,
           }}
         >
-          {TextHideShow ?'Deposit Account':''}
+          {TextHideShow ? 'Deposit Account' : ''}
         </Text>
       </KeyboardAvoidingView>
       <View
@@ -1189,7 +1196,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansMedium,
-    marginTop: wp("10%")
+    marginTop: wp('10%'),
   },
 });
 

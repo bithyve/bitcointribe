@@ -37,51 +37,9 @@ import moment from 'moment';
 import { UsNumberFormat } from '../../common/utilities';
 
 export default function ExistingSavingMethodDetails(props) {
-  const getBittrAccount = props.navigation.state.params.getBittrAccount
+  const FBTCAccount = props.navigation.state.params.getBittrAccount
     ? props.navigation.state.params.getBittrAccount
     : {};
-  let balances = getBittrAccount.balances.balance
-    ? getBittrAccount.balances.balance
-    : 0 + getBittrAccount.balances.unconfirmedBalance
-    ? getBittrAccount.balances.unconfirmedBalance
-	: 0;
-	const [getBittrDetails, setGetBittrDetails] = useState({});
-	const [transactions, setTransactions] = useState([
-    // {
-    // 	amount:'0.7',
-    // 	accountType:"Regular Account",
-    // 	date:new Date()
-    // },
-    // {
-    // 	amount:'0.3',
-    // 	accountType:"Regular Account",
-    // 	date:new Date()
-    // },
-    // {
-    // 	amount:'0.8',
-    // 	accountType:"Regular Account",
-    // 	date:new Date()
-    // },
-  ]);
-
-  const getAccountNameByType = (type) => {
-    if (type == REGULAR_ACCOUNT) {
-      return 'Checking Account';
-    }
-    if (type == SECURE_ACCOUNT) {
-      return 'Saving Account';
-    }
-    return 'Test Account';
-  };
-  useEffect(() => {
-    (async () => {
-      let getBittrDetails = JSON.parse(
-        await AsyncStorage.getItem('getBittrDetails'),
-	  );
-	  setGetBittrDetails(getBittrDetails);
-	  console.log("GETBITTR SEPA details", getBittrDetails);
-    })();
-  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -101,16 +59,16 @@ export default function ExistingSavingMethodDetails(props) {
             >
               <FontAwesome
                 name="long-arrow-left"
-                color={Colors.black1}
+                color={Colors.blue}
                 size={17}
               />
             </TouchableOpacity>
             <View style={{ flex: 1, marginRight: 10, marginBottom: 10 }}>
               <Text style={styles.modalHeaderTitleText}>
-                {'Payment Source Detail'}
+                {'Funding Sources Detail'}
               </Text>
               <Text style={styles.modalHeaderSmallTitleText}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Funding sources full details
               </Text>
             </View>
           </View>
@@ -142,8 +100,8 @@ export default function ExistingSavingMethodDetails(props) {
             }}
           >
             <Image
-              source={require('../../assets/images/icons/icon_getbitter.png')}
-              style={{ width: wp('7%'), height: wp('7%') }}
+              source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+              style={{ width: wp('5%'), height: wp('5%') }}
             />
           </View>
           <View
@@ -153,11 +111,19 @@ export default function ExistingSavingMethodDetails(props) {
               <Text
                 style={{
                   color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
+                  fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(13),
                 }}
               >
-                Ref # {getBittrAccount.data.deposit_code}
+                <Text
+                  style={{
+                    fontSize: RFValue(11),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Voucher Code
+                </Text>{' '}
+                #{FBTCAccount.voucherCode}
               </Text>
               <Text
                 style={{
@@ -167,7 +133,9 @@ export default function ExistingSavingMethodDetails(props) {
                   marginTop: 5,
                 }}
               >
-                {getBittrAccount.email}
+                {FBTCAccount.accountType == REGULAR_ACCOUNT
+                  ? 'Checking Account'
+                  : 'Savings Account'}
               </Text>
             </View>
             <View style={{ height: 1, backgroundColor: Colors.borderColor }} />
@@ -179,17 +147,15 @@ export default function ExistingSavingMethodDetails(props) {
                   fontSize: RFValue(13),
                 }}
               >
-                Amount Saved
+                Voucher Amount
               </Text>
               <View style={styles.transactionModalAmountView}>
-                <Image
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                  style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                />
                 <Text style={styles.transactionModalAmountText}>
-                  {balances}
+                  {FBTCAccount.quotes.amount}
                 </Text>
-                <Text style={styles.transactionModalAmountUnitText}>sats</Text>
+                <Text style={styles.transactionModalAmountUnitText}>
+                  {FBTCAccount.quotes.currency}
+                </Text>
               </View>
             </View>
           </View>
@@ -202,13 +168,6 @@ export default function ExistingSavingMethodDetails(props) {
               marginRight: wp('3%'),
             }}
           >
-            {/* <View style={{backgroundColor:Colors.green, borderRadius: wp('5%')/2, width:wp('5%'), height:wp('5%'), justifyContent:'center', alignItems:'center'}}>
-							<Feather
-								name={'check'}
-								size={RFValue(13)}
-								color={Colors.darkGreen}
-							/>
-						</View> */}
             <Ionicons
               name="ios-arrow-forward"
               color={Colors.borderColor}
@@ -238,7 +197,7 @@ export default function ExistingSavingMethodDetails(props) {
               fontSize: RFValue(13),
             }}
           >
-            Account Holder Name
+            Voucher Code
           </Text>
           <Text
             style={{
@@ -248,7 +207,7 @@ export default function ExistingSavingMethodDetails(props) {
               marginTop: 5,
             }}
           >
-            {getBittrDetails['Account holder']}
+            {FBTCAccount.voucherCode}
           </Text>
         </View>
         <View
@@ -271,7 +230,7 @@ export default function ExistingSavingMethodDetails(props) {
               fontSize: RFValue(13),
             }}
           >
-            BIC
+            Amount
           </Text>
           <Text
             style={{
@@ -281,73 +240,7 @@ export default function ExistingSavingMethodDetails(props) {
               marginTop: 5,
             }}
           >
-            {getBittrDetails['BIC Code']}
-          </Text>
-        </View>
-        {/* <View
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            marginTop: 5,
-            marginBottom: 5,
-            justifyContent: 'center',
-            borderRadius: 10,
-            backgroundColor: Colors.white,
-            padding: wp('4%'),
-            paddingLeft: wp('6%'),
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(13),
-            }}
-          >
-            Phone
-          </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(13),
-              marginTop: 5,
-            }}
-          >
-            {getBittrAccount.phone}
-          </Text>
-        </View> */}
-        <View
-          style={{
-            marginLeft: 20,
-            marginRight: 20,
-            marginTop: 5,
-            marginBottom: 5,
-            justifyContent: 'center',
-            borderRadius: 10,
-            backgroundColor: Colors.white,
-            padding: wp('4%'),
-            paddingLeft: wp('6%'),
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.black,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(13),
-            }}
-          >
-            IBAN
-          </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(13),
-              marginTop: 5,
-            }}
-          >
-            {getBittrDetails['IBAN Number']}
+            {FBTCAccount.quotes.amount}
           </Text>
         </View>
         <View
@@ -370,7 +263,7 @@ export default function ExistingSavingMethodDetails(props) {
               fontSize: RFValue(13),
             }}
           >
-            Account Associated
+            Sats Received
           </Text>
           <Text
             style={{
@@ -380,110 +273,110 @@ export default function ExistingSavingMethodDetails(props) {
               marginTop: 5,
             }}
           >
-            {getAccountNameByType(getBittrAccount.accountType)}
+            {FBTCAccount.quotes.bitcoin_amount}
           </Text>
         </View>
-        {getBittrAccount.transactions.transactionDetails &&
-        getBittrAccount.transactions.transactionDetails.length ? (
-          <View
+        <View
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+            marginTop: 5,
+            marginBottom: 5,
+            justifyContent: 'center',
+            borderRadius: 10,
+            backgroundColor: Colors.white,
+            padding: wp('4%'),
+            paddingLeft: wp('6%'),
+          }}
+        >
+          <Text
             style={{
-              marginLeft: 20,
-              marginRight: 20,
-              marginTop: 15,
-              marginBottom: 5,
-              justifyContent: 'center',
-              borderRadius: 10,
-              padding: wp('4%'),
-              paddingLeft: wp('6%'),
+              color: Colors.black,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(13),
             }}
           >
-            <Text
-              style={{
-                color: Colors.black,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(13),
-              }}
-            >
-              Transactions
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(13),
-                marginTop: 5,
-              }}
-            >
-              Lorem ipsum dolor sit amet, consectetur adipiscing
-            </Text>
-          </View>
-        ) : null}
-        <FlatList
-          data={getBittrAccount.transactions.transactionDetails}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                backgroundColor: Colors.borderColor,
-                height: 1,
-                marginLeft: 25,
-                marginRight: 25,
-              }}
-            />
-          )}
-          renderItem={({ item, index }) => {
-            return (
-              <View
-                style={{
-                  marginLeft: 20,
-                  marginRight: 20,
-                  marginTop: index == 0 ? 15 : 5,
-                  marginBottom: 5,
-                  alignItems: 'center',
-                  borderRadius: 10,
-                  padding: wp('4%'),
-                  paddingLeft: wp('6%'),
-                  flexDirection: 'row',
-                }}
-              >
-                <View>
-                  <Text
-                    style={{
-                      color: Colors.black,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(13),
-                    }}
-                  >
-                    {item.accountType}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(13),
-                      marginTop: 5,
-                    }}
-                  >
-                    {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
-                  </Text>
-                </View>
-                <View style={{ padding: wp('3%'), marginLeft: 'auto' }}>
-                  <View style={styles.transactionModalAmountView}>
-                    <Image
-                      source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                    />
-                    <Text style={styles.transactionModalAmountText}>
-                      {UsNumberFormat(item.amount)}
-                    </Text>
-                    <Text style={styles.transactionModalAmountUnitText}>
-                      sats
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            );
+            Rate
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(13),
+              marginTop: 5,
+            }}
+          >
+            {FBTCAccount.quotes.exchange_rate}
+          </Text>
+        </View>
+        <View
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+            marginTop: 5,
+            marginBottom: 5,
+            justifyContent: 'center',
+            borderRadius: 10,
+            backgroundColor: Colors.white,
+            padding: wp('4%'),
+            paddingLeft: wp('6%'),
           }}
-        />
+        >
+          <Text
+            style={{
+              color: Colors.black,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(13),
+            }}
+          >
+            Date
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(13),
+              marginTop: 5,
+            }}
+          >
+            {moment(FBTCAccount.orderData.date).utc().format('DD MMMM YYYY')}
+          </Text>
+        </View>
+        <View
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+            marginTop: 5,
+            marginBottom: 5,
+            justifyContent: 'center',
+            borderRadius: 10,
+            backgroundColor: Colors.white,
+            padding: wp('4%'),
+            paddingLeft: wp('6%'),
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.black,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(13),
+            }}
+          >
+            Receive In account
+          </Text>
+          <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue(13),
+              marginTop: 5,
+            }}
+          >
+            {FBTCAccount.accountType == REGULAR_ACCOUNT
+              ? 'Checking Account'
+              : 'Savings Account'}
+          </Text>
+        </View>
       </ScrollView>
     </View>
   );
@@ -498,10 +391,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
     marginBottom: 10,
-    marginTop: hp('5%'),
+    marginTop: 10,
   },
   modalHeaderTitleText: {
-    color: Colors.black1,
+    color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
   },
@@ -511,7 +404,7 @@ const styles = StyleSheet.create({
   },
   modalHeaderSmallTitleText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
     marginBottom: 10,
   },
@@ -521,7 +414,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   transactionModalAmountText: {
-    marginLeft: 5,
     marginRight: 5,
     fontSize: RFValue(17),
     fontFamily: Fonts.OpenSans,
@@ -531,5 +423,6 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.OpenSans,
+    lineHeight: RFValue(18),
   },
 });

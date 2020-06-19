@@ -1993,7 +1993,7 @@ export default function Home(props) {
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
-    } else if (item.title == 'Services') {
+    } else if (item.title == 'Funding Sources') {
       props.navigation.navigate('ExistingSavingMethods');
     }
     // else if (item.title == 'All accounts and funds') {
