@@ -71,7 +71,6 @@ export default function Launch(props) {
             if (!url) props.navigation.replace('Login');
             else {
               const splits = url.split('/');
-
               if (splits[5] === 'sss') {
                 const requester = splits[4];
                 if (splits[6] === 'ek') {
@@ -94,7 +93,7 @@ export default function Launch(props) {
                   Alert.alert(
                     'Invalid deeplink',
                     `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                    splits[3]
+                      splits[3]
                     }`,
                   );
                 } else {
@@ -112,7 +111,9 @@ export default function Launch(props) {
                     hint: splits[8],
                     uploadedAt: splits[9],
                   };
-                  props.navigation.replace('Login', { trustedContactRequest });
+                  props.navigation.replace('Login', {
+                    trustedContactRequest,
+                  });
                 }
               } else if (splits[4] === 'rk') {
                 const recoveryRequest = {
@@ -128,6 +129,9 @@ export default function Launch(props) {
                   'Restoration link Identified',
                   'Restoration links only works during restoration mode',
                 );
+              } else if (url.includes('fastbitcoins')) {
+                const userKey = url.substr(url.lastIndexOf('/') + 1);
+                props.navigation.navigate('Login', { userKey });
               } else {
                 const EmailToken = url.substr(url.lastIndexOf('/') + 1);
                 console.log('EmailToken', EmailToken);
