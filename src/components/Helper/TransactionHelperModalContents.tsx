@@ -37,6 +37,8 @@ export default function TransactionHelperModalContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginTop: 10,
+                marginBottom: 10,
                 }}
             />
             <Text

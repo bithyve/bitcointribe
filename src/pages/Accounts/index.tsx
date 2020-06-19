@@ -1882,7 +1882,9 @@ export default function Accounts(props) {
             ref={TestAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-              hp('89%'),
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('87%')
+              : hp('89%')
               // Platform.OS == 'ios' && DeviceInfo.hasNotch()
               //   ? hp('35%')
               //   : hp('40%'),
