@@ -17,6 +17,25 @@ import { UsNumberFormat } from '../../common/utilities';
 
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions';
 import DeviceInfo from 'react-native-device-info';
+import { getCurrencyImageName } from '../../common/CommonFunctions/index';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY','INR','EUR'];
+
+function setCurrencyCodeToImage(currencyName, currencyColor) {
+    return (
+        <View style={{
+            marginRight: 5,
+            marginBottom: wp('0.7%'),
+        }}>
+            <MaterialCommunityIcons
+                name={currencyName}
+                color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
+                size={wp('3.5%')}
+            />
+        </View>
+    );
+}
 
 const HomeList = ({ Items, navigation, getIconByAccountType, switchOn, accounts, CurrencyCode, balances, exchangeRates }) => {
     return (
@@ -128,19 +147,21 @@ const HomeList = ({ Items, navigation, getIconByAccountType, switchOn, accounts,
                                         }}
                                     >
                                         {value.accountType === 'test' || switchOn ? (
-                                            <Image
-                                                style={styles.cardBitCoinImage}
-                                                source={value.bitcoinicon}
-                                            />
-                                        ) : (
-                                                <Image
-                                                    style={styles.cardBitCoinImage}
-                                                    source={getCurrencyImageByRegion(
-                                                        CurrencyCode,
-                                                        'light_blue',
-                                                    )}
-                                                />
-                                            )}
+                                  <Image
+                                    style={styles.cardBitCoinImage}
+                                    source={value.bitcoinicon}
+                                  />
+                                ) : (currencyCode.includes(CurrencyCode)) ? (
+                                    setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode), 'light_blue')
+                                ) : (
+                                  <Image
+                                    style={styles.cardBitCoinImage}
+                                    source={getCurrencyImageByRegion(
+                                      CurrencyCode,
+                                      'light_blue',
+                                    )}
+                                  />
+                                )}
                                         <Text
                                             style={
                                                 accounts.accountsSynched

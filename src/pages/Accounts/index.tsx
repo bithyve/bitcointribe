@@ -64,6 +64,7 @@ import {
 import TransactionHelperModalContents from '../../components/Helper/TransactionHelperModalContents';
 import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 
 export default function Accounts(props) {
   const [FBTCAccount, setFBTCAccount] = useState({});
@@ -167,10 +168,19 @@ export default function Accounts(props) {
     setTransactionDetailsHelperBottomSheet,
   ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
-  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR','EUR'];
+  const currencyCode = [
+    'BRL',
+    'CNY',
+    'JPY',
+    'GBP',
+    'KRW',
+    'RUB',
+    'TRY',
+    'INR',
+    'EUR',
+  ];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
-    console.log('currencyColor', currencyColor);
     return (
       <MaterialCommunityIcons
         name={currencyName}
@@ -179,30 +189,6 @@ export default function Accounts(props) {
       />
     );
   }
-
-  const getCurrencyImage = (currencyCodeValue, color) => {
-    switch (currencyCodeValue) {
-      case 'BRL':
-        return setCurrencyCodeToImage('currency-brl', color);
-      case 'CNY':
-      case 'JPY':
-        return setCurrencyCodeToImage('currency-cny', color);
-      case 'GBP':
-        return setCurrencyCodeToImage('currency-gbp', color);
-      case 'KRW':
-        return setCurrencyCodeToImage('currency-krw', color);
-      case 'RUB':
-        return setCurrencyCodeToImage('currency-rub', color);
-      case 'TRY':
-        return setCurrencyCodeToImage('currency-try', color);
-      case 'INR':
-          return setCurrencyCodeToImage('currency-inr', color);
-      case 'EUR':
-          return setCurrencyCodeToImage('currency-eur', color);         
-      default:
-        break;
-    }
-  };
 
   const checkNHighlight = async () => {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
@@ -578,7 +564,8 @@ export default function Accounts(props) {
                   marginBottom: wp('1.2%'),
                 }}
               >
-                {getCurrencyImage(CurrencyCode, 'light')}
+                {setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode),
+                'light')}
               </View>
             ) : (
               <Image
@@ -727,238 +714,236 @@ export default function Accounts(props) {
         </View>
       );
     } else {
-      return (
-        transactions.length ? (
-          <View style={styles.modalContentContainer}>
-            <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <View style={{ height: 'auto' }}>
-                <FlatList
-                  data={transactions}
-                  ItemSeparatorComponent={() => (
-                    <View style={{ backgroundColor: Colors.white }}>
-                      <View style={styles.separatorView} />
-                    </View>
-                  )}
-                  renderItem={({ item }) => {
-                    return (
-                      <AppBottomSheetTouchableWrapper
-                        onPress={
-                          () => {
-                            (TransactionDetailsBottomSheet as any).current.snapTo(
-                              1,
-                            );
-                            checkNShowHelperModal();
-                            setTimeout(() => {
-                              setTransactionItem(item);
-                            }, 10);
-                          }
-                          // props.navigation.navigate('TransactionDetails', {
-                          //   item,
-                          //   serviceType,
-                          //   getServiceType: getServiceType,
-                          // })
+      return transactions.length ? (
+        <View style={styles.modalContentContainer}>
+          <View style={{ marginLeft: 20, marginTop: 20 }}>
+            <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={{ height: 'auto' }}>
+              <FlatList
+                data={transactions}
+                ItemSeparatorComponent={() => (
+                  <View style={{ backgroundColor: Colors.white }}>
+                    <View style={styles.separatorView} />
+                  </View>
+                )}
+                renderItem={({ item }) => {
+                  return (
+                    <AppBottomSheetTouchableWrapper
+                      onPress={
+                        () => {
+                          (TransactionDetailsBottomSheet as any).current.snapTo(
+                            1,
+                          );
+                          checkNShowHelperModal();
+                          setTimeout(() => {
+                            setTransactionItem(item);
+                          }, 10);
                         }
-                        style={{
-                          ...styles.transactionModalElementView,
-                          backgroundColor: Colors.white,
-                        }}
-                      >
-                        <View style={styles.modalElementInfoView}>
-                          <View style={{ justifyContent: 'center' }}>
-                            <FontAwesome
-                              name={
-                                item.transactionType == 'Received'
-                                  ? 'long-arrow-down'
-                                  : 'long-arrow-up'
-                              }
-                              size={15}
-                              color={
-                                item.transactionType == 'Received'
-                                  ? Colors.green
-                                  : Colors.red
-                              }
-                            />
-                          </View>
-                          <View
-                            style={{ justifyContent: 'center', marginLeft: 10 }}
-                          >
-                            <Text style={styles.transactionModalTitleText}>
-                              {item.accountType}{' '}
-                            </Text>
-                            <Text style={styles.transactionModalDateText}>
-                              {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
-                              {/* <Entypo
+                        // props.navigation.navigate('TransactionDetails', {
+                        //   item,
+                        //   serviceType,
+                        //   getServiceType: getServiceType,
+                        // })
+                      }
+                      style={{
+                        ...styles.transactionModalElementView,
+                        backgroundColor: Colors.white,
+                      }}
+                    >
+                      <View style={styles.modalElementInfoView}>
+                        <View style={{ justifyContent: 'center' }}>
+                          <FontAwesome
+                            name={
+                              item.transactionType == 'Received'
+                                ? 'long-arrow-down'
+                                : 'long-arrow-up'
+                            }
+                            size={15}
+                            color={
+                              item.transactionType == 'Received'
+                                ? Colors.green
+                                : Colors.red
+                            }
+                          />
+                        </View>
+                        <View
+                          style={{ justifyContent: 'center', marginLeft: 10 }}
+                        >
+                          <Text style={styles.transactionModalTitleText}>
+                            {item.accountType}{' '}
+                          </Text>
+                          <Text style={styles.transactionModalDateText}>
+                            {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
+                            {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
                     {item.time} */}
-                            </Text>
-                          </View>
+                          </Text>
                         </View>
-                        <View style={styles.transactionModalAmountView}>
-                          <Image
-                            source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                      </View>
+                      <View style={styles.transactionModalAmountView}>
+                        <Image
+                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                          style={{
+                            width: 12,
+                            height: 12,
+                            resizeMode: 'contain',
+                            alignSelf: 'center',
+                          }}
+                        />
+                        <View
+                          style={{
+                            marginLeft: 5,
+                            alignSelf: 'center',
+                            marginRight: 5,
+                            flexDirection: 'row',
+                          }}
+                        >
+                          <Text
                             style={{
-                              width: 12,
-                              height: 12,
-                              resizeMode: 'contain',
+                              ...styles.transactionModalAmountText,
+                              color:
+                                item.transactionType == 'Received'
+                                  ? Colors.green
+                                  : Colors.red,
                               alignSelf: 'center',
-                            }}
-                          />
-                          <View
-                            style={{
-                              marginLeft: 5,
-                              alignSelf: 'center',
-                              marginRight: 5,
-                              flexDirection: 'row',
                             }}
                           >
-                            <Text
-                              style={{
-                                ...styles.transactionModalAmountText,
-                                color:
-                                  item.transactionType == 'Received'
-                                    ? Colors.green
-                                    : Colors.red,
-                                alignSelf: 'center',
-                              }}
-                            >
-                              {/* {switchOn
+                            {/* {switchOn
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
                           exchangeRates[CurrencyCode].last
                         ).toFixed(2)} */}
-                              {/* {item.amount} */}
-                              {item.accountType == 'Test Account'
-                                ? UsNumberFormat(item.amount)
-                                : switchOn
-                                ? UsNumberFormat(item.amount)
-                                : exchangeRates
-                                ? (
-                                    (item.amount / 1e8) *
-                                    exchangeRates[CurrencyCode].last
-                                  ).toFixed(2)
-                                : null}
-                            </Text>
-                            <Text
-                              style={{
-                                alignSelf: 'center',
-                                fontSize: RFValue(13),
-                                fontFamily: Fonts.OpenSans,
-                                color: Colors.textColorGrey,
-                                lineHeight: 19,
-                              }}
-                            >
-                              {item.accountType == 'Test Account'
-                                ? 't-sats'
-                                : switchOn
-                                ? 'sats'
-                                : CurrencyCode.toLocaleLowerCase()}
-                            </Text>
-                          </View>
+                            {/* {item.amount} */}
+                            {item.accountType == 'Test Account'
+                              ? UsNumberFormat(item.amount)
+                              : switchOn
+                              ? UsNumberFormat(item.amount)
+                              : exchangeRates
+                              ? (
+                                  (item.amount / 1e8) *
+                                  exchangeRates[CurrencyCode].last
+                                ).toFixed(2)
+                              : null}
+                          </Text>
                           <Text
                             style={{
-                              ...styles.transactionModalAmountUnitText,
                               alignSelf: 'center',
+                              fontSize: RFValue(13),
+                              fontFamily: Fonts.OpenSans,
+                              color: Colors.textColorGrey,
+                              lineHeight: 19,
                             }}
                           >
-                            {item.confirmations < 6 ? item.confirmations : '6+'}
+                            {item.accountType == 'Test Account'
+                              ? 't-sats'
+                              : switchOn
+                              ? 'sats'
+                              : CurrencyCode.toLocaleLowerCase()}
                           </Text>
-                          <Ionicons
-                            name="ios-arrow-forward"
-                            color={Colors.textColorGrey}
-                            size={12}
-                            style={{ marginLeft: 20, alignSelf: 'center' }}
-                          />
                         </View>
-                      </AppBottomSheetTouchableWrapper>
-                    );
-                  }}
-                />
-              </View>
+                        <Text
+                          style={{
+                            ...styles.transactionModalAmountUnitText,
+                            alignSelf: 'center',
+                          }}
+                        >
+                          {item.confirmations < 6 ? item.confirmations : '6+'}
+                        </Text>
+                        <Ionicons
+                          name="ios-arrow-forward"
+                          color={Colors.textColorGrey}
+                          size={12}
+                          style={{ marginLeft: 20, alignSelf: 'center' }}
+                        />
+                      </View>
+                    </AppBottomSheetTouchableWrapper>
+                  );
+                }}
+              />
             </View>
-            {transactions.length <= 1 ? (
-              <View style={{ backgroundColor: Colors.white }}>
-                <View
+          </View>
+          {transactions.length <= 1 ? (
+            <View style={{ backgroundColor: Colors.white }}>
+              <View
+                style={{
+                  margin: 15,
+                  backgroundColor: Colors.backgroundColor,
+                  padding: 10,
+                  paddingTop: 20,
+                  paddingBottom: 20,
+                  marginBottom:
+                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                  borderRadius: 7,
+                }}
+              >
+                <Text
                   style={{
-                    margin: 15,
-                    backgroundColor: Colors.backgroundColor,
-                    padding: 10,
-                    paddingTop: 20,
-                    paddingBottom: 20,
-                    marginBottom:
-                      Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
-                    borderRadius: 7,
+                    color: Colors.black,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: Colors.black,
-                      fontSize: RFValue(13),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    View your transactions
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    All recent transactions across your accounts appear here
-                  </Text>
-                </View>
+                  View your transactions
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  All recent transactions across your accounts appear here
+                </Text>
               </View>
-            ) : null}
-          </View>
-        ) : 
+            </View>
+          ) : null}
+        </View>
+      ) : (
         <View style={styles.modalContentContainer}>
-            <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-            </View>
-              <View style={{ backgroundColor: Colors.white }}>
-                <View
-                  style={{
-                    margin: 15,
-                    backgroundColor: Colors.backgroundColor,
-                    padding: 10,
-                    paddingTop: 20,
-                    paddingBottom: 20,
-                    marginBottom:
-                      Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
-                    borderRadius: 7,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: Colors.black,
-                      fontSize: RFValue(13),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    View your transactions
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    All recent transactions across your accounts appear here
-                  </Text>
-                </View>
-              </View>
+          <View style={{ marginLeft: 20, marginTop: 20 }}>
+            <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
           </View>
+          <View style={{ flex: 1 }}></View>
+          <View style={{ backgroundColor: Colors.white }}>
+            <View
+              style={{
+                margin: 15,
+                backgroundColor: Colors.backgroundColor,
+                padding: 10,
+                paddingTop: 20,
+                paddingBottom: 20,
+                marginBottom:
+                  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                borderRadius: 7,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.black,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                View your transactions
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                All recent transactions across your accounts appear here
+              </Text>
+            </View>
+          </View>
+        </View>
       );
     }
   };
@@ -1361,12 +1346,18 @@ export default function Accounts(props) {
               inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
               activeOffImage={
                 currencyCode.includes(CurrencyCode)
-                  ? getCurrencyImage(CurrencyCode, 'light')
+                  ? setCurrencyCodeToImage(
+                      getCurrencyImageName(CurrencyCode),
+                      'light',
+                    )
                   : getCurrencyImageByRegion(CurrencyCode, 'light')
               }
               inactiveOffImage={
                 currencyCode.includes(CurrencyCode)
-                  ? getCurrencyImage(CurrencyCode, 'light')
+                  ? setCurrencyCodeToImage(
+                      getCurrencyImageName(CurrencyCode),
+                      'dark',
+                    )
                   : getCurrencyImageByRegion(CurrencyCode, 'dark')
               }
               toggleColor={Colors.lightBlue}

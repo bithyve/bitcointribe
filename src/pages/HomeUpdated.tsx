@@ -1369,7 +1369,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             data={cardData}
-                            // extraData={{ balances, switchOn, walletName }}
+                            extraData={{ balances, switchOn, walletName, currencyCode,accounts,exchangeRates }}
                             renderItem={(Items) =>
                                 <HomeList
                                     Items={Items}
@@ -1466,20 +1466,21 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         onPressElements={(type) => {
                             if (type == 'buyBitcoins') {
                                 this.setState({
-                                    addBottomSheetsFlag: true,
-                                    tabBarIndex: 0,
+                                    //addBottomSheetsFlag: true,
+                                   // tabBarIndex: 0,
                                     selectToAdd: type
                                 }, () => {
-                                    (this.refs.addBottomSheet as any).snapTo(1)
+                                    this.props.navigation.navigate('VoucherScanner');
                                 })
-                            } else if (type == 'addContact') {
+                                
+                              } else if (type == 'addContact') {
                                 this.setState({
-                                    addSubBottomSheetsFlag: true,
-                                    addBottomSheetsFlag: false,
+                                   // addSubBottomSheetsFlag: true,
+                                   // addBottomSheetsFlag: false,
                                     tabBarIndex: 0,
                                     selectToAdd: type
                                 }, () => (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(1))
-                            }
+                              }
                         }}
                         addData={modalData}
                     />}
