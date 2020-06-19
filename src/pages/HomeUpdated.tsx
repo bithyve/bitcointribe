@@ -49,10 +49,16 @@ import {
     downloadMShare,
     initHealthCheck,
     uploadRequestedShare,
-    ErrorSending,
-    ErrorReceiving,
-    UploadSuccessfully,
 } from '../store/actions/sss';
+import {
+    createRandomString,
+} from '../common/CommonFunctions/timeFormatter';
+
+import {
+    approveTrustedContact,
+    fetchEphemeralChannel,
+    clearPaymentDetails,
+} from '../store/actions/trustedContacts';
 import moment from 'moment';
 import {
     updateFCMTokens,
@@ -73,7 +79,6 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import { approveTrustedContact } from '../store/actions/trustedContacts';
 import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
@@ -83,6 +88,7 @@ import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
 import { initialCardData } from '../stubs/initialCardData';
 import { initialTransactionData } from '../stubs/initialTransactionData';
+import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
 
 function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -118,7 +124,7 @@ const TransactionHeader = ({ openCloseModal }) => {
 }
 
 
-const TrustedContactRequestContent = ({ trustedContactRequest, recoveryRequest, onPressAccept, onPressReject, onPhoneNumberChange }) => {
+const TrustedContactRequestContent = ({ bottomSheetRef, trustedContactRequest, recoveryRequest, onPressAccept, onPressReject, onPhoneNumberChange }) => {
     if (!trustedContactRequest && !recoveryRequest) return;
     let {
         requester,
@@ -138,11 +144,10 @@ const TrustedContactRequestContent = ({ trustedContactRequest, recoveryRequest, 
             isGuardian={isGuardian}
             isRecovery={isRecovery}
             hint={hint}
+            bottomSheetRef={bottomSheetRef}
             trustedContactName={requester}
             onPressAccept={(key) => onPressAccept(key)}
-            onPressReject={() => {
-                onPressReject()
-            }}
+            onPressReject={(key) => { onPressReject(key) }}
             onPhoneNumberChange={(text) => {
                 onPhoneNumberChange(text)
             }}
@@ -188,7 +193,8 @@ interface HomeStateTypes {
     trustedContactRequest: any,
     recoveryRequest: any,
     custodyRequest: any,
-    isLoadContacts: boolean
+    isLoadContacts: boolean,
+
 }
 
 interface HomePropsTypes {
@@ -200,8 +206,14 @@ interface HomePropsTypes {
     UNDER_CUSTODY: any,
     fetchNotifications: any,
     updateFCMTokens: any,
-    downloadMShare: any
-
+    downloadMShare: any,
+    approveTrustedContact: any,
+    fetchEphemeralChannel: any,
+    uploadRequestedShare: any,
+    s3Service: any,
+    initHealthCheck: any,
+    overallHealth: any,
+    fetchDerivativeAccBalTx: any
 }
 
 let isNavigate = false;
@@ -457,6 +469,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         this.appStateListener = AppState.addEventListener('change', this.handleAppStateChange);
         this.bootStrapNotifications()
         this.setUpFocusListener()
+        this.getNewTransactionNotifications()
         Linking.addEventListener('url', this.handleDeepLink);
         setTimeout(() => {
             this.setState({
@@ -479,7 +492,197 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             }, 1000);
 
         });
+
+        // health check
+
+        const { s3Service, initHealthCheck } = this.props
+        const { healthCheckInitialized } = s3Service.sss;
+        if (!healthCheckInitialized) {
+            initHealthCheck()
+        }
+
+        this.handleDeeplinkModal()
+
     };
+
+
+    getNewTransactionNotifications = async () => {
+        let newTransactions = [];
+        const derivativeAccountType = 'FAST_BITCOINS';
+        const { accounts, fetchDerivativeAccBalTx } = this.props
+        const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
+        const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+        if (
+            secureAccount.derivativeAccounts[derivativeAccountType][1] &&
+            secureAccount.derivativeAccounts[derivativeAccountType][1].xpub
+        )
+            fetchDerivativeAccBalTx(SECURE_ACCOUNT, derivativeAccountType)
+
+        if (
+            regularAccount.derivativeAccounts[derivativeAccountType][1] &&
+            regularAccount.derivativeAccounts[derivativeAccountType][1].xpub
+        )
+            fetchDerivativeAccBalTx(REGULAR_ACCOUNT, derivativeAccountType)
+
+        let newTransactionsRegular =
+            regularAccount.derivativeAccounts[derivativeAccountType][1] &&
+            regularAccount.derivativeAccounts[derivativeAccountType][1]
+                .newTransactions;
+        let newTransactionsSecure =
+            secureAccount.derivativeAccounts[derivativeAccountType][1] &&
+            secureAccount.derivativeAccounts[derivativeAccountType][1]
+                .newTransactions;
+
+        if (
+            newTransactionsRegular &&
+            newTransactionsRegular.length &&
+            newTransactionsSecure &&
+            newTransactionsSecure.length
+        ) {
+            newTransactions = [...newTransactionsRegular, ...newTransactionsSecure];
+        } else if (newTransactionsRegular && newTransactionsRegular.length)
+            newTransactions = [...newTransactionsRegular];
+        else if (newTransactionsSecure && newTransactionsSecure.length)
+            newTransactions = [...newTransactionsSecure];
+
+        //console.log('newTransactions', newTransactions);
+
+        if (newTransactions.length) {
+            let asyncNotification = JSON.parse(
+                await AsyncStorage.getItem('notificationList'),
+            );
+            let asyncNotificationList = [];
+            if (asyncNotification.length) {
+                asyncNotificationList = [];
+                for (let i = 0; i < asyncNotification.length; i++) {
+                    asyncNotificationList.push(asyncNotification[i]);
+                }
+            }
+            let tmpList = asyncNotificationList;
+            let obj = {
+                type: 'contact',
+                isMandatory: false,
+                read: false,
+                title: 'New FastBitcoin Transactions',
+                time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+                date: new Date(),
+                info: newTransactions.length + ' New FBTC transactions',
+                notificationId: createRandomString(17),
+            };
+            tmpList.push(obj);
+
+            await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+            let notificationDetails = {
+                id: obj.notificationId,
+                title: obj.title,
+                body: obj.info,
+            };
+            this.localNotification(notificationDetails);
+            tmpList.sort(function (left, right) {
+                return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+            });
+            setTimeout(() => {
+                this.setState({
+                    notificationData: tmpList,
+                    notificationDataChange: !this.state.notificationDataChange
+                })
+            }, 2);
+        }
+    };
+
+
+    localNotification = async (notificationDetails) => {
+        const notification = new firebase.notifications.Notification()
+            .setTitle(notificationDetails.title)
+            .setBody(notificationDetails.body)
+            .setNotificationId(notificationDetails.id)
+            .setSound('default')
+            .setData({
+                title: notificationDetails.title,
+                body: notificationDetails.body,
+            })
+            .android.setChannelId('reminder')
+            .android.setPriority(firebase.notifications.Android.Priority.High);
+        // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+        const date = new Date();
+        date.setSeconds(date.getSeconds() + 1);
+        await firebase
+            .notifications()
+            .scheduleNotification(notification, {
+                fireDate: date.getTime(),
+            })
+            .then(() => { })
+            .catch((err) => { });
+        firebase
+            .notifications()
+            .getScheduledNotifications()
+            .then((notifications) => { });
+    };
+
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (prevProps.notificationList !== this.props.notificationList) {
+            this.setupNotificationList()
+        }
+    };
+
+
+
+
+    handleDeeplinkModal = () => {
+        const custodyRequest = this.props.navigation.getParam('custodyRequest');
+        const recoveryRequest = this.props.navigation.getParam('recoveryRequest');
+        const trustedContactRequest = this.props.navigation.getParam(
+            'trustedContactRequest',
+        );
+
+        if (custodyRequest) {
+            this.setState({
+                custodyRequest,
+            }, () => {
+                if (this.state.tabBarIndex === 999) {
+                    this.setState({
+                        tabBarIndex: 0,
+                        deepLinkModalOpen: true
+                    })
+                }
+
+                setTimeout(() => {
+                    if (this.refs.allAccountsBottomSheet) {
+                        (this.refs.allAccountsBottomSheet as any).snapTo(0);
+                        (this.refs.settingsBottomSheet as any).snapTo(0)
+                    };
+
+                    (this.refs.custodianRequestBottomSheet as any).snapTo(1);
+                    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                }, 2);
+            })
+            return
+        }
+
+        if (recoveryRequest || trustedContactRequest) {
+            this.setState({
+                recoveryRequest,
+                trustedContactRequest
+            }, () => {
+                if (this.state.tabBarIndex === 999) {
+                    this.setState({
+                        tabBarIndex: 0,
+                        deepLinkModalOpen: true
+                    })
+                }
+
+                (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+            })
+
+            return
+        }
+
+        return
+
+    };
+
 
     componentWillUnmount() {
         if (this.focusListener) {
@@ -663,6 +866,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             this.setCurrencyCodeFromAsync();
             this.getAssociatedContact();
             this.checkFastBitcoin();
+            this.getBalances()
+            this.props.fetchNotifications()
+            this.getNewTransactionNotifications()
         });
 
         (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
@@ -935,7 +1141,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             });
         }
 
-
         this.setState({
             balances: {
                 testBalance,
@@ -1016,108 +1221,25 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     };
 
     onTrustedContactRequestAccept = (key) => {
-        const { UNDER_CUSTODY } = this.props
-        const { recoveryRequest, trustedContactRequest, custodyRequest } = this.state
-        if (!trustedContactRequest && !recoveryRequest) return;
-        let {
-            requester,
-            hintType,
-            hint,
-            isGuardian,
-            encryptedKey,
-            publicKey,
-            isQR,
-            uploadedAt,
-            isRecovery,
-        } = trustedContactRequest || recoveryRequest;
-
         this.setState({
             tabBarIndex: 999,
             deepLinkModalOpen: false
         })
-
-        if (!isRecovery) {
-            if (Date.now() - uploadedAt > 600000) {
-                Alert.alert(
-                    `${isQR ? 'QR' : 'Link'} expired!`,
-                    `Please ask the sender to initiate a new ${
-                    isQR ? 'QR' : 'Link'
-                    }`,
-                );
-
-                this.setState({
-                    loading: false
-                })
-            } else {
-                if (isGuardian && UNDER_CUSTODY[requester]) {
-                    Alert.alert(
-                        'Failed to store',
-                        'You cannot custody multiple shares of the same user.',
-                    );
-                    this.setState({
-                        loading: false
-                    })
-                } else {
-                    if (!publicKey) {
-                        try {
-                            publicKey = TrustedContactsService.decryptPub(
-                                encryptedKey,
-                                key,
-                            ).decryptedPub;
-                        } catch (err) {
-                            console.log({ err });
-                            Alert.alert('Decryption Failed', err.message);
-                        }
-                    }
-                    if (publicKey) {
-                        // navigation.navigate('ContactsListForAssociateContact', {
-                        //     postAssociation: (contact) => {
-                        //         const contactName = `${contact.firstName} ${
-                        //             contact.lastName ? contact.lastName : ''
-                        //             }`.toLowerCase();
-                        //         if (isGuardian) {
-                        //             dispatch(
-                        //                 approveTrustedContact(
-                        //                     contactName,
-                        //                     publicKey,
-                        //                     true,
-                        //                     requester,
-                        //                 ),
-                        //             );
-                        //         } else {
-                        //             dispatch(
-                        //                 approveTrustedContact(contactName, publicKey, true),
-                        //             );
-                        //         }
-                        //     },
-                        //     isGuardian,
-                        // });
-                    }
-                }
-            }
-        } else {
-            if (!UNDER_CUSTODY[requester]) {
-                Alert.alert(
-                    'Failed to send!',
-                    'You do not host any secret for this user.',
-                );
-                this.setState({
-                    loading: false
-                })
-            } else {
-                const decryptedKey = TrustedContactsService.decryptPub(
-                    encryptedKey,
-                    key,
-                ).decryptedPub;
-                // dispatch(
-                //     uploadRequestedShare(recoveryRequest.requester, decryptedKey),
-                // );
-            }
-        }
+        setTimeout(() => {
+            (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
+        }, 1);
+        this.processDLRequest(key, false)
     }
 
-    onTrustedContactRejct = () => {
-
+    onTrustedContactRejct = (key) => {
+        setTimeout(() => {
+            this.setState({
+                tabBarIndex: 999,
+                deepLinkModalOpen: false
+            })
+        }, 2);
+        (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
+        this.processDLRequest(key, true);
     }
 
     onPhoneNumberChange = () => {
@@ -1176,6 +1298,110 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             return
         }
     }
+
+
+    processDLRequest = (key, rejected) => {
+        const { trustedContactRequest, recoveryRequest } = this.state
+        let {
+            requester,
+            isGuardian,
+            encryptedKey,
+            publicKey,
+            isQR,
+            uploadedAt,
+            isRecovery,
+        } = trustedContactRequest || recoveryRequest;
+        const { UNDER_CUSTODY, uploadRequestedShare, navigation, approveTrustedContact, fetchEphemeralChannel } = this.props
+
+        if (!isRecovery) {
+            if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
+                Alert.alert(
+                    `${isQR ? 'QR' : 'Link'} expired!`,
+                    `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
+                );
+                this.setState({
+                    loading: false
+                })
+            } else {
+                if (isGuardian && UNDER_CUSTODY[requester]) {
+                    Alert.alert(
+                        'Failed to store',
+                        'You cannot custody multiple shares of the same user.',
+                    );
+                    this.setState({
+                        loading: false
+                    })
+                } else {
+                    if (!publicKey) {
+                        try {
+                            publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                                .decryptedPub;
+                        } catch (err) {
+                            //console.log({ err });
+                            Alert.alert(
+                                'Invalid Number/Email',
+                                'Decryption failed due to invalid input, try again.',
+                            );
+                        }
+                    }
+                    if (publicKey && !rejected) {
+                        navigation.navigate('ContactsListForAssociateContact', {
+                            postAssociation: (contact) => {
+                                const contactName = `${contact.firstName} ${
+                                    contact.lastName ? contact.lastName : ''
+                                    }`.toLowerCase();
+                                if (isGuardian) {
+                                    approveTrustedContact(
+                                        contactName,
+                                        publicKey,
+                                        true,
+                                        requester,
+                                    )
+
+                                } else {
+                                    approveTrustedContact(contactName, publicKey, true)
+                                }
+                            },
+                            isGuardian,
+                        });
+                    } else if (publicKey && rejected) {
+                        // don't assoicate; only fetch the payment details from EC
+                        fetchEphemeralChannel(null, null, publicKey)
+                    }
+                }
+            }
+        } else {
+            if (!UNDER_CUSTODY[requester]) {
+                Alert.alert(
+                    'Failed to send!',
+                    'You do not host any secret for this user.',
+                );
+
+                this.setState({
+                    loading: false
+                })
+            } else {
+                if (!publicKey) {
+                    try {
+                        publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                            .decryptedPub;
+                    } catch (err) {
+                        console.log({ err });
+                        Alert.alert(
+                            'Invalid Number/Email',
+                            'Decryption failed due to invalid input, try again.',
+                        );
+                    }
+                }
+                if (publicKey) {
+                    uploadRequestedShare(recoveryRequest.requester, publicKey)
+                }
+            }
+        }
+    }
+
+
+
 
     openCloseModal = () => {
         const { openModal, selectedBottomTab } = this.state
@@ -1288,6 +1514,103 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         }
     };
 
+    setupNotificationList = async () => {
+        let asyncNotification = JSON.parse(
+            await AsyncStorage.getItem('notificationList'),
+        );
+        let asyncNotificationList = [];
+        if (asyncNotification) {
+            asyncNotificationList = [];
+            for (let i = 0; i < asyncNotification.length; i++) {
+                asyncNotificationList.push(asyncNotification[i]);
+            }
+        }
+        let tmpList = asyncNotificationList;
+        const { notificationList } = this.props
+        if (notificationList) {
+            for (let i = 0; i < notificationList['notifications'].length; i++) {
+                const element = notificationList['notifications'][i];
+                let readStatus = false;
+                if (element.notificationType == 'release') {
+                    let releaseCases = JSON.parse(
+                        await AsyncStorage.getItem('releaseCases'),
+                    );
+                    if (element.body.split(' ')[1] == releaseCases.build) {
+                        if (releaseCases.remindMeLaterClick) {
+                            readStatus = false;
+                        }
+                        if (releaseCases.ignoreClick) {
+                            readStatus = true;
+                        }
+                    } else {
+                        readStatus = true;
+                    }
+                }
+                if (
+                    asyncNotificationList.findIndex(
+                        (value) => value.notificationId == element.notificationId,
+                    ) > -1
+                ) {
+                    let temp =
+                        asyncNotificationList[
+                        asyncNotificationList.findIndex(
+                            (value) => value.notificationId == element.notificationId,
+                        )
+                        ];
+                    if (element.notificationType == 'release') {
+                        readStatus = readStatus;
+                    } else {
+                        readStatus = temp.read;
+                    }
+                    let obj = {
+                        ...temp,
+                        read: readStatus,
+                        type: element.notificationType,
+                        title: element.title,
+                        info: element.body,
+                        isMandatory: element.tag == 'mandatory' ? true : false,
+                        time: timeFormatter(
+                            moment(new Date()),
+                            moment(element.date).valueOf(),
+                        ),
+                        date: new Date(element.date),
+                    };
+                    tmpList[
+                        tmpList.findIndex(
+                            (value) => value.notificationId == element.notificationId,
+                        )
+                    ] = obj;
+                } else {
+                    let obj = {
+                        type: element.notificationType,
+                        isMandatory: element.tag == 'mandatory' ? true : false,
+                        read: readStatus,
+                        title: element.title,
+                        time: timeFormatter(
+                            moment(new Date()),
+                            moment(element.date).valueOf(),
+                        ),
+                        date: new Date(element.date),
+                        info: element.body,
+                        notificationId: element.notificationId,
+                    };
+                    tmpList.push(obj);
+                }
+            }
+            await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+            tmpList.sort(function (left, right) {
+                return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+            });
+
+
+            this.setState({
+                notificationData: tmpList,
+                notificationDataChange: !this.state.notificationDataChange
+            })
+
+        }
+    };
+
 
 
     render() {
@@ -1330,7 +1653,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             accounts,
             walletName,
             UNDER_CUSTODY,
-            downloadMShare
+            downloadMShare,
+            overallHealth
         } = this.props
 
         // const custodyRequest = navigation.getParam('custodyRequest');
@@ -1358,7 +1682,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         exchangeRates={exchangeRates}
                         CurrencyCode={currencyCode}
                         navigation={this.props.navigation}
-                        overallHealth={null}
+                        overallHealth={overallHealth}
                         onSwitchToggle={this.onSwitchToggle}
                     />
                 </View>
@@ -1369,7 +1693,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             data={cardData}
-                            extraData={{ balances, switchOn, walletName, currencyCode,accounts,exchangeRates }}
+                            extraData={{ balances, switchOn, walletName, currencyCode, accounts, exchangeRates }}
                             renderItem={(Items) =>
                                 <HomeList
                                     Items={Items}
@@ -1467,20 +1791,20 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                             if (type == 'buyBitcoins') {
                                 this.setState({
                                     //addBottomSheetsFlag: true,
-                                   // tabBarIndex: 0,
+                                    // tabBarIndex: 0,
                                     selectToAdd: type
                                 }, () => {
                                     this.props.navigation.navigate('VoucherScanner');
                                 })
-                                
-                              } else if (type == 'addContact') {
+
+                            } else if (type == 'addContact') {
                                 this.setState({
-                                   // addSubBottomSheetsFlag: true,
-                                   // addBottomSheetsFlag: false,
+                                    // addSubBottomSheetsFlag: true,
+                                    // addBottomSheetsFlag: false,
                                     tabBarIndex: 0,
                                     selectToAdd: type
                                 }, () => (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(1))
-                              }
+                            }
                         }}
                         addData={modalData}
                     />}
@@ -1710,6 +2034,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                             onPressAccept={this.onTrustedContactRequestAccept}
                             onPressReject={this.onTrustedContactRejct}
                             onPhoneNumberChange={this.onPhoneNumberChange}
+                            bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
                         />)
                     }
                     }
@@ -2297,15 +2622,26 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 const mapStateToProps = (state) => {
     return {
-        notificationList: state.notifications.notifications,
+        notificationList: state.notifications,
         exchangeRates: idx(state, _ => _.accounts.exchangeRates),
         accounts: state.accounts || [],
         walletName: idx(state, _ => _.storage.database.WALLET_SETUP.walletName) || '',
-        UNDER_CUSTODY: idx(state, _ => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY)
+        UNDER_CUSTODY: idx(state, _ => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY),
+        s3Service: idx(state, _ => _.sss.service),
+        overallHealth: idx(state, _ => _.sss.overallHealth),
     }
 }
 
-export default connect(mapStateToProps, { fetchNotifications, updateFCMTokens, downloadMShare })(HomeUpdated)
+export default connect(mapStateToProps, {
+    fetchEphemeralChannel,
+    fetchNotifications,
+    updateFCMTokens,
+    downloadMShare,
+    approveTrustedContact,
+    uploadRequestedShare,
+    initHealthCheck,
+    fetchDerivativeAccBalTx
+})(HomeUpdated)
 
 const styles = StyleSheet.create({
     card: {

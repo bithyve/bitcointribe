@@ -17,7 +17,7 @@ import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
 import ToggleSwitch from '../../components/ToggleSwitch';
 import HomePageShield from '../../components/HomePageShield';
-const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY','INR','EUR'];
+const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR', 'EUR'];
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 
@@ -67,7 +67,7 @@ const HomeHeader = ({
                             style={{ width: wp('6%'), height: wp('6%') }}
                             resizeMode={'contain'}
                         >
-                            {notificationData.findIndex((value) => value.read == false) >
+                            {(notificationData || {}).notifications.findIndex((value) => value.read == false) >
                                 -1 ? (
                                     <View
                                         style={{
