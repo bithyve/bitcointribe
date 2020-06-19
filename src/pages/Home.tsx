@@ -3330,7 +3330,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={() => (
@@ -3363,7 +3363,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
         ]}
         renderContent={renderAddContent}
         renderHeader={renderAddHeader}
@@ -3419,7 +3419,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -3547,7 +3547,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('64%'),
+              : hp('65%'),
           ]}
           renderContent={renderAllAccountsContents}
           renderHeader={renderAllAccountsHeader}
@@ -3571,7 +3571,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('64%'),
+              : hp('65%'),
           ]}
           renderContent={renderSettingsContents}
           renderHeader={renderSettingsHeader}
@@ -3654,7 +3654,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('64%'),
+              : hp('65%'),
           ]}
           renderContent={renderAddModalContents}
           renderHeader={renderAddModalHeader}

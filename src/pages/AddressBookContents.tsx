@@ -405,7 +405,7 @@ export default function AddressBookContents(props) {
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
-              Contacts who can help me restore my wallet.
+              Contacts who can help me restore my wallet
             </Text>
             {!Loading ? (
               <View style={{ marginBottom: 15 }}>
@@ -424,7 +424,7 @@ export default function AddressBookContents(props) {
           <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>I am the Keeper of</Text>
             <Text style={styles.pageInfoText}>
-              Contacts who I can help restore their wallets.
+              Contacts who I can help restore their wallets
             </Text>
 
             {!Loading ? (
@@ -444,7 +444,7 @@ export default function AddressBookContents(props) {
           <View style={{ marginTop: wp('5%') }}>
             <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
             <Text style={styles.pageInfoText}>
-              Contacts who I can pay directly.
+              Contacts who I can pay directly
             </Text>
             {!Loading ? (
               <View style={{ marginBottom: 15 }}>
