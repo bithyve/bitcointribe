@@ -177,20 +177,36 @@ const TrustedContactHistory = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let SelectedContactsTemp = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
     );
-    if (SelectedContactsTemp) {
-      setSelectedContacts(SelectedContactsTemp);
-      if (selectedTitle == 'Trusted Contact 1' && SelectedContactsTemp[0]) {
-        setChosenContact(SelectedContactsTemp[0]);
-      } else if (
-        selectedTitle == 'Trusted Contact 2' &&
-        SelectedContactsTemp[1]
-      ) {
-        setChosenContact(SelectedContactsTemp[1]);
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      const selectedContacts = trustedContactsInfo.slice(1, 3);
+      setSelectedContacts(selectedContacts);
+
+      if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
+        setChosenContact(selectedContacts[0]);
+      } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
+        setChosenContact(selectedContacts[1]);
       }
     }
+
+    // let SelectedContactsTemp = JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
+    // if (SelectedContactsTemp) {
+    //   setSelectedContacts(SelectedContactsTemp);
+    //   if (selectedTitle == 'Trusted Contact 1' && SelectedContactsTemp[0]) {
+    //     setChosenContact(SelectedContactsTemp[0]);
+    //   } else if (
+    //     selectedTitle == 'Trusted Contact 2' &&
+    //     SelectedContactsTemp[1]
+    //   ) {
+    //     setChosenContact(SelectedContactsTemp[1]);
+    //   }
+    // }
   }, [selectedTitle]);
 
   const getContacts = useCallback(
@@ -343,21 +359,21 @@ const TrustedContactHistory = (props) => {
       // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
       // (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
 
-      let selectedContactList = JSON.parse(
-        await AsyncStorage.getItem('SelectedContacts'),
-      );
-      if (!selectedContactList) {
-        selectedContactList = [];
-      }
-      if (index == 2) {
-        selectedContactList[1] = chosenContact;
-      } else if (index == 1) {
-        selectedContactList[0] = chosenContact;
-      }
-      await AsyncStorage.setItem(
-        'SelectedContacts',
-        JSON.stringify(selectedContactList),
-      );
+      // let selectedContactList = JSON.parse(
+      //   await AsyncStorage.getItem('SelectedContacts'),
+      // );
+      // if (!selectedContactList) {
+      //   selectedContactList = [];
+      // }
+      // if (index == 2) {
+      //   selectedContactList[1] = chosenContact;
+      // } else if (index == 1) {
+      //   selectedContactList[0] = chosenContact;
+      // }
+      // await AsyncStorage.setItem(
+      //   'SelectedContacts',
+      //   JSON.stringify(selectedContactList),
+      // );
 
       updateAutoHighlightFlags();
       saveInTransitHistory();
@@ -527,16 +543,16 @@ const TrustedContactHistory = (props) => {
   // }, [SHARES_TRANSFER_DETAILS[index]]);
 
   const onPressReshare = useCallback(async () => {
-    let selectedContactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
+    // let selectedContactList = JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
     //console.log({ selectedContactList });
     //console.log({ chosenContact });
-    if (selectedTitle == 'Trusted Contact 1') {
-      setChosenContact(selectedContactList[0]);
-    } else if (selectedTitle == 'Trusted Contact 2') {
-      setChosenContact(selectedContactList[1]);
-    }
+    // if (selectedTitle == 'Trusted Contact 1') {
+    //   setChosenContact(selectedContactList[0]);
+    // } else if (selectedTitle == 'Trusted Contact 2') {
+    //   setChosenContact(selectedContactList[1]);
+    // }
     // (CommunicationModeBottomSheet as any).current.snapTo(1);
     (shareBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);
@@ -851,14 +867,41 @@ const TrustedContactHistory = (props) => {
       let trustedContactsInfo: any = await AsyncStorage.getItem(
         'TrustedContactsInfo',
       );
-      console.log({ trustedContactsInfo });
 
       if (trustedContactsInfo) {
         trustedContactsInfo = JSON.parse(trustedContactsInfo);
+
+        if (trustedContactsInfo[index]) {
+          let found = false;
+          for (let i = 3; i < trustedContactsInfo.length; i++) {
+            // push if not present in TC list
+            if (
+              trustedContactsInfo[i] &&
+              trustedContactsInfo[i].name == trustedContactsInfo[index].name
+            ) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) trustedContactsInfo.push(trustedContactsInfo[index]);
+        }
+
+        for (let i = 0; i < trustedContactsInfo.length; i++) {
+          if (
+            trustedContactsInfo[i] &&
+            trustedContactsInfo[i].name == contact.name
+          ) {
+            trustedContactsInfo.splice(i, 1);
+            break;
+          }
+        }
         trustedContactsInfo[index] = contact;
       } else {
         trustedContactsInfo = [];
-        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+        trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
+        trustedContactsInfo[1] = null;
+        trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
       await AsyncStorage.setItem(
@@ -893,7 +936,31 @@ const TrustedContactHistory = (props) => {
 
       if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
         // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
-        dispatch(uploadEncMShare(index, contactName, data, true));
+        setTrustedLink('');
+        setTrustedQR('');
+        // remove the previous TC
+        let trustedContactsInfo: any = await AsyncStorage.getItem(
+          'TrustedContactsInfo',
+        );
+
+        let previousGuardianName;
+        if (trustedContactsInfo) {
+          trustedContactsInfo = JSON.parse(trustedContactsInfo);
+          const previousGuardian = trustedContactsInfo[index];
+          if (previousGuardian) {
+            previousGuardianName = `${previousGuardian.firstName} ${
+              previousGuardian.lastName ? previousGuardian.lastName : ''
+            }`
+              .toLowerCase()
+              .trim();
+          } else {
+            console.log('Previous guardian details missing');
+          }
+        }
+
+        dispatch(
+          uploadEncMShare(index, contactName, data, true, previousGuardianName),
+        );
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
         setChangeContact(false);
@@ -902,11 +969,11 @@ const TrustedContactHistory = (props) => {
         Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
           config.TC_REQUEST_EXPIRY
       ) {
+        setTrustedLink('');
+        setTrustedQR('');
         dispatch(uploadEncMShare(index, contactName, data));
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
-        setTrustedLink('');
-        setTrustedQR('');
       } else if (
         trustedContact &&
         !trustedContact.symmetricKey &&
@@ -915,14 +982,14 @@ const TrustedContactHistory = (props) => {
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
           config.TC_REQUEST_EXPIRY
       ) {
+        setTrustedLink('');
+        setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
             contactName,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
-        setTrustedLink('');
-        setTrustedQR('');
       }
     } else {
       console.log({ chosenContact });

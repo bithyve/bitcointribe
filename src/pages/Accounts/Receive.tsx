@@ -262,6 +262,7 @@ export default function Receive(props) {
     AsTrustedContact,
     receiveLink,
     receiveQR,
+    updateEphemeralChannelLoader,
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
@@ -284,6 +285,9 @@ export default function Receive(props) {
       }
     } else {
       trustedContactsInfo = [];
+      trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
+      trustedContactsInfo[1] = null;
+      trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
     console.log({ trustedContactsInfo });

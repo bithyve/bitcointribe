@@ -39,6 +39,7 @@ export const uploadEncMShare = (
   contactName: string,
   data: EphemeralData,
   changingGuardian?: boolean,
+  previousGuardianName?: string,
 ) => {
   return {
     type: UPLOAD_ENC_MSHARE,
@@ -47,6 +48,7 @@ export const uploadEncMShare = (
       contactName,
       data,
       changingGuardian,
+      previousGuardianName,
     },
   };
 };
