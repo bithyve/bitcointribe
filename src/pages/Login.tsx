@@ -275,6 +275,7 @@ export default function Login(props) {
   const trustedContactRequest = props.navigation.getParam(
     'trustedContactRequest',
   );
+  const userKey = props.navigation.getParam('userKey');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -289,6 +290,7 @@ export default function Login(props) {
                 custodyRequest,
                 recoveryRequest,
                 trustedContactRequest,
+                userKey
               });
             }, 2500);
             dispatch(startupSync());
