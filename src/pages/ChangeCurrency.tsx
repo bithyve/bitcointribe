@@ -35,7 +35,7 @@ export default function ChangeCurrency(props) {
       let currencyCode = await AsyncStorage.getItem('currencyCode');
       setCurrency(
         currencyList[
-          currencyList.findIndex((value) => value.code == currencyCode)
+        currencyList.findIndex((value) => value.code == currencyCode)
         ],
       );
     })();
@@ -142,110 +142,110 @@ export default function ChangeCurrency(props) {
             />
           </View>
         </TouchableOpacity>
-        <View style={{position: 'relative', flex: 1,}}>
-        {isVisible && (
-          <View
+        <View style={{ position: 'relative', flex: 1, }}>
+          {isVisible && (
+            <View
+              style={{
+                marginTop: wp('3%'),
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: Colors.borderColor,
+                overflow: 'hidden',
+                marginLeft: wp('10%'),
+                marginRight: wp('10%'),
+
+              }}
+            >
+              <ScrollView>
+                {currencyList.map((item) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setCurrency(item);
+                        setIsVisible(false);
+                      }}
+                      style={{ flexDirection: 'row', height: wp('13%') }}
+                    >
+                      <View
+                        style={{
+                          height: wp('13%'),
+                          width: wp('15%'),
+                          backgroundColor: Colors.borderColor,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          borderBottomWidth: 1,
+                          borderBottomColor: Colors.white,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: Fonts.FiraSansMedium,
+                            fontSize: RFValue(13),
+                            color: Colors.textColorGrey,
+                          }}
+                        >
+                          {item.symbol}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: 'center',
+                          height: wp('13%'),
+                          borderBottomWidth: 1,
+                          borderBottomColor: Colors.borderColor,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(13),
+                            color: Colors.textColorGrey,
+                            marginLeft: wp('3%'),
+                          }}
+                        >
+                          {item.code}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          )}
+        </View>
+        <View >
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
+            }
+          />
+          <TouchableOpacity
+            onPress={() => setNewCurrency()}
             style={{
-              marginTop: wp('3%'),
+              backgroundColor: Colors.blue,
+              width: wp('35%'),
+              height: wp('13%'),
               borderRadius: 10,
-              borderWidth: 1,
-              borderColor: Colors.borderColor,
-              overflow: 'hidden',
-              marginLeft: wp('10%'),
-              marginRight: wp('10%'),
-              
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginLeft: 30,
+              marginRight: 20,
+              marginBottom: hp('3%')
             }}
           >
-            <ScrollView>
-            {currencyList.map((item) => {
-              return (
-                <TouchableOpacity
-                  onPress={() => {
-                    setCurrency(item);
-                    setIsVisible(false);
-                  }}
-                  style={{ flexDirection: 'row', height: wp('13%') }}
-                >
-                  <View
-                    style={{
-                      height: wp('13%'),
-                      width: wp('15%'),
-                      backgroundColor: Colors.borderColor,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderBottomWidth: 1,
-                      borderBottomColor: Colors.white,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: Fonts.FiraSansMedium,
-                        fontSize: RFValue(13),
-                        color: Colors.textColorGrey,
-                      }}
-                    >
-                      {item.symbol}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: 'center',
-                      height: wp('13%'),
-                      borderBottomWidth: 1,
-                      borderBottomColor: Colors.borderColor,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontFamily: Fonts.FiraSansRegular,
-                        fontSize: RFValue(13),
-                        color: Colors.textColorGrey,
-                        marginLeft: wp('3%'),
-                      }}
-                    >
-                      {item.code}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-            </ScrollView>
-          </View>
-        )}
-      </View>
-      <View >
-        <BottomInfoBox
-        title={'Note'}
-          infoText={
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
-          }
-        />
-        <TouchableOpacity
-          onPress={() => setNewCurrency()}
-          style={{
-            backgroundColor: Colors.blue,
-            width: wp('35%'),
-            height: wp('13%'),
-            borderRadius: 10,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginLeft:30,
-            marginRight: 20,
-            marginBottom: hp('3%')
-          }}
-        >
-          <Text
-            style={{
-              fontSize: RFValue(13),
-              color: Colors.white,
-              fontFamily: Fonts.FiraSansMedium,
-            }}
-          >
-            Save Changes
+            <Text
+              style={{
+                fontSize: RFValue(13),
+                color: Colors.white,
+                fontFamily: Fonts.FiraSansMedium,
+              }}
+            >
+              Save Changes
           </Text>
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

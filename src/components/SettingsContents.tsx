@@ -18,59 +18,47 @@ export default function SettingsContents(props) {
     const [currencycode, setCurrencycode] = useState('');
     const [switchOn, setSwitchOn] = useState(false);
     const [PageData, setPageData] = useState([
-        // {
-        //     title:"Jumble Keyboard",
-        //     info:"Lorem ipsum dolor sit amet, consectetur",
-        //     image:require("../assets/images/icons/jumble.png"),
-        //     type:"JumbleKeyboard"
-        // },
         {
-            title:"Manage Passcode",
-            info:"Change your passcode",
-            image:require("../assets/images/icons/managepin.png"),
-            type:"ManagePin"
+            title: "Manage Passcode",
+            info: "Change your passcode",
+            image: require("../assets/images/icons/managepin.png"),
+            type: "ManagePin"
         },
-        // {
-        //     title:"Change Wallet Name",
-        //     info:"Lorem ipsum dolor sit amet, consectetur",
-        //     image:require("../assets/images/icons/existing_saving_method.png"),
-        //     type:"ChangeWalletName"
-        // },
         {
-            title:"Change Currency",
-            info:"Choose your Currency",
-            image:require("../assets/images/icons/country.png"),
-            type:"ChangeCurrency"
+            title: "Change Currency",
+            info: "Choose your Currency",
+            image: require("../assets/images/icons/country.png"),
+            type: "ChangeCurrency"
         }
     ]);
-    
+
     return (<View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.modalHeaderTitleText}>{"Settings"}</Text>
             </View>
         </View>
         <ScrollView style={{ flex: 1 }}>
-            {PageData.map((item)=>{
-                return <AppBottomSheetTouchableWrapper onPress={()=>props.onPressManagePin(item.type, currencycode)} style={styles.selectedContactsView}>
-                <Image source={item.image} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: wp('3%'), marginRight: wp('3%') }} />
-                <View style={{ justifyContent: 'center', marginRight: 10, flex:1 }}>
-                    <Text style={styles.titleText}>{item.title}</Text>
-                    <Text style={styles.infoText}>{item.info}</Text>
-                </View>
-                <View style={{ marginLeft: 'auto' }}>
-                    {item.type == "JumbleKeyboard" ?
-                        <ToggleSwitch isNotImage={true} toggleColor={Colors.lightBlue} toggleCircleColor={Colors.blue} onpress={() => { setSwitchOn(!switchOn); }} toggle={switchOn} />
-                    : 
-                        <Ionicons
-                            name="ios-arrow-forward"
-                            color={Colors.textColorGrey}
-                            size={15}
-                            style={{ marginLeft: wp('3%'), marginRight: wp('3%'), alignSelf: 'center' }}
-                        />
-                    }
-                </View>
-            </AppBottomSheetTouchableWrapper>
+            {PageData.map((item) => {
+                return <AppBottomSheetTouchableWrapper onPress={() => props.onPressManagePin(item.type, currencycode)} style={styles.selectedContactsView}>
+                    <Image source={item.image} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: wp('3%'), marginRight: wp('3%') }} />
+                    <View style={{ justifyContent: 'center', marginRight: 10, flex: 1 }}>
+                        <Text style={styles.titleText}>{item.title}</Text>
+                        <Text style={styles.infoText}>{item.info}</Text>
+                    </View>
+                    <View style={{ marginLeft: 'auto' }}>
+                        {item.type == "JumbleKeyboard" ?
+                            <ToggleSwitch isNotImage={true} toggleColor={Colors.lightBlue} toggleCircleColor={Colors.blue} onpress={() => { setSwitchOn(!switchOn); }} toggle={switchOn} />
+                            :
+                            <Ionicons
+                                name="ios-arrow-forward"
+                                color={Colors.textColorGrey}
+                                size={15}
+                                style={{ marginLeft: wp('3%'), marginRight: wp('3%'), alignSelf: 'center' }}
+                            />
+                        }
+                    </View>
+                </AppBottomSheetTouchableWrapper>
             })}
         </ScrollView>
         <View style={{
@@ -155,8 +143,8 @@ const styles = StyleSheet.create({
         marginRight: 20,
         paddingTop: 15,
         paddingBottom: 20,
-        borderBottomColor:Colors.borderColor,
-        borderBottomWidth:1
+        borderBottomColor: Colors.borderColor,
+        borderBottomWidth: 1
     },
     titleText: {
         fontSize: RFValue(13),

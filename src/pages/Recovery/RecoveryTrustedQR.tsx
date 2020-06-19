@@ -16,9 +16,10 @@ import {
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useSelector } from 'react-redux';
-import QRCode from 'react-native-qrcode-svg';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import QRCode from 'react-native-qrcode-svg';
+
 
 export default function RecoveryTrustedQR(props) {
   return (
@@ -55,8 +56,8 @@ export default function RecoveryTrustedQR(props) {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={props.trustedQR} size={hp('27%')} />
-        )}
+            <QRCode value={props.trustedQR} size={hp('27%')} />
+          )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{

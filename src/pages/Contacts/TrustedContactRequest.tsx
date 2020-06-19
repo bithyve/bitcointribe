@@ -274,8 +274,8 @@ export default function TrustedContactRequest(props) {
                 </Text>
               )
             ) : (
-              <Text style={styles.modalTitleText}>Recovery Share Request</Text>
-            )}
+                <Text style={styles.modalTitleText}>Recovery Share Request</Text>
+              )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
               {props.inputType ? "Accept the request to add your contact to Friends and Family" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor" }
             </Text>
@@ -319,8 +319,8 @@ export default function TrustedContactRequest(props) {
                 {props.inputType === 'phone'
                   ? `+91 XXX XXX X${props.hint}`
                   : props.inputType === 'email'
-                  ? `XXX${props.hint}@bithyve.com`
-                  : null}
+                    ? `XXX${props.hint}@bithyve.com`
+                    : null}
               </Text>
             </Text>
           ) : null}
@@ -366,8 +366,8 @@ export default function TrustedContactRequest(props) {
               {props.loading && props.loading == true ? (
                 <ActivityIndicator size="small" />
               ) : (
-                <Text style={styles.proceedButtonText}>Accept Request</Text>
-              )}
+                  <Text style={styles.proceedButtonText}>Accept Request</Text>
+                )}
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper
               onPress={() => {

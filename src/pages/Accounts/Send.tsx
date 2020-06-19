@@ -89,16 +89,16 @@ export default function Send(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
     setBalances({
       testBalance,
@@ -189,7 +189,7 @@ export default function Send(props) {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
+            }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -368,8 +368,8 @@ export default function Send(props) {
                 serviceType === TEST_ACCOUNT
                   ? balances.testBalance
                   : serviceType === REGULAR_ACCOUNT
-                  ? balances.regularBalance
-                  : balances.secureBalance,
+                    ? balances.regularBalance
+                    : balances.secureBalance,
               bitcoinAmount: options.amount ? `${options.amount}` : '',
             });
             break;
@@ -566,14 +566,14 @@ export default function Send(props) {
             >
               {item
                 ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
+                  item.firstName && item.lastName
+                    ? item.firstName + ' ' + item.lastName
+                    : item.firstName && !item.lastName
                       ? item.firstName
                       : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
+                        ? item.lastName
+                        : '',
+                )
                 : ''}
             </Text>
           </View>
@@ -719,7 +719,7 @@ export default function Send(props) {
       <View style={styles.modalContentContainer}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == 'ios' ? 'padding' : ''}
+          behavior={Platform.OS === 'ios' ? 'padding' : ''}
           enabled
         >
           <ScrollView nestedScrollEnabled={true}>

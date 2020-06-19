@@ -41,12 +41,9 @@ export default function SaveBitcoinModalContents(props) {
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => props.onPressBack()}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
-          >
+          <AppBottomSheetTouchableWrapper onPress={() => props.onPressBack()} style={{ height: 30, width: 30, }}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ flex: 1 }}>
             <Text style={styles.modalHeaderTitleText}>Buy Bitcoin</Text>
             <Text style={styles.pageInfoText}>
@@ -69,7 +66,7 @@ export default function SaveBitcoinModalContents(props) {
           >
             <View style={styles.modalElementInfoView}>
               <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                <Image source={item.image} style={{ width: 25, height: item.title=='Use a Voucher'?  30: 25 }} resizeMode='contain'  />
+                <Image source={item.image} style={{ width: 25, height: item.title == 'Use a Voucher' ? 30 : 25 }} resizeMode='contain' />
               </View>
               <View style={{ justifyContent: 'center', marginLeft: 10 }}>
                 <Text style={styles.addModalTitleText}>{item.title} </Text>

@@ -34,12 +34,13 @@ import {
   downloadMShare,
   ErrorReceiving,
 } from '../../store/actions/sss';
-import QRCode from 'react-native-qrcode-svg';
 import Toast from '../../components/Toast';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
+import QRCode from 'react-native-qrcode-svg';
+
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
@@ -60,13 +61,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
-        JSON.stringify({
-          ...REQUEST_DETAILS,
-          requester: WALLET_SETUP.walletName,
-          type: 'recoveryQR',
-          ver: DeviceInfo.getVersion(),
-        }),
-      )
+      JSON.stringify({
+        ...REQUEST_DETAILS,
+        requester: WALLET_SETUP.walletName,
+        type: 'recoveryQR',
+        ver: DeviceInfo.getVersion(),
+      }),
+    )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
@@ -150,7 +151,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
           <View style={{ flex: 2 }}>
             <HeaderTitle
               isKnowMoreButton={true}
-              onPressKnowMore={() => {}}
+              onPressKnowMore={() => { }}
               firstLineTitle={'Restore wallet using'}
               secondLineTitle={'Keeper Device'}
               infoTextNormal={
@@ -165,8 +166,8 @@ export default function RestoreWalletBySecondaryDevice(props) {
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={secondaryQR} size={hp('27%')} />
-            )}
+                <QRCode value={secondaryQR} size={hp('27%')} />
+              )}
             {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>
 

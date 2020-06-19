@@ -25,13 +25,13 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 const NewTwoFASecret = props => {
-    const [receivingAddress, setReceivingAddress] = useState('2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g');
+  const [receivingAddress, setReceivingAddress] = useState('2N6ubBgDNrs9NnJGSF3gQBUwM7SwQtGQs2g');
   return (
     <SafeAreaView style={{ flex: 1 }}>
-    <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-    
-   <View style={{...BackupStyles.modalContainer, backgroundColor:Colors.white, marginTop: 10}}>
-          <ScrollView style={styles.qrModalScrollView}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+
+      <View style={{ ...BackupStyles.modalContainer, backgroundColor: Colors.white, marginTop: 10 }}>
+        <ScrollView style={styles.qrModalScrollView}>
           <View style={BackupStyles.modalHeaderTitleView}>
             <View
               style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
@@ -49,27 +49,27 @@ const NewTwoFASecret = props => {
                 />
               </TouchableOpacity> */}
               <Text style={BackupStyles.modalHeaderTitleText}>
-              2FA secret
+                2FA secret
               </Text>
               <AppBottomSheetTouchableWrapper
-              style={{
-                backgroundColor: '#77B9EB',
-                marginLeft: 'auto',
-                borderRadius: 5,
-                justifyContent: 'center',
-                alignItems: 'center',
-                paddingLeft: 10,
-                paddingRight: 10,
-                paddingTop: 5,
-                paddingBottom:5
-              }}
-              onPress={() => {
-                props.navigation.pop(1);
-              }}
+                style={{
+                  backgroundColor: '#77B9EB',
+                  marginLeft: 'auto',
+                  borderRadius: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 5,
+                  paddingBottom: 5
+                }}
+                onPress={() => {
+                  props.navigation.pop(1);
+                }}
               >
-              <Text
+                <Text
                   onPress={() => {
-                   props.navigation.pop(1);
+                    props.navigation.pop(1);
                   }}
                   style={{
                     color: Colors.white,
@@ -77,9 +77,9 @@ const NewTwoFASecret = props => {
                     marginLeft: 'auto',
                   }}
                 >
-                 Done
+                  Done
                 </Text>
-                </AppBottomSheetTouchableWrapper>
+              </AppBottomSheetTouchableWrapper>
             </View>
           </View>
           <View style={BackupStyles.modalContentView}>
@@ -88,51 +88,51 @@ const NewTwoFASecret = props => {
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-              <QRCode value={receivingAddress} size={hp('27%')} />
-            )}
+                <QRCode value={receivingAddress} size={hp('27%')} />
+              )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
           </View>
           <View
-              style={{
-                marginBottom: 30,
-                padding: 20,
-                marginLeft: 15,
-                marginRight: 15,
-                borderRadius: 10,
-                justifyContent: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(13),
-                  marginBottom: 2,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Scan in Authenticator
-              </Text>
-              <Text style={styles.bottomNoteInfoText}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              </Text>
-            </View>
-          
-          </ScrollView>
-          <View
             style={{
-              marginTop: 'auto',
-              marginBottom: hp('0.2%'),
+              marginBottom: 30,
+              padding: 20,
+              marginLeft: 15,
+              marginRight: 15,
+              borderRadius: 10,
+              justifyContent: 'center',
             }}
           >
-            <BottomInfoBox
-            title={'Note'}
-              infoText={
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-              }
-            />
+            <Text
+              style={{
+                color: Colors.blue,
+                fontSize: RFValue(13),
+                marginBottom: 2,
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Scan in Authenticator
+              </Text>
+            <Text style={styles.bottomNoteInfoText}>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+              </Text>
           </View>
+
+        </ScrollView>
+        <View
+          style={{
+            marginTop: 'auto',
+            marginBottom: hp('0.2%'),
+          }}
+        >
+          <BottomInfoBox
+            title={'Note'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+            }
+          />
+        </View>
       </View>
-      </SafeAreaView>
+    </SafeAreaView>
   );
 };
 
