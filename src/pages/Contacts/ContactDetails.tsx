@@ -799,7 +799,8 @@ export default function ContactDetails(props) {
             }}
           >
             <TouchableOpacity
-              style={styles.bottomButton}
+              disabled={Contact.isWard? false: true}
+              style={{...styles.bottomButton, opacity: Contact.isWard ? 1: 0.5}}
               onPress={onHelpRestore}
             >
               <Image
