@@ -450,6 +450,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
 
 
     onAppStateChange = async (nextAppState) => {
+        this.handleAppStateChange(nextAppState);
         const { appState } = this.state
         try {
             if (appState === nextAppState) return;
