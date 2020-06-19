@@ -262,8 +262,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         super(props);
         this.focusListener = null
         this.appStateListener = null
-        this.NoInternetBottomSheet = React.createRef();
-        this.unsubscribe = null
         this.state = {
             notificationData: [],
             cardData: [],
@@ -645,22 +643,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             })
         }, 1000);
 
-        this.unsubscribe = NetInfo.addEventListener(state => {
-            setTimeout(() => {
-                if (state.isInternetReachable === null) {
-                    return
-                }
-
-                if (state.isInternetReachable) {
-                    (this.NoInternetBottomSheet as any).current.snapTo(0);
-                } else {
-
-                    (this.NoInternetBottomSheet as any).current.snapTo(1);
-                }
-            }, 1000);
-
-        });
-
         // health check
 
         const { s3Service, initHealthCheck } = this.props
@@ -836,6 +818,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         const trustedContactRequest = this.props.navigation.getParam(
             'trustedContactRequest',
         );
+        const userKey = this.props.navigation.getParam('userKey');
 
         if (custodyRequest) {
             this.setState({
@@ -880,6 +863,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
             return
         }
 
+        if(userKey){
+            this.props.navigation.navigate('VoucherScanner', { userKey });
+            return
+        }
+
         return
 
     };
@@ -889,25 +877,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
         if (this.focusListener) {
             this.focusListener()
         }
-
-        if (this.unsubscribe) {
-            this.unsubscribe()
-        }
-
-
         if (this.appStateListener) {
             this.appStateListener()
         }
-
         if (this.firebaseNotificationListener) {
             this.firebaseNotificationListener()
         }
         if (this.notificationOpenedListener) {
             this.notificationOpenedListener()
         }
-
-
-
     }
 
 
@@ -2807,25 +2785,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         }}
                     />}
                 />
-
-                <BottomSheet
-                    onCloseEnd={() => { }}
-                    enabledInnerScrolling={true}
-                    ref={this.NoInternetBottomSheet}
-                    snapPoints={[-50, hp('60%')]}
-                    renderContent={() =>
-                        <NoInternetModalContents
-                            onPressTryAgain={() => { (this.NoInternetBottomSheet as any).current.snapTo(0) }}
-                            onPressIgnore={() => { (this.NoInternetBottomSheet as any).current.snapTo(0) }}
-                        />
-                    }
-                    renderHeader={() => <TransparentHeaderModal
-                        onPressheader={() => {
-                            (this.NoInternetBottomSheet as any).current.snapTo(0);
-                        }}
-                    />}
-                />
-
             </ImageBackground>
         )
     }
