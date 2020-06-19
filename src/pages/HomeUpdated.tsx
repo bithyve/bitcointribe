@@ -88,11 +88,38 @@ import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
 import { initialCardData } from '../stubs/initialCardData';
 import { initialTransactionData } from '../stubs/initialTransactionData';
-import { fetchDerivativeAccBalTx } from '../store/actions/accounts';
+import { fetchDerivativeAccBalTx, addTransferDetails } from '../store/actions/accounts';
+import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 
 function isEmpty(obj) {
     return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
 }
+
+
+export const isCompatible = async (method: string, version: string) => {
+    if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
+        // checking compatibility via Relay
+        const res = await RelayServices.checkCompatibility(method, version);
+        if (res.status !== 200) {
+            console.log('Failed to check compatibility');
+            return true;
+        }
+
+        const { compatible, alternatives } = res.data;
+        if (!compatible) {
+            if (alternatives) {
+                if (alternatives.update)
+                    Alert.alert('Update your app inorder to process this link/QR');
+                else if (alternatives.message) Alert.alert(alternatives.message);
+            } else {
+                Alert.alert('Incompatible link/QR, updating your app might help');
+            }
+            return false;
+        }
+        return true;
+    }
+    return true;
+};
 
 
 const getIconByAccountType = (type) => {
@@ -213,7 +240,10 @@ interface HomePropsTypes {
     s3Service: any,
     initHealthCheck: any,
     overallHealth: any,
-    fetchDerivativeAccBalTx: any
+    fetchDerivativeAccBalTx: any,
+    addTransferDetails: any,
+    paymentDetails: any,
+    clearPaymentDetails: any
 }
 
 let isNavigate = false;
@@ -283,107 +313,244 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     }
 
 
-    getQrCodeData = (qrData) => {
-        const { navigation } = this.props
-        const scannedData = JSON.parse(qrData);
-        switch (scannedData.type) {
-            case 'trustedGuardian':
-                const trustedGruardianRequest = {
-                    isGuardian: scannedData.isGuardian,
-                    requester: scannedData.requester,
-                    publicKey: scannedData.publicKey,
-                    uploadedAt: scannedData.uploadedAt,
-                    type: scannedData.type,
-                    isQR: true,
-                    v: scannedData.v || ""
-                };
-                this.setState({
-                    loading: false,
-                    secondaryDeviceOtp: trustedGruardianRequest,
-                    trustedContactRequest: trustedGruardianRequest,
-                    isLoadContacts: true
-                }, () => {
-                    setTimeout(() => {
-                        (this.refs.qrTabBarBottomSheet as any).snapTo(0)
-                    }, 2);
+    processQRData = async (qrData) => {
+        const { accounts, addTransferDetails, navigation } = this.props
+        const { balances } = this.state
 
-                    if (this.state.tabBarIndex === 999) {
-                        this.setState({
-                            tabBarIndex: 0,
-                            deepLinkModalOpen: true
-                        })
-                    }
-                    setTimeout(() => {
-                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-                    }, 2);
-                })
-                return
+        const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
+        const { type } = regularService.addressDiff(qrData);
+        if (type) {
+            const serviceType = REGULAR_ACCOUNT; // default service type
+            let item;
+            switch (type) {
+                case 'address':
+                    const recipientAddress = qrData;
+                    item = {
+                        id: recipientAddress,
+                    };
 
-            case 'secondaryDeviceGuardian':
-                const secondaryDeviceGuardianRequest = {
-                    isGuardian: scannedData.isGuardian,
-                    requester: scannedData.requester,
-                    publicKey: scannedData.publicKey,
-                    uploadedAt: scannedData.uploadedAt,
-                    type: scannedData.type,
-                    isQR: true,
-                    v: scannedData.v || ""
-                };
+                    addTransferDetails(serviceType, {
+                        selectedContact: item,
+                    })
+                    navigation.navigate('SendToContact', {
+                        selectedContact: item,
+                        serviceType,
+                        netBalance: (balances || {}).regularBalance,
+                    });
+                    break;
 
-                this.setState({
-                    loading: false,
-                    secondaryDeviceOtp: secondaryDeviceGuardianRequest,
-                    trustedContactRequest: secondaryDeviceGuardianRequest,
-                }, () => {
-                    // TODO -- figure out why its not closing with out timeout
-                    setTimeout(() => {
-                        (this.refs.qrTabBarBottomSheet as any).snapTo(0)
-                    }, 2);
+                case 'paymentURI':
+                    const { address, options } = regularService.decodePaymentURI(qrData);
+                    item = {
+                        id: address,
+                    };
 
-                    if (this.state.tabBarIndex === 999) {
-                        this.setState({
-                            tabBarIndex: 0,
-                            deepLinkModalOpen: true
-                        })
-                    }
-                    setTimeout(() => {
-                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-                    }, 2);
-                })
-                break;
 
-            case 'recoveryQR':
-                const recoveryRequest = {
-                    isRecovery: true,
-                    requester: scannedData.requester,
-                    rk: scannedData.KEY,
-                    isQR: true,
-                    v: scannedData.v || ""
-                };
+                    addTransferDetails(serviceType, {
+                        selectedContact: item,
+                    })
 
-                this.setState({
-                    loading: false,
-                    recoveryRequest: recoveryRequest
-                }, () => {
-                    setTimeout(() => {
-                        (this.refs.qrTabBarBottomSheet as any).snapTo(0)
-                    }, 2);
+                    navigation.navigate('SendToContact', {
+                        selectedContact: item,
+                        serviceType,
+                        netBalance: balances.regularBalance,
+                        bitcoinAmount: options.amount ? `${options.amount}` : '',
+                    });
+                    break;
 
-                    if (this.state.tabBarIndex === 999) {
-                        this.setState({
-                            tabBarIndex: 0,
-                            deepLinkModalOpen: true
-                        })
-                    }
-                    setTimeout(() => {
-                        (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-                        (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-                    }, 2);
-                })
-            default:
-                break;
+                default:
+                    Alert.alert('Invalid QR');
+                    break;
+            }
+
+            return;
+        }
+
+        try {
+            const scannedData = JSON.parse(qrData);
+            if (scannedData.ver) {
+                if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
+            }
+            switch (scannedData.type) {
+                case 'trustedGuardian':
+                    const trustedGruardianRequest = {
+                        isGuardian: scannedData.isGuardian,
+                        requester: scannedData.requester,
+                        publicKey: scannedData.publicKey,
+                        uploadedAt: scannedData.uploadedAt,
+                        type: scannedData.type,
+                        isQR: true,
+                    };
+                    this.setState({
+                        loading: false,
+                        secondaryDeviceOtp: trustedGruardianRequest,
+                        trustedContactRequest: trustedGruardianRequest,
+                        recoveryRequest: null,
+                        isLoadContacts: true
+                    }, () => {
+                        setTimeout(() => {
+                            (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                        }, 2);
+
+                        if (this.state.tabBarIndex === 999) {
+                            this.setState({
+                                tabBarIndex: 0,
+                                deepLinkModalOpen: true
+                            })
+                        }
+                        setTimeout(() => {
+                            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                        }, 2);
+                    })
+
+                    break;
+
+                case 'secondaryDeviceGuardian':
+                    const secondaryDeviceGuardianRequest = {
+                        isGuardian: scannedData.isGuardian,
+                        requester: scannedData.requester,
+                        publicKey: scannedData.publicKey,
+                        uploadedAt: scannedData.uploadedAt,
+                        type: scannedData.type,
+                        isQR: true,
+                    };
+
+
+                    this.setState({
+                        loading: false,
+                        secondaryDeviceOtp: secondaryDeviceGuardianRequest,
+                        trustedContactRequest: secondaryDeviceGuardianRequest,
+                    }, () => {
+                        // TODO -- figure out why its not closing with out timeout
+                        setTimeout(() => {
+                            (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                        }, 2);
+
+                        if (this.state.tabBarIndex === 999) {
+                            this.setState({
+                                tabBarIndex: 0,
+                                deepLinkModalOpen: true
+                            })
+                        }
+                        setTimeout(() => {
+                            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                        }, 2);
+                    })
+
+                    break;
+
+                case 'trustedContactQR':
+                    const tcRequest = {
+                        requester: scannedData.requester,
+                        publicKey: scannedData.publicKey,
+                        type: scannedData.type,
+                        isQR: true,
+                    };
+
+
+                    this.setState({
+                        loading: false,
+                        secondaryDeviceOtp: tcRequest,
+                        trustedContactRequest: tcRequest,
+                        recoveryRequest: null,
+                    }, () => {
+                        // TODO -- figure out why its not closing with out timeout
+                        setTimeout(() => {
+                            (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                        }, 2);
+
+                        if (this.state.tabBarIndex === 999) {
+                            this.setState({
+                                tabBarIndex: 0,
+                                deepLinkModalOpen: true
+                            })
+                        }
+                        setTimeout(() => {
+                            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                        }, 2);
+                    })
+
+                    break;
+
+                case 'paymentTrustedContactQR':
+                    const paymentTCRequest = {
+                        isPaymentRequest: true,
+                        requester: scannedData.requester,
+                        publicKey: scannedData.publicKey,
+                        type: scannedData.type,
+                        isQR: true,
+                    };
+
+
+
+                    this.setState({
+                        loading: false,
+                        secondaryDeviceOtp: paymentTCRequest,
+                        trustedContactRequest: paymentTCRequest,
+                        recoveryRequest: null,
+                    }, () => {
+                        // TODO -- figure out why its not closing with out timeout
+                        setTimeout(() => {
+                            (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                        }, 2);
+
+                        if (this.state.tabBarIndex === 999) {
+                            this.setState({
+                                tabBarIndex: 0,
+                                deepLinkModalOpen: true
+                            })
+                        }
+                        setTimeout(() => {
+                            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                        }, 2);
+                    })
+
+                    break;
+
+                case 'recoveryQR':
+                    const recoveryRequest = {
+                        isRecovery: true,
+                        requester: scannedData.requester,
+                        publicKey: scannedData.KEY,
+                        isQR: true,
+                    };
+                    this.setState({
+                        loading: false,
+                        recoveryRequest: recoveryRequest
+                    }, () => {
+                        setTimeout(() => {
+                            (this.refs.qrTabBarBottomSheet as any).snapTo(0)
+                        }, 2);
+
+                        if (this.state.tabBarIndex === 999) {
+                            this.setState({
+                                tabBarIndex: 0,
+                                deepLinkModalOpen: true
+                            })
+                        }
+                        setTimeout(() => {
+                            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+                            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+                        }, 2);
+                    })
+                    break;
+
+                case 'ReverseRecoveryQR':
+                    Alert.alert(
+                        'Restoration QR Identified',
+                        'Restoration QR only works during restoration mode',
+                    );
+                    break;
+
+                default:
+                    break;
+            }
+        } catch (err) {
+            Alert.alert('Invalid QR');
         }
     };
 
@@ -603,9 +770,42 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     };
 
 
-    componentDidUpdate = (prevProps, prevState) => {
+    componentDidUpdate = (prevProps) => {
+
         if (prevProps.notificationList !== this.props.notificationList) {
             this.setupNotificationList()
+        }
+
+        if (this.props.paymentDetails !== null && this.props.paymentDetails) {
+            const serviceType = REGULAR_ACCOUNT;
+            const { paymentDetails, accounts, navigation, clearPaymentDetails } = this.props
+            const { balances } = this.state
+            let { address, paymentURI } = paymentDetails;
+            let options: any = {};
+            if (paymentURI) {
+                const details = accounts[serviceType].service.decodePaymentURI(
+                    paymentURI,
+                );
+                address = details.address;
+                options = details.options;
+            }
+
+            const item = {
+                id: address,
+            };
+
+            addTransferDetails(serviceType, {
+                selectedContact: item,
+            })
+
+            clearPaymentDetails()
+
+            navigation.navigate('SendToContact', {
+                selectedContact: item,
+                serviceType,
+                netBalance: balances.regularBalance,
+                bitcoinAmount: options.amount ? `${options.amount}` : '',
+            });
         }
     };
 
@@ -721,9 +921,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
     };
 
 
-    handleDeepLink = (event) => {
-        const splits = event.url.split('/');
+    handleDeepLink = async (event) => {
         const { navigation } = this.props
+        const splits = event.url.split('/');
 
         if (splits[5] === 'sss') {
             const requester = splits[4];
@@ -753,7 +953,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 // navigation.navigate('Home', { custodyRequest });
             } else if (splits[6] === 'rk') {
                 const recoveryRequest = { requester, rk: splits[7] };
-
                 this.setState({
                     recoveryRequest,
                     trustedContactRequest: null,
@@ -770,7 +969,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     }, 2);
                 })
             }
-        } else if (splits[4] === 'tc' || splits[4] === 'tcg') {
+        } else if (
+            splits[4] === 'tc' ||
+            splits[4] === 'tcg' ||
+            splits[4] === 'ptc'
+        ) {
             if (splits[3] !== config.APP_STAGE) {
                 Alert.alert(
                     'Invalid deeplink',
@@ -779,8 +982,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     }`,
                 );
             } else {
+                const version = splits.pop().slice(1);
+                if (version) {
+                    if (!(await isCompatible(splits[4], version))) return;
+                }
+
                 const trustedContactRequest = {
                     isGuardian: splits[4] === 'tcg' ? true : false,
+                    isPaymentRequest: splits[4] === 'ptc' ? true : false,
                     requester: splits[5],
                     encryptedKey: splits[6],
                     hintType: splits[7],
@@ -804,7 +1013,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                         (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
                     }, 2);
                 })
-
             }
         } else if (splits[4] === 'rk') {
             const recoveryRequest = {
@@ -814,8 +1022,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                 hintType: splits[7],
                 hint: splits[8],
             };
-
-
             this.setState({
                 recoveryRequest,
                 trustedContactRequest: null,
@@ -831,6 +1037,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
                 }, 2);
             })
+        } else if (splits[4] === 'rrk') {
+            Alert.alert(
+                'Restoration link Identified',
+                'Restoration links only works during restoration mode',
+            );
         }
 
         if (event.url.includes('fastbitcoins')) {
@@ -1831,10 +2042,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                     renderContent={() => <QrCodeModalContents
                         modalRef={this.refs.qrTabBarBottomSheet}
                         isOpenedFlag={qrBottomSheetsFlag}
-                        onQrScan={(qrData) => this.getQrCodeData(qrData)}
+                        onQrScan={(qrData) => this.processQRData(qrData)}
                         onPressQrScanner={() => {
                             navigation.navigate('QrScanner', {
-                                scanedCode: this.getQrCodeData,
+                                scanedCode: this.processQRData,
                             });
                         }}
                     />}
@@ -2485,7 +2696,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes>{
                             ]}
                             renderContent={() => <SelectedContactFromAddressBook
                                 onPressQrScanner={() => {
-                                    navigation.navigate('QrScanner', { scanedCode: this.getQrCodeData });
+                                    navigation.navigate('QrScanner', { scanedCode: this.processQRData });
                                 }}
                                 onPressProceed={() => {
                                     (this.refs.contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
@@ -2589,6 +2800,7 @@ const mapStateToProps = (state) => {
         UNDER_CUSTODY: idx(state, _ => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY),
         s3Service: idx(state, _ => _.sss.service),
         overallHealth: idx(state, _ => _.sss.overallHealth),
+        paymentDetails: idx(state, _ => _.trustedContacts.paymentDetails)
     }
 }
 
@@ -2600,7 +2812,9 @@ export default connect(mapStateToProps, {
     approveTrustedContact,
     uploadRequestedShare,
     initHealthCheck,
-    fetchDerivativeAccBalTx
+    fetchDerivativeAccBalTx,
+    addTransferDetails,
+    clearPaymentDetails
 })(HomeUpdated)
 
 const styles = StyleSheet.create({
