@@ -71,6 +71,7 @@ export default function Launch(props) {
             if (!url) props.navigation.replace('Login');
             else {
               const splits = url.split('/');
+
               if (splits[5] === 'sss') {
                 const requester = splits[4];
                 if (splits[6] === 'ek') {
@@ -93,7 +94,7 @@ export default function Launch(props) {
                   Alert.alert(
                     'Invalid deeplink',
                     `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                      splits[3]
+                    splits[3]
                     }`,
                   );
                 } else {

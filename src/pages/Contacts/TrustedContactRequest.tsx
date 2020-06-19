@@ -92,12 +92,12 @@ export default function TrustedContactRequest(props) {
             style={{ flex: 1, fontSize: RFValue(13) }}
             onFocus={() => {
               setOnBlurFocus(true);
-              props.bottomSheetRef.current.snapTo(2);
+              props.bottomSheetRef.snapTo(2);
             }}
             onBlur={() => {
               checkForValidation(EmailId);
               setOnBlurFocus(false);
-              props.bottomSheetRef.current.snapTo(1);
+              props.bottomSheetRef.snapTo(1);
             }}
           />
           <View style={styles.separatorView} />
@@ -133,12 +133,12 @@ export default function TrustedContactRequest(props) {
             style={{ flex: 1 }}
             onFocus={() => {
               setOnBlurFocus(true);
-              props.bottomSheetRef.current.snapTo(2);
+              props.bottomSheetRef.snapTo(2);
             }}
             onBlur={() => {
               checkForValidation(PhoneNumber);
               setOnBlurFocus(false);
-              props.bottomSheetRef.current.snapTo(1);
+              props.bottomSheetRef.snapTo(1);
             }}
           />
         </View>
@@ -187,9 +187,9 @@ export default function TrustedContactRequest(props) {
                 }}
                 onFocus={() => {
                   if (passcode.length == 0 && i == 0) {
-                    props.bottomSheetRef.current.snapTo(2);
+                    props.bottomSheetRef.snapTo(2);
                   } else {
-                    props.bottomSheetRef.current.snapTo(2);
+                    props.bottomSheetRef.snapTo(2);
                   }
                 }}
                 onBlur={() => {
@@ -197,7 +197,7 @@ export default function TrustedContactRequest(props) {
                     (passcode.length == 0 || passcode.length == 6) &&
                     i == 5
                   ) {
-                    props.bottomSheetRef.current.snapTo(1);
+                    props.bottomSheetRef.snapTo(1);
                   }
                 }}
               />

@@ -994,9 +994,9 @@
     xmldoc "^0.4.0"
 
 "@react-native-community/netinfo@^5.0.0":
-  version "5.9.2"
-  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-5.9.2.tgz#0e9df9717f292cd54fa9de322205b6263a1cb8e2"
-  integrity sha512-YPN6Qi9Sf64GlE3muLi4u4p4LaFP/65PTS0xssiGEaBAwSmZoUhzihhW1AptNe66ZQK9PxXfKIJDiLnYveK1aw==
+  version "5.9.3"
+  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-5.9.3.tgz#22df477780a3e4870a7acc9bca99096528ac0914"
+  integrity sha512-B7t6WrMOKrr+l9A2HqlkwCtENqgpFwDU2fueJ8HxfyZqq9dC820CYSbUu5tQVvKiF9TW/l+0gvy40p2jItDLnA==
 
 "@react-navigation/core@^3.7.6":
   version "3.7.6"
@@ -2577,14 +2577,14 @@ ee-first@1.1.1:
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
 electron-to-chromium@^1.3.413:
-  version "1.3.475"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.475.tgz#67688cc82c342f39594a412286e975eda45d8412"
-  integrity sha512-vcTeLpPm4+ccoYFXnepvkFt0KujdyrBU19KNEO40Pnkhta6mUi2K0Dn7NmpRcNz7BvysnSqeuIYScP003HWuYg==
+  version "1.3.478"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.478.tgz#cfa0f2f0d3012463438a3bc81f50f2d109aca450"
+  integrity sha512-pt9GUDD52uEO9ZXWcG4UuW/HwE8T+a8iFP7K2qqWrHB5wUxbbvCIXGBVpQDDQwSR766Nn4AkmLYxOUNd4Ji5Dw==
 
 elliptic@^6.0.0, elliptic@^6.4.0, elliptic@^6.5.2:
-  version "6.5.2"
-  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.2.tgz#05c5678d7173c049d8ca433552224a495d0e3762"
-  integrity sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==
+  version "6.5.3"
+  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.3.tgz#cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6"
+  integrity sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==
   dependencies:
     bn.js "^4.4.0"
     brorand "^1.0.1"
@@ -4794,9 +4794,9 @@ mkdirp@^0.5.1, mkdirp@~0.5.1:
     minimist "^1.2.5"
 
 moment@^2.10.6:
-  version "2.26.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.26.0.tgz#5e1f82c6bafca6e83e808b30c8705eed0dcbd39a"
-  integrity sha512-oIixUO+OamkUkwjhAVE18rAMfRJNsNe/Stid/gwHSOfHrOtw9EhAY2AHvdKZ/k/MggcYELFCJz/Sn2pL8b8JMw==
+  version "2.27.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.27.0.tgz#8bff4e3e26a236220dfe3e36de756b6ebaa0105d"
+  integrity sha512-al0MUK7cpIcglMv3YF13qSgdAIqxHTO7brRtaz3DlSULbqfazqkc5kEjNrLDOM7fsjshoFIihnU8snrP7zUvhQ==
 
 morgan@^1.9.0:
   version "1.10.0"
@@ -4989,9 +4989,9 @@ object-copy@^0.1.0:
     kind-of "^3.0.3"
 
 object-inspect@^1.7.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.7.0.tgz#f4f6bd181ad77f006b5ece60bd0b6f398ff74a67"
-  integrity sha512-a7pEHdh1xKIAgTySUGgLMx/xwDZskN1Ud6egYYN3EdRW4ZMPNEDUTF+hwy2LUC+Bl+SyLXANnwz/jyh/qutKUw==
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/object-inspect/-/object-inspect-1.8.0.tgz#df807e5ecf53a609cc6bfe93eac3cc7be5b3a9d0"
+  integrity sha512-jLdtEOB112fORuypAyl/50VRVIBIdVQOSUUGQHzJ4xBSbit81zRarz7GThkEFZy1RceYrWYcPcBFPQwHyAc1gA==
 
 object-is@^1.0.1:
   version "1.1.2"
@@ -5621,9 +5621,9 @@ react-native-contacts@^5.0.6:
   integrity sha512-BE1rKkSG7pVQ99kc21IdNqKSqtcTvtecu806VzZnAeVpc/E/ThLtCVUde0K45KyBbSXo6ImlnNxqCkVJngTXaQ==
 
 react-native-copilot@^2.4.6:
-  version "2.4.7"
-  resolved "https://registry.yarnpkg.com/react-native-copilot/-/react-native-copilot-2.4.7.tgz#bb9ac482e7fd24fcc291023258215c6ccae14605"
-  integrity sha512-Ed4CCZ7n0OCvYFGmYKmvw73AnK7RiJvrz0EZyX/21T4B1iNLGg+k33YeTnnBDeB4TEj5NmrojIAXuTbC5bttxQ==
+  version "2.4.8"
+  resolved "https://registry.yarnpkg.com/react-native-copilot/-/react-native-copilot-2.4.8.tgz#0f7e7850f2e708f9c34ed5079a9c84112269b15f"
+  integrity sha512-igysgywfak76USShPio8kH+FoK9ipdjFBr9kHj7bFR1YroArKFh08nT2mTGAnHXfPjrAPQFWTWdUEHRtUYRqFw==
   dependencies:
     hoist-non-react-statics "^3.0.1"
     mitt "^1.1.3"
