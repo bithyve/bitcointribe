@@ -540,11 +540,14 @@ export default function Login(props) {
                 onPress={() => {
                   loaderBottomSheet.current.snapTo(1);
                   setTimeout(() => {
+                    setMessage(
+                      'Hexa Test Account'
+                    );
                     setSubTextMessage1(
-                      'Did you know that 1 bitcoin = 100 million sats?',
+                      'Test Account comes preloaded with test-sats',
                     );
                     setSubTextMessage2(
-                      'Hexa uses sats to make it easier to use bitcoins',
+                      'Best place to start if you are new to Bitcoin',
                     );
                   }, 3000);
                   setTimeout(() => {
