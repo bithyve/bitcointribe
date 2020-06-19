@@ -851,14 +851,41 @@ const TrustedContactHistory = (props) => {
       let trustedContactsInfo: any = await AsyncStorage.getItem(
         'TrustedContactsInfo',
       );
-      console.log({ trustedContactsInfo });
 
       if (trustedContactsInfo) {
         trustedContactsInfo = JSON.parse(trustedContactsInfo);
+
+        if (trustedContactsInfo[index]) {
+          let found = false;
+          for (let i = 3; i < trustedContactsInfo.length; i++) {
+            // push if not present in TC list
+            if (
+              trustedContactsInfo[i] &&
+              trustedContactsInfo[i].name == trustedContactsInfo[index].name
+            ) {
+              found = true;
+              break;
+            }
+          }
+
+          if (!found) trustedContactsInfo.push(trustedContactsInfo[index]);
+        }
+
+        for (let i = 0; i < trustedContactsInfo.length; i++) {
+          if (
+            trustedContactsInfo[i] &&
+            trustedContactsInfo[i].name == contact.name
+          ) {
+            trustedContactsInfo.splice(i, 1);
+            break;
+          }
+        }
         trustedContactsInfo[index] = contact;
       } else {
         trustedContactsInfo = [];
-        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+        trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
+        trustedContactsInfo[1] = null;
+        trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
       await AsyncStorage.setItem(
@@ -893,7 +920,31 @@ const TrustedContactHistory = (props) => {
 
       if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
         // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
-        dispatch(uploadEncMShare(index, contactName, data, true));
+        setTrustedLink('');
+        setTrustedQR('');
+        // remove the previous TC
+        let trustedContactsInfo: any = await AsyncStorage.getItem(
+          'TrustedContactsInfo',
+        );
+
+        let previousGuardianName;
+        if (trustedContactsInfo) {
+          trustedContactsInfo = JSON.parse(trustedContactsInfo);
+          const previousGuardian = trustedContactsInfo[index];
+          if (previousGuardian) {
+            previousGuardianName = `${previousGuardian.firstName} ${
+              previousGuardian.lastName ? previousGuardian.lastName : ''
+            }`
+              .toLowerCase()
+              .trim();
+          } else {
+            console.log('Previous guardian details missing');
+          }
+        }
+
+        dispatch(
+          uploadEncMShare(index, contactName, data, true, previousGuardianName),
+        );
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
         setChangeContact(false);
@@ -902,11 +953,11 @@ const TrustedContactHistory = (props) => {
         Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
           config.TC_REQUEST_EXPIRY
       ) {
+        setTrustedLink('');
+        setTrustedQR('');
         dispatch(uploadEncMShare(index, contactName, data));
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
-        setTrustedLink('');
-        setTrustedQR('');
       } else if (
         trustedContact &&
         !trustedContact.symmetricKey &&
@@ -915,14 +966,14 @@ const TrustedContactHistory = (props) => {
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
           config.TC_REQUEST_EXPIRY
       ) {
+        setTrustedLink('');
+        setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
             contactName,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
-        setTrustedLink('');
-        setTrustedQR('');
       }
     } else {
       console.log({ chosenContact });

@@ -83,7 +83,10 @@ export default function AddContactSendRequest(props) {
       }
     } else {
       trustedContactsInfo = [];
-      trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
+      trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
+      trustedContactsInfo[1] = null;
+      trustedContactsInfo[2] = null;
+      trustedContactsInfo[3] = contact;
     }
     console.log({ trustedContactsInfo });
     await AsyncStorage.setItem(
@@ -232,9 +235,9 @@ export default function AddContactSendRequest(props) {
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
-      isFromReceive={true}
-      headerText={'Share'}
-      subHeaderText={'Share with your contact'}
+        isFromReceive={true}
+        headerText={'Share'}
+        subHeaderText={'Share with your contact'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         link={trustedLink}
@@ -339,7 +342,7 @@ export default function AddContactSendRequest(props) {
                   paddingTop: 5,
                 }}
               >
-                 Send a Friends and Family request
+                Send a Friends and Family request
               </Text>
             </View>
             <TouchableOpacity
@@ -551,7 +554,9 @@ export default function AddContactSendRequest(props) {
           ref={SendViaLinkBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('45%') : hp('46%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('45%')
+              : hp('46%'),
           ]}
           renderContent={renderSendViaLinkContents}
           renderHeader={renderSendViaLinkHeader}
@@ -561,7 +566,9 @@ export default function AddContactSendRequest(props) {
           ref={SendViaQRBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('46%') : hp('46%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('46%')
+              : hp('46%'),
           ]}
           renderContent={renderSendViaQRContents}
           renderHeader={renderSendViaQRHeader}

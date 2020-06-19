@@ -168,6 +168,9 @@ function* uploadEncMetaShareWorker({ payload }) {
   // Transfer: User >>> Guardian
   const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
+  const trustedContacts = yield select(
+    (state) => state.trustedContacts.service,
+  );
 
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
     (state) => state.storage.database,
@@ -175,6 +178,11 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   if (payload.changingGuardian) {
     yield call(s3Service.reshareMetaShare, payload.shareIndex);
+    if (payload.previousGuardianName) {
+      trustedContacts.tc.trustedContacts[
+        payload.previousGuardianName
+      ].isGuardian = false;
+    }
   } else {
     // preventing re-uploads till expiry
     if (DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[payload.shareIndex]) {
@@ -226,6 +234,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     const updatedSERVICES = {
       ...SERVICES,
       S3_SERVICE: JSON.stringify(s3Service),
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
 
     const updatedBackup = {
