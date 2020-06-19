@@ -177,20 +177,36 @@ const TrustedContactHistory = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let SelectedContactsTemp = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
     );
-    if (SelectedContactsTemp) {
-      setSelectedContacts(SelectedContactsTemp);
-      if (selectedTitle == 'Trusted Contact 1' && SelectedContactsTemp[0]) {
-        setChosenContact(SelectedContactsTemp[0]);
-      } else if (
-        selectedTitle == 'Trusted Contact 2' &&
-        SelectedContactsTemp[1]
-      ) {
-        setChosenContact(SelectedContactsTemp[1]);
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      const selectedContacts = trustedContactsInfo.slice(1, 3);
+      setSelectedContacts(selectedContacts);
+
+      if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
+        setChosenContact(selectedContacts[0]);
+      } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
+        setChosenContact(selectedContacts[1]);
       }
     }
+
+    // let SelectedContactsTemp = JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
+    // if (SelectedContactsTemp) {
+    //   setSelectedContacts(SelectedContactsTemp);
+    //   if (selectedTitle == 'Trusted Contact 1' && SelectedContactsTemp[0]) {
+    //     setChosenContact(SelectedContactsTemp[0]);
+    //   } else if (
+    //     selectedTitle == 'Trusted Contact 2' &&
+    //     SelectedContactsTemp[1]
+    //   ) {
+    //     setChosenContact(SelectedContactsTemp[1]);
+    //   }
+    // }
   }, [selectedTitle]);
 
   const getContacts = useCallback(
@@ -343,21 +359,21 @@ const TrustedContactHistory = (props) => {
       // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
       // (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
 
-      let selectedContactList = JSON.parse(
-        await AsyncStorage.getItem('SelectedContacts'),
-      );
-      if (!selectedContactList) {
-        selectedContactList = [];
-      }
-      if (index == 2) {
-        selectedContactList[1] = chosenContact;
-      } else if (index == 1) {
-        selectedContactList[0] = chosenContact;
-      }
-      await AsyncStorage.setItem(
-        'SelectedContacts',
-        JSON.stringify(selectedContactList),
-      );
+      // let selectedContactList = JSON.parse(
+      //   await AsyncStorage.getItem('SelectedContacts'),
+      // );
+      // if (!selectedContactList) {
+      //   selectedContactList = [];
+      // }
+      // if (index == 2) {
+      //   selectedContactList[1] = chosenContact;
+      // } else if (index == 1) {
+      //   selectedContactList[0] = chosenContact;
+      // }
+      // await AsyncStorage.setItem(
+      //   'SelectedContacts',
+      //   JSON.stringify(selectedContactList),
+      // );
 
       updateAutoHighlightFlags();
       saveInTransitHistory();
@@ -527,16 +543,16 @@ const TrustedContactHistory = (props) => {
   // }, [SHARES_TRANSFER_DETAILS[index]]);
 
   const onPressReshare = useCallback(async () => {
-    let selectedContactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
+    // let selectedContactList = JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
     //console.log({ selectedContactList });
     //console.log({ chosenContact });
-    if (selectedTitle == 'Trusted Contact 1') {
-      setChosenContact(selectedContactList[0]);
-    } else if (selectedTitle == 'Trusted Contact 2') {
-      setChosenContact(selectedContactList[1]);
-    }
+    // if (selectedTitle == 'Trusted Contact 1') {
+    //   setChosenContact(selectedContactList[0]);
+    // } else if (selectedTitle == 'Trusted Contact 2') {
+    //   setChosenContact(selectedContactList[1]);
+    // }
     // (CommunicationModeBottomSheet as any).current.snapTo(1);
     (shareBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);

@@ -34,7 +34,6 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import { fetchSSSFromDB } from '../../store/actions/storage';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthCheck';
@@ -785,31 +784,50 @@ export default function ManageBackup(props) {
   };
 
   const setContactsFromAsync = async () => {
-    let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
     );
-    setContacts(contactList);
-    if (contactList.length) {
-      if (
-        contactList.findIndex((value) => value && value.type == 'contact1') !=
-        -1
-      ) {
-        pageData[1].personalInfo =
-          contactList[
-            contactList.findIndex((value) => value && value.type == 'contact1')
-          ];
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      const selectedContacts = trustedContactsInfo.slice(1, 3);
+      setContacts(selectedContacts);
+
+      if (selectedContacts[0]) {
+        pageData[1].personalInfo = selectedContacts[0];
       }
-      if (
-        contactList.findIndex((value) => value && value.type == 'contact2') !=
-        -1
-      ) {
-        pageData[2].personalInfo =
-          contactList[
-            contactList.findIndex((value) => value && value.type == 'contact2')
-          ];
+      if (selectedContacts[1]) {
+        pageData[2].personalInfo = selectedContacts[1];
       }
+      setPageData([...pageData]);
     }
-    setPageData([...pageData]);
+
+    // let contactList = JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
+
+    // setContacts(contactList);
+    // if (contactList.length) {
+    //   if (
+    //     contactList.findIndex((value) => value && value.type == 'contact1') !=
+    //     -1
+    //   ) {
+    //     pageData[1].personalInfo =
+    //       contactList[
+    //         contactList.findIndex((value) => value && value.type == 'contact1')
+    //       ];
+    //   }
+    //   if (
+    //     contactList.findIndex((value) => value && value.type == 'contact2') !=
+    //     -1
+    //   ) {
+    //     pageData[2].personalInfo =
+    //       contactList[
+    //         contactList.findIndex((value) => value && value.type == 'contact2')
+    //       ];
+    //   }
+    // }
+    // setPageData([...pageData]);
   };
 
   const setAutoHighlightFlagsFromAsync = async () => {
@@ -1437,7 +1455,6 @@ export default function ManageBackup(props) {
   };
 
   const getCardTitle = (item) => {
-  
     if (item.type === 'contact1' || item.type === 'contact2') {
       if (item.personalInfo) {
         if (item.personalInfo.firstName && item.personalInfo.lastName) {
@@ -1449,16 +1466,15 @@ export default function ManageBackup(props) {
         if (item.personalInfo.firstName && !item.personalInfo.lastName) {
           return item.personalInfo.firstName;
         }
-        
+
         return '';
-      }
-      else {
+      } else {
         return 'Friends and Family';
       }
     }
 
     if (item.type === 'copy1' || item.type === 'copy2') {
-      return 'Personal Copy'
+      return 'Personal Copy';
     }
 
     if (item.type === 'secondaryDevice') {
@@ -1466,35 +1482,34 @@ export default function ManageBackup(props) {
     }
 
     if (item.type === 'security') {
-      return 'Security Question'
+      return 'Security Question';
     }
 
     return item.title;
-  }
+  };
 
   const getCardSubText = (item) => {
-
     if (item.type === 'contact1' || item.type === 'contact2') {
       if (item.personalInfo) {
-        return 'Friends and Family'
+        return 'Friends and Family';
       }
-      return 'Select a Friend or Family memeber as a Keeper'
+      return 'Select a Friend or Family memeber as a Keeper';
     }
     if (item.type === 'secondaryDevice') {
       if (item.status === 'Ugly') {
-        return 'Another device running Hexa app that you own'
+        return 'Another device running Hexa app that you own';
       }
-      return 'Last Backup '
+      return 'Last Backup ';
     }
     if (item.type === 'copy1' || item.type === 'copy2') {
       if (item.status === 'Ugly') {
-        return 'Secure your Recovery Key as a file (pdf)'
+        return 'Secure your Recovery Key as a file (pdf)';
       }
-      return 'The PDFs are locked with your Secutiry Answers'
+      return 'The PDFs are locked with your Secutiry Answers';
     }
 
-    return 'Last Backup '
-  }
+    return 'Last Backup ';
+  };
 
   return (
     <View style={{ flex: 1 }}>
