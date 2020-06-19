@@ -4,9 +4,11 @@ import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getCurrencyImageName } from '../common/CommonFunctions/index';
 
 export default function ToggleSwitch(props) {
   const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR','EUR'];
+
   function setCurrencyCode(currencyName, currencyColor) {
     console.log('currencyColor', currencyColor);
     return (
@@ -17,30 +19,6 @@ export default function ToggleSwitch(props) {
       />
     );
   }
-
-  const getCurrencyImage = (currencyCodeValue, color) => {
-    switch (currencyCodeValue) {
-      case 'BRL':
-        return setCurrencyCode('currency-brl', color);
-      case 'CNY':
-      case 'JPY':
-        return setCurrencyCode('currency-cny', color);
-      case 'GBP':
-        return setCurrencyCode('currency-gbp', color);
-      case 'KRW':
-        return setCurrencyCode('currency-krw', color);
-      case 'RUB':
-        return setCurrencyCode('currency-rub', color);
-      case 'TRY':
-        return setCurrencyCode('currency-try', color);
-      case 'INR':
-        return setCurrencyCode('currency-inr', color);
-      case 'EUR':
-        return setCurrencyCode('currency-eur', color);  
-      default:
-        break;
-    }
-  };
 
   return (
     <TouchableOpacity
@@ -72,7 +50,7 @@ export default function ToggleSwitch(props) {
               props.inactiveOffImage ? (
                 props.inactiveOffImage
               ) : (
-                getCurrencyImage(props.currencyCodeValue, 'gray')
+                setCurrencyCode(getCurrencyImageName(props.currencyCodeValue), 'gray')
               )
             ) : (
               <Image
@@ -141,7 +119,7 @@ export default function ToggleSwitch(props) {
               props.activeOffImage ? (
                 props.activeOffImage
               ) : (
-                getCurrencyImage(props.currencyCodeValue, 'blue')
+                setCurrencyCode(getCurrencyImageName(props.currencyCodeValue), 'blue')
               )
             ) : (
               <Image

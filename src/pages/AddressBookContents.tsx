@@ -11,6 +11,7 @@ import {
   Image,
   ScrollView,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -38,6 +39,7 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../components/ModalHeader';
 
 export default function AddressBookContents(props) {
+  const [onRefresh, setOnRefresh] = useState(false);
   const [
     AddContactAddressBookBookBottomSheet,
     setAddContactAddressBookBottomSheet,
@@ -390,7 +392,16 @@ export default function AddressBookContents(props) {
             </Text>
           </View>
         </View>
-        <ScrollView style={{ flex: 1 }}>
+        <ScrollView 
+        refreshControl={
+          <RefreshControl
+            refreshing={onRefresh}
+            onRefresh={() => {
+              dispatch(trustedChannelsSync());
+            }}
+          />
+        }
+        style={{ flex: 1 }}>
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>

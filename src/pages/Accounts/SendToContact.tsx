@@ -55,6 +55,7 @@ import BottomInfoBox from '../../components/BottomInfoBox';
 import Currencies from '../../common/Currencies';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
+import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 
 export default function SendToContact(props) {
   const [RegularAccountBalance, setRegularAccountBalance] = useState(0);
@@ -177,30 +178,7 @@ export default function SendToContact(props) {
     );
   }
 
-  const getCurrencyImage = (currencyCodeValue, color) => {
-    switch (currencyCodeValue) {
-      case 'BRL':
-        return setCurrencyCodeToImage('currency-brl', color);
-      case 'CNY':
-      case 'JPY':
-        return setCurrencyCodeToImage('currency-cny', color);
-      case 'GBP':
-        return setCurrencyCodeToImage('currency-gbp', color);
-      case 'KRW':
-        return setCurrencyCodeToImage('currency-krw', color);
-      case 'RUB':
-        return setCurrencyCodeToImage('currency-rub', color);
-      case 'TRY':
-        return setCurrencyCodeToImage('currency-try', color);
-      case 'INR':
-        return setCurrencyCodeToImage('currency-inr', color);
-      case 'EUR':
-        return setCurrencyCodeToImage('currency-eur', color);     
-      default:
-        break;
-    }
-  };
-
+  
   useEffect(() => {
     dispatch(clearTransfer(serviceType));
     dispatch(addTransferDetails(serviceType, { selectedContact }));
@@ -615,8 +593,8 @@ export default function SendToContact(props) {
       >
         <View style={styles.amountInputImage}>
           {currencyCode.includes(CurrencyCode) ? 
-            getCurrencyImage(CurrencyCode, 'gray')
-           : <Image
+          setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode), 'gray')
+            : <Image
               style={{
                 ...styles.textBoxImage,
               }}

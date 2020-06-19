@@ -12,6 +12,30 @@ export const validateEmail = email => {
   return reg.test(email);
 };
 
+export const getCurrencyImageName = (currencyCodeValue) => {
+  switch (currencyCodeValue) {
+    case 'BRL':
+      return 'currency-brl';
+    case 'CNY':
+    case 'JPY':
+      return 'currency-cny';
+    case 'GBP':
+      return 'currency-gbp';
+    case 'KRW':
+      return 'currency-krw';
+    case 'RUB':
+      return 'currency-rub';
+    case 'TRY':
+      return 'currency-try';
+    case 'INR':
+      return 'currency-inr';
+    case 'EUR':
+      return 'currency-eur';       
+    default:
+      break;
+  }
+};
+
 export const getCurrencyImageByRegion = (currencyCode, type) => {
   const dollarCurrency = ['USD', 'AUD', 'BBD', 'BSD', 'BZD', 'BMD', 'BND', 'KHR', 'CAD', 'KYD', 'XCD', 'FJD', 'GYD', 'HKD', 'JMD', 'LRD', 'NAD', 'NZD', 'SGD', 'SBD', 'SRD', 'TWD', 'TTD', 'TVD', 'ZWD']
   const poundCurrency = ['EGP', 'FKP', 'GIP', 'GGP', 'IMP', 'JEP', 'SHP', 'SYP', 'GBP']
