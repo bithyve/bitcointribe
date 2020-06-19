@@ -48,6 +48,9 @@ import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
+  let [subTextMessage, setSubTextMessage] = useState(
+    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it'
+  )
   const [Elevation, setElevation] = useState(10);
   const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -296,10 +299,19 @@ export default function NewWalletQuestion(props) {
   const seLoaderMessages = () => {
     setTimeout(() => {
       setMessage('Bootstrapping Accounts');
+      setSubTextMessage(
+        'Hexa has a multi-account model which lets you better manage your bitcoin (sats)'
+      )
       setTimeout(() => {
-        setMessage('Filling Test account with test sats');
+        setMessage('Filling Test Account with test sats');
+        setSubTextMessage(
+          'Preloaded Test Account is the best place to start your Bitcoin journey'
+        )
         setTimeout(() => {
-          setMessage('Generating Recovery Keys');
+          setMessage('Generate Recovery Keys');
+          setSubTextMessage(
+            'Recovery Keys help you restore your Hexa wallet in case your phone is lost'
+          )
         }, 3000);
       }, 3000);
     }, 3000);
@@ -309,10 +321,10 @@ export default function NewWalletQuestion(props) {
     return (
       <LoaderModal
         headerText={message}
-        messageText={'This may take a few seconds'}
+        messageText={subTextMessage}
       />
     );
-  }, [message]);
+  }, [message, subTextMessage]);
 
   const renderLoaderModalHeader = () => {
     return (
