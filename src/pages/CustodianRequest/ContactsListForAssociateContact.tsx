@@ -21,8 +21,22 @@ const ContactsListForAssociateContact = (props) => {
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (
-        trustedContactsInfo.findIndex((value) => {
-          if (value && value.id) return value.id == contacts[0].id;
+        trustedContactsInfo.findIndex((trustedContact) => {
+          if (!trustedContact) return false;
+
+          const presentContactName = `${trustedContact.firstName} ${
+            trustedContact.lastName ? trustedContact.lastName : ''
+          }`
+            .toLowerCase()
+            .trim();
+
+          const selectedContactName = `${contacts[0].firstName} ${
+            contacts[0].lastName ? contacts[0].lastName : ''
+          }`
+            .toLowerCase()
+            .trim();
+
+          return presentContactName == selectedContactName;
         }) == -1
       ) {
         trustedContactsInfo.push(contacts[0]);
@@ -38,6 +52,7 @@ const ContactsListForAssociateContact = (props) => {
         props.navigation.navigate('Home');
       } else {
         Toast('Trusted Contact already exists');
+        return;
       }
     } else {
       trustedContactsInfo = [];
@@ -46,7 +61,7 @@ const ContactsListForAssociateContact = (props) => {
       Toast(
         `${
           isGuardian
-            ? 'You have been successfully added as a Kepper'
+            ? 'You have been successfully added as a Keeper'
             : 'Contact successfully added to Friends and Family'
         }`,
       );
