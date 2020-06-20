@@ -119,6 +119,13 @@ const TrustedContactHistory = (props) => {
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
 
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
+  const [trustedLink, setTrustedLink] = useState('');
+  const [trustedQR, setTrustedQR] = useState('');
+
   const [trustedContactHistory, setTrustedContactHistory] = useState([
     {
       id: 1,
@@ -231,6 +238,24 @@ const TrustedContactHistory = (props) => {
     [SelectedContacts, chosenContact],
   );
 
+  const isTrustedContact = useCallback(
+    (selectedContact) => {
+      const contactName = `${selectedContact.firstName} ${
+        selectedContact.lastName ? selectedContact.lastName : ''
+      }`
+        .toLowerCase()
+        .trim();
+
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+      if (trustedContact && trustedContact.symmetricKey) {
+        // Trusted channel exists
+        return true;
+      }
+      return false;
+    },
+    [trustedContacts],
+  );
+
   const renderTrustedContactsContent = useCallback(() => {
     return (
       <TrustedContacts
@@ -238,8 +263,13 @@ const TrustedContactHistory = (props) => {
         onPressBack={() => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={(selectedContacts, index) => {
-          getContacts(selectedContacts, index);
+        onPressContinue={async (selectedContacts, index) => {
+          const isTrustedC = await isTrustedContact(selectedContacts[0]);
+          if (isTrustedC) {
+            Toast('Trusted Contact already exists');
+          } else {
+            getContacts(selectedContacts, index);
+          }
         }}
         index={index}
       />
@@ -756,13 +786,6 @@ const TrustedContactHistory = (props) => {
       />
     );
   };
-
-  const trustedContacts: TrustedContactsService = useSelector(
-    (state) => state.trustedContacts.service,
-  );
-
-  const [trustedLink, setTrustedLink] = useState('');
-  const [trustedQR, setTrustedQR] = useState('');
 
   const createDeepLink = useCallback(() => {
     console.log(uploadMetaShare, updateEphemeralChannelLoader);
