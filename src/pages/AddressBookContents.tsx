@@ -58,6 +58,13 @@ export default function AddressBookContents(props) {
     (state) => state.trustedContacts.service,
   );
 
+  const trustedChannelsSyncing = useSelector(
+    (state) => state.trustedContacts.loading.trustedChannelsSync,
+  );
+  useEffect(() => {
+    setOnRefresh(trustedChannelsSyncing);
+  }, [trustedChannelsSyncing]);
+
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -392,16 +399,17 @@ export default function AddressBookContents(props) {
             </Text>
           </View>
         </View>
-        <ScrollView 
-        refreshControl={
-          <RefreshControl
-            refreshing={onRefresh}
-            onRefresh={() => {
-              dispatch(trustedChannelsSync());
-            }}
-          />
-        }
-        style={{ flex: 1 }}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={onRefresh}
+              onRefresh={() => {
+                dispatch(trustedChannelsSync());
+              }}
+            />
+          }
+          style={{ flex: 1 }}
+        >
           <View style={{ marginTop: wp('2%') }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
@@ -410,11 +418,13 @@ export default function AddressBookContents(props) {
             {!Loading ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {MyKeeper.length>0 ? MyKeeper.map((item, index) => {
-                    return getElement(item, index, 'My Keepers');
-                  }) : 
-                  <View style={{height: wp('22%')+30, }} />
-                  }
+                  {MyKeeper.length > 0 ? (
+                    MyKeeper.map((item, index) => {
+                      return getElement(item, index, 'My Keepers');
+                    })
+                  ) : (
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             ) : (
@@ -430,11 +440,13 @@ export default function AddressBookContents(props) {
             {!Loading ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  { IMKeeper.length>0 ? IMKeeper.map((item, index) => {
-                    return getElement(item, index, "I'm Keeper of");
-                  }) : 
-                  <View style={{height: wp('22%')+30}} />
-                  }
+                  {IMKeeper.length > 0 ? (
+                    IMKeeper.map((item, index) => {
+                      return getElement(item, index, "I'm Keeper of");
+                    })
+                  ) : (
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             ) : (
@@ -449,13 +461,15 @@ export default function AddressBookContents(props) {
             {!Loading ? (
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
-                  {OtherTrustedContact.length>0 ? OtherTrustedContact.map((item, index) => {
-                    return getElement(item, index, 'Other Contacts');
-                  }):
-                  <View style={{height: wp('22%')+30}} />
-                  }
+                  {OtherTrustedContact.length > 0 ? (
+                    OtherTrustedContact.map((item, index) => {
+                      return getElement(item, index, 'Other Contacts');
+                    })
+                  ) : (
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                   <TouchableOpacity
-                    onPress={() =>{
+                    onPress={() => {
                       setTimeout(() => {
                         setIsLoadContacts(true);
                       }, 2);
