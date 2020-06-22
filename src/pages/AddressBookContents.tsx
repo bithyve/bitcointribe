@@ -37,6 +37,7 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../components/ModalHeader';
+import config from '../bitcoin/HexaConfig';
 
 export default function AddressBookContents(props) {
   const [onRefresh, setOnRefresh] = useState(false);
@@ -119,12 +120,19 @@ export default function AddressBookContents(props) {
             ].isWard;
 
           const isGuardian = index < 3 ? true : false;
+
+          const initiatedAt =
+            trustedContactsService.tc.trustedContacts[
+              contactName.toLowerCase().trim()
+            ].ephemeralChannel.initiatedAt;
+
           const element = {
             contactName,
             connectedVia,
             hasXpub,
             isGuardian,
             isWard,
+            initiatedAt,
             ...contactInfo,
           };
           trustedContacts.push(element);
@@ -278,7 +286,9 @@ export default function AddressBookContents(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Pending
+                {Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY
+                  ? 'Expired'
+                  : 'Pending'}
               </Text>
             </View>
           )}
