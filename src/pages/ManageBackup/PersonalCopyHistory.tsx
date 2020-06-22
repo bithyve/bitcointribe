@@ -219,13 +219,13 @@ const PersonalCopyHistory = (props) => {
       );
       if (!personalCopyDetails) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
-        saveInTransitHistory();
+        // saveInTransitHistory();
       } else {
         personalCopyDetails = JSON.parse(personalCopyDetails);
 
         if (!personalCopyDetails[selectedPersonalCopy.type]) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
-          saveInTransitHistory();
+          // saveInTransitHistory();
         } else setPersonalCopyDetails(personalCopyDetails);
       }
     })();
@@ -305,6 +305,7 @@ const PersonalCopyHistory = (props) => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
         onPressShare={() => {
+          saveInTransitHistory()
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
       />
