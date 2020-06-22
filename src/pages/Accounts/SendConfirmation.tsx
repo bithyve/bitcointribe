@@ -37,7 +37,10 @@ import SendConfirmationContent from './SendConfirmationContent';
 import RecipientComponent from './RecipientComponent';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
-import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -51,7 +54,6 @@ export default function SendConfirmation(props) {
   }, [accounts.exchangeRates]);
   const selectedContact = props.navigation.getParam('selectedContact');
   const serviceType = props.navigation.getParam('serviceType');
-  const averageTxFees = props.navigation.getParam('averageTxFees');
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const sweepSecure = props.navigation.getParam('sweepSecure');
@@ -90,7 +92,6 @@ export default function SendConfirmation(props) {
   //     );
   //   }
   // }, [sliderValueText]);
-
   useEffect(() => {
     console.log('transfer', transfer);
     if (transfer.stage2.failed) {
@@ -426,7 +427,7 @@ export default function SendConfirmation(props) {
             marginBottom: hp('1%'),
             marginTop: hp('1%'),
             flexDirection: 'row',
-            alignItems: 'flex-end'
+            alignItems: 'flex-end',
           }}
         >
           <Text
@@ -621,7 +622,9 @@ export default function SendConfirmation(props) {
                 }}
               >
                 {'Low Fee\n'} (
-                {averageTxFees ? averageTxFees['low'].averageTxFee : ''}
+                {transfer.stage1.txPrerequisites
+                  ? transfer.stage1.txPrerequisites['low'].fee
+                  : ''}
                 {' sats'})
               </Text>
               <Text
@@ -636,7 +639,9 @@ export default function SendConfirmation(props) {
                 }}
               >
                 {'In the middle\n'} (
-                {averageTxFees ? averageTxFees['medium'].averageTxFee : ''}
+                {transfer.stage1.txPrerequisites
+                  ? transfer.stage1.txPrerequisites['medium'].fee
+                  : ''}
                 {' sats'})
               </Text>
               <Text
@@ -650,7 +655,9 @@ export default function SendConfirmation(props) {
                 }}
               >
                 {'Fast Transaction\n'} (
-                {averageTxFees ? averageTxFees['high'].averageTxFee : ''}
+                {transfer.stage1.txPrerequisites
+                  ? transfer.stage1.txPrerequisites['high'].fee
+                  : ''}
                 {' sats'})
               </Text>
             </View>
