@@ -143,7 +143,7 @@ export default function UpdateApp(props) {
   const upgradeNow = () => {
     const url =
       Platform.OS == 'ios'
-        ? 'itms://itunes.apple.com/us/app/apple-store/' + Config.APP_ID + '?mt=8'
+        ? 'itms://itunes.apple.com/us/app/apple-store/' + Config.APPLE_APP_ID + '?mt=8'
         : 'market://details?id=' + Config.APP_ID;
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {

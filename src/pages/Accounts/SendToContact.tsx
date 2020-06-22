@@ -169,7 +169,6 @@ export default function SendToContact(props) {
   ];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
-    console.log('currencyColor', currencyColor);
     return (
       <View
         style={{

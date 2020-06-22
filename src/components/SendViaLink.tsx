@@ -515,7 +515,7 @@ export default function SendViaLink(props) {
                     return (
                       <AppBottomSheetTouchableWrapper
                         onPress={() => {
-                          if (item.title == 'Copy Link') writeToClipboard();
+                          if (item.title == 'Copy Link' || item.title == 'Copy address') writeToClipboard();
 
                           if (item.title == 'WhatsApp') openWhatsApp(item.url);
                           if (item.title == 'Telegram') openTelegram(item.url);
@@ -553,7 +553,7 @@ export default function SendViaLink(props) {
                               />
                             </View>
                             <Text style={styles.addModalInfoText}>
-                              {item.title}
+                              {item.title == `Copy Link` ? !props.contact && props.isFromReceive ? `Copy address`:`Copy Link`: item.title}
                             </Text>
                           </View>
                         </View>

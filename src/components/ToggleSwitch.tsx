@@ -10,7 +10,6 @@ export default function ToggleSwitch(props) {
   const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY', 'INR','EUR'];
 
   function setCurrencyCode(currencyName, currencyColor) {
-    console.log('currencyColor', currencyColor);
     return (
       <MaterialCommunityIcons
         name={currencyName}

@@ -620,6 +620,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
+    console.log("NEXTAPPSTATE", nextAppState)
     this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
@@ -628,7 +629,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         {
           appState: nextAppState,
         },
-        () => {
+        async () => {
           if (nextAppState === 'active') {
             this.scheduleNotification();
           }
@@ -642,7 +643,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     this.getBalances();
     this.appStateListener = AppState.addEventListener(
       'change',
-      this.handleAppStateChange,
+      this.onAppStateChange,
     );
     this.bootStrapNotifications();
     this.setUpFocusListener();
@@ -930,7 +931,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     ];
     if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
     if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
-    if (isContactOpen || isContactOpen) {
+    if (isContactOpen || isCameraOpen) {
       AsyncStorage.multiSet(keyArray, () => {});
       return;
     }
@@ -3116,8 +3117,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             />
           )}
           renderHeader={() => (
-            <TransparentHeaderModal
-              onPressheader={() => {
+            <ModalHeader
+            onPressHeader={() => {
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
             />
