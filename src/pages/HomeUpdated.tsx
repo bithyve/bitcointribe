@@ -1601,9 +1601,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation,
       approveTrustedContact,
       fetchEphemeralChannel,
+      walletName,
     } = this.props;
 
     if (!isRecovery) {
+      if (requester === walletName) {
+        Toast('Cannot be your own Trusted Contact/Guardian');
+        return;
+      }
       if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
         Alert.alert(
           `${isQR ? 'QR' : 'Link'} expired!`,
@@ -1660,10 +1665,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         }
       }
     } else {
+      if (requester === walletName) {
+        Toast('You do not host any share of your own');
+        return;
+      }
+
       if (!UNDER_CUSTODY[requester]) {
         Alert.alert(
           'Failed to send!',
-          'You do not host any secret for this user.',
+          'You do not host any share for this user',
         );
 
         this.setState({

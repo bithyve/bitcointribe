@@ -156,7 +156,17 @@ export default function SendToContact(props) {
     }
   };
 
-  const currencyCode = ['BRL', 'CNY', 'JPY', 'GBP', 'KRW', 'RUB', 'TRY','INR','EUR'];
+  const currencyCode = [
+    'BRL',
+    'CNY',
+    'JPY',
+    'GBP',
+    'KRW',
+    'RUB',
+    'TRY',
+    'INR',
+    'EUR',
+  ];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
     console.log('currencyColor', currencyColor);
@@ -178,7 +188,6 @@ export default function SendToContact(props) {
     );
   }
 
-  
   useEffect(() => {
     dispatch(clearTransfer(serviceType));
     dispatch(addTransferDetails(serviceType, { selectedContact }));
@@ -485,7 +494,7 @@ export default function SendToContact(props) {
         : 0;
       currency = currency < 1 ? currency * 1e8 : currency;
       setCurrencyAmount(temp);
-      setBitCoinAmount(currency.toFixed(2));
+      setBitCoinAmount(currency.toFixed(0));
     }
   };
 
@@ -592,15 +601,16 @@ export default function SendToContact(props) {
         }}
       >
         <View style={styles.amountInputImage}>
-          {currencyCode.includes(CurrencyCode) ? 
-          setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode), 'gray')
-            : <Image
+          {currencyCode.includes(CurrencyCode) ? (
+            setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode), 'gray')
+          ) : (
+            <Image
               style={{
                 ...styles.textBoxImage,
               }}
               source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
             />
-          }
+          )}
           {/* <Image
             style={styles.textBoxImage}
             source={require('../../assets/images/icons/dollar_grey.png')}
