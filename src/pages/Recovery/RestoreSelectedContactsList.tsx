@@ -62,6 +62,7 @@ import axios from 'axios';
 import QrCodeModalContents from '../../components/QrCodeModalContents';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
+import Toast from '../../components/Toast';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
@@ -612,7 +613,7 @@ export default function RestoreSelectedContactsList(props) {
           break;
       }
     } catch (err) {
-      Alert.alert('Invalid QR');
+      Toast('Invalid QR');
     }
   }, []);
 

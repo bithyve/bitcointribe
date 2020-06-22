@@ -352,7 +352,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           break;
 
         default:
-          Alert.alert('Invalid QR');
+          Toast('Invalid QR');
           break;
       }
 
@@ -554,7 +554,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           break;
       }
     } catch (err) {
-      Alert.alert('Invalid QR');
+      Toast('Invalid QR');
     }
   };
 
