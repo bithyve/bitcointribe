@@ -936,7 +936,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
     if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
     if (isContactOpen || isCameraOpen) {
-      AsyncStorage.multiSet(keyArray, () => {});
+      AsyncStorage.multiSet(keyArray, () => { });
       return;
     }
 
@@ -1110,10 +1110,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.getNewTransactionNotifications();
     });
 
-    (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
-    (this.refs.addTabBarBottomSheet as any).snapTo(0);
-    (this.refs.qrTabBarBottomSheet as any).snapTo(0);
-    (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+
+    setTimeout(() => {
+      (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+      (this.refs.addTabBarBottomSheet as any).snapTo(0);
+      (this.refs.qrTabBarBottomSheet as any).snapTo(0);
+      (this.refs.moreTabBarBottomSheet as any).snapTo(0);
+    }, 500);
 
     this.getAssociatedContact();
     this.setCurrencyCodeFromAsync();
@@ -3109,7 +3112,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -3125,7 +3128,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
           renderHeader={() => (
             <ModalHeader
-            onPressHeader={() => {
+              onPressHeader={() => {
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
             />
