@@ -315,7 +315,7 @@ export default class Bitcoin {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
             this.categorizeTx(tx, ownedAddresses, accountType);
-            transactions.transactionDetails.push({
+            const txObj = {
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,
               status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -323,7 +323,8 @@ export default class Bitcoin {
               date: tx.Status.block_time
                 ? new Date(tx.Status.block_time * 1000).toUTCString()
                 : new Date(Date.now()).toUTCString(),
-              transactionType: tx.transactionType,
+              transactionType:
+                tx.transactionType === 'Self' ? 'Sent' : tx.transactionType, // injecting sent(1) tx when tx is from and to self
               amount: tx.amount,
               accountType:
                 tx.accountType === TRUSTED_CONTACTS
@@ -333,9 +334,24 @@ export default class Bitcoin {
                       .join(' ')
                   : tx.accountType,
               recipientAddresses: tx.recipientAddresses,
-              senderAddresses: tx.senderAddresses,
+              senderAddresses:
+                tx.transactionType === 'Self' ? [] : tx.senderAddresses,
               blockTime: tx.Status.block_time, // only available when tx is confirmed
-            });
+            };
+
+            transactions.transactionDetails.push(txObj);
+
+            // if (tx.transactionType === 'Self') {
+            //   // injecting receive(2) tx when tx is from and to self
+            //   const txObj2 = {
+            //     ...txObj,
+            //     transactionType: 'Received',
+            //     recipientAddresses: [],
+            //     senderAddresses: tx.senderAddresses,
+            //   };
+
+            //   transactions.transactionDetails.push(txObj2);
+            // }
           }
         });
       }
@@ -1279,6 +1295,25 @@ export default class Bitcoin {
       }
     });
 
+    // if (value + (tx.fee | tx.fees) === 0) {
+    //   // tx from and to self
+    //   tx.transactionType = 'Self';
+    //   selfAmount += tx.fee ? tx.fee : tx.fees;
+    //   tx.amount = Math.abs(selfAmount);
+    //   tx.recipientAddresses = probableRecipientList;
+    //   tx.senderAddresses = probableSenderList;
+    // } else {
+    // tx.transactionType = value > 0 ? 'Received' : 'Sent';
+    // if (tx.transactionType === 'Sent') {
+    //   value += tx.fee ? tx.fee : tx.fees;
+    //   tx.recipientAddresses = probableRecipientList;
+    // } else {
+    //   tx.senderAddresses = probableSenderList;
+    // }
+    // tx.amount = Math.abs(value);
+    // tx.accountType = accountType;
+    // return tx;
+    // }
     tx.transactionType = value > 0 ? 'Received' : 'Sent';
     if (tx.transactionType === 'Sent') {
       value += tx.fee ? tx.fee : tx.fees;
