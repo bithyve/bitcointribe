@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Image, Text, StyleSheet, Platform } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -13,6 +13,28 @@ import { ScrollView } from 'react-native-gesture-handler';
 import DeviceInfo from 'react-native-device-info';
 
 export default function NotificationListContent(props) {
+
+  useEffect(() => {
+    {[1, 2, 3, 4].map((value) => {
+      return (
+        <View key={value} style={styles.EmptyListLoaderView}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.EmptyListLoaderCircle} />
+            <View>
+              <View style={styles.EmptyListLoaderSmallText} />
+              <View style={styles.EmptyListLoaderLargeText} />
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.EmptyListLoaderInfoText} />
+            <View style={styles.EmptyListLoaderLargeCircle} />
+          </View>
+        </View>
+      );
+    })}
+  }, [props.NotificationData]);
+
+  
   return props.NotificationData.length ? (
     <ScrollView style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -100,24 +122,6 @@ export default function NotificationListContent(props) {
           </View>
         </View>
       </View>
-      {[1, 2, 3, 4].map((value) => {
-        return (
-          <View key={value} style={styles.EmptyListLoaderView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={styles.EmptyListLoaderCircle} />
-              <View>
-                <View style={styles.EmptyListLoaderSmallText} />
-                <View style={styles.EmptyListLoaderLargeText} />
-              </View>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <View style={styles.EmptyListLoaderInfoText} />
-              <View style={styles.EmptyListLoaderLargeCircle} />
-            </View>
-          </View>
-        );
-      })}
-
       <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
         <View style={styles.infoBoxView}>
           <Text style={styles.infoBoxTitle}>Notification Drawer</Text>
