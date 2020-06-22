@@ -384,6 +384,7 @@ function* downloadMetaShareWorker({ payload }) {
   yield put(switchS3Loader('downloadMetaShare'));
 
   const { encryptedKey, otp } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
+  const s3Service: S3Service = yield select((state) => state.sss.service);
 
   const { DECENTRALIZED_BACKUP } = yield select(
     (state) => state.storage.database,
@@ -405,6 +406,7 @@ function* downloadMetaShareWorker({ payload }) {
       encryptedKey,
       otp,
       existingShares,
+      s3Service.sss.walletId,
     );
   } else {
     res = yield call(S3Service.downloadAndValidateShare, encryptedKey);

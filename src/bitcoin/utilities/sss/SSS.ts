@@ -257,10 +257,10 @@ export default class SSS {
     } = await SSS.downloadShare(encryptedKey, otp);
 
     if (SSS.validateStorage(metaShare, existingShares, walletId)) {
-      const { deleted } = await SSS.affirmDecryption(messageId);
-      if (!deleted) {
-        console.log('Unable to remove the share from the server');
-      }
+      // const { deleted } = await SSS.affirmDecryption(messageId);
+      // if (!deleted) {
+      //   console.log('Unable to remove the share from the server');
+      // }
       return { metaShare, encryptedDynamicNonPMDD };
     }
   };
