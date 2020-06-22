@@ -636,6 +636,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (nextAppState === 'active') {
             this.scheduleNotification();
           }
+          if (nextAppState === 'inactive' || nextAppState == 'background') {
+            await AsyncStorage.setItem(
+              'isInternetModalCome',
+              JSON.stringify(false),
+            );
+          }
+          
         },
       );
     } catch (error) { }
