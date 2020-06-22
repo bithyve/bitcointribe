@@ -259,6 +259,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     super(props);
     this.focusListener = null;
     this.appStateListener = null;
+    this.NoInternetBottomSheet = React.createRef();
+    this.unsubscribe = null;
     this.state = {
       notificationData: [],
       cardData: [],
@@ -618,6 +620,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
+    console.log("NEXTAPPSTATE", nextAppState)
     this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
@@ -626,7 +629,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         {
           appState: nextAppState,
         },
-        () => {
+        async () => {
           if (nextAppState === 'active') {
             this.scheduleNotification();
           }
@@ -640,7 +643,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     this.getBalances();
     this.appStateListener = AppState.addEventListener(
       'change',
-      this.handleAppStateChange,
+      this.onAppStateChange,
     );
     this.bootStrapNotifications();
     this.setUpFocusListener();
@@ -651,6 +654,20 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         transactionsLoading: false,
       });
     }, 1000);
+
+    this.unsubscribe = NetInfo.addEventListener((state) => {
+      setTimeout(() => {
+        if (state.isInternetReachable === null) {
+          return;
+        }
+
+        if (state.isInternetReachable) {
+          (this.NoInternetBottomSheet as any).current.snapTo(0);
+        } else {
+          (this.NoInternetBottomSheet as any).current.snapTo(1);
+        }
+      }, 1000);
+    });
 
     // health check
 
@@ -887,6 +904,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     if (this.focusListener) {
       this.focusListener();
     }
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
     if (this.appStateListener) {
       this.appStateListener();
     }
@@ -911,7 +931,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     ];
     if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
     if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
-    if (isContactOpen || isContactOpen) {
+    if (isContactOpen || isCameraOpen) {
       AsyncStorage.multiSet(keyArray, () => {});
       return;
     }
@@ -3077,6 +3097,29 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             <ModalHeader
               onPressHeader={() => {
                 (this.refs.notificationsListBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+        />
+        <BottomSheet
+          onCloseEnd={() => {}}
+          enabledInnerScrolling={true}
+          ref={this.NoInternetBottomSheet}
+          snapPoints={[-50, hp('60%')]}
+          renderContent={() => (
+            <NoInternetModalContents
+              onPressTryAgain={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+              onPressIgnore={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+            onPressHeader={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
             />
           )}
