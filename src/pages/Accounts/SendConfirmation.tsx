@@ -92,6 +92,20 @@ export default function SendConfirmation(props) {
   //     );
   //   }
   // }, [sliderValueText]);
+  const updateDescription = useCallback(async (txid, description) => {
+    let descriptionHistory = {};
+    let storedHistory = await AsyncStorage.getItem('descriptionHistory');
+
+    if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
+    descriptionHistory[txid] = description;
+
+    console.log(descriptionHistory[txid]);
+    await AsyncStorage.setItem(
+      'descriptionHistory',
+      JSON.stringify(descriptionHistory),
+    );
+  }, []);
+
   useEffect(() => {
     console.log('transfer', transfer);
     if (transfer.stage2.failed) {
@@ -99,6 +113,10 @@ export default function SendConfirmation(props) {
         SendUnSuccessBottomSheet.current.snapTo(1);
       }, 2);
     } else if (transfer.txid) {
+      console.log(transfer.details[0].note);
+      if (transfer.details[0].note) {
+        updateDescription(transfer.txid, transfer.details[0].note);
+      }
       storeTrustedContactsHistory(transfer.details);
       SendSuccessBottomSheet.current.snapTo(1);
     } else if (!transfer.txid && transfer.executed === 'ST2') {

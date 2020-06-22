@@ -28,12 +28,12 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function TransactionDetails(props) {
   const txDetails = props.item;
   if (!txDetails) {
-    return null
+    return null;
   }
   const getServiceType = props.getServiceType ? props.getServiceType : null;
   const serviceType = props.serviceType ? props.serviceType : null;
@@ -57,36 +57,50 @@ export default function TransactionDetails(props) {
 
   const getImageByAccountType = (accountType) => {
     if (accountType == 'FAST_BITCOINS') {
-      return <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          borderColor: Colors.borderColor,
-          borderWidth: 0.5,
-          borderRadius: wp('12%') / 2,
-          width: wp('12%'),
-          height: wp('12%'),
-          backgroundColor: Colors.white,
-        }}
-      >
-        <Image
-          source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+      return (
+        <View
           style={{
-            width: wp('8%'),
-            height: wp('8%'),
-            resizeMode: 'contain',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: Colors.borderColor,
+            borderWidth: 0.5,
+            borderRadius: wp('12%') / 2,
+            width: wp('12%'),
+            height: wp('12%'),
+            backgroundColor: Colors.white,
           }}
-        />
-      </View>
-    } else if (accountType == "Savings Account" || accountType == "Test Account" || accountType == "Checking Account") {
-      return <View>
-        <Image
-          source={accountType == "Savings Account" ? require('../../assets/images/icons/icon_secureaccount.png') : accountType == "Test Account" ? require('../../assets/images/icons/icon_test.png') : require('../../assets/images/icons/icon_regular.png')}
-          style={{ width: wp('12%'), height: wp('12%') }}
-        />
-      </View>
+        >
+          <Image
+            source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+            style={{
+              width: wp('8%'),
+              height: wp('8%'),
+              resizeMode: 'contain',
+            }}
+          />
+        </View>
+      );
+    } else if (
+      accountType == 'Savings Account' ||
+      accountType == 'Test Account' ||
+      accountType == 'Checking Account'
+    ) {
+      return (
+        <View>
+          <Image
+            source={
+              accountType == 'Savings Account'
+                ? require('../../assets/images/icons/icon_secureaccount.png')
+                : accountType == 'Test Account'
+                ? require('../../assets/images/icons/icon_test.png')
+                : require('../../assets/images/icons/icon_regular.png')
+            }
+            style={{ width: wp('12%'), height: wp('12%') }}
+          />
+        </View>
+      );
     }
-  }
+  };
 
   return (
     <View style={styles.modalContainer}>
@@ -96,7 +110,10 @@ export default function TransactionDetails(props) {
             {'Transaction Details'}
           </Text>
           {serviceType && serviceType == TEST_ACCOUNT ? (
-            <AppBottomSheetTouchableWrapper style={{ marginLeft: 'auto', }} onPress={() => props.onPressKnowMore()}>
+            <AppBottomSheetTouchableWrapper
+              style={{ marginLeft: 'auto' }}
+              onPress={() => props.onPressKnowMore()}
+            >
               <Text
                 style={{
                   color: Colors.textColorGrey,
@@ -105,7 +122,7 @@ export default function TransactionDetails(props) {
                 }}
               >
                 Know more
-            </Text>
+              </Text>
             </AppBottomSheetTouchableWrapper>
           ) : null}
         </View>
@@ -147,9 +164,7 @@ export default function TransactionDetails(props) {
                 marginTop: hp('1%'),
               }}
             >
-              {moment(txDetails.date)
-                .utc()
-                .format('DD MMMM YYYY')}
+              {moment(txDetails.date).utc().format('DD MMMM YYYY')}
               {/* <Entypo
                 size={10}
                 name={"dot-single"}
@@ -299,7 +314,7 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(12),
               }}
             >
-              Description
+              Note
             </Text>
             <Text
               style={{
