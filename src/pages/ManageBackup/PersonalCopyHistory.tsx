@@ -488,7 +488,7 @@ const PersonalCopyHistory = (props) => {
             setTimeout(() => {
               setQRModalHeader('Reshare Personal Copy');
             }, 2);
-            (QrBottomSheet.current as any).snapTo(1);
+            (PersonalCopyShareBottomSheet.current as any).snapTo(1);
           }}
           onPressContinue={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
