@@ -34,6 +34,7 @@ const initialState: {
 
   loading: {
     updateEphemeralChannel: Boolean;
+    trustedChannelsSync: Boolean;
   };
 } = {
   service: null,
@@ -45,6 +46,7 @@ const initialState: {
   paymentDetails: null,
   loading: {
     updateEphemeralChannel: false,
+    trustedChannelsSync: false,
   },
 };
 

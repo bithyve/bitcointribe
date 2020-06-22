@@ -7,7 +7,7 @@ import {
   Platform,
   AsyncStorage,
   PermissionsAndroid,
-  Linking
+  Linking,
 } from 'react-native';
 import { useSelector } from 'react-redux';
 import {
@@ -69,9 +69,9 @@ export default function AddContactAddressBook(props) {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     getContactsAsync();
-  },[props.isLoadContacts]);
+  }, [props.isLoadContacts]);
 
   const getContact = () => {
     if (props.isLoadContacts) {
@@ -502,7 +502,7 @@ export default function AddContactAddressBook(props) {
           )}
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={contactListErrorBottomSheet}
+            ref={contactListErrorBottomSheet as any}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()

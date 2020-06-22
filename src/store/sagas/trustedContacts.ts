@@ -305,6 +305,8 @@ export const fetchTrustedChannelWatcher = createWatcher(
 
 export function* trustedChannelsSyncWorker() {
   // TODO: simplify and optimise the saga
+  yield put(switchTCLoading('trustedChannelsSync'));
+
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
@@ -382,16 +384,6 @@ export function* trustedChannelsSyncWorker() {
               );
             }
           }
-
-          const { SERVICES } = yield select((state) => state.storage.database);
-          const updatedSERVICES = {
-            ...SERVICES,
-            REGULAR_ACCOUNT: JSON.stringify(regularService),
-            TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-          };
-          yield call(insertDBWorker, {
-            payload: { SERVICES: updatedSERVICES },
-          });
         }
       }
     } else {
@@ -455,22 +447,23 @@ export function* trustedChannelsSyncWorker() {
               }
             }
           }
-
-          const { SERVICES } = yield select((state) => state.storage.database);
-          const updatedSERVICES = {
-            ...SERVICES,
-            REGULAR_ACCOUNT: JSON.stringify(regularService),
-            TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-          };
-          yield call(insertDBWorker, {
-            payload: { SERVICES: updatedSERVICES },
-          });
         }
       } else {
         console.log(`Failed to generate xpub for ${contactName}`);
       }
     }
   }
+  const { SERVICES } = yield select((state) => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    REGULAR_ACCOUNT: JSON.stringify(regularService),
+    TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+  };
+  yield call(insertDBWorker, {
+    payload: { SERVICES: updatedSERVICES },
+  });
+
+  yield put(switchTCLoading('trustedChannelsSync'));
 }
 
 export const trustedChannelsSyncWatcher = createWatcher(

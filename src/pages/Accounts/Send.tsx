@@ -51,6 +51,7 @@ import {
 } from '../../store/actions/accounts';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendHelpContents from '../../components/Helper/SendHelpContents';
+import Toast from '../../components/Toast';
 
 export default function Send(props) {
   const dispatch = useDispatch();
@@ -89,16 +90,16 @@ export default function Send(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
     setBalances({
       testBalance,
@@ -189,7 +190,7 @@ export default function Send(props) {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -368,14 +369,14 @@ export default function Send(props) {
                 serviceType === TEST_ACCOUNT
                   ? balances.testBalance
                   : serviceType === REGULAR_ACCOUNT
-                    ? balances.regularBalance
-                    : balances.secureBalance,
+                  ? balances.regularBalance
+                  : balances.secureBalance,
               bitcoinAmount: options.amount ? `${options.amount}` : '',
             });
             break;
 
           default:
-            Alert.alert('Invalid QR');
+            Toast('Invalid QR');
             break;
         }
 
@@ -566,14 +567,14 @@ export default function Send(props) {
             >
               {item
                 ? nameToInitials(
-                  item.firstName && item.lastName
-                    ? item.firstName + ' ' + item.lastName
-                    : item.firstName && !item.lastName
+                    item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
                       ? item.firstName
                       : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-                )
+                      ? item.lastName
+                      : '',
+                  )
                 : ''}
             </Text>
           </View>

@@ -244,19 +244,32 @@ export default function Home(props) {
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([]);
   const [qrData, setqrData] = useState('');
-  const currencyCode = ['BRL','CNY', 'JPY', 'GBP','KRW', 'RUB','TRY','INR','EUR'];
+  const currencyCode = [
+    'BRL',
+    'CNY',
+    'JPY',
+    'GBP',
+    'KRW',
+    'RUB',
+    'TRY',
+    'INR',
+    'EUR',
+  ];
 
   function setCurrencyCodeToImage(currencyName, currencyColor) {
-    console.log("currencyColor", currencyColor);
+    console.log('currencyColor', currencyColor);
     return (
-      <View style={{
-      marginRight: 5,
-      marginBottom: wp('0.7%'),}}>
-      <MaterialCommunityIcons
-        name={currencyName}
-        color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
-        size={wp('3.5%')}
-      />
+      <View
+        style={{
+          marginRight: 5,
+          marginBottom: wp('0.7%'),
+        }}
+      >
+        <MaterialCommunityIcons
+          name={currencyName}
+          color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
+          size={wp('3.5%')}
+        />
       </View>
     );
   }
@@ -279,7 +292,7 @@ export default function Home(props) {
       case 'INR':
         return setCurrencyCodeToImage('currency-inr', color);
       case 'EUR':
-        return setCurrencyCodeToImage('currency-eur', color);       
+        return setCurrencyCodeToImage('currency-eur', color);
       default:
         break;
     }
@@ -456,11 +469,11 @@ export default function Home(props) {
     // }
   }, [accounts]);
 
-  useEffect(()=>{
+  useEffect(() => {
     setTimeout(() => {
       setTransactionLoading(false);
     }, 1000);
-  },[transactions])
+  }, [transactions]);
 
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
@@ -1424,7 +1437,7 @@ export default function Home(props) {
           break;
 
         default:
-          Alert.alert('Invalid QR');
+          Toast('Invalid QR');
           break;
       }
 
@@ -1528,7 +1541,7 @@ export default function Home(props) {
           break;
       }
     } catch (err) {
-      Alert.alert('Invalid QR');
+      Toast('Invalid QR');
     }
   };
 
@@ -3037,8 +3050,8 @@ export default function Home(props) {
                       source={require('../assets/images/icons/icon_bitcoin_light.png')}
                     />
                   ) : currencyCode.includes(CurrencyCode) ? (
-              getCurrencyImage(CurrencyCode, 'light')
-            ) : (
+                    getCurrencyImage(CurrencyCode, 'light')
+                  ) : (
                     <Image
                       style={{
                         ...styles.cardBitCoinImage,
@@ -3233,7 +3246,7 @@ export default function Home(props) {
                                     style={styles.cardBitCoinImage}
                                     source={value.bitcoinicon}
                                   />
-                                ) : (currencyCode.includes(CurrencyCode)) ? (
+                                ) : currencyCode.includes(CurrencyCode) ? (
                                   getCurrencyImage(CurrencyCode, 'light_blue')
                                 ) : (
                                   <Image
