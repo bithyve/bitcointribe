@@ -308,7 +308,7 @@ export default function NewWalletQuestion(props) {
           'Preloaded Test Account is the best place to start your Bitcoin journey'
         )
         setTimeout(() => {
-          setMessage('Generate Recovery Keys');
+          setMessage('Generating Recovery Keys');
           setSubTextMessage(
             'Recovery Keys help you restore your Hexa wallet in case your phone is lost'
           )

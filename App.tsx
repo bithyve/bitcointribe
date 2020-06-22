@@ -14,6 +14,8 @@ import { getVersion, getBuildId } from 'react-native-device-info';
 import { setApiHeaders } from './src/services/api';
 import firebase from 'react-native-firebase';
 import { NavigationState } from 'react-navigation';
+import { AsyncStorage } from 'react-native';
+import ModalHeader from './src/components/ModalHeader';
 
 const prefix = 'hexa://';
 
@@ -48,18 +50,29 @@ class App extends Component {
     return route.routeName;
   }
 
+  componentWillUnmount = async() =>{
+    await AsyncStorage.setItem(
+      'isInternetModalCome',
+      JSON.stringify(false),
+    );
+  }
+
   render() {
     return (
       <Provider store={store} uriPrefix={prefix}>
         <Navigator
-          onNavigationStateChange={(prevState, currentState) => {
+          onNavigationStateChange={ async(prevState, currentState) => {
             const currentScreen = this.getActiveRouteName(currentState);
             const prevScreen = this.getActiveRouteName(prevState);
+            let isInternetModalCome = JSON.parse(
+              await AsyncStorage.getItem('isInternetModalCome'),
+            );  
             if (
               currentScreen != 'Login' &&
               currentScreen != 'Launch' &&
-              currentScreen != 'ReLogin'
+              currentScreen != 'ReLogin' && !isInternetModalCome
             ) {
+              console.log("global.isInternetModalCome",isInternetModalCome, typeof isInternetModalCome);
               NetInfo.addEventListener((state) => {
                 setTimeout(() => {
                   if (state.isInternetReachable === null) {
@@ -88,14 +101,18 @@ class App extends Component {
               onPressTryAgain={() => {
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
-              onPressIgnore={() => {
+              onPressIgnore={async() => {
+                await AsyncStorage.setItem(
+                  'isInternetModalCome',
+                  JSON.stringify(true),
+                );
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
             />
           )}
           renderHeader={() => (
-            <TransparentHeaderModal
-              onPressheader={() => {
+            <ModalHeader
+            onPressHeader={() => {
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
             />
