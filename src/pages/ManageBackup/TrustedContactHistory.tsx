@@ -10,6 +10,7 @@ import {
   Platform,
   AsyncStorage,
   Alert,
+  Keyboard,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -264,6 +265,7 @@ const TrustedContactHistory = (props) => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={async (selectedContacts, index) => {
+          Keyboard.dismiss()
           const isTrustedC = await isTrustedContact(selectedContacts[0]);
           if (isTrustedC) {
             Toast('Trusted Contact already exists');
