@@ -993,10 +993,9 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
-"@react-native-community/netinfo@^5.0.0":
+"@react-native-community/netinfo@https://github.com/react-native-community/react-native-netinfo.git#1f83d634b73d885b6cc0028302b77ee1993fc245":
   version "5.9.3"
-  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-5.9.3.tgz#22df477780a3e4870a7acc9bca99096528ac0914"
-  integrity sha512-B7t6WrMOKrr+l9A2HqlkwCtENqgpFwDU2fueJ8HxfyZqq9dC820CYSbUu5tQVvKiF9TW/l+0gvy40p2jItDLnA==
+  resolved "https://github.com/react-native-community/react-native-netinfo.git#1f83d634b73d885b6cc0028302b77ee1993fc245"
 
 "@react-navigation/core@^3.7.6":
   version "3.7.6"
@@ -1060,10 +1059,9 @@
   resolved "https://registry.yarnpkg.com/@redux-saga/types/-/types-1.1.0.tgz#0e81ce56b4883b4b2a3001ebe1ab298b84237204"
   integrity sha512-afmTuJrylUU/0OtqzaRkbyYFFNgCF73Bvel/sw90pvGrWIZ+vyoIJqA6eMSoA6+nb443kTmulmBtC9NerXboNg==
 
-"@tradle/react-native-http@^2.0.0":
+"@tradle/react-native-http@https://github.com/tradle/react-native-http.git#8f1f6a75d05a323d7908627bf44a2297a56f8511":
   version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@tradle/react-native-http/-/react-native-http-2.0.1.tgz#af19e240e1e580bfa249563924d1be472686f48b"
-  integrity sha1-rxniQOHlgL+iSVY5JNG+RyaG9Is=
+  resolved "https://github.com/tradle/react-native-http.git#8f1f6a75d05a323d7908627bf44a2297a56f8511"
   dependencies:
     Base64 "~0.2.0"
     inherits "~2.0.1"
@@ -1423,10 +1421,9 @@ assert-plus@1.0.0, assert-plus@^1.0.0:
   resolved "https://registry.yarnpkg.com/assert-plus/-/assert-plus-1.0.0.tgz#f12e0f3c5d77b0b1cdd9146942e4e96c1e4dd525"
   integrity sha1-8S4PPF13sLHN2RRpQuTpbB5N1SU=
 
-assert@^1.1.1:
+"assert@https://github.com/browserify/commonjs-assert.git#8386769eb15077c84b5e46f772d41bcb0b40651c":
   version "1.5.0"
-  resolved "https://registry.yarnpkg.com/assert/-/assert-1.5.0.tgz#55c109aaf6e0aefdb3dc4b71240c70bf574b18eb"
-  integrity sha512-EDsgawzwoun2CZkCgtxJbv392v4nbk9XDD06zI+kQYoBM/3RBWLlEyJARDOmhAAosBjWACEkKL6S+lIZtcAubA==
+  resolved "https://github.com/browserify/commonjs-assert.git#8386769eb15077c84b5e46f772d41bcb0b40651c"
   dependencies:
     object-assign "^4.1.1"
     util "0.10.3"
@@ -1453,10 +1450,9 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
-asyncstorage-down@^4.2.0:
+"asyncstorage-down@https://github.com/tradle/asyncstorage-down.git#832cf4980e98c931c455b843631251f435a8b229":
   version "4.2.0"
-  resolved "https://registry.yarnpkg.com/asyncstorage-down/-/asyncstorage-down-4.2.0.tgz#6d126f42e6e4db0a25113e118ff618f2d4534046"
-  integrity sha512-xTljBjicpnxsoA7yEs6duXFXWEZC0V1Q/PeKcUM7Cd2k2W1XPGfyBY1kPXBxTqR++u6ZuDa5egnU8/E/WkJv4Q==
+  resolved "https://github.com/tradle/asyncstorage-down.git#832cf4980e98c931c455b843631251f435a8b229"
   dependencies:
     abstract-leveldown "2.6.1"
     argsarray "0.0.1"
@@ -1479,10 +1475,9 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.10.0.tgz#a17b3a8ea811060e74d47d306122400ad4497ae2"
   integrity sha512-3YDiu347mtVtjpyV3u5kVqQLP242c06zwDOgpeRnybmXlYYsLbtTrUBUm8i8srONt+FWobl5aibnU1030PeeuA==
 
-axios@^0.19.0:
+"axios@https://github.com/axios/axios.git#2a0ff479f9fb7f09a219f5178ca85a6519562ff1":
   version "0.19.2"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
-  integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
+  resolved "https://github.com/axios/axios.git#2a0ff479f9fb7f09a219f5178ca85a6519562ff1"
   dependencies:
     follow-redirects "1.5.10"
 
@@ -1641,17 +1636,15 @@ bip174@^1.0.1:
   resolved "https://registry.yarnpkg.com/bip174/-/bip174-1.0.1.tgz#858a587f9529e22ee9b0572fd884e5783696824d"
   integrity sha512-Mq2aFs1TdMfxBpYPg7uzjhsiXbAtoVq44TNjEWtvuZBiBgc3m7+n55orYMtTAxdg7jWbL4DtH0MKocJER4xERQ==
 
-bip21@^2.0.2:
+"bip21@https://github.com/bitcoinjs/bip21.git#0336ab5698ee06bbd977e2e8d7cee9cdf0bbfd2d":
   version "2.0.3"
-  resolved "https://registry.yarnpkg.com/bip21/-/bip21-2.0.3.tgz#6e95b542718af497b442d92ae8af433d6ea80368"
-  integrity sha512-L4ODmASLjsHYAU+TG7xffkYNMvHzAe4mkVX7mcvOUyKAr/MDBPrsRgqUhE8EmKdeEKHk5SYpX1Aexzvm/6WdbQ==
+  resolved "https://github.com/bitcoinjs/bip21.git#0336ab5698ee06bbd977e2e8d7cee9cdf0bbfd2d"
   dependencies:
     qs "^6.3.0"
 
-bip32@^2.0.4:
+bip32@^2.0.4, "bip32@https://github.com/bitcoinjs/bip32.git#2fca3348a8958a2d4c4d1b7a512c86e5296e40d5":
   version "2.0.5"
-  resolved "https://registry.yarnpkg.com/bip32/-/bip32-2.0.5.tgz#e3808a9e97a880dbafd0f5f09ca4a1e14ee275d2"
-  integrity sha512-zVY4VvJV+b2fS0/dcap/5XLlpqtgwyN8oRkuGgAS1uLOeEp0Yo6Tw2yUTozTtlrMJO3G8n4g/KX/XGFHW6Pq3g==
+  resolved "https://github.com/bitcoinjs/bip32.git#2fca3348a8958a2d4c4d1b7a512c86e5296e40d5"
   dependencies:
     "@types/node" "10.12.18"
     bs58check "^2.1.1"
@@ -1661,20 +1654,18 @@ bip32@^2.0.4:
     typeforce "^1.11.5"
     wif "^2.0.6"
 
-bip39@^3.0.2:
+"bip39@https://github.com/bitcoinjs/bip39.git#2b05db702c8e88315937111f7ee9dffbd6a13f32":
   version "3.0.2"
-  resolved "https://registry.yarnpkg.com/bip39/-/bip39-3.0.2.tgz#2baf42ff3071fc9ddd5103de92e8f80d9257ee32"
-  integrity sha512-J4E1r2N0tUylTKt07ibXvhpT2c5pyAFgvuA5q1H9uDy6dEGpjV8jmymh3MTYJDLCNbIVClSB9FbND49I6N24MQ==
+  resolved "https://github.com/bitcoinjs/bip39.git#2b05db702c8e88315937111f7ee9dffbd6a13f32"
   dependencies:
     "@types/node" "11.11.6"
     create-hash "^1.1.0"
     pbkdf2 "^3.0.9"
     randombytes "^2.0.1"
 
-bip65@^1.0.3:
+"bip65@https://github.com/bitcoinjs/bip65.git#ea1bfc80c013f0e3c4688d1ca13d00ec771a59f7":
   version "1.0.3"
-  resolved "https://registry.yarnpkg.com/bip65/-/bip65-1.0.3.tgz#60b64adf33c7a8ffacca3bb996f39648b23b0cf8"
-  integrity sha512-RQ1nc7xtnLa5XltnCqkoR2zmhuz498RjMJwrLKQzOE049D1HUqnYfon7cVSbwS5UGm0/EQlC2CH+NY3MyITA4Q==
+  resolved "https://github.com/bitcoinjs/bip65.git#ea1bfc80c013f0e3c4688d1ca13d00ec771a59f7"
 
 bip66@^1.1.0:
   version "1.1.5"
@@ -1683,10 +1674,9 @@ bip66@^1.1.0:
   dependencies:
     safe-buffer "^5.0.1"
 
-bitcoin-core@^3.0.0:
+"bitcoin-core@https://github.com/ruimarinho/bitcoin-core.git#504afda7a018f63ecb23cbb64a2936eb015e5c5d":
   version "3.0.0"
-  resolved "https://registry.yarnpkg.com/bitcoin-core/-/bitcoin-core-3.0.0.tgz#3ad59a16b6748d8b60937affae6c5f1df2db770d"
-  integrity sha512-fdh8V/5lxDXwbq6KUCd9PjbTDe1kPGFM1brSFByuzMb+VSArr1qF422qbAJvW0dLQSaRhVDb7WC+a602QM70FQ==
+  resolved "https://github.com/ruimarinho/bitcoin-core.git#504afda7a018f63ecb23cbb64a2936eb015e5c5d"
   dependencies:
     "@uphold/request-logger" "^2.0.0"
     debugnyan "^1.0.0"
@@ -1701,10 +1691,9 @@ bitcoin-ops@^1.3.0, bitcoin-ops@^1.4.0:
   resolved "https://registry.yarnpkg.com/bitcoin-ops/-/bitcoin-ops-1.4.1.tgz#e45de620398e22fd4ca6023de43974ff42240278"
   integrity sha512-pef6gxZFztEhaE9RY9HmWVmiIHqCb2OyS4HPKkpc6CIiiOa3Qmuoylxc5P2EkU3w+5eTSifI9SEZC88idAIGow==
 
-bitcoinjs-lib@^5.1.6:
+"bitcoinjs-lib@https://github.com/bitcoinjs/bitcoinjs-lib.git#91bb1e91aed97c4a31476c576d1810baeabdc055":
   version "5.1.10"
-  resolved "https://registry.yarnpkg.com/bitcoinjs-lib/-/bitcoinjs-lib-5.1.10.tgz#91ec7cde308007008b22ed9117c5f26970cbad54"
-  integrity sha512-CesUqtBtnYc+SOMsYN9jWQWhdohW1MpklUkF7Ukn4HiAyN6yxykG+cIJogfRt6x5xcgH87K1Q+Mnoe/B+du1Iw==
+  resolved "https://github.com/bitcoinjs/bitcoinjs-lib.git#91bb1e91aed97c4a31476c576d1810baeabdc055"
   dependencies:
     bech32 "^1.1.2"
     bip174 "^1.0.1"
@@ -2005,9 +1994,9 @@ camelcase@^5.0.0:
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
 caniuse-lite@^1.0.30001043:
-  version "1.0.30001085"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001085.tgz#bed28bd51ff7425d33ee23e730c7f3b703711db6"
-  integrity sha512-x0YRFRE0pmOD90z+9Xk7jwO58p4feVNXP+U8kWV+Uo/HADyrgESlepzIkUqPgaXkpyceZU6siM1gsK7sHgplqA==
+  version "1.0.30001087"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001087.tgz#4a0bdc5998a114fcf8b7954e7ba6c2c29831c54a"
+  integrity sha512-KAQRGtt+eGCQBSp2iZTQibdCf9oe6cNTi5lmpsW38NnxP4WMYzfU6HCRmh4kJyh6LrTM9/uyElK4xcO93kafpg==
 
 capture-exit@^1.2.0:
   version "1.2.0"
@@ -2104,10 +2093,9 @@ code-point-at@^1.0.0:
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-coinselect@^3.1.11:
+"coinselect@https://github.com/bitcoinjs/coinselect.git#becfd26096fd9fc719f5b4928935be61d87bbb98":
   version "3.1.12"
-  resolved "https://registry.yarnpkg.com/coinselect/-/coinselect-3.1.12.tgz#2255794c4002f7ecac9cf6d1cefe9f0adfd2fe7f"
-  integrity sha512-XKnm9wwZzJRGuvR1BGNbFZEfa4SEr38do8Z5riq0797QwMT836EqhdPuhtbn8uAX8vCMqJ7+gS4CHa1G9M5xhw==
+  resolved "https://github.com/bitcoinjs/coinselect.git#becfd26096fd9fc719f5b4928935be61d87bbb98"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -2326,10 +2314,9 @@ cross-spawn@^6.0.0, cross-spawn@^6.0.5:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-crypto-js@^3.1.9-1:
+"crypto-js@https://github.com/brix/crypto-js.git#1d303185c01535a6ee60e33f349f5289565f7fcb":
   version "3.3.0"
-  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.3.0.tgz#846dd1cce2f68aacfa156c8578f926a609b7976b"
-  integrity sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==
+  resolved "https://github.com/brix/crypto-js.git#1d303185c01535a6ee60e33f349f5289565f7fcb"
 
 css-select@^2.0.2:
   version "2.1.0"
@@ -2515,10 +2502,9 @@ dijkstrajs@^1.0.1:
   resolved "https://registry.yarnpkg.com/dijkstrajs/-/dijkstrajs-1.0.1.tgz#d3cd81221e3ea40742cfcde556d4e99e98ddc71b"
   integrity sha1-082BIh4+pAdCz83lVtTpnpjdxxs=
 
-dns.js@^1.0.1:
+"dns.js@https://github.com/indutny/dns.js.git#82d01aaa273c46d0f36dcf3660242cc44d576461":
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/dns.js/-/dns.js-1.0.1.tgz#bfc0950d79777728c67500b1c418075e653955ee"
-  integrity sha1-v8CVDXl3dyjGdQCxxBgHXmU5Ve4=
+  resolved "https://github.com/indutny/dns.js.git#82d01aaa273c46d0f36dcf3660242cc44d576461"
 
 dom-serializer@0:
   version "0.2.2"
@@ -2577,14 +2563,26 @@ ee-first@1.1.1:
   integrity sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=
 
 electron-to-chromium@^1.3.413:
-  version "1.3.480"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.480.tgz#190ae45074578349a4c4f336fba29e76b20e9ef5"
-  integrity sha512-wnuUfQCBMAdzu5Xe+F4FjaRK+6ToG6WvwG72s8k/3E6b+hoGVYGiQE7JD1NhiCMcqF3+wV+c2vAnaLGRSSWVqA==
+  version "1.3.481"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.481.tgz#0d59e72a0aaeb876b43fb1d6e84bf0dfc99617e8"
+  integrity sha512-q2PeCP2PQXSYadDo9uNY+uHXjdB9PcsUpCVoGlY8TZOPHGlXdevlqW9PkKeqCxn2QBkGB8b6AcMO++gh8X82bA==
 
 elliptic@^6.0.0, elliptic@^6.4.0, elliptic@^6.5.2:
   version "6.5.3"
   resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-6.5.3.tgz#cb59eb2efdaf73a0bd78ccd7015a62ad6e0f93d6"
   integrity sha512-IMqzv5wNQf+E6aHeIqATs0tOLeOTwj1QKbRcS3jBbYkl5oLAserA8yJTT7/VyHUYG91PRmPyeQDObKLPpeS4dw==
+  dependencies:
+    bn.js "^4.4.0"
+    brorand "^1.0.1"
+    hash.js "^1.0.0"
+    hmac-drbg "^1.0.0"
+    inherits "^2.0.1"
+    minimalistic-assert "^1.0.0"
+    minimalistic-crypto-utils "^1.0.0"
+
+"elliptic@https://github.com/indutny/elliptic.git#8647803dc3d90506aa03021737f7b061ba959ae1":
+  version "6.5.3"
+  resolved "https://github.com/indutny/elliptic.git#8647803dc3d90506aa03021737f7b061ba959ae1"
   dependencies:
     bn.js "^4.4.0"
     brorand "^1.0.1"
@@ -5637,10 +5635,9 @@ react-native-countdown-component@^2.6.0:
     prop-types "^15.5.8"
     sprintf-js "^1.1.1"
 
-react-native-crypto@^2.1.0:
+"react-native-crypto@https://github.com/tradle/react-native-crypto.git#639d8e29ac1feae20f95f2e285851d5ed4898a9a":
   version "2.2.0"
-  resolved "https://registry.yarnpkg.com/react-native-crypto/-/react-native-crypto-2.2.0.tgz#c999ed7c96064f830e1f958687f53d0c44025770"
-  integrity sha512-eZu9Y8pa8BN9FU2pIex7MLRAi+Cd1Y6bsxfiufKh7sfraAACJvjQTeW7/zcQAT93WMfM+D0OVk+bubvkrbrUkw==
+  resolved "https://github.com/tradle/react-native-crypto.git#639d8e29ac1feae20f95f2e285851d5ed4898a9a"
   dependencies:
     browserify-cipher "^1.0.0"
     browserify-sign "^4.0.4"
@@ -6379,10 +6376,9 @@ scheduler@^0.13.3:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-secrets.js-grempe@^2.0.0:
+"secrets.js-grempe@https://github.com/grempe/secrets.js.git#fe0b970df7d7ad709e05307b2e2363a4a3613aff":
   version "2.0.0"
-  resolved "https://registry.yarnpkg.com/secrets.js-grempe/-/secrets.js-grempe-2.0.0.tgz#65b32bf6bfe4f40e8ed0e44dc74f469e293a4ab8"
-  integrity sha512-4xkOIaDAg998dTFXZUJTOoVbdLHfB818SMeLJ69ABccgGEKokxsoRFupAFfAImloUSKv4QUGNMgKVbKMf6z0Ug==
+  resolved "https://github.com/grempe/secrets.js.git#fe0b970df7d7ad709e05307b2e2363a4a3613aff"
 
 "semver@2 || 3 || 4 || 5", semver@^5.0.1, semver@^5.0.3, semver@^5.1.0, semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0:
   version "5.7.1"
@@ -6763,7 +6759,13 @@ string_decoder@^1.1.1:
   dependencies:
     safe-buffer "~5.2.0"
 
-string_decoder@~0.10.25, string_decoder@~0.10.x:
+"string_decoder@https://github.com/nodejs/string_decoder.git#1f29dd715a6c829da89e869af7dafc231c20ed9f":
+  version "1.3.0"
+  resolved "https://github.com/nodejs/string_decoder.git#1f29dd715a6c829da89e869af7dafc231c20ed9f"
+  dependencies:
+    safe-buffer "~5.2.0"
+
+string_decoder@~0.10.x:
   version "0.10.31"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-0.10.31.tgz#62e203bc41766c6c28c9fc84301dab1c5310fa94"
   integrity sha1-YuIDvEF2bGwoyfyEMB2rHFMQ+pQ=
