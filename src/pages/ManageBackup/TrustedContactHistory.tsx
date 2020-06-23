@@ -265,7 +265,7 @@ const TrustedContactHistory = (props) => {
           (trustedContactsBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={async (selectedContacts, index) => {
-          Keyboard.dismiss()
+          Keyboard.dismiss();
           const isTrustedC = await isTrustedContact(selectedContacts[0]);
           if (isTrustedC) {
             Toast('Trusted Contact already exists');
@@ -835,9 +835,10 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
       const phoneNumber = chosenContact.phoneNumbers[0].number;
       console.log({ phoneNumber });
-      const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      number = number.slice(number.length - 10); // last 10 digits only
       const numHintType = 'num';
-      const numHint = number.slice(number.length - 3);
+      const numHint = number[0] + number.slice(number.length - 2);
       const numberEncPubKey = TrustedContactsService.encryptPub(
         publicKey,
         number,
@@ -855,13 +856,11 @@ const TrustedContactHistory = (props) => {
       setActivateReshare(true);
     } else if (chosenContact.emails && chosenContact.emails.length) {
       const email = chosenContact.emails[0].email;
-      const emailInitials: string = email.split('@')[0];
       const emailHintType = 'eml';
-      const emailHint = emailInitials.slice(emailInitials.length - 3);
-      const emailEncPubKey = TrustedContactsService.encryptPub(
-        publicKey,
-        emailInitials,
-      ).encryptedPub;
+      const emailHint =
+        email[0] + email.replace('.com', '').slice(email.length - 2);
+      const emailEncPubKey = TrustedContactsService.encryptPub(publicKey, email)
+        .encryptedPub;
       const emailDL =
         `https://hexawallet.io/${config.APP_STAGE}/tcg` +
         `/${requester}` +

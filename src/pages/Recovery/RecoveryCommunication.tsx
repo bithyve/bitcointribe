@@ -120,9 +120,10 @@ export default function RecoveryCommunication(props) {
     const appVersion = DeviceInfo.getVersion();
     switch (selectedContactMode.type) {
       case 'number':
-        const number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        let number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
         const numHintType = 'num';
-        const numHint = number.slice(number.length - 3);
+        const numHint = number[0] + number.slice(number.length - 2);
         const numberEncKey = TrustedContactsService.encryptPub(
           // using TCs encryption mech
           REQUEST_DETAILS.KEY,
@@ -147,12 +148,13 @@ export default function RecoveryCommunication(props) {
         break;
 
       case 'email':
-        const emailInitials: string = selectedContactMode.info.split('@')[0];
+        const Email: string = selectedContactMode.info;
         const emailHintType = 'eml';
-        const emailHint = emailInitials.slice(emailInitials.length - 3);
+        const emailHint =
+          Email[0] + Email.replace('.com', '').slice(Email.length - 2);
         const emailEncPubKey = TrustedContactsService.encryptPub(
           REQUEST_DETAILS.KEY,
-          emailInitials,
+          Email,
         ).encryptedPub;
         const emailDL =
           `https://hexawallet.io/${config.APP_STAGE}/rk` +
