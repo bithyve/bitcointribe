@@ -337,6 +337,7 @@ const VoucherScanner = (props) => {
     if (!FBTCAccountData) {
       obj = {
         user_key: userKey,
+        registrationDate: moment(new Date()).valueOf(),
         test_account: {
           voucher: [],
         },
