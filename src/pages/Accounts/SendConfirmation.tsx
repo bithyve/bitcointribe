@@ -123,6 +123,7 @@ export default function SendConfirmation(props) {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
         recipientAddress: '',
+        onTransactionSuccess
       });
     }
   }, [transfer]);
@@ -293,6 +294,11 @@ export default function SendConfirmation(props) {
       </View>
     );
   };
+
+  const onTransactionSuccess = () =>{
+    if (SendSuccessBottomSheet.current)
+      SendSuccessBottomSheet.current.snapTo(1);
+  }
 
   const renderSendSuccessContents = () => {
     return (
