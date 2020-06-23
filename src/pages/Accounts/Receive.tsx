@@ -273,31 +273,27 @@ export default function Receive(props) {
 
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
-      trustedContactsInfo.push(contact);
-      // if (
-      //   trustedContactsInfo.findIndex((trustedContact) => {
-      //     if (!trustedContact) return false;
+      if (
+        trustedContactsInfo.findIndex((trustedContact) => {
+          if (!trustedContact) return false;
 
-      //     const presentContactName = `${trustedContact.firstName} ${
-      //       trustedContact.lastName ? trustedContact.lastName : ''
-      //     }`
-      //       .toLowerCase()
-      //       .trim();
+          const presentContactName = `${trustedContact.firstName} ${
+            trustedContact.lastName ? trustedContact.lastName : ''
+          }`
+            .toLowerCase()
+            .trim();
 
-      //     const selectedContactName = `${contact.firstName} ${
-      //       contact.lastName ? contact.lastName : ''
-      //     }`
-      //       .toLowerCase()
-      //       .trim();
+          const selectedContactName = `${contact.firstName} ${
+            contact.lastName ? contact.lastName : ''
+          }`
+            .toLowerCase()
+            .trim();
 
-      //     return presentContactName == selectedContactName;
-      //   }) == -1
-      // ) {
-      //   trustedContactsInfo.push(contact);
-      //   // Toast('Trusted Contact added successfully');
-      // } else {
-      //   // Toast('Trusted Contact already exists');
-      // }
+          return presentContactName == selectedContactName;
+        }) == -1
+      ) {
+        trustedContactsInfo.push(contact);
+      }
     } else {
       trustedContactsInfo = [];
       trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
