@@ -219,7 +219,9 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  canNavigate: boolean
+  canNavigate: boolean;
+  isContactOpen: boolean;
+  isCameraOpen: boolean;
 }
 
 interface HomePropsTypes {
@@ -244,10 +246,6 @@ interface HomePropsTypes {
   clearPaymentDetails: any;
 
 }
-
-
-let isContactOpen = false;
-let isCameraOpen = false;
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
@@ -298,7 +296,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
-      canNavigate: false
+      canNavigate: false,
+      isContactOpen: false,
+  isCameraOpen: false
     };
   }
 
@@ -929,13 +929,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    const { canNavigate } = this.state
+    const { canNavigate , isContactOpen, isCameraOpen } = this.state
     let response = await AsyncStorage.multiGet([
       'isContactOpen',
       'isCameraOpen',
     ]);
-    isContactOpen = JSON.parse(response[0][1]);
-    isCameraOpen = JSON.parse(response[1][1]);
+    this.setState(JSON.parse(response[0][1]));
+    this.setState(JSON.parse(response[1][1]));
     let keyArray = [
       ['isCameraOpen', JSON.stringify(true)],
       ['isContactOpen', JSON.stringify(true)],
@@ -2166,6 +2166,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                     {
                       // addSubBottomSheetsFlag: true,
                       // addBottomSheetsFlag: false,
+                      isLoadContacts: true,
                       tabBarIndex: 0,
                       selectToAdd: type,
                     },
