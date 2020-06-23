@@ -304,10 +304,12 @@ const PersonalCopyHistory = (props) => {
         onPressBack={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
-        onPressShare={() => {
-          saveInTransitHistory()
+        onPressShare={() => {}}
+        onPressConfirm={() => {
+          saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
+        
       />
     );
   }, [selectedPersonalCopy, personalCopyDetails]);
