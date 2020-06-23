@@ -14,100 +14,7 @@ import DeviceInfo from 'react-native-device-info';
 
 export default function NotificationListContent(props) {
 
-  useEffect(() => {
-    {[1, 2, 3, 4].map((value) => {
-      return (
-        <View key={value} style={styles.EmptyListLoaderView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={styles.EmptyListLoaderCircle} />
-            <View>
-              <View style={styles.EmptyListLoaderSmallText} />
-              <View style={styles.EmptyListLoaderLargeText} />
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={styles.EmptyListLoaderInfoText} />
-            <View style={styles.EmptyListLoaderLargeCircle} />
-          </View>
-        </View>
-      );
-    })}
-  }, [props.NotificationData]);
-
-  
-  return props.NotificationData.length ? (
-    <ScrollView style={styles.modalContainer}>
-      <View style={styles.modalHeaderTitleView}>
-        <View style={{ flexDirection: 'row' }}>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressBack()}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{ justifyContent: 'center' }}>
-            <Text style={styles.modalHeaderTitleText}>{'Notifications'}</Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={{ flex: 1 }}>
-        {props.NotificationData.map((value, index) => {
-          return (
-            <AppBottomSheetTouchableWrapper
-              key={index}
-              onPress={() => props.onNotificationClicked(value)}
-              style={{
-                ...styles.notificationElement,
-                backgroundColor: value.read ? Colors.white : Colors.shadowBlue,
-              }}
-            >
-              <View style={{ flexDirection: 'row' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image
-                    source={
-                      value.type == 'release'
-                        ? require('../assets/images/icons/icon_hexa.png')
-                        : require('../assets/images/icons/icon_receive.png')
-                    }
-                    style={styles.notificationElementImage}
-                  />
-                  <Text style={styles.notificationElementTitle}>
-                    {value.title}
-                  </Text>
-                </View>
-                <View style={styles.notificationElementInfoView}>
-                  <Text style={styles.notificationElementTimeText}>
-                    {value.time}
-                  </Text>
-                  {value.isMandatory ? (
-                    <FontAwesome name="star" color={Colors.yellow} size={17} />
-                  ) : (
-                    <View style={{ width: 17 }} />
-                  )}
-                </View>
-              </View>
-              <Text style={styles.notificationElementInfoText}>
-                {value.info}
-              </Text>
-            </AppBottomSheetTouchableWrapper>
-          );
-        })}
-        {props.NotificationData.length <= 1 ? (
-          <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
-            <View style={styles.waterMarkInfoBoxView}>
-              <Text style={styles.waterMarkInfoBoxTitle}>
-                No notification yet
-              </Text>
-              <Text style={styles.waterMarkInfoBoxInfo}>
-                All your recent notifications will be visible here
-              </Text>
-            </View>
-          </View>
-        ) : null}
-      </View>
-    </ScrollView>
-  ) : (
+  return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View style={{ flexDirection: 'row' }}>
@@ -122,14 +29,93 @@ export default function NotificationListContent(props) {
           </View>
         </View>
       </View>
-      <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
-        <View style={styles.infoBoxView}>
-          <Text style={styles.infoBoxTitle}>Notification Drawer</Text>
-          <Text style={styles.infoBoxInfo}>
-            All your recent notifications are visible here
-          </Text>
+      <ScrollView style={{ height: 'auto'}}>
+        <View style={{ flex: 1 }}>
+          {props.notificationLoading
+            ? [1, 2, 3, 4, 5].map((value) => {
+                return (
+                  <View key={value} style={styles.EmptyListLoaderView}>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <View style={styles.EmptyListLoaderCircle} />
+                      <View>
+                        <View style={styles.EmptyListLoaderSmallText} />
+                        <View style={styles.EmptyListLoaderLargeText} />
+                      </View>
+                    </View>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
+                      <View style={styles.EmptyListLoaderInfoText} />
+                      <View style={styles.EmptyListLoaderLargeCircle} />
+                    </View>
+                  </View>
+                );
+              })
+            : props.NotificationData.map((value, index) => {
+                return (
+                  <AppBottomSheetTouchableWrapper
+                    key={index}
+                    onPress={() => props.onNotificationClicked(value)}
+                    style={{
+                      ...styles.notificationElement,
+                      backgroundColor: value.read
+                        ? Colors.white
+                        : Colors.shadowBlue,
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row' }}>
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        <Image
+                          source={
+                            value.type == 'release'
+                              ? require('../assets/images/icons/icon_hexa.png')
+                              : require('../assets/images/icons/icon_receive.png')
+                          }
+                          style={styles.notificationElementImage}
+                        />
+                        <Text style={styles.notificationElementTitle}>
+                          {value.title}
+                        </Text>
+                      </View>
+                      <View style={styles.notificationElementInfoView}>
+                        <Text style={styles.notificationElementTimeText}>
+                          {value.time}
+                        </Text>
+                        {value.isMandatory ? (
+                          <FontAwesome
+                            name="star"
+                            color={Colors.yellow}
+                            size={17}
+                          />
+                        ) : (
+                          <View style={{ width: 17 }} />
+                        )}
+                      </View>
+                    </View>
+                    <Text style={styles.notificationElementInfoText}>
+                      {value.info}
+                    </Text>
+                  </AppBottomSheetTouchableWrapper>
+                );
+              })}
         </View>
-      </View>
+      </ScrollView>
+      {props.NotificationData.length <= 1 ? (
+            <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
+              <View style={styles.waterMarkInfoBoxView}>
+                <Text style={styles.waterMarkInfoBoxTitle}>
+                  No notification yet
+                </Text>
+                <Text style={styles.waterMarkInfoBoxInfo}>
+                  All your recent notifications will be visible here
+                </Text>
+              </View>
+            </View>
+          ) : null}
     </View>
   );
 }
