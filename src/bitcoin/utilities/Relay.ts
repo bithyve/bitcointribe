@@ -79,6 +79,7 @@ export default class Relay {
     walletID: string,
   ): Promise<{
     notifications: INotification[];
+    DHInfos: [{ address: string; publicKey: string }];
   }> => {
     let res: AxiosResponse;
 
@@ -92,8 +93,8 @@ export default class Relay {
       if (err.code) throw new Error(err.code);
     }
 
-    const { notifications } = res.data;
-    return { notifications };
+    const { notifications, DHInfos } = res.data;
+    return { notifications, DHInfos };
   };
 
   public static sendNotification = async (

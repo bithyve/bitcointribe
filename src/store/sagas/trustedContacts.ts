@@ -35,6 +35,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import { insertDBWorker } from './storage';
 import { AsyncStorage } from 'react-native';
+import { fetchNotificationsWorker } from './notifications';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -80,7 +81,11 @@ function* approveTrustedContactWorker({ payload }) {
     yield put(trustedContactApproved(contactName, true));
     if (payload.updateEphemeralChannel) {
       const uploadXpub = true;
-      const data = { publicKey: res.data.publicKey };
+      const data = {
+        DHInfo: {
+          publicKey: res.data.publicKey,
+        },
+      };
       yield put(
         updateEphemeralChannel(
           contactName,
@@ -314,27 +319,48 @@ export function* trustedChannelsSyncWorker() {
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
+  yield call(fetchNotificationsWorker); // refreshes DHInfos
+  let DHInfos = yield call(AsyncStorage.getItem, 'DHInfos');
+  if (DHInfos) {
+    DHInfos = JSON.parse(DHInfos);
+  } else {
+    DHInfos = [];
+  }
+
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   for (const contactName of Object.keys(contacts)) {
-    let { trustedChannel } = contacts[contactName];
+    let { trustedChannel, ephemeralChannel } = contacts[contactName];
 
     if (!trustedChannel) {
       // trusted channel not setup; probably need to still get the counter party's pubKey
-      const res = yield call(
-        trustedContacts.fetchEphemeralChannel,
-        contactName,
-        true,
-      );
 
-      if (res.status !== 200) {
-        console.log(
-          `Failed to setup trusted channel with contact ${contactName}`,
+      let contactsPublicKey;
+      DHInfos.forEach((dhInfo: { address: string; publicKey: string }) => {
+        if (dhInfo.address === ephemeralChannel.address) {
+          contactsPublicKey = dhInfo.publicKey;
+        }
+      });
+
+      if (contactsPublicKey) {
+        const res = yield call(
+          trustedContacts.finalizeContact,
+          contactName,
+          contactsPublicKey,
         );
-        continue;
+
+        if (res.status !== 200) {
+          console.log(
+            `Failed to setup trusted channel with contact ${contactName}`,
+          );
+          continue;
+        } else {
+          // refresh the trustedChannel object
+          trustedChannel =
+            trustedContacts.tc.trustedContacts[contactName.trim()]
+              .trustedChannel;
+        }
       } else {
-        // refresh the trustedChannel object
-        trustedChannel =
-          trustedContacts.tc.trustedContacts[contactName.trim()].trustedChannel;
+        continue;
       }
     }
 

@@ -168,6 +168,10 @@ export interface EphemeralData {
   publicKey?: string; // pubKeys serves as the identifier as it can be public
   walletID?: string;
   FCM?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
   shareTransferDetails?: {
     otp: string;
     encryptedKey: string;
