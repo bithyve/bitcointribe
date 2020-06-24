@@ -107,29 +107,41 @@ export default function ExistingSavingMethodDetails(props) {
           <View
             style={{ flex: 1, marginLeft: wp('3%'), marginRight: wp('3%') }}
           >
-            <View style={{ padding: wp('3%') }}>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(13),
-                }}
-              >
+            <View
+              style={{
+                padding: wp('3%'),
+                paddingLeft: wp('0%'),
+                paddingRight: wp('0%'),
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text
                   style={{
-                    fontSize: RFValue(11),
+                    color: Colors.blue,
                     fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(13),
                   }}
                 >
-                  Voucher Code
-                </Text>{' '}
-                #{FBTCAccount.voucherCode}
-              </Text>
+                  Voucher Code {FBTCAccount.voucherCode}
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 'auto',
+                  }}
+                >
+                  {moment(FBTCAccount.orderData.date)
+                    .utc()
+                    .format('DD MMMM YYYY')}
+                </Text>
+              </View>
               <Text
                 style={{
                   color: Colors.textColorGrey,
                   fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(13),
+                  fontSize: RFValue(10),
                   marginTop: 5,
                 }}
               >
@@ -139,41 +151,77 @@ export default function ExistingSavingMethodDetails(props) {
               </Text>
             </View>
             <View style={{ height: 1, backgroundColor: Colors.borderColor }} />
-            <View style={{ padding: wp('3%') }}>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(13),
-                }}
-              >
-                Voucher Amount
-              </Text>
-              <View style={styles.transactionModalAmountView}>
-                <Text style={styles.transactionModalAmountText}>
-                  {FBTCAccount.quotes.amount}
+            <View
+              style={{
+                padding: wp('3%'),
+                paddingLeft: wp('0%'),
+                paddingRight: wp('0%'),
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                  }}
+                >
+                  Voucher Amount
                 </Text>
-                <Text style={styles.transactionModalAmountUnitText}>
-                  {FBTCAccount.quotes.currency}
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontFamily: Fonts.FiraSansRegular,
+                    fontSize: RFValue(10),
+                    marginLeft: 'auto',
+                  }}
+                >
+                  Rate
                 </Text>
               </View>
+              <View style={{ flexDirection: 'row' }}>
+                <View style={styles.transactionModalAmountView}>
+                  <Image
+                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                    style={{
+                      width: wp('3%'),
+                      height: wp('3%'),
+                      resizeMode: 'contain',
+                      marginBottom: wp('1%'),
+                    }}
+                  />
+                  <Text style={styles.transactionModalAmountText}>
+                    {FBTCAccount.quotes.bitcoin_amount
+                      ? FBTCAccount.quotes.bitcoin_amount
+                      : 0}
+                  </Text>
+                  <Text style={styles.transactionModalAmountUnitText}>
+                    sats
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    ...styles.transactionModalAmountView,
+                    marginLeft: 'auto',
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                    style={{
+                      width: wp('3%'),
+                      height: wp('3%'),
+                      resizeMode: 'contain',
+                      marginBottom: wp('1%'),
+                    }}
+                  />
+                  <Text style={styles.transactionModalAmountText}>
+                    {FBTCAccount.quotes.exchange_rate
+                      ? FBTCAccount.quotes.exchange_rate
+                      : 0}
+                  </Text>
+                </View>
+              </View>
             </View>
-          </View>
-          <View
-            style={{
-              width: wp('10%'),
-              height: wp('10%'),
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: wp('3%'),
-            }}
-          >
-            <Ionicons
-              name="ios-arrow-forward"
-              color={Colors.borderColor}
-              size={RFValue(20)}
-              style={{ alignSelf: 'center' }}
-            />
           </View>
         </View>
 
@@ -411,7 +459,7 @@ const styles = StyleSheet.create({
 
   transactionModalAmountView: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   transactionModalAmountText: {
     marginRight: 5,

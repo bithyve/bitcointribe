@@ -280,15 +280,37 @@ export default function ExistingSavingMethods(props) {
                             marginRight: wp('3%'),
                           }}
                         >
-                          <View style={{ padding: wp('3%') }}>
+                          <View
+                            style={{
+                              padding: wp('3%'),
+                              paddingRight: wp('0%'),
+                              paddingLeft: wp('0%'),
+                            }}
+                          >
                             <View
                               style={{
-                                width: wp('40%'),
-                                height: wp('5%'),
-                                backgroundColor: Colors.backgroundColor,
-                                borderRadius: 5,
+                                flexDirection: 'row',
+                                alignItems: 'center',
                               }}
-                            />
+                            >
+                              <View
+                                style={{
+                                  width: wp('40%'),
+                                  height: wp('5%'),
+                                  backgroundColor: Colors.backgroundColor,
+                                  borderRadius: 5,
+                                }}
+                              />
+                              <View
+                                style={{
+                                  width: wp('20%'),
+                                  height: wp('3%'),
+                                  backgroundColor: Colors.backgroundColor,
+                                  borderRadius: 5,
+                                  marginLeft: 'auto',
+                                }}
+                              />
+                            </View>
                             <View
                               style={{
                                 width: wp('30%'),
@@ -305,35 +327,55 @@ export default function ExistingSavingMethods(props) {
                               backgroundColor: Colors.borderColor,
                             }}
                           />
-                          <View style={{ padding: wp('3%') }}>
-                            <View
-                              style={{
-                                width: wp('40%'),
-                                height: wp('5%'),
-                                backgroundColor: Colors.backgroundColor,
-                                borderRadius: 5,
-                              }}
-                            />
-                            <View
-                              style={{
-                                width: wp('30%'),
-                                height: wp('5%'),
-                                backgroundColor: Colors.backgroundColor,
-                                borderRadius: 5,
-                                marginTop: 5,
-                              }}
-                            />
+                          <View
+                            style={{
+                              padding: wp('3%'),
+                              paddingRight: wp('0%'),
+                              paddingLeft: wp('0%'),
+                            }}
+                          >
+                            <View style={{ flexDirection: 'row' }}>
+                              <View
+                                style={{
+                                  width: wp('25%'),
+                                  height: wp('3%'),
+                                  backgroundColor: Colors.backgroundColor,
+                                  borderRadius: 5,
+                                }}
+                              />
+                              <View
+                                style={{
+                                  width: wp('25%'),
+                                  height: wp('3%'),
+                                  backgroundColor: Colors.backgroundColor,
+                                  borderRadius: 5,
+                                  marginLeft: 'auto',
+                                }}
+                              />
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                              <View
+                                style={{
+                                  width: wp('30%'),
+                                  height: wp('5%'),
+                                  backgroundColor: Colors.backgroundColor,
+                                  borderRadius: 5,
+                                  marginTop: 5,
+                                }}
+                              />
+                              <View
+                                style={{
+                                  width: wp('20%'),
+                                  height: wp('5%'),
+                                  backgroundColor: Colors.backgroundColor,
+                                  borderRadius: 5,
+                                  marginTop: 5,
+                                  marginLeft: 'auto',
+                                }}
+                              />
+                            </View>
                           </View>
                         </View>
-                        <View
-                          style={{
-                            width: wp('5%'),
-                            height: wp('5%'),
-                            marginRight: wp('3%'),
-                            backgroundColor: Colors.backgroundColor,
-                            borderRadius: wp('10%') / 2,
-                          }}
-                        />
                       </View>
                     </View>
                   );
@@ -483,29 +525,43 @@ export default function ExistingSavingMethods(props) {
                       marginRight: wp('3%'),
                     }}
                   >
-                    <View style={{ padding: wp('3%') }}>
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontFamily: Fonts.FiraSansMedium,
-                          fontSize: RFValue(13),
-                        }}
+                    <View
+                      style={{
+                        padding: wp('3%'),
+                        paddingRight: wp('0%'),
+                        paddingLeft: wp('0%'),
+                      }}
+                    >
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
                       >
                         <Text
                           style={{
-                            fontSize: RFValue(11),
+                            color: Colors.blue,
                             fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(13),
                           }}
                         >
-                          Voucher Code
-                        </Text>{' '}
-                        #{value.voucherCode}
-                      </Text>
+                          Voucher Code {value.voucherCode}
+                        </Text>
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(10),
+                            marginLeft: 'auto',
+                          }}
+                        >
+                          {moment(value.orderData.date)
+                            .utc()
+                            .format('DD MMMM YYYY')}
+                        </Text>
+                      </View>
                       <Text
                         style={{
                           color: Colors.textColorGrey,
                           fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(13),
+                          fontSize: RFValue(10),
                           marginTop: 5,
                         }}
                       >
@@ -520,41 +576,77 @@ export default function ExistingSavingMethods(props) {
                         backgroundColor: Colors.borderColor,
                       }}
                     />
-                    <View style={{ padding: wp('3%') }}>
-                      <Text
-                        style={{
-                          color: Colors.textColorGrey,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(13),
-                        }}
-                      >
-                        Voucher Amount
-                      </Text>
-                      <View style={styles.transactionModalAmountView}>
-                        <Text style={styles.transactionModalAmountText}>
-                          {value.quotes.amount ? value.quotes.amount : 0}
+                    <View
+                      style={{
+                        padding: wp('3%'),
+                        paddingRight: wp('0%'),
+                        paddingLeft: wp('0%'),
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(10),
+                          }}
+                        >
+                          Voucher Amount
                         </Text>
-                        <Text style={styles.transactionModalAmountUnitText}>
-                          {value.quotes.currency}
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontSize: RFValue(10),
+                            marginLeft: 'auto',
+                          }}
+                        >
+                          Rate
                         </Text>
                       </View>
+                      <View style={{ flexDirection: 'row' }}>
+                        <View style={styles.transactionModalAmountView}>
+                          <Image
+                            source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                            style={{
+                              width: wp('3%'),
+                              height: wp('3%'),
+                              resizeMode: 'contain',
+                              marginBottom: wp('1%'),
+                            }}
+                          />
+                          <Text style={styles.transactionModalAmountText}>
+                            {value.quotes.bitcoin_amount
+                              ? value.quotes.bitcoin_amount
+                              : 0}
+                          </Text>
+                          <Text style={styles.transactionModalAmountUnitText}>
+                            sats
+                          </Text>
+                        </View>
+                        <View
+                          style={{
+                            ...styles.transactionModalAmountView,
+                            marginLeft: 'auto',
+                          }}
+                        >
+                          <Image
+                            source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                            style={{
+                              width: wp('3%'),
+                              height: wp('3%'),
+                              resizeMode: 'contain',
+                              marginBottom: wp('1%'),
+                            }}
+                          />
+                          <Text style={styles.transactionModalAmountText}>
+                            {value.quotes.exchange_rate
+                              ? value.quotes.exchange_rate
+                              : 0}
+                          </Text>
+                        </View>
+                      </View>
                     </View>
-                  </View>
-                  <View
-                    style={{
-                      width: wp('10%'),
-                      height: wp('10%'),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginRight: wp('3%'),
-                    }}
-                  >
-                    <Ionicons
-                      name="ios-arrow-forward"
-                      color={Colors.borderColor}
-                      size={RFValue(20)}
-                      style={{ alignSelf: 'center' }}
-                    />
                   </View>
                 </TouchableOpacity>
               );
@@ -604,7 +696,7 @@ const styles = StyleSheet.create({
   },
   transactionModalAmountUnitText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
+    fontSize: RFValue(9),
     fontFamily: Fonts.OpenSans,
     lineHeight: RFValue(18),
   },
