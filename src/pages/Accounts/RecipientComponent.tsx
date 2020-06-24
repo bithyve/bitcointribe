@@ -24,7 +24,6 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 function RecipientComponent(props) {
-  console.log("props.item", props.item);
   return (
     <TouchableOpacity
       onPress={() => props.onPressElement()}

@@ -106,7 +106,6 @@ export default function SendToContact(props) {
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const service = useSelector((state) => state.accounts[serviceType].service);
-
   useEffect(() => {
     setCurrencyCodeFromAsync();
     if (bitcoinAmount) convertBitCoinToCurrency(bitcoinAmount);
@@ -188,9 +187,11 @@ export default function SendToContact(props) {
   }
 
   useEffect(() => {
-    dispatch(clearTransfer(serviceType));
-    dispatch(addTransferDetails(serviceType, { selectedContact }));
-
+    if (isFromAddressBook){
+      dispatch(clearTransfer(serviceType));
+      dispatch(addTransferDetails(serviceType, { selectedContact }));
+    }
+    
     if (netBalance !== 0 && !netBalance) {
       const service = accounts[serviceType].service;
       const instance = service.hdWallet || service.secureHDWallet;
@@ -402,16 +403,18 @@ export default function SendToContact(props) {
                     )
                   : ''}
               </Text>
-            ) : (
-              item && item.id ? 
+            ) : item && item.id ? (
               <Text
                 style={{
                   textAlign: 'center',
                   fontSize: 18,
                   lineHeight: 18, //... One for top and one for bottom alignment
                 }}
-              >@</Text>
-              :<Image
+              >
+                @
+              </Text>
+            ) : (
+              <Image
                 source={require('../../assets/images/icons/icon_user.png')}
                 style={styles.circleShapeView}
               />
@@ -546,7 +549,7 @@ export default function SendToContact(props) {
 
   const renderBitCoinInputText = () => {
     return (
-      <View
+      <TouchableOpacity
         style={{
           ...InputStyle,
           marginBottom: wp('1.5%'),
@@ -555,6 +558,7 @@ export default function SendToContact(props) {
           width: wp('70%'),
           height: wp('13%'),
         }}
+        onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           <Image
@@ -563,6 +567,9 @@ export default function SendToContact(props) {
           />
         </View>
         {renderVerticalDivider()}
+        <TouchableOpacity
+        onPress={()=>setSwitchOn(!switchOn)}
+      >
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           placeholder={
@@ -591,13 +598,14 @@ export default function SendToContact(props) {
             }
           }}
         />
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     );
   };
 
   const renderUSDInputText = () => {
     return (
-      <View
+      <TouchableOpacity
         style={{
           ...InputStyle1,
           marginBottom: wp('1.5%'),
@@ -606,6 +614,7 @@ export default function SendToContact(props) {
           width: wp('70%'),
           height: wp('13%'),
         }}
+        onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           {currencyCode.includes(CurrencyCode) ? (
@@ -624,6 +633,9 @@ export default function SendToContact(props) {
           /> */}
         </View>
         {renderVerticalDivider()}
+        <TouchableOpacity
+        onPress={()=>setSwitchOn(!switchOn)}
+      >
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10 }}
           editable={!switchOn}
@@ -654,7 +666,8 @@ export default function SendToContact(props) {
             }
           }}
         />
-      </View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     );
   };
 
@@ -943,13 +956,14 @@ export default function SendToContact(props) {
           <ScrollView>
             <View style={{ flex: 1, flexDirection: 'row' }}>
               <View style={{ flex: 1, flexDirection: 'column' }}>
-                {renderBitCoinInputText()}
+                {renderUSDInputText()}
                 {isInvalidBalance ? (
                   <View style={{ marginLeft: 'auto' }}>
                     <Text style={styles.errorText}>Insufficient balance</Text>
                   </View>
                 ) : null}
-                {renderUSDInputText()}
+                {renderBitCoinInputText()}
+                
               </View>
               <View
                 style={{

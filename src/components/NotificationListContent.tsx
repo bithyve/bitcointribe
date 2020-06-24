@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: 7,
   },
   waterMarkInfoBoxTitle: {
-    color: Colors.black,
+    color: Colors.blue,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
