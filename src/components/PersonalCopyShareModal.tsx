@@ -29,10 +29,10 @@ export default function PersonalCopyShareModal(props) {
   const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
     {
       id: 1,
-      title: 'Send pdf on email',
+      title: 'Sending Email',
       type: 'Email',
       flagShare: false,
-      info: 'Make sure you delete the message from your sent folder',
+      info: 'Only native email app is supported for the email option. For other email apps, use ‘other options’',
       imageIcon: Icons.manageBackup.PersonalCopy.email,
     },
     {
