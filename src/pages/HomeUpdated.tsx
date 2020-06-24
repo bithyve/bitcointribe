@@ -931,13 +931,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   handleAppStateChange = async (nextAppState) => {
     let limit = 15000
-    const { canNavigate, isContactOpen, isCameraOpen } = this.state
+    const { isContactOpen, isCameraOpen } = this.state
     let response = await AsyncStorage.multiGet([
       'isContactOpen',
       'isCameraOpen',
     ]);
-    this.setState(JSON.parse(response[0][1]));
-    this.setState(JSON.parse(response[1][1]));
+
+    this.setState({
+      isContactOpen: JSON.parse(response[0][1]),
+      isCameraOpen: JSON.parse(response[1][1])
+    })
     let keyArray = [
       ['isCameraOpen', JSON.stringify(true)],
       ['isContactOpen', JSON.stringify(true)],
