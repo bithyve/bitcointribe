@@ -58,7 +58,6 @@ import {
   fetchEphemeralChannel,
   clearPaymentDetails,
 } from '../store/actions/trustedContacts';
-import moment from 'moment';
 import {
   updateFCMTokens,
   fetchNotifications,
@@ -78,7 +77,6 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import HomeList from '../components/home/home-list';
@@ -93,6 +91,8 @@ import {
 } from '../store/actions/accounts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
+import moment from 'moment'
+
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -221,6 +221,7 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   canNavigate: boolean;
+  lastActiveTime: string;
   isContactOpen: boolean;
   isCameraOpen: boolean;
 }
@@ -298,6 +299,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       custodyRequest: null,
       isLoadContacts: false,
       canNavigate: false,
+      lastActiveTime: moment().toISOString(),
       isContactOpen: false,
       isCameraOpen: false,
       notificationLoading: true,
@@ -628,7 +630,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
-    console.log('NEXTAPPSTATE', nextAppState);
     this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
@@ -933,13 +934,17 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    const { canNavigate, isContactOpen, isCameraOpen } = this.state;
+    let limit = 15000
+    const { isContactOpen, isCameraOpen } = this.state
     let response = await AsyncStorage.multiGet([
       'isContactOpen',
       'isCameraOpen',
     ]);
-    this.setState(JSON.parse(response[0][1]));
-    this.setState(JSON.parse(response[1][1]));
+
+    this.setState({
+      isContactOpen: JSON.parse(response[0][1]),
+      isCameraOpen: JSON.parse(response[1][1])
+    })
     let keyArray = [
       ['isCameraOpen', JSON.stringify(true)],
       ['isContactOpen', JSON.stringify(true)],
@@ -951,22 +956,27 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       return;
     }
 
-    var blockApp = setTimeout(() => {
-      if (canNavigate) {
-        this.props.navigation.navigate('ReLogin');
-      }
-    }, 15000);
-
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      clearTimeout(blockApp);
-      this.setState({ canNavigate: true });
+      this.setState({ lastActiveTime: moment().toISOString() })
     } else {
-      this.setState({ canNavigate: false });
-      return;
+      let diff = moment().diff(moment(this.state.lastActiveTime))
+      if (diff >= limit) {
+        this.setState({
+          lastActiveTime: moment().toISOString()
+        }, () => {
+          this.props.navigation.navigate('ReLogin');
+        })
+
+      } else {
+        this.setState({
+          lastActiveTime: moment().toISOString()
+        })
+        return
+      }
     }
   };
 
@@ -1119,6 +1129,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.getBalances();
       this.props.fetchNotifications();
       this.getNewTransactionNotifications();
+      this.setState({
+        lastActiveTime: moment().toISOString()
+      })
     });
 
     setTimeout(() => {
