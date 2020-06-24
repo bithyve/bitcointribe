@@ -110,7 +110,10 @@ export default class RelayServices {
   ): Promise<
     | {
         status: number;
-        data: { notifications: INotification[] };
+        data: {
+          notifications: INotification[];
+          DHInfos: [{ address: string; publicKey: string }];
+        };
         err?: undefined;
         message?: undefined;
       }
