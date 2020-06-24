@@ -305,7 +305,13 @@ const PersonalCopyHistory = (props) => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
         onPressShare={() => {}}
-        onPressConfirm={() => {
+        onPressConfirm={async () => {
+          let personalCopyDetails = JSON.parse(await AsyncStorage.getItem(
+            'personalCopyDetails',
+          ));
+          personalCopyDetails[selectedPersonalCopy.type].shared = true;
+          AsyncStorage.setItem('personalCopyDetails', JSON.stringify(personalCopyDetails));
+          setPersonalCopyDetails(personalCopyDetails);
           saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}

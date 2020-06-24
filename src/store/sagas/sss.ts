@@ -753,7 +753,7 @@ function* sharePersonalCopyWorker({ payload }) {
       ...personalCopyDetails,
       [selectedPersonalCopy.type]: {
         ...personalCopyDetails[selectedPersonalCopy.type],
-        shared: true,
+        // shared: true,
         sharingDetails: { shareVia, sharedAt: Date.now() },
       },
     };
