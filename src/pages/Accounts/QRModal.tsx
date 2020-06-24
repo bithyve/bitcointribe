@@ -68,8 +68,8 @@ export default function QRModal(props) {
             {props.isOpenedFlag && openCameraFlag ? (
               <View
                 style={{
-                  width: wp('100%'),
-                  height: wp('100%'),
+                  width: wp('90%'),
+                  height: wp('90%'),
                   overflow: 'hidden',
                   borderRadius: 20,
                 }}
@@ -79,8 +79,8 @@ export default function QRModal(props) {
                     this.cameraRef = ref;
                   }}
                   style={{
-                    width: wp('100%'),
-                    height: wp('100%'),
+                    width: wp('90%'),
+                    height: wp('90%'),
                   }}
                   onBarCodeRead={barcodeRecognized}
                   captureAudio={false}
@@ -161,8 +161,8 @@ export default function QRModal(props) {
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
                   style={{
-                    width: wp('100%'),
-                    height: wp('100%'),
+                    width: wp('90%'),
+                    height: wp('90%'),
                     overflow: 'hidden',
                     borderRadius: 20,
                   }}

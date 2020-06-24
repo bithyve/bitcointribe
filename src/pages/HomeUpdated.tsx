@@ -221,6 +221,8 @@ interface HomeStateTypes {
   isLoadContacts: boolean;
   canNavigate: boolean,
   lastActiveTime: string
+  isContactOpen: boolean;
+  isCameraOpen: boolean;
 }
 
 interface HomePropsTypes {
@@ -245,10 +247,6 @@ interface HomePropsTypes {
   clearPaymentDetails: any;
 
 }
-
-
-let isContactOpen = false;
-let isCameraOpen = false;
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
@@ -301,6 +299,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       canNavigate: false,
       lastActiveTime: moment().toISOString()
+      isContactOpen: false,
+      isCameraOpen: false
     };
   }
 
@@ -638,6 +638,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (nextAppState === 'active') {
             this.scheduleNotification();
           }
+          if (nextAppState === 'inactive' || nextAppState == 'background') {
+            await AsyncStorage.setItem(
+              'isInternetModalCome',
+              JSON.stringify(false),
+            );
+          }
+
         },
       );
     } catch (error) { }
@@ -925,12 +932,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   handleAppStateChange = async (nextAppState) => {
     let limit = 15000
+    const { canNavigate, isContactOpen, isCameraOpen } = this.state
     let response = await AsyncStorage.multiGet([
       'isContactOpen',
       'isCameraOpen',
     ]);
-    isContactOpen = JSON.parse(response[0][1]);
-    isCameraOpen = JSON.parse(response[1][1]);
+    this.setState(JSON.parse(response[0][1]));
+    this.setState(JSON.parse(response[1][1]));
     let keyArray = [
       ['isCameraOpen', JSON.stringify(true)],
       ['isContactOpen', JSON.stringify(true)],
@@ -2170,6 +2178,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                     {
                       // addSubBottomSheetsFlag: true,
                       // addBottomSheetsFlag: false,
+                      isLoadContacts: true,
                       tabBarIndex: 0,
                       selectToAdd: type,
                     },

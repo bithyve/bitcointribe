@@ -129,6 +129,8 @@ export default function TrustedContactRequest(props) {
             placeholder={'Enter Phone Number'}
             onChangeText={(text) => {
               setPhoneNumber(text);
+              if (text.length === 10)
+                checkForValidation(text)
             }}
             style={{ flex: 1 }}
             onFocus={() => {

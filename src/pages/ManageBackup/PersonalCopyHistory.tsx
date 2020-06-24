@@ -219,13 +219,13 @@ const PersonalCopyHistory = (props) => {
       );
       if (!personalCopyDetails) {
         dispatch(generatePersonalCopy(selectedPersonalCopy));
-        saveInTransitHistory();
+        // saveInTransitHistory();
       } else {
         personalCopyDetails = JSON.parse(personalCopyDetails);
 
         if (!personalCopyDetails[selectedPersonalCopy.type]) {
           dispatch(generatePersonalCopy(selectedPersonalCopy));
-          saveInTransitHistory();
+          // saveInTransitHistory();
         } else setPersonalCopyDetails(personalCopyDetails);
       }
     })();
@@ -305,6 +305,7 @@ const PersonalCopyHistory = (props) => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
         onPressShare={() => {
+          saveInTransitHistory()
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -487,7 +488,7 @@ const PersonalCopyHistory = (props) => {
             setTimeout(() => {
               setQRModalHeader('Reshare Personal Copy');
             }, 2);
-            (QrBottomSheet.current as any).snapTo(1);
+            (PersonalCopyShareBottomSheet.current as any).snapTo(1);
           }}
           onPressContinue={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);

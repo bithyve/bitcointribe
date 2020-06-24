@@ -72,7 +72,7 @@ export default function ChangeCurrency(props) {
             marginBottom: wp('7%'),
           }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing
+          Select your local currency
         </Text>
         <TouchableOpacity
           onPress={() => {
@@ -215,12 +215,12 @@ export default function ChangeCurrency(props) {
           )}
         </View>
         <View >
-          <BottomInfoBox
+          {/* <BottomInfoBox
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
             }
-          />
+          /> */}
           <TouchableOpacity
             onPress={() => setNewCurrency()}
             style={{
