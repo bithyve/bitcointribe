@@ -58,7 +58,6 @@ import {
   fetchEphemeralChannel,
   clearPaymentDetails,
 } from '../store/actions/trustedContacts';
-import moment from 'moment';
 import {
   updateFCMTokens,
   fetchNotifications,
@@ -78,7 +77,6 @@ import AddContactAddressBook from './Contacts/AddContactAddressBook';
 import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
-import MessageAsPerHealth from '../components/home/messgae-health';
 import TransactionsContent from '../components/home/transaction-content';
 import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import HomeList from '../components/home/home-list';
@@ -93,6 +91,8 @@ import {
 } from '../store/actions/accounts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
+import moment from 'moment'
+
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -219,7 +219,8 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  canNavigate: boolean
+  canNavigate: boolean,
+  lastActiveTime: string
 }
 
 interface HomePropsTypes {
@@ -298,7 +299,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
-      canNavigate: false
+      canNavigate: false,
+      lastActiveTime: moment().toISOString()
     };
   }
 
@@ -922,7 +924,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    const { canNavigate } = this.state
+    let limit = 15000
     let response = await AsyncStorage.multiGet([
       'isContactOpen',
       'isCameraOpen',
@@ -940,22 +942,28 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       return;
     }
 
-    var blockApp = setTimeout(() => {
-      if (canNavigate) {
-        this.props.navigation.navigate('ReLogin');
-      }
-    }, 15000);
-
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      clearTimeout(blockApp)
-      this.setState({ canNavigate: true })
+      this.setState({ lastActiveTime: moment().toISOString() })
+
     } else {
-      this.setState({ canNavigate: false })
-      return
+      let diff = moment().diff(moment(this.state.lastActiveTime))
+      if (diff >= limit) {
+        this.setState({
+          lastActiveTime: moment().toISOString()
+        }, () => {
+          this.props.navigation.navigate('ReLogin');
+        })
+
+      } else {
+        this.setState({
+          lastActiveTime: moment().toISOString()
+        })
+        return
+      }
     }
   };
 
@@ -1108,6 +1116,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.getBalances();
       this.props.fetchNotifications();
       this.getNewTransactionNotifications();
+      this.setState({
+        lastActiveTime: moment().toISOString()
+      })
     });
 
 
