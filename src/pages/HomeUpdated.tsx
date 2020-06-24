@@ -219,8 +219,8 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  canNavigate: boolean,
-  lastActiveTime: string
+  canNavigate: boolean;
+  lastActiveTime: string;
   isContactOpen: boolean;
   isCameraOpen: boolean;
 }
