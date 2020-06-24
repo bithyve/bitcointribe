@@ -35,6 +35,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import { fetchDerivativeAccBalTx } from '../../store/actions/accounts';
 import moment from 'moment';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 export default function ExistingSavingMethods(props) {
   const [FBTCAccount, setFBTCAccount] = useState([]);
@@ -123,20 +124,129 @@ export default function ExistingSavingMethods(props) {
         <ScrollView style={{ flex: 1 }}>
           {loading ? (
             <View style={{ flex: 1 }}>
-              {[1, 2, 3, 4].map(() => {
-                return (
+              <View
+                style={{
+                  ...styles.cardOuterView,
+                  padding: wp('3%'),
+                  justifyContent: 'center',
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: wp('1.5%'),
+                    marginRight: wp('3%'),
+                  }}
+                >
                   <View
                     style={{
-                      width: wp('70%'),
-                      height: wp('3%'),
-                      margin: 5,
-                      marginLeft: wp('5%'),
+                      width: wp('10%'),
+                      height: wp('10%'),
+                      borderRadius: wp('10%') / 2,
                       backgroundColor: Colors.backgroundColor,
-                      borderRadius: 5,
                     }}
                   />
-                );
-              })}
+                  <View
+                    style={{
+                      width: wp('30%'),
+                      height: wp('7%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 9,
+                      marginTop: 5,
+                      marginLeft: wp('3%'),
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: wp('15%'),
+                      height: wp('5%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 7,
+                      marginLeft: 'auto',
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    height: 1,
+                    backgroundColor: Colors.borderColor,
+                    margin: wp('3%'),
+                    marginTop: wp('0.5%'),
+                  }}
+                />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    margin: wp('3%'),
+                    marginTop: wp('1.5%'),
+                  }}
+                >
+                  <View
+                    style={{
+                      width: wp('40%'),
+                      height: wp('4%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 6,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: wp('30%'),
+                      height: wp('5%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 7,
+                      marginLeft: 'auto',
+                    }}
+                  />
+                </View>
+                <View style={styles.permissionView}>
+                  <View
+                    style={{
+                      width: wp('35%'),
+                      height: wp('5%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 7,
+                      marginLeft: 'auto',
+                    }}
+                  />
+                  <View style={styles.permissionSeparationView} />
+                  <View
+                    style={{
+                      ...styles.permissionImage,
+                      backgroundColor: Colors.backgroundColor,
+                      marginLeft: 'auto',
+                      borderRadius: wp('5.5%') / 2,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    ...styles.permissionView,
+                    marginTop: wp('0%'),
+                    marginBottom: wp('1.5%'),
+                  }}
+                >
+                  <View
+                    style={{
+                      width: wp('35%'),
+                      height: wp('5%'),
+                      backgroundColor: Colors.backgroundColor,
+                      borderRadius: 7,
+                    }}
+                  />
+                  <View style={styles.permissionSeparationView} />
+                  <View
+                    style={{
+                      ...styles.permissionImage,
+                      backgroundColor: Colors.backgroundColor,
+                      marginLeft: 'auto',
+                      borderRadius: wp('5.5%') / 2,
+                    }}
+                  />
+                </View>
+              </View>
               <View style={{ flex: 1 }}>
                 {[1, 2, 3, 4].map(() => {
                   return (
@@ -233,49 +343,117 @@ export default function ExistingSavingMethods(props) {
           ) : null}
         </ScrollView>
       ) : FBTCAccountInfo ? (
-        <View style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1 }}>
           <View
             style={{
-              margin: wp('3%'),
-              marginLeft: wp('5%'),
-              marginRight: wp('5%'),
-              borderBottomColor: Colors.borderColor,
-              borderBottomWidth: 0.5,
-              paddingBottom: wp('4%'),
+              ...styles.cardOuterView,
+              padding: wp('3%'),
+              justifyContent: 'center',
             }}
           >
-            {FBTCAccountInfo.user_key && (
-              <Text style={styles.accountInfo}>
-                <Text style={styles.accountInfoTitle}>User Key: </Text>
-                {FBTCAccountInfo.user_key}
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: wp('1.5%'),
+                marginRight: wp('3%'),
+              }}
+            >
+              <Image
+                source={require('../../assets/images/icons/fastbitcoin.png')}
+                style={{ width: wp('10%'), height: wp('10%') }}
+              />
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(14),
+                  marginLeft: wp('2%'),
+                }}
+              >
+                Fast Bitcoin
               </Text>
-            )}
-            {FBTCAccountInfo.hasOwnProperty('redeem_vouchers') && (
-              <Text style={styles.accountInfo}>
-                <Text style={styles.accountInfoTitle}>
-                  Has Redeem Permission:{' '}
-                </Text>
-                {FBTCAccountInfo.redeem_vouchers ? 'Yes' : 'No'}
+              <Text
+                style={{
+                  color: Colors.darkGreen,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginLeft: 'auto',
+                }}
+              >
+                Active
               </Text>
-            )}
-            {FBTCAccountInfo.hasOwnProperty('redeem_vouchers') && (
-              <Text style={styles.accountInfo}>
-                <Text style={styles.accountInfoTitle}>
-                  Has Exchange Balances Permission:{' '}
-                </Text>
-                {FBTCAccountInfo.exchange_balances ? 'Yes' : 'No'}
+            </View>
+            <View
+              style={{
+                height: 1,
+                backgroundColor: Colors.borderColor,
+                margin: wp('3%'),
+                marginTop: wp('0.5%'),
+              }}
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                margin: wp('3%'),
+                marginTop: wp('1.5%'),
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(9),
+                }}
+              >
+                REGISTRATION DATE
               </Text>
-            )}
-            {FBTCAccountInfo.hasOwnProperty('sell_bitcoins') && (
-              <Text style={styles.accountInfo}>
-                <Text style={styles.accountInfoTitle}>
-                  Has Sell Bitcoin Permission:{' '}
-                </Text>
-                {FBTCAccountInfo.sell_bitcoins ? 'Yes' : 'No'}
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginLeft: 'auto',
+                }}
+              >
+                {moment(FBTCAccount.registrationDate)
+                  .utc()
+                  .format('DD MMMM YYYY')}
               </Text>
-            )}
+            </View>
+            <View style={styles.permissionView}>
+              <Text style={styles.permissionTitle}>REDEEM PERMISSION</Text>
+              <View style={styles.permissionSeparationView} />
+              {FBTCAccountInfo.redeem_vouchers ? (
+                <Image
+                  source={require('../../assets/images/icons/icon_check_green.png')}
+                  style={styles.permissionImage}
+                />
+              ) : (
+                <View style={styles.permissionImage} />
+              )}
+            </View>
+            <View
+              style={{
+                ...styles.permissionView,
+                marginTop: wp('0%'),
+                marginBottom: wp('1.5%'),
+              }}
+            >
+              <Text style={styles.permissionTitle}>BALANCE PERMISSION</Text>
+              <View style={styles.permissionSeparationView} />
+              {FBTCAccountInfo.exchange_balances ? (
+                <Image
+                  source={require('../../assets/images/icons/icon_check_green.png')}
+                  style={styles.permissionImage}
+                />
+              ) : (
+                <View style={styles.permissionImage} />
+              )}
+            </View>
           </View>
-          <ScrollView style={{ flex: 1 }}>
+          <View style={{ flex: 1 }}>
             {FBTCAccount.map((value) => {
               return (
                 <TouchableOpacity
@@ -285,27 +463,13 @@ export default function ExistingSavingMethods(props) {
                     });
                   }}
                   style={{
-                    marginLeft: 20,
-                    marginRight: 20,
-                    marginTop: 5,
-                    marginBottom: 5,
+                    ...styles.cardOuterView,
                     flexDirection: 'row',
                     alignItems: 'center',
-                    borderColor: Colors.borderColor,
-                    borderWidth: 1,
-                    borderRadius: 10,
                   }}
                 >
                   <View
-                    style={{
-                      width: wp('10%'),
-                      height: wp('10%'),
-                      borderRadius: wp('10%') / 2,
-                      backgroundColor: Colors.backgroundColor,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginLeft: wp('3%'),
-                    }}
+                    style={{ ...styles.fastBitcoinIcon, marginLeft: wp('3%') }}
                   >
                     <Image
                       source={require('../../assets/images/icons/fastbitcoin_dark.png')}
@@ -395,8 +559,8 @@ export default function ExistingSavingMethods(props) {
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
-        </View>
+          </View>
+        </ScrollView>
       ) : null}
     </View>
   );
@@ -451,5 +615,45 @@ const styles = StyleSheet.create({
   },
   accountInfoTitle: {
     fontFamily: Fonts.FiraSansRegular,
+  },
+  cardOuterView: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 5,
+    marginBottom: 5,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  fastBitcoinIcon: {
+    flexDirection: 'row',
+    width: wp('10%'),
+    height: wp('10%'),
+    borderRadius: wp('10%') / 2,
+    backgroundColor: Colors.backgroundColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  permissionTitle: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(11),
+  },
+  permissionView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: wp('3%'),
+  },
+  permissionSeparationView: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.borderColor,
+    marginLeft: wp('3%'),
+    marginRight: wp('3%'),
+  },
+  permissionImage: {
+    width: wp('5.5%'),
+    height: wp('5.5%'),
+    marginLeft: 'auto',
   },
 });

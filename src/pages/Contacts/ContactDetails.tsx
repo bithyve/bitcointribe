@@ -42,6 +42,7 @@ import S3Service from '../../bitcoin/services/sss/S3Service';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
+import BottomInfoBox from '../../components/BottomInfoBox';
 
 export default function ContactDetails(props) {
   const dispatch = useDispatch();
@@ -140,6 +141,12 @@ export default function ContactDetails(props) {
       isFromAddressBook: true,
     });
   };
+
+  const onPressResendRequest = () =>{
+    props.navigation.navigate('AddContactSendRequest', {
+      SelectedContact: [Contact],
+    });
+  }
 
   const getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = [];
@@ -567,11 +574,9 @@ export default function ContactDetails(props) {
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.hasXpub && Contact.contactName != 'Secondary Device' && (
-              <TouchableOpacity
-                onPress={() => onPressSend()}
+            {Contact.contactName != 'Secondary Device' && <TouchableOpacity
+                onPress={() => {Contact.hasXpub && Contact.contactName != 'Secondary Device' ? onPressSend() : onPressResendRequest()}}
                 style={{
-                  width: wp('15%'),
                   height: wp('6%'),
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -581,16 +586,18 @@ export default function ContactDetails(props) {
                   borderRadius: 4,
                   flexDirection: 'row',
                   alignSelf: 'flex-end',
+                  paddingLeft: wp('1.5%'),
+                  paddingRight: wp('1.5%')
                 }}
               >
-                <Image
+                {Contact.hasXpub && Contact.contactName != 'Secondary Device' && <Image
                   source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                   style={{
                     height: wp('4%'),
                     width: wp('4%'),
                     resizeMode: 'contain',
                   }}
-                />
+                />}
                 <Text
                   style={{
                     color: Colors.white,
@@ -599,13 +606,13 @@ export default function ContactDetails(props) {
                     marginLeft: 2,
                   }}
                 >
-                  Send
+                  {Contact.hasXpub ? 'Send' : 'Resend Request'}
                 </Text>
-              </TouchableOpacity>
-            )}
+              </TouchableOpacity>}
           </View>
         </View>
         {!Loading ? (
+          <View style={{ flex: 1 }}>
           <ScrollView style={{ flex: 1 }}>
             {sortedHistory(trustedContactHistory).map((value) => {
               if (SelectedOption == value.id) {
@@ -711,6 +718,8 @@ export default function ContactDetails(props) {
               }
             })}
           </ScrollView>
+          <BottomInfoBox backgroundColor={Colors.white} title={'Note'} infoText={'The details of your friend and Family will come here.'}/>
+          </View>
         ) : (
           <View style={{ flex: 1 }}>
             <ScrollView>
@@ -755,36 +764,7 @@ export default function ContactDetails(props) {
                 );
               })}
             </ScrollView>
-            <View style={{ backgroundColor: Colors.backgroundColor }}>
-              <View
-                style={{
-                  margin: 15,
-                  backgroundColor: Colors.white,
-                  padding: 10,
-                  paddingTop: 20,
-                  borderRadius: 7,
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.black,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  No history
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  The history of your Recovery Key will appear here
-                </Text>
-              </View>
-            </View>
+            <BottomInfoBox backgroundColor={Colors.white} title={'Note'} infoText={'The details of your friend and Family will come here.'}/>
           </View>
         )}
         {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (

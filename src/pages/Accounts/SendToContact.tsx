@@ -403,7 +403,15 @@ export default function SendToContact(props) {
                   : ''}
               </Text>
             ) : (
-              <Image
+              item && item.id ? 
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 18,
+                  lineHeight: 18, //... One for top and one for bottom alignment
+                }}
+              >@</Text>
+              :<Image
                 source={require('../../assets/images/icons/icon_user.png')}
                 style={styles.circleShapeView}
               />
@@ -791,7 +799,6 @@ export default function SendToContact(props) {
       style={{
         flex: 1,
         backgroundColor: Colors.white,
-        alignSelf: 'center',
       }}
     >
       <SafeAreaView style={{ flex: 0 }} />
