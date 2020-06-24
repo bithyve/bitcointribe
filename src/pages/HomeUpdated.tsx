@@ -185,6 +185,7 @@ const TrustedContactRequestContent = ({
 };
 
 interface HomeStateTypes {
+  notificationLoading: boolean;
   notificationData?: any[];
   cardData?: any[];
   switchOn: boolean;
@@ -298,11 +299,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       canNavigate: false,
       isContactOpen: false,
-  isCameraOpen: false
+      isCameraOpen: false,
+      notificationLoading: true,
     };
   }
 
   onPressNotifications = () => {
+    setTimeout(() => {
+      this.setState({notificationLoading: false});
+    }, 2000);
     (this.refs.notificationsListBottomSheet as any).snapTo(1);
   };
 
@@ -3102,6 +3107,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <NotificationListContent
+              notificationLoading={this.state.notificationLoading}
               NotificationData={notificationData}
               onNotificationClicked={(value) =>
                 this.onNotificationClicked(value)

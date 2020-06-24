@@ -567,9 +567,9 @@ export default function SendViaLink(props) {
       </ScrollView>
       {!props.isFromReceive ? <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
-          title={'Note'}
+          title={'Sharing options'}
           infoText={
-            'Sharing options. Use any of the methods shown to share the request link or Bitcoin address'
+            'Use any of the methods shown to share the request link or Bitcoin address'
           }
         />
       </View> : null}

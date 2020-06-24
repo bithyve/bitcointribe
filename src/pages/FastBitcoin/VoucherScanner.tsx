@@ -247,9 +247,9 @@ const VoucherScanner = (props) => {
           );
         })();
         if (isUserRegistered) {
-          if (voucherCode && selectedAccount) createFBTCAccount();
+          if (voucherCode.length == 12 && selectedAccount) createFBTCAccount();
         } else {
-          if (voucherCode && selectedAccount && !userKey1)
+          if (voucherCode.length == 12 && selectedAccount && !userKey1)
             AccountVerificationBottomSheet.current.snapTo(1);
         }
       } else {
@@ -337,6 +337,7 @@ const VoucherScanner = (props) => {
     if (!FBTCAccountData) {
       obj = {
         user_key: userKey,
+        registrationDate: moment(new Date()).valueOf(),
         test_account: {
           voucher: [],
         },
@@ -855,10 +856,7 @@ const VoucherScanner = (props) => {
               style={styles.qrModalTextInput}
               autoCorrect={false}
               onChangeText={(text) => {
-                if (text.length == 12) {
-                  setVoucherCode(text);
-                  Keyboard.dismiss();
-                }
+                setVoucherCode(text);
               }}
               onFocus={() => {
                 setTextHideShow(false);

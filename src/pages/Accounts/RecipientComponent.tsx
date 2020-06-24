@@ -24,6 +24,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 function RecipientComponent(props) {
+  console.log("props.item", props.item);
   return (
     <TouchableOpacity
       onPress={() => props.onPressElement()}
@@ -86,6 +87,14 @@ function RecipientComponent(props) {
                   )}
                 </Text>
               ) : (
+                props.item && props.item.selectedContact.id ? 
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: RFValue(30),
+                  lineHeight: RFValue(30), //... One for top and one for bottom alignment
+                }}
+              >@</Text> :
                 <Image
                   source={require('../../assets/images/icons/icon_user.png')}
                   style={styles.circleShapeView}

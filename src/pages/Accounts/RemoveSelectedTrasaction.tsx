@@ -25,9 +25,9 @@ export default function RemoveSelectedTrasaction(props) {
             marginLeft: wp('6%'),
           }}
         >
-          <Text style={styles.modalTitleText}>Remove Transaction</Text>
+          <Text style={styles.modalTitleText}>Remove Recipient</Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-            Lorem ipsum dolor sit amet, consectetur
+          This will remove the recipient form Send
           </Text>
         </View>
         <ScrollView>
@@ -43,20 +43,6 @@ export default function RemoveSelectedTrasaction(props) {
           SelectedContactId={SelectedContactId}  
         />
         </ScrollView>
-        <View
-          style={{
-            marginTop: hp('3%'),
-            marginBottom: hp('3%'),
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-          }}
-        >
-          <Text style={{ ...styles.modalInfoText }}>
-            {
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
-            }
-          </Text>
-        </View>
 
         <View
           style={{
