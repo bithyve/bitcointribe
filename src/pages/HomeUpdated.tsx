@@ -245,7 +245,6 @@ interface HomePropsTypes {
   addTransferDetails: any;
   paymentDetails: any;
   clearPaymentDetails: any;
-
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -298,7 +297,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       custodyRequest: null,
       isLoadContacts: false,
       canNavigate: false,
-      lastActiveTime: moment().toISOString()
+      lastActiveTime: moment().toISOString(),
       isContactOpen: false,
       isCameraOpen: false
     };
