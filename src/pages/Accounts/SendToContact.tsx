@@ -426,7 +426,6 @@ export default function SendToContact(props) {
   };
 
   const renderMultipleContacts = (item) => {
-    console.log("item.selectedContact",item.selectedContact)
     return (
       <View
         style={{
