@@ -27,6 +27,7 @@ export default function TrustedContactRequest(props) {
   const [onBlurFocus, setOnBlurFocus] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeArray, setPasscodeArray] = useState([]);
+  console.log("props.hint", props.hint);
   function onPressNumber(text) {
     let tmpPasscode = passcodeArray;
     if (text) {
@@ -100,7 +101,7 @@ export default function TrustedContactRequest(props) {
               props.bottomSheetRef.snapTo(1);
             }}
           />
-          <View style={styles.separatorView} />
+          {/* <View style={styles.separatorView} />
           <Text
             style={{
               ...styles.countryCodeText,
@@ -108,13 +109,13 @@ export default function TrustedContactRequest(props) {
             }}
           >
             @bithyve.com
-          </Text>
+          </Text> */}
         </View>
       );
     } else if (props.inputType == 'phone') {
       return (
         <View style={styles.textboxView}>
-          <Text
+          {/* <Text
             style={{
               ...styles.countryCodeText,
               color: PhoneNumber ? Colors.textColorGrey : Colors.borderColor,
@@ -122,7 +123,7 @@ export default function TrustedContactRequest(props) {
           >
             +91
           </Text>
-          <View style={styles.separatorView} />
+          <View style={styles.separatorView} /> */}
           <TextInput
             keyboardType={'numeric'}
             placeholderTextColor={Colors.borderColor}
@@ -211,6 +212,7 @@ export default function TrustedContactRequest(props) {
   };
 
   const checkForValidation = (text) => {
+    console.log("TEXT",text.charAt(0) + text.substring(8), props.hint)
     if (props.inputType == 'phone') {
       if (text.length == 0) {
         setWrongInputError('');
@@ -223,7 +225,7 @@ export default function TrustedContactRequest(props) {
         setIsDisabled(true);
       } else if (
         text.length >= 3 &&
-        text.substr(text.length - 3) != props.hint
+        text.charAt(0) + text.substring(8) != props.hint
       ) {
         setWrongInputError('Incorrect Phone Number, try again');
         setIsDisabled(true);
@@ -238,7 +240,7 @@ export default function TrustedContactRequest(props) {
         setIsDisabled(true);
       } else if (
         text.length >= 3 &&
-        text.substr(text.length - 3) != props.hint
+        text.charAt(0) + text.substring(8) != props.hint
       ) {
         setWrongInputError('Incorrect Email, try again');
         setIsDisabled(true);
@@ -315,13 +317,14 @@ export default function TrustedContactRequest(props) {
                 marginBottom: wp('8%'),
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod{' '}
+              {props.inputType === 'phone'
+                  ? "Enter your 10 digit phone number  " : props.inputType === 'email'
+                  ? "Enter your email ID  " : null}
               <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                 {props.inputType === 'phone'
-                  ? `+91 XXX XXX X${props.hint}`
+                  ? `${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`
                   : props.inputType === 'email'
-                    ? `XXX${props.hint}@bithyve.com`
+                    ? `${props.hint.charAt(0)}XXXXXXXX@XXX${props.hint.substring(1)}.com`
                     : null}
               </Text>
             </Text>
@@ -331,7 +334,7 @@ export default function TrustedContactRequest(props) {
             <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.phoneNumberInfoText}>
-                  Enter Phone Number
+                {props.inputType === 'phone' ? "Enter Phone Number" : "Enter Email Address"}
                 </Text>
                 <Text style={styles.inputErrorText}>{WrongInputError}</Text>
               </View>
