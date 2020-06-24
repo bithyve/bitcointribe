@@ -88,7 +88,7 @@ export const sendNotificationWatcher = createWatcher(
   SEND_NOTIFICATION,
 );
 
-function* fetchNotificationsWorker() {
+export function* fetchNotificationsWorker() {
   const service: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -97,8 +97,9 @@ function* fetchNotificationsWorker() {
 
   const res = yield call(RelayServices.fetchNotifications, data.walletId);
   if (res.status === 200) {
-    const { notifications } = res.data;
+    const { notifications, DHInfos } = res.data;
     console.log({ notifications });
+    yield call(AsyncStorage.setItem, 'DHInfos', JSON.stringify(DHInfos));
     yield put(notificationsFetched(notifications));
   } else {
     console.log('Failed to deliver notification');

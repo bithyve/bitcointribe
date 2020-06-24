@@ -182,9 +182,10 @@ export default function AddContactSendRequest(props) {
         if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
           const phoneNumber = Contact.phoneNumbers[0].number;
           console.log({ phoneNumber });
-          const number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
           const numHintType = 'num';
-          const numHint = number.slice(number.length - 3);
+          const numHint = number[0] + number.slice(number.length - 2);
           const numberEncPubKey = TrustedContactsService.encryptPub(
             publicKey,
             number,
@@ -202,12 +203,12 @@ export default function AddContactSendRequest(props) {
           setTrustedLink(numberDL);
         } else if (Contact.emails && Contact.emails.length) {
           const email = Contact.emails[0].email;
-          const emailInitials: string = email.split('@')[0];
           const emailHintType = 'eml';
-          const emailHint = emailInitials.slice(emailInitials.length - 3);
+          const emailHint =
+            email[0] + email.replace('.com', '').slice(email.length - 2);
           const emailEncPubKey = TrustedContactsService.encryptPub(
             publicKey,
-            emailInitials,
+            email,
           ).encryptedPub;
           const emailDL =
             `https://hexawallet.io/${config.APP_STAGE}/tc` +

@@ -307,6 +307,11 @@ export default class TrustedContacts {
       if (dataElements.shareTransferDetails) {
         this.trustedContacts[contactName].isGuardian = true;
       }
+
+      if (dataElements.DHInfo) {
+        dataElements.DHInfo.address = ephemeralChannel.address;
+      }
+
       const res = await BH_AXIOS.post('updateEphemeralChannel', {
         HEXA_ID,
         address: ephemeralChannel.address,

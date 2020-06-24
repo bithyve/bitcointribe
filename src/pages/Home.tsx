@@ -243,6 +243,7 @@ export default function Home(props) {
   const [transactions, setTransactions] = useState([]);
   const [NotificationDataChange, setNotificationDataChange] = useState(false);
   const [NotificationData, setNotificationData] = useState([]);
+  const [notificationLoading, setNotificationLoading] = useState(true);
   const [qrData, setqrData] = useState('');
   const currencyCode = [
     'BRL',
@@ -943,6 +944,7 @@ export default function Home(props) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNotificationData(tmpList);
+      setNotificationLoading(false);
       setNotificationDataChange(!NotificationDataChange);
     }
   };
@@ -2773,6 +2775,7 @@ export default function Home(props) {
   const renderNotificationsContent = useCallback(() => {
     return (
       <NotificationListContent
+        notificationLoading={notificationLoading}
         NotificationData={NotificationData}
         onNotificationClicked={(value) => onNotificationClicked(value)}
         onPressBack={() => {

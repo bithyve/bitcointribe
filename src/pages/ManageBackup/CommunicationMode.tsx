@@ -134,10 +134,10 @@ export default function CommunicationMode(props) {
     switch (selectedContactMode.type) {
       case 'number':
         console.log({ info: selectedContactMode.info });
-        const number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
-        console.log({ number, info: selectedContactMode.info });
+        let number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
         const numHintType = 'num';
-        const numHint = number.slice(number.length - 3);
+        const numHint = number[0] + number.slice(number.length - 2);
         const numberEncPubKey = TrustedContactsService.encryptPub(
           publicKey,
           number,
@@ -154,12 +154,13 @@ export default function CommunicationMode(props) {
         break;
 
       case 'email':
-        const emailInitials: string = selectedContactMode.info.split('@')[0];
+        const Email: string = selectedContactMode.info;
         const emailHintType = 'eml';
-        const emailHint = emailInitials.slice(emailInitials.length - 3);
+        const emailHint =
+          Email[0] + Email.replace('.com', '').slice(Email.length - 2);
         const emailEncPubKey = TrustedContactsService.encryptPub(
           publicKey,
-          emailInitials,
+          Email,
         ).encryptedPub;
         const emailDL =
           `https://hexawallet.io/${config.APP_STAGE}/tcg` +

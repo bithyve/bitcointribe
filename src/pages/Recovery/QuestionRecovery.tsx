@@ -223,8 +223,10 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
   },
   dropdownBoxText: {
+    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(13),
+    marginRight: 15,
   },
   dropdownBoxModal: {
     borderRadius: 10,
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
     height: 50,
     paddingLeft: 15,
     paddingRight: 15,
-    alignItems: 'center',
+    alignItems: 'center',    
     backgroundColor: Colors.white,
   },
   dropdownBoxOpened: {
