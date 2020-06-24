@@ -7,6 +7,7 @@ import {
   FlatList,
   Platform,
   AsyncStorage,
+  TouchableOpacity,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -24,6 +25,7 @@ import { sharePersonalCopy } from '../store/actions/sss';
 
 export default function PersonalCopyShareModal(props) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
+  const [isShared, setIsShared] = useState(false)
   const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
     {
       id: 1,
@@ -57,6 +59,10 @@ export default function PersonalCopyShareModal(props) {
   const onShare = async (shareOption) => {
     dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy));
     props.onPressShare();
+  };
+
+  const onConfirm = async () => {
+    props.onPressConfirm();
   };
 
   const disableSharingOption = useCallback(
@@ -113,6 +119,7 @@ export default function PersonalCopyShareModal(props) {
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
                   onShare(item);
+                  setIsShared(true)
                 }}
                 disabled={disableSharingOption(item)}
                 style={[
@@ -153,11 +160,26 @@ export default function PersonalCopyShareModal(props) {
           )}
           keyExtractor={(item, index) => index.toString()}
         />
+        <AppBottomSheetTouchableWrapper
+          disabled={isShared? false : true}
+          onPress={() => {
+            console.log('Confirm');
+            onConfirm();
+          }}
+          style={{
+            ...styles.proceedButtonView,
+            elevation: 10,
+            backgroundColor:
+              isShared ? Colors.blue : Colors.lightBlue,
+          }}
+          >
+            <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
+          </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
         title={'Security question and answer'}
         infoText={
-          'The answer your your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
+          'The answer to your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
         }
       />
     </View>
@@ -239,5 +261,23 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     alignSelf: 'center',
+  },
+  proceedButtonView: {
+    marginTop: hp('4%'),
+    marginBottom: hp('2%'),
+    height: wp('13%'),
+    width: wp('40%'),
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
   },
 });

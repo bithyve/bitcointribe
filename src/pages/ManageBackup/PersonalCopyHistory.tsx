@@ -304,10 +304,18 @@ const PersonalCopyHistory = (props) => {
         onPressBack={() => {
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
-        onPressShare={() => {
-          saveInTransitHistory()
+        onPressShare={() => {}}
+        onPressConfirm={async () => {
+          let personalCopyDetails = JSON.parse(await AsyncStorage.getItem(
+            'personalCopyDetails',
+          ));
+          personalCopyDetails[selectedPersonalCopy.type].shared = true;
+          AsyncStorage.setItem('personalCopyDetails', JSON.stringify(personalCopyDetails));
+          setPersonalCopyDetails(personalCopyDetails);
+          saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
+        
       />
     );
   }, [selectedPersonalCopy, personalCopyDetails]);

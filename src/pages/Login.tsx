@@ -35,7 +35,7 @@ import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Sats or Satoshis');
+  let [message, setMessage] = useState('Satoshis or Sats');
   let [subTextMessage1, setSubTextMessage1] = useState(
     '1 bitcoin = 100 million satoshis or sats',
   );
