@@ -66,6 +66,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
     public PdfPassword(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
     }
+    private static float qrImageSize = 320f;
 
     @Override
     // getName is required to define the name of the module represented in
@@ -121,30 +122,30 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 1:",
                 subFont));
         document.add(preface);
-        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), 250, 250, null);
+        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int)qrImageSize, (int)qrImageSize, null);
         Image codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(0),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(0),
+//                smallBold));
+//        document.add(preface);
         //part 2
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Part 2:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(1),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(1),
+//                smallBold));
+//        document.add(preface);
 
         document.newPage();
         //part 3
@@ -153,30 +154,30 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 3:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(2), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(2), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(2),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(2),
+//                smallBold));
+//        document.add(preface);
         //part 4
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Part 4:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(3), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(3), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(3),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(3),
+//                smallBold));
+//        document.add(preface);
         document.newPage();
 
         //part 5
@@ -185,30 +186,30 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 5:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(4), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(4), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(4),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(4),
+//                smallBold));
+//        document.add(preface);
         //part 6
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Part 6:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(5), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(5), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(5),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(5),
+//                smallBold));
+//        document.add(preface);
         document.newPage();
 
         //part 7
@@ -217,33 +218,33 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Part 7:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(6), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(6), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(6),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(6),
+//                smallBold));
+//        document.add(preface);
         //part 8
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Part 8:",
                 subFont));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(qrcode.getString(7), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(7), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                qrCodeString.getString(7),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                qrCodeString.getString(7),
+//                smallBold));
+//        document.add(preface);
         document.newPage();
         // Secondary Xpub and 2FA Secret
-        preface = new Paragraph();
+        /*preface = new Paragraph();
         preface.add(new Paragraph(
                 "Secondary Xpub (Encrypted):",
                 catFont));
@@ -262,7 +263,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Scan the above QR Code using your HEXA " +
                         "wallet in order to restore your Secure Account.",
                 smallBold));
-        document.add(preface);
+        document.add(preface);*/
 
 
         // Secondary Mnemonic and BitHyve Xpub
@@ -274,18 +275,18 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Use this key to reset the 2FA if you have lost your authenticator/ Keeper app or for exiting your funds from Savings account if the BitHyve server is not responding",
                 smallBold));
         document.add(preface);
-        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), 250, 250, null);
+        barcodeQRCode = new BarcodeQRCode(jsonObj.getString("secondaryMnemonic"), (int)qrImageSize, (int)qrImageSize, null);
         codeQrImage = barcodeQRCode.getImage();
-        codeQrImage.scaleAbsolute(250, 250);
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
         document.add(codeQrImage);
-        preface = new Paragraph();
-        preface.add(new Paragraph(
-                jsonObj.getString("secondaryMnemonic"),
-                smallBold));
-        document.add(preface);
+//        preface = new Paragraph();
+//        preface.add(new Paragraph(
+//                jsonObj.getString("secondaryMnemonic"),
+//                smallBold));
+//        document.add(preface);
 
 
-        preface = new Paragraph();
+        /*preface = new Paragraph();
         preface.add(new Paragraph(
                 "BitHyve Xpub:",
                 catFont));
@@ -300,7 +301,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
                 "Following assets can be used to recover your funds using " +
                         "the open - sourced ga - recovery tool.",
                 smallBold));
-        document.add(preface);
+        document.add(preface);*/
 
 
 
