@@ -164,9 +164,13 @@ export default function ContactDetails(props) {
   };
 
   const onPressResendRequest = () => {
-    props.navigation.navigate('AddContactSendRequest', {
-      SelectedContact: [Contact],
-    });
+    if (index < 3) {
+      (ReshareBottomSheet as any).current.snapTo(1);
+    } else {
+      props.navigation.navigate('AddContactSendRequest', {
+        SelectedContact: [Contact],
+      });
+    }
   };
 
   const getHistoryForTrustedContacts = async () => {
@@ -310,7 +314,7 @@ export default function ContactDetails(props) {
     }
   };
 
-  useEffect(() => {
+  const generateHelpRestoreQR = useCallback(() => {
     if (!Contact) {
       Alert.alert('Contact details missing');
       return;
@@ -451,11 +455,13 @@ export default function ContactDetails(props) {
     ) {
       dispatch(uploadRequestedShare(requester, encryptionKey));
     } else {
-      setTimeout(() => {
-        (SendViaQRBottomSheet as any).current.snapTo(1);
-      }, 2);
+      generateHelpRestoreQR();
     }
   }, [Contact, UNDER_CUSTODY]);
+
+  useEffect(() => {
+    if (uploadSuccessfull) generateHelpRestoreQR();
+  }, [uploadSuccessfull]);
 
   useEffect(() => {
     if (errorSending) {
@@ -789,6 +795,9 @@ export default function ContactDetails(props) {
         .toLowerCase()
         .trim();
       console.log({ contactName });
+
+      if (contactName === 'secondary device') return;
+
       if (!trustedContacts.tc.trustedContacts[contactName]) return;
 
       createDeepLink();
@@ -889,49 +898,56 @@ export default function ContactDetails(props) {
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.contactName != 'Secondary Device' && (
-              <TouchableOpacity
-                onPress={() => {
-                  Contact.hasXpub && Contact.contactName != 'Secondary Device'
-                    ? onPressSend()
-                    : onPressResendRequest();
-                }}
-                style={{
-                  height: wp('6%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: Colors.lightBlue,
-                  marginLeft: 'auto',
-                  marginBottom: 10,
-                  borderRadius: 4,
-                  flexDirection: 'row',
-                  alignSelf: 'flex-end',
-                  paddingLeft: wp('1.5%'),
-                  paddingRight: wp('1.5%'),
-                }}
-              >
-                {Contact.hasXpub && Contact.contactName != 'Secondary Device' && (
-                  <Image
-                    source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                    style={{
-                      height: wp('4%'),
-                      width: wp('4%'),
-                      resizeMode: 'contain',
-                    }}
-                  />
-                )}
-                <Text
+            {Contact.contactName != 'Secondary Device' ? (
+              Contact.hasTrustedChannel && !Contact.hasXpub ? null : (
+                <TouchableOpacity
+                  onPress={() => {
+                    Contact.hasXpub && Contact.contactName != 'Secondary Device'
+                      ? onPressSend()
+                      : onPressResendRequest();
+                  }}
                   style={{
-                    color: Colors.white,
-                    fontFamily: Fonts.FiraSansMedium,
-                    fontSize: RFValue(10),
-                    marginLeft: 2,
+                    height: wp('6%'),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: Colors.lightBlue,
+                    marginLeft: 'auto',
+                    marginBottom: 10,
+                    borderRadius: 4,
+                    flexDirection: 'row',
+                    alignSelf: 'flex-end',
+                    paddingLeft: wp('1.5%'),
+                    paddingRight: wp('1.5%'),
                   }}
                 >
-                  {Contact.hasXpub ? 'Send' : 'Resend Request'}
-                </Text>
-              </TouchableOpacity>
-            )}
+                  {Contact.hasXpub &&
+                    Contact.contactName != 'Secondary Device' && (
+                      <Image
+                        source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                        style={{
+                          height: wp('4%'),
+                          width: wp('4%'),
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  <Text
+                    style={{
+                      color: Colors.white,
+                      fontFamily: Fonts.FiraSansMedium,
+                      fontSize: RFValue(10),
+                      marginLeft: 2,
+                    }}
+                  >
+                    {Contact.hasXpub
+                      ? 'Send'
+                      : index < 3
+                      ? 'Reshare'
+                      : 'Resend Request'}
+                  </Text>
+                </TouchableOpacity>
+              )
+            ) : null}
           </View>
         </View>
         {!Loading ? (
@@ -1110,17 +1126,12 @@ export default function ContactDetails(props) {
             }}
           >
             <TouchableOpacity
+              disabled={!Contact.isWard}
               style={{
                 ...styles.bottomButton,
-                // opacity: Contact.isWard ? 1 : 0.5,
+                opacity: Contact.isWard ? 1 : 0.5,
               }}
-              onPress={() => {
-                if (index < 3) {
-                  (ReshareBottomSheet as any).current.snapTo(1);
-                } else if (Contact.isWard) {
-                  onHelpRestore();
-                }
-              }}
+              onPress={onHelpRestore}
             >
               <Image
                 source={require('../../assets/images/icons/icon_sell.png')}
@@ -1130,29 +1141,23 @@ export default function ContactDetails(props) {
                 {uploading ? (
                   <ActivityIndicator size="small" />
                 ) : (
-                  <Text style={styles.buttonText}>
-                    {index < 3 ? 'Reshare' : 'Help Restore'}
-                  </Text>
+                  <Text style={styles.buttonText}>Help Restore</Text>
                 )}
                 <Text numberOfLines={1} style={styles.buttonInfo}>
                   Lorem ipsum dolor
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomButton} disabled={true}>
+            <TouchableOpacity
+              style={{ ...styles.bottomButton, opacity: 0.5 }}
+              disabled={true}
+            >
               <Image
                 source={require('../../assets/images/icons/icon_buy.png')}
                 style={styles.buttonImage}
               />
               <View>
-                <Text
-                  style={{
-                    ...styles.buttonText,
-                    opacity: 0.5,
-                  }}
-                >
-                  Request Key
-                </Text>
+                <Text style={styles.buttonText}>Request Key</Text>
                 <Text numberOfLines={1} style={styles.buttonInfo}>
                   Lorem ipsum dolor
                 </Text>

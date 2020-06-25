@@ -130,6 +130,12 @@ export default function AddressBookContents(props) {
               contactName.toLowerCase().trim()
             ].ephemeralChannel.initiatedAt;
 
+          const hasTrustedChannel = trustedContactsService.tc.trustedContacts[
+            contactName.toLowerCase().trim()
+          ].symmetricKey
+            ? true
+            : false;
+
           const element = {
             contactName,
             connectedVia,
@@ -138,6 +144,7 @@ export default function AddressBookContents(props) {
             isWard,
             initiatedAt,
             shareIndex,
+            hasTrustedChannel,
             ...contactInfo,
           };
           trustedContacts.push(element);
