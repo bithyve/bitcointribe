@@ -191,7 +191,7 @@ export default function AddContactAddressBook(props) {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -393,26 +393,26 @@ export default function AddContactAddressBook(props) {
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map((value) => {
-                  return (
-                    <View style={styles.selectedContactView}>
-                      <Text style={styles.selectedContactNameText}>
-                        {value.name ? value.name.split(' ')[0] : ''}{' '}
-                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                          {value.name ? value.name.split(' ')[1] : ''}
-                        </Text>
+                return (
+                  <View style={styles.selectedContactView}>
+                    <Text style={styles.selectedContactNameText}>
+                      {value.name ? value.name.split(' ')[0] : ''}{' '}
+                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                        {value.name ? value.name.split(' ')[1] : ''}
                       </Text>
-                      <AppBottomSheetTouchableWrapper
-                        onPress={() => onCancel(value)}
-                      >
-                        <AntDesign
-                          name="close"
-                          size={17}
-                          color={Colors.white}
-                        />
-                      </AppBottomSheetTouchableWrapper>
-                    </View>
-                  );
-                })
+                    </Text>
+                    <AppBottomSheetTouchableWrapper
+                      onPress={() => onCancel(value)}
+                    >
+                      <AntDesign
+                        name="close"
+                        size={17}
+                        color={Colors.white}
+                      />
+                    </AppBottomSheetTouchableWrapper>
+                  </View>
+                );
+              })
               : null}
           </View>
           <View style={[styles.searchBoxContainer]}>

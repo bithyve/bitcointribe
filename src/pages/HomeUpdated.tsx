@@ -92,6 +92,7 @@ import {
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
 import moment from 'moment'
+import { withNavigationFocus } from 'react-navigation';
 
 
 function isEmpty(obj) {
@@ -247,6 +248,7 @@ interface HomePropsTypes {
   paymentDetails: any;
   clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
+  isFocused: boolean;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -308,7 +310,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   onPressNotifications = () => {
     setTimeout(() => {
-      this.setState({notificationLoading: false});
+      this.setState({ notificationLoading: false });
     }, 2000);
     (this.refs.notificationsListBottomSheet as any).snapTo(1);
   };
@@ -617,9 +619,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        (err) => { }, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -650,7 +652,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -692,6 +694,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       initHealthCheck();
     }
 
+
+    // call this once deeplink is detected aswell
     this.handleDeeplinkModal();
   };
 
@@ -799,12 +803,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => { })
+      .catch((err) => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {});
+      .then((notifications) => { });
   };
 
   componentDidUpdate = (prevProps) => {
@@ -858,6 +862,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     );
     const userKey = this.props.navigation.getParam('userKey');
 
+
     if (custodyRequest) {
       this.setState(
         {
@@ -898,9 +903,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               deepLinkModalOpen: true,
             });
           }
-
-          (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
-          (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+          setTimeout(() => {
+            (this.refs.trustedContactRequestBottomSheet as any).snapTo(1);
+            (this.refs.transactionTabBarBottomSheet as any).snapTo(1);
+          }, 2);
         },
       );
 
@@ -922,9 +928,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     if (this.unsubscribe) {
       this.unsubscribe();
     }
-    if (this.appStateListener) {
-      this.appStateListener();
-    }
+    // if (this.appStateListener) {
+    //   this.appStateListener();
+    // }
     if (this.firebaseNotificationListener) {
       this.firebaseNotificationListener();
     }
@@ -934,28 +940,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    let limit = 15000
+    let limit = 15
     const { isContactOpen, isCameraOpen } = this.state
-    let response = await AsyncStorage.multiGet([
-      'isContactOpen',
-      'isCameraOpen',
-    ]);
-
-    this.setState({
-      isContactOpen: JSON.parse(response[0][1]),
-      isCameraOpen: JSON.parse(response[1][1])
-    })
-    let keyArray = [
-      ['isCameraOpen', JSON.stringify(true)],
-      ['isContactOpen', JSON.stringify(true)],
-    ];
-    if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
-    if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
-    if (isContactOpen || isCameraOpen) {
-      AsyncStorage.multiSet(keyArray, () => {});
-      return;
-    }
-
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
@@ -963,7 +949,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     ) {
       this.setState({ lastActiveTime: moment().toISOString() })
     } else {
-      let diff = moment().diff(moment(this.state.lastActiveTime))
+      let { lastActiveTime } = this.state
+      let diff = moment().diff(moment(lastActiveTime), 'seconds')
       if (diff >= limit) {
         this.setState({
           lastActiveTime: moment().toISOString()
@@ -981,7 +968,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLink = async (event) => {
-    const { navigation } = this.props;
+    const { navigation, isFocused } = this.props;
+    // if user is in any other screen before opening 
+    // deep link , we will navigate user to home first
+    if (!isFocused) {
+      navigation.navigate('Home')
+    }
     const splits = event.url.split('/');
 
     if (splits[5] === 'sss') {
@@ -1043,7 +1035,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1366,7 +1358,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1375,17 +1367,17 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     const trustedAccounts: TrustedContactDerivativeAccount =
       accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        TRUSTED_CONTACTS
+      TRUSTED_CONTACTS
       ];
     if (trustedAccounts.instance.using) {
       for (
@@ -1423,13 +1415,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     const accumulativeBalance = regularBalance + secureBalance;
@@ -1571,7 +1563,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -1713,7 +1705,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               postAssociation: (contact) => {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
-                }`.toLowerCase();
+                  }`.toLowerCase();
                 if (isGuardian) {
                   approveTrustedContact(
                     contactName,
@@ -1850,8 +1842,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1926,9 +1918,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2123,8 +2115,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2173,8 +2165,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2253,8 +2245,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('82%')
               : hp('82%'),
@@ -2308,8 +2300,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2437,7 +2429,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         />
         <BottomSheet
           onCloseEnd={() => {
-            if (tabBarIndex === 0 && !deepLinkModalOpen) {
+            if (tabBarIndex === 0) {
               this.setState({
                 tabBarIndex: 999,
               });
@@ -2754,8 +2746,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                         () =>
                           (this.refs
                             .AddContactAddressBookBookBottomSheet as any).snapTo(
-                            1,
-                          ),
+                              1,
+                            ),
                       );
                     }}
                     onPressBiller={() => {
@@ -2766,8 +2758,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                         () =>
                           (this.refs
                             .AddContactAddressBookBookBottomSheet as any).snapTo(
-                            1,
-                          ),
+                              1,
+                            ),
                       );
                     }}
                     onPressBack={() => {
@@ -3024,7 +3016,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
         {familyAndFriendsBookBottomSheetsFlag ? (
           <BottomSheet
-            onOpenEnd={() => {}}
+            onOpenEnd={() => { }}
             enabledInnerScrolling={true}
             ref={'contactSelectedFromAddressBookBottomSheet'}
             snapPoints={[
@@ -3043,14 +3035,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 onPressProceed={() => {
                   (this.refs
                     .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    1,
-                  );
+                      1,
+                    );
                 }}
                 onPressBack={() => {
                   (this.refs
                     .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
+                      0,
+                    );
                 }}
               />
             )}
@@ -3061,8 +3053,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 onPressHeader={() => {
                   (this.refs
                     .contactSelectedFromAddressBookBottomSheet as any).snapTo(
-                    0,
-                  );
+                      0,
+                    );
                 }}
               />
             )}
@@ -3070,7 +3062,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ) : null}
         {familyAndFriendsBookBottomSheetsFlag ? (
           <BottomSheet
-            onOpenEnd={() => {}}
+            onOpenEnd={() => { }}
             enabledInnerScrolling={true}
             ref={'contactSelectedFromAddressBookQrCodeBottomSheet'}
             snapPoints={[
@@ -3084,14 +3076,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 onPressProceed={() => {
                   (this.refs
                     .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
+                      0,
+                    );
                 }}
                 onPressBack={() => {
                   (this.refs
                     .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
+                      0,
+                    );
                 }}
               />
             )}
@@ -3102,8 +3094,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 onPressHeader={() => {
                   (this.refs
                     .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
+                      0,
+                    );
                 }}
               />
             )}
@@ -3153,7 +3145,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -3198,7 +3190,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, {
+export default withNavigationFocus(connect(mapStateToProps, {
   fetchEphemeralChannel,
   fetchNotifications,
   updateFCMTokens,
@@ -3209,7 +3201,7 @@ export default connect(mapStateToProps, {
   fetchDerivativeAccBalTx,
   addTransferDetails,
   clearPaymentDetails,
-})(HomeUpdated);
+})(HomeUpdated));
 
 const styles = StyleSheet.create({
   card: {
@@ -3282,8 +3274,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
