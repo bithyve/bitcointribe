@@ -340,11 +340,11 @@ const PersonalCopyHistory = (props) => {
             : 'Scan the Secondary Mnemonic'
         }
         infoText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+          'Open your PDF copy which is password protected with your Secret Answer'
         }
-        noteText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-        }
+        // noteText={
+        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+        // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {
