@@ -53,7 +53,8 @@ export default function ContactDetails(props) {
   const [Loading, setLoading] = useState(true);
   const Contact = props.navigation.state.params.contact;
   const contactsType = props.navigation.state.params.contactsType;
-  const index = props.navigation.state.params.index;
+  const itemIndex = props.navigation.state.params.index;
+  const index = props.navigation.state.params.shareIndex;
   const [contact, setContact] = useState(Contact ? Contact : Object);
   const [SelectedOption, setSelectedOption] = useState(0);
   const [ReshareBottomSheet, setReshareBottomSheet] = useState(
@@ -645,6 +646,12 @@ export default function ContactDetails(props) {
       //   onOTPShare(index); // enables reshare
       //   setChangeContact(false);
       // } else
+      console.log({ index });
+      console.log(SHARES_TRANSFER_DETAILS);
+      console.log(
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+          config.TC_REQUEST_EXPIRY,
+      );
       if (
         !SHARES_TRANSFER_DETAILS[index] ||
         Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
@@ -819,14 +826,12 @@ export default function ContactDetails(props) {
             createGuardian();
             if (SendViaQRBottomSheet.current)
               (SendViaQRBottomSheet as any).current.snapTo(1);
-            // setContactIndex(index);
             (shareBottomSheet as any).current.snapTo(0);
           }}
           onPressViaLink={() => {
             createGuardian();
             if (SendViaLinkBottomSheet.current)
               (SendViaLinkBottomSheet as any).current.snapTo(1);
-            // setContactIndex(index);
             (shareBottomSheet as any).current.snapTo(0);
           }}
         />
@@ -1048,7 +1053,7 @@ export default function ContactDetails(props) {
               {[1, 2, 3, 4, 5].map((value, index) => {
                 return (
                   <View
-                    key={index}
+                    key={itemIndex}
                     style={{
                       margin: wp('3%'),
                       backgroundColor: Colors.white,
@@ -1134,13 +1139,20 @@ export default function ContactDetails(props) {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomButton}>
+            <TouchableOpacity style={styles.bottomButton} disabled={true}>
               <Image
                 source={require('../../assets/images/icons/icon_buy.png')}
                 style={styles.buttonImage}
               />
               <View>
-                <Text style={styles.buttonText}>Request Key</Text>
+                <Text
+                  style={{
+                    ...styles.buttonText,
+                    opacity: 0.5,
+                  }}
+                >
+                  Request Key
+                </Text>
                 <Text numberOfLines={1} style={styles.buttonInfo}>
                   Lorem ipsum dolor
                 </Text>
