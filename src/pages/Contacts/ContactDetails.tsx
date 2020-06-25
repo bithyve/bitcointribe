@@ -142,11 +142,11 @@ export default function ContactDetails(props) {
     });
   };
 
-  const onPressResendRequest = () =>{
+  const onPressResendRequest = () => {
     props.navigation.navigate('AddContactSendRequest', {
       SelectedContact: [Contact],
     });
-  }
+  };
 
   const getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = [];
@@ -348,7 +348,9 @@ export default function ContactDetails(props) {
       // } else if (Contact.emails && Contact.emails.length) {
       //   const email = Contact.emails[0].email;
       //   const emailHintType = 'eml';
-      //   const emailHint = email[0] + email.replace('.com', '').slice(email.length - 2);
+      // const trucatedEmail = email.replace('.com', '');
+      // const emailHint =
+      //   email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
       //   const emailEncKey = TrustedContactsService.encryptPub(
       //     KEY,
       //     email,
@@ -574,8 +576,13 @@ export default function ContactDetails(props) {
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.contactName != 'Secondary Device' && <TouchableOpacity
-                onPress={() => {Contact.hasXpub && Contact.contactName != 'Secondary Device' ? onPressSend() : onPressResendRequest()}}
+            {Contact.contactName != 'Secondary Device' && (
+              <TouchableOpacity
+                onPress={() => {
+                  Contact.hasXpub && Contact.contactName != 'Secondary Device'
+                    ? onPressSend()
+                    : onPressResendRequest();
+                }}
                 style={{
                   height: wp('6%'),
                   justifyContent: 'center',
@@ -587,17 +594,19 @@ export default function ContactDetails(props) {
                   flexDirection: 'row',
                   alignSelf: 'flex-end',
                   paddingLeft: wp('1.5%'),
-                  paddingRight: wp('1.5%')
+                  paddingRight: wp('1.5%'),
                 }}
               >
-                {Contact.hasXpub && Contact.contactName != 'Secondary Device' && <Image
-                  source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                  style={{
-                    height: wp('4%'),
-                    width: wp('4%'),
-                    resizeMode: 'contain',
-                  }}
-                />}
+                {Contact.hasXpub && Contact.contactName != 'Secondary Device' && (
+                  <Image
+                    source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                    style={{
+                      height: wp('4%'),
+                      width: wp('4%'),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                )}
                 <Text
                   style={{
                     color: Colors.white,
@@ -608,85 +617,35 @@ export default function ContactDetails(props) {
                 >
                   {Contact.hasXpub ? 'Send' : 'Resend Request'}
                 </Text>
-              </TouchableOpacity>}
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         {!Loading ? (
           <View style={{ flex: 1 }}>
-          <ScrollView style={{ flex: 1 }}>
-            {sortedHistory(trustedContactHistory).map((value) => {
-              if (SelectedOption == value.id) {
-                return (
-                  <TouchableOpacity
-                    key={value.id}
-                    onPress={() => SelectOption(value.id)}
-                    style={{
-                      margin: wp('3%'),
-                      backgroundColor: Colors.white,
-                      borderRadius: 10,
-                      height: wp('20%'),
-                      width: wp('90%'),
-                      justifyContent: 'center',
-                      paddingLeft: wp('3%'),
-                      paddingRight: wp('3%'),
-                      alignSelf: 'center',
-                    }}
-                  >
-                    <Text
+            <ScrollView style={{ flex: 1 }}>
+              {sortedHistory(trustedContactHistory).map((value) => {
+                if (SelectedOption == value.id) {
+                  return (
+                    <TouchableOpacity
+                      key={value.id}
+                      onPress={() => SelectOption(value.id)}
                       style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
+                        margin: wp('3%'),
+                        backgroundColor: Colors.white,
+                        borderRadius: 10,
+                        height: wp('20%'),
+                        width: wp('90%'),
+                        justifyContent: 'center',
+                        paddingLeft: wp('3%'),
+                        paddingRight: wp('3%'),
+                        alignSelf: 'center',
                       }}
-                    >
-                      {value.title}
-                    </Text>
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansRegular,
-                        marginTop: 5,
-                      }}
-                    >
-                      {value.info}
-                    </Text>
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(9),
-                        fontFamily: Fonts.FiraSansRegular,
-                        marginTop: hp('0.3%'),
-                      }}
-                    >
-                      {value.date}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              } else {
-                return (
-                  <TouchableOpacity
-                    key={value.id}
-                    onPress={() => SelectOption(value.id)}
-                    style={{
-                      margin: wp('3%'),
-                      backgroundColor: Colors.white,
-                      borderRadius: 10,
-                      height: wp('15%'),
-                      width: wp('85%'),
-                      justifyContent: 'center',
-                      paddingLeft: wp('3%'),
-                      paddingRight: wp('3%'),
-                      alignSelf: 'center',
-                    }}
-                  >
-                    <View
-                      style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
                       <Text
                         style={{
-                          color: Colors.textColorGrey,
-                          fontSize: RFValue(10),
+                          color: Colors.blue,
+                          fontSize: RFValue(13),
                           fontFamily: Fonts.FiraSansRegular,
                         }}
                       >
@@ -695,30 +654,85 @@ export default function ContactDetails(props) {
                       <Text
                         style={{
                           color: Colors.textColorGrey,
+                          fontSize: RFValue(10),
+                          fontFamily: Fonts.FiraSansRegular,
+                          marginTop: 5,
+                        }}
+                      >
+                        {value.info}
+                      </Text>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
                           fontSize: RFValue(9),
                           fontFamily: Fonts.FiraSansRegular,
-                          marginLeft: 'auto',
+                          marginTop: hp('0.3%'),
                         }}
                       >
                         {value.date}
                       </Text>
-                    </View>
-                    <Text
+                    </TouchableOpacity>
+                  );
+                } else {
+                  return (
+                    <TouchableOpacity
+                      key={value.id}
+                      onPress={() => SelectOption(value.id)}
                       style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(8),
-                        fontFamily: Fonts.FiraSansRegular,
-                        marginTop: 5,
+                        margin: wp('3%'),
+                        backgroundColor: Colors.white,
+                        borderRadius: 10,
+                        height: wp('15%'),
+                        width: wp('85%'),
+                        justifyContent: 'center',
+                        paddingLeft: wp('3%'),
+                        paddingRight: wp('3%'),
+                        alignSelf: 'center',
                       }}
                     >
-                      {value.info}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              }
-            })}
-          </ScrollView>
-          <BottomInfoBox backgroundColor={Colors.white} title={'Note'} infoText={'The details of your friend and Family will come here.'}/>
+                      <View
+                        style={{ flexDirection: 'row', alignItems: 'center' }}
+                      >
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue(10),
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}
+                        >
+                          {value.title}
+                        </Text>
+                        <Text
+                          style={{
+                            color: Colors.textColorGrey,
+                            fontSize: RFValue(9),
+                            fontFamily: Fonts.FiraSansRegular,
+                            marginLeft: 'auto',
+                          }}
+                        >
+                          {value.date}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{
+                          color: Colors.textColorGrey,
+                          fontSize: RFValue(8),
+                          fontFamily: Fonts.FiraSansRegular,
+                          marginTop: 5,
+                        }}
+                      >
+                        {value.info}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                }
+              })}
+            </ScrollView>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={'The details of your friend and Family will come here.'}
+            />
           </View>
         ) : (
           <View style={{ flex: 1 }}>
@@ -764,7 +778,11 @@ export default function ContactDetails(props) {
                 );
               })}
             </ScrollView>
-            <BottomInfoBox backgroundColor={Colors.white} title={'Note'} infoText={'The details of your friend and Family will come here.'}/>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={'The details of your friend and Family will come here.'}
+            />
           </View>
         )}
         {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (

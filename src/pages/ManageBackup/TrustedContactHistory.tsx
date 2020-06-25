@@ -596,9 +596,7 @@ const TrustedContactHistory = (props) => {
         modalRef={ReshareBottomSheet}
         title={'Reshare Recovery Key\nwith Keeper'}
         info={'Did your Keeper not receive the Recovery Key?'}
-        note={
-          'You can reshare the Recovery Key with your Keeper'
-        }
+        note={'You can reshare the Recovery Key with your Keeper'}
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
@@ -857,8 +855,9 @@ const TrustedContactHistory = (props) => {
     } else if (chosenContact.emails && chosenContact.emails.length) {
       const email = chosenContact.emails[0].email;
       const emailHintType = 'eml';
+      const trucatedEmail = email.replace('.com', '');
       const emailHint =
-        email[0] + email.replace('.com', '').slice(email.length - 2);
+        email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
       const emailEncPubKey = TrustedContactsService.encryptPub(publicKey, email)
         .encryptedPub;
       const emailDL =
@@ -1131,7 +1130,9 @@ const TrustedContactHistory = (props) => {
           contactText={'Adding to Friends and Family:'}
           contact={chosenContact ? chosenContact : null}
           noteHeader={'Keeper Request'}
-          noteText={'Scan QR. On scanning, you will be adding the contact as your Keeper'}
+          noteText={
+            'Scan QR. On scanning, you will be adding the contact as your Keeper'
+          }
           QR={trustedQR}
           contactEmail={''}
           onPressBack={() => {

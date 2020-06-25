@@ -150,8 +150,9 @@ export default function RecoveryCommunication(props) {
       case 'email':
         const Email: string = selectedContactMode.info;
         const emailHintType = 'eml';
+        const trucatedEmail = Email.replace('.com', '');
         const emailHint =
-          Email[0] + Email.replace('.com', '').slice(Email.length - 2);
+          Email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
         const emailEncPubKey = TrustedContactsService.encryptPub(
           REQUEST_DETAILS.KEY,
           Email,

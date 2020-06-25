@@ -218,8 +218,9 @@ export default function Receive(props) {
         } else if (selectedContact.emails && selectedContact.emails.length) {
           const email = selectedContact.emails[0].email;
           const emailHintType = 'eml';
+          const trucatedEmail = email.replace('.com', '');
           const emailHint =
-            email[0] + email.replace('.com', '').slice(email.length - 2);
+            email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
           const emailEncPubKey = TrustedContactsService.encryptPub(
             publicKey,
             email,

@@ -204,8 +204,9 @@ export default function AddContactSendRequest(props) {
         } else if (Contact.emails && Contact.emails.length) {
           const email = Contact.emails[0].email;
           const emailHintType = 'eml';
+          const trucatedEmail = email.replace('.com', '');
           const emailHint =
-            email[0] + email.replace('.com', '').slice(email.length - 2);
+            email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
           const emailEncPubKey = TrustedContactsService.encryptPub(
             publicKey,
             email,
