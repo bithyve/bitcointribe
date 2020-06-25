@@ -27,7 +27,7 @@ export default function TrustedContactRequest(props) {
   const [onBlurFocus, setOnBlurFocus] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeArray, setPasscodeArray] = useState([]);
-  console.log("props.hint", props.hint);
+  console.log('props.hint', props.hint);
   function onPressNumber(text) {
     let tmpPasscode = passcodeArray;
     if (text) {
@@ -41,10 +41,10 @@ export default function TrustedContactRequest(props) {
     }
   }
 
-  useEffect(()=>{
-    if(!props.inputType) setIsDisabled(false);
+  useEffect(() => {
+    if (!props.inputType) setIsDisabled(false);
     else setIsDisabled(true);
-  },[props.inputType])
+  }, [props.inputType]);
 
   const getStyle = (i) => {
     if (i == 0) {
@@ -130,8 +130,7 @@ export default function TrustedContactRequest(props) {
             placeholder={'Enter Phone Number'}
             onChangeText={(text) => {
               setPhoneNumber(text);
-              if (text.length === 10)
-                checkForValidation(text)
+              if (text.length === 10) checkForValidation(text);
             }}
             style={{ flex: 1 }}
             onFocus={() => {
@@ -212,7 +211,7 @@ export default function TrustedContactRequest(props) {
   };
 
   const checkForValidation = (text) => {
-    console.log("TEXT",text.charAt(0) + text.substring(8), props.hint)
+    console.log('TEXT', text.charAt(0) + text.substring(8), props.hint);
     if (props.inputType == 'phone') {
       if (text.length == 0) {
         setWrongInputError('');
@@ -240,7 +239,9 @@ export default function TrustedContactRequest(props) {
         setIsDisabled(true);
       } else if (
         text.length >= 3 &&
-        text.charAt(0) + text.substring(8) != props.hint
+        text.charAt(0) +
+          text.replace('.com', '').slice(text.replace('.com', '').length - 2) !=
+          props.hint
       ) {
         setWrongInputError('Incorrect Email, try again');
         setIsDisabled(true);
@@ -278,10 +279,12 @@ export default function TrustedContactRequest(props) {
                 </Text>
               )
             ) : (
-                <Text style={styles.modalTitleText}>Recovery Share Request</Text>
-              )}
+              <Text style={styles.modalTitleText}>Recovery Share Request</Text>
+            )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              {props.inputType ? "Accept the request to add your contact to Friends and Family" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor" }
+              {props.inputType
+                ? 'Accept the request to add your contact to Friends and Family'
+                : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'}
             </Text>
           </View>
           <View style={styles.box}>
@@ -318,14 +321,18 @@ export default function TrustedContactRequest(props) {
               }}
             >
               {props.inputType === 'phone'
-                  ? "Enter your 10 digit phone number  " : props.inputType === 'email'
-                  ? "Enter your email ID  " : null}
+                ? 'Enter your 10 digit phone number  '
+                : props.inputType === 'email'
+                ? 'Enter your email ID  '
+                : null}
               <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                 {props.inputType === 'phone'
                   ? `${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`
                   : props.inputType === 'email'
-                    ? `${props.hint.charAt(0)}XXXXXXXX@XXX${props.hint.substring(1)}.com`
-                    : null}
+                  ? `${props.hint.charAt(0)}XXXX@XXX${props.hint.substring(
+                      1,
+                    )}.com`
+                  : null}
               </Text>
             </Text>
           ) : null}
@@ -334,7 +341,9 @@ export default function TrustedContactRequest(props) {
             <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
               <View style={{ flexDirection: 'row' }}>
                 <Text style={styles.phoneNumberInfoText}>
-                {props.inputType === 'phone' ? "Enter Phone Number" : "Enter Email Address"}
+                  {props.inputType === 'phone'
+                    ? 'Enter Phone Number'
+                    : 'Enter Email Address'}
                 </Text>
                 <Text style={styles.inputErrorText}>{WrongInputError}</Text>
               </View>
@@ -371,8 +380,8 @@ export default function TrustedContactRequest(props) {
               {props.loading && props.loading == true ? (
                 <ActivityIndicator size="small" />
               ) : (
-                  <Text style={styles.proceedButtonText}>Accept Request</Text>
-                )}
+                <Text style={styles.proceedButtonText}>Accept Request</Text>
+              )}
             </AppBottomSheetTouchableWrapper>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
