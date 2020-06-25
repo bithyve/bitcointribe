@@ -91,8 +91,7 @@ import {
 } from '../store/actions/accounts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
-import moment from 'moment'
-
+import moment from 'moment';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -308,7 +307,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   onPressNotifications = () => {
     setTimeout(() => {
-      this.setState({notificationLoading: false});
+      this.setState({ notificationLoading: false });
     }, 2000);
     (this.refs.notificationsListBottomSheet as any).snapTo(1);
   };
@@ -934,8 +933,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   }
 
   handleAppStateChange = async (nextAppState) => {
-    let limit = 15000
-    const { isContactOpen, isCameraOpen } = this.state
+    let limit = 15000;
+    const { isContactOpen, isCameraOpen } = this.state;
     let response = await AsyncStorage.multiGet([
       'isContactOpen',
       'isCameraOpen',
@@ -943,8 +942,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     this.setState({
       isContactOpen: JSON.parse(response[0][1]),
-      isCameraOpen: JSON.parse(response[1][1])
-    })
+      isCameraOpen: JSON.parse(response[1][1]),
+    });
     let keyArray = [
       ['isCameraOpen', JSON.stringify(true)],
       ['isContactOpen', JSON.stringify(true)],
@@ -961,21 +960,23 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      this.setState({ lastActiveTime: moment().toISOString() })
+      this.setState({ lastActiveTime: moment().toISOString() });
     } else {
-      let diff = moment().diff(moment(this.state.lastActiveTime))
+      let diff = moment().diff(moment(this.state.lastActiveTime));
       if (diff >= limit) {
-        this.setState({
-          lastActiveTime: moment().toISOString()
-        }, () => {
-          this.props.navigation.navigate('ReLogin');
-        })
-
+        this.setState(
+          {
+            lastActiveTime: moment().toISOString(),
+          },
+          () => {
+            this.props.navigation.navigate('ReLogin');
+          },
+        );
       } else {
         this.setState({
-          lastActiveTime: moment().toISOString()
-        })
-        return
+          lastActiveTime: moment().toISOString(),
+        });
+        return;
       }
     }
   };
@@ -1130,8 +1131,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.props.fetchNotifications();
       this.getNewTransactionNotifications();
       this.setState({
-        lastActiveTime: moment().toISOString()
-      })
+        lastActiveTime: moment().toISOString(),
+      });
     });
 
     setTimeout(() => {
@@ -1713,7 +1714,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               postAssociation: (contact) => {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
-                }`.toLowerCase();
+                }`
+                  .toLowerCase()
+                  .trim();
                 if (isGuardian) {
                   approveTrustedContact(
                     contactName,
