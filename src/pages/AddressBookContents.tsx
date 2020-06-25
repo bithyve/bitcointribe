@@ -299,7 +299,8 @@ export default function AddressBookContents(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                {Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY
+                {Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+                !contact.hasTrustedChannel
                   ? 'Expired'
                   : 'Pending'}
               </Text>

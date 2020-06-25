@@ -166,6 +166,8 @@ export const initHCWatcher = createWatcher(initHCWorker, INIT_HEALTH_CHECK);
 
 function* uploadEncMetaShareWorker({ payload }) {
   // Transfer: User >>> Guardian
+  yield put(switchS3Loader('uploadMetaShare'));
+
   const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
   const trustedContacts = yield select(
@@ -193,12 +195,12 @@ function* uploadEncMetaShareWorker({ payload }) {
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
+        yield put(switchS3Loader('uploadMetaShare'));
+
         return;
       }
     }
   }
-
-  yield put(switchS3Loader('uploadMetaShare'));
 
   // TODO: reactivate DNP Transportation for Hexa Premium
   // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
