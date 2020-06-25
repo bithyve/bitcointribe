@@ -157,7 +157,7 @@ export interface INotification {
   notificationType: notificationType;
   title: string;
   body: string;
-  data: Object;
+  data: any;
   tag: notificationTag;
   status?: string;
   date?: Date;

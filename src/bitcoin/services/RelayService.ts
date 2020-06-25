@@ -138,15 +138,14 @@ export default class RelayServices {
     }
   };
 
-  public static sendNotification = async (
-    receiverWalletID: string,
-    receiverFCMs: string[],
+  public static sendNotifications = async (
+    receivers: { walletId: string; FCMs: string[] }[],
     notification: INotification,
   ): Promise<
     | {
         status: number;
         data: {
-          delivered: Boolean;
+          sent: Boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -161,11 +160,7 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendNotification(
-          receiverWalletID,
-          receiverFCMs,
-          notification,
-        ),
+        data: await Relay.sendNotifications(receivers, notification),
       };
     } catch (err) {
       return {

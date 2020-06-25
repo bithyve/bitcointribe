@@ -97,34 +97,34 @@ export default class Relay {
     return { notifications, DHInfos };
   };
 
-  public static sendNotification = async (
-    receiverWalletID: string,
-    receiverFCMs: string[],
+  public static sendNotifications = async (
+    receivers: { walletId: string; FCMs: string[] }[],
     notification: INotification,
   ): Promise<{
-    delivered: Boolean;
+    sent: Boolean;
   }> => {
     try {
       let res: AxiosResponse;
 
-      if (!receiverFCMs.length)
-        throw new Error('Failed to deliver notification: FCM missing');
+      if (!receivers.length)
+        throw new Error('Failed to deliver notification: receivers missing');
 
       try {
-        res = await BH_AXIOS.post('sendNotification', {
+        res = await BH_AXIOS.post('sendNotifications', {
           HEXA_ID,
-          receiverWalletID, // walletId to which notification needs to be delivered
-          receiverFCMs,
+          receivers,
           notification,
         });
+        console.log({ res });
       } catch (err) {
+        console.log({ err });
         if (err.response) throw new Error(err.response.data.err);
         if (err.code) throw new Error(err.code);
       }
-      const { delivered } = res.data;
-      if (!delivered) throw new Error();
+      const { sent } = res.data;
+      if (!sent) throw new Error();
 
-      return { delivered };
+      return { sent };
     } catch (err) {
       throw new Error('Failed to deliver notification');
     }
