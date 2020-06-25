@@ -848,6 +848,7 @@ export default function Send(props) {
                       marginLeft: 'auto',
                       fontFamily: Fonts.FiraSansItalic,
                       marginTop: 10,
+                      paddingBottom: 50,
                     }}
                   >
                     Send it to a sample address
