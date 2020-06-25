@@ -37,24 +37,34 @@ import {
   uploadRequestedShare,
   ErrorSending,
   UploadSuccessfully,
+  uploadEncMShare,
 } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import SendShareModal from '../ManageBackup/SendShareModal';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
   const dispatch = useDispatch();
   const [Loading, setLoading] = useState(true);
   const Contact = props.navigation.state.params.contact;
   const contactsType = props.navigation.state.params.contactsType;
-  const index = props.navigation.state.params.index;
+  const itemIndex = props.navigation.state.params.index;
+  const index = props.navigation.state.params.shareIndex;
   const [contact, setContact] = useState(Contact ? Contact : Object);
   const [SelectedOption, setSelectedOption] = useState(0);
-  // const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
-  //   React.createRef(),
-  // );
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [shareBottomSheet, setshareBottomSheet] = useState(React.createRef());
+
+  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+    React.createRef(),
+  );
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
@@ -96,7 +106,7 @@ export default function ContactDetails(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  // const [trustedLink, setTrustedLink] = useState('');
+  const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
   const [key, setKey] = useState('');
@@ -112,6 +122,17 @@ export default function ContactDetails(props) {
   );
   const { UNDER_CUSTODY } = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
+  );
+
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+    (state) => state.storage.database,
+  );
+  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
+  const uploadMetaShare = useSelector(
+    (state) => state.sss.loading.uploadMetaShare,
+  );
+  const updateEphemeralChannelLoader = useSelector(
+    (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
 
   useEffect(() => {
@@ -143,9 +164,13 @@ export default function ContactDetails(props) {
   };
 
   const onPressResendRequest = () => {
-    props.navigation.navigate('AddContactSendRequest', {
-      SelectedContact: [Contact],
-    });
+    if (index < 3) {
+      (ReshareBottomSheet as any).current.snapTo(1);
+    } else {
+      props.navigation.navigate('AddContactSendRequest', {
+        SelectedContact: [Contact],
+      });
+    }
   };
 
   const getHistoryForTrustedContacts = async () => {
@@ -289,7 +314,7 @@ export default function ContactDetails(props) {
     }
   };
 
-  useEffect(() => {
+  const generateHelpRestoreQR = useCallback(() => {
     if (!Contact) {
       Alert.alert('Contact details missing');
       return;
@@ -430,11 +455,13 @@ export default function ContactDetails(props) {
     ) {
       dispatch(uploadRequestedShare(requester, encryptionKey));
     } else {
-      setTimeout(() => {
-        (SendViaQRBottomSheet as any).current.snapTo(1);
-      }, 2);
+      generateHelpRestoreQR();
     }
   }, [Contact, UNDER_CUSTODY]);
+
+  useEffect(() => {
+    if (uploadSuccessfull) generateHelpRestoreQR();
+  }, [uploadSuccessfull]);
 
   useEffect(() => {
     if (errorSending) {
@@ -450,34 +477,34 @@ export default function ContactDetails(props) {
     }
   }, [errorSending]);
 
-  // const renderSendViaLinkContents = useCallback(() => {
-  //   return (
-  //     <SendViaLink
-  //       contactText={'Send Recovery Secret'}
-  //       contact={Contact}
-  //       link={trustedLink}
-  //       contactEmail={''}
-  //       onPressBack={() => {
-  //         if (SendViaLinkBottomSheet.current)
-  //           (SendViaLinkBottomSheet as any).current.snapTo(0);
-  //       }}
-  //       onPressDone={() => {
-  //         (SendViaLinkBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, [Contact, trustedLink]);
+  const renderSendViaLinkContents = useCallback(() => {
+    return (
+      <SendViaLink
+        contactText={'Send Recovery Secret'}
+        contact={Contact}
+        link={trustedLink}
+        contactEmail={''}
+        onPressBack={() => {
+          if (SendViaLinkBottomSheet.current)
+            (SendViaLinkBottomSheet as any).current.snapTo(0);
+        }}
+        onPressDone={() => {
+          (SendViaLinkBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [Contact, trustedLink]);
 
-  // const renderSendViaLinkHeader = useCallback(() => {
-  //   return (
-  //     <ModalHeader
-  //       onPressHeader={() => {
-  //         if (SendViaLinkBottomSheet.current)
-  //           (SendViaLinkBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, []);
+  const renderSendViaLinkHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (SendViaLinkBottomSheet.current)
+            (SendViaLinkBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   const renderSendViaQRContents = useCallback(() => {
     return (
@@ -536,6 +563,301 @@ export default function ContactDetails(props) {
     );
   }, []);
 
+  const renderReshareContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ReshareBottomSheet}
+        title={'Reshare Recovery Key\nwith Keeper'}
+        info={'Did your Keeper not receive the Recovery Key?'}
+        note={'You can reshare the Recovery Key with your Keeper'}
+        proceedButtonText={'Reshare'}
+        cancelButtonText={'Back'}
+        isIgnoreButton={true}
+        onPressProceed={() => {
+          (shareBottomSheet as any).current.snapTo(1);
+          (ReshareBottomSheet as any).current.snapTo(0);
+        }}
+        onPressIgnore={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+        }}
+        isBottomImage={false}
+      />
+    );
+  }, []);
+
+  const renderReshareHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (ReshareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  function isEmpty(obj) {
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+  }
+
+  const createGuardian = useCallback(async () => {
+    if (!Object.keys(Contact).length) return;
+    if (
+      Contact.firstName &&
+      ((Contact.phoneNumbers && Contact.phoneNumbers.length) ||
+        (Contact.emails && Contact.emails.length))
+    ) {
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
+      console.log({ walletID, FCM });
+
+      const contactName = `${Contact.firstName} ${
+        Contact.lastName ? Contact.lastName : ''
+      }`
+        .toLowerCase()
+        .trim();
+      let data: EphemeralData = {
+        walletID,
+        FCM,
+      };
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+      // if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
+      //   // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
+      //   setTrustedLink('');
+      //   setTrustedQR('');
+      //   // remove the previous TC
+      //   let trustedContactsInfo: any = await AsyncStorage.getItem(
+      //     'TrustedContactsInfo',
+      //   );
+
+      //   let previousGuardianName;
+      //   if (trustedContactsInfo) {
+      //     trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      //     const previousGuardian = trustedContactsInfo[index];
+      //     if (previousGuardian) {
+      //       previousGuardianName = `${previousGuardian.firstName} ${
+      //         previousGuardian.lastName ? previousGuardian.lastName : ''
+      //       }`
+      //         .toLowerCase()
+      //         .trim();
+      //     } else {
+      //       console.log('Previous guardian details missing');
+      //     }
+      //   }
+
+      //   dispatch(
+      //     uploadEncMShare(index, contactName, data, true, previousGuardianName),
+      //   );
+      //   updateTrustedContactsInfo(Contact);
+      //   onOTPShare(index); // enables reshare
+      //   setChangeContact(false);
+      // } else
+      console.log({ index });
+      console.log(SHARES_TRANSFER_DETAILS);
+      console.log(
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+          config.TC_REQUEST_EXPIRY,
+      );
+      if (
+        !SHARES_TRANSFER_DETAILS[index] ||
+        Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
+          config.TC_REQUEST_EXPIRY
+      ) {
+        setTrustedLink('');
+        setTrustedQR('');
+        dispatch(uploadEncMShare(index, contactName, data));
+      } else if (
+        trustedContact &&
+        !trustedContact.symmetricKey &&
+        trustedContact.ephemeralChannel &&
+        trustedContact.ephemeralChannel.initiatedAt &&
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+          config.TC_REQUEST_EXPIRY
+      ) {
+        setTrustedLink('');
+        setTrustedQR('');
+        dispatch(
+          updateEphemeralChannel(
+            contactName,
+            trustedContact.ephemeralChannel.data[0],
+          ),
+        );
+      }
+    } else {
+      Alert.alert(
+        'Invalid Contact',
+        'Cannot add a contact without phone-num/email as a trusted entity',
+      );
+    }
+  }, [SHARES_TRANSFER_DETAILS[index], Contact]);
+
+  const createDeepLink = useCallback(() => {
+    console.log(uploadMetaShare, updateEphemeralChannelLoader);
+    if (uploadMetaShare || updateEphemeralChannelLoader) {
+      if (trustedLink) setTrustedLink('');
+      if (trustedQR) setTrustedQR('');
+      return;
+    }
+    if (!SHARES_TRANSFER_DETAILS[index]) {
+      setTimeout(() => {
+        setErrorMessageHeader('Failed to share');
+        setErrorMessage(
+          'There was some error while sharing the Recovery Key, please try again',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      return;
+    }
+
+    if (!Contact) {
+      console.log('Err: Contact missing');
+      return;
+    }
+
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
+
+    if (
+      !trustedContacts.tc.trustedContacts[contactName] &&
+      !trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+    ) {
+      console.log(
+        'Err: Trusted Contact/Ephemeral Channel does not exists for contact: ',
+        contactName,
+      );
+      return;
+    }
+
+    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const requester = WALLET_SETUP.walletName;
+    const appVersion = DeviceInfo.getVersion();
+    if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+      const phoneNumber = Contact.phoneNumbers[0].number;
+      console.log({ phoneNumber });
+      let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+      number = number.slice(number.length - 10); // last 10 digits only
+      const numHintType = 'num';
+      const numHint = number[0] + number.slice(number.length - 2);
+      const numberEncPubKey = TrustedContactsService.encryptPub(
+        publicKey,
+        number,
+      ).encryptedPub;
+      const numberDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `/${requester}` +
+        `/${numberEncPubKey}` +
+        `/${numHintType}` +
+        `/${numHint}` +
+        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
+        `/v${appVersion}`;
+      console.log({ numberDL });
+      setTrustedLink(numberDL);
+    } else if (Contact.emails && Contact.emails.length) {
+      const email = Contact.emails[0].email;
+      const emailHintType = 'eml';
+      const trucatedEmail = email.replace('.com', '');
+      const emailHint =
+        email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
+      const emailEncPubKey = TrustedContactsService.encryptPub(publicKey, email)
+        .encryptedPub;
+      const emailDL =
+        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `/${requester}` +
+        `/${emailEncPubKey}` +
+        `/${emailHintType}` +
+        `/${emailHint}` +
+        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
+        `/v${appVersion}`;
+      console.log({ emailDL });
+      setTrustedLink(emailDL);
+    } else {
+      Alert.alert(
+        'Invalid Contact',
+        'Cannot add a contact without phone-num/email as a trusted entity',
+      );
+    }
+  }, [
+    Contact,
+    trustedContacts,
+    SHARES_TRANSFER_DETAILS[index],
+    uploadMetaShare,
+    updateEphemeralChannelLoader,
+  ]);
+
+  useEffect(() => {
+    if (Contact.firstName && SHARES_TRANSFER_DETAILS[index]) {
+      const contactName = `${Contact.firstName} ${
+        Contact.lastName ? Contact.lastName : ''
+      }`
+        .toLowerCase()
+        .trim();
+      console.log({ contactName });
+
+      if (contactName === 'secondary device') return;
+
+      if (!trustedContacts.tc.trustedContacts[contactName]) return;
+
+      createDeepLink();
+      const publicKey =
+        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      setTrustedQR(
+        JSON.stringify({
+          isGuardian: true,
+          requester: WALLET_SETUP.walletName,
+          publicKey,
+          uploadedAt:
+            trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+              .initiatedAt,
+          type: 'trustedGuardian',
+          ver: DeviceInfo.getVersion(),
+        }),
+      );
+    }
+  }, [
+    SHARES_TRANSFER_DETAILS[index],
+    Contact,
+    trustedContacts,
+    uploadMetaShare,
+    updateEphemeralChannelLoader,
+  ]);
+
+  const SendShareModalFunction = useCallback(() => {
+    //console.log("Contact", Contact);
+    if (!isEmpty(Contact)) {
+      return (
+        <SendShareModal
+          contact={Contact ? Contact : null}
+          textHeader={'Sharing Secret with'}
+          onPressViaQr={() => {
+            createGuardian();
+            if (SendViaQRBottomSheet.current)
+              (SendViaQRBottomSheet as any).current.snapTo(1);
+            (shareBottomSheet as any).current.snapTo(0);
+          }}
+          onPressViaLink={() => {
+            createGuardian();
+            if (SendViaLinkBottomSheet.current)
+              (SendViaLinkBottomSheet as any).current.snapTo(1);
+            (shareBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }
+  }, [Contact]);
+
+  const SendModalFunction = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (shareBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
       <SafeAreaView
@@ -576,49 +898,56 @@ export default function ContactDetails(props) {
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.contactName != 'Secondary Device' && (
-              <TouchableOpacity
-                onPress={() => {
-                  Contact.hasXpub && Contact.contactName != 'Secondary Device'
-                    ? onPressSend()
-                    : onPressResendRequest();
-                }}
-                style={{
-                  height: wp('6%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: Colors.lightBlue,
-                  marginLeft: 'auto',
-                  marginBottom: 10,
-                  borderRadius: 4,
-                  flexDirection: 'row',
-                  alignSelf: 'flex-end',
-                  paddingLeft: wp('1.5%'),
-                  paddingRight: wp('1.5%'),
-                }}
-              >
-                {Contact.hasXpub && Contact.contactName != 'Secondary Device' && (
-                  <Image
-                    source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                    style={{
-                      height: wp('4%'),
-                      width: wp('4%'),
-                      resizeMode: 'contain',
-                    }}
-                  />
-                )}
-                <Text
+            {Contact.contactName != 'Secondary Device' ? (
+              Contact.hasTrustedChannel && !Contact.hasXpub ? null : (
+                <TouchableOpacity
+                  onPress={() => {
+                    Contact.hasXpub && Contact.contactName != 'Secondary Device'
+                      ? onPressSend()
+                      : onPressResendRequest();
+                  }}
                   style={{
-                    color: Colors.white,
-                    fontFamily: Fonts.FiraSansMedium,
-                    fontSize: RFValue(10),
-                    marginLeft: 2,
+                    height: wp('6%'),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: Colors.lightBlue,
+                    marginLeft: 'auto',
+                    marginBottom: 10,
+                    borderRadius: 4,
+                    flexDirection: 'row',
+                    alignSelf: 'flex-end',
+                    paddingLeft: wp('1.5%'),
+                    paddingRight: wp('1.5%'),
                   }}
                 >
-                  {Contact.hasXpub ? 'Send' : 'Resend Request'}
-                </Text>
-              </TouchableOpacity>
-            )}
+                  {Contact.hasXpub &&
+                    Contact.contactName != 'Secondary Device' && (
+                      <Image
+                        source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                        style={{
+                          height: wp('4%'),
+                          width: wp('4%'),
+                          resizeMode: 'contain',
+                        }}
+                      />
+                    )}
+                  <Text
+                    style={{
+                      color: Colors.white,
+                      fontFamily: Fonts.FiraSansMedium,
+                      fontSize: RFValue(10),
+                      marginLeft: 2,
+                    }}
+                  >
+                    {Contact.hasXpub
+                      ? 'Send'
+                      : index < 3
+                      ? 'Reshare'
+                      : 'Resend Request'}
+                  </Text>
+                </TouchableOpacity>
+              )
+            ) : null}
           </View>
         </View>
         {!Loading ? (
@@ -740,7 +1069,7 @@ export default function ContactDetails(props) {
               {[1, 2, 3, 4, 5].map((value, index) => {
                 return (
                   <View
-                    key={index}
+                    key={itemIndex}
                     style={{
                       margin: wp('3%'),
                       backgroundColor: Colors.white,
@@ -797,7 +1126,7 @@ export default function ContactDetails(props) {
             }}
           >
             <TouchableOpacity
-              disabled={Contact.isWard ? false : true}
+              disabled={!Contact.isWard}
               style={{
                 ...styles.bottomButton,
                 opacity: Contact.isWard ? 1 : 0.5,
@@ -819,7 +1148,10 @@ export default function ContactDetails(props) {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bottomButton}>
+            <TouchableOpacity
+              style={{ ...styles.bottomButton, opacity: 0.5 }}
+              disabled={true}
+            >
               <Image
                 source={require('../../assets/images/icons/icon_buy.png')}
                 style={styles.buttonImage}
@@ -834,7 +1166,7 @@ export default function ContactDetails(props) {
           </View>
         )}
       </View>
-      {/* <BottomSheet
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -843,7 +1175,7 @@ export default function ContactDetails(props) {
         ]}
         renderContent={renderSendViaLinkContents}
         renderHeader={renderSendViaLinkHeader}
-      /> */}
+      />
       <BottomSheet
         enabledInnerScrolling={true}
         ref={SendViaQRBottomSheet as any}
@@ -856,6 +1188,16 @@ export default function ContactDetails(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        ref={ReshareBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
+        ]}
+        renderContent={renderReshareContent}
+        renderHeader={renderReshareHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
@@ -863,6 +1205,16 @@ export default function ContactDetails(props) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={shareBottomSheet as any}
+        snapPoints={[
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('65%'),
+        ]}
+        renderContent={SendShareModalFunction}
+        renderHeader={SendModalFunction}
       />
     </View>
   );
