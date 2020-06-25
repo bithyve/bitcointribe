@@ -36,6 +36,7 @@ import {
 import { fetchDerivativeAccBalTx } from '../../store/actions/accounts';
 import moment from 'moment';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import BottomInfoBox from '../../components/BottomInfoBox';
 
 export default function ExistingSavingMethods(props) {
   const [FBTCAccount, setFBTCAccount] = useState([]);
@@ -654,6 +655,14 @@ export default function ExistingSavingMethods(props) {
           </View>
         </ScrollView>
       ) : null}
+    <View style={{marginTop: 'auto'}}>
+      <BottomInfoBox
+        title={'Funding Sources'}
+        infoText={
+          'When you setup a service for getting bitcoin, it appears here'
+        }
+      />
+      </View>
     </View>
   );
 }

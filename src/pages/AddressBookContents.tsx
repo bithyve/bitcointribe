@@ -120,11 +120,21 @@ export default function AddressBookContents(props) {
             ].isWard;
 
           const isGuardian = index < 3 ? true : false;
+          let shareIndex;
+          if (isGuardian) {
+            shareIndex = index;
+          }
 
           const initiatedAt =
             trustedContactsService.tc.trustedContacts[
               contactName.toLowerCase().trim()
             ].ephemeralChannel.initiatedAt;
+
+          const hasTrustedChannel = trustedContactsService.tc.trustedContacts[
+            contactName.toLowerCase().trim()
+          ].symmetricKey
+            ? true
+            : false;
 
           const element = {
             contactName,
@@ -133,6 +143,8 @@ export default function AddressBookContents(props) {
             isGuardian,
             isWard,
             initiatedAt,
+            shareIndex,
+            hasTrustedChannel,
             ...contactInfo,
           };
           trustedContacts.push(element);
@@ -230,6 +242,7 @@ export default function AddressBookContents(props) {
             contactsType,
             contact,
             index,
+            shareIndex: contact.shareIndex,
           });
         }}
         style={styles.selectedContactsView}

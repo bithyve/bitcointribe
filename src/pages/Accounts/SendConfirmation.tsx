@@ -41,6 +41,13 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import RelayServices from '../../bitcoin/services/RelayService';
+import {
+  INotification,
+  notificationTag,
+  notificationType,
+} from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -106,6 +113,40 @@ export default function SendConfirmation(props) {
     );
   }, []);
 
+  const WALLET_SETUP = useSelector(
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  const trustedContactsService: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
+  );
+
+  const sendNotifications = useCallback(() => {
+    const receivers = [];
+    transfer.details.forEach((details) => {
+      if (details.selectedContact && details.selectedContact.firstName) {
+        const contactName = `${details.selectedContact.firstName} ${
+          details.selectedContact.lastName
+            ? details.selectedContact.lastName
+            : ''
+        }`
+          .toLowerCase()
+          .trim();
+        const recipient =
+          trustedContactsService.tc.trustedContacts[contactName];
+        receivers.push({ walletId: recipient.walletID, FCMs: recipient.FCMs });
+      }
+    });
+    const notification: INotification = {
+      notificationType: notificationType.contact,
+      title: 'New Transaction',
+      body: `Transaction received from ${WALLET_SETUP.walletName}`,
+      data: {},
+      tag: notificationTag.IMP,
+    };
+    RelayServices.sendNotifications(receivers, notification).then(console.log);
+  }, []);
+
   useEffect(() => {
     console.log('transfer', transfer);
     if (transfer.stage2.failed) {
@@ -113,7 +154,7 @@ export default function SendConfirmation(props) {
         SendUnSuccessBottomSheet.current.snapTo(1);
       }, 2);
     } else if (transfer.txid) {
-      console.log(transfer.details[0].note);
+      sendNotifications();
       if (transfer.details[0].note) {
         updateDescription(transfer.txid, transfer.details[0].note);
       }
@@ -123,7 +164,7 @@ export default function SendConfirmation(props) {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
         recipientAddress: '',
-        onTransactionSuccess
+        onTransactionSuccess,
       });
     }
   }, [transfer]);
@@ -295,10 +336,10 @@ export default function SendConfirmation(props) {
     );
   };
 
-  const onTransactionSuccess = () =>{
+  const onTransactionSuccess = () => {
     if (SendSuccessBottomSheet.current)
       SendSuccessBottomSheet.current.snapTo(1);
-  }
+  };
 
   const renderSendSuccessContents = () => {
     return (

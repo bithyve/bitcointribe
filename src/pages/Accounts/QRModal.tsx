@@ -284,12 +284,12 @@ export default function QRModal(props) {
           </View>
         </View>
         <View style={{ marginTop: 'auto' }}>
-          <BottomInfoBox
+          {props.noteText && <BottomInfoBox
             title={'Note'}
             infoText={
               props.noteText
             }
-          />
+          />}
         </View>
       </ScrollView>
     </View>

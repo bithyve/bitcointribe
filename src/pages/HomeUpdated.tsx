@@ -947,22 +947,24 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      this.setState({ lastActiveTime: moment().toISOString() })
+      this.setState({ lastActiveTime: moment().toISOString() });
     } else {
       let { lastActiveTime } = this.state
       let diff = moment().diff(moment(lastActiveTime), 'seconds')
       if (diff >= limit) {
-        this.setState({
-          lastActiveTime: moment().toISOString()
-        }, () => {
-          this.props.navigation.navigate('ReLogin');
-        })
-
+        this.setState(
+          {
+            lastActiveTime: moment().toISOString(),
+          },
+          () => {
+            this.props.navigation.navigate('ReLogin');
+          },
+        );
       } else {
         this.setState({
-          lastActiveTime: moment().toISOString()
-        })
-        return
+          lastActiveTime: moment().toISOString(),
+        });
+        return;
       }
     }
   };
@@ -1122,8 +1124,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.props.fetchNotifications();
       this.getNewTransactionNotifications();
       this.setState({
-        lastActiveTime: moment().toISOString()
-      })
+        lastActiveTime: moment().toISOString(),
+      });
     });
 
     setTimeout(() => {
@@ -1678,10 +1680,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
                 .decryptedPub;
             } catch (err) {
-              //console.log({ err });
+              console.log("abc1",{ err });
               Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.',
+                'Request Rejected'
               );
             }
           }
@@ -1746,10 +1747,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
               .decryptedPub;
           } catch (err) {
-            console.log({ err });
+            console.log("abc2",{ err });
             Alert.alert(
-              'Invalid Number/Email',
-              'Decryption failed due to invalid input, try again.',
+              'Request Rejected'
             );
           }
         }
