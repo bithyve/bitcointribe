@@ -72,7 +72,7 @@ export default function SendConfirmationContent(props) {
       >
         <Text style={{ ...styles.modalInfoText }}>
           {
-            'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
+            props.infoText ? props.infoText : ''
           }
         </Text>
       </View>

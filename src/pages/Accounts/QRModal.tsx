@@ -17,6 +17,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 export default function QRModal(props) {
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
@@ -60,6 +61,16 @@ export default function QRModal(props) {
     <View style={styles.modalContentContainer}>
       <ScrollView style={styles.qrModalScrollView}>
         <View style={styles.modalHeaderTitleView}>
+        <AppBottomSheetTouchableWrapper
+              onPress={() => props.onBackPress()}
+              style={{ height: 30, width: 30, alignSelf: 'center' }}
+            >
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </AppBottomSheetTouchableWrapper>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={styles.modalHeaderTitleText}>{props.QRModalHeader}</Text>
           </View>
