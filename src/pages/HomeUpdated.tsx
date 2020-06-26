@@ -1720,7 +1720,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               isGuardian,
             });
           } else if (publicKey && rejected) {
-            // don't assoicate; only fetch the payment details from EC
+            // don't associate; only fetch the payment details from EC
             fetchEphemeralChannel(null, null, publicKey);
           }
         }

@@ -93,7 +93,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.derivationPath = this.isTest
       ? `m/${this.purpose}'/1'/0'`
-      : `m/${this.purpose}'/0'/0'`; // helps with seperating regular and test acc (even on the testnet)
+      : `m/${this.purpose}'/0'/0'`; // helps with separating regular and test acc (even on the testnet)
 
     this.initializeStateVars(stateVars);
   }
@@ -681,7 +681,7 @@ export default class HDSegwitWallet extends Bitcoin {
       return { synched: true };
     } catch (err) {
       console.log(
-        `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+        `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
       );
       throw new Error('Fetching balance-txn by addresses failed');
     }
@@ -852,7 +852,7 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
-    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
     const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
@@ -885,7 +885,7 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   private gapLimitCatchUp = async () => {
-    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
     const externalAddress = this.getExternalAddressByIndex(
       this.nextFreeAddressIndex + this.gapLimit - 1,
@@ -1639,7 +1639,7 @@ export default class HDSegwitWallet extends Bitcoin {
       return this.addressToWIFCache[address];
     } // cache hit
 
-    // fast approach, first lets iterate over all addressess we have in cache
+    // fast approach, first lets iterate over all addresses we have in cache
     // for (const index of Object.keys(this.internalAddresssesCache)) {
     //   if (this.getInternalAddressByIndex(parseInt(index, 10)) === address) {
     //     return (this.addressToWIFCache[address] = this.getInternalWIFByIndex(

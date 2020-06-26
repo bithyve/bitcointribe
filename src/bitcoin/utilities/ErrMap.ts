@@ -38,7 +38,7 @@ export const ErrMap = {
   505: "Unable to recover share from QRs", // recoverMetaShareFromQR() >> reconstructs the share by combining the splitted QRs
   506: "Health updation failed", // updateHealth() >> updates the health of the supplied shares
   507: "Failed to generate the shareID", // getShareId() >> provides the shareID for a given share
-  508: "Unable to generate encryption key", // generateKey() >> generates a psuedo-random encryption key
+  508: "Unable to generate encryption key", // generateKey() >> generates a pseudo-random encryption key
   509: "Unable to encrypt data via OTP", // encryptViaOTP() >> encrypts data(key) using OTP
   510: "Unable to generate shares", // generateShares() >> generate SSS shares and encrypt them using the supplied answer
   511: "Static nonPMDD encryption failed", // encryptStaticNonPMDD >> encrypts static non-PMDD
