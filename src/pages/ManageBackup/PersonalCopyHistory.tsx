@@ -45,9 +45,12 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
@@ -419,6 +422,25 @@ const PersonalCopyHistory = (props) => {
     );
   }, []);
 
+  const renderHelpHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+            if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHelpContent = () => {
+    return(
+      <PersonalCopyHelpContents />
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -478,7 +500,7 @@ const PersonalCopyHistory = (props) => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+                (HelpBottomSheet as any).current.snapTo(1);
               }}
               containerStyle={{
                 marginTop: 'auto',
@@ -568,6 +590,16 @@ const PersonalCopyHistory = (props) => {
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
+      />
+      <BottomSheet 
+        enabledInnerScrolling={true}
+        ref={HelpBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+        ]}
+        renderContent={renderHelpContent}
+        renderHeader={renderHelpHeader}
       />
     </View>
   );
