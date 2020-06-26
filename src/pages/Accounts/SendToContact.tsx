@@ -568,10 +568,14 @@ export default function SendToContact(props) {
         </View>
         {renderVerticalDivider()}
         <TouchableOpacity
+        style={{paddingLeft: 10, flex: 1,
+        height: wp('13%'),
+        justifyContent: 'center'
+        }}
         onPress={()=>setSwitchOn(!switchOn)}
       >
         <TextInput
-          style={{ ...styles.textBox, paddingLeft: 10 }}
+          style={{ ...styles.textBox,height: wp('9%'), width: wp('45%') }}
           placeholder={
             switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
           }
@@ -634,10 +638,14 @@ export default function SendToContact(props) {
         </View>
         {renderVerticalDivider()}
         <TouchableOpacity
+        style={{paddingLeft: 10, flex: 1,
+          height: wp('13%'),
+          justifyContent: 'center'
+          }}
         onPress={()=>setSwitchOn(!switchOn)}
       >
         <TextInput
-          style={{ ...styles.textBox, paddingLeft: 10 }}
+          style={{ ...styles.textBox, height: wp('9%'), width: wp('45%') }}
           editable={!switchOn}
           placeholder={
             switchOn
@@ -1012,12 +1020,13 @@ export default function SendToContact(props) {
                 marginBottom: wp('1.5%'),
                 marginTop: wp('1.5%'),
                 flexDirection: 'row',
-                width: wp('85%'),
                 height: wp('13%'),
               }}
             >
               <TextInput
-                style={styles.textBox}
+                style={{...styles.textBox, paddingLeft: 15, flex: 1,
+                  height: wp('13%'),
+                  }}
                 returnKeyLabel="Done"
                 returnKeyType="done"
                 onSubmitEditing={Keyboard.dismiss}
@@ -1207,12 +1216,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   textBox: {
-    flex: 1,
-    height: wp('13%'),
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
   },
   confirmButtonView: {
     width: wp('50%'),
