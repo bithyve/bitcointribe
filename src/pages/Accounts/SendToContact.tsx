@@ -248,15 +248,18 @@ export default function SendToContact(props) {
   }, [accounts.exchangeRates]);
 
   useEffect(() => {
-    if (bitcoinAmount && currencyAmount) {
+    if (bitcoinAmount && currencyAmount && transfer.details.length) {
       if (netBalance < Number(bitcoinAmount)) {
         setIsInvalidBalance(true);
         setIsConfirmDisabled(true);
       } else setIsConfirmDisabled(false);
     } else {
       setIsConfirmDisabled(true);
+      if(!transfer.details.length){
+        props.navigation.goBack();
+      }
     }
-  }, [bitcoinAmount, currencyAmount]);
+  }, [bitcoinAmount, currencyAmount, transfer]);
 
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', () => {
@@ -272,6 +275,7 @@ export default function SendToContact(props) {
       }, 10);
       SendUnSuccessBottomSheet.current.snapTo(1);
     } else if (transfer.executed === 'ST1') {
+      if(transfer.details.length){
       props.navigation.navigate('SendConfirmation', {
         serviceType,
         sweepSecure,
@@ -280,6 +284,7 @@ export default function SendToContact(props) {
         averageTxFees,
       });
     }
+  }
   }, [transfer, recipients, averageTxFees]);
 
   const handleTrasferST1 = () => {

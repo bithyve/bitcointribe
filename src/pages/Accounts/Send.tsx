@@ -338,12 +338,6 @@ export default function Send(props) {
             item = {
               id: recipientAddress,
             };
-            dispatch(
-              addTransferDetails(serviceType, {
-                selectedContact: item,
-              }),
-            );
-
             onSelectContact(item);
             break;
 

@@ -104,7 +104,7 @@ export default function NotificationListContent(props) {
               })}
         </View>
       </ScrollView>
-      {props.NotificationData.length <= 1 ? (
+      {!props.NotificationData.length ? (
             <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
               <View style={styles.waterMarkInfoBoxView}>
                 <Text style={styles.waterMarkInfoBoxTitle}>

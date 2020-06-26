@@ -17,8 +17,7 @@ export default function RemoveSelectedTrasaction(props) {
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-      <View>
-        <View
+      <View
           style={{
             ...styles.successModalHeaderView,
             marginRight: wp('6%'),
@@ -80,7 +79,6 @@ export default function RemoveSelectedTrasaction(props) {
             </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
-      </View>
     </View>
   );
 }
