@@ -45,7 +45,7 @@ import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendShareModal from '../ManageBackup/SendShareModal';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralData, MetaShare } from '../../bitcoin/utilities/Interface';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
@@ -66,6 +66,9 @@ export default function ContactDetails(props) {
     React.createRef(),
   );
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [ExitKeyQRBottomSheet, setExitKeyQRBottomSheet] = useState(
     React.createRef(),
   );
   const [trustedContactHistory, setTrustedContactHistory] = useState([
@@ -108,6 +111,7 @@ export default function ContactDetails(props) {
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
+  const [encryptedExitKey, setEncryptedExitKey] = useState('');
 
   const [key, setKey] = useState('');
   const uploading = useSelector(
@@ -418,6 +422,35 @@ export default function ContactDetails(props) {
     }
   }, [Contact, UNDER_CUSTODY]);
 
+  useEffect(() => {
+    if (!Contact || !Contact.isWard) {
+      return;
+    }
+
+    const contactName = `${Contact.firstName} ${
+      Contact.lastName ? Contact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim();
+
+    if (
+      !trustedContacts.tc.trustedContacts[contactName] &&
+      !trustedContacts.tc.trustedContacts[contactName].isWard
+    ) {
+      return;
+    }
+    const requester =
+      trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
+
+    const metaShare: MetaShare = UNDER_CUSTODY[requester].META_SHARE;
+    if (metaShare.meta.index === 0) {
+      const encryptedExitKey = metaShare.encryptedStaticNonPMDD;
+      setEncryptedExitKey(
+        JSON.stringify({ type: 'encryptedExitKey', encryptedExitKey }),
+      );
+    }
+  }, [Contact]);
+
   const onHelpRestore = useCallback(() => {
     if (!Contact) {
       console.log('Err: Contact missing');
@@ -524,7 +557,7 @@ export default function ContactDetails(props) {
         }}
       />
     );
-  }, [Contact, trustedQR]);
+  }, [Contact, trustedQR, encryptedExitKey]);
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
@@ -532,6 +565,37 @@ export default function ContactDetails(props) {
         onPressHeader={() => {
           if (SendViaQRBottomSheet.current)
             (SendViaQRBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const renderExitKeyQRContents = useCallback(() => {
+    return (
+      <SendViaQR
+        headerText={'Encrypted Exit Key'}
+        subHeaderText={'Your ward should scan the QR to restore Personal Copy'}
+        contactText={''}
+        contact={Contact}
+        QR={encryptedExitKey}
+        contactEmail={''}
+        onPressBack={() => {
+          if (ExitKeyQRBottomSheet.current)
+            (ExitKeyQRBottomSheet as any).current.snapTo(0);
+        }}
+        onPressDone={() => {
+          (ExitKeyQRBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [Contact, trustedQR, encryptedExitKey]);
+
+  const renderExitKeyQRHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (ExitKeyQRBottomSheet.current)
+            (ExitKeyQRBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -1149,17 +1213,27 @@ export default function ContactDetails(props) {
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ ...styles.bottomButton, opacity: 0.5 }}
-              disabled={true}
+              style={{
+                ...styles.bottomButton,
+                opacity: encryptedExitKey ? 1 : 0.5,
+              }}
+              disabled={encryptedExitKey ? false : true}
+              onPress={() => {
+                if (encryptedExitKey) {
+                  (ExitKeyQRBottomSheet as any).current.snapTo(1);
+                }
+              }}
             >
               <Image
                 source={require('../../assets/images/icons/icon_buy.png')}
                 style={styles.buttonImage}
               />
               <View>
-                <Text style={styles.buttonText}>Request Key</Text>
+                <Text style={styles.buttonText}>
+                  {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
+                </Text>
                 <Text numberOfLines={1} style={styles.buttonInfo}>
-                  Lorem ipsum dolor
+                  {encryptedExitKey ? 'Help restore PDF' : 'Lorem ipsum dolor'}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -1185,6 +1259,16 @@ export default function ContactDetails(props) {
         ]}
         renderContent={renderSendViaQRContents}
         renderHeader={renderSendViaQRHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ExitKeyQRBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('83%') : hp('85%'),
+        ]}
+        renderContent={renderExitKeyQRContents}
+        renderHeader={renderExitKeyQRHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
