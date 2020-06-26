@@ -72,7 +72,7 @@ export default function SendConfirmationContent(props) {
       >
         <Text style={{ ...styles.modalInfoText }}>
           {
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
+            'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
           }
         </Text>
       </View>

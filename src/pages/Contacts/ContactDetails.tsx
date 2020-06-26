@@ -76,32 +76,31 @@ export default function ContactDetails(props) {
       id: 1,
       title: 'Recovery Key created',
       date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      // info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
       title: 'Recovery Key in-transit',
       date: null,
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
+      // info: 'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
       title: 'Recovery Key accessible',
       date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      // info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
       title: 'Recovery Key not accessible',
       date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
+      // info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 5,
       title: 'Sent Amount',
       date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
+      // info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
 
@@ -1094,7 +1093,7 @@ export default function ContactDetails(props) {
                       >
                         {value.title}
                       </Text>
-                      <Text
+                      {/* <Text
                         style={{
                           color: Colors.textColorGrey,
                           fontSize: RFValue(10),
@@ -1103,7 +1102,7 @@ export default function ContactDetails(props) {
                         }}
                       >
                         {value.info}
-                      </Text>
+                      </Text> */}
                       <Text
                         style={{
                           color: Colors.textColorGrey,
@@ -1156,7 +1155,7 @@ export default function ContactDetails(props) {
                           {value.date}
                         </Text>
                       </View>
-                      <Text
+                      {/* <Text
                         style={{
                           color: Colors.textColorGrey,
                           fontSize: RFValue(8),
@@ -1165,7 +1164,7 @@ export default function ContactDetails(props) {
                         }}
                       >
                         {value.info}
-                      </Text>
+                      </Text> */}
                     </TouchableOpacity>
                   );
                 }
@@ -1211,9 +1210,9 @@ export default function ContactDetails(props) {
                 ) : (
                   <Text style={styles.buttonText}>Help Restore</Text>
                 )}
-                <Text numberOfLines={1} style={styles.buttonInfo}>
+                {/* <Text numberOfLines={1} style={styles.buttonInfo}>
                   Lorem ipsum dolor
-                </Text>
+                </Text> */}
               </View>
             </TouchableOpacity>
             <TouchableOpacity
