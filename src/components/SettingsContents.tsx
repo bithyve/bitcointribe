@@ -13,6 +13,7 @@ import ToggleSwitch from './ToggleSwitch';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
 import { ScrollView } from 'react-native-gesture-handler';
+import DeviceInfo from 'react-native-device-info';
 
 export default function SettingsContents(props) {
     const [currencycode, setCurrencycode] = useState('');
@@ -29,6 +30,12 @@ export default function SettingsContents(props) {
             info: "Choose your Currency",
             image: require("../assets/images/icons/country.png"),
             type: "ChangeCurrency"
+        },
+        {
+            title: "Hexa Release",
+            info: "Version ",
+            image: require('../assets/images/icons/settings.png'),
+            type: "AboutApp"
         }
     ]);
 
@@ -44,18 +51,18 @@ export default function SettingsContents(props) {
                     <Image source={item.image} style={{ width: wp('7%'), height: wp('7%'), resizeMode: 'contain', marginLeft: wp('3%'), marginRight: wp('3%') }} />
                     <View style={{ justifyContent: 'center', marginRight: 10, flex: 1 }}>
                         <Text style={styles.titleText}>{item.title}</Text>
-                        <Text style={styles.infoText}>{item.info}</Text>
+                        <Text style={styles.infoText}>{item.type == 'AboutApp' ? item.info + DeviceInfo.getVersion() + ' (' + DeviceInfo.getBuildNumber() + ') ' : item.info}</Text>
                     </View>
                     <View style={{ marginLeft: 'auto' }}>
                         {item.type == "JumbleKeyboard" ?
                             <ToggleSwitch isNotImage={true} toggleColor={Colors.lightBlue} toggleCircleColor={Colors.blue} onpress={() => { setSwitchOn(!switchOn); }} toggle={switchOn} />
                             :
-                            <Ionicons
+                           item.type!='AboutApp' ? <Ionicons
                                 name="ios-arrow-forward"
                                 color={Colors.textColorGrey}
                                 size={15}
                                 style={{ marginLeft: wp('3%'), marginRight: wp('3%'), alignSelf: 'center' }}
-                            />
+                            />: null 
                         }
                     </View>
                 </AppBottomSheetTouchableWrapper>
