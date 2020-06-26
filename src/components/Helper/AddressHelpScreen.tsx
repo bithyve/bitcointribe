@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function TransactionHelperModalContents(props) {
+export default function FriendsAndFamilyHelpContents(props) {
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -28,7 +28,7 @@ export default function TransactionHelperModalContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Transaction
+                    Address
                 </Text>
             </View>
             <View
@@ -37,7 +37,6 @@ export default function TransactionHelperModalContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
-                marginTop: 10,
                 marginBottom: hp('1%'),
                 }}
             />
@@ -49,11 +48,11 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transction is identified by an alphanumeric{'\n'}string called the transaction id, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
+                A Bitcoin Address is an alphanumeric identifier{'\n'}that represents a destination for a Bitcoin{'\n'}Payment. A single wallet may house multiple{'\n'}addresses within it
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
+                    source={require('../../assets/images/icons/address_info_1.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
@@ -65,14 +64,18 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can independently verify your transaction{'\n'}by looking up the transaction ID on a block{'\n'}explorer like blockstream.info
+                Addresses do not carry balances, they only{'\n'}receive funds, and you do not send “from” an{'\n'}address at any time. An address is the{'\n'}representation of the “to” field associated with{'\n'}a single unspent transaction output
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                Addresses for bitcoin start with 1, 2, 3 or bc1. 2{'\n'}is reserved for Bitcoin Testnet, which is used{'\n'}by the Checking Account, and bc1 is reserved{'\n'}for bech32 compatible addresses on Bitcoin{'\n'}Mainnet
+            </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -95,76 +98,44 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction. For most transactions,{'\n'}six confirmations is taken as reference.
+                An address is derived from a random string{'\n'}called the Seed, which is used to generate the{'\n'}master private key. This master private key is{'\n'}used by Hexa to derive addresses for the{'\n'}Checking and Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/confirmation_time.png')}
+                    source={require('../../assets/images/icons/address_info_2.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            You can see the number of confirmations{'\n'}against the transaction
+                There are multiple types of addresses in{'\n'}Bitcoin, such as p2pkh, p2sh, p2wpkh, p2wsh,{'\n'}and more. Hexa uses a wrapped p2sh (p2wsh{'\n'}inside p2sh) address for the Checking and{'\n'}Savings Account
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                Hexa does not use native segwit addresses,{'\n'}and wraps them inside p2sh addresses. This is{'\n'}done because many wallets have not{'\n'}implemented Segwit yet
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/transaction_confirmation.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                Know more: https://en.bitcoin.it/wiki/Address
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
         </View>
     </ScrollView>
   );

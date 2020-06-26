@@ -33,6 +33,7 @@ export default function SendHelpContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginBottom: hp('1%'),
                 }}
             />
             <Text

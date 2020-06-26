@@ -40,6 +40,7 @@ import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthChec
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 
 export default function ManageBackup(props) {
   const [
@@ -237,17 +238,18 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
-      <WalletBackupAndRecoveryContents
-        onPressManageBackup={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-        onSkip={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-        onStartBackup={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <WalletBackupAndRecoveryContents
+      //   onPressManageBackup={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      //   onSkip={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      //   onStartBackup={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <ManageBackupHelpContents />
     );
   };
 

@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function TestAccountHelpContents(props) {
+export default function SecurityQuestionHelpContents(props) {
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -28,7 +28,7 @@ export default function TestAccountHelpContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Test Account
+                    Security Question
                 </Text>
             </View>
             <View
@@ -37,6 +37,7 @@ export default function TestAccountHelpContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginBottom: hp('1%'),
                 }}
             />
             <Text
@@ -47,11 +48,11 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            The test account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying Bitcoin. It comes preloaded{'\n'}with test bitcoins that you can send to other{'\n'}users on Bitcoin’s test network
+                Security Questions are used to safegaurd your{'\n'}personal copies in the event someone gains{'\n'}possession without your consent. Therefore, it{'\n'}is recommended that you answer remember{'\n'}the question and answer provided
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/test_account_info_1.png')}
+                    source={require('../../assets/images/icons/security_question_info.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
@@ -63,7 +64,17 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Bitcoin Testnet is similar to Bitcoin Mainnet{'\n'}and has Test Bitcoins for people to experiment{'\n'}with. Test bitcoins can not be sent to wallets{'\n'}that only support bitcoin
+                Hexa will remind you of your security questions{'\n'}routinely to help you remember your question{'\n'}and answer. The Health Shield automatically{'\n'}updates when you answer correctly. If you don’t,{'\n'}Hexa will prompt the answer, and ask again
+            </Text>
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                If a person possesses your security answers,{'\n'}they can not steal or deny access to your{'\n'}funds. However, it is recommended that you{'\n'}keep the answer safe to provide for an extra{'\n'}layer of security
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -77,54 +88,6 @@ export default function TestAccountHelpContents(props) {
                     }}
                 />
             </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                Test Account Addresses start with “2”{'\n'}compared with “1”, “3” or “bc1” for Bitcoin{'\n'}Mainnet. If you are sending Test Bitcoins to{'\n'}your friend, please make sure to verify this
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/test_account_info_2.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                Bitcoins sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved. This is because a{'\n'}Test Bitcoin Address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
-            </Text>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                Know more: hhttps://en.bitcoin.it/wiki/Testnet
-            </Text>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                Read more: Hexa FAQ
-            </Text>
         </View>
     </ScrollView>
   );

@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function TransactionHelperModalContents(props) {
+export default function CheckingAccountHelpContents(props) {
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -28,7 +28,7 @@ export default function TransactionHelperModalContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Transaction
+                    Checking Account
                 </Text>
             </View>
             <View
@@ -37,7 +37,6 @@ export default function TransactionHelperModalContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
-                marginTop: 10,
                 marginBottom: hp('1%'),
                 }}
             />
@@ -49,11 +48,11 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transction is identified by an alphanumeric{'\n'}string called the transaction id, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
+                The checking account is designed as an account{'\n'}that you plan to use in the short term. Funds in{'\n'}the checking account can be spent immediately{'\n'}without 2FA confirmation, and carries lower fees{'\n'}compared to the Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
+                    source={require('../../assets/images/icons/checking_account_info_1.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
@@ -65,14 +64,8 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can independently verify your transaction{'\n'}by looking up the transaction ID on a block{'\n'}explorer like blockstream.info
+                Since the Checking Account does not require{'\n'}2FA for spending, a person using your phone{'\n'}and knowins your passcode will be able to{'\n'}spend your bitcoin. Hence, for storing more{'\n'}funds or for spending infrequently, please store{'\n'}your funds in the Savings Account
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -95,76 +88,34 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction. For most transactions,{'\n'}six confirmations is taken as reference.
+                The checking account is a single signature{'\n'}account as compared to a multi signature{'\n'}Savings Account, and does not require 2FA for{'\n'}spending. Its smaller requirement results in{'\n'}a smaller fee as compared to the Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/confirmation_time.png')}
+                    source={require('../../assets/images/icons/test_account_info_2.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            You can see the number of confirmations{'\n'}against the transaction
+                Bitcoins sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved. This is because a{'\n'}Test Bitcoin Address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                Read more: Hexa FAQ
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/transaction_confirmation.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
         </View>
     </ScrollView>
   );

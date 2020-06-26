@@ -30,6 +30,9 @@ import HistoryPageComponent from '../../components/HistoryPageComponent';
 import HealthCheckSecurityQuestion from './HealthCheckSecurityQuestion';
 import moment from 'moment';
 import _ from 'underscore';
+import KnowMoreButton from '../../components/KnowMoreButton';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import SecurityQuestionHelpContents from '../../components/Helper/SecurityQuestionHelpContents';
 
 const SecurityQuestionHistory = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
@@ -41,6 +44,7 @@ const SecurityQuestionHistory = props => {
     }
   };
 
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
       id: 1,
@@ -192,6 +196,25 @@ const SecurityQuestionHistory = props => {
     })();
   }, []);
 
+  const renderHelpHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+            if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHelpContent = () => {
+    return(
+      <SecurityQuestionHelpContents />
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -249,6 +272,17 @@ const SecurityQuestionHistory = props => {
                 </Text>
               </Text>
             </View>
+            <KnowMoreButton
+              onpress={() => {
+                (HelpBottomSheet as any).current.snapTo(1);
+              }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
+              textStyle={{}}
+            />
             <Image
               style={{ ...BackupStyles.cardIconImage, alignSelf: 'center' }}
               source={getIconByStatus(
@@ -292,6 +326,16 @@ const SecurityQuestionHistory = props => {
         ]}
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}
+      />
+      <BottomSheet 
+        enabledInnerScrolling={true}
+        ref={HelpBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+        ]}
+        renderContent={renderHelpContent}
+        renderHeader={renderHelpHeader}
       />
     </View>
   );

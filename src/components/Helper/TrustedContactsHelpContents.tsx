@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function TransactionHelperModalContents(props) {
+export default function FriendsAndFamilyHelpContents(props) {
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -28,7 +28,7 @@ export default function TransactionHelperModalContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Transaction
+                    Friends and Family
                 </Text>
             </View>
             <View
@@ -37,8 +37,7 @@ export default function TransactionHelperModalContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
-                marginTop: 10,
-                marginBottom: hp('1%'),
+                marginBottom: hp('1%')
                 }}
             />
             <Text
@@ -49,11 +48,11 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transction is identified by an alphanumeric{'\n'}string called the transaction id, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
+                Friends and Family are contacts that you{'\n'}know and trust, and those whom you transact with{'\n'}routinely. When transacting with Friends and{'\n'}Family, you need not ask them for a QR code{'\n'}when sending bitcoins
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
+                    source={require('../../assets/images/icons/FnF_recovery_key_2.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
@@ -65,14 +64,18 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can independently verify your transaction{'\n'}by looking up the transaction ID on a block{'\n'}explorer like blockstream.info
+                Selecting a contact as Friends and Family{'\n'}creates a secure channel betweem you and the{'\n'}contact. This secure channel enables easy{'\n'}exchange of information without requiring{'\n'}user action
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                The secure channel is a 2 party ECDH channel,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-end, enabling only the receiver{'\n'}and sender to decrypt their information
+            </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -95,76 +98,44 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction. For most transactions,{'\n'}six confirmations is taken as reference.
+                These ECDH channels are used to{'\n'}communicate your extended public key. An{'\n'}extended public key can be used by a peer to{'\n'}generate new addresses on behalf of you
+            </Text>
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                Possessing an extended public key does not{'\n'}allow one to take possession of funds. This is{'\n'}because the peer does not possess the private{'\n'}key which confirms ownership of funds
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/confirmation_time.png')}
+                    source={require('../../assets/images/icons/test_account_info_2.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            You can see the number of confirmations{'\n'}against the transaction
+                Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to any communication held between the{'\n'}two parties
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                Know more: https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/transaction_confirmation.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
         </View>
     </ScrollView>
   );

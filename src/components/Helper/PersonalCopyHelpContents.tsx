@@ -37,6 +37,7 @@ export default function PersonalCopyHelpContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginBottom: hp('1%'),
                 }}
             />
             <Text

@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function TransactionHelperModalContents(props) {
+export default function ManageBackupHelpContents(props) {
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -28,7 +28,7 @@ export default function TransactionHelperModalContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Transaction
+                    Health of the App
                 </Text>
             </View>
             <View
@@ -37,7 +37,6 @@ export default function TransactionHelperModalContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
-                marginTop: 10,
                 marginBottom: hp('1%'),
                 }}
             />
@@ -49,11 +48,11 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transction is identified by an alphanumeric{'\n'}string called the transaction id, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
+                The Health Shield shows if your Recovery Keys{'\n'}are available. There are three modes - Red,{'\n'}Yellow and Green. Red requires immediate{'\n'}action and Yellow requires you to act when{'\n'}possible. Green shows your Recovery Shares{'\n'}are available
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
+                    source={require('../../assets/images/icons/manage_backup_info_1.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
@@ -65,14 +64,8 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can independently verify your transaction{'\n'}by looking up the transaction ID on a block{'\n'}explorer like blockstream.info
+                Hexa’s backup scheme enables you to recover{'\n'}your account at any time by retrieving three of{'\n'}your five Recovery Keys and they need to be{'\n'}constantly available in order to enable you to{'\n'}retrieve your account
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -95,76 +88,34 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction. For most transactions,{'\n'}six confirmations is taken as reference.
+                This recovery is enabled by a cryptographic{'\n'}scheme known as Shamir’s Secret Sharing or{'\n'}SSS. SSS uses polynomial points to enable you to{'\n'}recover your Hexa Wallet with three of your{'\n'}five Recovery Keys
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/confirmation_time.png')}
+                    source={require('../../assets/images/icons/FnF_recovery_key.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            You can see the number of confirmations{'\n'}against the transaction
+                Recovery Keys need to be available at all times{'\n'}to enable recovery. If your keys are not available,{'\n'}you will not be able to recover your Wallet
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
             <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                Read more: Hexa FAQ
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/transaction_confirmation.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
         </View>
     </ScrollView>
   );
