@@ -258,8 +258,7 @@ const ResetTwoFAHelp = (props) => {
                 {'Having trouble with your 2FA'}
               </Text>
               <Text style={styles.modalHeaderInfoText}>
-                Lorem ipsum dolor sit amet, consectetur{'\n'}adipiscing elit,
-                sed do eiusmod tempor
+                If your 2FA is not working follow one of the below steps
               </Text>
             </View>
           </View>

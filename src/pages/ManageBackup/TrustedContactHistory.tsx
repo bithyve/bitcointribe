@@ -1129,9 +1129,9 @@ const TrustedContactHistory = (props) => {
         <SendViaQR
           contactText={'Adding to Friends and Family:'}
           contact={chosenContact ? chosenContact : null}
-          noteHeader={'Keeper Request'}
+          noteHeader={'Scan QR'}
           noteText={
-            'Scan QR. On scanning, you will be adding the contact as your Keeper'
+            'On scanning, you will be adding the contact as your Keeper'
           }
           QR={trustedQR}
           contactEmail={''}
