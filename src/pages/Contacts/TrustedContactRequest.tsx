@@ -274,8 +274,7 @@ export default function TrustedContactRequest(props) {
                 <Text style={styles.modalTitleText}>Payment Request </Text>
               ) : (
                 <Text style={styles.modalTitleText}>
-                  Friends and Family{'\n'}Request{' '}
-                  {props.isGuardian ? '(Guardian)' : null}
+                  {props.isGuardian ? 'Friends and Family\nRequest' : 'Keeper Reuest'}
                 </Text>
               )
             ) : (
@@ -284,7 +283,7 @@ export default function TrustedContactRequest(props) {
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
               {props.inputType
                 ? 'Accept the request to add your contact to Friends and Family'
-                : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'}
+                : 'Your contact below wants you to be their Keeper, so that you can help them restore their wallet'}
             </Text>
           </View>
           <View style={styles.box}>
