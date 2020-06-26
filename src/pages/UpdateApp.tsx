@@ -143,8 +143,8 @@ export default function UpdateApp(props) {
   const upgradeNow = () => {
     const url =
       Platform.OS == 'ios'
-        ? 'itms://itunes.apple.com/us/app/apple-store/' + Config.APPLE_APP_ID + '?mt=8'
-        : 'market://details?id=' + Config.APP_ID;
+        ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en';
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);
@@ -245,11 +245,6 @@ export default function UpdateApp(props) {
             ) : null}
           </View>
 
-          <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%'), marginRight: wp('8%'),
-            marginLeft: wp('8%'), }}>
-            Lorem ipsum dolor sit amet, consectetur{'\n'}adipiscing elit, sed do
-            eiusmod
-          </Text>
         </View>
         {releaseNotes.map((value) => {
           return (
@@ -286,8 +281,7 @@ export default function UpdateApp(props) {
           }}
         >
           <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit,{'\n'}sed do
-            eiusmod tempor incididunt ut labore et dolore
+          For updating you will be taken to the App Store/ Play Store
           </Text>
 
           <View
