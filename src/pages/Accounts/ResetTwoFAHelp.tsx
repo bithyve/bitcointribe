@@ -138,13 +138,13 @@ const ResetTwoFAHelp = (props) => {
     return (
       <QRModal
         QRModalHeader={QRModalHeader}
-        title={'Scan the Secondary Mnemonic'}
+        title={'Scan the Regenerate/ Exit Key'}
         infoText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+          'This can be found on the last page of your PDF personal copy'
         }
-        noteText={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
-        }
+        // noteText={
+        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+        // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {
@@ -153,6 +153,9 @@ const ResetTwoFAHelp = (props) => {
             QrBottomSheet.current.snapTo(0);
           }
           getQrCodeData(qrData);
+        }}
+        onBackPress={() => {
+          (QrBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -258,8 +261,7 @@ const ResetTwoFAHelp = (props) => {
                 {'Having trouble with your 2FA'}
               </Text>
               <Text style={styles.modalHeaderInfoText}>
-                Lorem ipsum dolor sit amet, consectetur{'\n'}adipiscing elit,
-                sed do eiusmod tempor
+                If your 2FA is not working follow one of the below steps
               </Text>
             </View>
           </View>

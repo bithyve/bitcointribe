@@ -345,7 +345,8 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Successfully'}
-        info={'Bitcoins successfully sent to Contact'}
+        info={'Transactions successfully submitted'}
+        infoText={'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'}
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'View Account'}

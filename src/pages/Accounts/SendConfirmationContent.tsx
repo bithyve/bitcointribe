@@ -72,7 +72,7 @@ export default function SendConfirmationContent(props) {
       >
         <Text style={{ ...styles.modalInfoText }}>
           {
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
+            props.infoText ? props.infoText : ''
           }
         </Text>
       </View>

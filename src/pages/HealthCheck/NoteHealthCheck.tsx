@@ -107,7 +107,7 @@ const NoteHealthCheck = props => {
                 title={'Reshare Recovery Key\nwith Keeper'}
                 info={'Did your Keeper not receive the Recovery Key?'}
                 note={
-                    'You can reshare the Recovery Key with your Keeper\n via Email or Sms'
+                    'You can reshare the Recovery Key with your Keeper'
                 }
                 proceedButtonText={'Reshare'}
                 cancelButtonText={'Back'}

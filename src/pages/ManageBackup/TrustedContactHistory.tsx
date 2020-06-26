@@ -1021,12 +1021,7 @@ const TrustedContactHistory = (props) => {
         'Cannot add a contact without phone-num/email as a trusted entity',
       );
     }
-  }, [
-    SHARES_TRANSFER_DETAILS[index],
-    trustedContacts,
-    chosenContact,
-    changeContact,
-  ]);
+  }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);
 
   useEffect(() => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
@@ -1134,9 +1129,9 @@ const TrustedContactHistory = (props) => {
         <SendViaQR
           contactText={'Adding to Friends and Family:'}
           contact={chosenContact ? chosenContact : null}
-          noteHeader={'Keeper Request'}
+          noteHeader={'Scan QR'}
           noteText={
-            'Scan QR. On scanning, you will be adding the contact as your Keeper'
+            'On scanning, you will be adding the contact as your Keeper'
           }
           QR={trustedQR}
           contactEmail={''}
