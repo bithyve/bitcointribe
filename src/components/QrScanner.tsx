@@ -44,7 +44,6 @@ export default function QrScanner(props) {
           isCameraOpen = JSON.parse(value); // boolean false
         }
       });
-      console.log('isCameraOpen in QR Scanner', isCameraOpen);
       if (!isCameraOpen) {
         await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
       }

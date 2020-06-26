@@ -58,105 +58,105 @@ export default function QRModal(props) {
 
   return (
     <View style={styles.modalContentContainer}>
-        <ScrollView style={styles.qrModalScrollView}>
-          <View style={styles.modalHeaderTitleView}>
-            <View style={{ flexDirection: 'row', alignItems:'center'}}>
-              <Text style={styles.modalHeaderTitleText}>{props.QRModalHeader}</Text>
-            </View>
+      <ScrollView style={styles.qrModalScrollView}>
+        <View style={styles.modalHeaderTitleView}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.modalHeaderTitleText}>{props.QRModalHeader}</Text>
           </View>
-          <View style={styles.qrModalImageNTextInputView}>
-            {props.isOpenedFlag && openCameraFlag ? (
-              <View
+        </View>
+        <View style={styles.qrModalImageNTextInputView}>
+          {props.isOpenedFlag && openCameraFlag ? (
+            <View
+              style={{
+                width: wp('90%'),
+                height: wp('90%'),
+                overflow: 'hidden',
+                borderRadius: 20,
+              }}
+            >
+              <RNCamera
+                ref={(ref) => {
+                  this.cameraRef = ref;
+                }}
                 style={{
                   width: wp('90%'),
                   height: wp('90%'),
-                  overflow: 'hidden',
-                  borderRadius: 20,
                 }}
+                onBarCodeRead={barcodeRecognized}
+                captureAudio={false}
               >
-                <RNCamera
-                  ref={(ref) => {
-                    this.cameraRef = ref;
-                  }}
+                <View
                   style={{
-                    width: wp('90%'),
-                    height: wp('90%'),
+                    flexDirection: 'row',
+                    paddingTop: 12,
+                    paddingRight: 12,
+                    paddingLeft: 12,
+                    width: '100%',
                   }}
-                  onBarCodeRead={barcodeRecognized}
-                  captureAudio={false}
                 >
                   <View
                     style={{
-                      flexDirection: 'row',
-                      paddingTop: 12,
-                      paddingRight: 12,
-                      paddingLeft: 12,
-                      width: '100%',
+                      borderLeftWidth: 1,
+                      borderTopColor: 'white',
+                      borderLeftColor: 'white',
+                      height: hp('5%'),
+                      width: hp('5%'),
+                      borderTopWidth: 1,
                     }}
-                  >
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderTopColor: 'white',
-                        borderLeftColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        borderTopWidth: 1,
-                      }}
-                    />
-                    <View
-                      style={{
-                        borderTopWidth: 1,
-                        borderRightWidth: 1,
-                        borderRightColor: 'white',
-                        borderTopColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        marginLeft: 'auto',
-                      }}
-                    />
-                  </View>
+                  />
                   <View
                     style={{
-                      marginTop: 'auto',
-                      flexDirection: 'row',
-                      paddingBottom: 12,
-                      paddingRight: 12,
-                      paddingLeft: 12,
-                      width: '100%',
+                      borderTopWidth: 1,
+                      borderRightWidth: 1,
+                      borderRightColor: 'white',
+                      borderTopColor: 'white',
+                      height: hp('5%'),
+                      width: hp('5%'),
+                      marginLeft: 'auto',
                     }}
-                  >
-                    <View
-                      style={{
-                        borderLeftWidth: 1,
-                        borderBottomColor: 'white',
-                        borderLeftColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        borderBottomWidth: 1,
-                      }}
-                    />
-                    <View
-                      style={{
-                        borderBottomWidth: 1,
-                        borderRightWidth: 1,
-                        borderRightColor: 'white',
-                        borderBottomColor: 'white',
-                        height: hp('5%'),
-                        width: hp('5%'),
-                        marginLeft: 'auto',
-                      }}
-                    />
-                  </View>
-                </RNCamera>
-              </View>
-            ) : (
+                  />
+                </View>
+                <View
+                  style={{
+                    marginTop: 'auto',
+                    flexDirection: 'row',
+                    paddingBottom: 12,
+                    paddingRight: 12,
+                    paddingLeft: 12,
+                    width: '100%',
+                  }}
+                >
+                  <View
+                    style={{
+                      borderLeftWidth: 1,
+                      borderBottomColor: 'white',
+                      borderLeftColor: 'white',
+                      height: hp('5%'),
+                      width: hp('5%'),
+                      borderBottomWidth: 1,
+                    }}
+                  />
+                  <View
+                    style={{
+                      borderBottomWidth: 1,
+                      borderRightWidth: 1,
+                      borderRightColor: 'white',
+                      borderBottomColor: 'white',
+                      height: hp('5%'),
+                      width: hp('5%'),
+                      marginLeft: 'auto',
+                    }}
+                  />
+                </View>
+              </RNCamera>
+            </View>
+          ) : (
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
                   setTimeout(() => {
-                    setOpenCameraFlag(true); 
+                    setOpenCameraFlag(true);
                   }, 2);
-                  }}
+                }}
               >
                 <ImageBackground
                   source={require('../../assets/images/icons/iPhone-QR.png')}
@@ -233,29 +233,29 @@ export default function QRModal(props) {
                 </ImageBackground>
               </AppBottomSheetTouchableWrapper>
             )}
-            <View
+          <View
+            style={{
+              marginBottom: 30,
+              padding: 20,
+              marginLeft: 15,
+              marginRight: 15,
+              borderRadius: 10,
+              justifyContent: 'center',
+            }}
+          >
+            <Text
               style={{
-                marginBottom: 30,
-                padding: 20,
-                marginLeft: 15,
-                marginRight: 15,
-                borderRadius: 10,
-                justifyContent: 'center',
+                color: Colors.blue,
+                fontSize: RFValue(13),
+                marginBottom: 2,
+                fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(13),
-                  marginBottom: 2,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {props.title}
-              </Text>
-              <Text style={styles.bottomNoteInfoText}>
-                {props.infoText}
-                {/* {props.linkText ? (
+              {props.title}
+            </Text>
+            <Text style={styles.bottomNoteInfoText}>
+              {props.infoText}
+              {/* {props.linkText ? (
                   <Text
                     style={{
                       color: Colors.textColorGrey,
@@ -280,18 +280,18 @@ export default function QRModal(props) {
                     {props.italicText}
                   </Text>
                 ) : null}*/}
-              </Text>
-            </View>
+            </Text>
           </View>
-          <View style={{marginTop: 'auto'}}>
+        </View>
+        <View style={{ marginTop: 'auto' }}>
           {props.noteText && <BottomInfoBox
             title={'Note'}
-              infoText={
-                props.noteText
-              }
-            />}
-            </View>
-        </ScrollView>
+            infoText={
+              props.noteText
+            }
+          />}
+        </View>
+      </ScrollView>
     </View>
   );
 }
