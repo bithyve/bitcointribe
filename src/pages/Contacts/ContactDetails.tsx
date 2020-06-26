@@ -1014,7 +1014,57 @@ export default function ContactDetails(props) {
             ) : null}
           </View>
         </View>
-        {!Loading ? (
+        {Loading ? (
+          <View style={{ flex: 1 }}>
+            <ScrollView style={{ flex: 1 }}>
+              {[1, 2, 3, 4, 5].map((value, index) => {
+                return (
+                  <View
+                    key={index}
+                    style={{
+                      margin: wp('3%'),
+                      backgroundColor: Colors.white,
+                      borderRadius: 10,
+                      height: wp('20%'),
+                      width: wp('90%'),
+                      paddingLeft: wp('3%'),
+                      paddingRight: wp('3%'),
+                      alignSelf: 'center',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <View>
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('4%'),
+                          width: wp('40%'),
+                          borderRadius: 10,
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('4%'),
+                          width: wp('30%'),
+                          marginTop: 5,
+                          borderRadius: 10,
+                        }}
+                      />
+                    </View>
+                  </View>
+                );
+              })}
+            </ScrollView>
+            <BottomInfoBox
+              backgroundColor={Colors.white}
+              title={'Note'}
+              infoText={'The details of your friend and Family will come here.'}
+            />
+          </View>
+        ) : (
           <View style={{ flex: 1 }}>
             <ScrollView style={{ flex: 1 }}>
               {sortedHistory(trustedContactHistory).map((value) => {
@@ -1121,61 +1171,15 @@ export default function ContactDetails(props) {
                 }
               })}
             </ScrollView>
-            <BottomInfoBox
-              backgroundColor={Colors.white}
-              title={'Note'}
-              infoText={'The details of your friend and Family will come here.'}
-            />
-          </View>
-        ) : (
-          <View style={{ flex: 1 }}>
-            <ScrollView>
-              {[1, 2, 3, 4, 5].map((value, index) => {
-                return (
-                  <View
-                    key={itemIndex}
-                    style={{
-                      margin: wp('3%'),
-                      backgroundColor: Colors.white,
-                      borderRadius: 10,
-                      height: wp('20%'),
-                      width: wp('90%'),
-                      paddingLeft: wp('3%'),
-                      paddingRight: wp('3%'),
-                      alignSelf: 'center',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    <View>
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp('4%'),
-                          width: wp('40%'),
-                          borderRadius: 10,
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp('4%'),
-                          width: wp('30%'),
-                          marginTop: 5,
-                          borderRadius: 10,
-                        }}
-                      />
-                    </View>
-                  </View>
-                );
-              })}
-            </ScrollView>
-            <BottomInfoBox
-              backgroundColor={Colors.white}
-              title={'Note'}
-              infoText={'The details of your friend and Family will come here.'}
-            />
+            {sortedHistory(trustedContactHistory).length <= 1 && (
+              <BottomInfoBox
+                backgroundColor={Colors.white}
+                title={'Note'}
+                infoText={
+                  'The details of your friend and Family will come here.'
+                }
+              />
+            )}
           </View>
         )}
         {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (
