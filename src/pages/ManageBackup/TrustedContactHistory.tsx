@@ -52,9 +52,12 @@ import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
@@ -1158,6 +1161,25 @@ const TrustedContactHistory = (props) => {
     );
   }, []);
 
+  const renderHelpHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+            if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHelpContent = () => {
+    return(
+      <FriendsAndFamilyHelpContents />
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -1214,7 +1236,7 @@ const TrustedContactHistory = (props) => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (trustedContactsBottomSheet as any).current.snapTo(1);
+                (HelpBottomSheet as any).current.snapTo(1);
               }}
               containerStyle={{
                 marginTop: 'auto',
@@ -1393,6 +1415,16 @@ const TrustedContactHistory = (props) => {
         ]}
         renderContent={renderSendViaQRContents}
         renderHeader={renderSendViaQRHeader}
+      />
+      <BottomSheet 
+        enabledInnerScrolling={true}
+        ref={HelpBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+        ]}
+        renderContent={renderHelpContent}
+        renderHeader={renderHelpHeader}
       />
     </View>
   );

@@ -42,9 +42,12 @@ import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
+import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
@@ -476,6 +479,35 @@ const SecondaryDeviceHistory = (props) => {
       />
     );
   }, []);
+  const renderHelpHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+            if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHelpContent = () => {
+    return(
+      <KeeperDeviceHelpContents />
+    );
+  }
+
+  if (isErrorSendingFailed) {
+    setTimeout(() => {
+      setErrorMessageHeader('Error sending Recovery Key');
+      setErrorMessage(
+        'There was an error while sending your Recovery Key, please try again in a little while',
+      );
+    }, 2);
+    (ErrorBottomSheet as any).current.snapTo(1);
+    dispatch(ErrorSending(null));
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -535,7 +567,7 @@ const SecondaryDeviceHistory = (props) => {
             </View>
             <KnowMoreButton
               onpress={() => {
-                (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
+                (HelpBottomSheet as any).current.snapTo(1);
               }}
               containerStyle={{
                 marginTop: 'auto',
@@ -639,6 +671,16 @@ const SecondaryDeviceHistory = (props) => {
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
+      />
+      <BottomSheet 
+        enabledInnerScrolling={true}
+        ref={HelpBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+        ]}
+        renderContent={renderHelpContent}
+        renderHeader={renderHelpHeader}
       />
     </View>
   );
