@@ -280,7 +280,7 @@ export default function AddressBookContents(props) {
             marginLeft: 'auto',
           }}
         >
-          {!contact.hasXpub && contact.contactName != 'Secondary Device' && (
+          {!contact.hasXpub && (
             <View
               style={{
                 width: wp('15%'),
