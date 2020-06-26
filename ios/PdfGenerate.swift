@@ -23,7 +23,7 @@ import QRCoder
   @objc public var twoFASecret:NSString = "";
   @objc public var secondaryMnemonic:NSString = "";
   @objc public var bhXpub:NSString = "";
-  @objc public var imageSize:CGFloat = 120;
+  @objc public var imageSize:CGFloat = 110;
   @objc public var margin:CGFloat = 10;
   
   
