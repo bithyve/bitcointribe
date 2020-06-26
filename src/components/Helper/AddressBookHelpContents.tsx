@@ -10,7 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 
-export default function FriendsAndFamilyHelpContents(props) {
+export default function AddressBookHelpContents(props) {
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -53,7 +53,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/FnF_recovery_key_2.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -113,7 +113,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/test_account_info_2.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -132,6 +132,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                     color: Colors.white,
                     fontSize: RFValue(12),
                     fontFamily: Fonts.FiraSansRegular,
+                    marginHorizontal: wp('10%'),
                 }}
             >
                 Know more: https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman
