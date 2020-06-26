@@ -659,7 +659,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          decryptedStaticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD;
+          decryptedStaticNonPMDD;
         };
         err?: undefined;
         message?: undefined;

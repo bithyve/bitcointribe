@@ -44,6 +44,7 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import QRModal from '../Accounts/QRModal';
+import S3Service from '../../bitcoin/services/sss/S3Service';
 
 const PersonalCopyHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -55,6 +56,7 @@ const PersonalCopyHistory = (props) => {
   const healthCheckFailed = useSelector(
     (state) => state.sss.pdfHealthCheckFailed,
   );
+  const s3Service: S3Service = useSelector((state) => state.sss.service);
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -306,16 +308,18 @@ const PersonalCopyHistory = (props) => {
         }}
         onPressShare={() => {}}
         onPressConfirm={async () => {
-          let personalCopyDetails = JSON.parse(await AsyncStorage.getItem(
-            'personalCopyDetails',
-          ));
+          let personalCopyDetails = JSON.parse(
+            await AsyncStorage.getItem('personalCopyDetails'),
+          );
           personalCopyDetails[selectedPersonalCopy.type].shared = true;
-          AsyncStorage.setItem('personalCopyDetails', JSON.stringify(personalCopyDetails));
+          AsyncStorage.setItem(
+            'personalCopyDetails',
+            JSON.stringify(personalCopyDetails),
+          );
           setPersonalCopyDetails(personalCopyDetails);
           saveInTransitHistory();
           (PersonalCopyShareBottomSheet as any).current.snapTo(0);
         }}
-        
       />
     );
   }, [selectedPersonalCopy, personalCopyDetails]);
@@ -352,7 +356,34 @@ const PersonalCopyHistory = (props) => {
             const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
             dispatch(checkPDFHealth(qrData, index));
           } else if (QRModalHeader === 'Reshare Personal Copy') {
-            const { restored } = secureAccount.restoreSecondaryMnemonic(qrData);
+            let restored = false;
+            try {
+              qrData = JSON.parse(qrData);
+              if (qrData.type && qrData.type === 'encryptedExitKey') {
+                const res = s3Service.decryptStaticNonPMDD(
+                  qrData.encryptedExitKey,
+                );
+                if (res.status === 200) {
+                  restored = secureAccount.restoreSecondaryMnemonic(
+                    res.data.decryptedStaticNonPMDD.secondaryMnemonic,
+                  ).restored;
+                } else {
+                  Alert.alert(
+                    'Reshare failed',
+                    'Unable to decrypt the exit key',
+                  );
+                }
+              } else {
+                restored = secureAccount.restoreSecondaryMnemonic(qrData)
+                  .restored;
+              }
+            } catch (err) {
+              // if secondary mnemonic parsing fails
+              console.log({ err });
+              restored = secureAccount.restoreSecondaryMnemonic(qrData)
+                .restored;
+            }
+
             if (restored) {
               setPCShared(false);
               dispatch(generatePersonalCopy(selectedPersonalCopy));
@@ -496,7 +527,7 @@ const PersonalCopyHistory = (props) => {
             setTimeout(() => {
               setQRModalHeader('Reshare Personal Copy');
             }, 2);
-            (PersonalCopyShareBottomSheet.current as any).snapTo(1);
+            (QrBottomSheet.current as any).snapTo(1);
           }}
           onPressContinue={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
