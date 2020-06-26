@@ -1680,9 +1680,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
                 .decryptedPub;
             } catch (err) {
-              console.log("abc1",{ err });
               Alert.alert(
-                'Request Rejected'
+                'Invalid Number/Email',
+                'Decryption failed due to invalid input, try again.',
               );
             }
           }
@@ -1747,9 +1747,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
               .decryptedPub;
           } catch (err) {
-            console.log("abc2",{ err });
             Alert.alert(
-              'Request Rejected'
+              'Invalid Number/Email',
+              'Decryption failed due to invalid input, try again.',
             );
           }
         }

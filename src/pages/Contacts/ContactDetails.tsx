@@ -689,7 +689,7 @@ export default function ContactDetails(props) {
         'Cannot add a contact without phone-num/email as a trusted entity',
       );
     }
-  }, [SHARES_TRANSFER_DETAILS[index], Contact]);
+  }, [SHARES_TRANSFER_DETAILS[index], Contact, trustedContacts]);
 
   const createDeepLink = useCallback(() => {
     console.log(uploadMetaShare, updateEphemeralChannelLoader);

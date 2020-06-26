@@ -1021,7 +1021,12 @@ const TrustedContactHistory = (props) => {
         'Cannot add a contact without phone-num/email as a trusted entity',
       );
     }
-  }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);
+  }, [
+    SHARES_TRANSFER_DETAILS[index],
+    trustedContacts,
+    chosenContact,
+    changeContact,
+  ]);
 
   useEffect(() => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
