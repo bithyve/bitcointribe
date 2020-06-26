@@ -1561,7 +1561,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     this.processDLRequest(key, false);
   };
 
-  onTrustedContactRejct = (key) => {
+  onTrustedContactReject = (key) => {
     setTimeout(() => {
       this.setState({
         tabBarIndex: 999,
@@ -1569,7 +1569,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }, 2);
     (this.refs.trustedContactRequestBottomSheet as any).snapTo(0);
-    this.processDLRequest(key, true);
+    // this.processDLRequest(key, true);
   };
 
   onPhoneNumberChange = () => {};
@@ -2474,7 +2474,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 trustedContactRequest={trustedContactRequest}
                 recoveryRequest={recoveryRequest}
                 onPressAccept={this.onTrustedContactRequestAccept}
-                onPressReject={this.onTrustedContactRejct}
+                onPressReject={this.onTrustedContactReject}
                 onPhoneNumberChange={this.onPhoneNumberChange}
                 bottomSheetRef={this.refs.trustedContactRequestBottomSheet}
               />
