@@ -110,7 +110,7 @@ const TrustedContactHealthCheck = props => {
                 title={'Reshare Recovery Key\nwith Keeper'}
                 info={'Did your contact not receive the Recovery Key?'}
                 note={
-                    'You can reshare the Recovery Key with your Keeper\n via Email or Sms'
+                    'You can reshare the Recovery Key with your Keeper'
                 }
                 proceedButtonText={'Reshare'}
                 cancelButtonText={'Back'}
