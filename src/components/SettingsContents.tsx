@@ -138,7 +138,7 @@ export default function SettingsContents(props) {
         >
           <Text style={styles.addModalTitleText}>FAQs</Text>
         </AppBottomSheetTouchableWrapper>
-        s
+        
         <View
           style={{ height: 20, width: 1, backgroundColor: Colors.borderColor }}
         />
