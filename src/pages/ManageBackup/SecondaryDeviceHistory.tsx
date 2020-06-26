@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   AsyncStorage,
   Platform,
+  Alert,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -37,12 +38,18 @@ import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
+import QRModal from '../Accounts/QRModal';
+import S3Service from '../../bitcoin/services/sss/S3Service';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
+  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const SHARES_TRANSFER_DETAILS = useSelector(
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
@@ -55,6 +62,10 @@ const SecondaryDeviceHistory = (props) => {
   const dispatch = useDispatch();
   const [changeContact, setChangeContact] = useState(false);
   const [secondaryQR, setSecondaryQR] = useState('');
+  const s3Service: S3Service = useSelector((state) => state.sss.service);
+  const secureAccount: SecureAccount = useSelector(
+    (state) => state.accounts[SECURE_ACCOUNT].service,
+  );
 
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
@@ -154,54 +165,59 @@ const SecondaryDeviceHistory = (props) => {
     );
   }, []);
 
-  const createGuardian = useCallback(async () => {
-    const walletID = await AsyncStorage.getItem('walletID');
-    const FCM = await AsyncStorage.getItem('fcmToken');
+  const createGuardian = useCallback(
+    async (reshare?: boolean) => {
+      const walletID = await AsyncStorage.getItem('walletID');
+      const FCM = await AsyncStorage.getItem('fcmToken');
 
-    const firstName = 'Secondary';
-    const lastName = 'Device';
-    const contactName = `${firstName} ${lastName ? lastName : ''}`
-      .toLowerCase()
-      .trim();
+      const firstName = 'Secondary';
+      const lastName = 'Device';
+      const contactName = `${firstName} ${lastName ? lastName : ''}`
+        .toLowerCase()
+        .trim();
 
-    let data: EphemeralData = {
-      walletID,
-      FCM,
-    };
-    const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+      let data: EphemeralData = {
+        walletID,
+        FCM,
+      };
+      const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
-    if (changeContact) {
-      dispatch(uploadEncMShare(0, contactName, data, true));
-      updateTrustedContactsInfo({ firstName, lastName });
-      setChangeContact(false);
-    } else {
-      if (
-        !SHARES_TRANSFER_DETAILS[0] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        dispatch(uploadEncMShare(0, contactName, data));
+      if (changeContact) {
+        setSecondaryQR('');
+        dispatch(uploadEncMShare(0, contactName, data, true));
         updateTrustedContactsInfo({ firstName, lastName });
-      } else if (
-        trustedContact &&
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        dispatch(
-          updateEphemeralChannel(
-            contactName,
-            trustedContact.ephemeralChannel.data[0],
-          ),
-        );
+        setChangeContact(false);
+      } else {
+        if (
+          !SHARES_TRANSFER_DETAILS[0] ||
+          Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT >
+            config.TC_REQUEST_EXPIRY
+        ) {
+          setSecondaryQR('');
+          dispatch(uploadEncMShare(0, contactName, data, reshare));
+          updateTrustedContactsInfo({ firstName, lastName });
+        } else if (
+          trustedContact &&
+          !trustedContact.symmetricKey &&
+          trustedContact.ephemeralChannel &&
+          trustedContact.ephemeralChannel.initiatedAt &&
+          Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+            config.TC_REQUEST_EXPIRY
+        ) {
+          setSecondaryQR('');
+          dispatch(
+            updateEphemeralChannel(
+              contactName,
+              trustedContact.ephemeralChannel.data[0],
+            ),
+          );
+        }
       }
-    }
-  }, [SHARES_TRANSFER_DETAILS, changeContact, trustedContacts]);
+    },
+    [SHARES_TRANSFER_DETAILS, changeContact, trustedContacts],
+  );
 
   useEffect(() => {
-    console.log(uploadMetaShare, updateEphemeralChannelLoader);
     if (uploadMetaShare || updateEphemeralChannelLoader) {
       if (secondaryQR) setSecondaryQR('');
       return;
@@ -377,16 +393,89 @@ const SecondaryDeviceHistory = (props) => {
     );
   }, []);
 
-  if (isErrorSendingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Key');
-      setErrorMessage(
-        'There was an error while sending your Recovery Key, please try again in a little while',
-      );
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorSending(null));
-  }
+  useEffect(() => {
+    if (isErrorSendingFailed) {
+      setTimeout(() => {
+        setErrorMessageHeader('Error sending Recovery Key');
+        setErrorMessage(
+          'There was an error while sending your Recovery Key, please try again in a little while',
+        );
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(ErrorSending(null));
+    }
+  }, [isErrorSendingFailed]);
+
+  const renderQrContent = useCallback(() => {
+    return (
+      <QRModal
+        QRModalHeader={'Keeper Reshare'}
+        title={'Scan the Secondary Mnemonic'}
+        infoText={
+          'Open your PDF copy which is password protected with your Secret Answer'
+        }
+        // noteText={
+        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
+        // }
+        modalRef={QrBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={(qrData) => {
+          let isValid = false;
+          try {
+            qrData = JSON.parse(qrData);
+            if (qrData.type && qrData.type === 'encryptedExitKey') {
+              const res = s3Service.decryptStaticNonPMDD(
+                qrData.encryptedExitKey,
+              );
+              if (res.status === 200) {
+                isValid = secureAccount.isSecondaryMnemonic(
+                  res.data.decryptedStaticNonPMDD.secondaryMnemonic,
+                );
+              } else {
+                Alert.alert('Reshare failed', 'Unable to decrypt the exit key');
+              }
+            } else {
+              isValid = secureAccount.isSecondaryMnemonic(qrData);
+            }
+          } catch (err) {
+            // parsing fails during secondary mnemonic from PDF
+            console.log({ err });
+            isValid = secureAccount.isSecondaryMnemonic(qrData);
+          }
+
+          if (isValid) {
+            //create buddyMShare
+            const reshare = true; // increments the version of the meta share
+            createGuardian(reshare);
+            (secondaryDeviceBottomSheet.current as any).snapTo(1);
+          } else {
+            Alert.alert(
+              'Invalid Secondary Mnemonic',
+              'Please scan appropriate QR from one of your personal copy',
+            );
+          }
+
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+            (QrBottomSheet.current as any).snapTo(0);
+          }, 2);
+        }}
+      />
+    );
+  }, [QrBottomSheetsFlag]);
+
+  const renderQrHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -488,7 +577,8 @@ const SecondaryDeviceHistory = (props) => {
             // setTimeout(() => {
             //   setQRModalHeader('Reshare Personal Copy');
             // }, 2);
-            (secondaryDeviceBottomSheet.current as any).snapTo(1);
+
+            (QrBottomSheet.current as any).snapTo(1);
           }}
           onPressConfirm={() => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
@@ -531,6 +621,24 @@ const SecondaryDeviceHistory = (props) => {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag(true);
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onCloseStart={() => {}}
+        enabledInnerScrolling={true}
+        ref={QrBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
       />
     </View>
   );

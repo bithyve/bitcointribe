@@ -296,6 +296,9 @@ export default class SecureAccount {
   public removeSecondaryMnemonic = (): { removed: Boolean } =>
     this.secureHDWallet.removeSecondaryMnemonic();
 
+  public isSecondaryMnemonic = (secondaryMnemonic: string) =>
+    this.secureHDWallet.isSecondaryMnemonic(secondaryMnemonic);
+
   public restoreSecondaryMnemonic = (
     secondaryMnemonic: string,
   ): {
