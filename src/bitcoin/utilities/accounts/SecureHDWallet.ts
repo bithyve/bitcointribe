@@ -1230,7 +1230,7 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   private gapLimitCatchUp = async () => {
-    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
 
     const multiSig = this.createSecureMultiSig(
@@ -1433,7 +1433,7 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   private derivativeAccGapLimitCatchup = async (accountType, accountNumber) => {
-    // scanning future addressess in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
     const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber

@@ -2892,7 +2892,7 @@ export default function Home(props) {
                 isGuardian,
               });
             } else if (publicKey && rejected) {
-              // don't assoicate; only fetch the payment details from EC
+              // don't associate; only fetch the payment details from EC
               dispatch(fetchEphemeralChannel(null, null, publicKey));
             }
           }

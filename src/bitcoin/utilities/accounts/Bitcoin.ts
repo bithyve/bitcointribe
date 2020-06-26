@@ -227,7 +227,7 @@ export default class Bitcoin {
       };
     } catch (err) {
       console.log(
-        `An error occured while fetching balance via Esplora: ${err.response.data.err}`,
+        `An error occurred while fetching balance via Esplora: ${err.response.data.err}`,
       );
       console.log('Using Blockcypher fallback');
       try {
@@ -359,7 +359,7 @@ export default class Bitcoin {
       return { balances, transactions };
     } catch (err) {
       console.log(
-        `An error occured while fetching balance-txnn via Esplora: ${err.response.data.err}`,
+        `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
       );
       throw new Error('Fetching balance-txn by addresses failed');
     }
@@ -495,7 +495,7 @@ export default class Bitcoin {
       return { transactions };
     } catch (err) {
       console.log(
-        `An error occured while fetching transactions via Esplora Wrapper: ${err}`,
+        `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
       );
       console.log('Using Blockcypher fallback');
 
@@ -535,7 +535,7 @@ export default class Bitcoin {
         return { transactions };
       } catch (err) {
         console.log(
-          `An error occured while fetching transactions via Blockcypher fallback as well: ${err}`,
+          `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
         );
         throw new Error('Transaction fetching failed');
       }
@@ -574,7 +574,7 @@ export default class Bitcoin {
       return txCounts;
     } catch (err) {
       console.log(
-        `An error occured while fetching transactions via Esplora Wrapper: ${err}`,
+        `An error occurred while fetching transactions via Esplora Wrapper: ${err}`,
       );
       console.log('Using Blockcypher fallback');
 
@@ -586,7 +586,7 @@ export default class Bitcoin {
         return txCounts;
       } catch (err) {
         console.log(
-          `An error occured while fetching transactions via Blockcypher fallback as well: ${err}`,
+          `An error occurred while fetching transactions via Blockcypher fallback as well: ${err}`,
         );
         throw new Error('Transaction fetching failed');
       }
@@ -668,7 +668,7 @@ export default class Bitcoin {
   };
 
   public fetchChainInfo = async (): Promise<any> => {
-    // provides transation fee rate (satoshis/kilobyte)
+    // provides transition fee rate (satoshis/kilobyte)
     // bitcoinfees endpoint: https://bitcoinfees.earn.com/api/v1/fees/recommended (provides time estimates)
 
     try {
@@ -791,7 +791,7 @@ export default class Bitcoin {
       }
       return { UTXOs };
     } catch (err) {
-      console.log(`An error occured while connecting to Esplora: ${err}`);
+      console.log(`An error occurred while connecting to Esplora: ${err}`);
       console.log('Switching to Blockcypher UTXO fallback');
 
       try {
@@ -824,7 +824,7 @@ export default class Bitcoin {
       return data;
     } catch (err) {
       console.log(
-        `An error occured while fetching transaction details from Esplora: ${err}`,
+        `An error occurred while fetching transaction details from Esplora: ${err}`,
       );
       console.log('Switching to Blockcypher fallback');
       let data;
@@ -1113,7 +1113,7 @@ export default class Bitcoin {
       return { txid: res.data };
     } catch (err) {
       console.log(
-        `An error occured while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
+        `An error occurred while broadcasting through BitHyve Node. Using the fallback mechanism. ${err}`,
       );
       try {
         let res: AxiosResponse;
