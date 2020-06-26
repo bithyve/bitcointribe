@@ -961,56 +961,57 @@ export default function ContactDetails(props) {
                 <Text style={styles.phoneText}>{contact.connectedVia}</Text>
               ) : null}
             </View>
-            {Contact.contactName != 'Secondary Device' ? (
-              Contact.hasTrustedChannel && !Contact.hasXpub ? null : (
-                <TouchableOpacity
-                  onPress={() => {
-                    Contact.hasXpub && Contact.contactName != 'Secondary Device'
-                      ? onPressSend()
-                      : onPressResendRequest();
-                  }}
+            {Contact.hasTrustedChannel &&
+            !Contact.hasXpub ? null : Contact.contactName ===
+                'Secondary Device' && !Contact.hasXpub ? null : (
+              <TouchableOpacity
+                onPress={() => {
+                  Contact.hasXpub
+                    ? onPressSend()
+                    : Contact.contactName != 'Secondary Device'
+                    ? onPressResendRequest()
+                    : null;
+                }}
+                style={{
+                  height: wp('6%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.lightBlue,
+                  marginLeft: 'auto',
+                  marginBottom: 10,
+                  borderRadius: 4,
+                  flexDirection: 'row',
+                  alignSelf: 'flex-end',
+                  paddingLeft: wp('1.5%'),
+                  paddingRight: wp('1.5%'),
+                }}
+              >
+                {Contact.hasXpub && (
+                  <Image
+                    source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                    style={{
+                      height: wp('4%'),
+                      width: wp('4%'),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                )}
+                <Text
                   style={{
-                    height: wp('6%'),
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: Colors.lightBlue,
-                    marginLeft: 'auto',
-                    marginBottom: 10,
-                    borderRadius: 4,
-                    flexDirection: 'row',
-                    alignSelf: 'flex-end',
-                    paddingLeft: wp('1.5%'),
-                    paddingRight: wp('1.5%'),
+                    color: Colors.white,
+                    fontFamily: Fonts.FiraSansMedium,
+                    fontSize: RFValue(10),
+                    marginLeft: 2,
                   }}
                 >
-                  {Contact.hasXpub &&
-                    Contact.contactName != 'Secondary Device' && (
-                      <Image
-                        source={require('../../assets/images/icons/icon_bitcoin_light.png')}
-                        style={{
-                          height: wp('4%'),
-                          width: wp('4%'),
-                          resizeMode: 'contain',
-                        }}
-                      />
-                    )}
-                  <Text
-                    style={{
-                      color: Colors.white,
-                      fontFamily: Fonts.FiraSansMedium,
-                      fontSize: RFValue(10),
-                      marginLeft: 2,
-                    }}
-                  >
-                    {Contact.hasXpub
-                      ? 'Send'
-                      : index < 3
-                      ? 'Reshare'
-                      : 'Resend Request'}
-                  </Text>
-                </TouchableOpacity>
-              )
-            ) : null}
+                  {Contact.hasXpub
+                    ? 'Send'
+                    : index < 3
+                    ? 'Reshare'
+                    : 'Resend Request'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
         {Loading ? (
