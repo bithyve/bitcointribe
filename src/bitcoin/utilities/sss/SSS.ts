@@ -751,7 +751,7 @@ export default class SSS {
   public decryptStaticNonPMDD = (
     encryptStaticNonPMDD: string,
   ): {
-    decryptedStaticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD;
+    decryptedStaticNonPMDD;
   } => {
     const key = SSS.getDerivedKey(
       bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
