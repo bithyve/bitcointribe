@@ -34,7 +34,7 @@ const Confirmation = (props) => {
     <SendStatusModalContents
       title1stLine={'Sent Successfully'}
       title2ndLine={''}
-      info1stLine={'Bitcoins successfully sent to'}
+      info1stLine={'bitcoin sent successfully to'}
       info2ndLine={''}
       userName={recipientAddress}
       modalRef={SendSuccessBottomSheet}

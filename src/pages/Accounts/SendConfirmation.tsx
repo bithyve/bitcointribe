@@ -733,7 +733,7 @@ export default function SendConfirmation(props) {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
             }
           />
         </View>

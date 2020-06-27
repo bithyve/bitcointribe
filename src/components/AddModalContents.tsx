@@ -15,7 +15,7 @@ import { FlatList } from "react-native-gesture-handler";
 export default function AddModalContents( props ) {
 	const [ addData, setAddData ] = useState( [
 		{
-			title: `Buy bitcoins into Hexa wallet`, 
+			title: `Buy bitcoin into Hexa wallet`, 
 			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
 			info: 'Redeem a FastBitcoins voucher',
 			type:'buyBitcoins'

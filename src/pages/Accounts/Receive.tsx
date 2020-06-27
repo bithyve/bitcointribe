@@ -525,7 +525,7 @@ export default function Receive(props) {
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         info={
-          'Send the link below with your contact. It will send your bitcoins address and a way for the person to accept your request.'
+          'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
         }
         amount={amount === '' ? null : amount}
         link={receiveLink}
@@ -676,7 +676,7 @@ export default function Receive(props) {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoins from the Savings Account."
+                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
               }
             />
 

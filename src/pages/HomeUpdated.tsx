@@ -2916,7 +2916,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 pageInfo={
                   'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
                 }
-                pageTitle={'Sell Bitcoins'}
+                pageTitle={'Sell bitcoin'}
                 noteTitle={'Lorem ipsum'}
                 noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
                 proceedButtonText={'Calculate'}

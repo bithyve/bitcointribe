@@ -75,10 +75,10 @@ export default function Sell(props) {
   const renderSellHelperContents = () => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={`Selling Bitcoins`}
-        helperInfo={`You can also sell bitcoins to an exchange or a similar service provider. 
+        topButtonText={`Selling bitcoin`}
+        helperInfo={`You can also sell bitcoin to an exchange or a similar service provider. 
           You will typically get your local currency like the dollar ($) or the pound (£) in your 
-          bank account after processing As the Test Bitcoins have no market value, you don’t need to sell them`}
+          bank account after processing As the Test bitcoin have no market value, you don’t need to sell them`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           (SellHelperBottomSheet as any).current.snapTo(0);
