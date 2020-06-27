@@ -467,8 +467,8 @@ function* downloadMetaShareWorker({ payload }) {
       if (!updated) {
         if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
           Alert.alert(
-            'Share Exists',
-            'Following share already exists for recovery',
+            'Key Exists',
+            'Following key already exists for recovery',
           );
           return;
         }

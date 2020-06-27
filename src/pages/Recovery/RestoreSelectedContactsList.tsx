@@ -562,8 +562,8 @@ export default function RestoreSelectedContactsList(props) {
           dispatch(downloadMShare(KEY, null, 'recovery'));
         } else {
           Alert.alert(
-            'Share Exists',
-            'Following share already exists for recovery',
+            'Key Exists',
+            'Following key already exists for recovery',
           );
         }
       } else if (key) {

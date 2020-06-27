@@ -278,7 +278,7 @@ export default function TrustedContactRequest(props) {
                 </Text>
               )
             ) : (
-              <Text style={styles.modalTitleText}>Recovery Share Request</Text>
+              <Text style={styles.modalTitleText}>Recovery Key Request</Text>
             )}
             <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
               {props.inputType

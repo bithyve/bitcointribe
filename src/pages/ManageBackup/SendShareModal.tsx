@@ -47,10 +47,10 @@ export default function SendShareModal(props) {
       <View style={{ height: '100%' }}>
         <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
           <Text style={styles.commModeModalHeaderText}>
-            Share Recovery Key{'\n'}with contact
+            Send Recovery Key{'\n'}with contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Send share to Keeper, you can change your Keeper,
+            Send Key to Keeper, you can change your Keeper,
             or their primary mode of contact
           </Text>
         </View>
@@ -179,7 +179,7 @@ export default function SendShareModal(props) {
         <Text
           style={{ ...styles.commModeModalInfoText, marginBottom: hp('3.5%') }}
         >
-          You can choose to send the share via phone or email or via QR if your
+          You can choose to send the Key via phone or email or via QR if your
           contact is nearby
         </Text>
         <View

@@ -518,14 +518,14 @@ export default function Receive(props) {
         headerText={'Share'}
         subHeaderText={
           !isEmpty(selectedContact)
-            ? 'Share with your contact'
-            : 'Share bitcoin address'
+            ? 'Send to your contact'
+            : 'Send bitcoin address'
         }
         contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         info={
-          'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'
+          'Send the link below with your contact. It will send your bitcoins address and a way for the person to accept your request.'
         }
         amount={amount === '' ? null : amount}
         link={receiveLink}
@@ -1062,7 +1062,7 @@ export default function Receive(props) {
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
                   title={'Bitcoin Receiving Address'}
-                  infoText={'Generate bitcoin address and share via link or QR'}
+                  infoText={'Generate bitcoin address and send via link or QR'}
                 />
               </View>
               <View

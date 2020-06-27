@@ -1727,14 +1727,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }
     } else {
       if (requester === walletName) {
-        Toast('You do not host any share of your own');
+        Toast('You do not host any key of your own');
         return;
       }
 
       if (!UNDER_CUSTODY[requester]) {
         Alert.alert(
           'Failed to send!',
-          'You do not host any share for this user',
+          'You do not host any key for this user',
         );
 
         this.setState({

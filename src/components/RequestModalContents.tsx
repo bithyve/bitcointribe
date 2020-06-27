@@ -42,7 +42,7 @@ export default function RequestModalContents(props) {
             Request Recovery Key{'\n'}from Friends and Family
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Request share from Friends and Family, you can change your Keeper, or their primary mode of contact
+            Request Key from Friends and Family, you can change your Keeper, or their primary mode of contact
           </Text>
         </View>
         <View style={styles.contactProfileView}>
@@ -170,7 +170,7 @@ export default function RequestModalContents(props) {
         <Text
           style={{ ...styles.commModeModalInfoText, marginBottom: hp('3.5%') }}
         >
-          You can choose to request the share via phone or email or via QR if
+          You can choose to request the Key via phone or email or via QR if
           your contact is nearby
         </Text>
         <View

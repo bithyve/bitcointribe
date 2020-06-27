@@ -130,7 +130,7 @@ const SecondaryDevice = props => {
       <BottomInfoBox
         title={"Note"}
         infoText={
-          "Share your Recovery Key Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR"
+          "Send your Recovery Key Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR"
         }
       />
       <BottomSheet

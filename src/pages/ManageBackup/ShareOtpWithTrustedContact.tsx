@@ -29,7 +29,7 @@ export default function ShareOtpWithTrustedContact(props) {
           </AppBottomSheetTouchableWrapper> */}
           <View>
             <Text style={styles.modalHeaderTitleText}>
-              Share OTP with contact
+              Send OTP to contact
             </Text>
             <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
               Please provide this OTP to your contact in order for them
