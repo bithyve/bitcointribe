@@ -24,7 +24,7 @@ export default function SendHelpContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Sending Bitcoins
+                    Sending bitcoin
                 </Text>
             </View>
             <View

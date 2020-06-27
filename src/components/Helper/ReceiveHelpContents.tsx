@@ -24,7 +24,7 @@ export default function ReceiveHelpContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Receive Bitcoins
+                    Receive bitcoin
                 </Text>
             </View>
             <View

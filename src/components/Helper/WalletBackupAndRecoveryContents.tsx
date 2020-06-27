@@ -66,7 +66,7 @@ export default function WalletBackupAndRecoveryContents(props) {
           >
             Hexa
           </Text>
-          , you have full control over your bitcoins.{'\n'}This gives you{' '}
+          , you have full control over your bitcoin.{'\n'}This gives you{' '}
           <Text
             style={{
               color: Colors.white,
@@ -258,7 +258,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          All you need to do is follow the outlined steps and{'\n'}share these
+          All you need to do is follow the outlined steps and{'\n'}send these
           Keys{'\n'}with five independent sources.
         </Text>
       </View>
@@ -278,7 +278,7 @@ export default function WalletBackupAndRecoveryContents(props) {
           }}
         >
           Keepers can only help you recover{'\n'}your wallet and cannot see your
-          balance or use your bitcoins.
+          balance or use your bitcoin.
         </Text>
       </View>
       <View

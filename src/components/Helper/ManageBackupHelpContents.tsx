@@ -48,7 +48,7 @@ export default function ManageBackupHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Health Shield shows if your Recovery Keys{'\n'}are available. There are three modes - Red,{'\n'}Yellow and Green. Red requires immediate{'\n'}action and Yellow requires you to act when{'\n'}possible. Green shows your Recovery Shares{'\n'}are available
+                The Health Shield shows if your Recovery Keys{'\n'}are available. There are three modes - Red,{'\n'}Yellow and Green. Red requires immediate{'\n'}action and Yellow requires you to act when{'\n'}possible. Green shows your Recovery Keys{'\n'}are available
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

@@ -48,7 +48,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can share two of your five Recovery Keys{'\n'}with your Friends and Family chosen from{'\n'}your address book. You can then either send{'\n'}them a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
+                You can send two of your five Recovery Keys{'\n'}with your Friends and Family chosen from{'\n'}your address book. You can then either send{'\n'}them a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

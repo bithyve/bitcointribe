@@ -103,7 +103,7 @@ export default function TestAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                bitcoins sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved.
+                bitcoin sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved.
             </Text>
             <Text
                 style={{

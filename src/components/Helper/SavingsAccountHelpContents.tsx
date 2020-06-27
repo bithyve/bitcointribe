@@ -64,7 +64,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Spending from the Savings Account carries{'\n'}more fees compared to the Checking Account.{'\n'}This is in part, due to the requirement of an{'\n'}additional 2FA code to confirm spending
+                Spending from the Savings Account carries{'\n'}more fees compared to the Checking Account.{'\n'}This is in part, due to the requirement of {'\n'}2FA confirmation to confirm spending
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View

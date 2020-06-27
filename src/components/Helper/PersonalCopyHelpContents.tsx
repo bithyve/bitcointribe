@@ -48,7 +48,7 @@ export default function PersonalCopyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can share two of your five Recovery Keys{'\n'}as documents with accounts that you possess.{'\n'}Make sure you delete these from your phone{'\n'}after sharing
+                You can send two of your five Recovery Keys{'\n'}as documents with accounts that you possess.{'\n'}Make sure you delete these from your phone{'\n'}after sharing
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
