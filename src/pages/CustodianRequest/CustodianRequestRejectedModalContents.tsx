@@ -21,7 +21,7 @@ export default function CustodianRequestRejectedModalContents(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            Secret Rejected{"\n"}Successfully
+            Recovery Key Rejected{"\n"}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
             You have rejected the request to be a{"\n"}Keeper for

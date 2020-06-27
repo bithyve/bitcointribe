@@ -893,7 +893,7 @@ export default function ContactDetails(props) {
       return (
         <SendShareModal
           contact={Contact ? Contact : null}
-          textHeader={'Sharing Secret with'}
+          textHeader={'Sharing Key with'}
           onPressViaQr={() => {
             createGuardian();
             if (SendViaQRBottomSheet.current)

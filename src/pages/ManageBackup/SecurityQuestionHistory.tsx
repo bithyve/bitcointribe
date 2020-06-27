@@ -300,7 +300,7 @@ const SecurityQuestionHistory = props => {
           IsReshare
           data={sortedHistory(securityQuestionsHistory)}
           // reshareInfo={
-          //   'Want to send the Recovery Secret again to the same destination? '
+          //   'Want to send the Recovery Key again to the same destination? '
           // }
           onPressConfirm={() => {
             // ConfirmBottomSheet.current.snapTo(1);

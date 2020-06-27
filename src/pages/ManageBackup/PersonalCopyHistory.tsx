@@ -347,7 +347,7 @@ const PersonalCopyHistory = (props) => {
             : 'Scan the Secondary Mnemonic'
         }
         infoText={
-          'Open your PDF copy which is password protected with your Secret Answer'
+          'Open your PDF copy which is password protected with your Security Question's answer'
         }
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'

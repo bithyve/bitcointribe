@@ -936,7 +936,7 @@ export default function RestoreSelectedContactsList(props) {
                               color: Colors.darkGreen,
                             }}
                           >
-                            Secret Receieved
+                            Recovery Key Receieved
                           </Text>
                         </View>
                         <View
@@ -968,7 +968,7 @@ export default function RestoreSelectedContactsList(props) {
                               color: Colors.blue,
                             }}
                           >
-                            Secret In-Transit
+                            Recovery Key In-Transit
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -1108,7 +1108,7 @@ export default function RestoreSelectedContactsList(props) {
                                 color: Colors.darkGreen,
                               }}
                             >
-                              Secret Entered
+                              Recovery Key Entered
                             </Text>
                           </View>
                           <View
@@ -1140,7 +1140,7 @@ export default function RestoreSelectedContactsList(props) {
                                 color: Colors.red,
                               }}
                             >
-                              Secret Invalid
+                              Recovery Key Invalid
                             </Text>
                           </View>
                           <View

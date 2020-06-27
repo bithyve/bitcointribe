@@ -1067,7 +1067,7 @@ const TrustedContactHistory = (props) => {
         <SendShareModal
           contact={chosenContact ? chosenContact : null}
           index={index}
-          textHeader={'Sharing Secret with'}
+          textHeader={'Sharing Recovery Key with'}
           onPressViaQr={(index) => {
             createGuardian();
             if (SendViaQRBottomSheet.current)

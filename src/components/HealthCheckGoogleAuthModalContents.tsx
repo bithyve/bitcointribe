@@ -96,7 +96,7 @@ export default function HealthCheckGoogleAuthModalContents(props) {
                         }}
                     />
                 </View>
-                <Text style={styles.modalInfoText}>Answer 1 + Answer 2 to your secret questions is the{"\n"}password for the PDF</Text>
+                <Text style={styles.modalInfoText}>The answer to your Security Question is the{"\n"}password for the PDF</Text>
                 <TouchableOpacity
                     disabled={code.length < 3 ? true : false}
                     onPress={() => props.onPressConfirm()}

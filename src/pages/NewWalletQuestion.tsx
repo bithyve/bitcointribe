@@ -383,7 +383,7 @@ export default function NewWalletQuestion(props) {
                 firstLineTitle={'New Hexa Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
-                infoTextBold={'secret question and answer'}
+                infoTextBold={'Security Question and answer'}
                 infoTextNormal1={'\n(you need to remember this)'}
               />
 

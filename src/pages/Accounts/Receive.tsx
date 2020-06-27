@@ -676,7 +676,7 @@ export default function Receive(props) {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoins from the savings account."
+                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoins from the Savings Account."
               }
             />
 

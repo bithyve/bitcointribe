@@ -43,7 +43,7 @@ const ShareSuccessPage = props => {
                 <View style={{ ...styles.modalContentContainer, height: '100%' }}>
                     <View style={{ height: '100%' }}>
                         <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%'), }}>
-                            <Text style={styles.commModeModalHeaderText}>{"Secret Sent\nSuccessfully"}</Text>
+                            <Text style={styles.commModeModalHeaderText}>{"Recovery Key Sent\nSuccessfully"}</Text>
                             <Text style={styles.commModeModalInfoText}>{"Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do"}</Text>
                         </View>
                         <View style={styles.contactProfileView}>
