@@ -104,7 +104,7 @@ export default function CheckingAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Bitcoins sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved. This is because a{'\n'}Test Bitcoin Address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
+                Use this account to store smaller{'\n'}amounts and for your daily use
             </Text>
             <Text
                 style={{
