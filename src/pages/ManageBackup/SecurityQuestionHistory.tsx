@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   AsyncStorage,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import BackupStyles from './Styles';
@@ -86,6 +87,7 @@ const SecurityQuestionHistory = props => {
       <HealthCheckSecurityQuestion
         bottomSheetRef={SecurityQuestionBottomSheet}
         onPressConfirm={async () => {
+          Keyboard.dismiss();
           updateAutoHighlightFlags();
           saveConfirmationHistory();
           SecurityQuestionBottomSheet.current.snapTo(0);
