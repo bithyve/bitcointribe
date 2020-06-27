@@ -132,7 +132,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansMedium,
           }}
         >
-          The shield tells you{'\n'}how healthy your backup is
+          The Health Shield tells you{'\n'}how ready your backup is
         </Text>
       </View>
       <View
@@ -259,7 +259,7 @@ export default function WalletBackupAndRecoveryContents(props) {
           }}
         >
           All you need to do is follow the outlined steps and{'\n'}share these
-          Keys{'\n'}with five independent Keepers.
+          Keys{'\n'}with five independent sources.
         </Text>
       </View>
       <View
@@ -354,7 +354,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          Once you answer your secret question,{'\n'}the wallet is recreated and
+          Once you answer your Security Question,{'\n'}the wallet is recreated and
           you can use Hexa from your new device
         </Text>
       </View>

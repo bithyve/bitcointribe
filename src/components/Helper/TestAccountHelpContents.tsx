@@ -47,7 +47,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            The test account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying Bitcoin. It comes preloaded{'\n'}with test bitcoins that you can send to other{'\n'}users on Bitcoin’s test network
+            The Test Account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying bitcoin. It comes preloaded{'\n'}with test bitcoin that you can send to other{'\n'}users on Bitcoin Testnet
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -63,7 +63,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Bitcoin Testnet is similar to Bitcoin Mainnet{'\n'}and has Test Bitcoins for people to experiment{'\n'}with. Test bitcoins can not be sent to wallets{'\n'}that only support bitcoin
+                The Bitcoin Testnet is similar to Bitcoin Mainnet{'\n'}and has Test bitcoin for people to experiment{'\n'}with. Test bitcoin can not be sent to wallets{'\n'}that only support Bitcoin Mainnet
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -87,7 +87,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Test Account Addresses start with “2”{'\n'}compared with “1”, “3” or “bc1” for Bitcoin{'\n'}Mainnet. If you are sending Test Bitcoins to{'\n'}your friend, please make sure to verify this
+                Test Account addresses start with “2”{'\n'}compared with “1”, “3” or “bc1” for Bitcoin{'\n'}Mainnet. If you are sending Test bitcoin to{'\n'}your friend, please make sure to verify this
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -103,7 +103,7 @@ export default function TestAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Bitcoins sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved. This is because a{'\n'}Test Bitcoin Address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
+                bitcoins sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved.
             </Text>
             <Text
                 style={{
@@ -113,7 +113,7 @@ export default function TestAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Know more: hhttps://en.bitcoin.it/wiki/Testnet
+                This is because a{'\n'}Test Bitcoin address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
             </Text>
             <Text
                 style={{
@@ -123,7 +123,7 @@ export default function TestAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Read more: Hexa FAQ
+                Read more: https://en.bitcoin.it/wiki/Testnet
             </Text>
         </View>
     </ScrollView>

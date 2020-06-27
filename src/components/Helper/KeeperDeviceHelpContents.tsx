@@ -64,7 +64,7 @@ export default function KeeperDeviceHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                If your Keeper Device is not accessible, it is{'\n'}possible to restore it from your primary device{'\n'}and another keeper. If your Primary Keeper is{'\n'}not accessible, you need to retrieve the Keeper{'\n'}Recovery Keys and perform the restoration flow
+                If your Keeper Device is not accessible, it is{'\n'}possible to restore it from your primary device{'\n'}and another keeper.
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -88,7 +88,7 @@ export default function KeeperDeviceHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Keeper also acts as the host of the Exit Key,{'\n'}which can be used to migrate from Hexa{'\n'}to another wallet at any time. The Keeper also{'\n'}acts as the host of the 2FA confirmation code{'\n'}required to spend from the Savings Account
+                  The Keeper acts as the host of the Exit Key,{'\n'}which can be used to migrate from Hexa{'\n'}to another wallet at any time. The Keeper also{'\n'}stores the 2FA Key required to spend{'\n'} from the Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -104,7 +104,7 @@ export default function KeeperDeviceHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                The Exit Key on the Keeper Device is an{'\n'}alphanumeric string that can be used to derive{'\n'}your addresses and private keys at any time.{'\n'}This string is also called an “mnemonic”.
+                The Exit Key on the Keeper Device is an{'\n'}alphanumeric string that can be used to derive{'\n'}your addresses and private keys at any time.{'\n'}This string is also called a “mnemonic”.
             </Text>
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
@@ -116,7 +116,7 @@ export default function KeeperDeviceHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Exit Key is generated on your Keeper{'\n'}Device and stays there. As a result, your{'\n'}primary device has no access to the Exit Key
+                  Your{'\n'}primary device has no access to the Exit Key. {'\n'}Therefore, a person with access to your{'\n'}primary device does not have access to{'\n'}your Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -132,7 +132,7 @@ export default function KeeperDeviceHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                The Primary Keeper device generates its own{'\n'}set of Recovery Keys to enable recovery of the{'\n'}Exit Key. These Exit Recovery Keys are shared{'\n'}with the primary keeper and two other Keepers{'\n'}to enable recovery of the primary Keeper
+                Know more: https://en.bitcoin.it/wiki/Seed_phrase
             </Text>
         </View>
     </ScrollView>

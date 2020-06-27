@@ -44,7 +44,7 @@ export default function SendHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                When you want to send Bitcoins, you need a{'\n'}destination, which is denoted by the{'\n'}recipient’s address. This address is an{'\n'}alphanumeric string beginning with “1”, “3” or{'\n'}“bc1” for Bitcoin Mainnet, and “2” for the{'\n'}Bitcoin Testnet
+                When you want to send bitcoin, you need a{'\n'}destination, which is denoted by the{'\n'}recipient’s address. This address is an{'\n'}alphanumeric string beginning with “1”, “3” or{'\n'}“bc1” for Bitcoin Mainnet, and “2” for {'\n'}Bitcoin Testnet
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -60,7 +60,7 @@ export default function SendHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in the characters
+                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
             </Text>
             <Text
             style={{
@@ -110,7 +110,7 @@ export default function SendHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                A miner includes a transaction within their{'\n'}block only if the fee associated with it is{'\n'}sufficiently high. This is why Hexa requests for{'\n'}a fee when sending a transaction
+                A miner includes a transaction within their{'\n'}block only if the fee associated is{'\n'}sufficiently high. This is why Hexa requests for{'\n'}a fee when sending a transaction
             </Text>
             <Text
                 style={{
@@ -120,7 +120,7 @@ export default function SendHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                If the fee associated with a transaction is low,{'\n'}you may increase the fee paid by RBF{'\n'}or Replace-By-Fee. This provides additional{'\n'}incentive for the miner to mine{'\n'}your transaction
+                Read more: https://en.bitcoin.it/wiki/Miner_fees
             </Text>
         </View>
     </ScrollView>

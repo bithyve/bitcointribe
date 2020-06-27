@@ -48,7 +48,7 @@ export default function SecurityQuestionHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Security Questions are used to safeguard your{'\n'}personal copies in the event someone gains{'\n'}possession without your consent. Therefore, it{'\n'}is recommended that you answer remember{'\n'}the question and answer provided
+                  The Security Question is used to safeguard your{'\n'}personal Recovery Keys in the event someone {'\n'}gains possession without your consent. Therefore, {'\n'}it is required that you remember{'\n'}the question and answer you provide
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -64,7 +64,7 @@ export default function SecurityQuestionHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Hexa will remind you of your security questions{'\n'}routinely to help you remember your question{'\n'}and answer. The Health Shield automatically{'\n'}updates when you answer correctly. If you don’t,{'\n'}Hexa will prompt the answer, and ask again
+                Hexa will remind you of your Security Question{'\n'}routinely to help you remember your question{'\n'}and answer. The Health Shield automatically{'\n'}updates when you answer correctly
             </Text>
             <Text
             style={{
@@ -74,7 +74,7 @@ export default function SecurityQuestionHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                If a person possesses your security answers,{'\n'}they can not steal or deny access to your{'\n'}funds. However, it is recommended that you{'\n'}keep the answer safe to provide for an extra{'\n'}layer of security
+                  If a person gains knowledge of your Security {'\n'}Question and Answer, they can not steal or deny {'\n'}access to your funds. However, it is recommended{'\n'} that you keep the answer safe to provide{'\n'} for an extra layer of security
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View

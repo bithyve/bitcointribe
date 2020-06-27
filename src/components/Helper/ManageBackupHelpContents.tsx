@@ -64,7 +64,7 @@ export default function ManageBackupHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Hexa’s backup scheme enables you to recover{'\n'}your account at any time by retrieving three of{'\n'}your five Recovery Keys and they need to be{'\n'}constantly available in order to enable you to{'\n'}retrieve your account
+                Hexa’s backup scheme enables you to recover{'\n'}your wallet at any time by retrieving three of{'\n'}your five Recovery Keys. These need to be{'\n'}constantly available in order to enable you to{'\n'}retrieve your account
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -114,7 +114,7 @@ export default function ManageBackupHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Read more: Hexa FAQ
+                Read more: https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing
             </Text>
         </View>
     </ScrollView>

@@ -44,7 +44,7 @@ export default function ReceiveHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                When you want to receive Bitcoins, the sender{'\n'}needs to know where to send them to. This is{'\n'}given by your address shown as a QR code and{'\n'}as plaintext above 
+                When you want to receive bitcoin, the sender{'\n'}needs to know where to send them to. This is{'\n'}given by your address shown as a QR code and{'\n'}as plaintext above 
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -60,7 +60,7 @@ export default function ReceiveHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in the characters
+                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
             </Text>
             <Text
             style={{
@@ -70,7 +70,7 @@ export default function ReceiveHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                To improve your privacy, a new address is{'\n'}generated each time you want to receive{'\n'}bitcoins. If you would like to receive bitcoins{'\n'}from Friends and Family, please check the{'\n'}checkbox above
+                To improve your privacy, a new address is{'\n'}generated each time you want to receive{'\n'}bitcoin. If you would like to receive bitcoin{'\n'}from Friends and Family, please check the{'\n'}checkbox above
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -110,7 +110,7 @@ export default function ReceiveHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                A miner includes a transaction within their{'\n'}block only if the fee associated with it is{'\n'}sufficiently high. Please make sure the sender{'\n'}sends the transaction with appropriate fees{'\n'}for it to reach you faster
+                A miner includes a transaction within a{'\n'}block only if the fee associated is{'\n'}sufficiently high. Please make sure the sender{'\n'}sends the transaction with appropriate fees{'\n'}for it to reach you faster
             </Text>
             <Text
                 style={{
@@ -120,7 +120,7 @@ export default function ReceiveHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                If the fee associated with a transaction is low,{'\n'}you may increase the fee paid by RBF or{'\n'}Replace-By-Fee. This provides additional{'\n'}incentive for the miner to mine your{'\n'}transaction, and may result in you receiving{'\n'}bitcoins earlier
+                If the fee associated with a transaction is low,{'\n'}you may increase the fee paid by RBF or{'\n'}Replace-By-Fee. This provides additional{'\n'}incentive for the miner to mine your{'\n'}transaction, and may result in you receiving{'\n'}bitcoin earlier
             </Text>
             <Text
                 style={{

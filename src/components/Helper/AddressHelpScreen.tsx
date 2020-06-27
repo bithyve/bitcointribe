@@ -74,7 +74,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Addresses for bitcoin start with 1, 2, 3 or bc1. 2{'\n'}is reserved for Bitcoin Testnet, which is used{'\n'}by the Checking Account, and bc1 is reserved{'\n'}for bech32 compatible addresses on Bitcoin{'\n'}Mainnet
+                Bitcoin addresses start with 1, 2, 3 or bc1. 2{'\n'}is reserved for Bitcoin Testnet used{'\n'}by the Checking Account, and bc1 is reserved{'\n'}for bech32 addresses on Bitcoin{'\n'}Mainnet
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -124,7 +124,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Hexa does not use native segwit addresses,{'\n'}and wraps them inside p2sh addresses. This is{'\n'}done because many wallets have not{'\n'}implemented Segwit yet
+                Hexa does not use native segwit addresses,{'\n'}and wraps them inside p2sh addresses. This is{'\n'}done because many wallets have not{'\n'}implemented support for native Segwit addresses.
             </Text>
             <Text
                 style={{

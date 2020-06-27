@@ -48,7 +48,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The savings account is designed as an account{'\n'}where you can store funds that you don’t plan{'\n'}to use in the short term. The savings account{'\n'}requires 2FA confirmation to authorise{'\n'}spending. The 2FA code must be retrieved{'\n'}from the Keeper App
+                The Savings Account is designed as an account{'\n'}where you can store funds that you don’t plan{'\n'}to use in the short term. The Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}spending. The 2FA code must be retrieved{'\n'}from the Keeper App
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -88,7 +88,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The savings account is a 2 of 3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, and the other on a Keeper App), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper App can be used to migrate from Hexa{'\n'}at any time
+                The Savings Account is a 2 of 3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on a Keeper App), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper App can be used to migrate from Hexa{'\n'}
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -104,7 +104,7 @@ export default function SavingsAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                The Exit Key on the Primary Keeper Device is{'\n'}an alphanumeric string that can be used to{'\n'}derive your addresses and private keys any{'\n'}time. This string is also called a “mnemonic”
+                  A multisignature account requires signatures from {'\n'}the keys defined during generation. Hexa{'\n'}requires signatures from 2 of 3 keys, of which{'\n'}one key belongs to BitHyve.
             </Text>
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
@@ -116,7 +116,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Exit Key is generated on your Keeper{'\n'}Device and stays there. As a result, your{'\n'}primary device has no access to the Exit Key,{'\n'}and cannot spend from the Savings Account
+                The Exit Key on the Keeper Device is{'\n'}an alphanumeric string that can be used to{'\n'}derive your addresses and private keys any{'\n'}time. This string is also called a “mnemonic”
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -132,8 +132,7 @@ export default function SavingsAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                The Primary Keeper device generates its own{'\n'}set of Recovery Keys to enable recovery of the{'\n'}Exit Key. These Exit Recovery Keys are shared{'\n'}with the primary keeper and two other keepers
-            </Text>
+                Your{'\n'}primary device has no access to the Exit Key. {'\n'}Therefore, a person with access to your{'\n'}primary device does not have access to{'\n'}your Savings Account            </Text>
             <Text
                 style={{
                     textAlign: 'center',
@@ -142,7 +141,7 @@ export default function SavingsAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Read more: Hexa FAQ
+                Read more: https://en.bitcoin.it/wiki/Multisignature
             </Text>
         </View>
     </ScrollView>

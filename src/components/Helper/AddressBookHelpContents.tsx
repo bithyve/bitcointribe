@@ -48,7 +48,7 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Friends and Family are contacts that you{'\n'}know and trust, and those whom you transact with{'\n'}routinely. When transacting with Friends and{'\n'}Family, you need not ask them for a QR code{'\n'}when sending bitcoins
+                Friends and Family are contacts whom you{'\n'}know and trust, and those whom you transact with{'\n'}routinely. When transacting with Friends and{'\n'}Family, you are not required to ask them for a QR code{'\n'}when sending bitcoin
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -74,7 +74,7 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The secure channel is a 2 party ECDH channel,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information
+                The secure channel is a 2 party ECDH channel,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt information
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -98,7 +98,7 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                These ECDH channels are used to{'\n'}communicate your extended public key. An{'\n'}extended public key can be used by a peer to{'\n'}generate new addresses on behalf of you
+                These ECDH channels are used to{'\n'}communicate your extended public key. An{'\n'}extended public key can be used by a peer to{'\n'}generate new addresses on your behalf.
             </Text>
             <Text
             style={{
@@ -108,7 +108,7 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Possessing an extended public key does not{'\n'}allow one to take possession of funds. This is{'\n'}because the peer does not possess the private{'\n'}key which confirms ownership of funds
+                Possessing an extended public key does not{'\n'}allow one to gain possession of funds. This is{'\n'}because the contact does not possess your private{'\n'}key which affirms ownership of funds
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -124,7 +124,7 @@ export default function AddressBookHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to any communication held between the{'\n'}two parties
+                Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to all communications between the{'\n'}two parties
             </Text>
             <Text
                 style={{

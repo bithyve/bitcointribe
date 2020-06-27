@@ -48,7 +48,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can share two of your five Recovery Keys{'\n'}with your Friends and Family, chosen from{'\n'}your address book. You can then either send{'\n'}them a QR code or a link so they can open{'\n'}Hexa and act as your Guardian
+                You can share two of your five Recovery Keys{'\n'}with your Friends and Family chosen from{'\n'}your address book. You can then either send{'\n'}them a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -64,7 +64,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Recovery Keys are sent through ECDH channels,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information
+                Recovery Keys are sent through ECDH channels,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt information
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -88,7 +88,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation, however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to any communication held between the{'\n'}two parties
+                Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation, however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to all communications between the{'\n'}two parties
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

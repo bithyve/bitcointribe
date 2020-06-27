@@ -48,7 +48,7 @@ export default function CheckingAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The checking account is designed as an account{'\n'}that you plan to use in the short term. Funds in{'\n'}the checking account can be spent immediately{'\n'}without 2FA confirmation, and carries lower fees{'\n'}compared to the Savings Account
+                The Checking Account is designed as an account{'\n'}that you plan to use in the short term. Funds in{'\n'}the Checking Account can be spent immediately{'\n'}without 2FA confirmation, and carries lower fees{'\n'}compared to the Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -64,7 +64,7 @@ export default function CheckingAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Since the Checking Account does not require{'\n'}2FA for spending, a person using your phone{'\n'}and knowins your passcode will be able to{'\n'}spend your bitcoin. Hence, for storing more{'\n'}funds or for spending infrequently, please store{'\n'}your funds in the Savings Account
+                Since the Checking Account does not require{'\n'}2FA for spending, a person using your phone{'\n'}and knowing your passcode will be able to{'\n'}spend your bitcoin. Hence, for storing more{'\n'}funds or for spending infrequently, please store{'\n'}your funds in the Savings Account
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -88,7 +88,7 @@ export default function CheckingAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The checking account is a single signature{'\n'}account as compared to a multi signature{'\n'}Savings Account, and does not require 2FA for{'\n'}spending. Its smaller requirement results in{'\n'}a smaller fee as compared to the Savings Account
+                The Checking Account is a single signature{'\n'}account as compared to the multi signature{'\n'}Savings Account, and does not require 2FA for{'\n'}spending. This smaller requirement results in{'\n'}a lesser fee compared to the Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -104,7 +104,7 @@ export default function CheckingAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Use this account to store smaller{'\n'}amounts and for your daily use
+                Use this account to store small{'\n'}amounts for daily use
             </Text>
             <Text
                 style={{
@@ -114,7 +114,7 @@ export default function CheckingAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Read more: Hexa FAQ
+                Read more: https://en.bitcoin.it/wiki/Techniques_to_reduce_transaction_fees
             </Text>
         </View>
     </ScrollView>
