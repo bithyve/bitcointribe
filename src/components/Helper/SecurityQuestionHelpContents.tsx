@@ -53,7 +53,7 @@ export default function SecurityQuestionHelpContents(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/security_question_info.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
