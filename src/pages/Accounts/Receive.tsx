@@ -344,7 +344,7 @@ export default function Receive(props) {
         );
         if (res.status !== 200) {
           console.log(
-            'Err occurred while generating trusted derivative account',
+            'Err occurred while generating derivative account',
           );
         } else {
           // refresh the account number
@@ -886,7 +886,7 @@ export default function Receive(props) {
                       fontFamily: Fonts.FiraSansRegular,
                     }}
                   >
-                    Add sender as Trusted Contact
+                    Add sender as Contact
                   </Text>
                   <View
                     style={{
@@ -995,7 +995,7 @@ export default function Receive(props) {
                               paddingBottom: 3,
                             }}
                           >
-                            Adding as a Trusted Contact:
+                            Adding as a Contact:
                           </Text>
                           <Text style={styles.contactNameText}>
                             {selectedContact &&

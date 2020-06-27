@@ -78,7 +78,7 @@ export default function AddContactAddressBook(props) {
       ExpoContacts.getContactsAsync().then(async ({ data }) => {
         if (!data.length) {
           setErrorMessage(
-            'No contacts found. Please add contacts to your address book and try again',
+            'No contacts found. Please add contacts to your Address Book and try again',
           );
           (contactListErrorBottomSheet as any).current.snapTo(1);
         }
@@ -102,7 +102,7 @@ export default function AddContactAddressBook(props) {
       console.log('GRANTED', granted);
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
         setErrorMessage(
-          'Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
+          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
         );
         (contactListErrorBottomSheet as any).current.snapTo(1);
         setContactPermissionAndroid(false);
@@ -117,7 +117,7 @@ export default function AddContactAddressBook(props) {
       if (status === 'denied') {
         setContactPermissionIOS(false);
         setErrorMessage(
-          'Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
+          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
         );
         (contactListErrorBottomSheet as any).current.snapTo(1);
         return;
@@ -228,7 +228,7 @@ export default function AddContactAddressBook(props) {
     const isTrustedC = await isTrustedContact(selectedContacts[0]);
     setIsTC(isTrustedC);
     if (isTrustedC) {
-      Toast('Trusted Contact already exists');
+      Toast('Contact already exists');
     }
   }
 
@@ -253,7 +253,7 @@ export default function AddContactAddressBook(props) {
       console.log('GRANTED', granted);
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
         setErrorMessage(
-          'Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
+          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
         );
         (contactListErrorBottomSheet as any).current.snapTo(1);
         setContactPermissionAndroid(false);
@@ -278,7 +278,7 @@ export default function AddContactAddressBook(props) {
       if (status === 'denied') {
         setContactPermissionIOS(false);
         setErrorMessage(
-          'Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
+          'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
         );
         (contactListErrorBottomSheet as any).current.snapTo(1);
         return;
@@ -386,7 +386,7 @@ export default function AddContactAddressBook(props) {
           }}
         >
           {/* <Text style={styles.modalHeaderInfoText}>
-            {'Add contacts from your address book, or add a new contact'}
+            {'Add contacts from your Address Book, or add a new contact'}
           </Text> */}
         </View>
         <View style={{ flex: 1, ...props.style }}>

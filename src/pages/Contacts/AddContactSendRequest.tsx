@@ -225,7 +225,7 @@ export default function AddContactSendRequest(props) {
         } else {
           Alert.alert(
             'Invalid Contact',
-            'Cannot add a contact without phone-num/email as a trusted entity',
+            'Cannot add a contact without phone-num/email as a entity',
           );
           return;
         }

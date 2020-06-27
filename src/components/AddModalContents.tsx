@@ -23,7 +23,7 @@ export default function AddModalContents( props ) {
 		{
 			title: 'Add Contact', 
 			image: require( '../assets/images/icons/icon_addcontact.png' ), 
-			info: 'Add contacts from your address book',
+			info: 'Add contacts from your Address Book',
 			type:'addContact'
 		},
 		// {

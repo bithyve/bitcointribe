@@ -512,7 +512,7 @@ export default function AddressBookContents(props) {
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
+            <Text style={styles.pageTitle}>Other Contacts</Text>
             <Text style={styles.pageInfoText}>
               Contacts who I can pay directly
             </Text>
@@ -550,7 +550,7 @@ export default function AddressBookContents(props) {
                     />
                     <View>
                       <Text style={styles.contactText}>
-                        Add Trusted Contact
+                        Add Contact
                       </Text>
                     </View>
                   </TouchableOpacity>

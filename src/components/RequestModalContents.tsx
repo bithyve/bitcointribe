@@ -171,7 +171,7 @@ export default function RequestModalContents(props) {
           style={{ ...styles.commModeModalInfoText, marginBottom: hp('3.5%') }}
         >
           You can choose to request the share via phone or email or via QR if
-          your trusted contact is nearby
+          your contact is nearby
         </Text>
         <View
           style={{

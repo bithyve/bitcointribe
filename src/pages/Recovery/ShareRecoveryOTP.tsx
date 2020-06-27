@@ -48,10 +48,10 @@ export default function ShareRecoveryOTP(props) {
             </AppBottomSheetTouchableWrapper>
             <View>
               <Text style={styles.modalHeaderTitleText}>
-                Share OTP with{'\n'}trusted contact
+                Share OTP with{'\n'}contact
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-                Please provide this OTP to your trusted contact in order for
+                Please provide this OTP to your contact in order for
                 them to send you the recovery key
               </Text>
             </View>

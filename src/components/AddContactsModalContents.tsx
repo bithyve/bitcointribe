@@ -23,7 +23,7 @@ export default function AddContactsModalContents(props) {
             </AppBottomSheetTouchableWrapper>
                 <View>
                     <Text style={styles.modalHeaderTitleText}>{"Add Contact"}</Text>
-                    <Text style={styles.modalHeaderInfoText}>Add contact from your{"\n"}address book</Text>
+                    <Text style={styles.modalHeaderInfoText}>Add contact from your{"\n"}Address Book</Text>
                 </View>
             </View>
         </View>

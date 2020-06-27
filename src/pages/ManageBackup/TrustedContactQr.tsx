@@ -99,7 +99,7 @@ export default function TrustedContactQr(props) {
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
             <Text style={BackupStyles.modalHeaderTitleText}>
-              Trusted contact QR code
+              contact QR code
             </Text>
           </View>
         </View>

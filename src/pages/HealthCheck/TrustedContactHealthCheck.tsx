@@ -42,7 +42,7 @@ const TrustedContactHealthCheck = props => {
     );
     const [pageData, setPageData] = useState([
         {
-            id: 1, title: "Recovery Key Not Accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery key with your trusted contact"
+            id: 1, title: "Recovery Key Not Accessible", date: "19 May ‘19, 11:00am", info: "Confirm the health of recovery key with your contact"
         },
         {
             id: 2, title: "Recovery Key received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"

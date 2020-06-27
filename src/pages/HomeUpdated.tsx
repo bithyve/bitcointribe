@@ -1653,7 +1653,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     if (!isRecovery) {
       if (requester === walletName) {
-        Toast('Cannot be your own Trusted Contact/Guardian');
+        Toast('Cannot be your own Contact/Guardian');
         return;
       }
       if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
@@ -1696,7 +1696,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             },
           );
           if (pubExists) {
-            Toast('Trusted Contact already exists against this request');
+            Toast('Contact already exists against this request');
             return;
           }
 

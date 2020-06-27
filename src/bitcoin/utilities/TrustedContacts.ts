@@ -353,7 +353,7 @@ export default class TrustedContacts {
       if (!publicKey) {
         if (!this.trustedContacts[contactName]) {
           throw new Error(
-            `No trusted contact exist with contact name: ${contactName}`,
+            `No contact exist with contact name: ${contactName}`,
           );
         }
 
@@ -502,7 +502,7 @@ export default class TrustedContacts {
     try {
       if (!this.trustedContacts[contactName]) {
         throw new Error(
-          `No trusted contact exist with contact name: ${contactName}`,
+          `No contact exist with contact name: ${contactName}`,
         );
       }
 
@@ -511,7 +511,7 @@ export default class TrustedContacts {
         !this.trustedContacts[contactName].trustedChannel.address
       ) {
         throw new Error(
-          `Trusted channel not formed with the following contact: ${contactName}`,
+          `Secure channel not formed with the following contact: ${contactName}`,
         );
       }
 
@@ -571,7 +571,7 @@ export default class TrustedContacts {
     try {
       if (!this.trustedContacts[contactName]) {
         throw new Error(
-          `No trusted contact exist with contact name: ${contactName}`,
+          `No contact exist with contact name: ${contactName}`,
         );
       }
 
@@ -580,7 +580,7 @@ export default class TrustedContacts {
         !this.trustedContacts[contactName].trustedChannel.address
       ) {
         throw new Error(
-          `Trusted channel not formed with the following contact: ${contactName}`,
+          `Secure channel not formed with the following contact: ${contactName}`,
         );
       }
 
