@@ -104,7 +104,7 @@ export default function SavingsAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                The Exit Key on the Primary Keeper Device is{'\n'}an alphanumeric string that can be used to{'\n'}derive your addressses and private keys at any{'\n'}time. This string is also called an “mnemonic”
+                The Exit Key on the Primary Keeper Device is{'\n'}an alphanumeric string that can be used to{'\n'}derive your addresses and private keys any{'\n'}time. This string is also called a “mnemonic”
             </Text>
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>

@@ -104,7 +104,7 @@ export default function KeeperDeviceHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                The Exit Key on the Keeper Device is an{'\n'}alphanumeric string that can be used to derive{'\n'}your addressses and private keys at any time.{'\n'}This string is also called an “mnemonic”.
+                The Exit Key on the Keeper Device is an{'\n'}alphanumeric string that can be used to derive{'\n'}your addresses and private keys at any time.{'\n'}This string is also called an “mnemonic”.
             </Text>
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>

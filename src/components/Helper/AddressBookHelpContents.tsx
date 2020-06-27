@@ -74,7 +74,7 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The secure channel is a 2 party ECDH channel,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-end, enabling only the receiver{'\n'}and sender to decrypt their information
+                The secure channel is a 2 party ECDH channel,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View

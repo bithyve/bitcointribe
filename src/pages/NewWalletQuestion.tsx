@@ -300,7 +300,7 @@ export default function NewWalletQuestion(props) {
     setTimeout(() => {
       setMessage('Bootstrapping Accounts');
       setSubTextMessage(
-        'Hexa has a multi-account model which lets you better manage your bitcoin (sats)'
+        'Hexa has a multi-account model which lets you better manage your Bitcoin (sats)'
       )
       setTimeout(() => {
         setMessage('Filling Test Account with test sats');

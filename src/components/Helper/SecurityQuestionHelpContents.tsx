@@ -48,7 +48,7 @@ export default function SecurityQuestionHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Security Questions are used to safegaurd your{'\n'}personal copies in the event someone gains{'\n'}possession without your consent. Therefore, it{'\n'}is recommended that you answer remember{'\n'}the question and answer provided
+                Security Questions are used to safeguard your{'\n'}personal copies in the event someone gains{'\n'}possession without your consent. Therefore, it{'\n'}is recommended that you answer remember{'\n'}the question and answer provided
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
