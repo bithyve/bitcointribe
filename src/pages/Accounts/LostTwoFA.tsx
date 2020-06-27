@@ -49,8 +49,8 @@ const LostTwoFA = props => {
       }, 1500);
     } else if (generatedSecureXPriv === false) {
       setTimeout(() => {
-        setErrorMessageHeader('Invalid Secondary Mnemonic');
-        setErrorMessage('Invalid Secondary Mnemonic, please try again');
+        setErrorMessageHeader('Invalid Exit Key');
+        setErrorMessage('Invalid Exit Key, please try again');
       }, 2);
       (ErrorBottomSheet as any).current.snapTo(1);
       dispatch(secondaryXprivGenerated(null));
@@ -119,7 +119,7 @@ const LostTwoFA = props => {
         <TouchableOpacity
           onPress={() => {
             props.navigation.navigate('QrScanner', {
-              title: 'Scan Secondary Mnemonic',
+              title: 'Scan Exit Key',
               scanedCode: qrData => {
                 dispatch(resetTwoFA(qrData));
               },
@@ -138,7 +138,7 @@ const LostTwoFA = props => {
         <TouchableOpacity
           onPress={() => {
             props.navigation.navigate('QrScanner', {
-              title: 'Scan Secondary Mnemonic',
+              title: 'Scan Exit Key',
               scanedCode: qrData => {
                 dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
               },

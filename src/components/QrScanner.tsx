@@ -186,11 +186,11 @@ export default function QrScanner(props) {
 
         </View>
         <View style={{ marginTop: 'auto' }}></View>
-        {title == 'Scan Secondary Mnemonic' ?
+        {title == 'Scan Exit Key' ?
           <BottomInfoBox
             title={"Note"}
             infoText={
-              "Secondary Mnemonic This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA"
+              "Exit Key This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA"
             }
           /> : null}
       </View>

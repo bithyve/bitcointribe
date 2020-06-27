@@ -266,7 +266,7 @@ public class PdfPassword extends ReactContextBaseJavaModule {
         document.add(preface);*/
 
 
-        // Secondary Mnemonic and BitHyve Xpub
+        // Exit Key and BitHyve Xpub
         preface = new Paragraph();
         preface.add(new Paragraph(
                 "Exit/Regenerate 2FA Key:",

@@ -106,8 +106,8 @@ const ResetTwoFAHelp = (props) => {
         dispatch(secondaryXprivGenerated(null));
       } else if (generatedSecureXPriv === false) {
         setTimeout(() => {
-          setSuccessMessageHeader('Invalid Secondary Mnemonic');
-          setSuccessMessage('Invalid Secondary Mnemonic, please try again');
+          setSuccessMessageHeader('Invalid Exit Key');
+          setSuccessMessage('Invalid Exit Key, please try again');
         }, 2);
         (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
         dispatch(secondaryXprivGenerated(null));

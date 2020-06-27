@@ -32,7 +32,7 @@ export default function HealthCheckGoogleAuthModalContents(props) {
             <View style={{ flexDirection: 'row', padding: wp('7%') }}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <Text style={styles.modalTitleText}>Health Check{"\n"}Google Authenticator</Text>
-                    <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>Enter the first three digits of your 2FA secret{"\n"}key from secure PDF</Text>
+                    <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>Enter the first three digits of your 2FA Key{"\n"}key from secure PDF</Text>
                 </View>
             </View>
             <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%'), }}>

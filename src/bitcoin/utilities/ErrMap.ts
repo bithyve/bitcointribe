@@ -24,7 +24,7 @@ export const ErrMap = {
   304: "Unable to check health of the secure account", // checkHealth() >> checks the health of the secure account
   305: "Unable to check whether the secure account is active or not", // isActive() >> secure account presence monitor
   306: "Failed to reset two factor authentication", // resetTwoFA() >> resets the twoFA secret
-  307: "Unable to get the secondary mnemonic", // getSecondaryMnemonic() >> provides the secondary mnemonic
+  307: "Unable to get the exit key", // getSecondaryMnemonic() >> provides the Exit Key
   308: "Unable to get the secondary xpub", // getSecondaryXpub() >> provides the secondary xpub
   309: "Transaction creation failed", // transferST1() >> creates transaction
   310: "Transaction signing failed", // transferST2() >> signs and partially builds the transaction
