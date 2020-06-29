@@ -136,7 +136,7 @@ export default class SSS {
     walletId?: string,
   ): boolean => {
     if (walletId && decryptedMetaShare.meta.walletId === walletId) {
-      throw new Error("You're not allowed to be your own trusted party");
+      throw new Error("You're not allowed to be your own contact");
     }
 
     if (existingShares.length) {

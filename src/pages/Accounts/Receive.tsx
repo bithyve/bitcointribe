@@ -344,7 +344,7 @@ export default function Receive(props) {
         );
         if (res.status !== 200) {
           console.log(
-            'Err occurred while generating trusted derivative account',
+            'Err occurred while generating derivative account',
           );
         } else {
           // refresh the account number
@@ -518,14 +518,14 @@ export default function Receive(props) {
         headerText={'Share'}
         subHeaderText={
           !isEmpty(selectedContact)
-            ? 'Share with your contact'
-            : 'Share bitcoin address'
+            ? 'Send to your contact'
+            : 'Send bitcoin address'
         }
         contactText={'Adding to Friends and Family:'}
         amountCurrency={serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         info={
-          'Send the link below with your contact. It will share your bitcoins address and a way for the person to accept your request.'
+          'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
         }
         amount={amount === '' ? null : amount}
         link={receiveLink}
@@ -676,7 +676,7 @@ export default function Receive(props) {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoins from the savings account."
+                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
               }
             />
 
@@ -886,7 +886,7 @@ export default function Receive(props) {
                       fontFamily: Fonts.FiraSansRegular,
                     }}
                   >
-                    Add sender as Trusted Contact
+                    Add sender as Contact
                   </Text>
                   <View
                     style={{
@@ -995,7 +995,7 @@ export default function Receive(props) {
                               paddingBottom: 3,
                             }}
                           >
-                            Adding as a Trusted Contact:
+                            Adding as a Contact:
                           </Text>
                           <Text style={styles.contactNameText}>
                             {selectedContact &&
@@ -1062,7 +1062,7 @@ export default function Receive(props) {
               <View style={{ marginBottom: hp('1%') }}>
                 <BottomInfoBox
                   title={'Bitcoin Receiving Address'}
-                  infoText={'Generate bitcoin address and share via link or QR'}
+                  infoText={'Generate bitcoin address and send via link or QR'}
                 />
               </View>
               <View

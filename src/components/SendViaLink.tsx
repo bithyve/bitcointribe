@@ -569,7 +569,7 @@ export default function SendViaLink(props) {
         <BottomInfoBox
           title={'Sharing options'}
           infoText={
-            'Use any of the methods shown to share the request link or Bitcoin address'
+            'Use any of the methods shown to send the request link or Bitcoin address'
           }
         />
       </View> : null}

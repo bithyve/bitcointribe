@@ -151,7 +151,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
                 firstLineTitle={'New Hexa Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
-                infoTextBold={'secret question and answer'}
+                infoTextBold={'Secret Question and answer'}
               />
               <TouchableOpacity
                 activeOpacity={10}
@@ -364,7 +364,7 @@ export default function NewWalletQuestionRegenerateShare(props) {
             {dropdownBoxValue.id.trim() == '' ? (
               <BottomInfoBox
                 title={'Note'}
-                infoText={'Secret question and answer are very important for your wallet and it’s backup'}
+                infoText={'Secret Question and answer are very important for your wallet and it’s backup'}
               />
             ) : null}
           </TouchableOpacity>

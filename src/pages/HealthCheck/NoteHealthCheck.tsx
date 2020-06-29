@@ -74,7 +74,7 @@ const NoteHealthCheck = props => {
                 title={'Change your\nKeeper'}
                 info={'Having problems with your Keeper'}
                 note={
-                    'You can change the Keeper you selected to share your Recovery Key'
+                    'You can change the Keeper you selected to send your Recovery Key'
                 }
                 proceedButtonText={'Change'}
                 cancelButtonText={'Back'}

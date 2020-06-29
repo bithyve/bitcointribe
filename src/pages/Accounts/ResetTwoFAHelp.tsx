@@ -106,8 +106,8 @@ const ResetTwoFAHelp = (props) => {
         dispatch(secondaryXprivGenerated(null));
       } else if (generatedSecureXPriv === false) {
         setTimeout(() => {
-          setSuccessMessageHeader('Invalid Secondary Mnemonic');
-          setSuccessMessage('Invalid Secondary Mnemonic, please try again');
+          setSuccessMessageHeader('Invalid Exit Key');
+          setSuccessMessage('Invalid Exit Key, please try again');
         }, 2);
         (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
         dispatch(secondaryXprivGenerated(null));
@@ -208,10 +208,10 @@ const ResetTwoFAHelp = (props) => {
     return (
       <ServerErrorModal
         modalRef={ServerNotRespondingBottomSheet}
-        title={'Oops! The server\nis not responding'}
-        note={'Lorem ipsum dolor sit amet, consectetur'}
+        title={'The server is not responding?'}
+        // note={'Lorem ipsum dolor sit amet, consectetur'}
         info={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
+          'This may be due to network issues. Please try again. If it still does not work you can sweep the funds from Hexa using the Exit Key.'
         }
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
@@ -380,10 +380,10 @@ const ResetTwoFAHelp = (props) => {
           marginBottom: hp('5%'),
         }}
       >
-        <Text style={{ ...styles.modalHeaderInfoText }}>
+        {/* <Text style={{ ...styles.modalHeaderInfoText }}>
           Lorem ipsum dolor sit amet, consectetur{'\n'}adipiscing elit, sed do
           eiusmod tempor
-        </Text>
+        </Text> */}
       </View>
       <BottomSheet
         onOpenEnd={() => {

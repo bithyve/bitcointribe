@@ -24,7 +24,7 @@ export default function ReceiveHelpContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Sending Bitcoins
+                    Receive bitcoin
                 </Text>
             </View>
             <View
@@ -33,6 +33,7 @@ export default function ReceiveHelpContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginBottom: hp('1%'),
                 }}
             />
             <Text
@@ -43,12 +44,12 @@ export default function ReceiveHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                When you want to receive Bitcoins,{'\n'}the sender needs to know where{'\n'}to send them to 
+                When you want to receive bitcoin, the sender{'\n'}needs to know where to send them to. This is{'\n'}given by your address shown as a QR code and{'\n'}as plaintext above 
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/receive.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
+                    source={require('../../assets/images/icons/bitcoin_receive_info_1.png')}
+                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -59,14 +60,18 @@ export default function ReceiveHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                This is given by your address{'\n'}shown as a QR code and as{'\n'}plaintext alphanumeric string
+                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                To improve your privacy, a new address is{'\n'}generated each time you want to receive{'\n'}bitcoin. If you would like to receive bitcoin{'\n'}from Friends and Family, please check the{'\n'}checkbox above
+            </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -82,9 +87,19 @@ export default function ReceiveHelpContents(props) {
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Text
+                    style={{
+                        textAlign: 'center',
+                        color: Colors.white,
+                        fontSize: RFValue(12),
+                        fontFamily: Fonts.FiraSansRegular,
+                    }}
+                >
+                    Once the sender sends the transaction, the{'\n'}transaction is relayed to a bitcoin full node.{'\n'}This full node then announces the{'\n'}transactions to other full nodes, including{'\n'}those of miners
+                </Text>
                 <Image
-                    source={require('../../assets/images/icons/receive.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
+                    source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -95,44 +110,8 @@ export default function ReceiveHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Your wallet generates these address{'\n'}automatically and a single wallet{'\n'}can have many address within them
+                A miner includes a transaction within a{'\n'}block only if the fee associated is{'\n'}sufficiently high. Please make sure the sender{'\n'}sends the transaction with appropriate fees{'\n'}for it to reach you faster
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                To improve your privacy, a new{'\n'}address is generated each time you{'\n'}want to receive bitcoins.{'\n'}If you would like to receive{'\n'}bitcoins from Friends and Family,{'\n'}please check the checkbox above
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/receive.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
-                />
-            </View>
             <Text
                 style={{
                     textAlign: 'center',
@@ -141,26 +120,19 @@ export default function ReceiveHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Go further down the rabbit hole by clicking here
+                If the fee associated with a transaction is low,{'\n'}you may increase the fee paid by RBF or{'\n'}Replace-By-Fee. This provides additional{'\n'}incentive for the miner to mine your{'\n'}transaction, and may result in you receiving{'\n'}bitcoin earlier
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
+            <Text
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginHorizontal: wp('10%'),
+                }}
+            >
+                Know more: https://github.com/6102bitcoin/bitcoin-intro#step-12-buying-privately
+            </Text>
         </View>
     </ScrollView>
   );

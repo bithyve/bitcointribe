@@ -225,7 +225,7 @@ export default function AddContactSendRequest(props) {
         } else {
           Alert.alert(
             'Invalid Contact',
-            'Cannot add a contact without phone-num/email as a trusted entity',
+            'Cannot add a contact without phone-num/email as a entity',
           );
           return;
         }
@@ -251,7 +251,7 @@ export default function AddContactSendRequest(props) {
       <SendViaLink
         isFromReceive={true}
         headerText={'Share'}
-        subHeaderText={'Share with your contact'}
+        subHeaderText={'Send to your contact'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         link={trustedLink}

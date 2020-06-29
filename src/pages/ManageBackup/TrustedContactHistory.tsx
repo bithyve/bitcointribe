@@ -631,7 +631,7 @@ const TrustedContactHistory = (props) => {
         title={'Change your\nKeeper'}
         info={'Having problems with your Keeper'}
         note={
-          'You can change the Keeper you selected to share your Recovery Key'
+          'You can change the Keeper you selected to send your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -1067,7 +1067,7 @@ const TrustedContactHistory = (props) => {
         <SendShareModal
           contact={chosenContact ? chosenContact : null}
           index={index}
-          textHeader={'Sharing Secret with'}
+          textHeader={'Sharing Recovery Key with'}
           onPressViaQr={(index) => {
             createGuardian();
             if (SendViaQRBottomSheet.current)
@@ -1292,7 +1292,7 @@ const TrustedContactHistory = (props) => {
           }
           changeInfo={
             shared || activateReshare
-              ? 'Want to share the Recovery Key with another contact? '
+              ? 'Want to send the Recovery Key to another contact? '
               : null
           }
           onPressChange={() => {

@@ -65,6 +65,9 @@ import TransactionHelperModalContents from '../../components/Helper/TransactionH
 import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
+import CheckingAccountHelpContents from '../../components/Helper/CheckingAccountHelpContents';
+import deviceInfoModule from 'react-native-device-info';
+import SavingsAccountHelpContents from '../../components/Helper/SavingsAccountHelpContents';
 
 export default function Accounts(props) {
   const [FBTCAccount, setFBTCAccount] = useState({});
@@ -1026,19 +1029,20 @@ export default function Accounts(props) {
 
   const renderSecureAccountsHelperContents = useCallback(() => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={'Savings Account'}
-        image={require('../../assets/images/icons/secure.png')}
-        boldPara={''}
-        helperInfo={
-          'The funds in this account are secured by two factor authentication (2FA) which should be set up on the Keeper device\n\nUse this account to store funds that you will not require on a daily basis. Transactions from and to this account are costlier compared to the Checking Account'
-        }
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (SecureAccountHelperBottomSheet.current)
-            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={'Savings Account'}
+      //   image={require('../../assets/images/icons/secure.png')}
+      //   boldPara={''}
+      //   helperInfo={
+      //     'The funds in this account are secured by two factor authentication (2FA) which should be set up on the Keeper device\n\nUse this account to store funds that you will not require on a daily basis. Transactions from and to this account are costlier compared to the Checking Account'
+      //   }
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (SecureAccountHelperBottomSheet.current)
+      //       (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <SavingsAccountHelpContents />
     );
   }, []);
 
@@ -1065,19 +1069,20 @@ export default function Accounts(props) {
 
   const renderRegularAccountsHelperContents = useCallback(() => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={'Checking Account'}
-        image={require('../../assets/images/icons/regular.png')}
-        boldPara={''}
-        helperInfo={
-          'These are funds that you want to have easy access to for transactional needs\n\nTransfers from and to this account are typically cheap and fast'
-        }
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (RegularAccountHelperBottomSheet.current)
-            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={'Checking Account'}
+      //   image={require('../../assets/images/icons/regular.png')}
+      //   boldPara={''}
+      //   helperInfo={
+      //     'These are funds that you want to have easy access to for transactional needs\n\nTransfers from and to this account are typically cheap and fast'
+      //   }
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (RegularAccountHelperBottomSheet.current)
+      //       (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <CheckingAccountHelpContents />
     );
   }, []);
 
@@ -1901,10 +1906,9 @@ export default function Accounts(props) {
             ref={SecureAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+                ? hp('87%')
+                : hp('89%'),
             ]}
             renderContent={renderSecureAccountsHelperContents}
             renderHeader={renderSecureAccountsHelperHeader}
@@ -1914,10 +1918,9 @@ export default function Accounts(props) {
             ref={RegularAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+                ? hp('87%')
+                : hp('89%'),
             ]}
             renderContent={renderRegularAccountsHelperContents}
             renderHeader={renderRegularAccountsHelperHeader}
@@ -1940,7 +1943,7 @@ export default function Accounts(props) {
             ref={TransactionDetailsHelperBottomSheet as any}
             snapPoints={[
               -50,
-              hp('89%'),
+              Platform.OS == 'ios' && deviceInfoModule.hasNotch() ? hp('87%') : hp('89%'),
               // Platform.OS == 'ios' && DeviceInfo.hasNotch()
               //   ? hp('35%')
               //   : hp('40%'),

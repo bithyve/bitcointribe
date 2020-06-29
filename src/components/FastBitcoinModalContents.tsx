@@ -26,7 +26,7 @@ export default function FastBitcoinModalContents(props) {
                 </AppBottomSheetTouchableWrapper>
                 <View>
                     <Text style={styles.modalHeaderTitleText}>{"Fast Bitcoin"}</Text>
-                    <Text style={styles.modalHeaderInfoText}>Buy and sell bitcoins with cash,{"\n"}Lightning deposits and deliveries enabled</Text>
+                    <Text style={styles.modalHeaderInfoText}>Buy and sell bitcoin with cash,{"\n"}Lightning deposits and deliveries enabled</Text>
                 </View>
             </View>
         </View>

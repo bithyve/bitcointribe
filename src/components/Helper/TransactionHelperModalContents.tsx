@@ -38,7 +38,7 @@ export default function TransactionHelperModalContents(props) {
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
                 marginTop: 10,
-                marginBottom: 10,
+                marginBottom: hp('1%'),
                 }}
             />
             <Text
@@ -49,7 +49,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transction is identified by an alphanumeric{'\n'}string called the transaction id, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
+            A transction is identified by an alphanumeric{'\n'}string called the transaction ID, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -95,7 +95,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction. For most transactions,{'\n'}six confirmations is taken as reference.
+            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction.
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -111,7 +111,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            You can see the number of confirmations{'\n'}against the transaction
+                For most transactions, six confirmations is taken{'\n'}as reference.You can see the number of {'\n'}confirmations against the transaction within Hexa
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -141,7 +141,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -157,7 +157,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
+                Know more: https://www.blockchain.com/charts/mempool-size
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

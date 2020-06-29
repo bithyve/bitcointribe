@@ -47,12 +47,12 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            The test account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying Bitcoin
+            The Test Account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying bitcoin. It comes preloaded{'\n'}with test bitcoin that you can send to other{'\n'}users on Bitcoin Testnet
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/icon_test_white.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
+                    source={require('../../assets/images/icons/test_account_info_1.png')}
+                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -63,14 +63,8 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                It comes preloaded with test bitcoins{'\n'}that you can send to other users{'\n'}on Bitcoin’s test network
+                The Bitcoin Testnet is similar to Bitcoin Mainnet{'\n'}and has Test bitcoin for people to experiment{'\n'}with. Test bitcoin can not be sent to wallets{'\n'}that only support Bitcoin Mainnet
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -93,11 +87,11 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            Test bitcoins only exist on Bitcoin’s Testnet,{'\n'}and they can not be exchanged for real goods{'\n'}or Bitcoin. Test bitcoins can not be sent{'\n'}to wallets that only support bitcoin
+                Test Account addresses start with “2”{'\n'}compared with “1”, “3” or “bc1” for Bitcoin{'\n'}Mainnet. If you are sending Test bitcoin to{'\n'}your friend, please make sure to verify this
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/testAccountHelperImage.png')}
+                    source={require('../../assets/images/icons/test_account_info_2.png')}
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
@@ -109,14 +103,28 @@ export default function TestAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-            Go further down the rabbit hole by clicking here
+                bitcoin sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved.
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
+            <Text
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
+            >
+                This is because a{'\n'}Test Bitcoin address only supports Test Bitcoin{'\n'}and a Bitcoin Mainnet address only supports{'\n'}Mainnet Bitcoin
+            </Text>
+            <Text
+                style={{
+                    textAlign: 'center',
+                    color: Colors.white,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                }}
+            >
+                Read more: https://en.bitcoin.it/wiki/Testnet
+            </Text>
         </View>
     </ScrollView>
   );

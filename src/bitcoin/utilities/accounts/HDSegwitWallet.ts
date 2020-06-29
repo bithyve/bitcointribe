@@ -337,7 +337,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     if (!account) {
       throw new Error(
-        `No trusted contact derivative account exists for: ${contactName}`,
+        `No contact derivative account exists for: ${contactName}`,
       );
     } else if (!account.contactDetails) {
       throw new Error(`Contact details (xpub) missing for ${contactName}`);
@@ -415,7 +415,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
       if (!accountNumber) {
         throw new Error(
-          `No trusted contact derivative account exists for: ${contactName}`,
+          `No contact derivative account exists for: ${contactName}`,
         );
       }
     } else if (!this.derivativeAccounts[accountType][accountNumber]) {

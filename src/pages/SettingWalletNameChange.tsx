@@ -57,7 +57,7 @@ export default function SettingWalletNameChange(props) {
         </View>
         <View style={{ flex: 1, marginLeft: 10 }}>
         <Text style={styles.headerInfoText}>
-                To change wallet name,{'\n'}conform secret question and answer
+                To change wallet name,{'\n'}confirm Secret Question and answer
         </Text>
          
 

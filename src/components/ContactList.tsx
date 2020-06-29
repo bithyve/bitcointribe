@@ -87,7 +87,7 @@ export default function ContactList(props) {
     ExpoContacts.getContactsAsync().then(async ({ data }) => {
       if (!data.length) {
         //Alert.alert('No contacts found!');
-        setErrorMessage('No contacts found. Please add contacts to your address book and try again');
+        setErrorMessage('No contacts found. Please add contacts to your Address Book and try again');
         (contactListErrorBottomSheet as any).current.snapTo(1);
       }
       setContactData(data);
@@ -108,7 +108,7 @@ export default function ContactList(props) {
       const granted = await requestContactsPermission();
         console.log("GRANTED", granted);
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setErrorMessage('Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
           (contactListErrorBottomSheet as any).current.snapTo(1);
           setContactPermissionAndroid(false);
           return;
@@ -119,7 +119,7 @@ export default function ContactList(props) {
     const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
     if (status === 'denied') {
       setContactPermissionIOS(false);
-      setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+      setErrorMessage('Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
       (contactListErrorBottomSheet as any).current.snapTo(1);
       return;
     } else {
@@ -265,7 +265,7 @@ export default function ContactList(props) {
         const granted = await requestContactsPermission();
         console.log("GRANTED", granted);
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setErrorMessage('Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
           (contactListErrorBottomSheet as any).current.snapTo(1);
           setContactPermissionAndroid(false);
           return;
@@ -286,7 +286,7 @@ export default function ContactList(props) {
         const { status, expires, permissions } = await Permissions.getAsync(Permissions.CONTACTS);
         if (status === 'denied') {
           setContactPermissionIOS(false);
-          setErrorMessage('Cannot select trusted contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
+          setErrorMessage('Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts');
           (contactListErrorBottomSheet as any).current.snapTo(1);
           return;
         } else {
