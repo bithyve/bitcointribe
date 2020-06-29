@@ -68,6 +68,8 @@ import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import CheckingAccountHelpContents from '../../components/Helper/CheckingAccountHelpContents';
 import deviceInfoModule from 'react-native-device-info';
 import SavingsAccountHelpContents from '../../components/Helper/SavingsAccountHelpContents';
+import Loader from '../../components/loader';
+
 
 export default function Accounts(props) {
   const [FBTCAccount, setFBTCAccount] = useState({});
@@ -171,6 +173,7 @@ export default function Accounts(props) {
     setTransactionDetailsHelperBottomSheet,
   ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
+  const [showLoader, setShowLoader] = useState(true)
   const currencyCode = [
     'BRL',
     'CNY',
@@ -399,10 +402,10 @@ export default function Accounts(props) {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -568,32 +571,32 @@ export default function Accounts(props) {
                 }}
               >
                 {setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode),
-                'light')}
+                  'light')}
               </View>
             ) : (
-              <Image
-                style={styles.cardBitCoinImage}
-                source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-              />
-            )}
+                  <Image
+                    style={styles.cardBitCoinImage}
+                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                  />
+                )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(netBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
-                : exchangeRates
-                ? (
-                    (netBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
+                  ? UsNumberFormat(netBalance)
+                  : exchangeRates
+                    ? (
+                      (netBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                    : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : switchOn
-                ? 'sats'
-                : CurrencyCode.toLocaleLowerCase()}
+                  ? 'sats'
+                  : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -826,13 +829,13 @@ export default function Accounts(props) {
                             {item.accountType == 'Test Account'
                               ? UsNumberFormat(item.amount)
                               : switchOn
-                              ? UsNumberFormat(item.amount)
-                              : exchangeRates
-                              ? (
-                                  (item.amount / 1e8) *
-                                  exchangeRates[CurrencyCode].last
-                                ).toFixed(2)
-                              : null}
+                                ? UsNumberFormat(item.amount)
+                                : exchangeRates
+                                  ? (
+                                    (item.amount / 1e8) *
+                                    exchangeRates[CurrencyCode].last
+                                  ).toFixed(2)
+                                  : null}
                           </Text>
                           <Text
                             style={{
@@ -846,8 +849,8 @@ export default function Accounts(props) {
                             {item.accountType == 'Test Account'
                               ? 't-sats'
                               : switchOn
-                              ? 'sats'
-                              : CurrencyCode.toLocaleLowerCase()}
+                                ? 'sats'
+                                : CurrencyCode.toLocaleLowerCase()}
                           </Text>
                         </View>
                         <Text
@@ -908,46 +911,46 @@ export default function Accounts(props) {
           ) : null}
         </View>
       ) : (
-        <View style={styles.modalContentContainer}>
-          <View style={{ marginLeft: 20, marginTop: 20 }}>
-            <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-          </View>
-          <View style={{ flex: 1 }}></View>
-          <View style={{ backgroundColor: Colors.white }}>
-            <View
-              style={{
-                margin: 15,
-                backgroundColor: Colors.backgroundColor,
-                padding: 10,
-                paddingTop: 20,
-                paddingBottom: 20,
-                marginBottom:
-                  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
-                borderRadius: 7,
-              }}
-            >
-              <Text
+          <View style={styles.modalContentContainer}>
+            <View style={{ marginLeft: 20, marginTop: 20 }}>
+              <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+            </View>
+            <View style={{ flex: 1 }}></View>
+            <View style={{ backgroundColor: Colors.white }}>
+              <View
                 style={{
-                  color: Colors.black,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
+                  margin: 15,
+                  backgroundColor: Colors.backgroundColor,
+                  padding: 10,
+                  paddingTop: 20,
+                  paddingBottom: 20,
+                  marginBottom:
+                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                  borderRadius: 7,
                 }}
               >
-                View your transactions
+                <Text
+                  style={{
+                    color: Colors.black,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  View your transactions
               </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                All recent transactions across your accounts appear here
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  All recent transactions across your accounts appear here
               </Text>
+              </View>
             </View>
           </View>
-        </View>
-      );
+        );
     }
   };
 
@@ -1296,8 +1299,23 @@ export default function Accounts(props) {
         }
       });
     }
-    ////console.log('IN useEffect1');
   }, [serviceType]);
+
+
+  useEffect(() => {
+    if (showLoader) {
+      // after all interactions are done , loader need to be removed
+      InteractionManager.runAfterInteractions(() => {
+        setShowLoader(false)
+        return
+      })
+
+      // we need to force remove loader if interaction manager did not response in 3 secs
+      InteractionManager.setDeadline(3)
+    } else {
+      return
+    }
+  })
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -1337,7 +1355,7 @@ export default function Accounts(props) {
         </Text>
         <TouchableOpacity
           style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          onPress={() => { }}
         >
           <View
             style={{
@@ -1352,17 +1370,17 @@ export default function Accounts(props) {
               activeOffImage={
                 currencyCode.includes(CurrencyCode)
                   ? setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'light',
-                    )
+                    getCurrencyImageName(CurrencyCode),
+                    'light',
+                  )
                   : getCurrencyImageByRegion(CurrencyCode, 'light')
               }
               inactiveOffImage={
                 currencyCode.includes(CurrencyCode)
                   ? setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'dark',
-                    )
+                    getCurrencyImageName(CurrencyCode),
+                    'dark',
+                  )
                   : getCurrencyImageByRegion(CurrencyCode, 'dark')
               }
               toggleColor={Colors.lightBlue}
@@ -1409,12 +1427,12 @@ export default function Accounts(props) {
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
-                    ? getServiceType(REGULAR_ACCOUNT)
-                    : getServiceType(SECURE_ACCOUNT);
-                    setTimeout(() => {
-                      setCarouselInitIndex(index);
-                        }, 1000);
-                  
+                      ? getServiceType(REGULAR_ACCOUNT)
+                      : getServiceType(SECURE_ACCOUNT);
+                  setTimeout(() => {
+                    setCarouselInitIndex(index);
+                  }, 1000);
+
                 }}
                 renderItem={renderItem}
                 sliderWidth={sliderWidth}
@@ -1548,45 +1566,45 @@ export default function Accounts(props) {
                               </View>
                             </View>
                           ) : (
-                            <View style={styles.modalElementInfoView}>
-                              <View style={{ justifyContent: 'center' }}>
-                                <FontAwesome
-                                  name={
-                                    item.transactionType == 'Received'
-                                      ? 'long-arrow-down'
-                                      : 'long-arrow-up'
-                                  }
-                                  size={15}
-                                  color={
-                                    item.transactionType == 'Received'
-                                      ? Colors.green
-                                      : Colors.red
-                                  }
-                                />
-                              </View>
-                              <View
-                                style={{
-                                  justifyContent: 'center',
-                                  marginLeft: 10,
-                                }}
-                              >
-                                <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
-                                </Text>
-                                <Text style={styles.transactionModalDateText}>
-                                  {moment(item.date)
-                                    .utc()
-                                    .format('DD MMMM YYYY')}{' '}
-                                  {/* <Entypo
+                              <View style={styles.modalElementInfoView}>
+                                <View style={{ justifyContent: 'center' }}>
+                                  <FontAwesome
+                                    name={
+                                      item.transactionType == 'Received'
+                                        ? 'long-arrow-down'
+                                        : 'long-arrow-up'
+                                    }
+                                    size={15}
+                                    color={
+                                      item.transactionType == 'Received'
+                                        ? Colors.green
+                                        : Colors.red
+                                    }
+                                  />
+                                </View>
+                                <View
+                                  style={{
+                                    justifyContent: 'center',
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  <Text style={styles.transactionModalTitleText}>
+                                    {item.accountType}{' '}
+                                  </Text>
+                                  <Text style={styles.transactionModalDateText}>
+                                    {moment(item.date)
+                                      .utc()
+                                      .format('DD MMMM YYYY')}{' '}
+                                    {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                  {/* {item.time} */}
-                                </Text>
+                                    {/* {item.time} */}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
+                            )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1618,13 +1636,13 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                  ? UsNumberFormat(item.amount)
-                                  : exchangeRates
-                                  ? (
-                                      (item.amount / 1e8) *
-                                      exchangeRates[CurrencyCode].last
-                                    ).toFixed(2)
-                                  : null}
+                                    ? UsNumberFormat(item.amount)
+                                    : exchangeRates
+                                      ? (
+                                        (item.amount / 1e8) *
+                                        exchangeRates[CurrencyCode].last
+                                      ).toFixed(2)
+                                      : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1640,8 +1658,8 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                  ? 'sats'
-                                  : CurrencyCode.toLocaleLowerCase()}
+                                    ? 'sats'
+                                    : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1669,20 +1687,20 @@ export default function Accounts(props) {
                                 />
                               </View>
                             ) : (
-                              <View
-                                style={{
-                                  padding: 10,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Ionicons
-                                  name="ios-arrow-forward"
-                                  color={Colors.textColorGrey}
-                                  size={12}
-                                />
-                              </View>
-                            )}
+                                <View
+                                  style={{
+                                    padding: 10,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Ionicons
+                                    name="ios-arrow-forward"
+                                    color={Colors.textColorGrey}
+                                    size={12}
+                                  />
+                                </View>
+                              )}
                           </View>
                         </TouchableOpacity>
                       );
@@ -1855,6 +1873,9 @@ export default function Accounts(props) {
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
+          {
+            showLoader ? <Loader /> : null
+          }
 
           <BottomSheet
             enabledInnerScrolling={true}
@@ -1891,8 +1912,8 @@ export default function Accounts(props) {
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('87%')
-              : hp('89%')
+                ? hp('87%')
+                : hp('89%')
               // Platform.OS == 'ios' && DeviceInfo.hasNotch()
               //   ? hp('35%')
               //   : hp('40%'),
@@ -1953,13 +1974,13 @@ export default function Accounts(props) {
           />
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{
-            backgroundColor: Colors.backgroundColor,
-          }}
-          refreshControl={<RefreshControl refreshing={!is_initiated} />}
-        />
-      )}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={<RefreshControl refreshing={!is_initiated} />}
+          />
+        )}
     </View>
   );
   //  } else {
