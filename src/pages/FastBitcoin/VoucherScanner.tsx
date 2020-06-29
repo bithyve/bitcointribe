@@ -493,10 +493,10 @@ const VoucherScanner = (props) => {
       <ErrorModalContents
         modalRef={RegistrationSuccessBottomSheet}
         title={'Fast Bitcoin Account\nSuccessfully Registered'}
-        info={'Lorem ipsum dolor sit amet, consectetur'}
-        note={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
-        }
+        info={'You can now redeem the voucher'}
+        // note={
+        //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
+        // }
         proceedButtonText={'Redeem Voucher'}
         onPressProceed={async () => {
           let FBTCAccountData = JSON.parse(
