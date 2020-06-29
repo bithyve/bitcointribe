@@ -69,7 +69,7 @@
     "react-native-cardview": "^2.0.5",
     "react-native-communications": "^2.2.1",
     "react-native-config": "^1.1.0",
-    "react-native-contacts": "^5.0.6",
+    "react-native-contacts": "5.0.6",
     "react-native-copilot": "^2.4.6",
     "react-native-countdown-component": "^2.6.0",
     "react-native-crypto": "^2.1.0",
