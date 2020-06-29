@@ -49,6 +49,7 @@ import { EphemeralData, MetaShare } from '../../bitcoin/utilities/Interface';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
+  const [isSendDisabled, setIsSendDisabled] = useState(false);
   const dispatch = useDispatch();
   const [Loading, setLoading] = useState(true);
   const Contact = props.navigation.state.params.contact;
@@ -137,6 +138,18 @@ export default function ContactDetails(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
+
+  useEffect(() => {
+    let setIsSendDisabledListener = props.navigation.addListener(
+      'didFocus',
+      () => {
+        setIsSendDisabled(false);
+      },
+    );
+    return () => {
+      setIsSendDisabledListener.remove();
+    };
+  }, []);
 
   useEffect(() => {
     setContact(Contact);
@@ -965,7 +978,9 @@ export default function ContactDetails(props) {
             !Contact.hasXpub ? null : Contact.contactName ===
                 'Secondary Device' && !Contact.hasXpub ? null : (
               <TouchableOpacity
+                disabled={isSendDisabled}
                 onPress={() => {
+                  setIsSendDisabled(true);
                   Contact.hasXpub
                     ? onPressSend()
                     : Contact.contactName != 'Secondary Device'

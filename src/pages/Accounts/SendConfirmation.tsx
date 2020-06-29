@@ -40,6 +40,7 @@ import moment from 'moment';
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
+  SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RelayServices from '../../bitcoin/services/RelayService';
 import {
@@ -184,8 +185,8 @@ export default function SendConfirmation(props) {
             id: createRandomString(36),
             title: 'Sent Amount',
             date: moment(Date.now()).valueOf(),
-            info:
-              'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            info:"",
+              // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
             selectedContactInfo: element,
           };
           if (element.selectedContact.isWard) {
@@ -346,7 +347,9 @@ export default function SendConfirmation(props) {
       <SendConfirmationContent
         title={'Sent Successfully'}
         info={'Transaction(s) successfully submitted'}
-        infoText={'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'}
+        infoText={
+          'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
+        }
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'View Account'}
@@ -362,7 +365,10 @@ export default function SendConfirmation(props) {
             fetchBalanceTx(serviceType, {
               loader: true,
               syncTrustedDerivative:
-                serviceType === REGULAR_ACCOUNT ? true : false,
+                serviceType === REGULAR_ACCOUNT ||
+                serviceType === SECURE_ACCOUNT
+                  ? true
+                  : false,
             }),
           );
           props.navigation.navigate('Accounts');

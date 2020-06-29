@@ -45,8 +45,8 @@ export default function SettingNewWalletName(props) {
       <WalletNameChangeSuccessModalContents
         modalRef={WalletNameChangeSuccessBottomSheet}
         title={`Wallet Name Changed Successfully`}
-        info={
-          'Lorem ipsum dolor sit amet, consectetur\n\nsed do eiusmod tempor incididunt ut labore et'
+        info={""
+          // 'Lorem ipsum dolor sit amet, consectetur\n\nsed do eiusmod tempor incididunt ut labore et'
         }
         proceedButtonText={'View Wallet'}
         onPressProceed={() => onPressProceed()}
@@ -123,13 +123,13 @@ export default function SettingNewWalletName(props) {
           </View>
         </View>
         <View>
-          <BottomInfoBox
+          {/* <BottomInfoBox
             backgroundColor={Colors.white}
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
             }
-          />
+          /> */}
           <TouchableOpacity
             onPress={() => {
               (WalletNameChangeSuccessBottomSheet as any).current.snapTo(1);

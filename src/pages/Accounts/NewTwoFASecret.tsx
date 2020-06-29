@@ -112,9 +112,9 @@ const NewTwoFASecret = props => {
             >
               Scan in Authenticator
               </Text>
-            <Text style={styles.bottomNoteInfoText}>
+            {/* <Text style={styles.bottomNoteInfoText}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              </Text>
+              </Text> */}
           </View>
 
         </ScrollView>
@@ -124,12 +124,12 @@ const NewTwoFASecret = props => {
             marginBottom: hp('0.2%'),
           }}
         >
-          <BottomInfoBox
+          {/* <BottomInfoBox
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
             }
-          />
+          /> */}
         </View>
       </View>
     </SafeAreaView>

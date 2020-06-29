@@ -47,7 +47,6 @@ import {
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import BitcoinAddressSendSuccess from '../../components/BitcoinAddressSendSuccess';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchAddress } from '../../store/actions/accounts';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
@@ -62,10 +61,6 @@ import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 
 export default function Receive(props) {
-  const [
-    BitcoinAddressSendSuccessBottomSheet,
-    setBitcoinAddressSendSuccessBottomSheet,
-  ] = useState(React.createRef());
   const [
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
@@ -583,33 +578,6 @@ export default function Receive(props) {
         onPressHeader={() => {
           if (SendViaQRBottomSheet.current)
             (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, []);
-
-  const renderBitcoinAddressSendSuccessContents = useCallback(() => {
-    return (
-      <BitcoinAddressSendSuccess
-        contact={!isEmpty(selectedContact) ? selectedContact : null}
-        onPressSkip={() => {
-          if (BitcoinAddressSendSuccessBottomSheet.current)
-            (BitcoinAddressSendSuccessBottomSheet as any).current.snapTo(0);
-        }}
-        onPressAssociateContacts={() => {
-          if (BitcoinAddressSendSuccessBottomSheet.current)
-            (BitcoinAddressSendSuccessBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [selectedContact]);
-
-  const renderBitcoinAddressSendSuccessHeader = useCallback(() => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          if (BitcoinAddressSendSuccessBottomSheet.current)
-            (BitcoinAddressSendSuccessBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -1174,16 +1142,6 @@ export default function Receive(props) {
         ]}
         renderContent={renderSecureReceiveWarningContents}
         renderHeader={renderSecureReceiveWarningHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={BitcoinAddressSendSuccessBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('60%') : hp('65%'),
-        ]}
-        renderContent={renderBitcoinAddressSendSuccessContents}
-        renderHeader={renderBitcoinAddressSendSuccessHeader}
       />
     </View>
   );

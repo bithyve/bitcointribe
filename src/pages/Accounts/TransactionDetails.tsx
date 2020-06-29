@@ -105,13 +105,13 @@ export default function TransactionDetails(props) {
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={styles.modalHeaderTitleText}>
             {'Transaction Details'}
           </Text>
           {serviceType && serviceType == TEST_ACCOUNT ? (
             <AppBottomSheetTouchableWrapper
-              style={{ marginLeft: 'auto' }}
+              style={{ marginLeft: 'auto', marginRight: wp('2%') }}
               onPress={() => props.onPressKnowMore()}
             >
               <Text

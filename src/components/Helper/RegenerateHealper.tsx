@@ -41,11 +41,11 @@ export default function RegenerateHealper( props ) {
                             height: 15, width: 15,
                             borderColor: Colors.white
                         } } />
-                        <Text style={ { marginLeft: 20, color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular } }>{ "Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod" }</Text>
+                        {/* <Text style={ { marginLeft: 20, color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular } }>{ "Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy eirmod" }</Text> */}
                     </View>
                 ) }
                 <View style={ { justifyContent: 'center', alignItems: 'center', marginTop: hp( '2%' ) } }>
-                    <Text style={ { textAlign: 'center', color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansMedium } }>{ "Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy" }</Text>
+                    {/* <Text style={ { textAlign: 'center', color: Colors.white, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansMedium } }>{ "Lorem ipsum dolor sit amet, consetetur\nsadipscing elitr, sed diam nonumy" }</Text> */}
                 </View>
             </View>
         </ScrollView>

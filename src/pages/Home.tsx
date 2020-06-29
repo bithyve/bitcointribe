@@ -39,12 +39,7 @@ import TransactionDetailsContents from '../components/TransactionDetailsContents
 import TransactionListModalContents from '../components/TransactionListModalContents';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
-import FastBitcoinModalContents from '../components/FastBitcoinModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
-import AddContactsModalContents from '../components/AddContactsModalContents';
-import FamilyandFriendsAddressBookModalContents from '../components/FamilyandFriendsAddressBookModalContents';
-import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
-import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
 import HealthCheckSecurityQuestionModalContents from '../components/HealthCheckSecurityQuestionModalContents';
 import HealthCheckGoogleAuthModalContents from '../components/HealthCheckGoogleAuthModalContents';
 import SettingManagePin from './SettingManagePin';
@@ -482,7 +477,6 @@ export default function Home(props) {
   });
   const [FBTCAccount, setFBTCAccount] = useState({});
   const [answer, setAnswer] = useState('');
-  const [selectToAdd, setSelectToAdd] = useState('buyBitcoins');
   const [openmodal, setOpenmodal] = useState('closed');
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
   const [deepLinkModalOpen, setDeepLinkModalOpen] = useState(false);
@@ -513,10 +507,6 @@ export default function Home(props) {
   //   setHealthCheckSecurityQuestionBottomSheet,
   // ] = useState(React.createRef());
   const [
-    ContactSelectedFromAddressBookQrCodeBottomSheet,
-    setContactSelectedFromAddressBookQrCodeBottomSheet,
-  ] = useState(React.createRef());
-  const [
     ContactSelectedFromAddressBookBottomSheet,
     setContactSelectedFromAddressBookBottomSheet,
   ] = useState(React.createRef());
@@ -525,15 +515,6 @@ export default function Home(props) {
     setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [isLoadContacts, setIsLoadContacts] = useState(false);
-  const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
-  const [
-    fastBitcoinSellCalculationBottomSheet,
-    setFastBitcoinSellCalculationBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    fastBitcoinRedeemCalculationBottomSheet,
-    setFastBitcoinRedeemCalculationBottomSheet,
-  ] = useState(React.createRef());
   const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
     React.createRef(),
   );
@@ -1593,7 +1574,6 @@ export default function Home(props) {
               setSelectToAdd(type);
             }, 2);
             props.navigation.navigate('VoucherScanner');
-            //(AddBottomSheet as any).current.snapTo(1);
           } else if (type == 'addContact') {
             setTimeout(() => {
               //setAddSubBottomSheetsFlag(true);
@@ -2154,200 +2134,6 @@ export default function Home(props) {
     if (type == 'voucher') {
       props.navigation.navigate('VoucherScanner');
     }
-  };
-
-  const renderAddModalContents = () => {
-    if (selectToAdd == 'buyBitcoins') {
-      return (
-        <SaveBitcoinModalContents
-          onPressBack={() => {
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-          onPressElements={(type) => onPressSaveBitcoinElements(type)}
-        />
-      );
-    }
-    //else if (selectToAdd == 'Fastbitcoins') {
-    //   return (
-    //     <FastBitcoinModalContents
-    //       onPressSellTab={() => {
-    //         setTimeout(() => {
-    //           setTabSelected('sell');
-    //         }, 2);
-    //         (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
-    //       }}
-    //       onPressRedeemTab={() => {
-    //         setTimeout(() => {
-    //           setTabSelected('redeem');
-    //         }, 2);
-    //         (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
-    //       }}
-    //       onPressBack={() => {
-    //         setTimeout(() => {
-    //           setAddSubBottomSheetsFlag(false);
-    //           setTabBarZIndex(999);
-    //         }, 2);
-    //         (AddBottomSheet as any).current.snapTo(0);
-    //       }}
-    //     />
-    //   );
-    //}
-    else if (selectToAdd == 'addContact') {
-      return (
-        <AddContactsModalContents
-          onPressFriendAndFamily={() => {
-            setTimeout(() => {
-              setIsLoadContacts(true);
-            }, 2);
-            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBiller={() => {
-            setTimeout(() => {
-              setIsLoadContacts(true);
-            }, 2);
-            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    } else {
-      return null;
-    }
-  };
-
-  const renderAddModalHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setTimeout(() => {
-            setAddSubBottomSheetsFlag(false);
-            setTabBarZIndex(999);
-          }, 2);
-          (AddBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinRedeemCalculationContents = () => {
-    return (
-      <FastBitcoinCalculationModalContents
-        navigation={props.navigation}
-        modalRef={fastBitcoinRedeemCalculationBottomSheet}
-        pageInfo={
-          'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
-        }
-        pageTitle={'Redeem Voucher'}
-        noteTitle={'Lorem ipsum'}
-        noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
-        proceedButtonText="Calculate"
-        onPressBack={() => {
-          (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinSellCalculationContents = () => {
-    return (
-      <FastBitcoinCalculationModalContents
-        navigation={props.navigation}
-        modalRef={fastBitcoinSellCalculationBottomSheet}
-        pageInfo={
-          'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
-        }
-        pageTitle={'Sell bitcoin'}
-        noteTitle={'Lorem ipsum'}
-        noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
-        proceedButtonText={'Calculate'}
-        onPressBack={() => {
-          (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinSellCalculationHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinRedeemCalculationHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookContents = () => {
-    return (
-      <SelectedContactFromAddressBook
-        onPressQrScanner={() => {
-          props.navigation.navigate('QrScanner', { scanedCode: processQRData });
-        }}
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            1,
-          );
-        }}
-        onPressBack={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookQrCodeContents = () => {
-    return (
-      <SelectedContactFromAddressBookQrCode
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-        onPressBack={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookQrCodeHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-      />
-    );
   };
 
   const renderAddContactAddressBookContents = () => {
@@ -3650,68 +3436,6 @@ export default function Home(props) {
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
       />
-
-      {addBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(0);
-            }
-          }}
-          onCloseEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(999);
-            }
-            setAddSubBottomSheetsFlag(false);
-          }}
-          enabledInnerScrolling={true}
-          ref={AddBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('65%'),
-          ]}
-          renderContent={renderAddModalContents}
-          renderHeader={renderAddModalHeader}
-        />
-      ) : null}
-      {addSubBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-          }}
-          enabledInnerScrolling={true}
-          ref={fastBitcoinRedeemCalculationBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-            Platform.OS == 'ios' ? hp('90%') : hp('50%'),
-          ]}
-          renderContent={renderFastBitcoinRedeemCalculationContents}
-          renderHeader={renderFastBitcoinRedeemCalculationHeader}
-        />
-      ) : null}
-      {addSubBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-          }}
-          enabledInnerScrolling={true}
-          ref={fastBitcoinSellCalculationBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-            Platform.OS == 'ios' ? hp('90%') : hp('50%'),
-          ]}
-          renderContent={renderFastBitcoinSellCalculationContents}
-          renderHeader={renderFastBitcoinSellCalculationHeader}
-        />
-      ) : null}
       <BottomSheet
         onOpenEnd={() => {
           setTabBarZIndex(0);
@@ -3733,36 +3457,6 @@ export default function Home(props) {
         renderContent={renderAddContactAddressBookContents}
         renderHeader={renderAddContactAddressBookHeader}
       />
-      {/* {familyAndFriendsBookBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {}}
-          enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-          ]}
-          renderContent={renderContactSelectedFromAddressBookContents}
-          renderHeader={renderContactSelectedFromAddressBookHeader}
-        />
-      ) : null}
-      {familyAndFriendsBookBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {}}
-          enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookQrCodeBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-          ]}
-          renderContent={renderContactSelectedFromAddressBookQrCodeContents}
-          renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
-        />
-      ) : null} */}
 
       <BottomSheet
         onOpenEnd={() => {

@@ -53,7 +53,7 @@ export default function AccountSelectionModalContents(props) {
       <View style={styles.successModalHeaderView}>
         <Text style={styles.modalTitleText}>Change Account</Text>
         <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-          Lorem ipsum dolor sit amet, consectetur
+          Choose the account to send from
         </Text>
       </View>
       <View>
@@ -89,19 +89,6 @@ export default function AccountSelectionModalContents(props) {
           </AppBottomSheetTouchableWrapper>
         </View>
          })}
-      </View>
-      <View
-        style={{
-          marginBottom: hp('2%'),
-          marginRight: wp('6%'),
-          marginLeft: wp('6%'),
-        }}
-      >
-        <Text style={{ ...styles.modalInfoText }}>
-          {
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
-          }
-        </Text>
       </View>
       <View
         style={{

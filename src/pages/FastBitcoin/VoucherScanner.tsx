@@ -189,18 +189,21 @@ const VoucherScanner = (props) => {
           ? service.service.secureHDWallet
           : service.service.hdWallet;
 
-      if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
-        dispatch(
-          fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
+      if (
+        derivativeAccounts[FAST_BITCOINS][accountNumber] &&
+        derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress
+      ) {
+        setBitcoinAddress(
+          derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
         );
-      else {
-        if (derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress) {
-          setBitcoinAddress(
-            derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
-          );
-        }
       }
     }
+  }, [selectedAccount, service]);
+
+  useEffect(() => {
+    dispatch(
+      fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
+    );
   }, [selectedAccount]);
 
   useEffect(() => {
@@ -493,9 +496,9 @@ const VoucherScanner = (props) => {
       <ErrorModalContents
         modalRef={RegistrationSuccessBottomSheet}
         title={'Fast Bitcoin Account\nSuccessfully Registered'}
-        info={'Lorem ipsum dolor sit amet, consectetur'}
+        info={'FastBitcoins successfully registered'}
         note={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
+          'Congratulations, your wallet has been successfully linked to your FastBitcoins account. Now you can proceed to redeem your vouchers'
         }
         proceedButtonText={'Redeem Voucher'}
         onPressProceed={async () => {
@@ -538,17 +541,15 @@ const VoucherScanner = (props) => {
       await AsyncStorage.getItem('voucherData'),
     );
     if (fBTCAccountData) {
-      let obj={
+      let obj = {
         ...executeOrderDetails,
-        date: moment(new Date()).valueOf()
-      }
+        date: moment(new Date()).valueOf(),
+      };
       if (voucherFromAsync.selectedAccount.accountType == TEST_ACCOUNT) {
         for (let i = 0; i < fBTCAccountData.test_account.voucher.length; i++) {
           const element = fBTCAccountData.test_account.voucher[i];
           if (element.voucherCode == voucherFromAsync.voucher_code) {
-            fBTCAccountData.test_account.voucher[
-              i
-            ].orderData = obj;
+            fBTCAccountData.test_account.voucher[i].orderData = obj;
             break;
           }
         }
@@ -561,9 +562,7 @@ const VoucherScanner = (props) => {
         ) {
           const element = fBTCAccountData.saving_account.voucher[i];
           if (element.voucherCode == voucherFromAsync.voucher_code) {
-            fBTCAccountData.saving_account.voucher[
-              i
-            ].orderData = obj;
+            fBTCAccountData.saving_account.voucher[i].orderData = obj;
             break;
           }
         }
@@ -576,9 +575,7 @@ const VoucherScanner = (props) => {
         ) {
           const element = fBTCAccountData.checking_account.voucher[i];
           if (element.voucherCode == voucherFromAsync.voucher_code) {
-            fBTCAccountData.checking_account.voucher[
-              i
-            ].orderData = obj;
+            fBTCAccountData.checking_account.voucher[i].orderData = obj;
             break;
           }
         }
@@ -795,7 +792,7 @@ const VoucherScanner = (props) => {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
           <Text style={BackupStyles.modalHeaderTitleText}>
-            Scan a FastBitcoin voucher
+            Scan a FastBitcoins voucher
           </Text>
         </View>
       </View>

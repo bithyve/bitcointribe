@@ -47,7 +47,7 @@ const SendRequest = (props) => {
               <Text style={BackupStyles.modalHeaderTitleText}>
                 Send Request
               </Text>
-              <Text
+              {/* <Text
                 style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue(12),
@@ -55,7 +55,7 @@ const SendRequest = (props) => {
                 }}
               >
                 Lorem ipsum dolor sit amet, consec
-              </Text>
+              </Text> */}
             </View>
             <TouchableOpacity
               onPress={() => { }}
@@ -106,12 +106,12 @@ const SendRequest = (props) => {
             marginBottom: hp('5%'),
           }}
         >
-          <BottomInfoBox
+          {/* <BottomInfoBox
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
             }
-          />
+          /> */}
         </View>
       </View>
     </View>

@@ -63,7 +63,6 @@ const SecondaryDeviceHistory = (props) => {
   );
 
   const dispatch = useDispatch();
-  const [changeContact, setChangeContact] = useState(false);
   const [secondaryQR, setSecondaryQR] = useState('');
   const s3Service: S3Service = useSelector((state) => state.sss.service);
   const secureAccount: SecureAccount = useSelector(
@@ -185,11 +184,10 @@ const SecondaryDeviceHistory = (props) => {
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
-      if (changeContact) {
+      if (reshare) {
         setSecondaryQR('');
         dispatch(uploadEncMShare(0, contactName, data, true));
         updateTrustedContactsInfo({ firstName, lastName });
-        setChangeContact(false);
       } else {
         if (
           !SHARES_TRANSFER_DETAILS[0] ||
@@ -197,7 +195,7 @@ const SecondaryDeviceHistory = (props) => {
             config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
-          dispatch(uploadEncMShare(0, contactName, data, reshare));
+          dispatch(uploadEncMShare(0, contactName, data));
           updateTrustedContactsInfo({ firstName, lastName });
         } else if (
           trustedContact &&
@@ -217,7 +215,7 @@ const SecondaryDeviceHistory = (props) => {
         }
       }
     },
-    [SHARES_TRANSFER_DETAILS, changeContact, trustedContacts],
+    [SHARES_TRANSFER_DETAILS, trustedContacts],
   );
 
   useEffect(() => {

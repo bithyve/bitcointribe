@@ -181,13 +181,13 @@ export default function SettingWalletNameChange(props) {
                   </View>
       </View>
       <View >
-        <BottomInfoBox
+        {/* <BottomInfoBox
         backgroundColor={Colors.white}
           title={'Note'}
           infoText={
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et'
           }
-        />
+        /> */}
         <TouchableOpacity
           onPress={() => {
             props.navigation.navigate("SettingNewWalletName");

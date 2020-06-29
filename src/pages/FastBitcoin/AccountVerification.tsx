@@ -23,7 +23,7 @@ export default function AccountVerification(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            {'Fast Bitcoin\nAccount Verification'}
+            {'FastBitcoins voucher scanned'}
           </Text>
           <Text
             style={{
@@ -32,7 +32,7 @@ export default function AccountVerification(props) {
               color: Colors.lightTextColor,
             }}
           >
-            {'Lorem ipsum dolor sit amet, consectetur'}
+            {'Please complete the registration process with FastBitcoins to redeem the voucher'}
           </Text>
         </View>
         <View style={styles.successModalAmountView}>
@@ -44,7 +44,7 @@ export default function AccountVerification(props) {
             }}
           >
             {
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
+              'You can now redeem the voucher'
             }
           </Text>
         </View>

@@ -37,8 +37,8 @@ import {
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   FETCH_DERIVATIVE_ACC_ADDRESS,
-  SYNC_TRUSTED_DERIVATIVE_ACCOUNTS,
-  syncTrustedDerivativeAccounts,
+  SYNC_DERIVATIVE_ACCOUNTS,
+  syncDerivativeAccounts,
   STARTUP_SYNC,
 } from '../actions/accounts';
 import {
@@ -54,6 +54,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
 import { trustedChannelsSyncWorker } from './trustedContacts';
+import config from '../../bitcoin/HexaConfig';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -287,10 +288,11 @@ function* fetchBalanceTxWorker({ payload }) {
 
     if (
       payload.options.syncTrustedDerivative &&
-      payload.serviceType === REGULAR_ACCOUNT
+      (payload.serviceType === REGULAR_ACCOUNT ||
+        payload.serviceType === SECURE_ACCOUNT)
     ) {
       try {
-        yield put(syncTrustedDerivativeAccounts(service));
+        yield put(syncDerivativeAccounts([payload.serviceType]));
       } catch (err) {
         console.log({ err });
       }
@@ -366,48 +368,53 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
 );
 
-function* syncTrustedDerivativeAccountsWorker({ payload }) {
-  yield put(switchLoader(REGULAR_ACCOUNT, 'derivativeBalanceTx'));
+function* syncDerivativeAccountsWorker({ payload }) {
+  for (const serviceType of payload.serviceTypes) {
+    console.log('Syncing DAs for: ', serviceType);
 
-  const regularAccount: RegularAccount = payload.service
-    ? payload.service
-    : yield select((state) => state.accounts[REGULAR_ACCOUNT].service);
+    yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
+    const service = yield select(
+      (state) => state.accounts[serviceType].service,
+    );
 
-  const preFetchTrustedDerivativeAccounts = JSON.stringify(
-    regularAccount.hdWallet.derivativeAccounts[TRUSTED_CONTACTS],
-  );
+    const preFetchDerivativeAccounts = JSON.stringify(
+      serviceType === REGULAR_ACCOUNT
+        ? service.hdWallet.derivativeAccounts
+        : service.secureHDWallet.derivativeAccounts,
+    );
 
-  const res = yield call(
-    regularAccount.syncDerivativeAccountsBalanceTxs,
-    TRUSTED_CONTACTS,
-  );
+    const res = yield call(
+      service.syncDerivativeAccountsBalanceTxs,
+      Object.keys(config.DERIVATIVE_ACC),
+    );
 
-  const postFetchTrustedDerivativeAccounts = JSON.stringify(
-    regularAccount.hdWallet.derivativeAccounts[TRUSTED_CONTACTS],
-  );
+    const postFetchDerivativeAccounts = JSON.stringify(
+      serviceType === REGULAR_ACCOUNT
+        ? service.hdWallet.derivativeAccounts
+        : service.secureHDWallet.derivativeAccounts,
+    );
 
-  if (res.status === 200) {
-    if (
-      postFetchTrustedDerivativeAccounts !== preFetchTrustedDerivativeAccounts
-    ) {
-      const { SERVICES } = yield select((state) => state.storage.database);
-      const updatedSERVICES = {
-        ...SERVICES,
-        [REGULAR_ACCOUNT]: JSON.stringify(regularAccount),
-      };
-      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    if (res.status === 200) {
+      if (postFetchDerivativeAccounts !== preFetchDerivativeAccounts) {
+        const { SERVICES } = yield select((state) => state.storage.database);
+        const updatedSERVICES = {
+          ...SERVICES,
+          [serviceType]: JSON.stringify(service),
+        };
+        yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+      }
+    } else {
+      if (res.err === 'ECONNABORTED') requestTimedout();
+      console.log('Failed to sync derivative account');
     }
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    console.log('Failed to sync trusted derivative account');
-  }
 
-  yield put(switchLoader(REGULAR_ACCOUNT, 'derivativeBalanceTx'));
+    yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
+  }
 }
 
-export const syncTrustedDerivativeAccountsWatcher = createWatcher(
-  syncTrustedDerivativeAccountsWorker,
-  SYNC_TRUSTED_DERIVATIVE_ACCOUNTS,
+export const syncDerivativeAccountsWatcher = createWatcher(
+  syncDerivativeAccountsWorker,
+  SYNC_DERIVATIVE_ACCOUNTS,
 );
 
 function* processRecipients(
@@ -835,7 +842,9 @@ function* startupSyncWorker({ payload }) {
 
   try {
     console.log('Synching derivative accounts...');
-    yield call(syncTrustedDerivativeAccountsWorker, { payload: {} });
+    yield call(syncDerivativeAccountsWorker, {
+      payload: { serviceTypes: [REGULAR_ACCOUNT, SECURE_ACCOUNT] },
+    });
   } catch (err) {
     console.log('Trusted Derivative accounts sync failed: ', err);
   }
