@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, AsyncStorage } from 'react-native';
+import { View, StyleSheet, AsyncStorage, TouchableOpacity, Text, SafeAreaView, StatusBar } from 'react-native';
 import ContactList from '../../components/ContactList';
 import Toast from '../../components/Toast';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Colors from "../../common/Colors";
+import Fonts from "../../common/Fonts";
+import { RFValue } from 'react-native-responsive-fontsize';
 
 const ContactsListForAssociateContact = (props) => {
   const [contacts, setContacts] = useState([]);
@@ -99,6 +103,25 @@ const ContactsListForAssociateContact = (props) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 0 }} />
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={styles.modalHeaderTitleView}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => props.navigation.goBack()}
+              style={{ height: 30, width: 30, justifyContent: 'center' }}
+            >
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </TouchableOpacity>
+            <Text style={styles.modalHeaderTitleText}>
+              {'Associate a contact'}
+            </Text>
+          </View>
+        </View>
       <ContactList
         isTrustedContact={true}
         style={{}}
@@ -109,5 +132,23 @@ const ContactsListForAssociateContact = (props) => {
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingRight: 10,
+    paddingBottom: 15,
+    paddingTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 15,
+  },
+  modalHeaderTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+});
 export default ContactsListForAssociateContact;
