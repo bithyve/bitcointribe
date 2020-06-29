@@ -189,13 +189,18 @@ const VoucherScanner = (props) => {
           ? service.service.secureHDWallet
           : service.service.hdWallet;
 
-      if (derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress) {
+      if (
+        derivativeAccounts[FAST_BITCOINS][accountNumber] &&
+        derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress
+      ) {
         setBitcoinAddress(
           derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
         );
       }
     }
   }, [selectedAccount, service]);
+
+  console.log({ bitcoinAddress });
 
   useEffect(() => {
     dispatch(
