@@ -346,15 +346,10 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Successfully'}
-<<<<<<< HEAD
         info={'Transaction(s) successfully submitted'}
-        infoText={'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'}
-=======
-        info={'Transactions successfully submitted'}
         infoText={
           'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
         }
->>>>>>> DA balance & tx joint sync: Reg + Sec
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'View Account'}
