@@ -497,7 +497,7 @@ export default class HDSegwitWallet extends Bitcoin {
     for (const dAccountType of accountTypes) {
       const derivativeAccounts = this.derivativeAccounts[dAccountType];
 
-      if (!derivativeAccounts.instance.using) return;
+      if (!derivativeAccounts.instance.using) continue;
       for (
         let accountNumber = 1;
         accountNumber <= derivativeAccounts.instance.using;
