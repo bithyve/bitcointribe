@@ -5620,10 +5620,10 @@ react-native-config@^1.1.0:
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.2.1.tgz#f80454fc58ea89b549819ccb4bdab26518a9f0db"
   integrity sha512-u7MDku3fUUKAtxfUFLLwnj4htBYO840EBGdlDB9ry/eX1TY+asHwULaUkAj9x+pJo4vSpIp8GtYxxi8dLzDtJw==
 
-react-native-contacts@^5.0.6:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-5.2.2.tgz#804d26a5e10f8ec91f846268be5dd23df9b9040b"
-  integrity sha512-cRXDOiaMI1YRu6RsCBdejmlzQC5sS5xFdI6hQcqVzbo/GBRfKYHNn5st3wCysE0P8Wu1N+fUgX49J6JxTRxJHg==
+react-native-contacts@5.0.6:
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-5.0.6.tgz#929aa236eced56ea5662807ce8e9afb4f4bbbfe2"
+  integrity sha512-C0S0/rFxGh8URkxPigeb9ofAa3uzuaz5N++uRZx+p1KLkJItTvWj2eley2n3pA+ziePy4UrjP/W+2yYeUlxSqQ==
 
 react-native-copilot@^2.4.6:
   version "2.4.8"

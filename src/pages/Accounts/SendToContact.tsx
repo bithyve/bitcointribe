@@ -116,7 +116,7 @@ export default function SendToContact(props) {
       const instance = service.hdWallet || service.secureHDWallet;
       let balance =
         instance.balances.balance + instance.balances.unconfirmedBalance;
-      if (element === REGULAR_ACCOUNT || element === SECURE_ACCOUNT) {
+        if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
         for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
           let derivativeAccount;
 
