@@ -290,7 +290,7 @@ export default class SSS {
       return { decryptedData };
     } catch (err) {
       throw new Error(
-        'An error occured while decrypting the data: Invalid OTP/Tampered data',
+        'An error occurred while decrypting the data: Invalid OTP/Tampered data',
       );
     }
   };
@@ -332,7 +332,7 @@ export default class SSS {
       return { decryptedMetaShare };
     } catch (err) {
       throw new Error(
-        'An error occured while decrypting the share: Invalid Key/Tampered Share',
+        'An error occurred while decrypting the share: Invalid Key/Tampered Share',
       );
     }
   };

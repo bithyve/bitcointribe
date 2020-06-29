@@ -39,7 +39,7 @@ var xxx = function xxx() {};  // comment out to turn on debug logging
  *   bunyan can operate as if this is vanilla node.js.
  * - browser: Failing the above, we sniff using the `window` global
  *   <https://developer.mozilla.org/en-US/docs/Web/API/Window/window>.
- *      - browserify: http://browserify.org/  A browser-targetting bundler of
+ *      - browserify: http://browserify.org/  A browser-targeting bundler of
  *        node.js deps. The runtime is a browser env, so can't use fs access,
  *        etc. Browserify's build looks for `require(<single-string>)` imports
  *        to bundle. For some imports it won't be able to handle, we "hide"

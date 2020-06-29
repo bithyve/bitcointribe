@@ -514,7 +514,7 @@ export default function SendConfirmation(props) {
               textAlign: 'center',
             }}
           >
-            {' (Availble to spend '}
+            {' (Available to spend '}
             <Text
               style={{
                 color: Colors.blue,

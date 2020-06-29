@@ -344,7 +344,7 @@ export default function Receive(props) {
         );
         if (res.status !== 200) {
           console.log(
-            'Err occured while generating trusted derivative account',
+            'Err occurred while generating trusted derivative account',
           );
         } else {
           // refresh the account number

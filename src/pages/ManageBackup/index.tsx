@@ -1493,7 +1493,7 @@ export default function ManageBackup(props) {
       if (item.personalInfo) {
         return 'Friends and Family';
       }
-      return 'Select a Friend or Family memeber as a Keeper';
+      return 'Select a Friend or Family member as a Keeper';
     }
     if (item.type === 'secondaryDevice') {
       if (item.status === 'Ugly') {
