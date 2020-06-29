@@ -200,8 +200,6 @@ const VoucherScanner = (props) => {
     }
   }, [selectedAccount, service]);
 
-  console.log({ bitcoinAddress });
-
   useEffect(() => {
     dispatch(
       fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
