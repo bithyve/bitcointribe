@@ -25,18 +25,18 @@ export default function AccountVerification(props) {
           >
             {'FastBitcoins voucher scanned'}
           </Text>
-          <Text
+          {/* <Text
             style={{
               ...styles.modalInfoText,
               marginTop: wp('1.5%'),
               color: Colors.lightTextColor,
             }}
           >
-            {'Please complete the registration process with FastBitcoins to redeem the voucher'}
-          </Text>
+            {'Lorem ipsum dolor sit amet, consectetur'}
+          </Text> */}
         </View>
-        {/* <View style={styles.successModalAmountView}>
-          <Text
+        <View style={styles.successModalAmountView}>
+          {/* <Text
             style={{
               ...styles.modalInfoText,
               marginBottom: hp('1%'),
@@ -46,8 +46,8 @@ export default function AccountVerification(props) {
             {
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
             }
-          </Text>
-        </View> */}
+          </Text> */}
+        </View>
           <CopyThisText 
             text={props.link}
             openLink={() => {

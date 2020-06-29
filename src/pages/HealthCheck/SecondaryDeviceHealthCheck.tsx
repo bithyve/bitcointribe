@@ -101,7 +101,7 @@ const SecondaryDeviceHealthCheck = props => {
                 >
                   {value.title}
                 </Text>
-                <Text
+                {/* <Text
                   style={{
                     color: Colors.textColorGrey,
                     fontSize: RFValue(10),
@@ -110,7 +110,7 @@ const SecondaryDeviceHealthCheck = props => {
                   }}
                 >
                   Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit
-                </Text>
+                </Text> */}
                 <Text
                   style={{
                     color: Colors.textColorGrey,
@@ -160,7 +160,7 @@ const SecondaryDeviceHealthCheck = props => {
                   {value.date}
                 </Text>
               </View>
-              <Text
+              {/* <Text
                 style={{
                   color: Colors.textColorGrey,
                   fontSize: RFValue(8),
@@ -172,7 +172,7 @@ const SecondaryDeviceHealthCheck = props => {
                 <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                   dolor sit
                 </Text>
-              </Text>
+              </Text> */}
             </AppBottomSheetTouchableWrapper>
           );
         })}
