@@ -56,6 +56,8 @@ export default class SecureHDWallet extends Bitcoin {
   private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
+  private derivativeGapLimit: number;
+
   private cipherSpec: {
     algorithm: string;
     salt: string;
@@ -125,7 +127,7 @@ export default class SecureHDWallet extends Bitcoin {
         : {};
     this.gapLimit =
       stateVars && stateVars.gapLimit ? stateVars.gapLimit : config.GAP_LIMIT;
-
+    this.derivativeGapLimit = this.gapLimit / 2;
     this.primaryXpriv =
       stateVars && stateVars.primaryXpriv ? stateVars.primaryXpriv : undefined;
     this.secondaryXpriv =
@@ -488,7 +490,7 @@ export default class SecureHDWallet extends Bitcoin {
           accountNumber
         ].nextFreeAddressIndex = 0;
 
-      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+      for (itr = 0; itr < this.derivativeGapLimit + 1; itr++) {
         if (
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
@@ -1201,6 +1203,51 @@ export default class SecureHDWallet extends Bitcoin {
           childIndex: itr,
         });
       }
+
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        if (dAccountType === TRUSTED_CONTACTS) continue;
+        const derivativeAccount = this.derivativeAccounts[dAccountType];
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            const derivativeInstance = derivativeAccount[accountNumber];
+
+            if (
+              derivativeInstance.usedAddresses &&
+              derivativeInstance.usedAddresses.length
+            ) {
+              for (
+                let itr = 0;
+                itr <=
+                derivativeInstance.nextFreeAddressIndex +
+                  this.derivativeGapLimit; // would always be greater than
+                itr++
+              ) {
+                const possibleAddress = this.createSecureMultiSig(
+                  itr,
+                  derivativeInstance.xpub,
+                ).address;
+                if (possibleAddress === address) {
+                  return (this.signingEssentialsCache[address] = {
+                    multiSig,
+                    primaryPriv: this.deriveChildXKey(
+                      derivativeInstance.xpriv,
+                      itr,
+                    ),
+                    secondaryPriv: this.secondaryXpriv
+                      ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                      : null,
+                    childIndex: itr,
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
     }
 
     throw new Error('Could not find WIF for ' + address);
@@ -1220,9 +1267,37 @@ export default class SecureHDWallet extends Bitcoin {
         await this.fetchBalance();
       }
 
-      const { UTXOs } = await this.multiFetchUnspentOutputs(
-        this.consumedAddresses,
-      );
+      const batchedDerivativeAddresses = [];
+
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        if (dAccountType === TRUSTED_CONTACTS) continue; // TC not supported
+
+        const derivativeAccount = this.derivativeAccounts[dAccountType];
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            const derivativeInstance = derivativeAccount[accountNumber];
+            if (
+              derivativeInstance.usedAddresses &&
+              derivativeInstance.usedAddresses.length
+            ) {
+              batchedDerivativeAddresses.push(
+                ...derivativeInstance.usedAddresses,
+              );
+            }
+          }
+        }
+      }
+
+      const ownedAddresses = [
+        ...this.consumedAddresses,
+        ...batchedDerivativeAddresses,
+      ];
+
+      const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
       return UTXOs;
     } catch (err) {
       throw new Error(`Fetch UTXOs failed: ${err.message}`);
@@ -1445,7 +1520,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     const multiSig = this.createSecureMultiSig(
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
-        this.gapLimit -
+        this.derivativeGapLimit -
         1,
       this.derivativeAccounts[accountType][accountNumber].xpub,
     );
@@ -1455,7 +1530,7 @@ export default class SecureHDWallet extends Bitcoin {
     if (txCounts[multiSig.address] > 0) {
       this.derivativeAccounts[accountType][
         accountNumber
-      ].nextFreeAddressIndex += this.gapLimit;
+      ].nextFreeAddressIndex += this.derivativeGapLimit;
       tryAgain = true;
     }
 
@@ -1498,6 +1573,12 @@ export default class SecureHDWallet extends Bitcoin {
       };
       this.derivativeAccounts[accountType].instance.using++;
 
+      this.derivativeAccounts[accountType][
+        accountNumber
+      ].receivingAddress = this.createSecureMultiSig(
+        0,
+        this.derivativeAccounts[accountType][accountNumber].xpub,
+      ).address;
       return xpub;
     }
   };

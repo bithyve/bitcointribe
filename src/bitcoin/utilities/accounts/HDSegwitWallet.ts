@@ -41,7 +41,7 @@ export default class HDSegwitWallet extends Bitcoin {
   private externalAddressesCache: {};
   private addressToWIFCache: {};
   private lastBalTxSync: number = 0;
-  private derivativeGapLimit;
+  private derivativeGapLimit: number;
 
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -267,7 +267,7 @@ export default class HDSegwitWallet extends Bitcoin {
           accountNumber
         ].nextFreeAddressIndex = 0;
 
-      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+      for (itr = 0; itr < this.derivativeGapLimit + 1; itr++) {
         if (
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex +
@@ -352,7 +352,7 @@ export default class HDSegwitWallet extends Bitcoin {
       if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
         account.contactDetails.nextFreeAddressIndex = 0;
 
-      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+      for (itr = 0; itr < this.derivativeGapLimit + 1; itr++) {
         if (account.contactDetails.nextFreeAddressIndex + itr < 0) {
           continue;
         }
@@ -1457,20 +1457,23 @@ export default class HDSegwitWallet extends Bitcoin {
       const batchedDerivativeAddresses = [];
 
       if (!this.isTest) {
-        const trustedAccounts = this.derivativeAccounts[TRUSTED_CONTACTS];
-        if (trustedAccounts.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= trustedAccounts.instance.using;
-            accountNumber++
-          ) {
-            const trustedAccount: TrustedContactDerivativeAccountElements =
-              trustedAccounts[accountNumber];
-            if (
-              trustedAccount.usedAddresses &&
-              trustedAccount.usedAddresses.length
+        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+          const derivativeAccount = this.derivativeAccounts[dAccountType];
+          if (derivativeAccount.instance.using) {
+            for (
+              let accountNumber = 1;
+              accountNumber <= derivativeAccount.instance.using;
+              accountNumber++
             ) {
-              batchedDerivativeAddresses.push(...trustedAccount.usedAddresses);
+              const derivativeInstance = derivativeAccount[accountNumber];
+              if (
+                derivativeInstance.usedAddresses &&
+                derivativeInstance.usedAddresses.length
+              ) {
+                batchedDerivativeAddresses.push(
+                  ...derivativeInstance.usedAddresses,
+                );
+              }
             }
           }
         }
@@ -1677,32 +1680,37 @@ export default class HDSegwitWallet extends Bitcoin {
 
     if (!this.isTest) {
       // address to WIF for derivative accounts
-      const trustedAccounts = this.derivativeAccounts[TRUSTED_CONTACTS];
-      if (trustedAccounts.instance.using) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= trustedAccounts.instance.using;
-          accountNumber++
-        ) {
-          const trustedAccount: TrustedContactDerivativeAccountElements =
-            trustedAccounts[accountNumber];
-
-          if (
-            trustedAccount.usedAddresses &&
-            trustedAccount.usedAddresses.length
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        const derivativeAccount = this.derivativeAccounts[dAccountType];
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
           ) {
-            for (
-              let itr = 0;
-              itr <=
-              trustedAccount.nextFreeAddressIndex + this.derivativeGapLimit; // would always be greater than
-              itr++
+            const derivativeInstance = derivativeAccount[accountNumber];
+
+            if (
+              derivativeInstance.usedAddresses &&
+              derivativeInstance.usedAddresses.length
             ) {
-              const possibleAddress = this.getExternalAddressByIndex(
-                itr,
-                trustedAccount.xpub,
-              );
-              if (possibleAddress === address) {
-                return this.getExternalWIFByIndex(itr, trustedAccount.xpriv);
+              for (
+                let itr = 0;
+                itr <=
+                derivativeInstance.nextFreeAddressIndex +
+                  this.derivativeGapLimit; // would always be greater than
+                itr++
+              ) {
+                const possibleAddress = this.getExternalAddressByIndex(
+                  itr,
+                  derivativeInstance.xpub,
+                );
+                if (possibleAddress === address) {
+                  return this.getExternalWIFByIndex(
+                    itr,
+                    derivativeInstance.xpriv,
+                  );
+                }
               }
             }
           }
@@ -1771,11 +1779,12 @@ export default class HDSegwitWallet extends Bitcoin {
         this.derivativeAccounts[accountType][
           accountNumber
         ].contactName = contactName;
-        this.derivativeAccounts[accountType][
-          accountNumber
-        ].receivingAddress = this.getExternalAddressByIndex(0, xpub);
         this.trustedContactToDA[contactName] = accountNumber;
       }
+
+      this.derivativeAccounts[accountType][
+        accountNumber
+      ].receivingAddress = this.getExternalAddressByIndex(0, xpub);
 
       return xpub;
     }
