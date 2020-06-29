@@ -28,6 +28,6 @@ Loader.propTypes = {
 };
 
 Loader.defaultProps = {
-  backgroundColor: 'rgba(255,255,255,0.95)',
+  backgroundColor: 'rgba(1,1,1,0.05)',
   indicatorColor: undefined,
 };
