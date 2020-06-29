@@ -34,6 +34,10 @@ import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import {
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
@@ -70,6 +74,10 @@ export default function TwoFAToken(props) {
         dispatch(
           fetchBalanceTx(serviceType, {
             loader: true,
+            syncTrustedDerivative:
+              serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+                ? true
+                : false,
           }),
         );
         props.navigation.navigate('Accounts');

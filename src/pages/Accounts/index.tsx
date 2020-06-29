@@ -54,7 +54,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import moment from 'moment';
-
+import config from '../../bitcoin/HexaConfig';
 import { UsNumberFormat } from '../../common/utilities';
 import TransactionDetails from './TransactionDetails';
 import {
@@ -567,8 +567,10 @@ export default function Accounts(props) {
                   marginBottom: wp('1.2%'),
                 }}
               >
-                {setCurrencyCodeToImage(getCurrencyImageName(CurrencyCode),
-                'light')}
+                {setCurrencyCodeToImage(
+                  getCurrencyImageName(CurrencyCode),
+                  'light',
+                )}
               </View>
             ) : (
               <Image
@@ -1199,39 +1201,59 @@ export default function Accounts(props) {
 
       let currentTransactions = wallet.transactions.transactionDetails;
 
-      if (serviceType === REGULAR_ACCOUNT) {
-        const trustedAccounts: TrustedContactDerivativeAccount =
-          service.hdWallet.derivativeAccounts[TRUSTED_CONTACTS];
-        if (trustedAccounts.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= trustedAccounts.instance.using;
-            accountNumber++
-          ) {
-            // console.log({
-            //   accountNumber,
-            //   balances: trustedAccounts[accountNumber].balances,
-            //   transactions: trustedAccounts[accountNumber].transactions,
-            // });
-            if (trustedAccounts[accountNumber].balances) {
-              currentBalance +=
-                trustedAccounts[accountNumber].balances.balance +
-                trustedAccounts[accountNumber].balances.unconfirmedBalance;
-            }
+      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+          let derivativeAccount;
 
-            if (trustedAccounts[accountNumber].transactions) {
-              trustedAccounts[
-                accountNumber
-              ].transactions.transactionDetails.forEach((tx) => {
-                let include = true;
-                for (const currentTx of currentTransactions) {
-                  if (tx.txid === currentTx.txid) {
-                    include = false;
-                    break;
+          if (serviceType === REGULAR_ACCOUNT) {
+            derivativeAccount =
+              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+                dAccountType
+              ];
+          } else if (serviceType === SECURE_ACCOUNT) {
+            derivativeAccount =
+              accounts[SECURE_ACCOUNT].service.secureHDWallet
+                .derivativeAccounts[dAccountType];
+          }
+
+          if (
+            serviceType === SECURE_ACCOUNT &&
+            dAccountType === TRUSTED_CONTACTS
+          ) {
+            continue;
+          }
+
+          if (derivativeAccount.instance.using) {
+            for (
+              let accountNumber = 1;
+              accountNumber <= derivativeAccount.instance.using;
+              accountNumber++
+            ) {
+              // console.log({
+              //   accountNumber,
+              //   balances: trustedAccounts[accountNumber].balances,
+              //   transactions: trustedAccounts[accountNumber].transactions,
+              // });
+              if (derivativeAccount[accountNumber].balances) {
+                currentBalance +=
+                  derivativeAccount[accountNumber].balances.balance +
+                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
+              }
+
+              if (derivativeAccount[accountNumber].transactions) {
+                derivativeAccount[
+                  accountNumber
+                ].transactions.transactionDetails.forEach((tx) => {
+                  let include = true;
+                  for (const currentTx of currentTransactions) {
+                    if (tx.txid === currentTx.txid) {
+                      include = false;
+                      break;
+                    }
                   }
-                }
-                if (include) currentTransactions.push(tx);
-              });
+                  if (include) currentTransactions.push(tx);
+                });
+              }
             }
           }
         }
@@ -1392,7 +1414,10 @@ export default function Accounts(props) {
                     fetchBalanceTx(serviceType, {
                       loader: true,
                       syncTrustedDerivative:
-                        serviceType === REGULAR_ACCOUNT ? true : false,
+                        serviceType === REGULAR_ACCOUNT ||
+                        serviceType === SECURE_ACCOUNT
+                          ? true
+                          : false,
                     }),
                   );
                 }}
@@ -1411,10 +1436,9 @@ export default function Accounts(props) {
                     : index === 1
                     ? getServiceType(REGULAR_ACCOUNT)
                     : getServiceType(SECURE_ACCOUNT);
-                    setTimeout(() => {
-                      setCarouselInitIndex(index);
-                        }, 1000);
-                  
+                  setTimeout(() => {
+                    setCarouselInitIndex(index);
+                  }, 1000);
                 }}
                 renderItem={renderItem}
                 sliderWidth={sliderWidth}
@@ -1891,8 +1915,8 @@ export default function Accounts(props) {
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('87%')
-              : hp('89%')
+                ? hp('87%')
+                : hp('89%'),
               // Platform.OS == 'ios' && DeviceInfo.hasNotch()
               //   ? hp('35%')
               //   : hp('40%'),

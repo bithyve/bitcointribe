@@ -179,6 +179,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
+    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing SD
     yield call(s3Service.reshareMetaShare, payload.shareIndex);
     if (payload.previousGuardianName) {
       trustedContacts.tc.trustedContacts[

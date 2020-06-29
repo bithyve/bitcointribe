@@ -282,7 +282,7 @@ export default class BaseAccount {
   };
 
   public syncDerivativeAccountsBalanceTxs = async (
-    accountType: string,
+    accountTypes: string[],
   ): Promise<
     | {
         status: number;
@@ -302,7 +302,9 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.syncDerivativeAccountsBalanceTxs(accountType),
+        data: await this.hdWallet.syncDerivativeAccountsBalanceTxs(
+          accountTypes,
+        ),
       };
     } catch (err) {
       return {
