@@ -514,6 +514,40 @@ export default class SecureAccount {
     }
   };
 
+  public syncDerivativeAccountsBalanceTxs = async (
+    accountTypes: string[],
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          synched: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.syncDerivativeAccountsBalanceTxs(
+          accountTypes,
+        ),
+      };
+    } catch (err) {
+      return {
+        status: 0o3,
+        err: err.message,
+        message: "Failed to sync derivative account's balance and transactions",
+      };
+    }
+  };
+
   public getTransactionDetails = async (
     txHash: string,
   ): Promise<

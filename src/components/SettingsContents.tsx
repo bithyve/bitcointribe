@@ -25,7 +25,7 @@ export default function SettingsContents(props) {
     },
     {
       title: 'Change Currency',
-      info: 'Choose your Currency',
+      info: 'Choose your currency',
       image: require('../assets/images/icons/country.png'),
       type: 'ChangeCurrency',
     },

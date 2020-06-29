@@ -414,7 +414,7 @@ export default function ExistingSavingMethods(props) {
                   marginLeft: wp('2%'),
                 }}
               >
-                Fast Bitcoin
+                FastBitcoins
               </Text>
               <Text
                 style={{

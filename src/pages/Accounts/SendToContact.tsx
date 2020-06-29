@@ -56,6 +56,7 @@ import Currencies from '../../common/Currencies';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
+import config from '../../bitcoin/HexaConfig';
 
 export default function SendToContact(props) {
   const [RegularAccountBalance, setRegularAccountBalance] = useState(0);
@@ -115,21 +116,44 @@ export default function SendToContact(props) {
       const instance = service.hdWallet || service.secureHDWallet;
       let balance =
         instance.balances.balance + instance.balances.unconfirmedBalance;
-      if (element === REGULAR_ACCOUNT) {
-        const trustedAccounts: TrustedContactDerivativeAccount =
-          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-            TRUSTED_CONTACTS
-          ];
-        if (trustedAccounts.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= trustedAccounts.instance.using;
-            accountNumber++
+      if (element === REGULAR_ACCOUNT || element === SECURE_ACCOUNT) {
+        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+          let derivativeAccount;
+
+          if (serviceType === REGULAR_ACCOUNT) {
+            derivativeAccount =
+              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+                dAccountType
+              ];
+          } else if (serviceType === SECURE_ACCOUNT) {
+            derivativeAccount =
+              accounts[SECURE_ACCOUNT].service.secureHDWallet
+                .derivativeAccounts[dAccountType];
+          }
+
+          if (
+            serviceType === SECURE_ACCOUNT &&
+            dAccountType === TRUSTED_CONTACTS
           ) {
-            if (trustedAccounts[accountNumber].balances) {
-              balance +=
-                trustedAccounts[accountNumber].balances.balance +
-                trustedAccounts[accountNumber].balances.unconfirmedBalance;
+            continue;
+          }
+
+          if (derivativeAccount.instance.using) {
+            for (
+              let accountNumber = 1;
+              accountNumber <= derivativeAccount.instance.using;
+              accountNumber++
+            ) {
+              // console.log({
+              //   accountNumber,
+              //   balances: trustedAccounts[accountNumber].balances,
+              //   transactions: trustedAccounts[accountNumber].transactions,
+              // });
+              if (derivativeAccount[accountNumber].balances) {
+                balance +=
+                  derivativeAccount[accountNumber].balances.balance +
+                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
+              }
             }
           }
         }
@@ -185,11 +209,11 @@ export default function SendToContact(props) {
   }
 
   useEffect(() => {
-    if (isFromAddressBook){
+    if (isFromAddressBook) {
       dispatch(clearTransfer(serviceType));
       dispatch(addTransferDetails(serviceType, { selectedContact }));
     }
-    
+
     if (netBalance !== 0 && !netBalance) {
       const service = accounts[serviceType].service;
       const instance = service.hdWallet || service.secureHDWallet;
@@ -253,7 +277,7 @@ export default function SendToContact(props) {
       } else setIsConfirmDisabled(false);
     } else {
       setIsConfirmDisabled(true);
-      if(!transfer.details.length){
+      if (!transfer.details.length) {
         props.navigation.goBack();
       }
     }
@@ -273,16 +297,16 @@ export default function SendToContact(props) {
       }, 10);
       SendUnSuccessBottomSheet.current.snapTo(1);
     } else if (transfer.executed === 'ST1') {
-      if(transfer.details.length){
-      props.navigation.navigate('SendConfirmation', {
-        serviceType,
-        sweepSecure,
-        netBalance,
-        recipients,
-        averageTxFees,
-      });
+      if (transfer.details.length) {
+        props.navigation.navigate('SendConfirmation', {
+          serviceType,
+          sweepSecure,
+          netBalance,
+          recipients,
+          averageTxFees,
+        });
+      }
     }
-  }
   }, [transfer, recipients, averageTxFees]);
 
   const handleTrasferST1 = () => {
@@ -603,7 +627,6 @@ export default function SendToContact(props) {
         </TouchableOpacity>
     );
   };
-
   const renderUSDInputText = () => {
     return (
       <TouchableOpacity
@@ -635,7 +658,7 @@ export default function SendToContact(props) {
           /> */}
         </View>
         {renderVerticalDivider()}
-        
+
         <TextInput
           style={{ ...styles.textBox, paddingLeft: 10, flex: 1,
             height: wp('13%'), width: wp('45%') }}
@@ -963,7 +986,6 @@ export default function SendToContact(props) {
                   </View>
                 ) : null}
                 {renderBitCoinInputText()}
-                
               </View>
               <View
                 style={{
@@ -1016,9 +1038,12 @@ export default function SendToContact(props) {
               }}
             >
               <TextInput
-                style={{...styles.textBox, paddingLeft: 15, flex: 1,
+                style={{
+                  ...styles.textBox,
+                  paddingLeft: 15,
+                  flex: 1,
                   height: wp('13%'),
-                  }}
+                }}
                 returnKeyLabel="Done"
                 returnKeyType="done"
                 onSubmitEditing={Keyboard.dismiss}

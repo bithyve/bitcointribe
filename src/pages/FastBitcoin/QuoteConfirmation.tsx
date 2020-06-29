@@ -15,7 +15,7 @@ export default function QuoteConfirmation(props) {
       <View>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.modalTitleText}>
-            Confirm Fast Bitcoin{'\n'}Voucher Quote
+            Confirm FastBitcoins{'\n'}Voucher Quote
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
             The amount of sats for your voucher is shown below
