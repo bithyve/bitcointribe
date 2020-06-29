@@ -14,8 +14,7 @@ export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
 export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
-export const SYNC_TRUSTED_DERIVATIVE_ACCOUNTS =
-  'SYNC_TRUSTED_DERIVATIVE_ACCOUNTS';
+export const SYNC_DERIVATIVE_ACCOUNTS = 'SYNC_DERIVATIVE_ACCOUNTS';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
@@ -114,8 +113,8 @@ export const syncAccounts = (restore?) => {
   return { type: SYNC_ACCOUNTS, payload: { restore } };
 };
 
-export const syncTrustedDerivativeAccounts = (service) => {
-  return { type: SYNC_TRUSTED_DERIVATIVE_ACCOUNTS, payload: { service } };
+export const syncDerivativeAccounts = (serviceTypes: string[]) => {
+  return { type: SYNC_DERIVATIVE_ACCOUNTS, payload: { serviceTypes } };
 };
 
 export const calculateExchangeRate = () => {

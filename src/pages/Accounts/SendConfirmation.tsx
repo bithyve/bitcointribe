@@ -40,6 +40,7 @@ import moment from 'moment';
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
+  SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RelayServices from '../../bitcoin/services/RelayService';
 import {
@@ -345,8 +346,15 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Successfully'}
+<<<<<<< HEAD
         info={'Transaction(s) successfully submitted'}
         infoText={'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'}
+=======
+        info={'Transactions successfully submitted'}
+        infoText={
+          'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
+        }
+>>>>>>> DA balance & tx joint sync: Reg + Sec
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'View Account'}
@@ -362,7 +370,10 @@ export default function SendConfirmation(props) {
             fetchBalanceTx(serviceType, {
               loader: true,
               syncTrustedDerivative:
-                serviceType === REGULAR_ACCOUNT ? true : false,
+                serviceType === REGULAR_ACCOUNT ||
+                serviceType === SECURE_ACCOUNT
+                  ? true
+                  : false,
             }),
           );
           props.navigation.navigate('Accounts');

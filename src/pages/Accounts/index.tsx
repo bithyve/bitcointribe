@@ -1414,7 +1414,10 @@ export default function Accounts(props) {
                     fetchBalanceTx(serviceType, {
                       loader: true,
                       syncTrustedDerivative:
-                        serviceType === REGULAR_ACCOUNT ? true : false,
+                        serviceType === REGULAR_ACCOUNT ||
+                        serviceType === SECURE_ACCOUNT
+                          ? true
+                          : false,
                     }),
                   );
                 }}
