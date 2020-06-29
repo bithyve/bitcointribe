@@ -705,17 +705,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     const { accounts, fetchDerivativeAccBalTx } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
     const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
-    if (
-      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
-      secureAccount.derivativeAccounts[derivativeAccountType][1].xpub
-    )
-      fetchDerivativeAccBalTx(SECURE_ACCOUNT, derivativeAccountType);
-
-    if (
-      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
-      regularAccount.derivativeAccounts[derivativeAccountType][1].xpub
-    )
-      fetchDerivativeAccBalTx(REGULAR_ACCOUNT, derivativeAccountType);
 
     let newTransactionsRegular =
       regularAccount.derivativeAccounts[derivativeAccountType][1] &&
