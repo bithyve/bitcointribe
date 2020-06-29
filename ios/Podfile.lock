@@ -123,13 +123,13 @@ PODS:
     - React
   - react-native-config (1.2.1):
     - React
-  - react-native-contacts (5.2.1):
+  - react-native-contacts (5.2.2):
     - React
   - react-native-in-app-utils (6.0.2):
     - React
   - react-native-mail (4.1.0):
     - React
-  - react-native-netinfo (5.9.3):
+  - react-native-netinfo (5.9.4):
     - React
   - react-native-print (0.6.0):
     - React
@@ -496,10 +496,10 @@ SPEC CHECKSUMS:
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
   react-native-config: ae9ef3bdbf539f2d14ebaf4ebeba508f766e066a
-  react-native-contacts: 5724ae28c660a021bf1028874993fac794f9c07a
+  react-native-contacts: bae53b6909717b50a4f9fda5f177aabc87fd0c3b
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
-  react-native-netinfo: 1b8691be19549f020d0757b40aca4f355cafeeec
+  react-native-netinfo: cd479ab1b67cdd1cb1403a99ecdb24190a6dd7ef
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
@@ -531,4 +531,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ee84328f93944edd163ed35f7bf5ce0383faa559
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
