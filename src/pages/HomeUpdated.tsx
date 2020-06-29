@@ -1376,45 +1376,48 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           .transactionDetails
       : [];
 
-    const trustedAccounts: TrustedContactDerivativeAccount =
-      accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        TRUSTED_CONTACTS
-      ];
-    if (trustedAccounts.instance.using) {
-      for (
-        let accountNumber = 1;
-        accountNumber <= trustedAccounts.instance.using;
-        accountNumber++
-      ) {
-        // console.log({
-        //   accountNumber,
-        //   balances: trustedAccounts[accountNumber].balances,
-        //   transactions: trustedAccounts[accountNumber].transactions,
-        // });
-        if (trustedAccounts[accountNumber].balances) {
-          regularBalance +=
-            trustedAccounts[accountNumber].balances.balance +
-            trustedAccounts[accountNumber].balances.unconfirmedBalance;
-        }
+    // regular derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      const derivativeAccount =
+        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            regularBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
 
-        if (trustedAccounts[accountNumber].transactions) {
-          trustedAccounts[
-            accountNumber
-          ].transactions.transactionDetails.forEach((tx) => {
-            let include = true;
-            for (const currentTx of regularTransactions) {
-              if (tx.txid === currentTx.txid) {
-                include = false;
-                break;
+          if (derivativeAccount[accountNumber].transactions) {
+            derivativeAccount[
+              accountNumber
+            ].transactions.transactionDetails.forEach((tx) => {
+              let include = true;
+              for (const currentTx of regularTransactions) {
+                if (tx.txid === currentTx.txid) {
+                  include = false;
+                  break;
+                }
               }
-            }
-            if (include) regularTransactions.push(tx);
-          });
+              if (include) regularTransactions.push(tx);
+            });
+          }
         }
       }
     }
 
-    const secureBalance = accounts[SECURE_ACCOUNT].service
+    let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
@@ -1424,6 +1427,49 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
           .transactionDetails
       : [];
+
+    // secure derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+
+      const derivativeAccount =
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            secureBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+
+          if (derivativeAccount[accountNumber].transactions) {
+            derivativeAccount[
+              accountNumber
+            ].transactions.transactionDetails.forEach((tx) => {
+              let include = true;
+              for (const currentTx of secureTransactions) {
+                if (tx.txid === currentTx.txid) {
+                  include = false;
+                  break;
+                }
+              }
+              if (include) secureTransactions.push(tx);
+            });
+          }
+        }
+      }
+    }
 
     const accumulativeBalance = regularBalance + secureBalance;
 
