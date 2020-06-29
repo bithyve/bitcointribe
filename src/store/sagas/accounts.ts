@@ -54,6 +54,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
 import { trustedChannelsSyncWorker } from './trustedContacts';
+import config from '../../bitcoin/HexaConfig';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -379,7 +380,7 @@ function* syncTrustedDerivativeAccountsWorker({ payload }) {
 
   const res = yield call(
     regularAccount.syncDerivativeAccountsBalanceTxs,
-    TRUSTED_CONTACTS,
+    Object.keys(config.DERIVATIVE_ACC),
   );
 
   const postFetchTrustedDerivativeAccounts = JSON.stringify(
