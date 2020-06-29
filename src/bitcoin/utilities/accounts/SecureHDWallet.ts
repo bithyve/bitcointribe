@@ -576,9 +576,9 @@ export default class SecureHDWallet extends Bitcoin {
       );
     }
 
-    this.derivativeAccounts[accountType][accountNumber][
-      'consumedAddresses'
-    ] = consumedAddresses;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].usedAddresses = consumedAddresses;
     console.log({ derivativeAccConsumedAddresses: consumedAddresses });
 
     const {
@@ -1214,7 +1214,6 @@ export default class SecureHDWallet extends Bitcoin {
             accountNumber++
           ) {
             const derivativeInstance = derivativeAccount[accountNumber];
-
             if (
               derivativeInstance.usedAddresses &&
               derivativeInstance.usedAddresses.length
@@ -1223,17 +1222,18 @@ export default class SecureHDWallet extends Bitcoin {
                 let itr = 0;
                 itr <=
                 derivativeInstance.nextFreeAddressIndex +
-                  this.derivativeGapLimit; // would always be greater than
+                  this.derivativeGapLimit;
                 itr++
               ) {
-                const possibleAddress = this.createSecureMultiSig(
+                const multiSig = this.createSecureMultiSig(
                   itr,
                   derivativeInstance.xpub,
-                ).address;
+                );
+                const possibleAddress = multiSig.address;
                 if (possibleAddress === address) {
                   return (this.signingEssentialsCache[address] = {
                     multiSig,
-                    primaryPriv: this.deriveChildXKey(
+                    primaryPriv: this.deriveDerivativeChildXKey(
                       derivativeInstance.xpriv,
                       itr,
                     ),
@@ -1271,7 +1271,6 @@ export default class SecureHDWallet extends Bitcoin {
 
       for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
         if (dAccountType === TRUSTED_CONTACTS) continue; // TC not supported
-
         const derivativeAccount = this.derivativeAccounts[dAccountType];
         if (derivativeAccount.instance.using) {
           for (
@@ -1296,7 +1295,6 @@ export default class SecureHDWallet extends Bitcoin {
         ...this.consumedAddresses,
         ...batchedDerivativeAddresses,
       ];
-
       const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
       return UTXOs;
     } catch (err) {
