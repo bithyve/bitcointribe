@@ -25,7 +25,7 @@ export default function FastBitcoinModalContents(props) {
                     <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
                 </AppBottomSheetTouchableWrapper>
                 <View>
-                    <Text style={styles.modalHeaderTitleText}>{"Fast Bitcoin"}</Text>
+                    <Text style={styles.modalHeaderTitleText}>{"FastBitcoins"}</Text>
                     <Text style={styles.modalHeaderInfoText}>Buy and sell bitcoin with cash,{"\n"}Lightning deposits and deliveries enabled</Text>
                 </View>
             </View>

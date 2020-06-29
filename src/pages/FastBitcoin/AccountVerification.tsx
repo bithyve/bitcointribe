@@ -23,7 +23,7 @@ export default function AccountVerification(props) {
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            {'Fast Bitcoin\nAccount Verification'}
+            {'FastBitcoins\nAccount Verification'}
           </Text>
           <Text
             style={{

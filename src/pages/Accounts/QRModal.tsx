@@ -63,7 +63,7 @@ export default function QRModal(props) {
         <View style={styles.modalHeaderTitleView}>
         <AppBottomSheetTouchableWrapper
               onPress={() => props.onBackPress()}
-              style={{ height: 30, width: 30, alignSelf: 'center' }}
+              style={{ width: 30, alignSelf: 'center' }}
             >
               <FontAwesome
                 name="long-arrow-left"

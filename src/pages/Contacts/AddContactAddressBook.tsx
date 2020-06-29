@@ -343,7 +343,7 @@ export default function AddContactAddressBook(props) {
               {props.modalTitle ? props.modalTitle : 'Add Contact'}
             </Text>
             <Text style={styles.modalHeaderInfoText}>
-              {/* {'Lorem ipsum dolor sit amet, consec'} */}
+              {'Select a contact from your phones address book'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
