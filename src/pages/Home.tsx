@@ -1313,7 +1313,7 @@ export default function Home(props) {
       setTimeout(() => {
         setErrorMessageHeader('Sending successful');
         setErrorMessage(
-          'The Recovery Secret has been sent, the receiver needs to accept ',
+          'The Recovery Key has been sent, the receiver needs to accept ',
         );
         setButtonText('Done');
       }, 2);
@@ -2262,7 +2262,7 @@ export default function Home(props) {
         pageInfo={
           'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
         }
-        pageTitle={'Sell Bitcoins'}
+        pageTitle={'Sell bitcoin'}
         noteTitle={'Lorem ipsum'}
         noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
         proceedButtonText={'Calculate'}
@@ -2614,7 +2614,7 @@ export default function Home(props) {
   //       }
   //       subTitle={'Message from the Sender'}
   //       subTitleInfo={
-  //         'I am trying to restore my Hexa wallet and need the Recovery Secret shared with you'
+  //         'I am trying to restore my Hexa wallet and need the Recovery Key shared with you'
   //       }
   //       acceptButtonName={'Accept Request'}
   //       rejectButtonName={'Reject Request'}
@@ -2892,7 +2892,7 @@ export default function Home(props) {
                 isGuardian,
               });
             } else if (publicKey && rejected) {
-              // don't assoicate; only fetch the payment details from EC
+              // don't associate; only fetch the payment details from EC
               dispatch(fetchEphemeralChannel(null, null, publicKey));
             }
           }
@@ -2901,7 +2901,7 @@ export default function Home(props) {
         if (!UNDER_CUSTODY[requester]) {
           Alert.alert(
             'Failed to send!',
-            'You do not host any secret for this user.',
+            'You do not hold any Key of this user.',
           );
           setLoading(false);
         } else {

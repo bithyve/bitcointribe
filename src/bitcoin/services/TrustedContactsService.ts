@@ -70,7 +70,7 @@ export default class TrustedContactsService {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to setup trusted contact',
+        message: 'Failed to setup contact',
       };
     }
   };
@@ -109,7 +109,7 @@ export default class TrustedContactsService {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to finalize trusted contact',
+        message: 'Failed to finalize contact',
       };
     }
   };
@@ -237,7 +237,7 @@ export default class TrustedContactsService {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to update trusted channel',
+        message: 'Failed to update contact',
       };
     }
   };
@@ -271,7 +271,7 @@ export default class TrustedContactsService {
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to fetch from trusted channel',
+        message: 'Failed to fetch from contact',
       };
     }
   };

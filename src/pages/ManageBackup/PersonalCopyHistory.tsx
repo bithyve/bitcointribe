@@ -344,10 +344,10 @@ const PersonalCopyHistory = (props) => {
         title={
           QRModalHeader === 'Confirm Personal Copy'
             ? 'Scan the 1st QR from Personal Copy'
-            : 'Scan the Secondary Mnemonic'
+            : 'Scan the Exit Key'
         }
         infoText={
-          'Open your PDF copy which is password protected with your Secret Answer'
+          'Open your PDF copy which is password protected with your Security Question\'s answer'
         }
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
@@ -394,7 +394,7 @@ const PersonalCopyHistory = (props) => {
               (PersonalCopyShareBottomSheet as any).current.snapTo(1);
             } else {
               Alert.alert(
-                'Invalid Secondary Mnemonic',
+                'Invalid Exit Key',
                 'Please scan appropriate QR from one of your personal copy',
               );
             }

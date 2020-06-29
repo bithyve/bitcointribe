@@ -103,10 +103,10 @@ const ReceivingAddress = props => {
   const renderReceiveHelperContents = useCallback(() => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={'Receiving Bitcoins'}
+        topButtonText={'Receiving bitcoin'}
         image={require('../../assets/images/icons/receive.png')}
         helperInfo={
-          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from  "Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
+          'For receiving bitcoin, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoin or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoin/ sats from  "Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -160,7 +160,7 @@ const ReceivingAddress = props => {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoins from the savings account."
+                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
               }
             />
 
@@ -334,7 +334,7 @@ const ReceivingAddress = props => {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                'The QR code is your bitcoin address. The payer will scan it to send bitcoins. Alternatively copy the address displayed below it and send it to the payer'
+                'The QR code is your bitcoin address. The payer will scan it to send bitcoin. Alternatively copy the address displayed below it and send it to the payer'
               }
             />
           </View>

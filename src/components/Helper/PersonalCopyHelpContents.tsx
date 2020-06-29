@@ -37,6 +37,7 @@ export default function PersonalCopyHelpContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginBottom: hp('1%'),
                 }}
             />
             <Text
@@ -47,7 +48,7 @@ export default function PersonalCopyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can share two of your five Recovery Keys{'\n'}as documents with accounts that you possess.{'\n'}Make sure you delete these keys after sharing
+                You can send two of your five Recovery Keys{'\n'}as documents with accounts that you possess.{'\n'}Make sure you delete these from your phone{'\n'}after sharing
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -87,7 +88,7 @@ export default function PersonalCopyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                To recover your wallet, you need to scan three{'\n'}of your five Recovery Keys. Having two{'\n'}personal Recovery Keys in possession makes{'\n'}the recovery process faster, since you need to{'\n'}request only one key from external sources
+                To recover your wallet, you need to scan three{'\n'}of your five Recovery Keys. Having two{'\n'}personal Recovery Keys in your possession makes{'\n'}the recovery process faster, since you only need {'\n'}to request one key from external sources
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

@@ -75,7 +75,7 @@ export default function TestAccountHelperModalContents(props) {
   return (
     <View style={styles.modalContainer}>
       {
-        props.topButtonText == 'Receiving Bitcoins'?
+        props.topButtonText == 'Receiving bitcoin'?
         (<ScrollView>
           {mainView()}
         </ScrollView>) : 

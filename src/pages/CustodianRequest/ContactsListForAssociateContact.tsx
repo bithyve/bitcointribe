@@ -55,7 +55,7 @@ const ContactsListForAssociateContact = (props) => {
         postAssociation(contacts[0]);
         props.navigation.navigate('Home');
       } else {
-        Toast('Trusted Contact already exists');
+        Toast('Contact already exists');
         return;
       }
     } else {

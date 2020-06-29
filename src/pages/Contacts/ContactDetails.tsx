@@ -178,7 +178,7 @@ export default function ContactDetails(props) {
 
   const getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = [];
-    if (contactsType == 'Other Trusted Contacts') {
+    if (contactsType == 'Other Contacts') {
       OtherTrustedContactsHistory = JSON.parse(
         await AsyncStorage.getItem('OtherTrustedContactsHistory'),
       );
@@ -542,7 +542,7 @@ export default function ContactDetails(props) {
     return (
       <SendViaQR
         headerText={'Send Recovery Secret'}
-        subHeaderText={'Your ward should scan the QR to restore'}
+        subHeaderText={'You should scan the QR to restore'}
         contactText={''}
         contact={Contact}
         QR={trustedQR}
@@ -573,7 +573,7 @@ export default function ContactDetails(props) {
     return (
       <SendViaQR
         headerText={'Encrypted Exit Key'}
-        subHeaderText={'Your ward should scan the QR to restore Personal Copy'}
+        subHeaderText={'You should scan the QR to restore Personal Copy'}
         contactText={''}
         contact={Contact}
         QR={encryptedExitKey}
@@ -749,7 +749,7 @@ export default function ContactDetails(props) {
     } else {
       Alert.alert(
         'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
+        'Cannot add a contact without phone-num/email as a entity',
       );
     }
   }, [SHARES_TRANSFER_DETAILS[index], Contact, trustedContacts]);
@@ -788,7 +788,7 @@ export default function ContactDetails(props) {
       !trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
     ) {
       console.log(
-        'Err: Trusted Contact/Ephemeral Channel does not exists for contact: ',
+        'Err: Contact/Ephemeral Channel does not exists for contact: ',
         contactName,
       );
       return;
@@ -839,7 +839,7 @@ export default function ContactDetails(props) {
     } else {
       Alert.alert(
         'Invalid Contact',
-        'Cannot add a contact without phone-num/email as a trusted entity',
+        'Cannot add a contact without phone-num/email as a entity',
       );
     }
   }, [
@@ -893,7 +893,7 @@ export default function ContactDetails(props) {
       return (
         <SendShareModal
           contact={Contact ? Contact : null}
-          textHeader={'Sharing Secret with'}
+          textHeader={'Sharing Key with'}
           onPressViaQr={() => {
             createGuardian();
             if (SendViaQRBottomSheet.current)
@@ -1236,9 +1236,9 @@ export default function ContactDetails(props) {
                 <Text style={styles.buttonText}>
                   {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
                 </Text>
-                <Text numberOfLines={1} style={styles.buttonInfo}>
-                  {encryptedExitKey ? 'Help restore PDF' : 'Lorem ipsum dolor'}
-                </Text>
+                {encryptedExitKey ? <Text numberOfLines={1} style={styles.buttonInfo}>
+                  {'Help restore PDF'}
+                </Text> : null}
               </View>
             </TouchableOpacity>
           </View>

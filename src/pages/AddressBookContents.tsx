@@ -38,6 +38,9 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../components/ModalHeader';
 import config from '../bitcoin/HexaConfig';
+import KnowMoreButton from '../components/KnowMoreButton';
+import SmallHeaderModal from '../components/SmallHeaderModal';
+import AddressBookHelpContents from '../components/Helper/AddressBookHelpContents';
 
 export default function AddressBookContents(props) {
   const [onRefresh, setOnRefresh] = useState(false);
@@ -45,6 +48,7 @@ export default function AddressBookContents(props) {
     AddContactAddressBookBookBottomSheet,
     setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef<BottomSheet>());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [SelectedContact, setSelectedContact] = useState([]);
   const [Loading, setLoading] = useState(true);
@@ -179,6 +183,25 @@ export default function AddressBookContents(props) {
       focusListener.remove();
     };
   }, []);
+
+  const renderHelpHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+            if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  };
+
+  const renderHelpContent = () => {
+    return(
+      <AddressBookHelpContents />
+    );
+  }
 
   const getImageIcon = (item) => {
     if (item) {
@@ -422,6 +445,17 @@ export default function AddressBookContents(props) {
               {'Friends and Family'}
             </Text>
           </View>
+          <KnowMoreButton
+              onpress={() => {
+                (HelpBottomSheet as any).current.snapTo(1);
+              }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
+              textStyle={{}}
+            />
         </View>
         <ScrollView
           refreshControl={
@@ -478,7 +512,7 @@ export default function AddressBookContents(props) {
             )}
           </View>
           <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>Other Trusted Contacts</Text>
+            <Text style={styles.pageTitle}>Other Contacts</Text>
             <Text style={styles.pageInfoText}>
               Contacts who I can pay directly
             </Text>
@@ -516,7 +550,7 @@ export default function AddressBookContents(props) {
                     />
                     <View>
                       <Text style={styles.contactText}>
-                        Add Trusted Contact
+                        Add Contact
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -547,6 +581,16 @@ export default function AddressBookContents(props) {
         ]}
         renderContent={renderAddContactAddressBookContents}
         renderHeader={renderAddContactAddressBookHeader}
+      />
+      <BottomSheet 
+        enabledInnerScrolling={true}
+        ref={HelpBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+        ]}
+        renderContent={renderHelpContent}
+        renderHeader={renderHelpHeader}
       />
     </View>
   );

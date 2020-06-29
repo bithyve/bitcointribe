@@ -99,7 +99,7 @@ export default function TrustedContactQr(props) {
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
             <Text style={BackupStyles.modalHeaderTitleText}>
-              Trusted contact QR code
+              contact QR code
             </Text>
           </View>
         </View>
@@ -137,7 +137,7 @@ export default function TrustedContactQr(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
-        title={'Share your Recovery Key'}
+        title={'Send your Recovery Key'}
         infoText={
           'Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR'
         }

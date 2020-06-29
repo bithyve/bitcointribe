@@ -345,7 +345,7 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Successfully'}
-        info={'Transactions successfully submitted'}
+        info={'Transaction(s) successfully submitted'}
         infoText={'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'}
         userInfo={transfer.details}
         isFromContact={false}
@@ -514,7 +514,7 @@ export default function SendConfirmation(props) {
               textAlign: 'center',
             }}
           >
-            {' (Availble to spend '}
+            {' (Available to spend '}
             <Text
               style={{
                 color: Colors.blue,
@@ -733,7 +733,7 @@ export default function SendConfirmation(props) {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'When you want to send bitcoins, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
             }
           />
         </View>

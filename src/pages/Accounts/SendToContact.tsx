@@ -915,7 +915,7 @@ export default function SendToContact(props) {
               textAlign: 'center',
             }}
           >
-            {' (Availble to spend '}
+            {' (Available to spend '}
             {getBalanceText()}
             <Text
               style={{

@@ -155,7 +155,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
               firstLineTitle={'Restore wallet using'}
               secondLineTitle={'Keeper Device'}
               infoTextNormal={
-                'Use the Recover Secret stored in your Keeper device. '
+                'Use the Recovery Key stored in your Keeper device. '
               }
               infoTextBold={'you will need to have the other device with you'}
             />

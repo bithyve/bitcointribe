@@ -24,7 +24,7 @@ export const ErrMap = {
   304: "Unable to check health of the secure account", // checkHealth() >> checks the health of the secure account
   305: "Unable to check whether the secure account is active or not", // isActive() >> secure account presence monitor
   306: "Failed to reset two factor authentication", // resetTwoFA() >> resets the twoFA secret
-  307: "Unable to get the secondary mnemonic", // getSecondaryMnemonic() >> provides the secondary mnemonic
+  307: "Unable to get the exit key", // getSecondaryMnemonic() >> provides the Exit Key
   308: "Unable to get the secondary xpub", // getSecondaryXpub() >> provides the secondary xpub
   309: "Transaction creation failed", // transferST1() >> creates transaction
   310: "Transaction signing failed", // transferST2() >> signs and partially builds the transaction
@@ -38,7 +38,7 @@ export const ErrMap = {
   505: "Unable to recover share from QRs", // recoverMetaShareFromQR() >> reconstructs the share by combining the splitted QRs
   506: "Health updation failed", // updateHealth() >> updates the health of the supplied shares
   507: "Failed to generate the shareID", // getShareId() >> provides the shareID for a given share
-  508: "Unable to generate encryption key", // generateKey() >> generates a psuedo-random encryption key
+  508: "Unable to generate encryption key", // generateKey() >> generates a pseudo-random encryption key
   509: "Unable to encrypt data via OTP", // encryptViaOTP() >> encrypts data(key) using OTP
   510: "Unable to generate shares", // generateShares() >> generate SSS shares and encrypt them using the supplied answer
   511: "Static nonPMDD encryption failed", // encryptStaticNonPMDD >> encrypts static non-PMDD

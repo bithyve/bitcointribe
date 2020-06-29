@@ -1653,7 +1653,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     if (!isRecovery) {
       if (requester === walletName) {
-        Toast('Cannot be your own Trusted Contact/Guardian');
+        Toast('Cannot be your own Contact/Guardian');
         return;
       }
       if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
@@ -1696,7 +1696,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             },
           );
           if (pubExists) {
-            Toast('Trusted Contact already exists against this request');
+            Toast('Contact already exists against this request');
             return;
           }
 
@@ -1720,21 +1720,21 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               isGuardian,
             });
           } else if (publicKey && rejected) {
-            // don't assoicate; only fetch the payment details from EC
+            // don't associate; only fetch the payment details from EC
             fetchEphemeralChannel(null, null, publicKey);
           }
         }
       }
     } else {
       if (requester === walletName) {
-        Toast('You do not host any share of your own');
+        Toast('You do not host any key of your own');
         return;
       }
 
       if (!UNDER_CUSTODY[requester]) {
         Alert.alert(
           'Failed to send!',
-          'You do not host any share for this user',
+          'You do not host any key for this user',
         );
 
         this.setState({
@@ -2916,7 +2916,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 pageInfo={
                   'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
                 }
-                pageTitle={'Sell Bitcoins'}
+                pageTitle={'Sell bitcoin'}
                 noteTitle={'Lorem ipsum'}
                 noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
                 proceedButtonText={'Calculate'}

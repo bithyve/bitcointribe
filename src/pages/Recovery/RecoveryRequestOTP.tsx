@@ -197,7 +197,7 @@ export default function RecoveryRequestOTP(props) {
               Enter OTP to accept request
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              Please enter the 6 digit OTP the owner of secret shared with you
+              Please enter the 6 digit OTP the owner of the Recovery Key shared with you
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>

@@ -49,7 +49,7 @@ const NewTwoFASecret = props => {
                 />
               </TouchableOpacity> */}
               <Text style={BackupStyles.modalHeaderTitleText}>
-                2FA secret
+                2FA Key
               </Text>
               <AppBottomSheetTouchableWrapper
                 style={{

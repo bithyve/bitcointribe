@@ -467,7 +467,7 @@ export default function TwoFASweepFunds(props) {
                       <BottomInfoBox
                         title={'Amount'}
                         infoText={
-                          'The amount pre-filled is the total number of bitcoins presently in your Secure Account'
+                          'The amount pre-filled is the total number of bitcoin presently in your Secure Account'
                         }
                       />
                     </View>

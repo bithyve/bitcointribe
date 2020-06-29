@@ -413,9 +413,9 @@ const SecondaryDeviceHistory = (props) => {
     return (
       <QRModal
         QRModalHeader={'Keeper Reshare'}
-        title={'Scan the Secondary Mnemonic'}
+        title={'Scan the Exit Key'}
         infoText={
-          'Open your PDF copy which is password protected with your Secret Answer'
+          'Open your PDF copy which is password protected with your Secret Question\'s answer'
         }
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
@@ -453,7 +453,7 @@ const SecondaryDeviceHistory = (props) => {
             (secondaryDeviceBottomSheet.current as any).snapTo(1);
           } else {
             Alert.alert(
-              'Invalid Secondary Mnemonic',
+              'Invalid Exit Key',
               'Please scan appropriate QR from one of your personal copy',
             );
           }

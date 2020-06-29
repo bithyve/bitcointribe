@@ -40,6 +40,7 @@ import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthChec
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 
 export default function ManageBackup(props) {
   const [
@@ -237,17 +238,18 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
-      <WalletBackupAndRecoveryContents
-        onPressManageBackup={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-        onSkip={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-        onStartBackup={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <WalletBackupAndRecoveryContents
+      //   onPressManageBackup={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      //   onSkip={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      //   onStartBackup={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <ManageBackupHelpContents />
     );
   };
 
@@ -401,7 +403,7 @@ export default function ManageBackup(props) {
         title={'Change your\nKeeper'}
         info={'Having problems with your Keeper?'}
         note={
-          'You can change the Keeper you selected to share your Recovery Key'
+          'You can change the Keeper you selected to sebd your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -1493,7 +1495,7 @@ export default function ManageBackup(props) {
       if (item.personalInfo) {
         return 'Friends and Family';
       }
-      return 'Select a Friend or Family memeber as a Keeper';
+      return 'Select a Friend or Family member as a Keeper';
     }
     if (item.type === 'secondaryDevice') {
       if (item.status === 'Ugly') {

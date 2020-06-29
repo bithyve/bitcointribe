@@ -941,9 +941,9 @@ export default function Send(props) {
                         }}
                       >
                         <BottomInfoBox
-                          title={'You have not added any Trusted Contact'}
+                          title={'You have not added any Contact'}
                           infoText={
-                            'Add a Trusted Contact to send them sats without having to scan an address'
+                            'Add a Contact to send them sats without having to scan an address'
                           }
                         />
                       </View>

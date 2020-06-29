@@ -24,7 +24,7 @@ export default function SendHelpContents(props) {
                         marginBottom: hp('1%'),
                     }}
                 >
-                    Sending Bitcoins
+                    Sending bitcoin
                 </Text>
             </View>
             <View
@@ -33,6 +33,7 @@ export default function SendHelpContents(props) {
                 height: 1,
                 marginLeft: wp('5%'),
                 marginRight: wp('5%'),
+                marginBottom: hp('1%'),
                 }}
             />
             <Text
@@ -43,12 +44,12 @@ export default function SendHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            When you want to send Bitcoins,{'\n'}you need a destination, which is{'\n'}denoted by the recipient’s bitcoin address 
+                When you want to send bitcoin, you need a{'\n'}destination, which is denoted by the{'\n'}recipient’s address. This address is an{'\n'}alphanumeric string beginning with “1”, “3” or{'\n'}“bc1” for Bitcoin Mainnet, and “2” for {'\n'}Bitcoin Testnet
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/send.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
+                    source={require('../../assets/images/icons/bitcoin_send_info_1.png')}
+                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -59,14 +60,18 @@ export default function SendHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                This address is an alphanumeric{'\n'}string and often wallets use a{'\n'}QR code for the same
+                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                Once you press “Send” on Hexa, the transaction{'\n'}is relayed to a bitcoin full node. This full node{'\n'}then announces the transactions to other full{'\n'}nodes, including those of miners
+            </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -89,12 +94,12 @@ export default function SendHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            Bitcoin transactions can not be{'\n'}reversed or cancelled
+                A transaction that is not confirmed stays in the{'\n'}pool of unconfirmed transactions, called the{'\n'}mempool. The mempool is routinely cleared by{'\n'}miners every three to six hours
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
-                    source={require('../../assets/images/icons/send.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
+                    source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -105,44 +110,8 @@ export default function SendHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-            For this reason, it is{'\n'}recommended that you scan a{'\n'}QR code instead of keying{'\n'}in the characters
+                A miner includes a transaction within their{'\n'}block only if the fee associated is{'\n'}sufficiently high. This is why Hexa requests for{'\n'}a fee when sending a transaction
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
-        </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                There are multiple types of addresses{'\n'}in Bitcoin. Addresses begin with{'\n'}“1”, “3" or “bc1” for Bitcoin Mainnet,{'\n'}and “2" for the Bitcoin Testnet
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/send.png')}
-                    style={{ width: wp('50%'), height: wp('50%'), resizeMode: 'contain' }}
-                />
-            </View>
             <Text
                 style={{
                     textAlign: 'center',
@@ -151,26 +120,8 @@ export default function SendHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Go further down the rabbit hole by clicking here
+                Read more: https://en.bitcoin.it/wiki/Miner_fees
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
         </View>
     </ScrollView>
   );
