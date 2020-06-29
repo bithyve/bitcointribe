@@ -18,7 +18,7 @@ export default function VoucherRedeemSuccess(props) {
           Voucher redeemed successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-            Lorem ipsum dolor sit amet, consectetur
+          Congratulations, you have successfully redeemed the voucher
           </Text>
         </View>
         <View style={styles.box}>
@@ -56,8 +56,7 @@ export default function VoucherRedeemSuccess(props) {
             marginBottom: wp('8%'),
           }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore
+          You can view the transaction in the account when the funds are delivered by FastBitcoins
         </Text>
         <View
           style={{

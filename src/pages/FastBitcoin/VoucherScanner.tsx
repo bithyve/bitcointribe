@@ -495,10 +495,10 @@ const VoucherScanner = (props) => {
     return (
       <ErrorModalContents
         modalRef={RegistrationSuccessBottomSheet}
-        title={'FastBitcoins Account\nSuccessfully Registered'}
-        info={'Lorem ipsum dolor sit amet, consectetur'}
+        title={'Fast Bitcoin Account\nSuccessfully Registered'}
+        info={'FastBitcoins successfully registered'}
         note={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
+          'Congratulations, your wallet has been successfully linked to your FastBitcoins account. Now you can proceed to redeem your vouchers'
         }
         proceedButtonText={'Redeem Voucher'}
         onPressProceed={async () => {

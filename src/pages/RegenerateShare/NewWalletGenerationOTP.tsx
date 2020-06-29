@@ -77,11 +77,11 @@ const NewWalletGenerationOTP = props => {
                 <Text style={styles.commModeModalHeaderText}>
                   {'Enter OTP for the\nexisting secure account'}
                 </Text>
-                <Text style={styles.commModeModalInfoText}>
+                {/* <Text style={styles.commModeModalInfoText}>
                   {
                     'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt'
                   }
-                </Text>
+                </Text> */}
               </View>
               <View
                 style={{

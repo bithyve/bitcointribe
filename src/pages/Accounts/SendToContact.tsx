@@ -86,9 +86,7 @@ export default function SendToContact(props) {
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [CurrencySymbol, setCurrencySymbol] = useState('$');
-  const [bitcoinAmount, setBitCoinAmount] = useState(
-    props.navigation.getParam('bitcoinAmount'),
-  );
+  const [bitcoinAmount, setBitCoinAmount] = useState('');
   const [currencyAmount, setCurrencyAmount] = useState('');
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [note, setNote] = useState('');
@@ -497,7 +495,7 @@ export default function SendToContact(props) {
         >
           {switchOn
             ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
-            : CurrencySymbol +
+            : CurrencySymbol +" "+
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
@@ -586,8 +584,9 @@ export default function SendToContact(props) {
           flexDirection: 'row',
           width: wp('70%'),
           height: wp('13%'),
+          backgroundColor: switchOn ? Colors.white : Colors.backgroundColor
         }}
-        onPress={() => setSwitchOn(!switchOn)}
+        // onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           <Image
@@ -596,48 +595,38 @@ export default function SendToContact(props) {
           />
         </View>
         {renderVerticalDivider()}
-        <TouchableOpacity
-          style={{
-            paddingLeft: 10,
-            flex: 1,
-            height: wp('13%'),
-            justifyContent: 'center',
+        <TextInput
+          style={{ ...styles.textBox, flex: 1,paddingLeft: 10,
+            height: wp('13%'), width: wp('45%') }}
+          placeholder={
+            switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
+          }
+          editable={switchOn}
+          value={bitcoinAmount}
+          returnKeyLabel="Done"
+          returnKeyType="done"
+          keyboardType={'numeric'}
+          onChangeText={(value) => {
+            convertBitCoinToCurrency(value);
           }}
-          onPress={() => setSwitchOn(!switchOn)}
-        >
-          <TextInput
-            style={{ ...styles.textBox, height: wp('9%'), width: wp('45%') }}
-            placeholder={
-              switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
+          placeholderTextColor={Colors.borderColor}
+          onFocus={() => {
+            setInputStyle(styles.inputBoxFocused);
+          }}
+          onBlur={() => {
+            setInputStyle(styles.textBoxView);
+          }}
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === 'Backspace') {
+              setTimeout(() => {
+                setIsInvalidBalance(false);
+              }, 10);
             }
-            editable={switchOn}
-            value={bitcoinAmount}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            keyboardType={'numeric'}
-            onChangeText={(value) => {
-              convertBitCoinToCurrency(value);
-            }}
-            placeholderTextColor={Colors.borderColor}
-            onFocus={() => {
-              setInputStyle(styles.inputBoxFocused);
-            }}
-            onBlur={() => {
-              setInputStyle(styles.textBoxView);
-            }}
-            onKeyPress={(e) => {
-              if (e.nativeEvent.key === 'Backspace') {
-                setTimeout(() => {
-                  setIsInvalidBalance(false);
-                }, 10);
-              }
-            }}
-          />
+          }}
+        />
         </TouchableOpacity>
-      </TouchableOpacity>
     );
   };
-
   const renderUSDInputText = () => {
     return (
       <TouchableOpacity
@@ -648,8 +637,9 @@ export default function SendToContact(props) {
           flexDirection: 'row',
           width: wp('70%'),
           height: wp('13%'),
+          backgroundColor: !switchOn ? Colors.white : Colors.backgroundColor
         }}
-        onPress={() => setSwitchOn(!switchOn)}
+       // onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           {currencyCode.includes(CurrencyCode) ? (
@@ -668,47 +658,39 @@ export default function SendToContact(props) {
           /> */}
         </View>
         {renderVerticalDivider()}
-        <TouchableOpacity
-          style={{
-            paddingLeft: 10,
-            flex: 1,
-            height: wp('13%'),
-            justifyContent: 'center',
+
+        <TextInput
+          style={{ ...styles.textBox, paddingLeft: 10, flex: 1,
+            height: wp('13%'), width: wp('45%') }}
+          editable={!switchOn}
+          placeholder={
+            switchOn
+              ? 'Converted amount in ' + CurrencyCode
+              : 'Enter amount in ' + CurrencyCode
+          }
+          value={currencyAmount}
+          returnKeyLabel="Done"
+          returnKeyType="done"
+          keyboardType={'numeric'}
+          onChangeText={(value) => {
+            convertBitCoinToCurrency(value);
           }}
-          onPress={() => setSwitchOn(!switchOn)}
-        >
-          <TextInput
-            style={{ ...styles.textBox, height: wp('9%'), width: wp('45%') }}
-            editable={!switchOn}
-            placeholder={
-              switchOn
-                ? 'Converted amount in ' + CurrencyCode
-                : 'Enter amount in ' + CurrencyCode
+          placeholderTextColor={Colors.borderColor}
+          onFocus={() => {
+            setInputStyle1(styles.inputBoxFocused);
+          }}
+          onBlur={() => {
+            setInputStyle1(styles.textBoxView);
+          }}
+          onKeyPress={(e) => {
+            if (e.nativeEvent.key === 'Backspace') {
+              setTimeout(() => {
+                setIsInvalidBalance(false);
+              }, 10);
             }
-            value={currencyAmount}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            keyboardType={'numeric'}
-            onChangeText={(value) => {
-              convertBitCoinToCurrency(value);
-            }}
-            placeholderTextColor={Colors.borderColor}
-            onFocus={() => {
-              setInputStyle1(styles.inputBoxFocused);
-            }}
-            onBlur={() => {
-              setInputStyle1(styles.textBoxView);
-            }}
-            onKeyPress={(e) => {
-              if (e.nativeEvent.key === 'Backspace') {
-                setTimeout(() => {
-                  setIsInvalidBalance(false);
-                }, 10);
-              }
-            }}
-          />
+          }}
+        />
         </TouchableOpacity>
-      </TouchableOpacity>
     );
   };
 

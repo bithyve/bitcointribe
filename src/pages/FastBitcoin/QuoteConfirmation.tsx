@@ -18,7 +18,7 @@ export default function QuoteConfirmation(props) {
             Confirm FastBitcoins{'\n'}Voucher Quote
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-            Lorem ipsum dolor sit amet, consectetur
+            The amount of sats for your voucher is shown below
           </Text>
         </View>
         <View style={styles.box}>
@@ -124,8 +124,7 @@ export default function QuoteConfirmation(props) {
             marginBottom: wp('8%'),
           }}
         >
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore
+          Please proceed with redeeming the voucher
         </Text>
         <View
           style={{
