@@ -39,11 +39,8 @@ import EmailModalContents from '../pages/EmailModalContents';
 import Buy from '../pages/Accounts/Buy';
 import Sell from '../pages/Accounts/Sell';
 import QrScanner from '../components/QrScanner';
-import AddressBook from '../pages/RecoverySecretShare/AddressBook';
-import ShareRecoverySecretOtp from '../pages/RecoverySecretShare/ShareRecoverySecretOtp';
 import HealthCheck from '../pages/HealthCheck';
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck';
-import ShareSuccessPage from '../pages/RecoverySecretShare/ShareSuccessPage';
 import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck';
 import NoteHealthCheck from '../pages/HealthCheck/NoteHealthCheck';
 import CloudHealthCheck from '../pages/HealthCheck/CloudHealthCheck';
@@ -172,11 +169,8 @@ const HomeNavigator = createStackNavigator(
     Buy,
     Sell,
     QrScanner,
-    AddressBook,
-    ShareRecoverySecretOtp,
     HealthCheck,
     SecondaryDeviceHealthCheck,
-    ShareSuccessPage,
     TrustedContactHealthCheck,
     NoteHealthCheck,
     CloudHealthCheck,

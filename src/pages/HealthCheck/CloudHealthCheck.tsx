@@ -57,7 +57,7 @@ export default function CloudHealthCheck(props) {
                 <Image style={BackupStyles.cardIconImage} source={getIconByStatus(selectedStatus)} />
             </View>
             <View style={{ marginLeft: 30 }}>
-                <Text style={{
+                {/* <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansMedium
@@ -66,7 +66,7 @@ export default function CloudHealthCheck(props) {
                     color: Colors.textColorGrey,
                     fontSize: RFValue(11),
                     fontFamily: Fonts.FiraSansMedium
-                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
+                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text> */}
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={{

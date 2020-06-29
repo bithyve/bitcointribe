@@ -179,8 +179,8 @@ const ResetTwoFAHelp = (props) => {
       <ResetTwoFASuccess
         modalRef={ResetTwoFASuccessBottomSheet}
         title={successMessageHeader}
-        note={
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
+        note={""
+          // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
         }
         info={successMessage}
         proceedButtonText={'Proceed'}

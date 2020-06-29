@@ -94,8 +94,8 @@ export default function TwoFAToken(props) {
             id: createRandomString(36),
             title: 'Sent Amount',
             date: moment(Date.now()).valueOf(),
-            info:
-              'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            info:"",
+              // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
             selectedContactInfo: element,
           };
           if (element.selectedContact.isWard) {

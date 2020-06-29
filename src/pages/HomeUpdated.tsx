@@ -29,10 +29,6 @@ import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
-import AddContactsModalContents from '../components/AddContactsModalContents';
-import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
-import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
-import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import { AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import {
@@ -78,7 +74,6 @@ import TrustedContactRequest from './Contacts/TrustedContactRequest';
 import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import TransactionsContent from '../components/home/transaction-content';
-import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
 import HomeList from '../components/home/home-list';
 import HomeHeader from '../components/home/home-header';
 import idx from 'idx';
@@ -196,10 +191,8 @@ interface HomeStateTypes {
   modalData: any;
   knowMoreBottomSheetsFlag: boolean;
   qrBottomSheetsFlag: boolean;
-  addBottomSheetsFlag: boolean;
   tabBarIndex: number;
   addSubBottomSheetsFlag: boolean;
-  selectToAdd: string;
   openModal: string;
   atCloseEnd: boolean;
   loading: boolean;
@@ -210,7 +203,6 @@ interface HomeStateTypes {
   errorMessageHeader: string;
   errorMessage: string;
   buttonText: string;
-  familyAndFriendsBookBottomSheetsFlag: boolean;
   selectedContact: any[];
   notificationDataChange: boolean;
   appState: string;
@@ -275,10 +267,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       transactions: [],
       knowMoreBottomSheetsFlag: false,
       modalData: initialTransactionData,
-      addBottomSheetsFlag: false,
       tabBarIndex: 999,
       addSubBottomSheetsFlag: false,
-      selectToAdd: 'buyBitcoins',
       openModal: 'closed',
       atCloseEnd: false,
       loading: false,
@@ -289,7 +279,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       errorMessageHeader: '',
       errorMessage: '',
       buttonText: '',
-      familyAndFriendsBookBottomSheetsFlag: false,
       selectedContact: [],
       notificationDataChange: false,
       appState: '',
@@ -1600,7 +1589,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     if (tabTitle == 'Add') {
       this.setState(
         {
-          addBottomSheetsFlag: true,
           modalData: [],
           selectedBottomTab: tabTitle,
         },
@@ -1987,15 +1975,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       tabBarIndex,
       deepLinkModalOpen,
       knowMoreBottomSheetsFlag,
-      addBottomSheetsFlag,
       errorMessageHeader,
       errorMessage,
       buttonText,
       addSubBottomSheetsFlag,
       selectedContact,
-      familyAndFriendsBookBottomSheetsFlag,
       notificationData,
-      selectToAdd,
       fbBTCAccount,
       loading,
       atCloseEnd,
@@ -2174,28 +2159,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             <AddModalContents
               onPressElements={(type) => {
                 if (type == 'buyBitcoins') {
-                  this.setState(
-                    {
-                      //addBottomSheetsFlag: true,
-                      // tabBarIndex: 0,
-                      selectToAdd: type,
-                    },
-                    () => {
-                      this.props.navigation.navigate('VoucherScanner');
-                    },
-                  );
+                  this.props.navigation.navigate('VoucherScanner');
                 } else if (type == 'addContact') {
                   this.setState(
                     {
                       // addSubBottomSheetsFlag: true,
-                      // addBottomSheetsFlag: false,
                       isLoadContacts: true,
                       tabBarIndex: 0,
-                      selectToAdd: type,
                     },
                     () =>
-                      (this.refs
-                        .addContactAddressBookBookBottomSheet as any).snapTo(1),
+                      (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(1),
                   );
                 }
               }}
@@ -2693,107 +2666,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           />
         ) : null}
 
-        {addBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 0,
-                });
-              }
-            }}
-            onCloseEnd={() => {
-              if (!deepLinkModalOpen) {
-                this.setState({
-                  tabBarIndex: 999,
-                });
-              }
-
-              this.setState({
-                addBottomSheetsFlag: false,
-              });
-            }}
-            enabledInnerScrolling={true}
-            ref={'addBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('65%')
-                : hp('64%'),
-            ]}
-            renderContent={() => {
-              if (selectToAdd == 'buyBitcoins') {
-                return (
-                  <SaveBitcoinModalContents
-                    onPressBack={() => {
-                      (this.refs.addBottomSheet as any).snapTo(0);
-                    }}
-                    onPressElements={(type) =>
-                      this.onPressSaveBitcoinElements(type)
-                    }
-                    isExistingSavingMethod={isEmpty(fbBTCAccount)}
-                  />
-                );
-              } else if (selectToAdd == 'addContact') {
-                return (
-                  <AddContactsModalContents
-                    onPressFriendAndFamily={() => {
-                      this.setState(
-                        {
-                          isLoadContacts: true,
-                        },
-                        () =>
-                          (this.refs
-                            .AddContactAddressBookBookBottomSheet as any).snapTo(
-                            1,
-                          ),
-                      );
-                    }}
-                    onPressBiller={() => {
-                      this.setState(
-                        {
-                          isLoadContacts: true,
-                        },
-                        () =>
-                          (this.refs
-                            .AddContactAddressBookBookBottomSheet as any).snapTo(
-                            1,
-                          ),
-                      );
-                    }}
-                    onPressBack={() => {
-                      this.setState(
-                        {
-                          addSubBottomSheetsFlag: true,
-                          tabBarIndex: 999,
-                        },
-                        () => (this.refs.addBottomSheet as any).snapTo(0),
-                      );
-                    }}
-                  />
-                );
-              } else {
-                return null;
-              }
-            }}
-            renderHeader={() => (
-              <ModalHeader
-                onPressHeader={() => {
-                  this.setState(
-                    {
-                      addSubBottomSheetsFlag: false,
-                      tabBarIndex: 999,
-                    },
-                    () => {
-                      (this.refs.addBottomSheet as any).snapTo(0);
-                    },
-                  );
-                }}
-              />
-            )}
-          />
-        ) : null}
-
         <BottomSheet
           onOpenEnd={() => {
             this.setState({
@@ -2847,103 +2719,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
 
-        {addSubBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {
-              this.setState({
-                tabBarIndex: 0,
-              });
-            }}
-            enabledInnerScrolling={true}
-            ref={'fastBitcoinRedeemCalculationBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('90%')
-                : hp('90%'),
-              Platform.OS == 'ios' ? hp('90%') : hp('50%'),
-            ]}
-            renderContent={() => (
-              <FastBitcoinCalculationModalContents
-                navigation={navigation}
-                modalRef={this.refs.fastBitcoinRedeemCalculationBottomSheet}
-                pageInfo={
-                  'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
-                }
-                pageTitle={'Redeem Voucher'}
-                noteTitle={'Lorem ipsum'}
-                noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
-                proceedButtonText="Calculate"
-                onPressBack={() => {
-                  (this.refs
-                    .fastBitcoinRedeemCalculationBottomSheet as any).snapTo(0);
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  (this.refs
-                    .fastBitcoinRedeemCalculationBottomSheet as any).snapTo(0);
-                }}
-              />
-            )}
-          />
-        ) : null}
-
-        {addSubBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {
-              this.setState({
-                tabBarIndex: 0,
-              });
-            }}
-            enabledInnerScrolling={true}
-            ref={'fastBitcoinSellCalculationBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('90%')
-                : hp('90%'),
-              Platform.OS == 'ios' ? hp('90%') : hp('50%'),
-            ]}
-            renderContent={() => (
-              <FastBitcoinCalculationModalContents
-                navigation={navigation}
-                modalRef={this.refs.fastBitcoinSellCalculationBottomSheet}
-                pageInfo={
-                  'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
-                }
-                pageTitle={'Sell bitcoin'}
-                noteTitle={'Lorem ipsum'}
-                noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
-                proceedButtonText={'Calculate'}
-                onPressBack={() => {
-                  (this.refs
-                    .fastBitcoinSellCalculationBottomSheet as any).snapTo(0);
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  (this.refs
-                    .fastBitcoinSellCalculationBottomSheet as any).snapTo(0);
-                }}
-              />
-            )}
-          />
-        ) : null}
-
         <BottomSheet
           onOpenEnd={() => {
             this.setState({
               tabBarIndex: 0,
-              familyAndFriendsBookBottomSheetsFlag: true,
             });
           }}
           onOpenStart={() => {
@@ -2954,7 +2733,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           onCloseStart={() => {
             this.setState({
               tabBarIndex: 999,
-              familyAndFriendsBookBottomSheetsFlag: false,
             });
           }}
           enabledInnerScrolling={true}
@@ -2984,14 +2762,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 });
               }}
               onPressBack={() => {
-                this.setState(
-                  {
-                    familyAndFriendsBookBottomSheetsFlag: false,
-                  },
-                  () =>
-                    (this.refs
-                      .addContactAddressBookBookBottomSheet as any).snapTo(0),
-                );
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(0)
               }}
             />
           )}
@@ -3000,106 +2771,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               borderColor={Colors.white}
               backgroundColor={Colors.white}
               onPressHeader={() => {
-                this.setState(
-                  {
-                    familyAndFriendsBookBottomSheetsFlag: false,
-                  },
-                  () =>
-                    (this.refs
-                      .addContactAddressBookBookBottomSheet as any).snapTo(0),
-                );
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(0)
               }}
             />
           )}
         />
-
-        {familyAndFriendsBookBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {}}
-            enabledInnerScrolling={true}
-            ref={'contactSelectedFromAddressBookBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('90%')
-                : hp('90%'),
-            ]}
-            renderContent={() => (
-              <SelectedContactFromAddressBook
-                onPressQrScanner={() => {
-                  navigation.navigate('QrScanner', {
-                    scanedCode: this.processQRData,
-                  });
-                }}
-                onPressProceed={() => {
-                  (this.refs
-                    .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    1,
-                  );
-                }}
-                onPressBack={() => {
-                  (this.refs
-                    .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  (this.refs
-                    .contactSelectedFromAddressBookBottomSheet as any).snapTo(
-                    0,
-                  );
-                }}
-              />
-            )}
-          />
-        ) : null}
-        {familyAndFriendsBookBottomSheetsFlag ? (
-          <BottomSheet
-            onOpenEnd={() => {}}
-            enabledInnerScrolling={true}
-            ref={'contactSelectedFromAddressBookQrCodeBottomSheet'}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('90%')
-                : hp('90%'),
-            ]}
-            renderContent={() => (
-              <SelectedContactFromAddressBookQrCode
-                onPressProceed={() => {
-                  (this.refs
-                    .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
-                }}
-                onPressBack={() => {
-                  (this.refs
-                    .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                borderColor={Colors.white}
-                backgroundColor={Colors.white}
-                onPressHeader={() => {
-                  (this.refs
-                    .contactSelectedFromAddressBookQrCodeBottomSheet as any).snapTo(
-                    0,
-                  );
-                }}
-              />
-            )}
-          />
-        ) : null}
 
         <BottomSheet
           onOpenEnd={() => {
