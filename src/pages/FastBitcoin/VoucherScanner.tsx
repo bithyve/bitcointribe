@@ -492,7 +492,7 @@ const VoucherScanner = (props) => {
     return (
       <ErrorModalContents
         modalRef={RegistrationSuccessBottomSheet}
-        title={'Fast Bitcoin Account\nSuccessfully Registered'}
+        title={'FastBitcoins Account\nSuccessfully Registered'}
         info={'Lorem ipsum dolor sit amet, consectetur'}
         note={
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore'
@@ -795,7 +795,7 @@ const VoucherScanner = (props) => {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
           <Text style={BackupStyles.modalHeaderTitleText}>
-            Scan a FastBitcoin voucher
+            Scan a FastBitcoins voucher
           </Text>
         </View>
       </View>
