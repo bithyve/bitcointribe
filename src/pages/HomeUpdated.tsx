@@ -794,12 +794,17 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList();
     }
 
+    if (prevProps.accounts !== this.props.accounts) {
+      this.getBalances();
+    }
+
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
       const serviceType = REGULAR_ACCOUNT;
       const {
         paymentDetails,
         accounts,
         navigation,
+        addTransferDetails,
         clearPaymentDetails,
       } = this.props;
       const { balances } = this.state;
@@ -1097,7 +1102,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.setCurrencyCodeFromAsync();
       this.getAssociatedContact();
       this.checkFastBitcoin();
-      this.getBalances();
       this.props.fetchNotifications();
       this.getNewTransactionNotifications();
       this.setState({
@@ -1755,10 +1759,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }
 
       if (!UNDER_CUSTODY[requester]) {
-        Alert.alert(
-          'Failed to send!',
-          'You do not host any key for this user',
-        );
+        Alert.alert('Failed to send!', 'You do not host any key for this user');
 
         this.setState({
           loading: false,
@@ -2203,7 +2204,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                       tabBarIndex: 0,
                     },
                     () =>
-                      (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(1),
+                      (this.refs
+                        .addContactAddressBookBookBottomSheet as any).snapTo(1),
                   );
                 }
               }}
@@ -2797,7 +2799,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 });
               }}
               onPressBack={() => {
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(0)
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
               }}
             />
           )}
@@ -2806,7 +2810,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               borderColor={Colors.white}
               backgroundColor={Colors.white}
               onPressHeader={() => {
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(0)
+                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                  0,
+                );
               }}
             />
           )}
