@@ -5,8 +5,7 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
-  TextInput
+  ScrollView
 } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
@@ -15,7 +14,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
 } from "react-native-responsive-screen";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import RadioButton from "../components/RadioButton";
 
 export default function CommunicationModeModalContents(props) {

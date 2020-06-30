@@ -34,21 +34,24 @@ import {
   downloadMShare,
   ErrorReceiving,
 } from '../../store/actions/sss';
-import QRCode from 'react-native-qrcode-svg';
 import Toast from '../../components/Toast';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
+import QRCode from 'react-native-qrcode-svg';
+
 
 export default function RestoreWalletBySecondaryDevice(props) {
   const [secondaryQR, setSecondaryQR] = useState('');
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  const isErrorReceivingFailed = useSelector(
+    (state) => state.sss.errorReceiving,
+  );
   const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
@@ -58,12 +61,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
 
   REQUEST_DETAILS && !secondaryQR
     ? setSecondaryQR(
-        JSON.stringify({
-          ...REQUEST_DETAILS,
-          requester: WALLET_SETUP.walletName,
-          type: 'recoveryQR',
-        }),
-      )
+      JSON.stringify({
+        ...REQUEST_DETAILS,
+        requester: WALLET_SETUP.walletName,
+        type: 'recoveryQR',
+        ver: DeviceInfo.getVersion(),
+      }),
+    )
     : null;
   secondaryQR ? console.log(secondaryQR) : null;
   // REQUEST_DETAILS ? Alert.alert('OTP', REQUEST_DETAILS.OTP) : null;
@@ -79,13 +83,13 @@ export default function RestoreWalletBySecondaryDevice(props) {
   }, []);
 
   if (META_SHARE) {
-    Toast('Downloaded');
+    Toast('Received');
   }
   if (isErrorReceivingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
@@ -147,11 +151,11 @@ export default function RestoreWalletBySecondaryDevice(props) {
           <View style={{ flex: 2 }}>
             <HeaderTitle
               isKnowMoreButton={true}
-              onPressKnowMore={() => {}}
+              onPressKnowMore={() => { }}
               firstLineTitle={'Restore wallet using'}
-              secondLineTitle={'Secondary Device'}
+              secondLineTitle={'Keeper Device'}
               infoTextNormal={
-                'Use the Recover Secret stored in your secondary device. '
+                'Use the Recovery Key stored in your Keeper device. '
               }
               infoTextBold={'you will need to have the other device with you'}
             />
@@ -162,8 +166,8 @@ export default function RestoreWalletBySecondaryDevice(props) {
             {!secondaryQR ? (
               <ActivityIndicator size="large" />
             ) : (
-              <QRCode value={secondaryQR} size={hp('27%')} />
-            )}
+                <QRCode value={secondaryQR} size={hp('27%')} />
+              )}
             {/* {deepLink ? <CopyThisText text={deepLink} /> : null} */}
           </View>
 
@@ -179,11 +183,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
               <TouchableOpacity
                 onPress={() => {
                   dispatch(
-                    downloadMShare(
-                      REQUEST_DETAILS.OTP,
-                      REQUEST_DETAILS.ENCRYPTED_KEY,
-                      'recovery',
-                    ),
+                    downloadMShare(REQUEST_DETAILS.KEY, null, 'recovery'),
                   );
                 }}
                 disabled={!!META_SHARE}
@@ -212,8 +212,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
                 onPress={() =>
                   dispatch(
                     downloadMShare(
-                      REQUEST_DETAILS.OTP,
-                      REQUEST_DETAILS.ENCRYPTED_KEY,
+                      REQUEST_DETAILS.KEY,
                       'recovery',
                     ),
                   )
@@ -232,7 +231,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={ErrorBottomSheet}
+          ref={ErrorBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()

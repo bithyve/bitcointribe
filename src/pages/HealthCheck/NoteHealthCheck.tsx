@@ -38,22 +38,22 @@ const NoteHealthCheck = props => {
     const [ConfirmBottomSheet, setConfirmBottomSheet] = useState(React.createRef());
 	const [pageData, setPageData] = useState([
 		{
-			id: 1, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+			id: 1, title: "Recovery Key Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
 		},
 		{
-			id: 2, title: "Recovery Secret Received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
+			id: 2, title: "Recovery Key Received", date: "1 June ‘19, 9:00am", info: "consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet"
 		},
 		{
-			id: 3, title: "Recovery Secret In-Transit", date: "30 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+			id: 3, title: "Recovery Key In-Transit", date: "30 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
 		},
 		{
-			id: 4, title: "Recovery Secret Accessible", date: "24 May ‘19, 5:00pm", info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet"
+			id: 4, title: "Recovery Key Accessible", date: "24 May ‘19, 5:00pm", info: "Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet"
 		},
 		{
-			id: 5, title: "Recovery Secret In-Transit", date: "20 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+			id: 5, title: "Recovery Key In-Transit", date: "20 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
 		},
 		{
-			id: 6, title: "Recovery Secret Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
+			id: 6, title: "Recovery Key Not Accessible", date: "19 May ‘19, 11:00am", info: "Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit"
 		}
 	]);
 	const { loading } = useSelector(state => state.sss);
@@ -71,10 +71,10 @@ const NoteHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ChangeBottomSheet}
-                title={'Change your\nTrusted Contact'}
-                info={'Having problems with your Trusted Contact'}
+                title={'Change your\nKeeper'}
+                info={'Having problems with your Keeper'}
                 note={
-                    'You can change the Trusted Contact you selected to share your Recovery Secret'
+                    'You can change the Keeper you selected to send your Recovery Key'
                 }
                 proceedButtonText={'Change'}
                 cancelButtonText={'Back'}
@@ -104,10 +104,10 @@ const NoteHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ReshareBottomSheet}
-                title={'Reshare Recovery Secret\nwith Trusted Contact'}
-                info={'Did your contact not receive the Recovery Secret?'}
+                title={'Reshare Recovery Key\nwith Keeper'}
+                info={'Did your Keeper not receive the Recovery Key?'}
                 note={
-                    'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms'
+                    'You can reshare the Recovery Key with your Keeper'
                 }
                 proceedButtonText={'Reshare'}
                 cancelButtonText={'Back'}
@@ -137,10 +137,10 @@ const NoteHealthCheck = props => {
         return (
             <ErrorModalContents
                 modalRef={ConfirmBottomSheet}
-                title={'Confirm Recovery Secret\nwith Trusted Contact'}
-                info={'Your Trusted Contact seems away from their Hexa App'}
+                title={'Confirm Recovery Key\nwith Keeper'}
+                info={'Your Keeper seems away from their Hexa App'}
                 note={
-                    'You can send them a reminder to open their app to\nensure they have your Recovery Secret'
+                    'You can send them a reminder to open their app to\nensure they have your Recovery Key'
                 }
                 proceedButtonText={'Confirm'}
                 cancelButtonText={'Back'}
@@ -196,7 +196,7 @@ const NoteHealthCheck = props => {
 					if (SelectedOption == value.id) {
 						return <TouchableOpacity onPress={() => SelectOption(value.id)} style={{ margin: wp('3%'), backgroundColor: Colors.white, borderRadius: 10, height: wp('20%'), width: wp('90%'), justifyContent: 'center', paddingLeft: wp('3%'), paddingRight: wp('3%'), alignSelf: 'center' }}>
 							<Text style={{ color: Colors.blue, fontSize: RFValue(13), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
-							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text>
+							{/* <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit</Text> */}
 							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.3%') }}>{value.date}</Text>
 						</TouchableOpacity>
 					}
@@ -205,15 +205,15 @@ const NoteHealthCheck = props => {
 							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular }}>{value.title}</Text>
 							<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(9), fontFamily: Fonts.FiraSansRegular, marginLeft: 'auto' }}>{value.date}</Text>
 						</View>
-						<Text style={{ color: Colors.textColorGrey, fontSize: RFValue(8), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>dolor sit</Text></Text>
+						{/* <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(8), fontFamily: Fonts.FiraSansRegular, marginTop: hp('0.5%') }}>Lorem ipsum dolor Lorem dolor sit amet, consectetur <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>dolor sit</Text></Text> */}
 					</TouchableOpacity>
 				})}
 			</ScrollView>
 			{SelectedOption ?
 				<View style={{ justifyContent: 'center', alignItems: 'center', height: hp('25%'), backgroundColor: Colors.white }}>
-					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Reshare</Text></Text>
+					{/* <Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>consectetur Lorem ipsum dolor sit amet, consectetur sit <Text onPress={() => { ReshareBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Reshare</Text></Text> */}
 
-					<Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Change Source</Text></Text>
+					{/* <Text style={{ marginTop: hp('1%'), marginBottom: hp('1%'), color: Colors.textColorGrey, fontSize: RFValue(10), fontFamily: Fonts.FiraSansRegular, }}>Lorem ipsum dolor sit amet, consectetur sit amet <Text onPress={() => { ChangeBottomSheet.current.snapTo(1) }} style={{ color: Colors.blue, textDecorationLine: "underline" }}>Change Source</Text></Text> */}
 
 					<TouchableOpacity onPress={()=>{ConfirmBottomSheet.current.snapTo(1)}} style={{ backgroundColor: Colors.blue, height: wp('13%'), width: wp('40%'), justifyContent: 'center', alignItems: 'center', borderRadius: 10, marginTop: hp('3%'), marginBottom: hp('3%') }}><Text style={{ color: Colors.white, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMedium, }}>Confirm</Text></TouchableOpacity>
 				</View> : null

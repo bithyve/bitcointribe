@@ -10,3 +10,16 @@ export const UsNumberFormat = ( amount, decimalCount = 0, decimal = ".", thousan
         console.log( e )
     }
 };  
+
+export const timeConvert = (valueInMinutes) => {
+    var num = valueInMinutes;
+    var hours = Math.round(num / 60);
+    var days = Math.round(hours / 24);
+    if (valueInMinutes < 60) {
+        return valueInMinutes + ' minutes';
+    } else if (hours < 24) {
+        return hours + ' hours';
+    } else if (days > 0) {
+        return days == 1 ? days + ' day' : days + ' days';
+    }
+}

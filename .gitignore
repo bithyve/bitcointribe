@@ -61,4 +61,6 @@ buck-out/
 
 # environment variables
 #
-.env
+.env*
+env*
+!.env.example

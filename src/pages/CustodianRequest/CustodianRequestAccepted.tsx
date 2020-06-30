@@ -33,10 +33,10 @@ export default function CustodianRequestAccepted(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            Secret Accepted{'\n'}Successfully
+            Recovery Key Accepted{'\n'}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-            Secret Successfully Accepted{'\n'}You are now a guardian for
+            Recovery Key Accepted Successfully{'\n'}You are now a Keeper for
           </Text>
         </View>
         <View style={styles.box}>
@@ -56,8 +56,8 @@ export default function CustodianRequestAccepted(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              Associate the secret with a contact to better manage the{'\n'}
-              secrets you are guardian for
+              Associate the Key with a contact to better manage the{'\n'}
+              secrets you are Keeper for
             </Text>
           </View>
         </View>

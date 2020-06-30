@@ -21,6 +21,8 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import config from '../bitcoin/HexaConfig';
+import { isCompatible } from './Home';
 
 export default function Launch(props) {
   const dispatch = useDispatch();
@@ -69,8 +71,8 @@ export default function Launch(props) {
             if (!url) props.navigation.replace('Login');
             else {
               const splits = url.split('/');
-              const requester = splits[4];
               if (splits[5] === 'sss') {
+                const requester = splits[4];
                 if (splits[6] === 'ek') {
                   const custodyRequest = {
                     requester,
@@ -82,6 +84,58 @@ export default function Launch(props) {
                   const recoveryRequest = { requester, rk: splits[7] };
                   props.navigation.replace('Login', { recoveryRequest });
                 }
+              } else if (
+                splits[4] === 'tc' ||
+                splits[4] === 'tcg' ||
+                splits[4] === 'ptc'
+              ) {
+                if (splits[3] !== config.APP_STAGE) {
+                  Alert.alert(
+                    'Invalid deeplink',
+                    `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+                      splits[3]
+                    }`,
+                  );
+                } else {
+                  const version = splits.pop().slice(1);
+                  if (version) {
+                    if (!(await isCompatible(splits[4], version))) return;
+                  }
+
+                  const trustedContactRequest = {
+                    isGuardian: splits[4] === 'tcg' ? true : false,
+                    isPaymentRequest: splits[4] === 'ptc' ? true : false,
+                    requester: splits[5],
+                    encryptedKey: splits[6],
+                    hintType: splits[7],
+                    hint: splits[8],
+                    uploadedAt: splits[9],
+                  };
+                  props.navigation.replace('Login', {
+                    trustedContactRequest,
+                  });
+                }
+              } else if (splits[4] === 'rk') {
+                const recoveryRequest = {
+                  isRecovery: true,
+                  requester: splits[5],
+                  encryptedKey: splits[6],
+                  hintType: splits[7],
+                  hint: splits[8],
+                };
+                props.navigation.replace('Login', { recoveryRequest });
+              } else if (splits[4] === 'rrk') {
+                Alert.alert(
+                  'Restoration link Identified',
+                  'Restoration links only works during restoration mode',
+                );
+              } else if (url.includes('fastbitcoins')) {
+                const userKey = url.substr(url.lastIndexOf('/') + 1);
+                props.navigation.navigate('Login', { userKey });
+              } else {
+                const EmailToken = url.substr(url.lastIndexOf('/') + 1);
+                console.log('EmailToken', EmailToken);
+                props.navigation.navigate('SignUpDetails', { EmailToken });
               }
             }
           else props.navigation.replace('PasscodeConfirm');
@@ -113,7 +167,7 @@ export default function Launch(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),

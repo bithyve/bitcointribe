@@ -4,7 +4,6 @@ import {
   Text,
   View,
   SafeAreaView,
-  Alert,
   TouchableOpacity,
   StatusBar,
   Dimensions,
@@ -37,12 +36,17 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  FAST_BITCOINS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import {
   fetchBalance,
   fetchTransactions,
   getTestcoins,
   fetchBalanceTx,
+  fetchDerivativeAccXpub,
+  fetchDerivativeAccBalTx,
+  fetchDerivativeAccAddress,
 } from '../../store/actions/accounts';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
@@ -50,12 +54,25 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
 import moment from 'moment';
-import axios from 'axios';
-
+import config from '../../bitcoin/HexaConfig';
 import { UsNumberFormat } from '../../common/utilities';
 import TransactionDetails from './TransactionDetails';
+import {
+  TrustedContactDerivativeAccount,
+  Transactions,
+} from '../../bitcoin/utilities/Interface';
+import TransactionHelperModalContents from '../../components/Helper/TransactionHelperModalContents';
+import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getCurrencyImageName } from '../../common/CommonFunctions/index';
+import CheckingAccountHelpContents from '../../components/Helper/CheckingAccountHelpContents';
+import deviceInfoModule from 'react-native-device-info';
+import SavingsAccountHelpContents from '../../components/Helper/SavingsAccountHelpContents';
+import Loader from '../../components/loader';
+
 
 export default function Accounts(props) {
+  const [FBTCAccount, setFBTCAccount] = useState({});
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [serviceType, setServiceType] = useState(
     props.navigation.state.params
@@ -95,18 +112,21 @@ export default function Accounts(props) {
       accountInfo: 'Learn Bitcoin',
       backgroundImage: require('../../assets/images/carouselImages/test_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_test_white.png'),
+      type: TEST_ACCOUNT,
     },
     {
       accountType: 'Checking Account',
       accountInfo: 'Fast and easy',
       backgroundImage: require('../../assets/images/carouselImages/regular_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_regular_account.png'),
+      type: REGULAR_ACCOUNT,
     },
     {
       accountType: 'Savings Account',
       accountInfo: 'Multi-factor security',
       backgroundImage: require('../../assets/images/carouselImages/savings_account_background.png'),
       accountTypeImage: require('../../assets/images/icons/icon_secureaccount_white.png'),
+      type: SECURE_ACCOUNT,
     },
   ]);
 
@@ -128,19 +148,24 @@ export default function Accounts(props) {
   const [isSecureAccountHelperDone, setIsSecureAccountHelperDone] = useState(
     true,
   );
-  const service = useSelector(state => state.accounts[serviceType].service);
-  const loader = useSelector(
-    state => state.accounts[serviceType].loading.balanceTx,
+  const service = useSelector((state) => state.accounts[serviceType].service);
+  const balanceTxLoading = useSelector(
+    (state) => state.accounts[serviceType].loading.balanceTx,
   );
+  const derivativeBalanceTxLoading = useSelector(
+    (state) => state.accounts[serviceType].loading.derivativeBalanceTx,
+  );
+
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   const [netBalance, setNetBalance] = useState(
     wallet.balances.balance + wallet.balances.unconfirmedBalance,
   );
-  const [transactions, setTransactions] = useState(wallet.transactions);
+  const [transactionLoading, setTransactionLoading] = useState(true);
+  const [transactions, setTransactions] = useState([]);
   const [averageTxFees, setAverageTxFees] = useState();
 
-  const accounts = useSelector(state => state.accounts);
+  const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
   const [transactionItem, setTransactionItem] = useState({});
   const [
@@ -148,6 +173,29 @@ export default function Accounts(props) {
     setTransactionDetailsHelperBottomSheet,
   ] = useState(React.createRef());
   const [isHelperDone, setIsHelperDone] = useState(true);
+  const [showLoader, setShowLoader] = useState(true)
+  const currencyCode = [
+    'BRL',
+    'CNY',
+    'JPY',
+    'GBP',
+    'KRW',
+    'RUB',
+    'TRY',
+    'INR',
+    'EUR',
+  ];
+
+  function setCurrencyCodeToImage(currencyName, currencyColor) {
+    return (
+      <MaterialCommunityIcons
+        name={currencyName}
+        color={currencyColor == 'light' ? Colors.white : Colors.blue}
+        size={wp('3.5%')}
+      />
+    );
+  }
+
   const checkNHighlight = async () => {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
@@ -176,7 +224,7 @@ export default function Accounts(props) {
 
       setTimeout(() => {
         if (TestAccountHelperBottomSheet.current) {
-          TestAccountHelperBottomSheet.current.snapTo(1);
+          (TestAccountHelperBottomSheet.current as any).snapTo(1);
         }
       }, 1000);
     } else {
@@ -187,14 +235,9 @@ export default function Accounts(props) {
   };
 
   useEffect(() => {
+    checkFastBitcoin();
     if (wallet.transactions.transactionDetails.length) {
-      wallet.transactions.transactionDetails.sort(function(left, right) {
-        console.log(
-          'moment.utc(right.date),moment.utc(left.date)',
-          moment.utc(right.date).unix(),
-          moment.utc(left.date).unix(),
-          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
-        );
+      wallet.transactions.transactionDetails.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
@@ -204,29 +247,56 @@ export default function Accounts(props) {
       setIs_initiated(true);
     });
 
-    setTimeout(() => {
-      if (carousel.current) {
-        if (props.navigation.state.params) {
-          carousel.current.snapToItem(
-            props.navigation.getParam('index'),
-            true,
-            true,
-          );
-        } else {
-          carousel.current.snapToItem(1, true, true);
-        }
-      }
-    }, 2000);
-
     getServiceType(serviceType);
   }, []);
+
+  const checkFastBitcoin = async () => {
+    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    //console.log('getFBTCAccount', getFBTCAccount);
+    setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+  };
+  // useEffect(() => {
+  //   const accountNumber = 0;
+  //   const { derivativeAccounts } =
+  //     serviceType === SECURE_ACCOUNT
+  //       ? service.secureHDWallet
+  //       : service.hdWallet;
+
+  //   if (!derivativeAccounts[FAST_BITCOINS][accountNumber])
+  //     dispatch(fetchDerivativeAccAddress(serviceType, FAST_BITCOINS));
+  //   else {
+  //     console.log({
+  //       FBAddress:
+  //         derivativeAccounts[FAST_BITCOINS][accountNumber].receivingAddress,
+  //     });
+  //   }
+  // }, [service]);
+
+  // useEffect(() => {
+  //   if (serviceType === REGULAR_ACCOUNT || SECURE_ACCOUNT) {
+  //     const derivativeAccountType = 'FAST_BITCOINS';
+  //     const accountNumber = 0;
+  //     const { derivativeAccounts } =
+  //       serviceType === REGULAR_ACCOUNT
+  //         ? service.hdWallet
+  //         : service.secureHDWallet;
+  //     //console.log({
+  //       balances:
+  //         derivativeAccounts[derivativeAccountType][accountNumber].balances,
+  //       transactions:
+  //         derivativeAccounts[derivativeAccountType][accountNumber].transactions,
+  //     });
+  //     if (derivativeAccounts[derivativeAccountType][accountNumber].xpub)
+  //       dispatch(fetchDerivativeAccBalTx(serviceType, derivativeAccountType));
+  //   }
+  // }, []);
 
   useEffect(() => {
     (async () => {
       const storedAverageTxFees = JSON.parse(
         await AsyncStorage.getItem('storedAverageTxFees'),
       );
-      console.log({ storedAverageTxFees });
+      //console.log({ storedAverageTxFees });
       if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
         const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
         if (Date.now() - lastFetched < 1800000) {
@@ -271,16 +341,48 @@ export default function Accounts(props) {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
 
-  const getServiceType = useCallback(
-    serviceType => {
-      if (!serviceType) return;
-      //setTimeout(() => {
-      setServiceType(serviceType);
-      //}, 10);
-      if (serviceType == TEST_ACCOUNT) checkNHighlight();
-    },
-    [serviceType],
-  );
+  const getServiceType = (serviceType) => {
+    if (!serviceType) return;
+    setServiceType(serviceType);
+    //console.log('Service type', serviceType);
+    setTimeout(() => {
+      if (carousel.current) {
+        if (serviceType == TEST_ACCOUNT) {
+          (carousel.current as any).snapToItem(0, true, true);
+        } else if (serviceType == REGULAR_ACCOUNT) {
+          (carousel.current as any).snapToItem(1, true, true);
+        } else if (serviceType == SECURE_ACCOUNT) {
+          (carousel.current as any).snapToItem(2, true, true);
+        }
+      }
+    }, 2000);
+
+    if (serviceType == TEST_ACCOUNT) checkNHighlight();
+  };
+  function isEmpty(obj) {
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+  }
+  const renderFBTC = (FBTCAccount, accountType) => {
+    //console.log('FBTCAccount, renderFBTC', isEmpty(FBTCAccount), accountType);
+    if (accountType) {
+      if (accountType == 'Test Account')
+        return (
+          FBTCAccount.test_account.voucher.length &&
+          FBTCAccount.test_account.voucher[0].hasOwnProperty('quotes')
+        );
+      else if (accountType == 'Checking Account')
+        return (
+          FBTCAccount.checking_account.voucher.length &&
+          FBTCAccount.checking_account.voucher[0].hasOwnProperty('quotes')
+        );
+      else if (accountType == 'Savings Account')
+        return (
+          FBTCAccount.saving_account.length &&
+          FBTCAccount.saving_account.voucher[0].hasOwnProperty('quotes')
+        );
+    }
+    return false;
+  };
 
   const renderItem = ({ item, index }) => {
     return (
@@ -300,10 +402,10 @@ export default function Accounts(props) {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -360,13 +462,15 @@ export default function Accounts(props) {
                   //console.log('item.accountType', item.accountType);
                   if (item.accountType == 'Test Account') {
                     if (TestAccountHelperBottomSheet.current)
-                      TestAccountHelperBottomSheet.current.snapTo(1);
+                      (TestAccountHelperBottomSheet as any).current.snapTo(1);
                   } else if (item.accountType == 'Savings Account') {
                     if (SecureAccountHelperBottomSheet.current)
-                      SecureAccountHelperBottomSheet.current.snapTo(1);
+                      (SecureAccountHelperBottomSheet as any).current.snapTo(1);
                   } else if (item.accountType == 'Checking Account') {
                     if (RegularAccountHelperBottomSheet.current)
-                      RegularAccountHelperBottomSheet.current.snapTo(1);
+                      (RegularAccountHelperBottomSheet as any).current.snapTo(
+                        1,
+                      );
                   }
                 }}
               >
@@ -384,70 +488,117 @@ export default function Accounts(props) {
               source={require('../../assets/images/icons/icon_settings.png')}
             />
           </View>
-          {item.accountType == 'Savings Account' && (
-            <TouchableOpacity
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onPress={() => {
-                props.navigation.navigate('SecureScan', {
-                  serviceType,
-                  getServiceType: getServiceType,
-                });
-              }}
-            >
-              <Text
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'row',
+              marginLeft: 'auto',
+            }}
+          >
+            {!isEmpty(FBTCAccount) ? (
+              renderFBTC(FBTCAccount, item.accountType) ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.white,
+                    borderRadius: 15,
+                    padding: 5,
+                  }}
+                >
+                  <Image
+                    style={{
+                      marginLeft: 'auto',
+                      width: wp('3%'),
+                      height: wp('3%'),
+                      resizeMode: 'contain',
+                      padding: 5,
+                    }}
+                    source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+                  />
+                </View>
+              ) : null
+            ) : null}
+            {item.accountType == 'Savings Account' && (
+              <TouchableOpacity
                 style={{
-                  paddingLeft: 10,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  marginLeft: 'auto',
-                  fontFamily: Fonts.FiraSansMedium,
-                  fontSize: RFValue(15),
-                  color: Colors.white,
-                  alignSelf: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
                 onPress={() => {
-                  props.navigation.navigate('TwoFASetup', {
-                    twoFASetup: service.secureHDWallet.twoFASetup,
+                  props.navigation.navigate('SecureScan', {
+                    serviceType,
+                    getServiceType: getServiceType,
                   });
                 }}
               >
-                2FA
-              </Text>
-            </TouchableOpacity>
-          )}
+                <Text
+                  style={{
+                    paddingLeft: 10,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    marginLeft: 'auto',
+                    fontFamily: Fonts.FiraSansMedium,
+                    fontSize: RFValue(15),
+                    color: Colors.white,
+                    alignSelf: 'center',
+                  }}
+                  onPress={() => {
+                    props.navigation.navigate('TwoFASetup', {
+                      twoFASetup: service.secureHDWallet.twoFASetup,
+                    });
+                  }}
+                >
+                  2FA
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <View style={{ flexDirection: 'row' }}>
             {item.accountType == 'Test Account' || switchOn ? (
               <Image
                 style={styles.cardBitCoinImage}
                 source={require('../../assets/images/icons/icon_bitcoin_light.png')}
               />
+            ) : currencyCode.includes(CurrencyCode) ? (
+              <View
+                style={{
+                  marginRight: 5,
+                  marginTop: 'auto',
+                  marginLeft: 'auto',
+                  marginBottom: wp('1.2%'),
+                }}
+              >
+                {setCurrencyCodeToImage(
+                  getCurrencyImageName(CurrencyCode),
+                  'light',
+                )}
+              </View>
             ) : (
-              <Image
-                style={styles.cardBitCoinImage}
-                source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-              />
-            )}
+                  <Image
+                    style={styles.cardBitCoinImage}
+                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                  />
+                )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(netBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
-                : exchangeRates
-                ? (
-                    (netBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
+                  ? UsNumberFormat(netBalance)
+                  : exchangeRates
+                    ? (
+                      (netBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                    : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : switchOn
-                ? 'sats'
-                : CurrencyCode.toLocaleLowerCase()}
+                  ? 'sats'
+                  : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -489,308 +640,320 @@ export default function Accounts(props) {
   };
 
   const renderTransactionsContent = () => {
-    return transactions.transactionDetails.length ? (
-      <View style={styles.modalContentContainer}>
-        <View style={{ marginLeft: 20, marginTop: 20 }}>
-          <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <View style={{ height: 'auto' }}>
-            <FlatList
-              data={transactions.transactionDetails}
-              ItemSeparatorComponent={() => (
-                <View style={{ backgroundColor: Colors.white }}>
-                  <View style={styles.separatorView} />
-                </View>
-              )}
-              renderItem={({ item }) => {
-                return (
-                  <AppBottomSheetTouchableWrapper
-                    onPress={
-                      () => {
-                        (TransactionDetailsBottomSheet as any).current.snapTo(
-                          1,
-                        );
-                        checkNShowHelperModal();
-                        setTimeout(() => {
-                          setTransactionItem(item);
-                        }, 10);
-                      }
-                      // props.navigation.navigate('TransactionDetails', {
-                      //   item,
-                      //   serviceType,
-                      //   getServiceType: getServiceType,
-                      // })
-                    }
-                    style={{
-                      ...styles.transactionModalElementView,
-                      backgroundColor: Colors.white,
-                    }}
-                  >
-                    <View style={styles.modalElementInfoView}>
-                      <View style={{ justifyContent: 'center' }}>
-                        <FontAwesome
-                          name={
-                            item.transactionType == 'Received'
-                              ? 'long-arrow-down'
-                              : 'long-arrow-up'
-                          }
-                          size={15}
-                          color={
-                            item.transactionType == 'Received'
-                              ? Colors.green
-                              : Colors.red
-                          }
-                        />
-                      </View>
+    if (transactionLoading) {
+      return (
+        <View style={styles.modalContentContainer}>
+          <View
+            style={{
+              flex: 1,
+            }}
+          >
+            <View style={{ marginLeft: 20, marginTop: 20 }}>
+              <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+            </View>
+            {[1, 2, 3, 4, 5].map((value) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingTop: wp('5%'),
+                    paddingBottom: wp('5%'),
+                    borderBottomWidth: 0.5,
+                    borderColor: Colors.borderColor,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('5%'),
+                        borderRadius: wp('5%') / 2,
+                        marginLeft: 10,
+                        marginRight: 10,
+                      }}
+                    />
+                    <View>
                       <View
-                        style={{ justifyContent: 'center', marginLeft: 10 }}
-                      >
-                        <Text style={styles.transactionModalTitleText}>
-                          {item.accountType}{' '}
-                        </Text>
-                        <Text style={styles.transactionModalDateText}>
-                          {moment(item.date)
-                            .utc()
-                            .format('DD MMMM YYYY')}{' '}
-                          {/* <Entypo
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('5%'),
+                          width: wp('25%'),
+                          borderRadius: 10,
+                        }}
+                      />
+                      <View
+                        style={{
+                          backgroundColor: Colors.backgroundColor,
+                          height: wp('5%'),
+                          width: wp('35%'),
+                          marginTop: 5,
+                          borderRadius: 10,
+                        }}
+                      />
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('7%'),
+                        width: wp('20%'),
+                        borderRadius: 10,
+                      }}
+                    />
+                    <View
+                      style={{
+                        backgroundColor: Colors.backgroundColor,
+                        height: wp('5%'),
+                        width: wp('5%'),
+                        borderRadius: wp('5%') / 2,
+                        marginLeft: 10,
+                        marginRight: 10,
+                      }}
+                    />
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+      );
+    } else {
+      return transactions.length ? (
+        <View style={styles.modalContentContainer}>
+          <View style={{ marginLeft: 20, marginTop: 20 }}>
+            <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View style={{ height: 'auto' }}>
+              <FlatList
+                data={transactions}
+                ItemSeparatorComponent={() => (
+                  <View style={{ backgroundColor: Colors.white }}>
+                    <View style={styles.separatorView} />
+                  </View>
+                )}
+                renderItem={({ item }) => {
+                  return (
+                    <AppBottomSheetTouchableWrapper
+                      onPress={
+                        () => {
+                          (TransactionDetailsBottomSheet as any).current.snapTo(
+                            1,
+                          );
+                          checkNShowHelperModal();
+                          setTimeout(() => {
+                            setTransactionItem(item);
+                          }, 10);
+                        }
+                        // props.navigation.navigate('TransactionDetails', {
+                        //   item,
+                        //   serviceType,
+                        //   getServiceType: getServiceType,
+                        // })
+                      }
+                      style={{
+                        ...styles.transactionModalElementView,
+                        backgroundColor: Colors.white,
+                      }}
+                    >
+                      <View style={styles.modalElementInfoView}>
+                        <View style={{ justifyContent: 'center' }}>
+                          <FontAwesome
+                            name={
+                              item.transactionType == 'Received'
+                                ? 'long-arrow-down'
+                                : 'long-arrow-up'
+                            }
+                            size={15}
+                            color={
+                              item.transactionType == 'Received'
+                                ? Colors.green
+                                : Colors.red
+                            }
+                          />
+                        </View>
+                        <View
+                          style={{ justifyContent: 'center', marginLeft: 10 }}
+                        >
+                          <Text style={styles.transactionModalTitleText}>
+                            {item.accountType}{' '}
+                          </Text>
+                          <Text style={styles.transactionModalDateText}>
+                            {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
+                            {/* <Entypo
                       size={10}
                       name={"dot-single"}
                       color={Colors.textColorGrey}
                     />
                     {item.time} */}
-                        </Text>
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                    <View style={styles.transactionModalAmountView}>
-                      <Image
-                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                        style={{
-                          width: 12,
-                          height: 12,
-                          resizeMode: 'contain',
-                          alignSelf: 'center',
-                        }}
-                      />
-                      <View
-                        style={{
-                          marginLeft: 5,
-                          alignSelf: 'center',
-                          marginRight: 5,
-                          flexDirection: 'row',
-                        }}
-                      >
-                        <Text
+                      <View style={styles.transactionModalAmountView}>
+                        <Image
+                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                           style={{
-                            ...styles.transactionModalAmountText,
-                            color:
-                              item.transactionType == 'Received'
-                                ? Colors.green
-                                : Colors.red,
+                            width: 12,
+                            height: 12,
+                            resizeMode: 'contain',
                             alignSelf: 'center',
                           }}
+                        />
+                        <View
+                          style={{
+                            marginLeft: 5,
+                            alignSelf: 'center',
+                            marginRight: 5,
+                            flexDirection: 'row',
+                          }}
                         >
-                          {/* {switchOn
+                          <Text
+                            style={{
+                              ...styles.transactionModalAmountText,
+                              color:
+                                item.transactionType == 'Received'
+                                  ? Colors.green
+                                  : Colors.red,
+                              alignSelf: 'center',
+                            }}
+                          >
+                            {/* {switchOn
                       ? item.amount
                       : (
                           (item.amount / 1e8) *
                           exchangeRates[CurrencyCode].last
                         ).toFixed(2)} */}
-                          {/* {item.amount} */}
-                          {item.accountType == 'Test Account'
-                            ? UsNumberFormat(item.amount)
-                            : switchOn
-                            ? UsNumberFormat(item.amount)
-                            : exchangeRates
-                            ? (
-                                (item.amount / 1e8) *
-                                exchangeRates[CurrencyCode].last
-                              ).toFixed(2)
-                            : null}
-                        </Text>
+                            {/* {item.amount} */}
+                            {item.accountType == 'Test Account'
+                              ? UsNumberFormat(item.amount)
+                              : switchOn
+                                ? UsNumberFormat(item.amount)
+                                : exchangeRates
+                                  ? (
+                                    (item.amount / 1e8) *
+                                    exchangeRates[CurrencyCode].last
+                                  ).toFixed(2)
+                                  : null}
+                          </Text>
+                          <Text
+                            style={{
+                              alignSelf: 'center',
+                              fontSize: RFValue(13),
+                              fontFamily: Fonts.OpenSans,
+                              color: Colors.textColorGrey,
+                              lineHeight: 19,
+                            }}
+                          >
+                            {item.accountType == 'Test Account'
+                              ? 't-sats'
+                              : switchOn
+                                ? 'sats'
+                                : CurrencyCode.toLocaleLowerCase()}
+                          </Text>
+                        </View>
                         <Text
                           style={{
+                            ...styles.transactionModalAmountUnitText,
                             alignSelf: 'center',
-                            fontSize: RFValue(13),
-                            fontFamily: Fonts.OpenSans,
-                            color: Colors.textColorGrey,
-                            lineHeight: 19,
                           }}
                         >
-                          {item.accountType == 'Test Account'
-                            ? 't-sats'
-                            : switchOn
-                            ? 'sats'
-                            : CurrencyCode.toLocaleLowerCase()}
+                          {item.confirmations < 6 ? item.confirmations : '6+'}
                         </Text>
+                        <Ionicons
+                          name="ios-arrow-forward"
+                          color={Colors.textColorGrey}
+                          size={12}
+                          style={{ marginLeft: 20, alignSelf: 'center' }}
+                        />
                       </View>
-                      <Text
-                        style={{
-                          ...styles.transactionModalAmountUnitText,
-                          alignSelf: 'center',
-                        }}
-                      >
-                        {item.confirmations < 6 ? item.confirmations : '6+'}
-                      </Text>
-                      <Ionicons
-                        name="ios-arrow-forward"
-                        color={Colors.textColorGrey}
-                        size={12}
-                        style={{ marginLeft: 20, alignSelf: 'center' }}
-                      />
-                    </View>
-                  </AppBottomSheetTouchableWrapper>
-                );
-              }}
-            />
-          </View>
-        </View>
-        {transactions.transactionDetails.length <= 1 ? (
-          <View style={{ backgroundColor: Colors.white }}>
-            <View
-              style={{
-                margin: 15,
-                backgroundColor: Colors.backgroundColor,
-                padding: 10,
-                paddingTop: 20,
-                paddingBottom: 20,
-                marginBottom:
-                  Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
-                borderRadius: 7,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.black,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
+                    </AppBottomSheetTouchableWrapper>
+                  );
                 }}
-              >
-                You don't have any transactions yet
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Start using your accounts to make transactions
-              </Text>
+              />
             </View>
           </View>
-        ) : null}
-      </View>
-    ) : (
-      <View style={styles.modalContentContainer}>
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          {[1, 2, 3, 4, 5].map(value => {
-            return (
+          {transactions.length <= 1 ? (
+            <View style={{ backgroundColor: Colors.white }}>
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingTop: wp('5%'),
-                  paddingBottom: wp('5%'),
-                  borderBottomWidth: 0.5,
-                  borderColor: Colors.borderColor,
+                  margin: 15,
+                  backgroundColor: Colors.backgroundColor,
+                  padding: 10,
+                  paddingTop: 20,
+                  paddingBottom: 20,
+                  marginBottom:
+                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                  borderRadius: 7,
                 }}
               >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                  <View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('25%'),
-                        borderRadius: 10,
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('35%'),
-                        marginTop: 5,
-                        borderRadius: 10,
-                      }}
-                    />
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('7%'),
-                      width: wp('20%'),
-                      borderRadius: 10,
-                    }}
-                  />
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                </View>
+                <Text
+                  style={{
+                    color: Colors.black,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  View your transactions
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  All recent transactions across your accounts appear here
+                </Text>
               </View>
-            );
-          })}
+            </View>
+          ) : null}
         </View>
-        <View style={{ backgroundColor: Colors.white }}>
-          <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
-              borderRadius: 7,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              You don't have any transactions yet
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              Start using your accounts to make transactions
-            </Text>
+      ) : (
+          <View style={styles.modalContentContainer}>
+            <View style={{ marginLeft: 20, marginTop: 20 }}>
+              <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
+            </View>
+            <View style={{ flex: 1 }}></View>
+            <View style={{ backgroundColor: Colors.white }}>
+              <View
+                style={{
+                  margin: 15,
+                  backgroundColor: Colors.backgroundColor,
+                  padding: 10,
+                  paddingTop: 20,
+                  paddingBottom: 20,
+                  marginBottom:
+                    Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 30 : 20,
+                  borderRadius: 7,
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.black,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  View your transactions
+              </Text>
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(12),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  All recent transactions across your accounts appear here
+              </Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-    );
+        );
+    }
   };
 
   const renderTransactionsHeader = () => {
@@ -833,17 +996,18 @@ export default function Accounts(props) {
 
   const renderTestAccountsHelperContents = () => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={`Test Account`}
-        image={require('../../assets/images/icons/icon_test_white.png')}
-        boldPara={``}
-        helperInfo={`If you are new to Bitcoin, this account is designed for you. It comes pre-loaded with some test bitcoins\n\nYou can even send and receive test bitcoins from other Hexa wallet test accounts`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (TestAccountHelperBottomSheet.current)
-            (TestAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Test Account`}
+      //   image={require('../../assets/images/icons/icon_test_white.png')}
+      //   boldPara={``}
+      //   helperInfo={`This account is designed for those who are new to Bitcoin, and for those who want to experiment with Bitcoin. It comes pre-loaded with test bitcoins that you can send to and receive from other Hexa test accounts`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (TestAccountHelperBottomSheet.current)
+      //       (TestAccountHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <TestAccountHelpContents />
     );
   };
   const renderTestAccountsHelperHeader = () => {
@@ -870,19 +1034,20 @@ export default function Accounts(props) {
 
   const renderSecureAccountsHelperContents = useCallback(() => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={'Savings Account'}
-        image={require('../../assets/images/icons/secure.png')}
-        boldPara={''}
-        helperInfo={
-          'The funds in this account are secured by two factor authentication which is set up on your secondary device\n\nUse this account to store most of your funds. Something you will not need on an ongoing basis'
-        }
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (SecureAccountHelperBottomSheet.current)
-            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={'Savings Account'}
+      //   image={require('../../assets/images/icons/secure.png')}
+      //   boldPara={''}
+      //   helperInfo={
+      //     'The funds in this account are secured by two factor authentication (2FA) which should be set up on the Keeper device\n\nUse this account to store funds that you will not require on a daily basis. Transactions from and to this account are costlier compared to the Checking Account'
+      //   }
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (SecureAccountHelperBottomSheet.current)
+      //       (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <SavingsAccountHelpContents />
     );
   }, []);
 
@@ -909,19 +1074,20 @@ export default function Accounts(props) {
 
   const renderRegularAccountsHelperContents = useCallback(() => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={'Checking Account'}
-        image={require('../../assets/images/icons/regular.png')}
-        boldPara={''}
-        helperInfo={
-          'These are the funds that you have easy access to for your transactional needs\n\nTransfers from this account are typically cheaper and faster'
-        }
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          if (RegularAccountHelperBottomSheet.current)
-            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={'Checking Account'}
+      //   image={require('../../assets/images/icons/regular.png')}
+      //   boldPara={''}
+      //   helperInfo={
+      //     'These are funds that you want to have easy access to for transactional needs\n\nTransfers from and to this account are typically cheap and fast'
+      //   }
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (RegularAccountHelperBottomSheet.current)
+      //       (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <CheckingAccountHelpContents />
     );
   }, []);
 
@@ -936,7 +1102,7 @@ export default function Accounts(props) {
       }, 10);
 
       setTimeout(() => {
-        TransactionDetailsHelperBottomSheet.current.snapTo(1);
+        (TransactionDetailsHelperBottomSheet.current as any).snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -953,7 +1119,7 @@ export default function Accounts(props) {
         getServiceType={getServiceType}
         onPressKnowMore={() => {
           AsyncStorage.setItem('isTransactionHelperDone', 'true');
-          TransactionDetailsHelperBottomSheet.current.snapTo(1);
+          (TransactionDetailsHelperBottomSheet.current as any).snapTo(1);
         }}
       />
     );
@@ -974,14 +1140,15 @@ export default function Accounts(props) {
 
   const renderHelperContents = () => {
     return (
-      <TestAccountHelperModalContents
-        topButtonText={`Transaction Details`}
-        helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
-        continueButtonText={'Ok, got it'}
-        onPressContinue={() => {
-          (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Transaction Details`}
+      //   helperInfo={`This is where you can see the details of your transaction\n\nThe number of confirmations tells you the surety of your transaction. Generally 3-6 confirmations is considered secure depending on the amount sent`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <TransactionHelperModalContents />
     );
   };
   const renderHelperHeader = () => {
@@ -990,7 +1157,7 @@ export default function Accounts(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log('isHelperDone', isHelperDone);
+          //console.log('isHelperDone', isHelperDone);
           if (isHelperDone) {
             (TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
             setTimeout(() => {
@@ -1032,25 +1199,82 @@ export default function Accounts(props) {
         ? service.secureHDWallet
         : service.hdWallet;
     if (service) {
-      const currentBalance =
+      let currentBalance =
         wallet.balances.balance + wallet.balances.unconfirmedBalance;
-      if (netBalance !== currentBalance) {
-        setNetBalance(currentBalance);
+
+      let currentTransactions = wallet.transactions.transactionDetails;
+
+      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+          let derivativeAccount;
+
+          if (serviceType === REGULAR_ACCOUNT) {
+            derivativeAccount =
+              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+                dAccountType
+              ];
+          } else if (serviceType === SECURE_ACCOUNT) {
+            derivativeAccount =
+              accounts[SECURE_ACCOUNT].service.secureHDWallet
+                .derivativeAccounts[dAccountType];
+          }
+
+          if (
+            serviceType === SECURE_ACCOUNT &&
+            dAccountType === TRUSTED_CONTACTS
+          ) {
+            continue;
+          }
+
+          if (derivativeAccount.instance.using) {
+            for (
+              let accountNumber = 1;
+              accountNumber <= derivativeAccount.instance.using;
+              accountNumber++
+            ) {
+              // console.log({
+              //   accountNumber,
+              //   balances: trustedAccounts[accountNumber].balances,
+              //   transactions: trustedAccounts[accountNumber].transactions,
+              // });
+              if (derivativeAccount[accountNumber].balances) {
+                currentBalance +=
+                  derivativeAccount[accountNumber].balances.balance +
+                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
+              }
+
+              if (derivativeAccount[accountNumber].transactions) {
+                derivativeAccount[
+                  accountNumber
+                ].transactions.transactionDetails.forEach((tx) => {
+                  let include = true;
+                  for (const currentTx of currentTransactions) {
+                    if (tx.txid === currentTx.txid) {
+                      include = false;
+                      break;
+                    }
+                  }
+                  if (include) currentTransactions.push(tx);
+                });
+              }
+            }
+          }
+        }
       }
-      if (transactions !== wallet.transactions) {
-        wallet.transactions.transactionDetails.sort(function(left, right) {
-          console.log(
-            'moment.utc(right.date),moment.utc(left.date)',
-            moment.utc(right.date).unix(),
-            moment.utc(left.date).unix(),
-            moment.utc(right.date).unix() - moment.utc(left.date).unix(),
-          );
-          return moment.utc(right.date).unix() - moment.utc(left.date).unix();
-        });
-        setTransactions(wallet.transactions);
-      }
+
+      currentTransactions.sort(function (left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setNetBalance(currentBalance);
+      setTransactions(currentTransactions);
     }
   }, [service]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setTransactionLoading(false);
+    }, 1000);
+  }, [transactions]);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -1060,7 +1284,7 @@ export default function Accounts(props) {
     //   // dispatch(fetchTransactions(serviceType));
     // }
     if (serviceType === SECURE_ACCOUNT) {
-      AsyncStorage.getItem('isSecureAccountHelperDone').then(done => {
+      AsyncStorage.getItem('isSecureAccountHelperDone').then((done) => {
         if (!done) {
           AsyncStorage.setItem('isSecureAccountHelperDone', 'true');
           setTimeout(() => {
@@ -1068,7 +1292,7 @@ export default function Accounts(props) {
           }, 10);
           setTimeout(() => {
             if (SecureAccountHelperBottomSheet.current) {
-              SecureAccountHelperBottomSheet.current.snapTo(1);
+              (SecureAccountHelperBottomSheet.current as any).snapTo(1);
             }
           }, 1000);
         } else {
@@ -1079,7 +1303,7 @@ export default function Accounts(props) {
       });
     }
     if (serviceType === REGULAR_ACCOUNT) {
-      AsyncStorage.getItem('isRegularAccountHelperDone').then(done => {
+      AsyncStorage.getItem('isRegularAccountHelperDone').then((done) => {
         if (!done) {
           AsyncStorage.setItem('isRegularAccountHelperDone', 'true');
           setTimeout(() => {
@@ -1097,8 +1321,23 @@ export default function Accounts(props) {
         }
       });
     }
-    //console.log('IN useEffect1');
   }, [serviceType]);
+
+
+  useEffect(() => {
+    if (showLoader) {
+      // after all interactions are done , loader need to be removed
+      InteractionManager.runAfterInteractions(() => {
+        setShowLoader(false)
+        return
+      })
+
+      // we need to force remove loader if interaction manager did not response in 3 secs
+      InteractionManager.setDeadline(3)
+    } else {
+      return
+    }
+  })
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -1138,7 +1377,7 @@ export default function Accounts(props) {
         </Text>
         <TouchableOpacity
           style={{ height: 54, justifyContent: 'center' }}
-          onPress={() => {}}
+          onPress={() => { }}
         >
           <View
             style={{
@@ -1150,8 +1389,22 @@ export default function Accounts(props) {
               currencyCodeValue={CurrencyCode}
               activeOnImage={require('../../assets/images/icons/icon_bitcoin_light.png')}
               inactiveOnImage={require('../../assets/images/icons/icon_bitcoin_dark.png')}
-              activeOffImage={getCurrencyImageByRegion(CurrencyCode, 'light')}
-              inactiveOffImage={getCurrencyImageByRegion(CurrencyCode, 'dark')}
+              activeOffImage={
+                currencyCode.includes(CurrencyCode)
+                  ? setCurrencyCodeToImage(
+                    getCurrencyImageName(CurrencyCode),
+                    'light',
+                  )
+                  : getCurrencyImageByRegion(CurrencyCode, 'light')
+              }
+              inactiveOffImage={
+                currencyCode.includes(CurrencyCode)
+                  ? setCurrencyCodeToImage(
+                    getCurrencyImageName(CurrencyCode),
+                    'dark',
+                  )
+                  : getCurrencyImageByRegion(CurrencyCode, 'dark')
+              }
               toggleColor={Colors.lightBlue}
               toggleCircleColor={Colors.blue}
               onpress={async () => {
@@ -1172,12 +1425,17 @@ export default function Accounts(props) {
             }}
             refreshControl={
               <RefreshControl
-                refreshing={loader}
+                refreshing={balanceTxLoading || derivativeBalanceTxLoading}
                 onRefresh={() => {
                   // dispatch(fetchTransactions(serviceType));
                   dispatch(
                     fetchBalanceTx(serviceType, {
                       loader: true,
+                      syncTrustedDerivative:
+                        serviceType === REGULAR_ACCOUNT ||
+                        serviceType === SECURE_ACCOUNT
+                          ? true
+                          : false,
                     }),
                   );
                 }}
@@ -1189,22 +1447,25 @@ export default function Accounts(props) {
                 ref={carousel}
                 data={carouselData}
                 firstItem={carouselInitIndex}
-                onBeforeSnapToItem={index => {
+                onBeforeSnapToItem={(index) => {
+                  console.log('onBeforeSnapToItem', index);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
                     ? getServiceType(REGULAR_ACCOUNT)
                     : getServiceType(SECURE_ACCOUNT);
-                  handleIndexChange(index);
+                  setTimeout(() => {
+                    setCarouselInitIndex(index);
+                  }, 1000);
                 }}
                 renderItem={renderItem}
                 sliderWidth={sliderWidth}
                 itemWidth={sliderWidth * 0.95}
-                onSnapToItem={index => {
+                onSnapToItem={(index) => {
                   //console.log('INDEX', index, carouselInitIndex);
                   setTimeout(() => {
                     setCarouselInitIndex(index);
-                  }, 2000);
+                  }, 1000);
                 }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}
@@ -1216,11 +1477,11 @@ export default function Accounts(props) {
             <TouchableWithoutFeedback
               onPress={() => {
                 if (TestAccountHelperBottomSheet.current)
-                  TestAccountHelperBottomSheet.current.snapTo(0);
+                  (TestAccountHelperBottomSheet.current as any).snapTo(0);
                 if (RegularAccountHelperBottomSheet.current)
-                  RegularAccountHelperBottomSheet.current.snapTo(0);
+                  (RegularAccountHelperBottomSheet.current as any).snapTo(0);
                 if (SecureAccountHelperBottomSheet.current)
-                  SecureAccountHelperBottomSheet.current.snapTo(0);
+                  (SecureAccountHelperBottomSheet.current as any).snapTo(0);
               }}
             >
               <View>
@@ -1262,7 +1523,7 @@ export default function Accounts(props) {
                 </View>
                 <View>
                   <FlatList
-                    data={transactions.transactionDetails.slice(0, 3)}
+                    data={transactions.slice(0, 3)}
                     ItemSeparatorComponent={() => (
                       <View style={{ backgroundColor: Colors.backgroundColor }}>
                         <View style={styles.separatorView} />
@@ -1329,45 +1590,45 @@ export default function Accounts(props) {
                               </View>
                             </View>
                           ) : (
-                            <View style={styles.modalElementInfoView}>
-                              <View style={{ justifyContent: 'center' }}>
-                                <FontAwesome
-                                  name={
-                                    item.transactionType == 'Received'
-                                      ? 'long-arrow-down'
-                                      : 'long-arrow-up'
-                                  }
-                                  size={15}
-                                  color={
-                                    item.transactionType == 'Received'
-                                      ? Colors.green
-                                      : Colors.red
-                                  }
-                                />
-                              </View>
-                              <View
-                                style={{
-                                  justifyContent: 'center',
-                                  marginLeft: 10,
-                                }}
-                              >
-                                <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
-                                </Text>
-                                <Text style={styles.transactionModalDateText}>
-                                  {moment(item.date)
-                                    .utc()
-                                    .format('DD MMMM YYYY')}{' '}
-                                  {/* <Entypo
+                              <View style={styles.modalElementInfoView}>
+                                <View style={{ justifyContent: 'center' }}>
+                                  <FontAwesome
+                                    name={
+                                      item.transactionType == 'Received'
+                                        ? 'long-arrow-down'
+                                        : 'long-arrow-up'
+                                    }
+                                    size={15}
+                                    color={
+                                      item.transactionType == 'Received'
+                                        ? Colors.green
+                                        : Colors.red
+                                    }
+                                  />
+                                </View>
+                                <View
+                                  style={{
+                                    justifyContent: 'center',
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  <Text style={styles.transactionModalTitleText}>
+                                    {item.accountType}{' '}
+                                  </Text>
+                                  <Text style={styles.transactionModalDateText}>
+                                    {moment(item.date)
+                                      .utc()
+                                      .format('DD MMMM YYYY')}{' '}
+                                    {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                  {/* {item.time} */}
-                                </Text>
+                                    {/* {item.time} */}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
+                            )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1399,13 +1660,13 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                  ? UsNumberFormat(item.amount)
-                                  : exchangeRates
-                                  ? (
-                                      (item.amount / 1e8) *
-                                      exchangeRates[CurrencyCode].last
-                                    ).toFixed(2)
-                                  : null}
+                                    ? UsNumberFormat(item.amount)
+                                    : exchangeRates
+                                      ? (
+                                        (item.amount / 1e8) *
+                                        exchangeRates[CurrencyCode].last
+                                      ).toFixed(2)
+                                      : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1421,8 +1682,8 @@ export default function Accounts(props) {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                  ? 'sats'
-                                  : CurrencyCode.toLocaleLowerCase()}
+                                    ? 'sats'
+                                    : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1450,20 +1711,20 @@ export default function Accounts(props) {
                                 />
                               </View>
                             ) : (
-                              <View
-                                style={{
-                                  padding: 10,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Ionicons
-                                  name="ios-arrow-forward"
-                                  color={Colors.textColorGrey}
-                                  size={12}
-                                />
-                              </View>
-                            )}
+                                <View
+                                  style={{
+                                    padding: 10,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <Ionicons
+                                    name="ios-arrow-forward"
+                                    color={Colors.textColorGrey}
+                                    size={12}
+                                  />
+                                </View>
+                              )}
                           </View>
                         </TouchableOpacity>
                       );
@@ -1475,11 +1736,11 @@ export default function Accounts(props) {
             <TouchableWithoutFeedback
               onPress={() => {
                 if (TestAccountHelperBottomSheet.current)
-                  TestAccountHelperBottomSheet.current.snapTo(0);
+                  (TestAccountHelperBottomSheet.current as any).snapTo(0);
                 if (RegularAccountHelperBottomSheet.current)
-                  RegularAccountHelperBottomSheet.current.snapTo(0);
+                  (RegularAccountHelperBottomSheet.current as any).snapTo(0);
                 if (SecureAccountHelperBottomSheet.current)
-                  SecureAccountHelperBottomSheet.current.snapTo(0);
+                  (SecureAccountHelperBottomSheet.current as any).snapTo(0);
               }}
             >
               <View style={{ marginTop: hp('2%') }}>
@@ -1525,9 +1786,10 @@ export default function Accounts(props) {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      props.navigation.navigate('ReceivingAddress', {
+                      props.navigation.navigate('Receive', {
                         serviceType,
                         getServiceType: getServiceType,
+                        netBalance,
                       });
                     }}
                     style={styles.bottomCardView}
@@ -1635,10 +1897,13 @@ export default function Accounts(props) {
               </View>
             </TouchableWithoutFeedback>
           </ScrollView>
+          {
+            showLoader ? <Loader /> : null
+          }
 
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={bottomSheet}
+            ref={bottomSheet as any}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1667,13 +1932,15 @@ export default function Accounts(props) {
               // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
             }}
             enabledInnerScrolling={true}
-            ref={TestAccountHelperBottomSheet}
+            ref={TestAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+                ? hp('87%')
+                : hp('89%'),
+              // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              //   ? hp('35%')
+              //   : hp('40%'),
               //Platform.OS == 'android' ? hp('50%') : hp('90%'),
             ]}
             renderContent={renderTestAccountsHelperContents}
@@ -1681,33 +1948,31 @@ export default function Accounts(props) {
           />
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={SecureAccountHelperBottomSheet}
+            ref={SecureAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+                ? hp('87%')
+                : hp('89%'),
             ]}
             renderContent={renderSecureAccountsHelperContents}
             renderHeader={renderSecureAccountsHelperHeader}
           />
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={RegularAccountHelperBottomSheet}
+            ref={RegularAccountHelperBottomSheet as any}
             snapPoints={[
               -50,
-
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+                ? hp('87%')
+                : hp('89%'),
             ]}
             renderContent={renderRegularAccountsHelperContents}
             renderHeader={renderRegularAccountsHelperHeader}
           />
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={TransactionDetailsBottomSheet}
+            ref={TransactionDetailsBottomSheet as any}
             snapPoints={[
               -50,
               Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1720,25 +1985,26 @@ export default function Accounts(props) {
 
           <BottomSheet
             enabledInnerScrolling={true}
-            ref={TransactionDetailsHelperBottomSheet}
+            ref={TransactionDetailsHelperBottomSheet as any}
             snapPoints={[
               -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp('35%')
-                : hp('40%'),
+              Platform.OS == 'ios' && deviceInfoModule.hasNotch() ? hp('87%') : hp('89%'),
+              // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              //   ? hp('35%')
+              //   : hp('40%'),
             ]}
             renderContent={renderHelperContents}
             renderHeader={renderHelperHeader}
           />
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={{
-            backgroundColor: Colors.backgroundColor,
-          }}
-          refreshControl={<RefreshControl refreshing={!is_initiated} />}
-        />
-      )}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={<RefreshControl refreshing={!is_initiated} />}
+          />
+        )}
     </View>
   );
   //  } else {

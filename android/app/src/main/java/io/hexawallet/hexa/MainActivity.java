@@ -1,5 +1,7 @@
 package io.hexawallet.hexa;
-
+import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
@@ -24,5 +26,14 @@ public class MainActivity extends ReactActivity {
                 return new RNGestureHandlerEnabledRootView(MainActivity.this);
             }
         };
+    }
+
+    // prevent tapjacking
+    // https://stackoverflow.com/questions/51818363/how-to-solve-tapjacking-vulnerability-in-reactnative-app
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        View v = findViewById(android.R.id.content);
+        v.setFilterTouchesWhenObscured(true);
     }
 }

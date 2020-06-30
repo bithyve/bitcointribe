@@ -19,114 +19,112 @@ import { getIconByStatus } from './utils';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { generatePDF } from '../../store/actions/sss';
+import { generatePersonalCopies } from '../../store/actions/sss';
 
-const Cloud = props => {
-  const [ selectedStatus, setSelectedStatus ] = useState( 'Ugly' ); // for preserving health of this entity
-  const [ cloudData, setCloudData ] = useState( [
+const Cloud = (props) => {
+  const [selectedStatus, setSelectedStatus] = useState('Ugly'); // for preserving health of this entity
+  const [cloudData, setCloudData] = useState([
     {
       title: 'iCloud Drive',
       info: 'Store backup in iCloud Drive',
-      imageIcon: require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ),
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
     {
       title: 'Google Drive',
       info: 'Store backup in Google Drive',
-      imageIcon: require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ),
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
     {
       title: 'One Drive',
       info: 'Store backup in One Drive',
-      imageIcon: require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ),
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
     {
       title: 'DropBox Storage',
       info: 'Store backup in Dropbox Storage',
-      imageIcon: require( '../../assets/images/icons/logo_brand_brands_logos_icloud.png' ),
+      imageIcon: require('../../assets/images/icons/logo_brand_brands_logos_icloud.png'),
     },
-  ] );
+  ]);
 
-  const dispatch = useDispatch();
-  const { loading } = useSelector( state => state.sss );
+  // const dispatch = useDispatch();
+  // const { loading } = useSelector((state) => state.sss);
 
-  console.log( { loading } );
-
-  useEffect( () => {
-    dispatch( generatePDF( 4 ) );
-  }, [] );
+  // useEffect(() => {
+  //   dispatch(generatePersonalCopies());
+  // }, []);
 
   return (
-    <SafeAreaView style={ { flex: 1 } }>
-      <StatusBar backgroundColor={ Colors.white } barStyle="dark-content" />
-      <View style={ BackupStyles.headerContainer }>
+    <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={BackupStyles.headerContainer}>
         <TouchableOpacity
-          style={ BackupStyles.headerLeftIconContainer }
-          onPress={ () => {
+          style={BackupStyles.headerLeftIconContainer}
+          onPress={() => {
             props.navigation.goBack();
-          } }
+          }}
         >
-          <View style={ BackupStyles.headerLeftIconInnerContainer }>
-            <FontAwesome name="long-arrow-left" color={ Colors.blue } size={ 17 } />
+          <View style={BackupStyles.headerLeftIconInnerContainer}>
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </View>
         </TouchableOpacity>
       </View>
-      <View style={ BackupStyles.modalHeaderTitleView }>
-        <View style={ { marginTop: hp( '1%' ) } }>
-          <Text style={ BackupStyles.modalHeaderTitleText }>Cloud</Text>
-          <Text style={ BackupStyles.modalHeaderInfoText }>Never backed up</Text>
+      <View style={BackupStyles.modalHeaderTitleView}>
+        <View style={{ marginTop: hp('1%') }}>
+          <Text style={BackupStyles.modalHeaderTitleText}>Cloud</Text>
+          <Text style={BackupStyles.modalHeaderInfoText}>Never backed up</Text>
         </View>
         <Image
-          style={ BackupStyles.cardIconImage }
-          source={ getIconByStatus( selectedStatus ) }
+          style={BackupStyles.cardIconImage}
+          source={getIconByStatus(selectedStatus)}
         />
       </View>
 
-      <View style={ { flex: 1 } }>
+      <View style={{ flex: 1 }}>
         <Text
-          style={ {
+          style={{
             marginLeft: 30,
             color: Colors.textColorGrey,
             fontFamily: Fonts.FiraSansRegular,
-            fontSize: RFValue( 12 ),
+            fontSize: RFValue(12),
             marginTop: 5,
             marginBottom: 5,
-          } }
+          }}
         >
-          Select cloud drive to{ ' ' }
+          Select cloud drive to{' '}
           <Text
-            style={ {
+            style={{
               fontFamily: Fonts.FiraSansMediumItalic,
               fontWeight: 'bold',
-            } }
+            }}
           >
-            store recovery secret
+            store recovery key
           </Text>
         </Text>
-        <View style={ { flex: 1 } }>
+        <View style={{ flex: 1 }}>
           <FlatList
-            data={ cloudData }
-            renderItem={ ( { item, index } ) => (
-              <View style={ styles.listElements }>
+            data={cloudData}
+            renderItem={({ item, index }) => (
+              <View style={styles.listElements}>
                 <Image
-                  style={ styles.listElementsIconImage }
-                  source={ item.imageIcon }
+                  style={styles.listElementsIconImage}
+                  source={item.imageIcon}
                 />
-                <View style={ { justifyContent: 'space-between', flex: 1 } }>
-                  <Text style={ styles.listElementsTitle }>{ item.title }</Text>
-                  <Text style={ styles.listElementsInfo } numberOfLines={ 1 }>
-                    { item.info }
+                <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                  <Text style={styles.listElementsTitle}>{item.title}</Text>
+                  <Text style={styles.listElementsInfo} numberOfLines={1}>
+                    {item.info}
                   </Text>
                 </View>
-                <View style={ styles.listElementIcon }>
+                <View style={styles.listElementIcon}>
                   <Ionicons
                     name="ios-arrow-forward"
-                    color={ Colors.textColorGrey }
-                    size={ 15 }
-                    style={ { alignSelf: 'center' } }
+                    color={Colors.textColorGrey}
+                    size={15}
+                    style={{ alignSelf: 'center' }}
                   />
                 </View>
               </View>
-            ) }
+            )}
           />
         </View>
       </View>
@@ -134,7 +132,7 @@ const Cloud = props => {
   );
 };
 
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   listElements: {
     flexDirection: 'row',
     marginLeft: 20,
@@ -148,13 +146,13 @@ const styles = StyleSheet.create( {
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue(11),
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,
@@ -171,6 +169,6 @@ const styles = StyleSheet.create( {
     height: 25,
     alignSelf: 'center',
   },
-} );
+});
 
 export default Cloud;

@@ -28,10 +28,13 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function TransactionDetails(props) {
   const txDetails = props.item;
+  if (!txDetails) {
+    return null;
+  }
   const getServiceType = props.getServiceType ? props.getServiceType : null;
   const serviceType = props.serviceType ? props.serviceType : null;
   const [description, setDescription] = useState('');
@@ -52,39 +55,74 @@ export default function TransactionDetails(props) {
     })();
   }, [txDetails]);
 
+  const getImageByAccountType = (accountType) => {
+    if (accountType == 'FAST_BITCOINS') {
+      return (
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: Colors.borderColor,
+            borderWidth: 0.5,
+            borderRadius: wp('12%') / 2,
+            width: wp('12%'),
+            height: wp('12%'),
+            backgroundColor: Colors.white,
+          }}
+        >
+          <Image
+            source={require('../../assets/images/icons/fastbitcoin_dark.png')}
+            style={{
+              width: wp('8%'),
+              height: wp('8%'),
+              resizeMode: 'contain',
+            }}
+          />
+        </View>
+      );
+    } else if (
+      accountType == 'Savings Account' ||
+      accountType == 'Test Account' ||
+      accountType == 'Checking Account'
+    ) {
+      return (
+        <View>
+          <Image
+            source={
+              accountType == 'Savings Account'
+                ? require('../../assets/images/icons/icon_secureaccount.png')
+                : accountType == 'Test Account'
+                ? require('../../assets/images/icons/icon_test.png')
+                : require('../../assets/images/icons/icon_regular.png')
+            }
+            style={{ width: wp('12%'), height: wp('12%') }}
+          />
+        </View>
+      );
+    }
+  };
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-          {/* <TouchableOpacity
-                onPress={() => {
-                  if (getServiceType && serviceType) {
-                    getServiceType(serviceType);
-                  }
-                  props.navigation.goBack();
-                }}
-                style={{ height: 30, width: 30, justifyContent: 'center' }}
-              >
-                <FontAwesome
-                  name="long-arrow-left"
-                  color={Colors.blue}
-                  size={17}
-                />
-              </TouchableOpacity> */}
+        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={styles.modalHeaderTitleText}>
             {'Transaction Details'}
           </Text>
           {serviceType && serviceType == TEST_ACCOUNT ? (
-            <AppBottomSheetTouchableWrapper style={{marginLeft: 'auto',}}onPress={() => props.onPressKnowMore()}>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                marginLeft: 'auto',
-              }}
+            <AppBottomSheetTouchableWrapper
+              style={{ marginLeft: 'auto', marginRight: wp('2%') }}
+              onPress={() => props.onPressKnowMore()}
             >
-              Know more
-            </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  marginLeft: 'auto',
+                }}
+              >
+                Know more
+              </Text>
             </AppBottomSheetTouchableWrapper>
           ) : null}
         </View>
@@ -99,12 +137,7 @@ export default function TransactionDetails(props) {
           paddingBottom: hp('2%'),
         }}
       >
-        <View>
-          <Image
-            source={require('../../assets/images/icons/icon_regular.png')}
-            style={{ width: wp('12%'), height: wp('12%') }}
-          />
-        </View>
+        {getImageByAccountType(txDetails.accountType)}
         <View
           style={{
             flex: 1,
@@ -131,9 +164,7 @@ export default function TransactionDetails(props) {
                 marginTop: hp('1%'),
               }}
             >
-              {moment(txDetails.date)
-                .utc()
-                .format('DD MMMM YYYY')}
+              {moment(txDetails.date).utc().format('DD MMMM YYYY')}
               {/* <Entypo
                 size={10}
                 name={"dot-single"}
@@ -283,7 +314,7 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(12),
               }}
             >
-              Description
+              Note
             </Text>
             <Text
               style={{

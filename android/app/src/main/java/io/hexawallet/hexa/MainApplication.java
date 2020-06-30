@@ -3,6 +3,9 @@ package io.hexawallet.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactcommunity.rnlocalize.RNLocalizePackage;
+import com.lugg.ReactNativeConfig.ReactNativeConfigPackage;
+import com.gantix.JailMonkey.JailMonkeyPackage;
 import com.rt2zz.reactnativecontacts.ReactNativeContacts;
 import com.chirag.RNMail.*;
 import com.christopherdro.RNPrint.RNPrintPackage;
@@ -15,7 +18,6 @@ import com.peel.react.TcpSocketsModule;
 import com.peel.react.rnos.RNOSModule;
 import com.reactnativecommunity.netinfo.NetInfoPackage;
 import com.horcrux.svg.SvgPackage;
-import com.christopherdro.htmltopdf.RNHTMLtoPDFPackage;
 import com.kishanjvaghela.cardview.RNCardViewPackage;
 import com.brentvatne.react.ReactVideoPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -45,6 +47,11 @@ import io.fabric.sdk.android.Fabric;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
 
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.analytics.RNFirebaseAnalyticsPackage;
+import io.invertase.firebase.messaging.RNFirebaseMessagingPackage;
+import io.invertase.firebase.notifications.RNFirebaseNotificationsPackage;
+
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
       new BasePackageList().getPackageList(), Arrays.<SingletonModule>asList());
@@ -62,10 +69,14 @@ public class MainApplication extends Application implements ShareApplication, Re
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(new MainReactPackage(), new ReactNativeContacts(), new RNMail(),
+      return Arrays.<ReactPackage>asList(new MainReactPackage(),
+            new RNLocalizePackage(),
+            new ReactNativeConfigPackage(),
+            new JailMonkeyPackage(), new RNFirebasePackage(), new RNFirebaseMessagingPackage(),new RNFirebaseAnalyticsPackage(),
+          new RNFirebaseNotificationsPackage(), new ReactNativeContacts(), new RNMail(),
           new RNPrintPackage(), new RNSharePackage(), new RNCameraPackage(), new VectorIconsPackage(),
           new UdpSocketsModule(), new TcpSocketsModule(), new RNOSModule(), new NetInfoPackage(), new SvgPackage(),
-          new RNHTMLtoPDFPackage(), new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
+          new RNCardViewPackage(), new ReactVideoPackage(), new RNDeviceInfo(),
           new RandomBytesPackage(), new ReanimatedPackage(), new RNGestureHandlerPackage(), new RNScreensPackage(),
           new PdfPasswordPackage(), new ModuleRegistryAdapter(mModuleRegistryProvider));
     }

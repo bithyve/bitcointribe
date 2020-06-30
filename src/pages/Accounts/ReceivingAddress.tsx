@@ -21,7 +21,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import QRCode from 'react-native-qrcode-svg';
 import CopyThisText from '../../components/CopyThisText';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -31,14 +30,19 @@ import {
 } from '../../common/constants/serviceTypes';
 import { fetchAddress } from '../../store/actions/accounts';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Entypo from "react-native-vector-icons/Entypo";
 import Colors from '../../common/Colors';
 import BottomSheet from 'reanimated-bottom-sheet';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import QRCode from 'react-native-qrcode-svg';
+
+
 
 const ReceivingAddress = props => {
+  const [AsTrustedContact, setAsTrustedContact] = useState(false);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
@@ -87,11 +91,11 @@ const ReceivingAddress = props => {
     checkNShowHelperModal();
     (async () => {
       if (serviceType === SECURE_ACCOUNT) {
-         if (!(await AsyncStorage.getItem('savingsWarning'))) {
-        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-        if (SecureReceiveWarningBottomSheet.current)
-          SecureReceiveWarningBottomSheet.current.snapTo(1);
-        await AsyncStorage.setItem('savingsWarning', 'true');
+        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+          // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+          if (SecureReceiveWarningBottomSheet.current)
+            SecureReceiveWarningBottomSheet.current.snapTo(1);
+          await AsyncStorage.setItem('savingsWarning', 'true');
         }
       }
     })();
@@ -99,10 +103,10 @@ const ReceivingAddress = props => {
   const renderReceiveHelperContents = useCallback(() => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={'Receiving Bitcoins'}
+        topButtonText={'Receiving bitcoin'}
         image={require('../../assets/images/icons/receive.png')}
         helperInfo={
-          'For receiving bitcoins, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoins or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoins/ sats from a “Trusted Contact”, the app does all this for you and you don’t need to send a new address every time'
+          'For receiving bitcoin, you need to give an address to the sender. Mostly in form of a QR code. This is pretty much like an email address but your app generates a new one for you every time you want to do a transaction\n\nThe sender will scan this address or copy a long sequence of letters and numbers to send you the bitcoin or sats (a very small fraction of a bitcoin)\n\nNote that if you want to receive bitcoin/ sats from  "Friends and Family”, the app does all this for you and you don’t need to send a new address every time'
         }
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
@@ -156,7 +160,7 @@ const ReceivingAddress = props => {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your secondary device), you'll require the 2FA token in order to send bitcoins from the savings account."
+                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
               }
             />
 
@@ -259,7 +263,7 @@ const ReceivingAddress = props => {
       <TouchableWithoutFeedback
         onPress={() => {
           if (ReceiveHelperBottomSheet.current)
-            ReceiveHelperBottomSheet.current.snapTo(0);
+            (ReceiveHelperBottomSheet.current as any).snapTo(0);
         }}
       >
         <View style={BackupStyles.modalContainer}>
@@ -290,7 +294,7 @@ const ReceivingAddress = props => {
                   onPress={() => {
                     AsyncStorage.setItem('isReceiveHelperDone', 'true');
                     if (ReceiveHelperBottomSheet.current)
-                      ReceiveHelperBottomSheet.current.snapTo(1);
+                      (ReceiveHelperBottomSheet.current as any).snapTo(1);
                   }}
                   style={{
                     color: Colors.textColorGrey,
@@ -303,16 +307,25 @@ const ReceivingAddress = props => {
               ) : null}
             </View>
           </View>
-          <View style={BackupStyles.modalContentView}>
+          <View style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", marginTop: 20 }}>
             {!receivingAddress ? (
               <View style={styles.loader}>
                 <ActivityIndicator size="large" />
               </View>
             ) : (
-              <QRCode value={receivingAddress} size={hp('27%')} />
-            )}
+                <QRCode value={receivingAddress} size={hp('27%')} />
+              )}
             {receivingAddress ? <CopyThisText text={receivingAddress} /> : null}
+            <TouchableOpacity activeOpacity={10} onPress={() => { setAsTrustedContact(!AsTrustedContact) }} style={{ flexDirection: 'row', borderRadius: 8, backgroundColor: Colors.backgroundColor, alignItems: 'center', marginLeft: 15, marginRight: 15, paddingLeft: 20, paddingRight: 15, marginTop: 30, width: wp('86%'), height: wp('13%') }}>
+              <Text style={{ color: Colors.textColorGrey, fontSize: RFValue(12), fontFamily: Fonts.FiraSansRegular }}>Add sender to Friends and Family</Text>
+              <View style={{ width: wp('7%'), height: wp('7%'), borderRadius: 7, backgroundColor: Colors.white, borderColor: Colors.borderColor, borderWidth: 1, marginLeft: 'auto', alignItems: 'center', justifyContent: 'center' }} >
+                {AsTrustedContact &&
+                  <Entypo name="check" size={RFValue(17)} color={Colors.green} />
+                }
+              </View>
+            </TouchableOpacity>
           </View>
+
           <View
             style={{
               marginBottom: hp('5%'),
@@ -321,7 +334,7 @@ const ReceivingAddress = props => {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                'The QR code is your bitcoin address. The payer will scan it to send bitcoins. Alternatively copy the address displayed below it and send it to the payer'
+                'The QR code is your bitcoin address. The payer will scan it to send bitcoin. Alternatively copy the address displayed below it and send it to the payer'
               }
             />
           </View>

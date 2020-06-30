@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Image,
@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  AsyncStorage,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -28,11 +29,26 @@ import {
 } from '../../store/actions/accounts';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import BottomSheet from 'reanimated-bottom-sheet';
+import ModalHeader from '../../components/ModalHeader';
+import SendConfirmationContent from './SendConfirmationContent';
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
+import moment from 'moment';
+import {
+  REGULAR_ACCOUNT,
+  SECURE_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
   const serviceType = props.navigation.getParam('serviceType');
   const recipientAddress = props.navigation.getParam('recipientAddress');
+  const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const { transfer, loading } = useSelector(
+    (state) => state.accounts[serviceType],
+  );
 
   function onPressNumber(text) {
     let tmpToken = token;
@@ -47,7 +63,7 @@ export default function TwoFAToken(props) {
     <SendStatusModalContents
       title1stLine={'Sent Successfully'}
       title2ndLine={''}
-      info1stLine={'Bitcoins successfully sent to'}
+      info1stLine={'bitcoin successfully sent to'}
       info2ndLine={''}
       userName={recipientAddress}
       // modalRef={SendSuccessBottomSheet}
@@ -58,6 +74,10 @@ export default function TwoFAToken(props) {
         dispatch(
           fetchBalanceTx(serviceType, {
             loader: true,
+            syncTrustedDerivative:
+              serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+                ? true
+                : false,
           }),
         );
         props.navigation.navigate('Accounts');
@@ -67,16 +87,104 @@ export default function TwoFAToken(props) {
     />
   );
 
-  const { transfer, loading, service } = useSelector(
-    state => state.accounts[serviceType],
-  );
+  const storeTrustedContactsHistory = async (details) => {
+    if (details && details.length > 0) {
+      let IMKeeperOfHistory = JSON.parse(
+        await AsyncStorage.getItem('IMKeeperOfHistory'),
+      );
+      let OtherTrustedContactsHistory = JSON.parse(
+        await AsyncStorage.getItem('OtherTrustedContactsHistory'),
+      );
+      for (let i = 0; i < details.length; i++) {
+        const element = details[i];
+        if (element.selectedContact.contactName) {
+          let obj = {
+            id: createRandomString(36),
+            title: 'Sent Amount',
+            date: moment(Date.now()).valueOf(),
+            info:"",
+              // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            selectedContactInfo: element,
+          };
+          if (element.selectedContact.isWard) {
+            if (!IMKeeperOfHistory) IMKeeperOfHistory = [];
+            IMKeeperOfHistory.push(obj);
+            await AsyncStorage.setItem(
+              'IMKeeperOfHistory',
+              JSON.stringify(IMKeeperOfHistory),
+            );
+          }
+          if (
+            !element.selectedContact.isWard &&
+            !element.selectedContact.isGuardian
+          ) {
+            if (!OtherTrustedContactsHistory) OtherTrustedContactsHistory = [];
+            OtherTrustedContactsHistory.push(obj);
+            await AsyncStorage.setItem(
+              'OtherTrustedContactsHistory',
+              JSON.stringify(OtherTrustedContactsHistory),
+            );
+          }
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!transfer.txid && transfer.stage3.failed) {
+      setTimeout(() => {
+        SendUnSuccessBottomSheet.current.snapTo(1);
+      }, 2);
+    }
+    if (transfer.txid) {
+      storeTrustedContactsHistory(transfer.details);
+    }
+  }, [transfer]);
+
+  const renderSendUnSuccessContents = () => {
+    return (
+      <SendConfirmationContent
+        title={'Sent Unsuccessful'}
+        info={'There seems to be a problem'}
+        userInfo={transfer.details}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={() => {
+          //dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+        onPressCancel={() => {
+          //dispatch(clearTransfer(serviceType));
+          dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+          props.navigation.navigate('Accounts');
+        }}
+        isUnSuccess={true}
+      />
+    );
+  };
+
+  const renderSendUnSuccessHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          //  dispatch(clearTransfer(serviceType));
+          if (SendUnSuccessBottomSheet.current)
+            SendUnSuccessBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  };
 
   if (transfer.txid) {
-    return renderSuccessStatusContents();
+    if (props.navigation.state.params.onTransactionSuccess)
+      props.navigation.state.params.onTransactionSuccess();
+    props.navigation.goBack();
   }
-
-  // Alert.alert('2FA Secret Key', service.secureHDWallet.twoFASetup.secret); // TODO: secret display and removal mech
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -116,7 +224,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput = input;
                 }}
                 style={[
@@ -124,11 +232,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput2.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
                   }
@@ -140,7 +248,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput2 = input;
                 }}
                 style={[
@@ -148,11 +256,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput3.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput.focus();
                   }
@@ -164,7 +272,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput3 = input;
                 }}
                 style={[
@@ -172,11 +280,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput4.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput2.focus();
                   }
@@ -188,7 +296,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput4 = input;
                 }}
                 style={[
@@ -196,11 +304,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput5.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput3.focus();
                   }
@@ -212,7 +320,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput5 = input;
                 }}
                 style={[
@@ -220,11 +328,11 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                   if (value) this.textInput6.focus();
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput4.focus();
                   }
@@ -235,7 +343,7 @@ export default function TwoFAToken(props) {
                 returnKeyType="done"
                 returnKeyLabel="Done"
                 keyboardType="number-pad"
-                ref={input => {
+                ref={(input) => {
                   this.textInput6 = input;
                 }}
                 style={[
@@ -243,10 +351,10 @@ export default function TwoFAToken(props) {
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   onPressNumber(value);
                 }}
-                onKeyPress={e => {
+                onKeyPress={(e) => {
                   if (e.nativeEvent.key === 'Backspace') {
                     this.textInput5.focus();
                   }
@@ -280,9 +388,33 @@ export default function TwoFAToken(props) {
                 <Text style={styles.confirmButtonText}>Confirm</Text>
               )}
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                props.navigation.navigate('ResetTwoFAHelp');
+              }}
+              style={{
+                width: wp('30%'),
+                height: wp('13%'),
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
+                marginLeft: 5,
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(13),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Need Help?
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
-        <View
+        {/* <View
           style={{
             alignItems: 'center',
             marginBottom: 200,
@@ -296,7 +428,17 @@ export default function TwoFAToken(props) {
           >
             <Text>I am having problems with my 2FA</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
+        <BottomSheet
+          onCloseStart={() => {
+            SendUnSuccessBottomSheet.current.snapTo(0);
+          }}
+          enabledInnerScrolling={true}
+          ref={SendUnSuccessBottomSheet}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={renderSendUnSuccessContents}
+          renderHeader={renderSendUnSuccessHeader}
+        />
       </View>
     </SafeAreaView>
   );
@@ -359,7 +501,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   otpRequestHeaderView: {
-    marginTop: hp('5%'),
+    marginTop: hp('2%'),
     marginBottom: hp('2%'),
   },
   modalTitleText: {

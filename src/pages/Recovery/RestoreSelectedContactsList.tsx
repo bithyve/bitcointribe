@@ -11,7 +11,7 @@ import {
   Platform,
   AsyncStorage,
   Alert,
-  RefreshControl
+  RefreshControl,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -56,8 +56,13 @@ import {
   fetchTransactions,
   syncAccounts,
   calculateExchangeRate,
+  startupSync,
 } from '../../store/actions/accounts';
 import axios from 'axios';
+import QrCodeModalContents from '../../components/QrCodeModalContents';
+import { MetaShare } from '../../bitcoin/utilities/Interface';
+import config from '../../bitcoin/HexaConfig';
+import Toast from '../../components/Toast';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
@@ -98,9 +103,11 @@ export default function RestoreSelectedContactsList(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isWalletRecoveryFailed = useSelector(
-    state => state.sss.walletRecoveryFailed,
+    (state) => state.sss.walletRecoveryFailed,
   );
-  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
+  const isErrorReceivingFailed = useSelector(
+    (state) => state.sss.errorReceiving,
+  );
   console.log('isWalletRecoveryFailed', isWalletRecoveryFailed);
   // function openCloseModal() {
   //   if (!walletName) {
@@ -121,18 +128,8 @@ export default function RestoreSelectedContactsList(props) {
   //   }
   // }
 
-  const getSelectedContactList = async () => {
-    let contactList = await AsyncStorage.getItem('selectedContacts');
-    if (contactList) {
-      setSelectedContacts(JSON.parse(contactList));
-    }
-    let documentList = await AsyncStorage.getItem('selectedDocuments');
-    if (documentList) {
-      setSelectedDocuments(JSON.parse(documentList));
-    }
-  };
   const [exchangeRates, setExchangeRates] = useState();
-  const accounts = useSelector(state => state.accounts);
+  const accounts = useSelector((state) => state.accounts);
 
   const dispatch = useDispatch();
 
@@ -143,6 +140,18 @@ export default function RestoreSelectedContactsList(props) {
     accumulativeBalance: 0,
   });
   const [transactions, setTransactions] = useState([]);
+
+  const { DECENTRALIZED_BACKUP, SERVICES, WALLET_SETUP } = useSelector(
+    (state) => state.storage.database,
+  );
+
+  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
+
+  const SD_META_SHARE = RECOVERY_SHARES[0]
+    ? RECOVERY_SHARES[0].META_SHARE
+    : null;
+
+  const [metaShares, setMetaShares] = useState([]);
 
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
@@ -215,7 +224,7 @@ export default function RestoreSelectedContactsList(props) {
     onPullDown();
     let focusListener = props.navigation.addListener('didFocus', () => {
       getSelectedContactList();
-      temp = setInterval(()=>{
+      temp = setInterval(() => {
         onPullDown();
       }, 30000);
     });
@@ -265,6 +274,17 @@ export default function RestoreSelectedContactsList(props) {
   //   );
   // }
 
+  const getSelectedContactList = async () => {
+    let contactList = await AsyncStorage.getItem('selectedContacts');
+    if (contactList) {
+      setSelectedContacts(JSON.parse(contactList));
+    }
+    let documentList = await AsyncStorage.getItem('selectedDocuments');
+    if (documentList) {
+      setSelectedDocuments(JSON.parse(documentList));
+    }
+  };
+
   const onPressRequest = async () => {
     let selectedContacts = JSON.parse(
       await AsyncStorage.getItem('selectedContacts'),
@@ -308,7 +328,7 @@ export default function RestoreSelectedContactsList(props) {
       <LoaderModal
         headerText={message}
         messageText={
-          'This may take some time while Hexa is using the Recovery Secrets to recreate your wallet'
+          'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
         }
       />
     );
@@ -345,10 +365,10 @@ export default function RestoreSelectedContactsList(props) {
   function renderRecoveryQuestionContent() {
     return (
       <RecoveryQuestionModalContents
-        onQuestionSelect={value => {
+        onQuestionSelect={(value) => {
           setDropdownBoxValue(value);
         }}
-        onTextChange={text => {
+        onTextChange={(text) => {
           setAnswer(text);
         }}
         onPressConfirm={() => submitRecoveryQuestion()}
@@ -391,7 +411,7 @@ export default function RestoreSelectedContactsList(props) {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
-        title={'Recovery Secret Request'}
+        title={'Recovery Key Request'}
         titleNextLine={'from Cloud unsuccessful'}
         info={'There seems to a problem'}
         note={'You can choose to try again or select a different source'}
@@ -458,38 +478,42 @@ export default function RestoreSelectedContactsList(props) {
   }
   if (isErrorReceivingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
+      setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
+        'There was an error while receiving your Recovery Key, please try again',
       );
     }, 2);
     (ErrorBottomSheet1 as any).current.snapTo(1);
     dispatch(ErrorReceiving(null));
   }
 
-  const { DECENTRALIZED_BACKUP, SERVICES } = useSelector(
-    state => state.storage.database,
+  useEffect(() => {
+    const shares: MetaShare[] = [];
+    Object.keys(RECOVERY_SHARES).forEach((key) => {
+      const META_SHARE: MetaShare = RECOVERY_SHARES[key].META_SHARE;
+      if (META_SHARE) {
+        let insert = true;
+        shares.forEach((share) => {
+          if (share.shareId === META_SHARE.shareId) insert = false;
+        }, []);
+
+        if (insert) shares.push(META_SHARE);
+      }
+    });
+    if (shares.length) setMetaShares(shares);
+  }, [RECOVERY_SHARES]);
+
+  useEffect(() => {
+    setSecondaryDeviceRS(SD_META_SHARE);
+  }, [SD_META_SHARE]);
+
+  const walletImageChecked: Boolean = useSelector(
+    (state) => state.sss.walletImageChecked,
   );
-
-  const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-
-  const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[0]
-    ? RECOVERY_SHARES[0]
-    : { REQUEST_DETAILS: null, META_SHARE: null };
-
-  const metaShares = [];
-  Object.keys(RECOVERY_SHARES).forEach(key => {
-    const { META_SHARE } = RECOVERY_SHARES[key];
-    if (META_SHARE) metaShares.push(META_SHARE);
-  });
-
-  useEffect(()=>{
-    setSecondaryDeviceRS(META_SHARE);
-  },[META_SHARE])
 
   useEffect(() => {
     (async () => {
-      if (SERVICES) {
+      if (SERVICES && walletImageChecked) {
         await AsyncStorage.setItem('walletExists', 'true');
         await AsyncStorage.setItem('walletRecovered', 'true');
         // props.navigation.navigate('Home');
@@ -511,10 +535,12 @@ export default function RestoreSelectedContactsList(props) {
         //   props.navigation.navigate('Home');
         // }, 4000);
 
-        dispatch(syncAccounts());
+        setTimeout(() => {
+          dispatch(startupSync()); // delaying as checkMSharesHealth is also a DB inserting saga
+        }, 2000);
       }
     })();
-  }, [SERVICES]);
+  }, [SERVICES, walletImageChecked]);
 
   if (accounts.accountsSynched) {
     (loaderBottomSheet as any).current.snapTo(0);
@@ -525,19 +551,73 @@ export default function RestoreSelectedContactsList(props) {
     });
   }
 
-  const downloadSecret = shareIndex => {
-    const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
+  const downloadSecret = useCallback(
+    (shareIndex?, key?) => {
+      if (shareIndex) {
+        const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
 
-    if (!META_SHARE) {
-      const { OTP, ENCRYPTED_KEY } = REQUEST_DETAILS;
-      console.log({ OTP, ENCRYPTED_KEY });
-      dispatch(downloadMShare(OTP, ENCRYPTED_KEY, 'recovery'));
-    } else {
-      Alert.alert('Received', 'Secret already Received');
+        if (!META_SHARE) {
+          const { KEY } = REQUEST_DETAILS;
+          console.log({ KEY });
+          dispatch(downloadMShare(KEY, null, 'recovery'));
+        } else {
+          Alert.alert(
+            'Key Exists',
+            'Following key already exists for recovery',
+          );
+        }
+      } else if (key) {
+        // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
+        dispatch(downloadMShare(key, null, 'recovery'));
+      }
+    },
+    [RECOVERY_SHARES],
+  );
+
+  const getQrCodeData = useCallback((qrData) => {
+    try {
+      const scannedData = JSON.parse(qrData);
+      switch (scannedData.type) {
+        case 'ReverseRecoveryQR':
+          const recoveryRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.UPLOADED_AT,
+            isQR: true,
+          };
+
+          // if (recoveryRequest.requester !== WALLET_SETUP.walletName) {
+          //   Alert.alert(
+          //     'Invalid share',
+          //     "Following share doesn't belong to your wallet",
+          //   );
+          //   return;
+          // }
+
+          if (
+            Date.now() - recoveryRequest.uploadedAt >
+            config.TC_REQUEST_EXPIRY
+          ) {
+            Alert.alert(
+              `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
+              `Please ask your Guardian to initiate a new ${
+                recoveryRequest.isQR ? 'QR' : 'Link'
+              }`,
+            );
+          }
+
+          downloadSecret(null, recoveryRequest.publicKey);
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Toast('Invalid QR');
     }
-  };
+  }, []);
 
-  const updateStatusOnShareDownloadForTrustedContact = async() =>{
+  const updateStatusOnShareDownloadForTrustedContact = async () => {
     let mod = false;
     selectedContacts.forEach((contact, index) => {
       if (RECOVERY_SHARES[index + 1]) {
@@ -562,10 +642,10 @@ export default function RestoreSelectedContactsList(props) {
       );
       getSelectedContactList();
     }
-  }
+  };
 
   useEffect(() => {
-    updateStatusOnShareDownloadForTrustedContact()
+    updateStatusOnShareDownloadForTrustedContact();
   }, [RECOVERY_SHARES, selectedContacts]);
 
   useEffect(() => {
@@ -592,7 +672,7 @@ export default function RestoreSelectedContactsList(props) {
     }
   }
 
-  const onScanCompleted = async shareCode => {
+  const onScanCompleted = async (shareCode) => {
     let selectedDocsTemp = JSON.parse(
       await AsyncStorage.getItem('selectedDocuments'),
     );
@@ -620,7 +700,7 @@ export default function RestoreSelectedContactsList(props) {
   function renderRestoreByCloudQrCodeContent() {
     return (
       <RestoreByCloudQrCodeContents
-        onScanCompleted={shareCode => onScanCompleted(shareCode)}
+        onScanCompleted={(shareCode) => onScanCompleted(shareCode)}
         modalRef={RestoreByCloudQrCodeContents}
         isOpenedFlag={QrBottomSheetsFlag}
         onPressBack={() => {
@@ -641,13 +721,13 @@ export default function RestoreSelectedContactsList(props) {
     );
   }
 
-  const onPullDown = async() =>{
-    if(META_SHARE){
-      setSecondaryDeviceRS(META_SHARE);
+  const onPullDown = async () => {
+    if (SD_META_SHARE) {
+      setSecondaryDeviceRS(SD_META_SHARE);
     }
     updateStatusOnShareDownloadForTrustedContact();
     setOnRefresh(false);
-  }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -678,9 +758,9 @@ export default function RestoreSelectedContactsList(props) {
       >
         <HeaderTitle
           firstLineTitle={'Restore wallet using'}
-          secondLineTitle={'Recovery Secrets'}
+          secondLineTitle={'Recovery Keys'}
           infoTextNormal={
-            'These are the Recovery Secrets that you have stored in five places. '
+            'These are the Recovery Keys that you have stored in five places. '
           }
           infoTextBold={'You need three of them restore your wallet'}
         />
@@ -688,7 +768,7 @@ export default function RestoreSelectedContactsList(props) {
           style={{
             ...styles.listElements,
             marginTop: 60,
-            marginBottom: META_SHARE ? 0 : 10,
+            marginBottom: SD_META_SHARE ? 0 : 10,
           }}
           onPress={() =>
             props.navigation.navigate('RestoreWalletBySecondaryDevice')
@@ -699,9 +779,9 @@ export default function RestoreSelectedContactsList(props) {
             source={require('../../assets/images/icons/icon_secondarydevice.png')}
           />
           <View style={styles.textInfoView}>
-            <Text style={styles.listElementsTitle}>Secondary Device (One)</Text>
+            <Text style={styles.listElementsTitle}>Keeper Device (One)</Text>
             <Text style={styles.listElementsInfo}>
-              You need your secondary device with you to scan the QR code
+              You need your Keeper device with you to scan the QR code
             </Text>
           </View>
           <View style={styles.listElementIcon}>
@@ -787,9 +867,7 @@ export default function RestoreSelectedContactsList(props) {
               source={require('../../assets/images/icons/icon_contact.png')}
             />
             <View style={styles.textInfoView}>
-              <Text style={styles.listElementsTitle}>
-                Trusted Contacts (Two)
-              </Text>
+              <Text style={styles.listElementsTitle}>Keepers (Two)</Text>
               <Text style={styles.listElementsInfo}>
                 Select one or two contacts with whom you have stored your
                 recover secret
@@ -858,7 +936,7 @@ export default function RestoreSelectedContactsList(props) {
                               color: Colors.darkGreen,
                             }}
                           >
-                            Secret Receieved
+                            Recovery Key Receieved
                           </Text>
                         </View>
                         <View
@@ -890,7 +968,7 @@ export default function RestoreSelectedContactsList(props) {
                               color: Colors.blue,
                             }}
                           >
-                            Secret In-Transit
+                            Recovery Key In-Transit
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -982,7 +1060,7 @@ export default function RestoreSelectedContactsList(props) {
               </Text>
               <Text style={styles.listElementsInfo}>
                 Select one or two of the sources where you have kept the
-                Recovery Secret
+                Recovery Key
               </Text>
             </View>
             <View style={styles.listElementIcon}>
@@ -996,7 +1074,7 @@ export default function RestoreSelectedContactsList(props) {
           </View>
           {selectedDocuments.length > 0 && (
             <View style={{}}>
-              {selectedDocuments.map(value => {
+              {selectedDocuments.map((value) => {
                 if (value) {
                   return (
                     <TouchableOpacity
@@ -1030,7 +1108,7 @@ export default function RestoreSelectedContactsList(props) {
                                 color: Colors.darkGreen,
                               }}
                             >
-                              Secret Entered
+                              Recovery Key Entered
                             </Text>
                           </View>
                           <View
@@ -1062,7 +1140,7 @@ export default function RestoreSelectedContactsList(props) {
                                 color: Colors.red,
                               }}
                             >
-                              Secret Invalid
+                              Recovery Key Invalid
                             </Text>
                           </View>
                           <View
@@ -1101,6 +1179,16 @@ export default function RestoreSelectedContactsList(props) {
             </View>
           )}
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.navigate('RecoveryQrScanner', {
+              scanedCode: getQrCodeData,
+            });
+          }}
+        >
+          <Text>Scan Recovery Share</Text>
+        </TouchableOpacity>
+
         {metaShares.length >= 3 ? (
           <View>
             <TouchableOpacity
@@ -1206,7 +1294,7 @@ export default function RestoreSelectedContactsList(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet1}
+        ref={ErrorBottomSheet1 as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),

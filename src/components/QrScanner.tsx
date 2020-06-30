@@ -44,7 +44,6 @@ export default function QrScanner(props) {
           isCameraOpen = JSON.parse(value); // boolean false
         }
       });
-      console.log('isCameraOpen in QR Scanner', isCameraOpen);
       if (!isCameraOpen) {
         await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
       }
@@ -66,134 +65,134 @@ export default function QrScanner(props) {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar barStyle="dark-content" />
-      <View style={{flex: 1}}>
-      <View
-        style={{
-          borderBottomWidth: 1,
-          borderColor: Colors.borderColor,
-          alignItems: 'center',
-          flexDirection: 'row',
-          paddingRight: 10,
-          paddingBottom: 15,
-          paddingTop: 10,
-          marginLeft: 20,
-          marginBottom: 15,
-        }}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity
-            onPress={() => props.navigation.goBack()}
-            style={{ height: 30, width: 30, justifyContent: 'center' }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(18),
-              fontFamily: Fonts.FiraSansMedium,
-            }}
-          >
-            {title ? title : 'Scan QR code'}
-          </Text>
-        </View>
-      </View>
-      <View
-        style={{
-          width: wp('100%'),
-          height: wp('100%'),
-          overflow: 'hidden',
-          borderRadius: 20,
-          marginTop: hp('3%'),
-        }}
-      >
-        { openCameraFlag ?
-        <RNCamera
-          ref={ref => {
-            this.cameraRef = ref;
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            borderBottomWidth: 1,
+            borderColor: Colors.borderColor,
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingRight: 10,
+            paddingBottom: 15,
+            paddingTop: 10,
+            marginLeft: 20,
+            marginBottom: 15,
           }}
-          barCodeTypes={scanQRFlag}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => props.navigation.goBack()}
+              style={{ height: 30, width: 30, justifyContent: 'center' }}
+            >
+              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            </TouchableOpacity>
+            <Text
+              style={{
+                color: Colors.blue,
+                fontSize: RFValue(18),
+                fontFamily: Fonts.FiraSansMedium,
+              }}
+            >
+              {title ? title : 'Scan QR code'}
+            </Text>
+          </View>
+        </View>
+        <View
           style={{
             width: wp('100%'),
             height: wp('100%'),
+            overflow: 'hidden',
+            borderRadius: 20,
+            marginTop: hp('3%'),
           }}
-          onBarCodeRead={barcode => barcodeRecognized(barcode)}
-          captureAudio={false}
-        > 
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingTop: 12,
-              paddingRight: 12,
-              paddingLeft: 12,
-              width: '100%',
-            }}
-          >
-            <View
-              style={{
-                borderLeftWidth: 1,
-                borderTopColor: 'white',
-                borderLeftColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                borderTopWidth: 1,
+        >
+          {openCameraFlag ?
+            <RNCamera
+              ref={ref => {
+                this.cameraRef = ref;
               }}
-            />
-            <View
+              barCodeTypes={scanQRFlag}
               style={{
-                borderTopWidth: 1,
-                borderRightWidth: 1,
-                borderRightColor: 'white',
-                borderTopColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                marginLeft: 'auto',
+                width: wp('100%'),
+                height: wp('100%'),
               }}
-            />
-          </View>
-          <View
-            style={{
-              marginTop: 'auto',
-              flexDirection: 'row',
-              paddingBottom: 12,
-              paddingRight: 12,
-              paddingLeft: 12,
-              width: '100%',
-            }}
-          >
-            <View
-              style={{
-                borderLeftWidth: 1,
-                borderBottomColor: 'white',
-                borderLeftColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                borderBottomWidth: 1,
-              }}
-            />
-            <View
-              style={{
-                borderBottomWidth: 1,
-                borderRightWidth: 1,
-                borderRightColor: 'white',
-                borderBottomColor: 'white',
-                height: hp('5%'),
-                width: hp('5%'),
-                marginLeft: 'auto',
-              }}
-            />
-          </View>
-        </RNCamera> :  null }
-        
-      </View>
-      <View style={{marginTop: 'auto'}}></View>
-      {title == 'Scan Secondary Mnemonic' ?
-      <BottomInfoBox
-        title={"Note"}
-        infoText={
-          "Secondary Mnemonic This can be found on page of your pdf Recovery Secret. Please scan it to reset your 2FA"
-        }
-      /> : null}
+              onBarCodeRead={barcode => barcodeRecognized(barcode)}
+              captureAudio={false}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  paddingTop: 12,
+                  paddingRight: 12,
+                  paddingLeft: 12,
+                  width: '100%',
+                }}
+              >
+                <View
+                  style={{
+                    borderLeftWidth: 1,
+                    borderTopColor: 'white',
+                    borderLeftColor: 'white',
+                    height: hp('5%'),
+                    width: hp('5%'),
+                    borderTopWidth: 1,
+                  }}
+                />
+                <View
+                  style={{
+                    borderTopWidth: 1,
+                    borderRightWidth: 1,
+                    borderRightColor: 'white',
+                    borderTopColor: 'white',
+                    height: hp('5%'),
+                    width: hp('5%'),
+                    marginLeft: 'auto',
+                  }}
+                />
+              </View>
+              <View
+                style={{
+                  marginTop: 'auto',
+                  flexDirection: 'row',
+                  paddingBottom: 12,
+                  paddingRight: 12,
+                  paddingLeft: 12,
+                  width: '100%',
+                }}
+              >
+                <View
+                  style={{
+                    borderLeftWidth: 1,
+                    borderBottomColor: 'white',
+                    borderLeftColor: 'white',
+                    height: hp('5%'),
+                    width: hp('5%'),
+                    borderBottomWidth: 1,
+                  }}
+                />
+                <View
+                  style={{
+                    borderBottomWidth: 1,
+                    borderRightWidth: 1,
+                    borderRightColor: 'white',
+                    borderBottomColor: 'white',
+                    height: hp('5%'),
+                    width: hp('5%'),
+                    marginLeft: 'auto',
+                  }}
+                />
+              </View>
+            </RNCamera> : null}
+
+        </View>
+        <View style={{ marginTop: 'auto' }}></View>
+        {title == 'Scan Exit Key' ?
+          <BottomInfoBox
+            title={"Note"}
+            infoText={
+              "Exit Key This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA"
+            }
+          /> : null}
       </View>
     </SafeAreaView>
   );

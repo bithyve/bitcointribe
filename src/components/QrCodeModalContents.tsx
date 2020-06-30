@@ -13,66 +13,67 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
+import Styles from '../pages/HealthCheck/Styles';
 
 export default function QrCodeModalContents(props) {
 	const [openCameraFlag, setOpenCameraFlag] = useState(false)
 	const barcodeRecognized = async (barcodes) => {
 		if (barcodes.data) {
 			setOpenCameraFlag(false);
-			props.modalRef ? props.modalRef.current.snapTo(1) : ''; // closes modal
+			props.modalRef ? props.modalRef.snapTo(1) : ''; // closes modal
 			props.onQrScan(getFormattedString(barcodes.data));
 		}
 	};
 
 	useEffect(() => {
 		(async () => {
-		let isCameraOpen;
-		AsyncStorage.getItem('isCameraOpen', (err, value) => {
-		  if (err) {
-			  console.log(err)
-		  } else {
-			isCameraOpen = JSON.parse(value) // boolean false
-		  }
-		});
-		if (!isCameraOpen) {
-		  await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
-		}
-	  })();
-	  }, []);
+			let isCameraOpen;
+			AsyncStorage.getItem('isCameraOpen', (err, value) => {
+				if (err) {
+					console.log(err)
+				} else {
+					isCameraOpen = JSON.parse(value) // boolean false
+				}
+			});
+			if (!isCameraOpen) {
+				await AsyncStorage.setItem('isCameraOpen', JSON.stringify(true));
+			}
+		})();
+	}, []);
 
-	const getFormattedString = ( qrString: string ) => {
-		qrString = qrString.split( 'Dquote' ).join( '"' );
-		qrString = qrString.split( 'Qutation' ).join( ':' );
-		qrString = qrString.split( 'Lbrace' ).join( '{' );
-		qrString = qrString.split( 'Rbrace' ).join( '}' );
-		qrString = qrString.split( 'Slash' ).join( '/' );
-		qrString = qrString.split( 'Comma' ).join( ',' );
-		qrString = qrString.split( 'Squote' ).join( "'" );
-		qrString = qrString.split( 'Space' ).join( ' ' );
+	const getFormattedString = (qrString: string) => {
+		qrString = qrString.split('Dquote').join('"');
+		qrString = qrString.split('Qutation').join(':');
+		qrString = qrString.split('Lbrace').join('{');
+		qrString = qrString.split('Rbrace').join('}');
+		qrString = qrString.split('Slash').join('/');
+		qrString = qrString.split('Comma').join(',');
+		qrString = qrString.split('Squote').join("'");
+		qrString = qrString.split('Space').join(' ');
 		return qrString;
-	  };
+	};
 
 	return (<View style={styles.modalContentContainer}>
 		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS == 'ios' ? 'padding' : undefined} enabled keyboardVerticalOffset={150}>
 			<ScrollView style={styles.qrModalScrollView}>
+				<Text style={styles.modalSubheaderText}>{'Scan a Bitcoin address or any Hexa QR'}</Text>
 				<View style={styles.qrModalImageNTextInputView}>
 					{props.isOpenedFlag && openCameraFlag ?
 						(<View style={{
-							width: wp('100%'),
-							height: wp('100%'),
+							width: wp('90%'),
+							height: wp('90%'),
 							overflow: "hidden",
 							borderRadius: 20,
 						}}>
 							<RNCamera
 								ref={(ref) => { this.cameraRef = ref; }}
 								style={{
-									width: wp('100%'),
-									height: wp('100%')
+									width: wp('90%'),
+									height: wp('90%')
 								}}
 								onBarCodeRead={barcodeRecognized}
 								captureAudio={false}
@@ -89,8 +90,8 @@ export default function QrCodeModalContents(props) {
 						</View>) : (
 							<AppBottomSheetTouchableWrapper onPress={() => setOpenCameraFlag(true)} >
 								<ImageBackground source={require("../assets/images/icons/iPhone-QR.png")} style={{
-									width: wp('100%'),
-									height: wp('100%'),
+									width: wp('90%'),
+									height: wp('90%'),
 									overflow: "hidden",
 									borderRadius: 20,
 								}} >
@@ -105,33 +106,33 @@ export default function QrCodeModalContents(props) {
 								</ImageBackground>
 							</AppBottomSheetTouchableWrapper>
 						)}
-						{ !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
+					{/* { !props.flag ? <TextInput placeholder={'Enter Recipients Address'} 
 						placeholderTextColor={Colors.borderColor} 
 						style={styles.qrModalTextInput} 
 						autoCorrect={false}
 						/> : null}
-					
+					 */}
 				</View>
-				{ !props.flag ? 
-				<BottomInfoBox
-				title={'QR'}
-				infoText={
-				  "Scan a QR code to send money or receive information from another Hexa wallet"
-				}
-			  />
-				// <View style={styles.qrModalInfoView}>
-				// 	<View style={{ marginRight: 15 }}>
-				// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
-				// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
-				// 	</View>
-				// 	<Ionicons
-				// 		name="ios-arrow-forward"
-				// 		color={Colors.textColorGrey}
-				// 		size={15}
-				// 		style={{ alignSelf: 'center' }}
-				// 	/>
-				// </View>
-				 : null }
+				{!props.flag ?
+					<BottomInfoBox
+						title={'What can you scan?'}
+						infoText={
+							"Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request or a restore request"
+						}
+					/>
+					// <View style={styles.qrModalInfoView}>
+					// 	<View style={{ marginRight: 15 }}>
+					// 		<Text style={styles.qrModalInfoTitleText}>QR</Text>
+					// 		<Text style={styles.qrModalInfoInfoText}>Scan a QR code to send money or receive information from another Hexa wallet</Text>
+					// 	</View>
+					// 	<Ionicons
+					// 		name="ios-arrow-forward"
+					// 		color={Colors.textColorGrey}
+					// 		size={15}
+					// 		style={{ alignSelf: 'center' }}
+					// 	/>
+					// </View>
+					: null}
 			</ScrollView>
 		</KeyboardAvoidingView>
 	</View >
@@ -143,10 +144,17 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		paddingBottom: hp('10%')
 	},
+	modalSubheaderText: {
+		color: Colors.textColorGrey,
+		fontSize: RFValue(14),
+		fontFamily: Fonts.FiraSansRegular,
+		marginLeft: 15,
+		marginBottom: 20,
+	},
 	qrModalScrollView: {
 		display: 'flex',
 		backgroundColor: Colors.white,
-		marginTop:hp('3%')
+		marginTop: hp('1%')
 	},
 	qrModalImageNTextInputView: {
 		marginBottom: 10,

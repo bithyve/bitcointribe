@@ -16,7 +16,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import QRCode from 'react-native-qrcode-svg';
 import CopyThisText from '../../components/CopyThisText';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -27,6 +26,8 @@ import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
+import QRCode from 'react-native-qrcode-svg';
+
 
 const SecureScan = props => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -47,16 +48,16 @@ const SecureScan = props => {
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP;
   SHARES_TRANSFER_DETAILS[0] && !secondaryQR
     ? setSecondaryQR(
-        JSON.stringify({
-          ...SHARES_TRANSFER_DETAILS[0],
-          type: 'secondaryDeviceQR',
-        }),
-      )
+      JSON.stringify({
+        ...SHARES_TRANSFER_DETAILS[0],
+        type: 'secondaryDeviceQR',
+      }),
+    )
     : null;
 
   const deepLink = SHARES_TRANSFER_DETAILS[0]
     ? `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
-      SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
+    SHARES_TRANSFER_DETAILS[0].ENCRYPTED_KEY
     : '';
   const dispatch = useDispatch();
 
@@ -94,9 +95,9 @@ const SecureScan = props => {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
     }, 2);
     (ErrorBottomSheet as any).current.snapTo(1);
@@ -132,7 +133,7 @@ const SecureScan = props => {
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             The authenticator app should be{'\n'}installed on another device
-            like your Secondary Device
+            like your Keeper Device
           </Text>
         </View>
       </View>
@@ -142,8 +143,8 @@ const SecureScan = props => {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={secondaryQR} size={hp('27%')} />
-        )}
+            <QRCode value={secondaryQR} size={hp('27%')} />
+          )}
         {deepLink ? <CopyThisText text={deepLink} /> : null}
       </View>
       <View style={{ margin: 20 }}>

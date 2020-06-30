@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
   ScrollView,
@@ -13,11 +12,7 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
-import CommonStyles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
-import ContactList from '../components/ContactList';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import ToggleSwitch from './ToggleSwitch';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
@@ -30,7 +25,6 @@ import BottomInfoBox from './BottomInfoBox';
 
 function AllAccountsContents(props) {
   const [pin, setPin] = useState('');
-  const [pinFlag, setPinFlag] = useState(true);
   function onPressNumber(text) {
     let tmpPasscode = pin;
     if (pin.length < 4) {
@@ -43,7 +37,7 @@ function AllAccountsContents(props) {
       setPin(pin.slice(0, -1));
     }
   }
-  const [AllAccountData, setAllAccountData] = useState([
+  const [AllAccountData] = useState([
     {
       title: 'Test Account',
       info: 'Learn Bitcoin',
@@ -67,14 +61,6 @@ function AllAccountsContents(props) {
       unit: 'sats',
       amount: '60,000',
       image: require('../assets/images/icons/icon_secureaccount.png'),
-    },
-    {
-      title: 'Get Bittr Account',
-      accountType: 'getBittr',
-      unit: 'sats',
-      amount: '60,000',
-      info: 'Buy and sell bitcoin with our partners',
-      image: require('../assets/images/icons/icon_test.png'),
     },
     {
       title: 'Fast Bitcoin Account',

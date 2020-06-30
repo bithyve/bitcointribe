@@ -7,12 +7,17 @@ import {
   DOWNLOADED_MSHARE,
   OVERALL_HEALTH_CALCULATED,
   CHECKED_PDF_HEALTH,
-  QR_CHECKED,
+  PDF_HEALTH_CHECK_FAILED,
   UNABLE_RECOVER_SHARE_FROM_QR,
   WALLET_RECOVERY_FAILED,
   ERROR_SENDING,
-  UPLOAD_SUCCEFULLY,
-  ERROR_RECEIVING
+  UPLOAD_SUCCESSFULLY,
+  ERROR_RECEIVING,
+  WALLET_IMAGE_CHECKED,
+  GENERATE_PERSONAL_COPY,
+  SHARE_PERSONAL_COPY,
+  PERSONAL_COPY_SHARED,
+  PERSONAL_COPY_GENERATED,
 } from '../actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import { SERVICES_ENRICHED } from '../actions/storage';
@@ -37,6 +42,8 @@ const initialState: {
   };
   mnemonic: String;
   personalCopyIndex: Number;
+  personalCopyGenerated: { copy1: Boolean; copy2: Boolean };
+  personalCopyShared: { copy1: Boolean; copy2: Boolean };
   requestedShareUpload: {
     [tag: string]: { status: Boolean; err?: String };
   };
@@ -48,9 +55,10 @@ const initialState: {
     qaStatus: string;
     sharesInfo: { shareId: string; shareStage: string }[];
   };
-  qrChecked: Boolean;
+  pdfHealthCheckFailed: Boolean;
   unableRecoverShareFromQR: Boolean;
   walletRecoveryFailed: Boolean;
+  walletImageChecked: Boolean;
   errorSending: Boolean;
   uploadSuccessfully: Boolean;
   errorReceiving: Boolean;
@@ -73,12 +81,15 @@ const initialState: {
   },
   mnemonic: '',
   personalCopyIndex: 0,
+  personalCopyGenerated: { copy1: null, copy2: null },
+  personalCopyShared: { copy1: null, copy2: null },
   requestedShareUpload: {},
   downloadedMShare: {},
   overallHealth: null,
-  qrChecked: false,
+  pdfHealthCheckFailed: false,
   unableRecoverShareFromQR: false,
   walletRecoveryFailed: false,
+  walletImageChecked: false,
   errorSending: false,
   uploadSuccessfully: false,
   errorReceiving: false,
@@ -138,6 +149,42 @@ export default (state = initialState, action) => {
         },
       };
 
+    case GENERATE_PERSONAL_COPY:
+      return {
+        ...state,
+        personalCopyGenerated: {
+          ...state.personalCopyGenerated,
+          [action.payload.shareIndex === 3 ? 'copy1' : 'copy2']: null,
+        },
+      };
+
+    case PERSONAL_COPY_GENERATED:
+      return {
+        ...state,
+        personalCopyGenerated: {
+          ...state.personalCopyGenerated,
+          ...action.payload.generated,
+        },
+      };
+
+    case SHARE_PERSONAL_COPY:
+      return {
+        ...state,
+        personalCopyShared: {
+          ...state.personalCopyShared,
+          [action.payload.selectedPersonalCopy.type]: null,
+        },
+      };
+
+    case PERSONAL_COPY_SHARED:
+      return {
+        ...state,
+        personalCopyShared: {
+          ...state.personalCopyShared,
+          ...action.payload.shared,
+        },
+      };
+
     case OVERALL_HEALTH_CALCULATED:
       return {
         ...state,
@@ -154,7 +201,8 @@ export default (state = initialState, action) => {
           ],
         },
       };
-      case CHECKED_PDF_HEALTH:
+
+    case CHECKED_PDF_HEALTH:
       return {
         ...state,
         loading: {
@@ -163,32 +211,44 @@ export default (state = initialState, action) => {
         },
         //personalCopyIndex: action.payload.index
       };
-      case QR_CHECKED:
+
+    case PDF_HEALTH_CHECK_FAILED:
       return {
         ...state,
-        qrChecked: action.payload.isFailed,
+        pdfHealthCheckFailed: action.payload.failed,
       };
-      case UNABLE_RECOVER_SHARE_FROM_QR:
+
+    case UNABLE_RECOVER_SHARE_FROM_QR:
       return {
         ...state,
         unableRecoverShareFromQR: action.payload.isFailed,
       };
-      case WALLET_RECOVERY_FAILED:
+
+    case WALLET_RECOVERY_FAILED:
       return {
         ...state,
         walletRecoveryFailed: action.payload.isFailed,
       };
-      case ERROR_SENDING:
+
+    case WALLET_IMAGE_CHECKED:
+      return {
+        ...state,
+        walletImageChecked: action.payload.checked,
+      };
+
+    case ERROR_SENDING:
       return {
         ...state,
         errorSending: action.payload.isFailed,
       };
-      case UPLOAD_SUCCEFULLY:
+
+    case UPLOAD_SUCCESSFULLY:
       return {
         ...state,
         uploadSuccessfully: action.payload.isUploaded,
       };
-      case ERROR_RECEIVING:
+
+    case ERROR_RECEIVING:
       return {
         ...state,
         errorReceiving: action.payload.isFailed,

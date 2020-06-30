@@ -18,29 +18,34 @@ export default function NoInternetModalContents(props) {
         <View style={{ height: '100%' }}>
             <View style={styles.successModalHeaderView}>
                 <Text style={styles.modalTitleText}>No Internet{"\n"}Connection</Text>
-                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>Internet connection</Text></Text>
+                <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>There seems to be a problem with your{"\n"}<Text style={{ fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle: 'italic' }}>internet connection</Text></Text>
             </View>
             <View style={styles.successModalAmountView}>
-                <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>If the internet is not connected Hexa will not be able to</Text>
+                <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>Some of the features will not work as expected in your Hexa app, including:</Text>
                 <View style={{  }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                         <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={{ ...styles.modalInfoText, }}>update your recent transactions</Text>
+                        <Text style={{ ...styles.modalInfoText, }}>fetching your balance and transactions</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                         <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
-                        <Text style={styles.modalInfoText}>send or receive bitcoins</Text>
+                        <Text style={styles.modalInfoText}>sending sats</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                        <Entypo name={'dot-single'} size={10} color={Colors.textColorGrey} />
+                        <Text style={styles.modalInfoText}>contact requests
+</Text>
                     </View>
                 </View>
             </View>
             <View style={{ flexDirection: 'row', marginTop: 'auto', alignItems:'center' }} >
                 <AppBottomSheetTouchableWrapper
-                    onPress={() => props.onPressTryAgain()}
+                    onPress={() => props.onPressIgnore()}
                     style={{ ...styles.successModalButtonView }}
                 >
-                    <Text style={styles.proceedButtonText}>Try Again</Text>
+                    <Text style={styles.proceedButtonText}>OK</Text>
                 </AppBottomSheetTouchableWrapper>
-                <AppBottomSheetTouchableWrapper
+                {/* <AppBottomSheetTouchableWrapper
                     onPress={() => props.onPressIgnore()}
                     style={{
                         height: wp('13%'),
@@ -50,7 +55,7 @@ export default function NoInternetModalContents(props) {
                     }}
                 >
                     <Text style={{...styles.proceedButtonText, color:Colors.blue, }}>Ignore</Text>
-                </AppBottomSheetTouchableWrapper>
+                </AppBottomSheetTouchableWrapper> */}
                 <Image source={require('../assets/images/icons/noInternet.png')} style={styles.successModalImage} />
             </View>
         </View>
@@ -62,14 +67,6 @@ const styles = StyleSheet.create({
     modalContentContainer: {
         height: '100%',
         backgroundColor: Colors.white,
-        borderTopLeftRadius: 10,
-        borderLeftColor: Colors.borderColor,
-        borderLeftWidth: 1,
-        borderTopRightRadius: 10,
-        borderRightColor: Colors.borderColor,
-        borderRightWidth: 1,
-        borderTopColor: Colors.borderColor,
-        borderTopWidth: 1,
     },
     successModalHeaderView: {
         marginRight: wp('10%'),

@@ -78,7 +78,7 @@ const TrustedContacts = props => {
               fontWeight: 'bold',
             }}
           >
-            send Recovery Secrets
+            send Recovery Keys
           </Text>
         </Text>
         {props.LoadContacts ? renderContactList() : null}

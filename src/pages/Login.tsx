@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
+  Platform,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -21,21 +22,82 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { credsAuth } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
+import { calculateExchangeRate, startupSync } from '../store/actions/accounts';
 import {
-  syncAccounts,
-  calculateExchangeRate,
-} from '../store/actions/accounts';
-import { updateMSharesHealth, checkMSharesHealth } from '../store/actions/sss';
+  updateMSharesHealth,
+  checkMSharesHealth,
+  updateWalletImage,
+} from '../store/actions/sss';
+import JailMonkey from 'jail-monkey';
+import DeviceInfo from 'react-native-device-info';
+import ErrorModalContents from '../components/ErrorModalContents';
+import ModalHeader from '../components/ModalHeader';
+import RelayServices from '../bitcoin/services/RelayService';
 
 export default function Login(props) {
-  let [message, setMessage] = useState('Getting the latest details');
+  let [message, setMessage] = useState('Satoshis or Sats');
+  let [subTextMessage1, setSubTextMessage1] = useState(
+    '1 bitcoin = 100 million satoshis or sats',
+  );
+  let [subTextMessage2, setSubTextMessage2] = useState(
+    'Hexa uses sats to make using bitcoin easier',
+  );
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
+  const [JailBrokenTitle, setJailBrokenTitle] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef<BottomSheet>());
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef<BottomSheet>());
+  // const releases =[
+  //       {
+  //           "build": "40",
+  //           "version": "0.8",
+  //           "releaseNotes": {
+  //               "ios": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented",
+  //               "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //           },
+  //           "reminderLimit": 2
+  //       },
+  //       {
+  //         "build": "39",
+  //         "version": "0.8",
+  //         "releaseNotes": {
+  //             "ios": "dfsdg",
+  //             "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //         },
+  //         "reminderLimit": -1
+  //     },
+  //     {
+  //       "build": "38",
+  //       "version": "0.8",
+  //       "releaseNotes": {
+  //           "ios": "64356354",
+  //           "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //       },
+  //       "reminderLimit": -1
+  //   },
+  //   {
+  //     "build": "37",
+  //     "version": "0.8",
+  //     "releaseNotes": {
+  //         "ios": "dfgdgdg",
+  //         "android": "-Timed notification-Notification UI list implemented on Home-Reset 2FA new UI implemented-Address book UI implemented"
+  //     },
+  //     "reminderLimit": -1
+  // },
+  //       {
+  //           "build": "35",
+  //           "version": "3.40",
+  //           "releaseNotes": {
+  //               "ios": "ios notes for release 319",
+  //               "android": "android notes for release 319"
+  //           },
+  //           "reminderLimit": -1
+  //       }
+  //   ];
   const onPressNumber = useCallback(
-    text => {
+    (text) => {
       let tmpPasscode = passcode;
       if (passcode.length < 4) {
         if (text != 'x') {
@@ -52,15 +114,15 @@ export default function Login(props) {
   );
 
   const DECENTRALIZED_BACKUP = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
   // const testAccService = accounts[TEST_ACCOUNT].service;
   // const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const dispatch = useDispatch();
   const { isAuthenticated, authenticationFailed } = useSelector(
-    state => state.setupAndAuth,
+    (state) => state.setupAndAuth,
   );
-  const { dbFetched } = useSelector(state => state.storage);
+  const { dbFetched } = useSelector((state) => state.storage);
   // const [balances, setBalances] = useState({
   //   testBalance: 0,
   //   regularBalance: 0,
@@ -112,7 +174,7 @@ export default function Login(props) {
   //   setTransactions(accumulativeTransactions);
   // }, [accounts]);
 
-  const s3Service = useSelector(state => state.sss.service);
+  const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     // HC init and down-streaming
     if (s3Service) {
@@ -131,6 +193,57 @@ export default function Login(props) {
       }
     }
   }, [DECENTRALIZED_BACKUP]);
+
+  useEffect(() => {
+    if (JailMonkey.isJailBroken()) {
+      ErrorBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        setJailBrokenTitle(
+          Platform.OS == 'ios'
+            ? 'Your device is Jail Broken'
+            : 'Your device is Rooted',
+        );
+        setElevation(0);
+      }, 2);
+    }
+    DeviceInfo.isPinOrFingerprintSet().then((isPinOrFingerprintSet) => {
+      if (!isPinOrFingerprintSet) {
+        ErrorBottomSheet.current.snapTo(1);
+        setTimeout(() => {
+          setJailBrokenTitle(
+            "Your Phone don't have any Secure entry like Pin or Biometric",
+          );
+          setElevation(0);
+        }, 2);
+      }
+    });
+
+    RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
+      .then(async (res) => {
+        console.log('Release note', res.data.releases);
+        let releaseCases = JSON.parse(
+          await AsyncStorage.getItem('releaseCases'),
+        );
+        if (
+          res.data.releases.length &&
+          res.data.releases[0].build != DeviceInfo.getBuildNumber()
+        ) {
+          if (
+            releaseCases &&
+            releaseCases.build == res.data.releases[0].build &&
+            releaseCases.ignoreClick
+          )
+            return;
+          props.navigation.navigate('UpdateApp', {
+            releaseData: res.data.releases,
+          });
+        }
+        return;
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   // useEffect(() => {
   //   (async () => {
@@ -159,22 +272,28 @@ export default function Login(props) {
 
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
+  const trustedContactRequest = props.navigation.getParam(
+    'trustedContactRequest',
+  );
+  const userKey = props.navigation.getParam('userKey');
 
   useEffect(() => {
     if (isAuthenticated) {
-      AsyncStorage.getItem('walletExists').then(exists => {
+      AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
-            // calculate the exchangeRate
+            dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
-              (loaderBottomSheet as any).current.snapTo(0);
+              loaderBottomSheet.current.snapTo(0);
               props.navigation.navigate('Home', {
                 custodyRequest,
                 recoveryRequest,
+                trustedContactRequest,
+                userKey
               });
             }, 2500);
-            dispatch(syncAccounts());
+            dispatch(startupSync());
           }
         } else props.navigation.replace('RestoreAndRecoverWallet');
       });
@@ -185,11 +304,12 @@ export default function Login(props) {
     return (
       <LoaderModal
         headerText={message}
-        messageText={'This may take a few seconds'}
+        messageText={subTextMessage1}
+        messageText2={subTextMessage2}
       />
     );
-  },[ message]);
-  
+  }, [message, subTextMessage1, subTextMessage2]);
+
   const renderLoaderModalHeader = () => {
     return (
       <View
@@ -208,7 +328,10 @@ export default function Login(props) {
 
   const checkPasscode = () => {
     if (checkAuth) {
-      (loaderBottomSheet as any).current.snapTo(0);
+      setTimeout(() => {
+        loaderBottomSheet.current.snapTo(0);
+      }, 2);
+
       return (
         <View style={{ marginLeft: 'auto' }}>
           <Text style={styles.errorText}>Incorrect passcode, try again!</Text>
@@ -220,15 +343,60 @@ export default function Login(props) {
   useEffect(() => {
     if (authenticationFailed) {
       setCheckAuth(true);
+      checkPasscode();
     } else {
       setCheckAuth(false);
     }
   }, [authenticationFailed]);
 
+  const renderErrorModalContent = useCallback(() => {
+    return (
+      <ErrorModalContents
+        modalRef={ErrorBottomSheet}
+        title={JailBrokenTitle}
+        info={''}
+        proceedButtonText={'Ok'}
+        onPressProceed={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+        isBottomImage={true}
+        bottomImage={require('../assets/images/icons/errorImage.png')}
+      />
+    );
+  }, [JailBrokenTitle]);
+
+  const renderErrorModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          ErrorBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const proceedButton = () => {
+    loaderBottomSheet.current.snapTo(1);
+    setTimeout(() => {
+      setMessage(
+        'Hexa Test Account'
+      );
+      setSubTextMessage1(
+        'Test Account comes preloaded with test-sats',
+      );
+      setSubTextMessage2(
+        'Best place to start if you are new to Bitcoin',
+      );
+    }, 3000);
+    setTimeout(() => {
+      setElevation(0);
+    }, 2);
+    dispatch(credsAuth(passcode));
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <StatusBar />
-      <SafeAreaView style={{ flex: 0 }} />
       <View style={{ flex: 1 }}>
         <View style={{}}>
           <Text style={styles.headerTitleText}>Welcome back!</Text>
@@ -256,14 +424,14 @@ export default function Login(props) {
                     {passcode.length >= 1 ? (
                       <Text
                         style={{
-                          fontSize: RFValue(10, 812),
+                          fontSize: RFValue(10),
                           textAlignVertical: 'center',
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}
                       >
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -290,9 +458,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 2 ? (
-                      <Text style={{ fontSize: RFValue(10, 812) }}>
+                      <Text style={{ fontSize: RFValue(10) }}>
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -319,9 +487,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 3 ? (
-                      <Text style={{ fontSize: RFValue(10, 812) }}>
+                      <Text style={{ fontSize: RFValue(10) }}>
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -348,9 +516,9 @@ export default function Login(props) {
                     ]}
                   >
                     {passcode.length >= 4 ? (
-                      <Text style={{ fontSize: RFValue(10, 812) }}>
+                      <Text style={{ fontSize: RFValue(10) }}>
                         <FontAwesome
-                          size={8}
+                          size={10}
                           name={'circle'}
                           color={Colors.black}
                         />
@@ -372,7 +540,18 @@ export default function Login(props) {
               <TouchableOpacity
                 disabled={passcode.length == 4 ? false : true}
                 onPress={() => {
-                  (loaderBottomSheet as any).current.snapTo(1);
+                  loaderBottomSheet.current.snapTo(1);
+                  setTimeout(() => {
+                    setMessage(
+                      'Hexa Test Account'
+                    );
+                    setSubTextMessage1(
+                      'Test Account comes preloaded with test-sats',
+                    );
+                    setSubTextMessage2(
+                      'Best place to start if you are new to Bitcoin',
+                    );
+                  }, 3000);
                   setTimeout(() => {
                     setElevation(0);
                   }, 2);
@@ -529,12 +708,28 @@ export default function Login(props) {
           onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={loaderBottomSheet as any}
+          ref={loaderBottomSheet}
           snapPoints={[-50, hp('100%')]}
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
         />
       </View>
+      <BottomSheet
+        onCloseEnd={() => {
+          setElevation(10);
+        }}
+        onOpenEnd={() => {
+          setElevation(0);
+        }}
+        enabledInnerScrolling={true}
+        ref={ErrorBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('25%') : hp('30%'),
+        ]}
+        renderContent={renderErrorModalContent}
+        renderHeader={renderErrorModalHeader}
+      />
     </View>
   );
 }
@@ -552,29 +747,27 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   textBoxActive: {
-    borderWidth: 0.5,
     height: wp('13%'),
     width: wp('13%'),
     borderRadius: 7,
     marginLeft: 20,
     elevation: 10,
     shadowColor: Colors.borderColor,
-    shadowOpacity: 0.35,
+    shadowOpacity: 1,
     shadowOffset: { width: 0, height: 3 },
-    borderColor: Colors.borderColor,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: 'center',
     lineHeight: 18,
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue(13, 812),
+    fontSize: RFValue(13),
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -585,13 +778,13 @@ const styles = StyleSheet.create({
   keyPadElementTouchable: {
     flex: 1,
     height: hp('8%'),
-    fontSize: RFValue(18, 812),
+    fontSize: RFValue(18),
     justifyContent: 'center',
     alignItems: 'center',
   },
   keyPadElementText: {
     color: Colors.blue,
-    fontSize: RFValue(25, 812),
+    fontSize: RFValue(25),
     fontFamily: Fonts.FiraSansRegular,
     fontStyle: 'normal',
   },

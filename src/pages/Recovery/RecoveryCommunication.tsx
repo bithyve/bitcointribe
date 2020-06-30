@@ -14,6 +14,7 @@ import {
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
+import DeviceInfo from 'react-native-device-info';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,6 +29,8 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import RecoveryTrustedQR from './RecoveryTrustedQR';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import config from '../../bitcoin/HexaConfig';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
@@ -44,9 +47,9 @@ export default function RecoveryCommunication(props) {
   const [contactInfo, setContactInfo] = useState([]);
   const [trustedQR, setTrustedQR] = useState('');
 
-  const onContactSelect = index => {
+  const onContactSelect = (index) => {
     setContactInfo([
-      ...contactInfo.map(item => {
+      ...contactInfo.map((item) => {
         if (item !== contactInfo[index]) {
           return {
             ...item,
@@ -69,7 +72,7 @@ export default function RecoveryCommunication(props) {
   };
 
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
-    state => state.storage.database,
+    (state) => state.storage.database,
   );
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
 
@@ -107,36 +110,74 @@ export default function RecoveryCommunication(props) {
           ...REQUEST_DETAILS,
           requester: WALLET_SETUP.walletName,
           type: 'recoveryQR',
+          ver: DeviceInfo.getVersion(),
         }),
       )
     : null;
 
-  const communicate = async selectedContactMode => {
-    const deepLink =
-      `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/rk/` + // rk: recovery key
-      REQUEST_DETAILS.ENCRYPTED_KEY;
-
-    console.log("deepLink", deepLink)
-
+  const communicate = async (selectedContactMode) => {
+    const requester = WALLET_SETUP.walletName;
+    const appVersion = DeviceInfo.getVersion();
     switch (selectedContactMode.type) {
       case 'number':
-        textWithoutEncoding(selectedContactMode.info, deepLink);
-        props.navigation.navigate('ShareRecoveryOTP', {
-          OTP: REQUEST_DETAILS.OTP,
-        });
+        let number = selectedContactMode.info.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        const numHintType = 'num';
+        const numHint = number[0] + number.slice(number.length - 2);
+        const numberEncKey = TrustedContactsService.encryptPub(
+          // using TCs encryption mech
+          REQUEST_DETAILS.KEY,
+          number,
+        ).encryptedPub;
+
+        const numberDL =
+          `https://hexawallet.io/${config.APP_STAGE}/rk` +
+          `/${requester}` +
+          `/${numberEncKey}` +
+          `/${numHintType}` +
+          `/${numHint}` +
+          `/v${appVersion}`;
+
+        textWithoutEncoding(selectedContactMode.info, numberDL);
+        // props.navigation.navigate('ShareRecoveryOTP', {
+        //   OTP: REQUEST_DETAILS.OTP,
+        // });
+        setTimeout(() => {
+          props.navigation.navigate('RestoreSelectedContactsList');
+        }, 1000);
         break;
 
       case 'email':
+        const Email: string = selectedContactMode.info;
+        const emailHintType = 'eml';
+        const trucatedEmail = Email.replace('.com', '');
+        const emailHint =
+          Email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
+        const emailEncPubKey = TrustedContactsService.encryptPub(
+          REQUEST_DETAILS.KEY,
+          Email,
+        ).encryptedPub;
+        const emailDL =
+          `https://hexawallet.io/${config.APP_STAGE}/rk` +
+          `/${requester}` +
+          `/${emailEncPubKey}` +
+          `/${emailHintType}` +
+          `/${emailHint}` +
+          `/v${appVersion}`;
+
         email(
           [selectedContactMode.info],
           null,
           null,
-          'Guardian request',
-          deepLink,
+          'Keeper request',
+          emailDL,
         );
-        props.navigation.navigate('ShareRecoveryOTP', {
-          OTP: REQUEST_DETAILS.OTP,
-        });
+        // props.navigation.navigate('ShareRecoveryOTP', {
+        //   OTP: REQUEST_DETAILS.OTP,
+        // });
+        setTimeout(() => {
+          props.navigation.navigate('RestoreSelectedContactsList');
+        }, 1000);
         break;
       case 'qrcode':
         (trustedContactQrBottomSheet as any).current.snapTo(1);

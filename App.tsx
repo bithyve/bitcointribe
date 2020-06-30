@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import Navigator from "./src/navigation/Navigator";
-// import DummyNav from "./src/navigation/Dummy-Navigator";
-import { store, Provider } from "./src/store";
+console.disableYellowBox = true;
+import React, { Component, useState, useEffect } from 'react';
+import Navigator from './src/navigation/Navigator';
+import { store, Provider } from './src/store';
 import NoInternetModalContents from './src/components/NoInternetModalContents';
 import TransparentHeaderModal from './src/components/TransparentHeaderModal';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -9,62 +9,118 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { AppState, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-const prefix = 'hexa://'
-export default () => {
-  console.disableYellowBox = true;
-  const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [Internet, setInternet] = useState(true);
-  const renderNoInternetModalContent = () => {
-    return (
-      <NoInternetModalContents
-        onPressTryAgain={() => { (NoInternetBottomSheet as any).current.snapTo(0)}}
-        onPressIgnore={() => { (NoInternetBottomSheet as any).current.snapTo(0)}}
-      />
-    );
+import { getVersion, getBuildId } from 'react-native-device-info';
+import { setApiHeaders } from './src/services/api';
+import firebase from 'react-native-firebase';
+import { NavigationState } from 'react-navigation';
+import { AsyncStorage } from 'react-native';
+import ModalHeader from './src/components/ModalHeader';
+
+const prefix = 'hexa://';
+
+class App extends Component {
+  private NoInternetBottomSheet: React.RefObject<any>;
+
+  constructor(props) {
+    super(props);
+    firebase.analytics().setAnalyticsCollectionEnabled(true);
+    this.NoInternetBottomSheet = React.createRef();
+  }
+
+  componentWillMount = () => {
+    this.getAppVersion();
   };
 
-  const renderNoInternetModalHeader = () => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (NoInternetBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
+  getAppVersion = async () => {
+    let version = await getVersion();
+    let buildNumber = await getBuildId();
+    setApiHeaders({ appVersion: version, appBuildNumber: buildNumber });
   };
 
-  useEffect(()=>{
-    if(!Internet){
-      (NoInternetBottomSheet as any).current.snapTo(1);
+  getActiveRouteName(navigationState: NavigationState) {
+    if (!navigationState) {
+      return null;
     }
-  }, [Internet])
+    const route = navigationState.routes[navigationState.index];
+    // Dive into nested navigators
+    if (route.routes) {
+      return this.getActiveRouteName(route);
+    }
+    return route.routeName;
+  }
 
-  useEffect(() => {
-    NetInfo.addEventListener(state => {
-      if (state.isInternetReachable==true)
-        setInternet(true); 
-      else if (state.isInternetReachable==false){
-        setInternet(false); 
-      }
-    });
-  },[]);
+  componentWillUnmount = async() =>{
+    await AsyncStorage.setItem(
+      'isInternetModalCome',
+      JSON.stringify(false),
+    );
+  }
 
-  
-  return (
-    <Provider store={store} uriPrefix={prefix}>
-      <Navigator />
-      <BottomSheet
-        onCloseEnd={() => { }}
-        enabledInnerScrolling={true}
-        ref={NoInternetBottomSheet}
-        snapPoints={[-50, hp('60%')]}
-        renderContent={renderNoInternetModalContent}
-        renderHeader={renderNoInternetModalHeader}
-      />
-    </Provider>
-  );
-};
+  render() {
+    return (
+      <Provider store={store} uriPrefix={prefix}>
+        <Navigator
+          onNavigationStateChange={ async(prevState, currentState) => {
+            const currentScreen = this.getActiveRouteName(currentState);
+            const prevScreen = this.getActiveRouteName(prevState);
+            let isInternetModalCome = JSON.parse(
+              await AsyncStorage.getItem('isInternetModalCome'),
+            );  
+            if (
+              currentScreen != 'Login' &&
+              currentScreen != 'Launch' &&
+              currentScreen != 'ReLogin' && !isInternetModalCome
+            ) {
+              console.log("global.isInternetModalCome",isInternetModalCome, typeof isInternetModalCome);
+              NetInfo.addEventListener((state) => {
+                setTimeout(() => {
+                  if (state.isInternetReachable === null) {
+                    return;
+                  }
+                  if (state.isInternetReachable) {
+                    (this.NoInternetBottomSheet as any).current.snapTo(0);
+                  } else {
+                    (this.NoInternetBottomSheet as any).current.snapTo(1);
+                  }
+                }, 1000);
+              });
+            }
+            if (prevScreen !== currentScreen) {
+              firebase.analytics().setCurrentScreen(currentScreen);
+            }
+          }}
+        />
+        <BottomSheet
+          onCloseEnd={() => {}}
+          enabledInnerScrolling={true}
+          ref={this.NoInternetBottomSheet}
+          snapPoints={[-50, hp('60%')]}
+          renderContent={() => (
+            <NoInternetModalContents
+              onPressTryAgain={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+              onPressIgnore={async() => {
+                await AsyncStorage.setItem(
+                  'isInternetModalCome',
+                  JSON.stringify(true),
+                );
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+            onPressHeader={() => {
+                (this.NoInternetBottomSheet as any).current.snapTo(0);
+              }}
+            />
+          )}
+        />
+      </Provider>
+    );
+  }
+}
+
+export default App;

@@ -1,5 +1,9 @@
-import BaseAccount from "../../utilities/accounts/BaseAccount";
-import { Transactions } from "../../utilities/Interface";
+import BaseAccount from '../../utilities/accounts/BaseAccount';
+import {
+  Transactions,
+  DerivativeAccounts,
+  TransactionDetails,
+} from '../../utilities/Interface';
 
 export default class RegularAccount extends BaseAccount {
   public static fromJSON = (json: string) => {
@@ -17,7 +21,11 @@ export default class RegularAccount extends BaseAccount {
       gapLimit,
       balances,
       receivingAddress,
-      transactions
+      transactions,
+      derivativeAccounts,
+      lastBalTxSync,
+      newTransactions,
+      trustedContactToDA,
     }: {
       mnemonic: string;
       passphrase: string;
@@ -32,6 +40,10 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress;
       transactions: Transactions;
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
     } = hdWallet;
 
     return new RegularAccount(mnemonic, passphrase, purpose, {
@@ -44,7 +56,11 @@ export default class RegularAccount extends BaseAccount {
       gapLimit,
       balances,
       receivingAddress,
-      transactions
+      transactions,
+      derivativeAccounts,
+      lastBalTxSync,
+      newTransactions,
+      trustedContactToDA,
     });
   };
 
@@ -63,7 +79,11 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
-    }
+      derivativeAccounts: DerivativeAccounts;
+      lastBalTxSync: number;
+      newTransactions: TransactionDetails[];
+      trustedContactToDA: { [contactName: string]: number };
+    },
   ) {
     super(mnemonic, passphrase, dPathPurpose, stateVars);
   }

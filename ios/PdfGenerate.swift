@@ -23,7 +23,8 @@ import QRCoder
   @objc public var twoFASecret:NSString = "";
   @objc public var secondaryMnemonic:NSString = "";
   @objc public var bhXpub:NSString = "";
-  
+  @objc public var imageSize:CGFloat = 110;
+  @objc public var margin:CGFloat = 10;
   
   
   @objc public func generatePdf() -> String {
@@ -62,9 +63,21 @@ import QRCoder
     txtTitle.numberOfLines = 0
     txtTitle.frame = CGRect(x:5,y:5,width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
     txtTitle.font = UIFont.systemFont(ofSize: 10.0)
+    txtTitle.textColor = UIColor.black
     txtTitle.textAlignment = .left
     txtTitle.sizeToFit()
     v1.addSubview(txtTitle)
+
+    let txtSubHeading = UILabel();
+    txtSubHeading.text = "Follow the instructions on the app to scan the 8 QRs below"
+    txtSubHeading.lineBreakMode = .byWordWrapping
+    txtSubHeading.numberOfLines = 0
+    txtSubHeading.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender-1,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtSubHeading.font = UIFont.systemFont(ofSize: 6.0)
+    txtSubHeading.textColor = UIColor.black
+    txtSubHeading.textAlignment = .left
+    txtSubHeading.sizeToFit()
+    v1.addSubview(txtSubHeading)
     
     //          let imageTitle:UIImage? = (title as String).image(withAttributes: [.font: UIFont.systemFont(ofSize: 80.0)])
     //          let imageViewTitle = UIImageView()
@@ -73,11 +86,13 @@ import QRCoder
     //          v1.addSubview(imageViewTitle)
     
     // part 1
+    txtPart = UILabel();
     txtPart.text = "Part 1:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
-    txtPart.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender + txtSubHeading.frame.height + txtSubHeading.font.ascender - 5,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font = UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v1.addSubview(txtPart)
@@ -88,27 +103,29 @@ import QRCoder
     //        imageViewPart1.frame = CGRect(x:10,y:(imageViewTitle.frame.origin.y + imageViewTitle.frame.height),width:15, height:5)
     //        v1.addSubview(imageViewPart1)
     
-    qrCodeImage.image = generator.createImage(value: qrcode[0] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y +  txtPart.frame.height) , width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[0] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y +  txtPart.frame.height) , width: imageSize, height: imageSize)
     v1.addSubview(qrCodeImage)
     
-    txtQrCodeString.text = qrCodeString[0] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font = UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v1.addSubview(txtQrCodeString)
+//    txtQrCodeString.text = qrCodeString[0] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height + 2),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font = UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v1.addSubview(txtQrCodeString)
     
     // part 2
     txtPart = UILabel();
     txtPart.text = "Part 2:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
-    txtPart.frame = CGRect(x:10,y:txtQrCodeString.frame.origin
-      .y+txtQrCodeString.frame.height + txtQrCodeString.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.frame = CGRect(x:10,y:qrCodeImage.frame.origin
+      .y+qrCodeImage.frame.height + margin,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font = UIFont.systemFont(ofSize: 6.0) // txtPart.font.withSize(40)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v1.addSubview(txtPart)
@@ -116,19 +133,20 @@ import QRCoder
     
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[1] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[1] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: imageSize, height: imageSize)
     v1.addSubview(qrCodeImage)
     
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = qrCodeString[1] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v1.addSubview(txtQrCodeString)
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = qrCodeString[1] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height + 2),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v1.addSubview(txtQrCodeString)
     
     // page 2
     let v2 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
@@ -139,6 +157,7 @@ import QRCoder
     txtPart.numberOfLines = 0
     txtPart.frame = CGRect(x:10,y:10,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font =  UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v2.addSubview(txtPart)
@@ -146,27 +165,30 @@ import QRCoder
     
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[2] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: ( txtPart.frame.origin.y + txtPart.frame.height) , width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[2] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: ( txtPart.frame.origin.y + txtPart.frame.height) , width: imageSize, height: imageSize)
     v2.addSubview(qrCodeImage)
     
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = qrCodeString[2] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v2.addSubview(txtQrCodeString)
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = qrCodeString[2] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v2.addSubview(txtQrCodeString)
+    
     // part 4
     txtPart = UILabel();
     txtPart.text = "Part 4:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
-    txtPart.frame = CGRect(x:10,y:txtQrCodeString.frame.origin
-      .y+txtQrCodeString.frame.height + txtQrCodeString.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.frame = CGRect(x:10,y:qrCodeImage.frame.origin
+      .y+qrCodeImage.frame.height + margin,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font =  UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v2.addSubview(txtPart)
@@ -174,18 +196,20 @@ import QRCoder
     
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[3] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[3] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: imageSize, height: imageSize)
     v2.addSubview(qrCodeImage)
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = qrCodeString[3] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v2.addSubview(txtQrCodeString);
+    
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = qrCodeString[3] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v2.addSubview(txtQrCodeString);
     
     // page 3
     let v3 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
@@ -196,6 +220,7 @@ import QRCoder
     txtPart.numberOfLines = 0
     txtPart.frame = CGRect(x:10,y:10,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font =  UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v3.addSubview(txtPart)
@@ -203,43 +228,48 @@ import QRCoder
     
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[4] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: ( txtPart.frame.origin.y + txtPart.frame.height) , width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[4] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: ( txtPart.frame.origin.y + txtPart.frame.height) , width: imageSize, height: imageSize)
     v3.addSubview(qrCodeImage)
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = qrCodeString[4] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v3.addSubview(txtQrCodeString)
+    
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = qrCodeString[4] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v3.addSubview(txtQrCodeString)
+    
     // part 4
     txtPart = UILabel();
     txtPart.text = "Part 6:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
-    txtPart.frame = CGRect(x:10,y:txtQrCodeString.frame.origin
-      .y+txtQrCodeString.frame.height + txtQrCodeString.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.frame = CGRect(x:10,y:qrCodeImage.frame.origin
+      .y+qrCodeImage.frame.height + margin,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font = UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v3.addSubview(txtPart)
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[5] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[5] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: imageSize, height: imageSize)
     v3.addSubview(qrCodeImage)
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = qrCodeString[5] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font = UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v3.addSubview(txtQrCodeString)
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = qrCodeString[5] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font = UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v3.addSubview(txtQrCodeString)
     
     // page 4
     let v4 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
@@ -250,144 +280,164 @@ import QRCoder
     txtPart.numberOfLines = 0
     txtPart.frame = CGRect(x:10,y:10,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font =  UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v4.addSubview(txtPart)
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[6] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: ( txtPart.frame.origin.y + txtPart.frame.height) , width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: qrcode[6] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: ( txtPart.frame.origin.y + txtPart.frame.height) , width: imageSize, height: imageSize)
     v4.addSubview(qrCodeImage)
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = qrCodeString[6] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v4.addSubview(txtQrCodeString)
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = qrCodeString[6] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v4.addSubview(txtQrCodeString)
     // part 4
     txtPart = UILabel();
     txtPart.text = "Part 8:"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
-    txtPart.frame = CGRect(x:10,y:txtQrCodeString.frame.origin
-      .y+txtQrCodeString.frame.height + txtQrCodeString.font.ascender + 2,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    txtPart.frame = CGRect(x:10,y:qrCodeImage.frame.origin
+      .y+qrCodeImage.frame.height + margin,width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
     txtPart.font =  UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
     txtPart.textAlignment = .left
     txtPart.sizeToFit()
     v4.addSubview(txtPart)
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: qrcode[7] as! String,size: CGSize(width: 80, height: 80))
-    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: 80, height: 80);
+    qrCodeImage.image = generator.createImage(value: qrcode[7] as! String,size: CGSize(width: imageSize, height: imageSize))
+    qrCodeImage.frame = CGRect(x: 10, y: (txtPart.frame.origin.y + txtPart.frame.height), width: imageSize, height: imageSize);
     v4.addSubview(qrCodeImage);
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text =  qrCodeString[7] as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v4.bounds.size.width - 10, height:v4.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit()
-    v4.addSubview(txtQrCodeString)
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text =  qrCodeString[7] as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:5,y:(qrCodeImage.frame.origin.y + qrCodeImage.frame.size.height),width:v4.bounds.size.width - 10, height:v4.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit()
+//    v4.addSubview(txtQrCodeString)
     
     
     //page 5
-    let v5 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
-    txtTitle = UILabel();
-    txtTitle.text = "Secondary Xpub (Encrypted):"
-    txtTitle.lineBreakMode = .byWordWrapping
-    txtTitle.numberOfLines = 0
-    txtTitle.frame = CGRect(x:5,y:5,width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
-    txtTitle.font =  UIFont.systemFont(ofSize: 10.0)
-    txtTitle.textAlignment = .left
-    txtTitle.sizeToFit()
-    v5.addSubview(txtTitle)
-    qrCodeImage = UIImageView();
-    generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: secondaryXpub as String,size: CGSize(width: 80, height: 70))
-    qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height) , width: 80, height: 80)
-    v5.addSubview(qrCodeImage)
+     let v5 = UIView( frame: CGRect(x: 0.0,y: 0, width: 210.0, height: 297.0))
+    // txtTitle = UILabel();
+    // txtTitle.text = "Secondary Xpub (Encrypted):"
+    // txtTitle.lineBreakMode = .byWordWrapping
+    // txtTitle.numberOfLines = 0
+    // txtTitle.frame = CGRect(x:5,y:5,width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
+    // txtTitle.font =  UIFont.systemFont(ofSize: 10.0)
+    // txtTitle.textAlignment = .left
+    // txtTitle.sizeToFit()
+    // v5.addSubview(txtTitle)
+    // qrCodeImage = UIImageView();
+    // generator = QRCodeGenerator();
+    // qrCodeImage.image = generator.createImage(value: secondaryXpub as String,size: CGSize(width: 80, height: 70))
+    // qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height) , width: 80, height: 80)
+    // v5.addSubview(qrCodeImage)
     
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = secondaryXpub as? String
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit();
-    v5.addSubview(txtQrCodeString);
+    // txtQrCodeString = UILabel();
+    // txtQrCodeString.text = secondaryXpub as? String
+    // txtQrCodeString.lineBreakMode = .byWordWrapping
+    // txtQrCodeString.numberOfLines = 0
+    // txtQrCodeString.frame = CGRect(x:5,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    // txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
+    // txtQrCodeString.textAlignment = .center
+    // txtQrCodeString.sizeToFit();
+    // v5.addSubview(txtQrCodeString);
        
       
-    txtMessage = UILabel();
-    txtMessage.text = "Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.";
-    txtMessage.lineBreakMode = .byWordWrapping
-    txtMessage.numberOfLines = 0
-    txtMessage.frame = CGRect(x:5,y: ( txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
-    txtMessage.font =  UIFont.systemFont(ofSize: 6.0)
-    txtMessage.textAlignment = .center
-    txtMessage.sizeToFit();
-    v5.addSubview(txtMessage);
+    // txtMessage = UILabel();
+    // txtMessage.text = "Scan the above QR Code using your HEXA wallet in order to restore your Secure Account.";
+    // txtMessage.lineBreakMode = .byWordWrapping
+    // txtMessage.numberOfLines = 0
+    // txtMessage.frame = CGRect(x:5,y: ( txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v1.bounds.size.width - 10, height:v1.bounds.size.height)
+    // txtMessage.font =  UIFont.systemFont(ofSize: 6.0)
+    // txtMessage.textAlignment = .center
+    // txtMessage.sizeToFit();
+    // v5.addSubview(txtMessage);
       
       
     
     txtTitle = UILabel();
-    txtTitle.text = "Secondary Mnemonic:"
+    txtTitle.text = "Exit/Regenerate 2FA Key:"
     txtTitle.lineBreakMode = .byWordWrapping
     txtTitle.numberOfLines = 0
-    txtTitle.frame = CGRect(x:5,y:(txtMessage.frame.origin.y + txtMessage.frame.height),width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
+    txtTitle.frame = CGRect(x:5,y:(txtMessage.frame.origin.y + txtMessage.frame.height),width:v5.bounds.size.width - 5, height:v5.bounds.size.height)
     txtTitle.font =  UIFont.systemFont(ofSize: 10.0)
+    txtTitle.textColor = UIColor.black
     txtTitle.textAlignment = .left
     txtTitle.sizeToFit()
     v5.addSubview(txtTitle)
+
+    txtPart.text = "Use this key to reset the 2FA if you have lost your authenticator/ Keeper app or for exiting your funds from Savings account if the BitHyve server is not responding"
+    txtPart.lineBreakMode = .byWordWrapping
+    txtPart.numberOfLines = 0
+    txtPart.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender + 2,width:v5.bounds.size.width - 10, height:v5.bounds.size.height)
+    txtPart.font = UIFont.systemFont(ofSize: 6.0)
+    txtPart.textColor = UIColor.black
+    txtPart.textAlignment = .left
+    txtPart.sizeToFit()
+    v5.addSubview(txtPart)
+
     qrCodeImage = UIImageView();
     generator = QRCodeGenerator();
-    qrCodeImage.image = generator.createImage(value: secondaryMnemonic as String,size: CGSize(width: 80, height: 70))
-    qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height) , width: 80, height: 80)
+    qrCodeImage.image = generator.createImage(value: secondaryMnemonic as String,size: CGSize(width: imageSize, height: imageSize - 10))
+    qrCodeImage.frame = CGRect(x: 10, y: ( txtTitle.frame.origin.y + txtTitle.frame.height + txtPart.frame.height + 15) , width: imageSize, height: imageSize)
      v5.addSubview(qrCodeImage)
     
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = secondaryMnemonic as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:10,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v5.bounds.size.width - 20, height:v5.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit();
-    v5.addSubview(txtQrCodeString);
+    // txtQrCodeString = UILabel();
+    // txtQrCodeString.text = secondaryMnemonic as? String;
+    // txtQrCodeString.lineBreakMode = .byWordWrapping
+    // txtQrCodeString.numberOfLines = 0
+    // txtQrCodeString.frame = CGRect(x:10,y: ( qrCodeImage.frame.origin.y + qrCodeImage.frame.height),width:v5.bounds.size.width - 20, height:v5.bounds.size.height)
+    // txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
+    // txtQrCodeString.textColor = UIColor.black
+    // txtQrCodeString.textAlignment = .center
+    // txtQrCodeString.sizeToFit();
+    // v5.addSubview(txtQrCodeString);
          
-    txtTitle = UILabel();
-    txtTitle.text = "BitHyve Xpub:"
-    txtTitle.lineBreakMode = .byWordWrapping
-    txtTitle.numberOfLines = 0
-    txtTitle.frame = CGRect(x:5,y:(txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
-    txtTitle.font =  UIFont.systemFont(ofSize: 10.0)
-    txtTitle.textAlignment = .left
-    txtTitle.sizeToFit()
-    v5.addSubview(txtTitle)
-    txtQrCodeString = UILabel();
-    txtQrCodeString.text = bhXpub as? String;
-    txtQrCodeString.lineBreakMode = .byWordWrapping
-    txtQrCodeString.numberOfLines = 0
-    txtQrCodeString.frame = CGRect(x:10,y: ( txtTitle.frame.origin.y + txtTitle.frame.height),width:v5.bounds.size.width - 20, height:v5.bounds.size.height)
-    txtQrCodeString.font =  UIFont.systemFont(ofSize: 6.0)
-    txtQrCodeString.textAlignment = .center
-    txtQrCodeString.sizeToFit();
-    v5.addSubview(txtQrCodeString);
+//    txtTitle = UILabel();
+//    txtTitle.text = "BitHyve Xpub:"
+//    txtTitle.lineBreakMode = .byWordWrapping
+//    txtTitle.numberOfLines = 0
+//    txtTitle.frame = CGRect(x:5,y:(txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v1.bounds.size.width - 5, height:v1.bounds.size.height)
+//    txtTitle.font =  UIFont.systemFont(ofSize: 10.0)
+//    txtTitle.textColor = UIColor.black
+//    txtTitle.textAlignment = .left
+//    txtTitle.sizeToFit()
+//    v5.addSubview(txtTitle)
+//    txtQrCodeString = UILabel();
+//    txtQrCodeString.text = bhXpub as? String;
+//    txtQrCodeString.lineBreakMode = .byWordWrapping
+//    txtQrCodeString.numberOfLines = 0
+//    txtQrCodeString.frame = CGRect(x:10,y: ( txtTitle.frame.origin.y + txtTitle.frame.height),width:v5.bounds.size.width - 20, height:v5.bounds.size.height)
+//    txtQrCodeString.font =  UIFont.systemFont(ofSize: 5.5)
+//    txtQrCodeString.textColor = UIColor.black
+//    txtQrCodeString.textAlignment = .center
+//    txtQrCodeString.sizeToFit();
+//    v5.addSubview(txtQrCodeString);
        
      
-    txtMessage = UILabel();
-    txtMessage.text = "Following assets can be used to recover your funds using the open - sourced ga - recovery tool.";
-    txtMessage.lineBreakMode = .byWordWrapping
-    txtMessage.numberOfLines = 0
-    txtMessage.frame = CGRect(x:5,y: ( txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v5.bounds.size.width - 10, height:v5.bounds.size.height)
-    txtMessage.font =  UIFont.systemFont(ofSize: 6.0)
-    txtMessage.textAlignment = .left
-    txtMessage.sizeToFit();
-    v5.addSubview(txtMessage);
+    // txtMessage = UILabel();
+    // txtMessage.text = "Following assets can be used to recover your funds using the open - sourced ga - recovery tool.";
+    // txtMessage.lineBreakMode = .byWordWrapping
+    // txtMessage.numberOfLines = 0
+    // txtMessage.frame = CGRect(x:5,y: ( txtQrCodeString.frame.origin.y + txtQrCodeString.frame.height),width:v5.bounds.size.width - 10, height:v5.bounds.size.height)
+    // txtMessage.font =  UIFont.systemFont(ofSize: 6.0)
+    // txtMessage.textColor = UIColor.black
+    // txtMessage.textAlignment = .left
+    // txtMessage.sizeToFit();
+    // v5.addSubview(txtMessage);
        
     let page1 = PDFPage.view(v1);
     let page2 = PDFPage.view(v2);

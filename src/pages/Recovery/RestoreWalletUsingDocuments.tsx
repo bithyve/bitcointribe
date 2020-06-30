@@ -54,7 +54,7 @@ export default function RestoreSelectedContactsList(props) {
             firstLineTitle={'Restore wallet using'}
             secondLineTitle={'Documents'}
             infoTextNormal={'Sources where you have kept a document '}
-            infoTextBold={'copy of the Recovery Secret'}
+            infoTextBold={'copy of the Recovery Key'}
           />
         </View>
         <View style={{ flex: 8 }}>
@@ -68,10 +68,10 @@ export default function RestoreSelectedContactsList(props) {
             />
             <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Cloud</Text>
-              <Text style={styles.listElementsInfo} numberOfLines={1}>
+              {/* <Text style={styles.listElementsInfo} numberOfLines={1}>
                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
                 diam nonumy eirmod tempor invidunt ut labore et dolore magna
-              </Text>
+              </Text> */}
             </View>
             <View style={styles.listElementIcon}>
               <Ionicons
@@ -89,10 +89,10 @@ export default function RestoreSelectedContactsList(props) {
             />
             <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Email</Text>
-              <Text style={styles.listElementsInfo} numberOfLines={1}>
+              {/* <Text style={styles.listElementsInfo} numberOfLines={1}>
                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
                 diam nonumy eirmod tempor invidunt ut labore et dolore magna
-              </Text>
+              </Text> */}
             </View>
             <View style={styles.listElementIcon}>
               <Ionicons
@@ -110,9 +110,9 @@ export default function RestoreSelectedContactsList(props) {
             />
             <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Print</Text>
-              <Text style={styles.listElementsInfo} numberOfLines={1}>
+              {/* <Text style={styles.listElementsInfo} numberOfLines={1}>
                 Lorem ipsum dolor sit amet, consetetur
-              </Text>
+              </Text> */}
             </View>
             <View style={styles.listElementIcon}>
               <Ionicons
@@ -135,9 +135,9 @@ export default function RestoreSelectedContactsList(props) {
             />
             <View style={{ justifyContent: 'space-between', flex: 1 }}>
               <Text style={styles.listElementsTitle}>Local</Text>
-              <Text style={styles.listElementsInfo}>
+              {/* <Text style={styles.listElementsInfo}>
                 Lorem ipsum dolor sit amet,
-              </Text>
+              </Text> */}
             </View>
             <View style={styles.listElementIcon}>
               <Ionicons

@@ -49,7 +49,7 @@ export default function CloudHealthCheck(props) {
             </View>
             <View style={{ ...BackupStyles.modalHeaderTitleView, marginLeft: 30, marginRight: 20, }}>
                 <View style={{ flex: 1, justifyContent: "center" }}>
-                    <Text style={BackupStyles.modalHeaderTitleText}>Confirm Recovery Secret{"\n"}from Cloud</Text>
+                    <Text style={BackupStyles.modalHeaderTitleText}>Confirm Recovery Key{"\n"}from Cloud</Text>
                     <Text style={BackupStyles.modalHeaderInfoText}>
                         Scan the first QR code from the PDF{"\n"}you saved in your cloud storage
                     </Text>
@@ -57,7 +57,7 @@ export default function CloudHealthCheck(props) {
                 <Image style={BackupStyles.cardIconImage} source={getIconByStatus(selectedStatus)} />
             </View>
             <View style={{ marginLeft: 30 }}>
-                <Text style={{
+                {/* <Text style={{
                     color: Colors.blue,
                     fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansMedium
@@ -66,7 +66,7 @@ export default function CloudHealthCheck(props) {
                     color: Colors.textColorGrey,
                     fontSize: RFValue(11),
                     fontFamily: Fonts.FiraSansMedium
-                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text>
+                }}>Lorem ipsum dolor Lorem dolor sit amet,{"\n"}consectetur dolor sit</Text> */}
             </View>
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={{

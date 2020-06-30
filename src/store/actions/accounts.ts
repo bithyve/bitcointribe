@@ -8,14 +8,23 @@ export const TRANSFER_ST2 = 'TRANSFER_ST2';
 export const ALTERNATE_TRANSFER_ST2 = 'ALTERNATE_TRANSFER_ST2';
 export const TRANSFER_ST3 = 'TRANSFER_ST3';
 export const GET_TESTCOINS = 'GET_TESTCOINS';
+export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS';
+export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS';
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER';
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX';
+export const STARTUP_SYNC = 'STARTUP_SYNC';
 export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS';
+export const SYNC_DERIVATIVE_ACCOUNTS = 'SYNC_DERIVATIVE_ACCOUNTS';
 export const EXCHANGE_RATE = 'EXCHANGE_RATE';
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV';
 export const RESET_TWO_FA = 'RESET_TWO_FA';
+export const RUN_TEST = 'RUN_TEST';
+export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
+export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
+export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
+  'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 
-export const fetchAddress = serviceType => {
+export const fetchAddress = (serviceType) => {
   return { type: FETCH_ADDR, payload: { serviceType } };
 };
 
@@ -32,21 +41,36 @@ export const fetchTransactions = (serviceType, service?) => {
 
 export const fetchBalanceTx = (
   serviceType,
-  options?: { service?; loader?; restore?; shouldNotInsert? },
+  options?: {
+    service?;
+    loader?;
+    restore?;
+    shouldNotInsert?;
+    syncTrustedDerivative?;
+  },
 ) => {
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
 
-export const transferST1 = (serviceType, transferInfo) => {
-  return { type: TRANSFER_ST1, payload: { serviceType, transferInfo } };
+export const transferST1 = (serviceType, recipients, averageTxFees?) => {
+  return {
+    type: TRANSFER_ST1,
+    payload: { serviceType, recipients, averageTxFees },
+  };
 };
 
-export const transferST2 = serviceType => {
-  return { type: TRANSFER_ST2, payload: { serviceType } };
+export const transferST2 = (serviceType, txnPriority, nSequence?) => {
+  return {
+    type: TRANSFER_ST2,
+    payload: { serviceType, txnPriority, nSequence },
+  };
 };
 
-export const alternateTransferST2 = serviceType => {
-  return { type: ALTERNATE_TRANSFER_ST2, payload: { serviceType } };
+export const alternateTransferST2 = (serviceType, txnPriority, nSequence?) => {
+  return {
+    type: ALTERNATE_TRANSFER_ST2,
+    payload: { serviceType, txnPriority, nSequence },
+  };
 };
 
 export const transferST3 = (serviceType, token) => {
@@ -54,12 +78,26 @@ export const transferST3 = (serviceType, token) => {
   return { type: TRANSFER_ST3, payload: { serviceType, token } };
 };
 
-export const getTestcoins = serviceType => {
+export const getTestcoins = (serviceType) => {
   // Test account specific
   return { type: GET_TESTCOINS, payload: { serviceType } };
 };
 
-export const clearTransfer = serviceType => {
+export const addTransferDetails = (serviceType, recipientData) => {
+  return {
+    type: ADD_TRANSFER_DETAILS,
+    payload: { serviceType, recipientData },
+  };
+};
+
+export const removeTransferDetails = (serviceType, recipientData) => {
+  return {
+    type: REMOVE_TRANSFER_DETAILS,
+    payload: { serviceType, recipientData },
+  };
+};
+
+export const clearTransfer = (serviceType) => {
   return { type: CLEAR_TRANSFER, payload: { serviceType } };
 };
 
@@ -67,8 +105,16 @@ export const accumulativeBalAndTx = () => {
   return { type: ACCUMULATIVE_BAL_AND_TX };
 };
 
+export const startupSync = (restore?) => {
+  return { type: STARTUP_SYNC, payload: { restore } };
+};
+
 export const syncAccounts = (restore?) => {
   return { type: SYNC_ACCOUNTS, payload: { restore } };
+};
+
+export const syncDerivativeAccounts = (serviceTypes: string[]) => {
+  return { type: SYNC_DERIVATIVE_ACCOUNTS, payload: { serviceTypes } };
 };
 
 export const calculateExchangeRate = () => {
@@ -82,10 +128,43 @@ export const generateSecondaryXpriv = (serviceType, secondaryMnemonic) => {
   };
 };
 
-export const resetTwoFA = secondaryMnemonic => {
+export const resetTwoFA = (secondaryMnemonic) => {
   return {
     type: RESET_TWO_FA,
     payload: { secondaryMnemonic },
+  };
+};
+
+export const runTest = () => {
+  return { type: RUN_TEST };
+};
+
+export const fetchDerivativeAccXpub = (accountType, accountNumber?) => {
+  return {
+    type: FETCH_DERIVATIVE_ACC_XPUB,
+    payload: { accountType, accountNumber },
+  };
+};
+
+export const fetchDerivativeAccAddress = (
+  serviceType,
+  accountType,
+  accountNumber?,
+) => {
+  return {
+    type: FETCH_DERIVATIVE_ACC_ADDRESS,
+    payload: { serviceType, accountType, accountNumber },
+  };
+};
+
+export const fetchDerivativeAccBalTx = (
+  serviceType,
+  accountType,
+  accountNumber?,
+) => {
+  return {
+    type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
+    payload: { serviceType, accountType, accountNumber },
   };
 };
 
@@ -128,7 +207,7 @@ export const executedST1 = (serviceType, result) => {
   return { type: TRANSFER_ST1_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST1 = serviceType => {
+export const failedST1 = (serviceType) => {
   return { type: TRANSFER_ST1_FAILED, payload: { serviceType } };
 };
 
@@ -136,7 +215,7 @@ export const executedST2 = (serviceType, result) => {
   return { type: TRANSFER_ST2_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST2 = serviceType => {
+export const failedST2 = (serviceType) => {
   return { type: TRANSFER_ST2_FAILED, payload: { serviceType } };
 };
 
@@ -145,7 +224,7 @@ export const executedST3 = (serviceType, result) => {
   return { type: TRANSFER_ST3_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST3 = serviceType => {
+export const failedST3 = (serviceType) => {
   return { type: TRANSFER_ST3_FAILED, payload: { serviceType } };
 };
 
@@ -153,11 +232,11 @@ export const switchLoader = (serviceType, beingLoaded) => {
   return { type: ACCOUNTS_LOADING, payload: { serviceType, beingLoaded } };
 };
 
-export const accountsSynched = synched => {
+export const accountsSynched = (synched) => {
   return { type: ACCOUNTS_SYNCHED, payload: { synched } };
 };
 
-export const exchangeRatesCalculated = exchangeRates => {
+export const exchangeRatesCalculated = (exchangeRates) => {
   return { type: EXCHANGE_RATE_CALCULATED, payload: { exchangeRates } };
 };
 
@@ -168,10 +247,10 @@ export const alternateTransferST2Executed = (serviceType, result) => {
   };
 };
 
-export const secondaryXprivGenerated = generated => {
+export const secondaryXprivGenerated = (generated) => {
   return { type: SECONDARY_XPRIV_GENERATED, payload: { generated } };
 };
 
-export const twoFAResetted = resetted => {
+export const twoFAResetted = (resetted) => {
   return { type: TWO_FA_RESETTED, payload: { resetted } };
 };

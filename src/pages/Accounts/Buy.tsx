@@ -43,6 +43,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function Buy(props) {
+  
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;
@@ -75,11 +76,11 @@ export default function Buy(props) {
   const renderBuyHelperContents = () => {
     return (
       <TestAccountHelperModalContents
-        topButtonText={`Buy Bitcoins`}
-        helperInfo={`Buying bitcoins (or sats) allows you to pay for bitcoins using your
+        topButtonText={`Buy bitcoin`}
+        helperInfo={`Buying bitcoin (or sats) allows you to pay for bitcoin using your
          local currency like dollar ($) or pound (£) typically through an exchange or 
         a similar service You will select the service you want to use and the account you want the
-        bitcoins in. And once the process is done, the bitcoins will appear in your wallet Don’t worry you don’t need to buy Test Bitcoins in this account :)`}
+        bitcoin in. And once the process is done, the bitcoin will appear in your wallet Don’t worry you don’t need to buy Test bitcoin in this account :)`}
         continueButtonText={'Ok, got it'}
         onPressContinue={() => {
           (BuyHelperBottomSheet as any).current.snapTo(0);

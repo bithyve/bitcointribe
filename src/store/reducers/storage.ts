@@ -3,7 +3,6 @@ import {
   DB_FETCHED,
   DB_INSERTED,
   KEY_FETCHED,
-  DB_FETCHEDSSS,
 } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
 
@@ -59,17 +58,6 @@ export default (state = initialState, action) => {
       return {
         ...state,
         key: action.payload.key,
-      };
-    case DB_FETCHEDSSS:
-      const updatedSSSState = {
-        ...state,
-        databaseSSS: {
-          ...action.payload.database,
-        },
-      };
-      console.log({ updatedSSSState });
-      return {
-        ...updatedSSSState,
       };
   }
   return state;

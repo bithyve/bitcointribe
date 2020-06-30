@@ -103,9 +103,9 @@ export default function RecoveryRequestOTP(props) {
     if (requestedShareUpload[requester]) {
       if (!requestedShareUpload[requester].status) {
         setTimeout(() => {
-          setErrorMessageHeader('Error sending Recovery Secret');
+          setErrorMessageHeader('Error sending Recovery Key');
           setErrorMessage(
-            'There was an error while sending your Recovery Secret, please try again in a little while',
+            'There was an error while sending your Recovery Key, please try again in a little while',
           );
           setButtonText('Try again');
           setIsConfirmDisabled(false);
@@ -148,9 +148,9 @@ export default function RecoveryRequestOTP(props) {
 
   if(isErrorSendingFailed){
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
       setButtonText('Try again');
     }, 2);
@@ -162,7 +162,7 @@ export default function RecoveryRequestOTP(props) {
     setTimeout(() => {
       setErrorMessageHeader('Sending successful');
       setErrorMessage(
-        'The Recovery Secret has been sent, the receiver needs to accept ',
+        'The Recovery Key has been sent, the receiver needs to accept ',
       );
       setButtonText('Done');
     }, 2);
@@ -197,7 +197,7 @@ export default function RecoveryRequestOTP(props) {
               Enter OTP to accept request
             </Text>
             <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
-              Please enter the 6 digit OTP the owner of secret shared with you
+              Please enter the 6 digit OTP the owner of the Recovery Key shared with you
             </Text>
           </View>
           <View style={{ marginBottom: hp('2%') }}>
@@ -388,7 +388,7 @@ export default function RecoveryRequestOTP(props) {
               {isConfirmDisabled ? (
                 <ActivityIndicator size="small" color={Colors.white} />
               ) : (
-                <Text style={styles.confirmButtonText}>Send Recovery Secret</Text>
+                <Text style={styles.confirmButtonText}>Send Recovery Key</Text>
               )}
             </TouchableOpacity>
           </View>

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Image, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, Image, Text, StyleSheet } from "react-native";
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -21,10 +21,10 @@ export default function CustodianRequestAcceptModalContents(props) {
           }}
         >
           <Text style={styles.modalTitleText}>
-            Secret Accepted{"\n"}Successfully
+            Recovery Key Accepted{"\n"}Successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp("1.5%") }}>
-            Secret Successfully Accepted{"\n"}You are now a guardian for
+            Recovery Key Successfully Accepted{"\n"}You are now a Keeper for
           </Text>
         </View>
         <View style={styles.box}>
@@ -46,8 +46,8 @@ export default function CustodianRequestAcceptModalContents(props) {
             }}
           >
             <Text style={{ ...styles.modalInfoText }}>
-              Associate the secret with a contact to better manage the{"\n"}
-              secrets you are guardian for
+              Associate the Key with a contact to better manage the{"\n"}
+              Recovery Key you are Keeper of
             </Text>
           </View>
         </View>

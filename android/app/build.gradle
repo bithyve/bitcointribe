@@ -2,7 +2,7 @@ apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
 apply plugin: 'io.fabric'      
-        
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"     
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
  * and bundleReleaseJsAndAssets).
@@ -80,6 +80,7 @@ project.ext.react = [
 apply from: '../../node_modules/react-native-unimodules/gradle.groovy'
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+apply plugin: 'com.google.gms.google-services'
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -99,15 +100,17 @@ def enableProguardInReleaseBuilds = false
 android {  
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-                                                
+    flavorDimensions "default"
+
     defaultConfig {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 32           
-        versionName "0.7"                     
+        versionCode 62
+        versionName "0.8"                     
         missingDimensionStrategy 'react-native-camera', 'general' 
         multiDexEnabled true
+        resValue "string", "build_config_package", "io.hexawallet.hexa"
     }                         
                                  
      signingConfigs {      
@@ -136,6 +139,26 @@ android {
 
         }
     }
+    productFlavors {
+        production {
+            minSdkVersion rootProject.ext.minSdkVersion
+            applicationId "io.hexawallet.hexa"
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            resValue "string", "build_config_package", "io.hexawallet.hexa"
+        }
+        staging {
+            minSdkVersion rootProject.ext.minSdkVersion
+            applicationId "io.hexawallet.hexa.staging"
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            resValue "string", "build_config_package", "io.hexawallet.hexa"
+        }
+        development {
+            minSdkVersion rootProject.ext.minSdkVersion
+            applicationId "io.hexawallet.hexa.development"
+            targetSdkVersion rootProject.ext.targetSdkVersion
+            resValue "string", "build_config_package", "io.hexawallet.hexa"
+        }
+    }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -156,6 +179,9 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-localize')
+    implementation project(':react-native-config')
+    implementation project(':jail-monkey')
     implementation project(':react-native-contacts')
     implementation project(':react-native-mail')
     implementation project(':react-native-print')
@@ -168,7 +194,6 @@ dependencies {
     implementation project(':react-native-os')
     implementation project(':@react-native-community_netinfo')
     implementation project(':react-native-svg')
-    implementation project(':react-native-html-to-pdf')
     implementation project(':react-native-cardview')
     implementation project(':react-native-video')
     implementation project(':react-native-device-info')
@@ -185,7 +210,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'com.itextpdf:itextg:5.5.10'
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:0.59.10"  // From node_modules
     addUnimodulesDependencies()
     // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:1.10.0'
@@ -194,6 +219,13 @@ dependencies {
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
     // For WebP support, without animations
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
+
+    compile(project(':react-native-firebase')) {   
+       transitive = false
+    }
+    implementation project(':react-native-firebase')
+    implementation "com.google.firebase:firebase-core:15.0.2"
+    implementation 'com.google.firebase:firebase-messaging:18.0.0'
 }  
 
 // Run this once to be able to run the application with BUCK

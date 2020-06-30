@@ -15,13 +15,14 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import QRCode from 'react-native-qrcode-svg';
 import CopyThisText from '../../components/CopyThisText';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { uploadEncMShare } from '../../store/actions/sss';
+import QRCode from 'react-native-qrcode-svg';
+
 
 const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam('twoFASetup');
@@ -38,8 +39,8 @@ const TwoFASetup = props => {
             onPressBack
               ? onPressBack
               : () => {
-                  props.navigation.goBack();
-                }
+                props.navigation.goBack();
+              }
           }
         >
           <View style={BackupStyles.headerLeftIconInnerContainer}>
@@ -58,7 +59,7 @@ const TwoFASetup = props => {
           </Text>
           <Text style={BackupStyles.modalHeaderInfoText}>
             The authenticator app should be installed on another device
-            like your Secondary Device
+            like your Keeper Device
           </Text>
         </View>
       </View>
@@ -73,9 +74,9 @@ const TwoFASetup = props => {
               onPressBack
                 ? onPressBack
                 : () => {
-                    // props.navigation.navigate('GoogleAuthenticatorOTP');
-                    props.navigation.goBack();
-                  }
+                  // props.navigation.navigate('GoogleAuthenticatorOTP');
+                  props.navigation.goBack();
+                }
             }
             style={{
               height: wp('13%'),
@@ -105,8 +106,8 @@ const TwoFASetup = props => {
               onPressBack
                 ? onPressBack
                 : () => {
-                    props.navigation.goBack();
-                  }
+                  props.navigation.goBack();
+                }
             }
             style={{
               height: wp('13%'),

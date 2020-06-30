@@ -16,13 +16,13 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import SendStatusModalContents from '../../components/SendStatusModalContents';
 
-const Confirmation = props => {
+const Confirmation = (props) => {
   const serviceType = props.navigation.getParam('serviceType');
   const recipientAddress = props.navigation.getParam('recipientAddress');
   const amount = props.navigation.getParam('amount');
 
   const { transfer, loading } = useSelector(
-    state => state.accounts[serviceType],
+    (state) => state.accounts[serviceType],
   );
 
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ const Confirmation = props => {
     <SendStatusModalContents
       title1stLine={'Sent Successfully'}
       title2ndLine={''}
-      info1stLine={'Bitcoins successfully sent to'}
+      info1stLine={'bitcoin sent successfully to'}
       info2ndLine={''}
       userName={recipientAddress}
       modalRef={SendSuccessBottomSheet}
@@ -78,7 +78,8 @@ const Confirmation = props => {
           <Button
             title="Send"
             onPress={() => {
-              dispatch(transferST2(serviceType));
+              const txnPriority = 'low';
+              dispatch(transferST2(serviceType, txnPriority));
             }}
           />
           <Button

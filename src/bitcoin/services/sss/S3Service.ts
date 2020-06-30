@@ -1,10 +1,12 @@
-import config from '../../Config';
+import config from '../../HexaConfig';
 import { ErrMap } from '../../utilities/ErrMap';
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
   MetaShare,
   SocialStaticNonPMDD,
+  EncryptedImage,
+  WalletImage,
 } from '../../utilities/Interface';
 import SSS from '../../utilities/sss/SSS';
 
@@ -78,11 +80,11 @@ export default class S3Service {
         data:
           | {
               metaShare: MetaShare;
-              dynamicNonPMDD: EncDynamicNonPMDD;
+              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
             }
           | {
               metaShare: MetaShare;
-              dynamicNonPMDD?: undefined;
+              encryptedDynamicNonPMDD?: undefined;
             };
         err?: undefined;
         message?: undefined;
@@ -110,7 +112,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          dynamicNonPMDD: EncDynamicNonPMDD;
+          encryptedDynamicNonPMDD: EncDynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -163,15 +165,14 @@ export default class S3Service {
   };
 
   public static generateRequestCreds = (): {
-    otp: string;
-    encryptedKey: string;
+    key: string;
   } => SSS.generateRequestCreds();
 
   public static uploadRequestedShare = async (
     encryptedKey: string,
-    otp: string,
-    metaShare: MetaShare,
-    dynamicNonPMDD?: EncDynamicNonPMDD,
+    otp?: string,
+    metaShare?: MetaShare,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<
     | {
         status: number;
@@ -195,7 +196,7 @@ export default class S3Service {
           encryptedKey,
           otp,
           metaShare,
-          dynamicNonPMDD,
+          encryptedDynamicNonPMDD,
         ),
       };
     } catch (err) {
@@ -205,7 +206,7 @@ export default class S3Service {
 
   public static downloadAndValidateShare = async (
     encryptedKey: string,
-    otp: string,
+    otp?: string,
     existingShares: MetaShare[] = [],
     walletId?: string,
   ): Promise<
@@ -213,7 +214,7 @@ export default class S3Service {
         status: number;
         data: {
           metaShare: MetaShare;
-          dynamicNonPMDD: EncDynamicNonPMDD;
+          encryptedDynamicNonPMDD: EncDynamicNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -306,7 +307,7 @@ export default class S3Service {
             shareId: string;
             updated: boolean;
             updatedAt?: number;
-            dynamicNonPMDD?: EncDynamicNonPMDD;
+            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
             err?: string;
           }>;
         };
@@ -537,7 +538,13 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          healthCheckStatus: { [shareId: string]: number };
+          shareGuardianMapping: {
+            [index: number]: {
+              shareId: string;
+              updatedAt: number;
+              guardian: string;
+            };
+          };
         };
         err?: undefined;
         message?: undefined;
@@ -578,13 +585,9 @@ export default class S3Service {
       }
   > => {
     try {
-      const { encryptedDynamicNonPMDD } = await this.sss.encryptDynamicNonPMDD(
-        dynamicNonPMDD,
-      );
-
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.updateDynamicNonPMDD(encryptedDynamicNonPMDD),
+        data: await this.sss.updateDynamicNonPMDD(dynamicNonPMDD),
       };
     } catch (err) {
       return { status: 515, err: err.message, message: ErrMap[515] };
@@ -592,7 +595,7 @@ export default class S3Service {
   };
 
   public decryptDynamicNonPMDD = (
-    encryptedDynamicNonPMDD: string,
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD,
   ):
     | {
         status: number;
@@ -656,7 +659,7 @@ export default class S3Service {
     | {
         status: number;
         data: {
-          decryptedStaticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD;
+          decryptedStaticNonPMDD;
         };
         err?: undefined;
         message?: undefined;
@@ -685,7 +688,7 @@ export default class S3Service {
       bhXpub: string;
     },
     tag: string,
-    version?: number,
+    version?: string,
   ):
     | {
         status: number;
@@ -788,7 +791,8 @@ export default class S3Service {
 
   public uploadShare = async (
     shareIndex: number,
-    dynamicNonPMDD?: any,
+    contactName: string,
+    dynamicNonPMDD?: MetaShare[],
   ): Promise<
     | {
         status: number;
@@ -809,10 +813,76 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.uploadShare(shareIndex, dynamicNonPMDD),
+        data: await this.sss.uploadShare(
+          shareIndex,
+          contactName,
+          dynamicNonPMDD,
+        ),
       };
     } catch (err) {
       return { status: 523, err: err.message, message: ErrMap[523] };
+    }
+  };
+
+  public updateWalletImage = async (
+    walletImage: WalletImage,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: Boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.sss.updateWalletImage(walletImage),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update Wallet Image',
+      };
+    }
+  };
+
+  public fetchWalletImage = async (): Promise<
+    | {
+        status: number;
+        data: {
+          walletImage: WalletImage;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.sss.fetchWalletImage(),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch Wallet Image',
+      };
     }
   };
 }

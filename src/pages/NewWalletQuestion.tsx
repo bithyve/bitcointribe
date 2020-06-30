@@ -33,7 +33,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
-import SmallHeaderModal from '../components/SmallHeaderModal';
 import {
   getTestcoins,
   calculateExchangeRate,
@@ -44,17 +43,14 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../common/constants/serviceTypes';
-import axios from 'axios';
-import {
-  checkMSharesHealth,
-  updateMSharesHealth,
-  downloadMShare,
-  initHealthCheck,
-} from '../store/actions/sss';
+
 import DeviceInfo from 'react-native-device-info';
 
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
+  let [subTextMessage, setSubTextMessage] = useState(
+    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it'
+  )
   const [Elevation, setElevation] = useState(10);
   const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -73,7 +69,6 @@ export default function NewWalletQuestion(props) {
   const [confirmAnswerMasked, setConfirmAnswerMasked] = useState('');
   const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true);
   const [hideShowAnswer, setHdeShowAnswer] = useState(true);
-  let [counter, setCounter] = useState(0);
   const dispatch = useDispatch();
   const walletName = props.navigation.getParam('walletName');
   const [ansError, setAnsError] = useState('');
@@ -82,6 +77,7 @@ export default function NewWalletQuestion(props) {
   const [isDisabled, setIsDisabled] = useState(false);
   const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
+  const [confirmAnswerTextInput, setConfirmAnswerTextInput] = useState(React.createRef());
   const [visibleButton, setVisibleButton] = useState(false);
   const accounts = useSelector(state => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
@@ -200,28 +196,28 @@ export default function NewWalletQuestion(props) {
 
   useEffect(() => {
     (async () => {
-    if (isLoaderStart) {
-      const security = {
-        question: dropdownBoxValue.question,
-        answer,
-      };
-      dispatch(initializeSetup(walletName, security));
-      const current = Date.now();
-      await AsyncStorage.setItem(
-        'SecurityAnsTimestamp',
-        JSON.stringify(current),
-      );
-      const securityQuestionHistory = {
-        created: current,
-        confirmed: current,
-      };
-      await AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify(securityQuestionHistory),
-      );
-    }
+      if (isLoaderStart) {
+        const security = {
+          question: dropdownBoxValue.question,
+          answer,
+        };
+        dispatch(initializeSetup(walletName, security));
+        const current = Date.now();
+        await AsyncStorage.setItem(
+          'SecurityAnsTimestamp',
+          JSON.stringify(current),
+        );
+        const securityQuestionHistory = {
+          created: current,
+          confirmed: current,
+        };
+        await AsyncStorage.setItem(
+          'securityQuestionHistory',
+          JSON.stringify(securityQuestionHistory),
+        );
+      }
     })();
-    }, [isLoaderStart]);
+  }, [isLoaderStart]);
 
   useEffect(() => {
     if (
@@ -239,13 +235,13 @@ export default function NewWalletQuestion(props) {
   const setConfirm = () => {
     setConfirmAnswer(tempAns);
     if (answer && confirmAnswer && confirmAnswer != answer) {
-        setAnsError('Answers do not match');
-      } else {
-        setTimeout(() => {
-          setAnsError('');
-        }, 2);
-      }
+      setAnsError('Answers do not match');
+    } else {
+      setTimeout(() => {
+        setAnsError('');
+      }, 2);
     }
+  };
 
   const setBackspace = event => {
     if (event.nativeEvent.key == 'Backspace') {
@@ -300,26 +296,35 @@ export default function NewWalletQuestion(props) {
     );
   };
 
-  const seLoaderMessages = () =>{
+  const seLoaderMessages = () => {
     setTimeout(() => {
-      setMessage("Setting up your accounts");
+      setMessage('Bootstrapping Accounts');
+      setSubTextMessage(
+        'Hexa has a multi-account model which lets you better manage your Bitcoin (sats)'
+      )
       setTimeout(() => {
-        setMessage("Getting test bitcoins (sats) for the Test account");
+        setMessage('Filling Test Account with test sats');
+        setSubTextMessage(
+          'Preloaded Test Account is the best place to start your Bitcoin journey'
+        )
         setTimeout(() => {
-          setMessage("Generating Recovery Secrets for the wallet backup");
+          setMessage('Generating Recovery Keys');
+          setSubTextMessage(
+            'Recovery Keys help you restore your Hexa wallet in case your phone is lost'
+          )
         }, 3000);
       }, 3000);
     }, 3000);
-  }
-  
+  };
+
   const renderLoaderModalContent = useCallback(() => {
     return (
       <LoaderModal
         headerText={message}
-        messageText={'This may take a few seconds'}
+        messageText={subTextMessage}
       />
     );
-  },[message]);
+  }, [message, subTextMessage]);
 
   const renderLoaderModalHeader = () => {
     return (
@@ -378,8 +383,8 @@ export default function NewWalletQuestion(props) {
                 firstLineTitle={'New Hexa Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
-                infoTextBold={'secret question and answer'}
-                infoTextNormal1={'(this is a very important step)'}
+                infoTextBold={'Security Question and answer'}
+                infoTextNormal1={'\n(you need to remember this)'}
               />
 
               <TouchableOpacity
@@ -411,7 +416,10 @@ export default function NewWalletQuestion(props) {
 
               {dropdownBoxOpenClose ? (
                 <View style={styles.dropdownBoxModal}>
-                  <ScrollView nestedScrollEnabled={true} style={{ height: hp('40%') }}>
+                  <ScrollView
+                    nestedScrollEnabled={true}
+                    style={{ height: hp('40%') }}
+                  >
                     {dropdownBoxList.map((value, index) => (
                       <TouchableOpacity
                         onPress={() => {
@@ -471,9 +479,11 @@ export default function NewWalletQuestion(props) {
                       value={hideShowAnswer ? answerMasked : answer}
                       autoCompleteType="off"
                       textContentType="none"
+                      returnKeyType='next'
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
+                      onSubmitEditing={() => (confirmAnswerTextInput as any).current.focus()}
                       keyboardType={
                         Platform.OS == 'ios'
                           ? 'ascii-capable'
@@ -483,6 +493,7 @@ export default function NewWalletQuestion(props) {
                         text = text.replace(/[^a-z]/g, '');
                         setAnswer(text);
                         setAnswerMasked(text);
+                        
                       }}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
@@ -490,6 +501,7 @@ export default function NewWalletQuestion(props) {
                         if (answer.length > 0) {
                           setAnswer('');
                           setAnswerMasked('');
+                          
                         }
                       }}
                       onBlur={() => {
@@ -522,6 +534,7 @@ export default function NewWalletQuestion(props) {
                         }
                       }}
                     />
+                    {answer ? 
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setHdeShowAnswer(!hideShowAnswer);
@@ -533,7 +546,8 @@ export default function NewWalletQuestion(props) {
                         color={Colors.blue}
                         name={hideShowAnswer ? 'eye-off' : 'eye'}
                       />
-                    </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback> 
+                     : null}
                   </View>
                   <View
                     style={{
@@ -548,6 +562,7 @@ export default function NewWalletQuestion(props) {
                   >
                     <TextInput
                       style={styles.modalInputBox}
+                      ref={confirmAnswerTextInput}
                       placeholder={'Confirm your answer'}
                       placeholderTextColor={Colors.borderColor}
                       value={
@@ -587,7 +602,6 @@ export default function NewWalletQuestion(props) {
                       onBlur={() => {
                         setConfirmAnswerInputStyle(styles.inputBox);
                         setDropdownBoxOpenClose(false);
-
                         let temp = '';
                         for (let i = 0; i < tempAns.length; i++) {
                           temp += '*';
@@ -596,6 +610,7 @@ export default function NewWalletQuestion(props) {
                         setConfirm();
                       }}
                     />
+                    {confirmAnswer ? 
                     <TouchableWithoutFeedback
                       onPress={() => {
                         setHideShowConfirmAnswer(!hideShowConfirmAnswer);
@@ -609,6 +624,7 @@ export default function NewWalletQuestion(props) {
                         name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
                       />
                     </TouchableWithoutFeedback>
+                     : null }
                   </View>
                 </View>
               ) : (
@@ -642,8 +658,8 @@ export default function NewWalletQuestion(props) {
             ? setButtonVisible()
             : null}
           <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorActiveView} />
-            <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
           </View>
         </View>
         {!visibleButton ? (
@@ -654,9 +670,9 @@ export default function NewWalletQuestion(props) {
             }}
           >
             <BottomInfoBox
-              title={'The answer is used to encrypt parts of your wallet'}
-              infoText={'Very important that this is something that only you '}
-              italicText={'know and remember'}
+              title={'This answer is used to encrypt your wallet'}
+              infoText={'It is extremely important that only you'}
+              italicText={' know and remember the answer'}
             />
           </View>
         ) : null}

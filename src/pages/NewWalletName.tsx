@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -10,24 +10,24 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  TextInput
-} from "react-native";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Fonts from "../common/Fonts";
-import Colors from "../common/Colors";
-import CommonStyles from "../common/Styles";
+  TextInput,
+} from 'react-native';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Fonts from '../common/Fonts';
+import Colors from '../common/Colors';
+import CommonStyles from '../common/Styles';
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp
-} from "react-native-responsive-screen";
-import { RFValue } from "react-native-responsive-fontsize";
-import DeviceInfo from "react-native-device-info";
-import HeaderTitle from "../components/HeaderTitle";
-import BottomInfoBox from "../components/BottomInfoBox";
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+import { RFValue } from 'react-native-responsive-fontsize';
+import DeviceInfo from 'react-native-device-info';
+import HeaderTitle from '../components/HeaderTitle';
+import BottomInfoBox from '../components/BottomInfoBox';
 
 export default function NewWalletName(props) {
-  const [walletName, setWalletName] = useState("");
+  const [walletName, setWalletName] = useState('');
   const [inputStyle, setInputStyle] = useState(styles.inputBox);
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -37,7 +37,7 @@ export default function NewWalletName(props) {
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.navigate("RestoreAndRecoverWallet");
+              props.navigation.navigate('RestoreAndRecoverWallet');
             }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -51,26 +51,30 @@ export default function NewWalletName(props) {
         </View>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS == "ios" ? "padding" : ""}
+          behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <ScrollView>
             <HeaderTitle
-              firstLineTitle={"New Hexa Wallet"}
-              secondLineTitle={""}
-              infoTextNormal={"Please name your "}
-              infoTextBold={"wallet"}
+              firstLineTitle={'New Hexa Wallet'}
+              secondLineTitle={''}
+              infoTextNormal={'Please enter a '}
+              infoTextBold={'display name.'}
+              infoTextNormal1={'Your contacts will use this to identify your wallet'}
             />
             <TextInput
               style={inputStyle}
-              placeholder={"Enter a name for your wallet"}
+              placeholder={'Enter display name'}
               placeholderTextColor={Colors.borderColor}
               value={walletName}
-              keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              }
               maxLength={20}
-              onChangeText={text => {
-                text = text.replace(/[^A-Za-z]/g, '')
-                setWalletName(text)}}
+              onChangeText={(text) => {
+                text = text.replace(/[^A-Za-z]/g, '');
+                setWalletName(text);
+              }}
               onFocus={() => {
                 setInputStyle(styles.inputBoxFocused);
               }}
@@ -78,36 +82,51 @@ export default function NewWalletName(props) {
                 setInputStyle(styles.inputBox);
               }}
             />
+            <View style={{width: '100%', alignItems: 'center'}}>
+              <Text style={{fontSize: RFValue(12), 
+                fontFamily: Fonts.FiraSansRegular }}>
+                  No numbers or special characters allowed</Text>
+            </View>
           </ScrollView>
 
           <View style={styles.bottomButtonView}>
-            {walletName.trim() != "" ? (
-              <TouchableOpacity
-                onPress={() => {
-                  props.navigation.navigate("NewWalletQuestion", {
-                    walletName
-                  });
+            {walletName.trim() != '' ? (
+              <View
+                style={{
+                  elevation: 10,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 15, height: 15 },
                 }}
-                style={styles.buttonView}
               >
-                <Text style={styles.buttonText}>Continue</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    props.navigation.navigate('NewWalletQuestion', {
+                      walletName,
+                    });
+                  }}
+                  style={styles.buttonView}
+                >
+                  <Text style={styles.buttonText}>Continue</Text>
+                </TouchableOpacity>
+              </View>
             ) : null}
             <View style={styles.statusIndicatorView}>
               <View style={styles.statusIndicatorActiveView} />
               <View style={styles.statusIndicatorInactiveView} />
             </View>
           </View>
-          
-          {walletName.trim() == "" ? (
-            <View style={{marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0}}>
+
+          {walletName.trim() == '' ? (
+            <View style={{ marginBottom: DeviceInfo.hasNotch ? hp('3%') : 0 }}>
               <BottomInfoBox
-                title={"We do not store this"}
-                infoText={"Only your contacts will see this when you transact with them, to identify you"}
+                title={'We do not store this'}
+                infoText={
+                  'This is used during your communication with your contacts'
+                }
               />
             </View>
           ) : null}
-          
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
@@ -120,19 +139,19 @@ const styles = StyleSheet.create({
     fontSize: RFValue(25),
     marginLeft: 20,
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   labelStyle: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
     marginLeft: 15,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   inputBox: {
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: hp("5%"),
+    marginTop: hp('5%'),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -140,13 +159,13 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 20
+    marginBottom: 20,
   },
   inputBoxFocused: {
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: hp("5%"),
+    marginTop: hp('5%'),
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -159,58 +178,54 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 2, height: 2 },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: 20
+    marginBottom: 20,
   },
   bottomNoteText: {
     color: Colors.blue,
     fontSize: RFValue(13),
     marginBottom: 5,
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
-    fontFamily: Fonts.FiraSansRegular
+    fontFamily: Fonts.FiraSansRegular,
   },
   buttonView: {
-    height: wp("13%"),
-    width: wp("30%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp('13%'),
+    width: wp('30%'),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: Colors.blue
+    backgroundColor: Colors.blue,
   },
   buttonText: {
     color: Colors.white,
     fontSize: RFValue(13),
-    fontFamily: Fonts.FiraSansMedium
+    fontFamily: Fonts.FiraSansMedium,
   },
   bottomButtonView: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingLeft: 30,
     paddingRight: 30,
     paddingBottom: DeviceInfo.hasNotch() ? 70 : 40,
     paddingTop: 30,
-    alignItems: "center",
-    elevation: 10,
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    alignItems: 'center',
   },
   statusIndicatorView: {
-    flexDirection: "row",
-    marginLeft: "auto"
+    flexDirection: 'row',
+    marginLeft: 'auto',
   },
   statusIndicatorActiveView: {
     height: 5,
     width: 25,
     backgroundColor: Colors.blue,
-    borderRadius: 10
+    borderRadius: 10,
   },
   statusIndicatorInactiveView: {
     width: 5,
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
-    marginLeft: 5
-  }
+    marginLeft: 5,
+  },
 });

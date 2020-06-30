@@ -34,13 +34,13 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import WalletBackupAndRecoveryContents from '../../components/Helper/WalletBackupAndRecoveryContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
-import { fetchSSSFromDB } from '../../store/actions/storage';
 import RegenerateHealper from '../../components/Helper/RegenerateHealper';
 import ModalHeader from '../../components/ModalHeader';
 import SecondaryDeviceHealthCheck from '../HealthCheck/SecondaryDeviceHealthCheck';
 import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
 
 export default function ManageBackup(props) {
   const [
@@ -88,38 +88,38 @@ export default function ManageBackup(props) {
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
-      title: 'Recovery Secret Not Accessible',
+      title: 'Recovery Key Not Accessible',
       date: '19 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Recovery Secret Received',
+      title: 'Recovery Key Received',
       date: '1 June ‘19, 9:00am',
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Recovery Secret In-Transit',
+      title: 'Recovery Key In-Transit',
       date: '30 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 4,
-      title: 'Recovery Secret Accessible',
+      title: 'Recovery Key Accessible',
       date: '24 May ‘19, 5:00pm',
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 5,
-      title: 'Recovery Secret In-Transit',
+      title: 'Recovery Key In-Transit',
       date: '20 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 6,
-      title: 'Recovery Secret Not Accessible',
+      title: 'Recovery Key Not Accessible',
       date: '19 May ‘19, 11:00am',
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
@@ -180,13 +180,13 @@ export default function ManageBackup(props) {
     },
   ]);
   const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector(state => state.sss.service);
+  const s3Service: S3Service = useSelector((state) => state.sss.service);
   // const { databaseSSS } = useSelector(state => state.storage);
-  const [overallHealth, setOverallHealth] = useState();
-  const health = useSelector(state => state.sss.overallHealth);
+  const [overallHealth, setOverallHealth] = useState(null);
+  const health = useSelector((state) => state.sss.overallHealth);
   //const { overallHealth } = useSelector( state => state.sss );
   const healthLoading = useSelector(
-    state => state.sss.loading.checkMSharesHealth,
+    (state) => state.sss.loading.checkMSharesHealth,
   );
   const [is_initiated, setIs_initiated] = useState(false);
 
@@ -226,7 +226,7 @@ export default function ManageBackup(props) {
     }
   }
 
-  const getIconByStatus = status => {
+  const getIconByStatus = (status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -238,17 +238,18 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryContents = () => {
     return (
-      <WalletBackupAndRecoveryContents
-        onPressManageBackup={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-        onSkip={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-        onStartBackup={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      // <WalletBackupAndRecoveryContents
+      //   onPressManageBackup={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      //   onSkip={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      //   onStartBackup={() => {
+      //     (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <ManageBackupHelpContents />
     );
   };
 
@@ -300,11 +301,11 @@ export default function ManageBackup(props) {
     return (
       <SecondaryDeviceHealthCheck
         data={secondaryDeviceHistory}
-        title={'Secondary Device'}
+        title={'Keeper Device'}
         time={selectedTime}
         status={selectedStatus}
         reshareInfo={
-          'Want to send the Recovery Secret again to the same destination? '
+          'Want to send the Recovery Key again to the same destination? '
         }
         onPressConfirm={() => {
           (ConfirmBottomSheet as any).current.snapTo(1);
@@ -339,7 +340,7 @@ export default function ManageBackup(props) {
         time={selectedTime}
         status={selectedStatus}
         reshareInfo={
-          'Want to send the Recovery Secret again to the same destination? '
+          'Want to send the Recovery Key again to the same destination? '
         }
         onPressConfirm={() => {
           (ConfirmBottomSheet as any).current.snapTo(1);
@@ -399,10 +400,10 @@ export default function ManageBackup(props) {
     return (
       <ErrorModalContents
         modalRef={ChangeBottomSheet}
-        title={'Change your\nTrusted Contact'}
-        info={'Having problems with your Trusted Contact'}
+        title={'Change your\nKeeper'}
+        info={'Having problems with your Keeper?'}
         note={
-          'You can change the Trusted Contact you selected to share your Recovery Secret'
+          'You can change the Keeper you selected to sebd your Recovery Key'
         }
         proceedButtonText={'Change'}
         cancelButtonText={'Back'}
@@ -436,24 +437,24 @@ export default function ManageBackup(props) {
     let info = '';
     let note = '';
     if (SelectTypeToReshare == 'secondaryDevice') {
-      title = 'Reshare Recovery Secret\nwith Secondary Device';
-      info = 'Did your secondary device not receive the Recovery Secret?';
-      note = 'You can reshare the Recovery Secret with your \nSecondary Device';
+      title = 'Reshare Recovery Key\nwith Keeper Device';
+      info = 'Did your Keeper device not receive the Recovery Key?';
+      note = 'You can reshare the Recovery Key with your \nKeeper Device';
     } else if (
       SelectTypeToReshare == 'contact1' ||
       SelectTypeToReshare == 'contact2'
     ) {
-      title = 'Reshare Recovery Secret\nwith Trusted Contact';
-      info = 'Did your contact not receive the Recovery Secret?';
+      title = 'Reshare Recovery Key\nwith Keeper';
+      info = 'Did your Keeper not receive the Recovery Key?';
       note =
-        'You can reshare the Recovery Secret with your Trusted\nContact via Email or Sms';
+        'You can reshare the Recovery Key with your Keeper';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
     ) {
-      title = 'Reshare Recovery Secret\nwith Personal Copy';
-      info = 'Did your personal Copies not receive the Recovery Secret?';
-      note = 'You can reshare the Recovery Secret with your \nPersonal Copy';
+      title = 'Reshare Recovery Key\nwith Personal Copy';
+      info = 'Did your personal Copies not receive the Recovery Key?';
+      note = 'You can reshare the Recovery Key with your \nPersonal Copy';
     }
     return (
       <ErrorModalContents
@@ -523,34 +524,34 @@ export default function ManageBackup(props) {
     let note = '';
     let proceedButtonText = '';
     if (SelectTypeToReshare == 'secondaryDevice') {
-      title = 'Confirm Recovery Secret\nwith Secondary Device';
-      info = 'Your Secondary Device seems away from their Hexa App';
+      title = 'Confirm Recovery Key\nwith Keeper Device';
+      info = 'Your Keeper Device seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Send a message';
     } else if (
       SelectTypeToReshare == 'contact1' ||
       SelectTypeToReshare == 'contact2'
     ) {
-      title = 'Confirm Recovery Secret\nwith Trusted Contact';
-      info = 'Your Trusted Contact seems away from their Hexa App';
+      title = 'Confirm Recovery Key\nwith Keeper';
+      info = 'Your Keeper seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
     ) {
-      title = 'Confirm Recovery Secret\nwith Personal Copy';
-      info = 'Your Trusted Contact seems away from their Hexa App';
+      title = 'Confirm Recovery Key\nwith Personal Copy';
+      info = 'Your Keeper seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
     } else if (SelectTypeToReshare == 'security') {
-      title = 'Confirm Recovery Secret\nwith Security Question';
+      title = 'Confirm Recovery Key\nwith Security Question';
       info = 'Your Security Question seems away from their Hexa App';
       note =
-        'You can send them a reminder to open their app to\nensure they have your Recovery Secret';
+        'You can send them a reminder to open their app to\nensure they have your Recovery Key';
       proceedButtonText = 'Confirm';
     }
     return (
@@ -653,7 +654,7 @@ export default function ManageBackup(props) {
     );
   };
 
-  const getScannerData = data => {
+  const getScannerData = (data) => {
     console.log('data', data);
   };
 
@@ -785,29 +786,50 @@ export default function ManageBackup(props) {
   };
 
   const setContactsFromAsync = async () => {
-    let contactList = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
+    let trustedContactsInfo: any = await AsyncStorage.getItem(
+      'TrustedContactsInfo',
     );
-    setContacts(contactList);
-    if (contactList.length) {
-      if (
-        contactList.findIndex(value => value && value.type == 'contact1') != -1
-      ) {
-        pageData[1].personalInfo =
-          contactList[
-            contactList.findIndex(value => value && value.type == 'contact1')
-          ];
+
+    if (trustedContactsInfo) {
+      trustedContactsInfo = JSON.parse(trustedContactsInfo);
+      const selectedContacts = trustedContactsInfo.slice(1, 3);
+      setContacts(selectedContacts);
+
+      if (selectedContacts[0]) {
+        pageData[1].personalInfo = selectedContacts[0];
       }
-      if (
-        contactList.findIndex(value => value && value.type == 'contact2') != -1
-      ) {
-        pageData[2].personalInfo =
-          contactList[
-            contactList.findIndex(value => value && value.type == 'contact2')
-          ];
+      if (selectedContacts[1]) {
+        pageData[2].personalInfo = selectedContacts[1];
       }
+      setPageData([...pageData]);
     }
-    setPageData([...pageData]);
+
+    // let contactList = JSON.parse(
+    //   await AsyncStorage.getItem('SelectedContacts'),
+    // );
+
+    // setContacts(contactList);
+    // if (contactList.length) {
+    //   if (
+    //     contactList.findIndex((value) => value && value.type == 'contact1') !=
+    //     -1
+    //   ) {
+    //     pageData[1].personalInfo =
+    //       contactList[
+    //         contactList.findIndex((value) => value && value.type == 'contact1')
+    //       ];
+    //   }
+    //   if (
+    //     contactList.findIndex((value) => value && value.type == 'contact2') !=
+    //     -1
+    //   ) {
+    //     pageData[2].personalInfo =
+    //       contactList[
+    //         contactList.findIndex((value) => value && value.type == 'contact2')
+    //       ];
+    //   }
+    // }
+    // setPageData([...pageData]);
   };
 
   const setAutoHighlightFlagsFromAsync = async () => {
@@ -902,7 +924,7 @@ export default function ManageBackup(props) {
   }, [autoHighlightFlags]);
 
   useEffect(() => {
-    dispatch(fetchSSSFromDB());
+    // dispatch(fetchSSSFromDB());
     checkNShowHelperModal();
   }, []);
 
@@ -926,7 +948,7 @@ export default function ManageBackup(props) {
     if (overallHealth) {
       setIsNextStepDisable(false);
       const updatedPageData = [...pageData];
-      updatedPageData.forEach(data => {
+      updatedPageData.forEach((data) => {
         switch (data.title) {
           case 'Secondary Device':
             if (overallHealth.sharesInfo[0]) {
@@ -1307,26 +1329,26 @@ export default function ManageBackup(props) {
   const onContactsUpdate = async () => {
     if (contacts.length) {
       if (
-        contacts.findIndex(value => value && value.type == 'contact1') != -1
+        contacts.findIndex((value) => value && value.type == 'contact1') != -1
       ) {
         pageData[1].personalInfo =
           contacts[
-            contacts.findIndex(value => value && value.type == 'contact1')
+            contacts.findIndex((value) => value && value.type == 'contact1')
           ];
       }
       if (
-        contacts.findIndex(value => value && value.type == 'contact2') != -1
+        contacts.findIndex((value) => value && value.type == 'contact2') != -1
       ) {
         pageData[2].personalInfo =
           contacts[
-            contacts.findIndex(value => value && value.type == 'contact2')
+            contacts.findIndex((value) => value && value.type == 'contact2')
           ];
       }
     }
     setPageData(pageData);
   };
 
-  const getTime = item => {
+  const getTime = (item) => {
     return (item.toString() && item.toString() == '0') ||
       item.toString() == 'never'
       ? 'never'
@@ -1338,8 +1360,15 @@ export default function ManageBackup(props) {
     if (s3Service) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
-        // console.log({ healthCheckInitialized });
-        // dispatch(checkMSharesHealth());
+        (async () => {
+          const intialHealthSync = await AsyncStorage.getItem(
+            'initalHealthSync',
+          );
+          if (!intialHealthSync) {
+            dispatch(checkMSharesHealth());
+            AsyncStorage.setItem('initalHealthSync', 'true');
+          }
+        })();
       } else {
         // console.log({ healthCheckInitialized });
         dispatch(initHealthCheck());
@@ -1347,7 +1376,7 @@ export default function ManageBackup(props) {
     }
   }, [s3Service]);
 
-  const getStatusIcon = item => {
+  const getStatusIcon = (item) => {
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
       return getIconByStatus(item.status);
     }
@@ -1369,7 +1398,7 @@ export default function ManageBackup(props) {
     return require('../../assets/images/icons/settings.png');
   };
 
-  const getImageIcon = item => {
+  const getImageIcon = (item) => {
     if (item.type == 'contact1' || item.type == 'contact2') {
       if (item.personalInfo) {
         if (item.personalInfo.imageAvailable) {
@@ -1425,6 +1454,63 @@ export default function ManageBackup(props) {
       }
     }
     return <Image style={styles.cardImage} source={getImageByType(item)} />;
+  };
+
+  const getCardTitle = (item) => {
+    if (item.type === 'contact1' || item.type === 'contact2') {
+      if (item.personalInfo) {
+        if (item.personalInfo.firstName && item.personalInfo.lastName) {
+          return item.personalInfo.firstName + ' ' + item.personalInfo.lastName;
+        }
+        if (!item.personalInfo.firstName && item.personalInfo.lastName) {
+          return item.personalInfo.lastName;
+        }
+        if (item.personalInfo.firstName && !item.personalInfo.lastName) {
+          return item.personalInfo.firstName;
+        }
+
+        return '';
+      } else {
+        return 'Friends and Family';
+      }
+    }
+
+    if (item.type === 'copy1' || item.type === 'copy2') {
+      return 'Personal Copy';
+    }
+
+    if (item.type === 'secondaryDevice') {
+      return 'Keeper Device';
+    }
+
+    if (item.type === 'security') {
+      return 'Security Question';
+    }
+
+    return item.title;
+  };
+
+  const getCardSubText = (item) => {
+    if (item.type === 'contact1' || item.type === 'contact2') {
+      if (item.personalInfo) {
+        return 'Friends and Family';
+      }
+      return 'Select a Friend or Family member as a Keeper';
+    }
+    if (item.type === 'secondaryDevice') {
+      if (item.status === 'Ugly') {
+        return 'Another device running Hexa app that you own';
+      }
+      return 'Last Backup ';
+    }
+    if (item.type === 'copy1' || item.type === 'copy2') {
+      if (item.status === 'Ugly') {
+        return 'Secure your Recovery Key as a file (pdf)';
+      }
+      return 'The PDFs are locked with your Security Answers';
+    }
+
+    return 'Last Backup ';
   };
 
   return (
@@ -1493,7 +1579,7 @@ export default function ManageBackup(props) {
                       marginLeft: 25,
                     }}
                   >
-                    The wallet backup is not secured. Please complete the setup
+                    The wallet backup is not complete. Please complete the setup
                     to safeguard against loss of funds
                   </Text>
                   <KnowMoreButton
@@ -1540,7 +1626,7 @@ export default function ManageBackup(props) {
                               {
                                 selectedStatus: item.status,
                                 selectedTime: getTime(item.time),
-                                selectedTitle: item.title,
+                                selectedTitle: getCardTitle(item),
                                 updateAutoHighlightFlags: () =>
                                   setAutoHighlightFlags({
                                     ...autoHighlightFlags,
@@ -1604,7 +1690,7 @@ export default function ManageBackup(props) {
                               {
                                 selectedStatus: item.status,
                                 selectedTime: getTime(item.time),
-                                selectedTitle: item.title,
+                                selectedTitle: getCardTitle(item),
                                 updateAutoHighlightFlags: () =>
                                   setAutoHighlightFlags({
                                     ...autoHighlightFlags,
@@ -1643,33 +1729,23 @@ export default function ManageBackup(props) {
                         {getImageIcon(item)}
                         <View style={{ marginLeft: 15 }}>
                           <Text style={styles.cardTitleText}>
-                            {item.personalInfo &&
-                            (item.type == 'contact1' || item.type == 'contact2')
-                              ? item.personalInfo.firstName &&
-                                item.personalInfo.lastName
-                                ? item.personalInfo.firstName +
-                                  ' ' +
-                                  item.personalInfo.lastName
-                                : item.personalInfo.firstName &&
-                                  !item.personalInfo.lastName
-                                ? item.personalInfo.firstName
-                                : !item.personalInfo.firstName &&
-                                  item.personalInfo.lastName
-                                ? item.personalInfo.lastName
-                                : ''
-                              : item.title}
+                            {getCardTitle(item)}
                           </Text>
                           <Text style={styles.cardTimeText}>
-                            Last backup{' '}
-                            <Text
-                              style={{
-                                fontFamily: Fonts.FiraSansMediumItalic,
-                                fontWeight: 'bold',
-                                fontStyle: 'italic',
-                              }}
-                            >
-                              {getTime(item.time)}
-                            </Text>
+                            {getCardSubText(item)}
+                            {(item.type === 'security' ||
+                              (item.type === 'secondaryDevice' &&
+                                item.status !== 'Ugly')) && (
+                              <Text
+                                style={{
+                                  fontFamily: Fonts.FiraSansMediumItalic,
+                                  fontWeight: 'bold',
+                                  fontStyle: 'italic',
+                                }}
+                              >
+                                {getTime(item.time)}
+                              </Text>
+                            )}
                           </Text>
                         </View>
                         <Image

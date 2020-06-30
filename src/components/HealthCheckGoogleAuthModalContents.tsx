@@ -32,7 +32,7 @@ export default function HealthCheckGoogleAuthModalContents(props) {
             <View style={{ flexDirection: 'row', padding: wp('7%') }}>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
                     <Text style={styles.modalTitleText}>Health Check{"\n"}Google Authenticator</Text>
-                    <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>Enter the first three digits of your 2FA secret{"\n"}key from secure PDF</Text>
+                    <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>Enter the first three digits of your 2FA Key{"\n"}key from secure PDF</Text>
                 </View>
             </View>
             <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%'), }}>
@@ -96,7 +96,7 @@ export default function HealthCheckGoogleAuthModalContents(props) {
                         }}
                     />
                 </View>
-                <Text style={styles.modalInfoText}>Answer 1 + Answer 2 to your secret questions is the{"\n"}password for the PDF</Text>
+                <Text style={styles.modalInfoText}>The answer to your Security Question is the{"\n"}password for the PDF</Text>
                 <TouchableOpacity
                     disabled={code.length < 3 ? true : false}
                     onPress={() => props.onPressConfirm()}

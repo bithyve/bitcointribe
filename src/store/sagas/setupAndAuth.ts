@@ -1,7 +1,7 @@
 import { call, put, select } from 'redux-saga/effects';
 import { createWatcher, serviceGenerator } from '../utils/utilities';
 import { AsyncStorage } from 'react-native';
-
+import DeviceInfo from 'react-native-device-info';
 import * as Cipher from '../../common/encryption';
 import * as SecureStore from '../../storage/secure-store';
 import {
@@ -16,20 +16,23 @@ import {
   INIT_RECOVERY,
   CHANGE_AUTH_CRED,
   credsChanged,
-  pinChangedFailed
+  pinChangedFailed,
 } from '../actions/setupAndAuth';
-import { insertIntoDB, keyFetched, fetchFromDB } from '../actions/storage';
+import { keyFetched, fetchFromDB } from '../actions/storage';
 import { Database } from '../../common/interfaces/Interfaces';
-import { Alert } from 'react-native';
+import { insertDBWorker } from './storage';
 
 function* initSetupWorker({ payload }) {
   yield put(switchSetupLoader('initializing'));
 
   const { walletName, security } = payload;
-  const { regularAcc, testAcc, secureAcc, s3Service } = yield call(
-    serviceGenerator,
-    security.answer,
-  );
+  const {
+    regularAcc,
+    testAcc,
+    secureAcc,
+    s3Service,
+    trustedContacts,
+  } = yield call(serviceGenerator, security.answer);
 
   const initialDatabase: Database = {
     WALLET_SETUP: { walletName, security },
@@ -44,10 +47,11 @@ function* initSetupWorker({ payload }) {
       TEST_ACCOUNT: JSON.stringify(testAcc),
       SECURE_ACCOUNT: JSON.stringify(secureAcc),
       S3_SERVICE: JSON.stringify(s3Service),
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     },
+    VERSION: DeviceInfo.getVersion(),
   };
-
-  yield put(insertIntoDB(initialDatabase));
+  yield call(insertDBWorker, { payload: initialDatabase });
   yield call(AsyncStorage.setItem, 'walletExists', 'true');
   yield put(setupInitialized());
 }
@@ -65,9 +69,10 @@ function* initRecoveryWorker({ payload }) {
       UNDER_CUSTODY: {},
       DYNAMIC_NONPMDD: {},
     },
+    VERSION: DeviceInfo.getVersion(),
   };
 
-  yield put(insertIntoDB(initialDatabase));
+  yield call(insertDBWorker, { payload: initialDatabase });
   // yield call(AsyncStorage.setItem, "walletExists", "true");
   // yield put(setupInitialized());
 }
@@ -141,7 +146,7 @@ function* changeAuthCredWorker({ payload }) {
     const oldHash = yield call(Cipher.hash, oldPasscode);
     const oldEncryptedKey = yield call(SecureStore.fetch, oldHash);
     const oldKey = yield call(Cipher.decrypt, oldEncryptedKey, oldHash);
-    const key = yield select(state => state.storage.key);
+    const key = yield select((state) => state.storage.key);
     if (oldKey !== key) {
       throw new Error('Incorrect Pin');
     }
@@ -157,8 +162,8 @@ function* changeAuthCredWorker({ payload }) {
     yield put(credsChanged('changed'));
   } catch (err) {
     console.log({ err });
-    yield put( pinChangedFailed(true) );
-   // Alert.alert('Pin change failed!', err.message);
+    yield put(pinChangedFailed(true));
+    // Alert.alert('Pin change failed!', err.message);
     yield put(credsChanged('not-changed'));
   }
 }

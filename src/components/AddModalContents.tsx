@@ -3,57 +3,62 @@ import {
 	View,
 	Image,
 	Text,
-	StyleSheet,
-	ScrollView,
-	FlatList
+	StyleSheet
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../common/Colors";
 import Fonts from "../common/Fonts";
-import CommonStyles from "../common/Styles";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppBottomSheetTouchableWrapper } from "../components/AppBottomSheetTouchableWrapper";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import Entypo from "react-native-vector-icons/Entypo";
+import { FlatList } from "react-native-gesture-handler"; 
 
 export default function AddModalContents( props ) {
 	const [ addData, setAddData ] = useState( [
+		{
+			title: `Buy bitcoin into Hexa wallet`, 
+			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
+			info: 'Redeem a FastBitcoins voucher',
+			type:'buyBitcoins'
+		},
+		{
+			title: 'Add Contact', 
+			image: require( '../assets/images/icons/icon_addcontact.png' ), 
+			info: 'Add contacts from your Address Book',
+			type:'addContact'
+		},
 		// {
-		// 	title: 'Getbittr', image: require('../assets/images/icons/icon_getbitter.png'), info: 'GetBittr gives you an easy way to stack sats',
+		// 	title: 'Add Account', 
+		// 	image: require( '../assets/images/icons/icon_addaccount.png' ), 
+		// 	info: 'Add an account to your wallet, Select from options',
+		// 	type:'addAccount'
 		// },
-		{
-			title: `Buy Bitcoins`, image: require( '../assets/images/icons/icon_fastbicoin.png' ), info: 'Buy bitcoins directly into your Hexa wallet',
-		},
-		{
-			title: 'Add Contact', image: require( '../assets/images/icons/icon_addcontact.png' ), info: 'Add contacts from your address book',
-		},
-		{
-			title: 'Add Account', image: require( '../assets/images/icons/icon_addaccount.png' ), info: 'Add an account to your wallet, Select from options',
-		},
-		{
-			title: 'Import Wallet', image: require( '../assets/images/icons/icon_importwallet.png' ), info: 'Import a non-Hexa wallet as an account',
-		},
-
+		// {
+		// 	title: 'Import Wallet', 
+		// 	image: require( '../assets/images/icons/icon_importwallet.png' ), 
+		// 	info: 'Import a non-Hexa wallet as an account',
+		// 	type:'importWallet'
+		// },
 	] )
 	return ( <View style={ styles.modalContentContainer }>
-		<FlatList
-			data={ addData }
-			ItemSeparatorComponent={ () => <View style={ { backgroundColor: Colors.white } }><View style={ styles.separatorView } /></View> }
-			renderItem={ ( { item } ) =>
-				<AppBottomSheetTouchableWrapper disabled={ true } onPress={ () => props.onPressElements( item.title ) } style={ styles.addModalView } >
-					<View style={ styles.modalElementInfoView }>
-						<View style={ { justifyContent: "center", } }>
-							<Image source={ item.image } style={ { width: 25, height: 25 } } />
+		<View style={{marginBottom: hp('13%')}}>
+			<FlatList
+				data={ addData }
+				ItemSeparatorComponent={ () => <View style={ { backgroundColor: Colors.white } }><View style={ styles.separatorView } /></View> }
+				renderItem={ ( { item } ) =>
+					<AppBottomSheetTouchableWrapper onPress={ () => props.onPressElements( item.type ) } style={ {...styles.addModalView, backgroundColor: Colors.white }} >
+						<View style={ styles.modalElementInfoView }>
+							<View style={ { justifyContent: "center", } }>
+								<Image source={ item.image } style={ { width: 25, height: 25 } } />
+							</View>
+							<View style={ { justifyContent: "center", marginLeft: 10 } }>
+								<Text style={ styles.addModalTitleText }>{ item.title } </Text>
+								<Text style={ styles.addModalInfoText }>{ item.info }</Text>
+							</View>
 						</View>
-						<View style={ { justifyContent: "center", marginLeft: 10 } }>
-							<Text style={ styles.addModalTitleText }>{ item.title } </Text>
-							<Text style={ styles.addModalInfoText }>{ item.info }</Text>
-						</View>
-					</View>
-				</AppBottomSheetTouchableWrapper>
-			}
-		/>
+					</AppBottomSheetTouchableWrapper>
+				}
+			/>
+		</View>
 	</View>
 	)
 }
@@ -61,11 +66,8 @@ const styles = StyleSheet.create( {
 	modalContentContainer: {
 		height: '100%',
 		backgroundColor: Colors.white,
-		paddingBottom: hp( '10%' )
 	},
 	addModalView: {
-		opacity: 0.3,
-		backgroundColor: Colors.borderColor,//Colors.white,
 		padding: 7,
 		flexDirection: 'row',
 		display: 'flex',
@@ -74,11 +76,13 @@ const styles = StyleSheet.create( {
 	},
 	addModalTitleText: {
 		color: Colors.blue,
-		fontSize: RFValue( 14 ),
+		fontSize: RFValue( 13 ),
+		fontFamily: Fonts.FiraSansRegular
 	},
 	addModalInfoText: {
 		color: Colors.textColorGrey,
 		fontSize: RFValue( 11 ),
+		fontFamily: Fonts.FiraSansRegular
 	},
 	modalElementInfoView: {
 		padding: 10,

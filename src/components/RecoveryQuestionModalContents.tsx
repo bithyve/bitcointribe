@@ -36,10 +36,9 @@ export default function RecoveryQuestionModalContents(props) {
             <Text style={styles.modalTitleText}>
               Enter Security Question{'\n'}and Answer
             </Text>
-            <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              To recover your wallet you have to select the security question
-              and enter its answer
-            </Text>
+            <Text
+              style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}
+            ></Text>
           </View>
           <View style={{ flex: 1 }}>
             <KnowMoreButton
@@ -61,14 +60,7 @@ export default function RecoveryQuestionModalContents(props) {
               setDropdownBoxOpenClose(!dropdownBoxOpenClose);
             }}
           >
-            <Text
-              style={{
-                ...styles.dropdownBoxText,
-                color: dropdownBoxValue.question
-                  ? Colors.textColorGrey
-                  : Colors.borderColor,
-              }}
-            >
+             <Text style={styles.dropdownBoxText}>
               {dropdownBoxValue.question
                 ? dropdownBoxValue.question
                 : 'Select Security Question'}
@@ -133,7 +125,7 @@ export default function RecoveryQuestionModalContents(props) {
               placeholder={'Enter Security Answer'}
               placeholderTextColor={Colors.borderColor}
               value={answer}
-              onChangeText={text => {
+              onChangeText={(text) => {
                 setAnswer(text);
                 props.onTextChange(answer);
               }}
@@ -147,8 +139,8 @@ export default function RecoveryQuestionModalContents(props) {
               }}
             />
             <Text style={styles.modalInfoText}>
-              The Security Answer is case sensitive, make sure you{'\n'}enter
-              the case, numeric or symbolic values correctly
+              The Security Answer is case sensitive. Please make sure{'\n'}you
+              enter all characters accurately.
             </Text>
           </View>
           <TouchableOpacity
@@ -188,8 +180,10 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
   },
   dropdownBoxText: {
+    color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(13),
+    marginRight: 15,
   },
   dropdownBoxModal: {
     borderRadius: 10,

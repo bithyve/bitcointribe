@@ -1,4 +1,4 @@
-import config from '../../Config';
+import config from '../../HexaConfig';
 const HEXA_HEALTH = config.HEALTH_STATUS.HEXA_HEALTH;
 const ENTITY_HEALTH = config.HEALTH_STATUS.ENTITY_HEALTH;
 const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS;
@@ -49,7 +49,6 @@ export default class HealthStatus {
       updatedAt: number;
     }>;
   } => {
-    console.log({ shares });
     const sharesInfo = new Array(shares.length);
     let SLOT1 = TIME_SLOTS.SHARE_SLOT1;
     let SLOT2 = TIME_SLOTS.SHARE_SLOT2;
@@ -64,7 +63,6 @@ export default class HealthStatus {
       }
     }
 
-    console.log({ sharesInfo });
     const delta: number[] = new Array(shares.length);
     const minutes: number[] = new Array(shares.length);
     for (let i = 0; i < delta.length; i++) {
@@ -96,7 +94,6 @@ export default class HealthStatus {
         }
       }
     }
-    console.log({ sharesInfo });
     return { sharesInfo };
   };
 

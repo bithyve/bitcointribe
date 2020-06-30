@@ -8,17 +8,17 @@ import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
 import sssReducer from './reducers/sss';
-import manageBackupReducer from './reducers/manageBackup';
+import fBTCReducers from './reducers/fbtc';
+import notificationsReducer from './reducers/notifications';
+import trustedContactsReducer from './reducers/trustedContacts';
 
 import {
   initDBWatcher,
   fetchDBWatcher,
-  fetchSSSDBWatcher,
   insertDBWatcher,
-  insertSSSDBWatcher,
   servicesEnricherWatcher,
-  updateSSSDBWatcher,
 } from './sagas/storage';
+
 import {
   initSetupWatcher,
   initRecoveryWatcher,
@@ -26,6 +26,7 @@ import {
   credentialsAuthWatcher,
   changeAuthCredWatcher,
 } from './sagas/setupAndAuth';
+
 import {
   fetchAddrWatcher,
   fetchBalanceWatcher,
@@ -41,7 +42,13 @@ import {
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
+  fetchDerivativeAccXpubWatcher,
+  fetchDerivativeAccBalanceTxWatcher,
+  fetchDerivativeAccAddressWatcher,
+  syncDerivativeAccountsWatcher,
+  startupSyncWatcher,
 } from './sagas/accounts';
+
 import {
   initHCWatcher,
   generateMetaSharesWatcher,
@@ -57,16 +64,40 @@ import {
   recoverMnemonicWatcher,
   recoverWalletWatcher,
   restoreDynamicNonPMDDWatcher,
-  generatePDFWatcher,
+  generatePersonalCopyWatcher,
   checkPDFHealthWatcher,
   restoreShareFromQRWatcher,
   shareHistoryUpdateWatcher,
+  updateWalletImageWatcher,
+  fetchWalletImageWatcher,
+  sharePersonalCopyWatcher,
 } from './sagas/sss';
 
 import {
-  sharePdfWatcher,
-  dbUpdatePdfSharingWatcher,
-} from './sagas/manageBackup';
+  accountSyncWatcher,
+  getQuoteWatcher,
+  executeOrderWatcher,
+  getBalancesWatcher,
+} from './sagas/fbtc';
+
+import {
+  updateFCMTokensWatcher,
+  sendNotificationWatcher,
+  fetchNotificationsWatcher,
+} from './sagas/notifications';
+
+import {
+  initializedTrustedContactWatcher,
+  approveTrustedContactWatcher,
+  fetchTrustedChannelWatcher,
+  fetchEphemeralChannelWatcher,
+  updateEphemeralChannelWatcher,
+  updateTrustedChannelWatcher,
+  trustedChannelsSyncWatcher,
+} from './sagas/trustedContacts';
+
+import { fromPrivateKey } from 'bip32';
+import reducer from './reducers/fbtc';
 
 // const rootSaga = function*() {
 //   yield all([
@@ -85,16 +116,13 @@ import {
 //   ]);
 // };
 
-const rootSaga = function*() {
+const rootSaga = function* () {
   const sagas = [
     // database watchers
     initDBWatcher,
     fetchDBWatcher,
-    fetchSSSDBWatcher,
     insertDBWatcher,
-    insertSSSDBWatcher,
     servicesEnricherWatcher,
-    updateSSSDBWatcher,
 
     // wallet setup watcher
     initSetupWatcher,
@@ -118,13 +146,19 @@ const rootSaga = function*() {
     exchangeRateWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
+    fetchDerivativeAccXpubWatcher,
+    fetchDerivativeAccAddressWatcher,
+    fetchDerivativeAccBalanceTxWatcher,
+    syncDerivativeAccountsWatcher,
+    startupSyncWatcher,
 
     // sss watchers
     initHCWatcher,
     generateMetaSharesWatcher,
     uploadEncMetaShareWatcher,
     downloadMetaShareWatcher,
-    generatePDFWatcher,
+    generatePersonalCopyWatcher,
+    sharePersonalCopyWatcher,
     updateMSharesHealthWatcher,
     checkMSharesHealthWatcher,
     checkPDFHealthWatcher,
@@ -138,15 +172,33 @@ const rootSaga = function*() {
     recoverWalletWatcher,
     restoreShareFromQRWatcher,
     shareHistoryUpdateWatcher,
+    updateWalletImageWatcher,
+    fetchWalletImageWatcher,
 
-    // manage backup
-    sharePdfWatcher,
-    dbUpdatePdfSharingWatcher,
+    //fBTC
+    accountSyncWatcher,
+    getQuoteWatcher,
+    executeOrderWatcher,
+    getBalancesWatcher,
+
+    // Notifications
+    updateFCMTokensWatcher,
+    fetchNotificationsWatcher,
+    sendNotificationWatcher,
+
+    // Trusted Contacts
+    initializedTrustedContactWatcher,
+    approveTrustedContactWatcher,
+    updateEphemeralChannelWatcher,
+    fetchEphemeralChannelWatcher,
+    updateTrustedChannelWatcher,
+    fetchTrustedChannelWatcher,
+    trustedChannelsSyncWatcher,
   ];
 
   yield all(
-    sagas.map(saga =>
-      spawn(function*() {
+    sagas.map((saga) =>
+      spawn(function* () {
         while (true) {
           try {
             yield call(saga);
@@ -165,7 +217,9 @@ const rootReducer = combineReducers({
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
-  manageBackup: manageBackupReducer,
+  fbtc: fBTCReducers,
+  notifications: notificationsReducer,
+  trustedContacts: trustedContactsReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

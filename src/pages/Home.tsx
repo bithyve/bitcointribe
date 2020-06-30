@@ -23,34 +23,23 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Animated from 'react-native-reanimated';
 import Colors from '../common/Colors';
 import DeviceInfo from 'react-native-device-info';
 import ToggleSwitch from '../components/ToggleSwitch';
-import Entypo from 'react-native-vector-icons/Entypo';
 import { RFValue } from 'react-native-responsive-fontsize';
 import CommonStyles from '../common/Styles';
 import NoInternetModalContents from '../components/NoInternetModalContents';
 import TransparentHeaderModal from '../components/TransparentHeaderModal';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents';
-import CustodianRequestOtpModalContents from '../components/CustodianRequestOtpModalContents';
 import MoreHomePageTabContents from '../components/MoreHomePageTabContents';
 import SmallHeaderModal from '../components/SmallHeaderModal';
-import AddressBookContents from '../components/AddressBookContents';
-import CustodianRequestAcceptModalContents from '../components/CustodianRequestAcceptModalContents';
 import HomePageShield from '../components/HomePageShield';
 import TransactionDetailsContents from '../components/TransactionDetailsContents';
 import TransactionListModalContents from '../components/TransactionListModalContents';
 import AddModalContents from '../components/AddModalContents';
 import QrCodeModalContents from '../components/QrCodeModalContents';
-import FastBitcoinModalContents from '../components/FastBitcoinModalContents';
 import FastBitcoinCalculationModalContents from '../components/FastBitcoinCalculationModalContents';
-import GetBittrModalContents from '../components/GetBittrModalContents';
-import AddContactsModalContents from '../components/AddContactsModalContents';
-import FamilyandFriendsAddressBookModalContents from '../components/FamilyandFriendsAddressBookModalContents';
-import SelectedContactFromAddressBook from '../components/SelectedContactFromAddressBook';
-import SelectedContactFromAddressBookQrCode from '../components/SelectedContactFromAddressBookQrCode';
 import HealthCheckSecurityQuestionModalContents from '../components/HealthCheckSecurityQuestionModalContents';
 import HealthCheckGoogleAuthModalContents from '../components/HealthCheckGoogleAuthModalContents';
 import SettingManagePin from './SettingManagePin';
@@ -60,6 +49,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  TRUSTED_CONTACTS,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
@@ -79,11 +69,9 @@ import ShareRecoverySecretModalContents from '../components/ShareRecoverySecretM
 import moment from 'moment';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import {
-  getTestcoins,
-  fetchBalance,
-  fetchTransactions,
-} from '../store/actions/accounts';
-import axios from 'axios';
+  updateFCMTokens,
+  fetchNotifications,
+} from '../store/actions/notifications';
 import TestAccountHelperModalContents from '../components/Helper/TestAccountHelperModalContents';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
@@ -91,31 +79,113 @@ import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import TransactionDetails from './Accounts/TransactionDetails';
 import Toast from '../components/Toast';
+import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
+import firebase from 'react-native-firebase';
+import NotificationListContent from '../components/NotificationListContent';
 // const { Value, abs, sub, min } = Animated
 // const snapPoints = [ Dimensions.get( 'screen' ).height - 150, 150 ]
 // const position = new Value( 1 )
 // const opacity = min( abs( sub( position, 1 ) ), 0.8 )
 // const zeroIndex = snapPoints.length - 1
 // const height = snapPoints[ 0 ]
+import {
+  timeFormatter,
+  createRandomString,
+} from '../common/CommonFunctions/timeFormatter';
+import Config from 'react-native-config';
+import RelayServices from '../bitcoin/services/RelayService';
+import AddContactAddressBook from './Contacts/AddContactAddressBook';
+import TrustedContactRequest from './Contacts/TrustedContactRequest';
+import config from '../bitcoin/HexaConfig';
+import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
+import {
+  approveTrustedContact,
+  fetchEphemeralChannel,
+  clearPaymentDetails,
+} from '../store/actions/trustedContacts';
+import MessageAsPerHealth from '../components/home/messgae-health';
+import TransactionsContent from '../components/home/transaction-content';
+import idx from 'idx';
+import SaveBitcoinModalContents from './FastBitcoin/SaveBitcoinModalContents';
+import {
+  fetchDerivativeAccBalTx,
+  addTransferDetails,
+} from '../store/actions/accounts';
+import {
+  TrustedContactDerivativeAccount,
+  EphemeralData,
+} from '../bitcoin/utilities/Interface';
+import * as RNLocalize from 'react-native-localize';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+export const isCompatible = async (method: string, version: string) => {
+  if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
+    // checking compatibility via Relay
+    const res = await RelayServices.checkCompatibility(method, version);
+    if (res.status !== 200) {
+      console.log('Failed to check compatibility');
+      return true;
+    }
+
+    const { compatible, alternatives } = res.data;
+    if (!compatible) {
+      if (alternatives) {
+        if (alternatives.update)
+          Alert.alert('Update your app inorder to process this link/QR');
+        else if (alternatives.message) Alert.alert(alternatives.message);
+      } else {
+        Alert.alert('Incompatible link/QR, updating your app might help');
+      }
+      return false;
+    }
+    return true;
+  }
+  return true;
+};
 
 export default function Home(props) {
+  // const trustedContacts: TrustedContactsService = useSelector(
+  //   (state) => state.trustedContacts.service,
+  // );
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     dispatch(initializeTrustedContact('Blake'));
+  //   }, 4000); // letting other db insertion happen
+  // }, []);
+  // //console.log(trustedContacts.tc.trustedContacts['Blake']);
+  const [
+    TrustedContactRequestBottomSheet,
+    setTrustedContactRequestBottomSheet,
+  ] = useState(React.createRef<BottomSheet>());
+
+  const [SelectedContact, setSelectedContact] = useState([]);
+  const notificationList = useSelector((state) => state.notifications);
+  const [NotificationList, setNotificationList] = useState([]);
+  const [
+    notificationsListBottomSheet,
+    setNotificationsListBottomSheet,
+  ] = useState(React.createRef());
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [buttonText, setButtonText] = useState('Try again');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
+  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   const isUploadSuccessfully = useSelector(
-    state => state.sss.uploadSuccessfully,
+    (state) => state.sss.uploadSuccessfully,
   );
-  const isErrorReceivingFailed = useSelector(state => state.sss.errorReceiving);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
+  const isErrorReceivingFailed = useSelector(
+    (state) => state.sss.errorReceiving,
+  );
   let [AtCloseEnd, setAtCloseEnd] = useState(false);
   let [loading, setLoading] = useState(false);
-  let [AssociatedContact, setAssociatedContact] = useState([]);
-  let [SelectedContacts, setSelectedContacts] = useState([]);
-  let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  // let [AssociatedContact, setAssociatedContact] = useState([]);
+  // let [SelectedContacts, setSelectedContacts] = useState([]);
+  // let [SecondaryDeviceAddress, setSecondaryDeviceAddress] = useState([]);
+  let [associatedContactName, setAssociatedContactName] = useState('');
   const [secondaryDeviceOtp, setSecondaryDeviceOtp] = useState({});
-  let SecondaryDeviceStatus = useSelector(state => state.sss.downloadedMShare);
+  let SecondaryDeviceStatus = useSelector(
+    (state) => state.sss.downloadedMShare,
+  );
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [KnowMoreBottomSheetsFlag, setKnowMoreBottomSheetsFlag] = useState(
@@ -128,15 +198,18 @@ export default function Home(props) {
     setFamilyAndFriendsBookBottomSheetsFlag,
   ] = useState(false);
   const WALLET_SETUP = useSelector(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
   );
-  const { status } = useSelector(state => state.sss);
   // alert(status);
   // const DECENTRALIZED_BACKUP = useSelector(
   //   state => state.storage.database.DECENTRALIZED_BACKUP,
   // );
   const walletName = WALLET_SETUP ? WALLET_SETUP.walletName : '';
-  const accounts = useSelector(state => state.accounts);
+  const accounts = useSelector((state) => state.accounts);
+
+  const paymentDetails = useSelector(
+    (state) => state.trustedContacts.paymentDetails,
+  );
   // const exchangeRate = props.navigation.state.params
   //   ? props.navigation.state.params.exchangeRates
   //   : null;
@@ -145,15 +218,15 @@ export default function Home(props) {
   useEffect(() => {
     if (accounts.exchangeRates) setExchangeRates(accounts.exchangeRates);
   }, [accounts.exchangeRates]);
-  // const [balances, setBalances] = useState({
-  //   testBalance: 0,
-  //   regularBalance: 0,
-  //   secureBalance: 0,
-  //   accumulativeBalance: 0,
-  // });
-  // const [transactions, setTransactions] = useState([]);
 
-  // const balancesParam = props.navigation.getParam('balances');
+  const s3Service = useSelector((state) => state.sss.service);
+  useEffect(() => {
+    if (s3Service) {
+      const { healthCheckInitialized } = s3Service.sss;
+      if (!healthCheckInitialized) dispatch(initHealthCheck());
+    }
+  }, [s3Service]);
+
   const [balances, setBalances] = useState({
     testBalance: 0,
     regularBalance: 0,
@@ -161,51 +234,197 @@ export default function Home(props) {
     accumulativeBalance: 0,
   });
   // const transactionsParam = props.navigation.getParam('transactions');
+  const [transactionLoading, setTransactionLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
-
+  const [NotificationDataChange, setNotificationDataChange] = useState(false);
+  const [NotificationData, setNotificationData] = useState([]);
+  const [notificationLoading, setNotificationLoading] = useState(true);
   const [qrData, setqrData] = useState('');
+  const currencyCode = [
+    'BRL',
+    'CNY',
+    'JPY',
+    'GBP',
+    'KRW',
+    'RUB',
+    'TRY',
+    'INR',
+    'EUR',
+  ];
+
+  function setCurrencyCodeToImage(currencyName, currencyColor) {
+    console.log('currencyColor', currencyColor);
+    return (
+      <View
+        style={{
+          marginRight: 5,
+          marginBottom: wp('0.7%'),
+        }}
+      >
+        <MaterialCommunityIcons
+          name={currencyName}
+          color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
+          size={wp('3.5%')}
+        />
+      </View>
+    );
+  }
+
+  const getCurrencyImage = (currencyCodeValue, color) => {
+    switch (currencyCodeValue) {
+      case 'BRL':
+        return setCurrencyCodeToImage('currency-brl', color);
+      case 'CNY':
+      case 'JPY':
+        return setCurrencyCodeToImage('currency-cny', color);
+      case 'GBP':
+        return setCurrencyCodeToImage('currency-gbp', color);
+      case 'KRW':
+        return setCurrencyCodeToImage('currency-krw', color);
+      case 'RUB':
+        return setCurrencyCodeToImage('currency-rub', color);
+      case 'TRY':
+        return setCurrencyCodeToImage('currency-try', color);
+      case 'INR':
+        return setCurrencyCodeToImage('currency-inr', color);
+      case 'EUR':
+        return setCurrencyCodeToImage('currency-eur', color);
+      default:
+        break;
+    }
+  };
+
+  const onNotificationClicked = async (value) => {
+    let asyncNotifications = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    let tempNotificationData = NotificationData;
+    for (let i = 0; i < tempNotificationData.length; i++) {
+      const element = tempNotificationData[i];
+      if (element.notificationId == value.notificationId) {
+        if (
+          asyncNotifications &&
+          asyncNotifications.length &&
+          asyncNotifications.findIndex(
+            (item) => item.notificationId == value.notificationId,
+          ) > -1
+        ) {
+          asyncNotifications[
+            asyncNotifications.findIndex(
+              (item) => item.notificationId == value.notificationId,
+            )
+          ].read = true;
+        }
+        tempNotificationData[i].read = true;
+      }
+    }
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotifications),
+    );
+    setNotificationData(tempNotificationData);
+    setNotificationDataChange(!NotificationDataChange);
+
+    if (value.type == 'release') {
+      RelayServices.fetchReleases(value.info.split(' ')[1])
+        .then(async (res) => {
+          if (res.data.releases.length) {
+            let releaseNotes = res.data.releases.length
+              ? res.data.releases.find((el) => {
+                  return el.build === value.info.split(' ')[1];
+                })
+              : '';
+            props.navigation.navigate('UpdateApp', {
+              releaseData: [releaseNotes],
+              isOpenFromNotificationList: true,
+              releaseNumber: value.info.split(' ')[1],
+            });
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
 
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
         accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
+
+    const testTransactions = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+      : [];
+
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
+
+    let regularTransactions = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+          .transactionDetails
+      : [];
+
+    const trustedAccounts: TrustedContactDerivativeAccount =
+      accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        TRUSTED_CONTACTS
+      ];
+    if (trustedAccounts.instance.using) {
+      for (
+        let accountNumber = 1;
+        accountNumber <= trustedAccounts.instance.using;
+        accountNumber++
+      ) {
+        // console.log({
+        //   accountNumber,
+        //   balances: trustedAccounts[accountNumber].balances,
+        //   transactions: trustedAccounts[accountNumber].transactions,
+        // });
+        if (trustedAccounts[accountNumber].balances) {
+          regularBalance +=
+            trustedAccounts[accountNumber].balances.balance +
+            trustedAccounts[accountNumber].balances.unconfirmedBalance;
+        }
+
+        if (trustedAccounts[accountNumber].transactions) {
+          trustedAccounts[
+            accountNumber
+          ].transactions.transactionDetails.forEach((tx) => {
+            let include = true;
+            for (const currentTx of regularTransactions) {
+              if (tx.txid === currentTx.txid) {
+                include = false;
+                break;
+              }
+            }
+            if (include) regularTransactions.push(tx);
+          });
+        }
+      }
+    }
+
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
-
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : [];
-    const regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
-      : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
           .transactionDetails
       : [];
+
+    const accumulativeBalance = regularBalance + secureBalance;
+
     const accumulativeTransactions = [
       ...testTransactions,
       ...regularTransactions,
       ...secureTransactions,
     ];
     if (accumulativeTransactions.length) {
-      accumulativeTransactions.sort(function(left, right) {
-        console.log(
-          'moment.utc(right.date),moment.utc(left.date)',
-          moment.utc(right.date).unix(),
-          moment.utc(left.date).unix(),
-          moment.utc(right.date).unix() - moment.utc(left.date).unix(),
-        );
+      accumulativeTransactions.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
     }
@@ -246,12 +465,18 @@ export default function Home(props) {
     // }
   }, [accounts]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setTransactionLoading(false);
+    }, 1000);
+  }, [transactions]);
+
   const [dropdownBoxValue, setDropdownBoxValue] = useState({
     id: '',
     question: '',
   });
+  const [FBTCAccount, setFBTCAccount] = useState({});
   const [answer, setAnswer] = useState('');
-  const [selectToAdd, setSelectToAdd] = useState('Getbittr');
   const [openmodal, setOpenmodal] = useState('closed');
   const [tabBarZIndex, setTabBarZIndex] = useState(999);
   const [deepLinkModalOpen, setDeepLinkModalOpen] = useState(false);
@@ -282,33 +507,17 @@ export default function Home(props) {
   //   setHealthCheckSecurityQuestionBottomSheet,
   // ] = useState(React.createRef());
   const [
-    ContactSelectedFromAddressBookQrCodeBottomSheet,
-    setContactSelectedFromAddressBookQrCodeBottomSheet,
-  ] = useState(React.createRef());
-  const [
     ContactSelectedFromAddressBookBottomSheet,
     setContactSelectedFromAddressBookBottomSheet,
   ] = useState(React.createRef());
   const [
-    FamilyAndFriendAddressBookBottomSheet,
-    setFamilyAndFriendAddressBookBottomSheet,
+    AddContactAddressBookBookBottomSheet,
+    setAddContactAddressBookBottomSheet,
   ] = useState(React.createRef());
-  const [AddBottomSheet, setAddBottomSheet] = useState(React.createRef());
-  const [
-    fastBitcoinSellCalculationBottomSheet,
-    setFastBitcoinSellCalculationBottomSheet,
-  ] = useState(React.createRef());
-  const [
-    fastBitcoinRedeemCalculationBottomSheet,
-    setFastBitcoinRedeemCalculationBottomSheet,
-  ] = useState(React.createRef());
+  const [isLoadContacts, setIsLoadContacts] = useState(false);
   const [AllAccountsBottomSheet, setAllAccountsBottomSheet] = useState(
     React.createRef(),
   );
-  const [addressBookBottomSheet, setAddressBookBottomSheet] = useState(
-    React.createRef(),
-  );
-
   const [NoInternetBottomSheet, setNoInternetBottomSheet] = useState(
     React.createRef(),
   );
@@ -355,6 +564,9 @@ export default function Home(props) {
   const [newData, setNewData] = useState([]);
   const custodyRequest = props.navigation.getParam('custodyRequest');
   const recoveryRequest = props.navigation.getParam('recoveryRequest');
+  const trustedContactRequest = props.navigation.getParam(
+    'trustedContactRequest',
+  );
 
   const [data, setData] = useState([
     {
@@ -493,19 +705,314 @@ export default function Home(props) {
     }
   }
 
-  useEffect(function() {
+  useEffect(() => {
+    getNotificationList();
+    getNewTransactionNotifications();
+    let notificationOnFocusListener = props.navigation.addListener(
+      'didFocus',
+      () => {
+        getNewTransactionNotifications();
+        getNotificationList();
+      },
+    );
+    return () => {
+      notificationOnFocusListener.remove();
+    };
+  }, []);
+
+  function randomInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  const getNewTransactionNotifications = async () => {
+    let newTransactions = [];
+    const derivativeAccountType = 'FAST_BITCOINS';
+    const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
+    const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
+    if (
+      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
+      secureAccount.derivativeAccounts[derivativeAccountType][1].xpub
+    )
+      dispatch(fetchDerivativeAccBalTx(SECURE_ACCOUNT, derivativeAccountType));
+
+    if (
+      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
+      regularAccount.derivativeAccounts[derivativeAccountType][1].xpub
+    )
+      dispatch(fetchDerivativeAccBalTx(REGULAR_ACCOUNT, derivativeAccountType));
+
+    let newTransactionsRegular =
+      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
+      regularAccount.derivativeAccounts[derivativeAccountType][1]
+        .newTransactions;
+    let newTransactionsSecure =
+      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
+      secureAccount.derivativeAccounts[derivativeAccountType][1]
+        .newTransactions;
+
+    if (
+      newTransactionsRegular &&
+      newTransactionsRegular.length &&
+      newTransactionsSecure &&
+      newTransactionsSecure.length
+    ) {
+      newTransactions = [...newTransactionsRegular, ...newTransactionsSecure];
+    } else if (newTransactionsRegular && newTransactionsRegular.length)
+      newTransactions = [...newTransactionsRegular];
+    else if (newTransactionsSecure && newTransactionsSecure.length)
+      newTransactions = [...newTransactionsSecure];
+
+    //console.log('newTransactions', newTransactions);
+
+    if (newTransactions.length) {
+      let asyncNotification = JSON.parse(
+        await AsyncStorage.getItem('notificationList'),
+      );
+      let asyncNotificationList = [];
+      if (asyncNotification.length) {
+        asyncNotificationList = [];
+        for (let i = 0; i < asyncNotification.length; i++) {
+          asyncNotificationList.push(asyncNotification[i]);
+        }
+      }
+      let tmpList = asyncNotificationList;
+      let obj = {
+        type: 'contact',
+        isMandatory: false,
+        read: false,
+        title: 'New FastBitcoin Transactions',
+        time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+        date: new Date(),
+        info: newTransactions.length + ' New FBTC transactions',
+        notificationId: createRandomString(17),
+      };
+      tmpList.push(obj);
+
+      await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+      let notificationDetails = {
+        id: obj.notificationId,
+        title: obj.title,
+        body: obj.info,
+      };
+      localNotification(notificationDetails);
+      tmpList.sort(function (left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setTimeout(() => {
+        setNotificationData(tmpList);
+        setNotificationDataChange(!NotificationDataChange);
+      }, 2);
+    }
+  };
+
+  const getNotificationList = async () => {
+    dispatch(fetchNotifications());
+  };
+
+  useEffect(() => {
+    setupNotificationList();
+  }, [notificationList]);
+
+  const onNotificationListOpen = async () => {
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (asyncNotificationList) {
+      for (let i = 0; i < asyncNotificationList.length; i++) {
+        if (asyncNotificationList[i]) {
+          asyncNotificationList[i].time = timeFormatter(
+            moment(new Date()),
+            moment(asyncNotificationList[i].date).valueOf(),
+          );
+        }
+      }
+      await AsyncStorage.setItem(
+        'notificationList',
+        JSON.stringify(asyncNotificationList),
+      );
+      asyncNotificationList.sort(function (left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setNotificationData(asyncNotificationList);
+      setNotificationDataChange(!NotificationDataChange);
+    }
+  };
+
+  const setupNotificationList = async () => {
+    let asyncNotification = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    let asyncNotificationList = [];
+    if (asyncNotification) {
+      asyncNotificationList = [];
+      for (let i = 0; i < asyncNotification.length; i++) {
+        asyncNotificationList.push(asyncNotification[i]);
+      }
+    }
+    let tmpList = asyncNotificationList;
+    if (notificationList) {
+      for (let i = 0; i < notificationList['notifications'].length; i++) {
+        const element = notificationList['notifications'][i];
+        let readStatus = false;
+        if (element.notificationType == 'release') {
+          let releaseCases = JSON.parse(
+            await AsyncStorage.getItem('releaseCases'),
+          );
+          if (element.body.split(' ')[1] == releaseCases.build) {
+            if (releaseCases.remindMeLaterClick) {
+              readStatus = false;
+            }
+            if (releaseCases.ignoreClick) {
+              readStatus = true;
+            }
+          } else {
+            readStatus = true;
+          }
+        }
+        if (
+          asyncNotificationList.findIndex(
+            (value) => value.notificationId == element.notificationId,
+          ) > -1
+        ) {
+          let temp =
+            asyncNotificationList[
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
+            ];
+          if (element.notificationType == 'release') {
+            readStatus = readStatus;
+          } else {
+            readStatus = temp.read;
+          }
+          let obj = {
+            ...temp,
+            read: readStatus,
+            type: element.notificationType,
+            title: element.title,
+            info: element.body,
+            isMandatory: element.tag == 'mandatory' ? true : false,
+            time: timeFormatter(
+              moment(new Date()),
+              moment(element.date).valueOf(),
+            ),
+            date: new Date(element.date),
+          };
+          tmpList[
+            tmpList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
+          ] = obj;
+        } else {
+          let obj = {
+            type: element.notificationType,
+            isMandatory: element.tag == 'mandatory' ? true : false,
+            read: readStatus,
+            title: element.title,
+            time: timeFormatter(
+              moment(new Date()),
+              moment(element.date).valueOf(),
+            ),
+            date: new Date(element.date),
+            info: element.body,
+            notificationId: element.notificationId,
+          };
+          tmpList.push(obj);
+        }
+      }
+      await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+      tmpList.sort(function (left, right) {
+        return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+      });
+      setNotificationData(tmpList);
+      setNotificationLoading(false);
+      setNotificationDataChange(!NotificationDataChange);
+    }
+  };
+
+  const onNotificationOpen = async (item) => {
+    let content = JSON.parse(item._data.content);
+    let asyncNotificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
+    if (!asyncNotificationList) {
+      asyncNotificationList = [];
+    }
+    let readStatus = true;
+    if (content.notificationType == 'release') {
+      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      if (releaseCases.ignoreClick) {
+        readStatus = true;
+      } else if (releaseCases.remindMeLaterClick) {
+        readStatus = false;
+      } else {
+        readStatus = false;
+      }
+    }
+    let obj = {
+      type: content.notificationType,
+      isMandatory: false,
+      read: readStatus,
+      title: item.title,
+      time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+      date: new Date(),
+      info: item.body,
+      notificationId: content.notificationId,
+    };
+    asyncNotificationList.push(obj);
+    await AsyncStorage.setItem(
+      'notificationList',
+      JSON.stringify(asyncNotificationList),
+    );
+    asyncNotificationList.sort(function (left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+    });
+    setNotificationData(asyncNotificationList);
+    setNotificationDataChange(!NotificationDataChange);
+  };
+
+  useEffect(function () {
+    AppState.addEventListener('change', onAppStateChange);
+    (async () => {
+      const enabled = await firebase.messaging().hasPermission();
+      if (!enabled) {
+        await firebase
+          .messaging()
+          .requestPermission()
+          .then(() => {
+            // User has authorized
+            createNotificationListeners();
+            storeFCMToken();
+            scheduleNotification();
+          })
+          .catch((error) => {
+            // User has rejected permissions
+            //console.log(
+            // 'PERMISSION REQUEST :: notification permission rejected',
+            //  error,
+            //);
+          });
+      } else {
+        createNotificationListeners();
+        storeFCMToken();
+        scheduleNotification();
+      }
+    })();
+
     let focusListener = props.navigation.addListener('didFocus', () => {
       setCurrencyCodeFromAsync();
-      getAssociatedContact();
+      // getAssociatedContact();
+      checkFastBitcoin();
     });
-    getAssociatedContact();
+    // getAssociatedContact();
     setCurrencyCodeFromAsync();
     updateAccountCardData();
+    checkFastBitcoin();
     (transactionTabBarBottomSheet as any).current.snapTo(1);
     (addTabBarBottomSheet as any).current.snapTo(0);
     (QrTabBarBottomSheet as any).current.snapTo(0);
     (moreTabBarBottomSheet as any).current.snapTo(0);
-    AppState.addEventListener('change', handleAppStateChange);
+    // AppState.addEventListener('change', handleAppStateChange);
 
     Linking.addEventListener('url', handleDeepLink);
     // return () => Linking.removeEventListener("url", handleDeepLink);
@@ -521,22 +1028,205 @@ export default function Home(props) {
     };
   }, []);
 
+  function isEmpty(obj) {
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+  }
+
+  const checkFastBitcoin = async () => {
+    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+  };
+
+  const onAppStateChange = async (nextAppState) => {
+    handleAppStateChange(nextAppState);
+    try {
+      if (this.appState == nextAppState) return;
+      this.appState = nextAppState;
+      if (this.appState == 'active') {
+        scheduleNotification();
+      }
+    } catch (error) {}
+  };
+
+  const createNotificationListeners = async () => {
+    /*
+     * Triggered when a particular notification has been received in foreground
+     * */
+    this.notificationListener = firebase
+      .notifications()
+      .onNotification((notification) => {
+        onNotificationArrives(notification);
+      });
+
+    /*
+     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
+     * */
+    this.notificationOpenedListener = firebase
+      .notifications()
+      .onNotificationOpened(async (notificationOpen) => {
+        const { title, body } = notificationOpen.notification;
+        // let data = JSON.parse(notificationOpen.notification.data.content);
+        // if(data.notificationType == "release"){
+        //   props.navigation.navigate('UpdateApp', {releaseData: data})
+        // }
+        getNotificationList();
+        onNotificationOpen(notificationOpen.notification);
+      });
+
+    /*
+     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
+     * */
+    const notificationOpen = await firebase
+      .notifications()
+      .getInitialNotification();
+    if (notificationOpen) {
+      const { title, body } = notificationOpen.notification;
+      getNotificationList();
+      onNotificationOpen(notificationOpen.notification);
+    }
+    /*
+     * Triggered for data only payload in foreground
+     * */
+    this.messageListener = firebase.messaging().onMessage((message) => {
+      //process data message
+    });
+  };
+
+  const scheduleNotification = async () => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle('We have not seen you in a while!')
+      .setBody(
+        'Opening your app regularly ensures you get all the notifications and security updates',
+      )
+      .setNotificationId('1')
+      .setSound('default')
+      .setData({
+        title: 'We have not seen you in a while!',
+        body:
+          'Opening your app regularly ensures you get all the notifications and security updates',
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setHours(date.getHours() + Number(Config.NOTIFICATION_HOUR));
+    // date.setSeconds(date.getSeconds() + Number(Config.NOTIFICATION_HOUR));
+
+    // //console.log('DATE', date, Config.NOTIFICATION_HOUR, date.getTime());
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+        //repeatInterval: 'hour',
+      })
+      .then(() => {})
+      .catch(
+        (err) => {}, //console.log('err', err)
+      );
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {
+        //console.log('logging notifications', notifications);
+      });
+  };
+
+  const localNotification = async (notificationDetails) => {
+    const notification = new firebase.notifications.Notification()
+      .setTitle(notificationDetails.title)
+      .setBody(notificationDetails.body)
+      .setNotificationId(notificationDetails.id)
+      .setSound('default')
+      .setData({
+        title: notificationDetails.title,
+        body: notificationDetails.body,
+      })
+      .android.setChannelId('reminder')
+      .android.setPriority(firebase.notifications.Android.Priority.High);
+    // Schedule the notification for 2hours on development and 2 weeks on Production in the future
+    const date = new Date();
+    date.setSeconds(date.getSeconds() + 1);
+    await firebase
+      .notifications()
+      .scheduleNotification(notification, {
+        fireDate: date.getTime(),
+      })
+      .then(() => {})
+      .catch((err) => {});
+    firebase
+      .notifications()
+      .getScheduledNotifications()
+      .then((notifications) => {});
+  };
+
+  const onNotificationArrives = async (notification) => {
+    getNotificationList();
+    const { title, body } = notification;
+    const deviceTrayNotification = new firebase.notifications.Notification()
+      .setTitle(title)
+      .setBody(body)
+      .setNotificationId(notification.notificationId)
+      .setSound('default')
+      .android.setPriority(firebase.notifications.Android.Priority.High)
+      .android.setChannelId(
+        notification.android.channelId
+          ? notification.android.channelId
+          : 'foregroundNotification',
+      ) // previously created
+      .android.setAutoCancel(true); // To remove notification when tapped on it
+
+    const channelId = new firebase.notifications.Android.Channel(
+      notification.android.channelId,
+      notification.android.channelId ? 'Reminder' : 'ForegroundNotification',
+      firebase.notifications.Android.Importance.High,
+    );
+    firebase.notifications().android.createChannel(channelId);
+    firebase.notifications().displayNotification(deviceTrayNotification);
+  };
+
+  // //console.log("notification.data", JSON.parse(notification.data.content));
+  //   let data = JSON.parse(notification.data.content);
+  //   if(data.notificationType == "release"){
+  //     props.navigation.navigate('UpdateApp', {releaseData: data})
+  //   }
+
+  // useEffect(() => {
+  //   const unsubscribe = firebase
+  //     .messaging()
+  //     .onMessage(async (remoteMessage) => {
+  //       //console.log('A new FCM message arrived!', remoteMessage);
+  //     });
+
+  //   return unsubscribe;
+  // }, []);
+
+  // const notifications = useSelector(
+  //   (state) => state.notifications.notifications,
+  // );
+  // //console.log({ notifications });
+  // useEffect(() => {
+  //   dispatch(fetchNotifications());
+  // }, []);
+
+  const storeFCMToken = async () => {
+    const fcmToken = await firebase.messaging().getToken();
+    let fcmArray = [fcmToken];
+    let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
+    if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
+      await AsyncStorage.setItem('fcmToken', fcmToken);
+      dispatch(updateFCMTokens(fcmArray));
+    } else if (!fcmTokenFromAsync) {
+      await AsyncStorage.setItem('fcmToken', fcmToken);
+      dispatch(updateFCMTokens(fcmArray));
+    }
+  };
   const setCurrencyCodeFromAsync = async () => {
+    ///console.log("RNLocalize.getCurrencies()[0]", RNLocalize.getCurrencies()[0]);
     let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      const identifiers = ['io.hexawallet.hexa'];
-      NativeModules.InAppUtils.loadProducts(
-        identifiers,
-        async (error, products) => {
-          await AsyncStorage.setItem(
-            'currencyCode',
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-          setCurrencyCode(
-            products && products.length ? products[0].currencyCode : 'USD',
-          );
-        },
-      );
+      await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+      setCurrencyCode(RNLocalize.getCurrencies()[0]);
     } else {
       setCurrencyCode(currencyCodeTmp);
     }
@@ -554,31 +1244,6 @@ export default function Home(props) {
   //     }
   //   }
   // };
-
-  const messageAsPerHealth = health => {
-    if (health == 0) {
-      return (
-        <Text style={styles.headerInfoText}>
-          The wallet backup is not secure.{'\n'}Please visit the health section
-          to{'\n'}improve the health of your backup
-        </Text>
-      );
-    } else if (health > 0 && health < 100) {
-      return (
-        <Text style={styles.headerInfoText}>
-          The wallet backup is not secured.{'\n'}Please complete the setup to
-          {'\n'}safeguard against loss of funds
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.headerInfoText}>
-          <Text style={{ fontStyle: 'italic' }}>Great!! </Text>The wallet backup
-          is{'\n'}secure. Keep an eye on the{'\n'}health of the backup here
-        </Text>
-      );
-    }
-  };
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -614,9 +1279,9 @@ export default function Home(props) {
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
-      setErrorMessageHeader('Error sending Recovery Secret');
+      setErrorMessageHeader('Error sending Recovery Key');
       setErrorMessage(
-        'There was an error while sending your Recovery Secret, please try again in a little while',
+        'There was an error while sending your Recovery Key, please try again in a little while',
       );
       setButtonText('Try again');
     }, 2);
@@ -624,29 +1289,33 @@ export default function Home(props) {
     dispatch(ErrorSending(null));
   }
 
-  if (isUploadSuccessfully) {
-    setTimeout(() => {
-      setErrorMessageHeader('Sending successful');
-      setErrorMessage(
-        'The Recovery Secret has been sent, the receiver needs to accept ',
-      );
-      setButtonText('Done');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(UploadSuccessfully(null));
-  }
+  useEffect(() => {
+    if (isUploadSuccessfully) {
+      setTimeout(() => {
+        setErrorMessageHeader('Sending successful');
+        setErrorMessage(
+          'The Recovery Key has been sent, the receiver needs to accept ',
+        );
+        setButtonText('Done');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(UploadSuccessfully(null));
+    }
+  }, [isUploadSuccessfully]);
 
-  if (isErrorReceivingFailed) {
-    setTimeout(() => {
-      setErrorMessageHeader('Error receiving Recovery Secret');
-      setErrorMessage(
-        'There was an error while receiving your Recovery Secret, please try again',
-      );
-      setButtonText('Try again');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorReceiving(null));
-  }
+  useEffect(() => {
+    if (isErrorReceivingFailed) {
+      setTimeout(() => {
+        setErrorMessageHeader('Error sending Recovery Secret');
+        setErrorMessage(
+          'There was an error while sending your Recovery Secret, please try again in a little while',
+        );
+        setButtonText('Try again');
+      }, 2);
+      (ErrorBottomSheet as any).current.snapTo(1);
+      dispatch(ErrorSending(null));
+    }
+  }, [isErrorReceivingFailed]);
 
   const updateAccountCardData = () => {
     let newArrayFinal = [];
@@ -666,245 +1335,6 @@ export default function Home(props) {
     }
   };
 
-  const renderTransactionsContent = () => {
-    return transactions.length ? (
-      <View style={styles.modalContentContainer}>
-        <View style={{ flex: 1 }}>
-          <View
-            style={{ height: 'auto', marginTop: 10, marginBottom: hp('13%') }}
-          >
-            <FlatList
-              data={transactions}
-              ItemSeparatorComponent={() => (
-                <View style={{ backgroundColor: Colors.white }}>
-                  <View style={styles.separatorView} />
-                </View>
-              )}
-              renderItem={({ item }) => (
-                <AppBottomSheetTouchableWrapper
-                  onPress={
-                    () => {
-                      (TransactionDetailsBottomSheet as any).current.snapTo(1);
-                      setTimeout(() => {
-                        setTransactionItem(item);
-                        setTabBarZIndex(0);
-                      }, 10);
-                    }
-                    //props.navigation.navigate('TransactionDetails', { item })
-                  }
-                  style={{
-                    ...styles.transactionModalElementView,
-                    backgroundColor: Colors.white,
-                  }}
-                >
-                  <View style={styles.modalElementInfoView}>
-                    <View style={{ justifyContent: 'center' }}>
-                      <FontAwesome
-                        name={
-                          item.transactionType == 'Received'
-                            ? 'long-arrow-down'
-                            : 'long-arrow-up'
-                        }
-                        size={15}
-                        color={
-                          item.transactionType == 'Received'
-                            ? Colors.green
-                            : Colors.red
-                        }
-                      />
-                    </View>
-                    <View style={{ justifyContent: 'center', marginLeft: 10 }}>
-                      <Text style={styles.transactionModalTitleText}>
-                        {item.accountType}{' '}
-                      </Text>
-                      <Text style={styles.transactionModalDateText}>
-                        {moment(item.date)
-                          .utc()
-                          .format('DD MMMM YYYY')}{' '}
-                        {/* <Entypo
-                      size={10}
-                      name={"dot-single"}
-                      color={Colors.textColorGrey}
-                    />
-                    {item.time} */}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.transactionModalAmountView}>
-                    <Image
-                      source={require('../assets/images/icons/icon_bitcoin_gray.png')}
-                      style={{ width: 12, height: 12, resizeMode: 'contain' }}
-                    />
-                    <Text
-                      style={{
-                        ...styles.transactionModalAmountText,
-                        color:
-                          item.transactionType == 'Received'
-                            ? Colors.green
-                            : Colors.red,
-                      }}
-                    >
-                      {UsNumberFormat(item.amount)}
-                    </Text>
-                    <Text style={styles.transactionModalAmountUnitText}>
-                      {item.confirmations < 6 ? item.confirmations : '6+'}
-                    </Text>
-                    <Ionicons
-                      name="ios-arrow-forward"
-                      color={Colors.textColorGrey}
-                      size={12}
-                      style={{ marginLeft: 20, alignSelf: 'center' }}
-                    />
-                  </View>
-                </AppBottomSheetTouchableWrapper>
-              )}
-            />
-          </View>
-        </View>
-        {transactions.length <= 1 ? (
-          <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              marginBottom: AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              borderRadius: 7,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              You don't have any transactions yet
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              Start using your accounts to make transactions
-            </Text>
-          </View>
-        ) : null}
-      </View>
-    ) : (
-      <View style={styles.modalContentContainer}>
-        <View
-          style={{
-            flex: 1,
-          }}
-        >
-          {[1, 2, 3, 4, 5].map(value => {
-            return (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingTop: wp('5%'),
-                  paddingBottom: wp('5%'),
-                  borderBottomWidth: 0.5,
-                  borderColor: Colors.borderColor,
-                }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                  <View>
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('25%'),
-                        borderRadius: 10,
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('35%'),
-                        marginTop: 5,
-                        borderRadius: 10,
-                      }}
-                    />
-                  </View>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('7%'),
-                      width: wp('20%'),
-                      borderRadius: 10,
-                    }}
-                  />
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
-                  />
-                </View>
-              </View>
-            );
-          })}
-        </View>
-        <View style={{ backgroundColor: Colors.white }}>
-          <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              marginBottom: hp('12%') + 15,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              borderRadius: 7,
-            }}
-          >
-            <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              You don't have any transactions yet
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-            >
-              Start using your accounts to make transactions
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   const setSecondaryDeviceAddresses = async () => {
     let secondaryDeviceOtpTemp = JSON.parse(
       await AsyncStorage.getItem('secondaryDeviceAddress'),
@@ -914,7 +1344,7 @@ export default function Home(props) {
     }
     if (
       secondaryDeviceOtpTemp.findIndex(
-        value => value.otp == (secondaryDeviceOtp as any).otp,
+        (value) => value.otp == (secondaryDeviceOtp as any).otp,
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push(secondaryDeviceOtp);
@@ -937,59 +1367,166 @@ export default function Home(props) {
         });
       }
       if ((secondaryDeviceOtp as any).type == 'secondaryDeviceQR') {
-        Toast('Recovery Secret received successfully');
+        Toast('Recovery Key received successfully');
         setSecondaryDeviceAddresses();
       }
-      getAssociatedContact();
+      // getAssociatedContact();
     }
   }, [SecondaryDeviceStatus]);
 
-  const getQrCodeData = qrData => {
-    const scannedData = JSON.parse(qrData);
-    switch (scannedData.type) {
-      case 'trustedContactQR':
-        const custodyRequest1 = {
-          requester: scannedData.requester,
-          ek: scannedData.ENCRYPTED_KEY,
-          uploadedAt: scannedData.UPLOADED_AT,
-          otp: scannedData.OTP,
-          isQR: true,
-          type: scannedData.type,
-        };
-        setLoading(false);
-        setSecondaryDeviceOtp(custodyRequest1);
-        props.navigation.navigate('Home', { custodyRequest: custodyRequest1 });
-        break;
-      case 'secondaryDeviceQR':
-        const custodyRequest2 = {
-          requester: scannedData.requester,
-          ek: scannedData.ENCRYPTED_KEY,
-          uploadedAt: scannedData.UPLOADED_AT,
-          otp: scannedData.OTP,
-          isQR: true,
-          type: scannedData.type,
-        }; //trustedContactQR
-        setLoading(false);
-        setSecondaryDeviceOtp(custodyRequest2);
-        props.navigation.navigate('Home', { custodyRequest: custodyRequest2 });
-        break;
-      case 'recoveryQR':
-        const recoveryRequest = {
-          requester: scannedData.requester,
-          rk: scannedData.ENCRYPTED_KEY,
-          otp: scannedData.OTP,
-          isQR: true,
-        };
-        setLoading(false);
-        props.navigation.navigate('Home', { recoveryRequest });
-      default:
-        break;
+  const processQRData = async (qrData) => {
+    const regularService: RegularAccount = accounts[REGULAR_ACCOUNT].service;
+    const { type } = regularService.addressDiff(qrData);
+    if (type) {
+      const serviceType = REGULAR_ACCOUNT; // default service type
+      let item;
+      switch (type) {
+        case 'address':
+          const recipientAddress = qrData;
+          item = {
+            id: recipientAddress,
+          };
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
+
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+          });
+          break;
+
+        case 'paymentURI':
+          const { address, options } = regularService.decodePaymentURI(qrData);
+          item = {
+            id: address,
+          };
+
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
+
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            netBalance: balances.regularBalance,
+            bitcoinAmount: options.amount ? `${options.amount}` : '',
+          });
+          break;
+
+        default:
+          Toast('Invalid QR');
+          break;
+      }
+
+      return;
+    }
+
+    try {
+      const scannedData = JSON.parse(qrData);
+      if (scannedData.ver) {
+        if (!(await isCompatible(scannedData.type, scannedData.ver))) return;
+      }
+      switch (scannedData.type) {
+        case 'trustedGuardian':
+          const trustedGruardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(trustedGruardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: trustedGruardianRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'secondaryDeviceGuardian':
+          const secondaryDeviceGuardianRequest = {
+            isGuardian: scannedData.isGuardian,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.uploadedAt,
+            type: scannedData.type,
+            isQR: true,
+          };
+
+          setLoading(false);
+          setSecondaryDeviceOtp(secondaryDeviceGuardianRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: secondaryDeviceGuardianRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'trustedContactQR':
+          const tcRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: tcRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'paymentTrustedContactQR':
+          const paymentTCRequest = {
+            isPaymentRequest: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            type: scannedData.type,
+            isQR: true,
+          };
+          setLoading(false);
+          setSecondaryDeviceOtp(tcRequest);
+          props.navigation.navigate('Home', {
+            trustedContactRequest: paymentTCRequest,
+            recoveryRequest: null,
+          });
+          break;
+
+        case 'recoveryQR':
+          const recoveryRequest = {
+            isRecovery: true,
+            requester: scannedData.requester,
+            publicKey: scannedData.KEY,
+            isQR: true,
+          };
+          setLoading(false);
+          props.navigation.navigate('Home', {
+            recoveryRequest,
+            trustedContactRequest: null,
+          });
+          break;
+
+        case 'ReverseRecoveryQR':
+          Alert.alert(
+            'Restoration QR Identified',
+            'Restoration QR only works during restoration mode',
+          );
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Toast('Invalid QR');
     }
   };
-
-  const renderTransactionContent = useCallback(() => {
-    return renderTransactionsContent();
-  }, [AtCloseEnd, transactions]);
 
   function renderTransactionHeader() {
     return (
@@ -1017,9 +1554,7 @@ export default function Home(props) {
 
   const renderTransactionDetailsHeader = useCallback(() => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           if (TransactionDetailsBottomSheet.current)
             (TransactionDetailsBottomSheet as any).current.snapTo(0);
@@ -1031,18 +1566,23 @@ export default function Home(props) {
   function renderAddContent() {
     return (
       <AddModalContents
-        onPressElements={type => {
-          if (
-            type == 'Fastbitcoins' ||
-            type == 'Getbittr' ||
-            type == 'Add Contact'
-          ) {
+        onPressElements={(type) => {
+          if (type == 'buyBitcoins') {
             setTimeout(() => {
-              setAddSubBottomSheetsFlag(true);
+              // setAddSubBottomSheetsFlag(true);
+              // setTabBarZIndex(0);
+              setSelectToAdd(type);
+            }, 2);
+            props.navigation.navigate('VoucherScanner');
+          } else if (type == 'addContact') {
+            setTimeout(() => {
+              //setAddSubBottomSheetsFlag(true);
+              // setAddBottomSheetsFlag(true);
+              setIsLoadContacts(true);
               setTabBarZIndex(0);
               setSelectToAdd(type);
             }, 2);
-            (AddBottomSheet as any).current.snapTo(1);
+            (AddContactAddressBookBookBottomSheet as any).current.snapTo(1);
           }
         }}
         addData={modaldata}
@@ -1068,10 +1608,10 @@ export default function Home(props) {
       <QrCodeModalContents
         modalRef={QrTabBarBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={qrData => getQrCodeData(qrData)}
+        onQrScan={(qrData) => processQRData(qrData)}
         onPressQrScanner={() => {
           props.navigation.navigate('QrScanner', {
-            scanedCode: getQrCodeData,
+            scanedCode: processQRData,
           });
         }}
       />
@@ -1086,14 +1626,17 @@ export default function Home(props) {
         style={styles.modalHeaderContainer}
       >
         <View style={styles.modalHeaderHandle} />
-        <Text style={styles.modalHeaderTitleText}>{'QR'}</Text>
+        <Text style={styles.modalHeaderTitleText}>{'Scan QR'}</Text>
       </TouchableOpacity>
     );
   }
 
   function renderMoreContent() {
     return (
-      <MoreHomePageTabContents onPressElements={item => onPressElement(item)} />
+      <MoreHomePageTabContents
+        onPressElements={(item) => onPressElement(item)}
+        isExistingSavingMethod={isEmpty(FBTCAccount)}
+      />
     );
   }
 
@@ -1273,7 +1816,7 @@ export default function Home(props) {
   // };
 
   const { UNDER_CUSTODY } = useSelector(
-    state => state.storage.database.DECENTRALIZED_BACKUP,
+    (state) => state.storage.database.DECENTRALIZED_BACKUP,
   );
   const renderCustodianRequestModalContent = useCallback(() => {
     if (!custodyRequest) return;
@@ -1290,7 +1833,10 @@ export default function Home(props) {
           }, 2);
           (CustodianRequestBottomSheet as any).current.snapTo(0);
 
-          if (Date.now() - custodyRequest.uploadedAt > 600000) {
+          if (
+            Date.now() - custodyRequest.uploadedAt >
+            config.TC_REQUEST_EXPIRY
+          ) {
             Alert.alert(
               'Request expired!',
               'Please ask the sender to initiate a new request',
@@ -1305,7 +1851,7 @@ export default function Home(props) {
               setLoading(false);
             } else {
               if (custodyRequest.isQR) {
-                dispatch(downloadMShare(custodyRequest.otp, custodyRequest.ek));
+                dispatch(downloadMShare(custodyRequest.ek, custodyRequest.otp));
                 setLoading(false);
               } else {
                 props.navigation.navigate('CustodianRequestOTP', {
@@ -1431,20 +1977,19 @@ export default function Home(props) {
   //   );
   // }, []);
 
-  const onPressElement = item => {
+  const onPressElement = (item) => {
     if (item.title == 'Backup Health') {
       props.navigation.navigate('ManageBackup');
     }
-    if (item.title == 'Address Book') {
-      (addressBookBottomSheet as any).current.snapTo(1);
-      setTimeout(() => {
-        setTabBarZIndex(0);
-      }, 10);
-    } else if (item.title == 'Settings') {
+    if (item.title == 'Friends and Family') {
+      props.navigation.navigate('AddressBookContents');
+    } else if (item.title == 'Wallet Settings') {
       (settingsBottomSheet as any).current.snapTo(1);
       setTimeout(() => {
         setTabBarZIndex(0);
       }, 10);
+    } else if (item.title == 'Funding Sources') {
+      props.navigation.navigate('ExistingSavingMethods');
     }
     // else if (item.title == 'All accounts and funds') {
     //   (AllAccountsBottomSheet as any).current.snapTo(1);
@@ -1454,7 +1999,7 @@ export default function Home(props) {
     // }
   };
 
-  const managePinSuccessProceed = pin => {
+  const managePinSuccessProceed = (pin) => {
     setTimeout(() => {
       setTabBarZIndex(999);
     }, 10);
@@ -1464,10 +2009,14 @@ export default function Home(props) {
   const onPressSettingsElements = async (type, currencycode) => {
     if (type == 'ManagePin') {
       return props.navigation.navigate('SettingManagePin', {
-        managePinSuccessProceed: pin => managePinSuccessProceed(pin),
+        managePinSuccessProceed: (pin) => managePinSuccessProceed(pin),
       });
-    } else if (type == 'ManageCurrency') {
-      setCurrencyCode(currencycode);
+    } else if (type == 'ChangeCurrency') {
+      let currency = await AsyncStorage.getItem('currencyCode');
+      props.navigation.navigate('ChangeCurrency');
+      setCurrencyCode(currency);
+    } else if (type == 'ChangeWalletName') {
+      props.navigation.navigate('SettingWalletNameChange');
     }
   };
 
@@ -1490,9 +2039,7 @@ export default function Home(props) {
 
   const renderSettingsHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1518,9 +2065,7 @@ export default function Home(props) {
 
   const renderAllAccountsHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -1531,51 +2076,20 @@ export default function Home(props) {
     );
   };
 
-  const getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-    setSelectedContacts(SelectedContacts);
-    let AssociatedContact = JSON.parse(
-      await AsyncStorage.getItem('AssociatedContacts'),
-    );
-    setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
-    setSecondaryDeviceAddress(SecondaryDeviceAddress);
-  };
-
-  const renderAddressBookContents = () => {
-    return (
-      <AddressBookContents
-        SecondaryDeviceAddress={SecondaryDeviceAddress}
-        AssociatedContact={AssociatedContact}
-        SelectedContacts={SelectedContacts}
-        onPressBack={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (addressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderAddressBookHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          setTimeout(() => {
-            setTabBarZIndex(999);
-          }, 2);
-          (addressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
+  // const getAssociatedContact = async () => {
+  //   let SelectedContacts = JSON.parse(
+  //     await AsyncStorage.getItem('SelectedContacts'),
+  //   );
+  //   setSelectedContacts(SelectedContacts);
+  //   let AssociatedContact = JSON.parse(
+  //     await AsyncStorage.getItem('AssociatedContacts'),
+  //   );
+  //   setAssociatedContact(AssociatedContact);
+  //   let SecondaryDeviceAddress = JSON.parse(
+  //     await AsyncStorage.getItem('secondaryDeviceAddress'),
+  //   );
+  //   setSecondaryDeviceAddress(SecondaryDeviceAddress);
+  // };
 
   // const renderCustodianRequestOtpModalHeader = () => {
   //   return (
@@ -1616,237 +2130,47 @@ export default function Home(props) {
   //   );
   // };
 
-  const renderAddModalContents = () => {
-    if (selectToAdd == 'Getbittr') {
-      return (
-        <GetBittrModalContents
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    } else if (selectToAdd == 'Fastbitcoins') {
-      return (
-        <FastBitcoinModalContents
-          onPressSellTab={() => {
-            setTimeout(() => {
-              setTabSelected('sell');
-            }, 2);
-            (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(1);
-          }}
-          onPressRedeemTab={() => {
-            setTimeout(() => {
-              setTabSelected('redeem');
-            }, 2);
-            (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    } else if (selectToAdd == 'Add Contact') {
-      return (
-        <AddContactsModalContents
-          onPressFriendAndFamily={() => {
-            setTimeout(() => {
-              setFamilyAndFriendsBookBottomSheetsFlag(true);
-            }, 2);
-            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBiller={() => {
-            setTimeout(() => {
-              setFamilyAndFriendsBookBottomSheetsFlag(true);
-            }, 2);
-            (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(1);
-          }}
-          onPressBack={() => {
-            setTimeout(() => {
-              setAddSubBottomSheetsFlag(false);
-              setTabBarZIndex(999);
-            }, 2);
-            (AddBottomSheet as any).current.snapTo(0);
-          }}
-        />
-      );
-    } else {
-      return null;
+  const onPressSaveBitcoinElements = (type) => {
+    if (type == 'voucher') {
+      props.navigation.navigate('VoucherScanner');
     }
   };
 
-  const renderAddModalHeader = () => {
+  const renderAddContactAddressBookContents = () => {
     return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          setTimeout(() => {
-            setAddSubBottomSheetsFlag(false);
-            setTabBarZIndex(999);
-          }, 2);
-          (AddBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinRedeemCalculationContents = () => {
-    return (
-      <FastBitcoinCalculationModalContents
-        navigation={props.navigation}
-        modalRef={fastBitcoinRedeemCalculationBottomSheet}
-        pageInfo={
-          'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
-        }
-        pageTitle={'Redeem Voucher'}
-        noteTitle={'Lorem ipsum'}
-        noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
-        proceedButtonText="Calculate"
-        onPressBack={() => {
-          (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinSellCalculationContents = () => {
-    return (
-      <FastBitcoinCalculationModalContents
-        navigation={props.navigation}
-        modalRef={fastBitcoinSellCalculationBottomSheet}
-        pageInfo={
-          'Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor'
-        }
-        pageTitle={'Sell Bitcoins'}
-        noteTitle={'Lorem ipsum'}
-        noteInfo={'Lorem ipsum dolor sit amet, consectetur'}
-        proceedButtonText={'Calculate'}
-        onPressBack={() => {
-          (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinSellCalculationHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          (fastBitcoinSellCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderFastBitcoinRedeemCalculationHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          (fastBitcoinRedeemCalculationBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookContents = () => {
-    return (
-      <SelectedContactFromAddressBook
-        onPressQrScanner={() => {
-          props.navigation.navigate('QrScanner', { scanedCode: getQrCodeData });
-        }}
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            1,
-          );
-        }}
-        onPressBack={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookQrCodeContents = () => {
-    return (
-      <SelectedContactFromAddressBookQrCode
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-        onPressBack={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-      />
-    );
-  };
-
-  const renderContactSelectedFromAddressBookQrCodeHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          (ContactSelectedFromAddressBookQrCodeBottomSheet as any).current.snapTo(
-            0,
-          );
-        }}
-      />
-    );
-  };
-
-  const renderFamilyAndFriendAddressBookContents = () => {
-    return (
-      <FamilyandFriendsAddressBookModalContents
-        modalRef={FamilyAndFriendAddressBookBottomSheet}
+      <AddContactAddressBook
+        isLoadContacts={isLoadContacts}
+        modalTitle={'Add contact to Friends and Family'}
+        modalRef={AddContactAddressBookBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
-        onPressProceed={() => {
-          (ContactSelectedFromAddressBookBottomSheet as any).current.snapTo(1);
+        onPressContinue={(selectedContacts) => {
+          setSelectedContact(selectedContacts);
+          props.navigation.navigate('AddContactSendRequest', {
+            SelectedContact: selectedContacts,
+          });
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        }}
+        onSelectContact={(selectedContact) => {
+          setSelectedContact(selectedContact);
         }}
         onPressBack={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);
-          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
-  const renderFamilyAndFriendAddressBookHeader = () => {
+  const renderAddContactAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.white}
-        backgroundColor={Colors.white}
+      <ModalHeader
         onPressHeader={() => {
           setTimeout(() => {
             setFamilyAndFriendsBookBottomSheetsFlag(false);
           }, 2);
-          (FamilyAndFriendAddressBookBottomSheet as any).current.snapTo(0);
+          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
@@ -1887,25 +2211,21 @@ export default function Home(props) {
   let isNavigate = false;
   let isContactOpen = false;
   let isCameraOpen = false;
-  const handleAppStateChange = async nextAppState => {
-    AsyncStorage.getItem('isContactOpen', (err, value) => {
-      if (err) console.log(err);
-      else {
-        isContactOpen = JSON.parse(value);
-      }
-    });
-    AsyncStorage.getItem('isCameraOpen', (err, value) => {
-      if (err) console.log(err);
-      else {
-        isCameraOpen = JSON.parse(value);
-      }
-    });
-    if (isCameraOpen) {
-      await AsyncStorage.setItem('isCameraOpen', JSON.stringify(false));
-      return;
-    }
-    if (isContactOpen) {
-      await AsyncStorage.setItem('isContactOpen', JSON.stringify(false));
+  const handleAppStateChange = async (nextAppState) => {
+    AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
+      (response) => {
+        isContactOpen = JSON.parse(response[0][1]);
+        isCameraOpen = JSON.parse(response[1][1]);
+      },
+    );
+    let keyArray = [
+      ['isCameraOpen', JSON.stringify(true)],
+      ['isContactOpen', JSON.stringify(true)],
+    ];
+    if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
+    if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
+    if (isContactOpen || isContactOpen) {
+      AsyncStorage.multiSet(keyArray, () => {});
       return;
     }
     var blockApp = setTimeout(() => {
@@ -1916,7 +2236,7 @@ export default function Home(props) {
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
-        : nextAppState == 'background'
+        : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
       clearTimeout(blockApp);
       isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
@@ -1925,11 +2245,11 @@ export default function Home(props) {
     }
   };
 
-  const handleDeepLink = useCallback(event => {
+  const handleDeepLink = useCallback(async (event) => {
     const splits = event.url.split('/');
-    const requester = splits[4];
 
     if (splits[5] === 'sss') {
+      const requester = splits[4];
       if (splits[6] === 'ek') {
         const custodyRequest = {
           requester,
@@ -1939,8 +2259,65 @@ export default function Home(props) {
         props.navigation.navigate('Home', { custodyRequest });
       } else if (splits[6] === 'rk') {
         const recoveryRequest = { requester, rk: splits[7] };
-        props.navigation.replace('Home', { recoveryRequest });
+        props.navigation.navigate('Home', {
+          recoveryRequest,
+          trustedContactRequest: null,
+        });
       }
+    } else if (
+      splits[4] === 'tc' ||
+      splits[4] === 'tcg' ||
+      splits[4] === 'ptc'
+    ) {
+      if (splits[3] !== config.APP_STAGE) {
+        Alert.alert(
+          'Invalid deeplink',
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[3]
+          }`,
+        );
+      } else {
+        const version = splits.pop().slice(1);
+        if (version) {
+          if (!(await isCompatible(splits[4], version))) return;
+        }
+
+        const trustedContactRequest = {
+          isGuardian: splits[4] === 'tcg' ? true : false,
+          isPaymentRequest: splits[4] === 'ptc' ? true : false,
+          requester: splits[5],
+          encryptedKey: splits[6],
+          hintType: splits[7],
+          hint: splits[8],
+          uploadedAt: splits[9],
+        };
+        props.navigation.navigate('Home', {
+          trustedContactRequest,
+          recoveryRequest: null,
+        });
+      }
+    } else if (splits[4] === 'rk') {
+      const recoveryRequest = {
+        isRecovery: true,
+        requester: splits[5],
+        encryptedKey: splits[6],
+        hintType: splits[7],
+        hint: splits[8],
+      };
+      props.navigation.navigate('Home', {
+        recoveryRequest,
+        trustedContactRequest: null,
+      });
+    } else if (splits[4] === 'rrk') {
+      Alert.alert(
+        'Restoration link Identified',
+        'Restoration links only works during restoration mode',
+      );
+    }
+
+    if (event.url.includes('fastbitcoins')) {
+      const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
+      props.navigation.navigate('VoucherScanner', { userKey });
     }
   }, []);
 
@@ -1953,12 +2330,7 @@ export default function Home(props) {
         }, 2);
       }
       setTimeout(() => {
-        if (
-          addressBookBottomSheet.current &&
-          AllAccountsBottomSheet.current &&
-          settingsBottomSheet.current
-        ) {
-          (addressBookBottomSheet as any).current.snapTo(0);
+        if (AllAccountsBottomSheet.current && settingsBottomSheet.current) {
           (AllAccountsBottomSheet as any).current.snapTo(0);
           (settingsBottomSheet.current as any).snapTo(0);
         }
@@ -1974,24 +2346,38 @@ export default function Home(props) {
           setDeepLinkModalOpen(true);
         }, 2);
       }
-      (RecoverySecretRequestBottomSheet as any).current.snapTo(1);
+      (TrustedContactRequestBottomSheet as any).current.snapTo(1);
       (transactionTabBarBottomSheet as any).current.snapTo(1);
     }
-  }, [custodyRequest, recoveryRequest]);
+
+    if (trustedContactRequest) {
+      if (tabBarZIndex == 999) {
+        setTimeout(() => {
+          setTabBarZIndex(0);
+          setDeepLinkModalOpen(true);
+        }, 2);
+      }
+      (TrustedContactRequestBottomSheet as any).current.snapTo(1);
+      (transactionTabBarBottomSheet as any).current.snapTo(1);
+    }
+  }, [custodyRequest, recoveryRequest, trustedContactRequest]);
 
   // const s3Service = useSelector(state => state.sss.service);
   const [overallHealth, setOverallHealth] = useState();
 
-  const health = useSelector(state => state.sss.overallHealth);
+  const health = useSelector((state) => state.sss.overallHealth);
   useEffect(() => {
-    console.log({ health });
     if (health) setOverallHealth(health);
   }, [health]);
 
   // useEffect(() => {
+  //   dispatch(runTest());
+  // }, []);
+
+  // useEffect(() => {
   //   const unsubscribe = NetInfo.addEventListener(state => {
-  //     console.log('Connection type', state.type);
-  //     console.log('Is connected?', state.isConnected);
+  //     //console.log('Connection type', state.type);
+  //     //console.log('Is connected?', state.isConnected);
   //
   //     if (!state.isConnected) {
   //       (NoInternetBottomSheet as any).current.snapTo(1);
@@ -2003,135 +2389,70 @@ export default function Home(props) {
   //   // return unsubscribe; // unsubscribing
   // }, []);
 
-  // const s3Service = useSelector(state => state.sss.service);
-  // useEffect(() => {
-  //   if (s3Service)
-  //     if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  // }, [s3Service]);
-
-  // const testAccService = accounts[TEST_ACCOUNT].service;
-  // useEffect(() => {
-  //   (async () => {
-  //     if (testAccService && !(await AsyncStorage.getItem('walletRecovered')))
-  //       if (!(await AsyncStorage.getItem('Received Testcoins'))) {
-  //         const { balances } = testAccService.hdWallet;
-  //         const netBalance = testAccService
-  //           ? balances.balance + balances.unconfirmedBalance
-  //           : 0;
-  //         if (!netBalance) {
-  //           console.log('Getting Testcoins');
-  //           dispatch(getTestcoins(TEST_ACCOUNT));
-  //         }
+  // const renderRecoverySecretRequestModalContent = useCallback(() => {
+  //   if (!recoveryRequest) return <View></View>;
+  //   return (
+  //     <RecoverySecretRequestModalContents
+  //       name={recoveryRequest.requester}
+  //       title={'You have a Recovery Request\nfrom your Trusted Contact'}
+  //       infoText={
+  //         'Please contact the sender to get\nthe OTP and share the secret'
   //       }
-  //   })();
-  // }, [testAccService]);
+  //       subTitle={'Message from the Sender'}
+  //       subTitleInfo={
+  //         'I am trying to restore my Hexa wallet and need the Recovery Key shared with you'
+  //       }
+  //       acceptButtonName={'Accept Request'}
+  //       rejectButtonName={'Reject Request'}
+  //       onPressAccept={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //         if (!UNDER_CUSTODY[recoveryRequest.requester]) {
+  //           Alert.alert(
+  //             'Failed to send!',
+  //             'You do not host any secret for this user.',
+  //           );
+  //           setLoading(false);
+  //         } else {
+  //           if (recoveryRequest.isQR) {
+  //             dispatch(
+  //               uploadRequestedShare(
+  //                 recoveryRequest.requester,
+  //                 recoveryRequest.rk,
+  //                 recoveryRequest.otp,
+  //               ),
+  //             );
+  //           } else {
+  //             props.navigation.navigate('RecoveryRequestOTP', {
+  //               recoveryRequest,
+  //             });
+  //           }
+  //         }
+  //       }}
+  //       onPressReject={() => {
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //       }}
+  //     />
+  //   );
+  // }, [recoveryRequest]);
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const storedExchangeRates = await AsyncStorage.getItem('exchangeRates');
-  //     if (storedExchangeRates) {
-  //       const exchangeRates = JSON.parse(storedExchangeRates);
-  //       if (Date.now() - exchangeRates.lastFetched < 1800000) {
-  //         setExchangeRates(exchangeRates);
-  //         return;
-  //       } // maintaining a half an hour difference b/w fetches
-  //     }
-  //     const res = await axios.get('https://blockchain.info/ticker');
-  //     if (res.status == 200) {
-  //       const exchangeRates = res.data;
-  //       exchangeRates.lastFetched = Date.now();
-  //       setExchangeRates(exchangeRates);
-  //       await AsyncStorage.setItem(
-  //         'exchangeRates',
-  //         JSON.stringify(exchangeRates),
-  //       );
-  //     } else {
-  //       console.log('Failed to retrieve exchange rates', res);
-  //     }
-  //   })();
+  // const renderRecoverySecretRequestModalHeader = useCallback(() => {
+  //   return (
+  //     <TransparentHeaderModal
+  //       onPressheader={() => {
+  //         (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
+  //         setTimeout(() => {
+  //           setTabBarZIndex(0);
+  //         }, 2);
+  //       }}
+  //     />
+  //   );
   // }, []);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (await AsyncStorage.getItem('walletRecovered')) {
-  //       dispatch(fetchBalance(TEST_ACCOUNT));
-  //       dispatch(fetchBalance(REGULAR_ACCOUNT));
-  //       dispatch(fetchBalance(SECURE_ACCOUNT));
-  //       dispatch(fetchTransactions(TEST_ACCOUNT));
-  //       dispatch(fetchTransactions(REGULAR_ACCOUNT));
-  //       dispatch(fetchTransactions(SECURE_ACCOUNT));
-
-  //       setTimeout(() => {
-  //         AsyncStorage.removeItem('walletRecovered');
-  //       }, 3000);
-  //     }
-  //   })();
-  // }, []);
-
-  const renderRecoverySecretRequestModalContent = useCallback(() => {
-    if (!recoveryRequest) return <View></View>;
-    return (
-      <RecoverySecretRequestModalContents
-        name={recoveryRequest.requester}
-        title={'You have a Recovery Request\nfrom your Trusted Contact'}
-        infoText={
-          'Please contact the sender to get\nthe OTP and share the secret'
-        }
-        subTitle={'Message from the Sender'}
-        subTitleInfo={
-          'I am trying to restore my Hexa wallet and need the Recovery Secret shared with you'
-        }
-        acceptButtonName={'Accept Request'}
-        rejectButtonName={'Reject Request'}
-        onPressAccept={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          if (!UNDER_CUSTODY[recoveryRequest.requester]) {
-            Alert.alert(
-              'Failed to send!',
-              'You do not host any secret for this user.',
-            );
-            setLoading(false);
-          } else {
-            if (recoveryRequest.isQR) {
-              dispatch(
-                uploadRequestedShare(
-                  recoveryRequest.requester,
-                  recoveryRequest.rk,
-                  recoveryRequest.otp,
-                ),
-              );
-            } else {
-              props.navigation.navigate('RecoveryRequestOTP', {
-                recoveryRequest,
-              });
-            }
-          }
-        }}
-        onPressReject={() => {
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-        }}
-      />
-    );
-  }, [recoveryRequest]);
-
-  const renderRecoverySecretRequestModalHeader = useCallback(() => {
-    return (
-      <TransparentHeaderModal
-        onPressheader={() => {
-          (RecoverySecretRequestBottomSheet as any).current.snapTo(0);
-          setTimeout(() => {
-            setTabBarZIndex(0);
-          }, 2);
-        }}
-      />
-    );
-  }, []);
 
   // const renderShareRecoverySecretQrCodeModalContent = () => {
   //   return (
@@ -2233,6 +2554,227 @@ export default function Home(props) {
   //   );
   // };
 
+  const onPressNotifications = () => {
+    (notificationsListBottomSheet as any).current.snapTo(1);
+  };
+
+  const renderNotificationsContent = useCallback(() => {
+    return (
+      <NotificationListContent
+        notificationLoading={notificationLoading}
+        NotificationData={NotificationData}
+        onNotificationClicked={(value) => onNotificationClicked(value)}
+        onPressBack={() => {
+          (notificationsListBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [NotificationData, NotificationDataChange]);
+
+  const renderNotificationsHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          (notificationsListBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, [NotificationData, NotificationDataChange]);
+
+  useEffect(() => {
+    if (paymentDetails) {
+      const serviceType = REGULAR_ACCOUNT;
+      let { address, paymentURI } = paymentDetails;
+      let options: any = {};
+      if (paymentURI) {
+        const details = accounts[serviceType].service.decodePaymentURI(
+          paymentURI,
+        );
+        address = details.address;
+        options = details.options;
+      }
+
+      const item = {
+        id: address,
+      };
+      dispatch(
+        addTransferDetails(serviceType, {
+          selectedContact: item,
+        }),
+      );
+
+      dispatch(clearPaymentDetails());
+
+      props.navigation.navigate('SendToContact', {
+        selectedContact: item,
+        serviceType,
+        netBalance: balances.regularBalance,
+        bitcoinAmount: options.amount ? `${options.amount}` : '',
+      });
+    }
+  }, [paymentDetails]);
+
+  const processDLRequest = useCallback(
+    (key, rejected?) => {
+      let {
+        requester,
+        isGuardian,
+        encryptedKey,
+        publicKey,
+        isQR,
+        uploadedAt,
+        isRecovery,
+      } = trustedContactRequest || recoveryRequest;
+
+      if (!isRecovery) {
+        if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
+          Alert.alert(
+            `${isQR ? 'QR' : 'Link'} expired!`,
+            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
+          );
+          setLoading(false);
+        } else {
+          if (isGuardian && UNDER_CUSTODY[requester]) {
+            Alert.alert(
+              'Failed to store',
+              'You cannot custody multiple shares of the same user.',
+            );
+            setLoading(false);
+          } else {
+            if (!publicKey) {
+              try {
+                publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                  .decryptedPub;
+              } catch (err) {
+                //console.log({ err });
+                Alert.alert(
+                  'Invalid Number/Email',
+                  'Decryption failed due to invalid input, try again.',
+                );
+              }
+            }
+            if (publicKey && !rejected) {
+              props.navigation.navigate('ContactsListForAssociateContact', {
+                postAssociation: (contact) => {
+                  const contactName = `${contact.firstName} ${
+                    contact.lastName ? contact.lastName : ''
+                  }`.toLowerCase();
+                  if (isGuardian) {
+                    dispatch(
+                      approveTrustedContact(
+                        contactName,
+                        publicKey,
+                        true,
+                        requester,
+                      ),
+                    );
+                  } else {
+                    dispatch(
+                      approveTrustedContact(contactName, publicKey, true),
+                    );
+                  }
+                  setAssociatedContactName(contactName);
+                },
+                isGuardian,
+              });
+            } else if (publicKey && rejected) {
+              // don't associate; only fetch the payment details from EC
+              dispatch(fetchEphemeralChannel(null, null, publicKey));
+            }
+          }
+        }
+      } else {
+        if (!UNDER_CUSTODY[requester]) {
+          Alert.alert(
+            'Failed to send!',
+            'You do not hold any Key of this user.',
+          );
+          setLoading(false);
+        } else {
+          if (!publicKey) {
+            try {
+              publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
+                .decryptedPub;
+            } catch (err) {
+              console.log({ err });
+              Alert.alert(
+                'Invalid Number/Email',
+                'Decryption failed due to invalid input, try again.',
+              );
+            }
+          }
+          if (publicKey) {
+            dispatch(
+              uploadRequestedShare(recoveryRequest.requester, publicKey),
+            );
+          }
+        }
+      }
+
+      TrustedContactRequestBottomSheet.current.snapTo(0);
+    },
+    [trustedContactRequest, recoveryRequest],
+  );
+
+  const renderTrustedContactRequestContent = useCallback(() => {
+    if (!trustedContactRequest && !recoveryRequest) return;
+    console.log({ trustedContactRequest, recoveryRequest });
+
+    let {
+      requester,
+      hintType,
+      hint,
+      isGuardian,
+      isQR,
+      isRecovery,
+      isPaymentRequest,
+    } = trustedContactRequest || recoveryRequest;
+
+    return (
+      <TrustedContactRequest
+        isQR={isQR}
+        inputType={
+          hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
+        }
+        isGuardian={isGuardian}
+        isRecovery={isRecovery}
+        isPayment={isPaymentRequest}
+        hint={hint}
+        bottomSheetRef={TrustedContactRequestBottomSheet}
+        trustedContactName={requester}
+        onPressAccept={(key) => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
+          }, 2);
+          processDLRequest(key);
+        }}
+        onPressReject={(key) => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
+          }, 2);
+          TrustedContactRequestBottomSheet.current.snapTo(0);
+          processDLRequest(key, true);
+        }}
+      />
+    );
+  }, [trustedContactRequest, recoveryRequest]);
+
+  const renderTrustedContactRequestHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setTabBarZIndex(999);
+            setDeepLinkModalOpen(false);
+          }, 2);
+          TrustedContactRequestBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <ImageBackground
       source={require('../assets/images/home-bg.png')}
@@ -2240,7 +2782,6 @@ export default function Home(props) {
       imageStyle={{ resizeMode: 'stretch' }}
     >
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-
       <View
         style={{
           flex: 3.8,
@@ -2248,54 +2789,104 @@ export default function Home(props) {
             Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('5%') : 0,
         }}
       >
-        <View style={styles.headerViewContainer}>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={styles.headerTitleViewContainer}>
-              <Text
-                style={styles.headerTitleText}
-              >{`${walletName}’s Wallet`}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                {switchOn ? (
-                  <Image
-                    style={{
-                      ...CommonStyles.homepageAmountImage,
-                      marginBottom: wp('1.5%'),
-                    }}
-                    source={require('../assets/images/icons/icon_bitcoin_light.png')}
-                  />
-                ) : (
-                  <Image
-                    style={{
-                      ...styles.cardBitCoinImage,
-                      marginBottom: wp('1.5%'),
-                    }}
-                    source={getCurrencyImageByRegion(CurrencyCode, 'light')}
-                  />
-                )}
+        <View style={{ ...styles.headerViewContainer, flex: 1 }}>
+          <View style={{ flexDirection: 'row', height: '100%' }}>
+            <View style={{ ...styles.headerTitleViewContainer }}>
+              <TouchableOpacity
+                onPress={() => onPressNotifications()}
+                style={{
+                  height: wp('10%'),
+                  width: wp('10%'),
+                  justifyContent: 'center',
+                }}
+              >
+                <ImageBackground
+                  source={require('../assets/images/icons/icon_notification.png')}
+                  style={{ width: wp('6%'), height: wp('6%') }}
+                  resizeMode={'contain'}
+                >
+                  {NotificationData.findIndex((value) => value.read == false) >
+                  -1 ? (
+                    <View
+                      style={{
+                        backgroundColor: Colors.red,
+                        height: wp('2.5%'),
+                        width: wp('2.5%'),
+                        borderRadius: wp('2.5%') / 2,
+                        alignSelf: 'flex-end',
+                      }}
+                    />
+                  ) : null}
+                </ImageBackground>
+              </TouchableOpacity>
+              <View style={{ marginBottom: wp('2%') }}>
                 <Text
+                  style={styles.headerTitleText}
+                >{`${walletName}’s Wallet`}</Text>
+                <View
                   style={{
-                    ...CommonStyles.homepageAmountText,
-                    color: Colors.white,
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    marginBottom: wp('3%'),
                   }}
                 >
-                  {switchOn
-                    ? UsNumberFormat(balances.accumulativeBalance)
-                    : exchangeRates
-                    ? (
-                        (balances.accumulativeBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                    : 0}
-                </Text>
-                <Text
-                  style={{
-                    ...CommonStyles.homepageAmountUnitText,
-                    color: Colors.white,
-                  }}
-                >
-                  {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
-                </Text>
+                  {switchOn ? (
+                    <Image
+                      style={{
+                        ...CommonStyles.homepageAmountImage,
+                        marginBottom: wp('1.5%'),
+                      }}
+                      source={require('../assets/images/icons/icon_bitcoin_light.png')}
+                    />
+                  ) : currencyCode.includes(CurrencyCode) ? (
+                    getCurrencyImage(CurrencyCode, 'light')
+                  ) : (
+                    <Image
+                      style={{
+                        ...styles.cardBitCoinImage,
+                        marginBottom: wp('1.5%'),
+                      }}
+                      source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                    />
+                  )}
+                  <Text
+                    style={{
+                      ...CommonStyles.homepageAmountText,
+                      color: Colors.white,
+                    }}
+                  >
+                    {switchOn
+                      ? UsNumberFormat(balances.accumulativeBalance)
+                      : exchangeRates
+                      ? (
+                          (balances.accumulativeBalance / 1e8) *
+                          exchangeRates[CurrencyCode].last
+                        ).toFixed(2)
+                      : 0}
+                  </Text>
+                  <Text
+                    style={{
+                      ...CommonStyles.homepageAmountUnitText,
+                      color: Colors.white,
+                    }}
+                  >
+                    {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+                  </Text>
+                </View>
+                <MessageAsPerHealth
+                  health={
+                    overallHealth ? (overallHealth as any).overallStatus : 0
+                  }
+                />
               </View>
+              <TouchableOpacity
+                onPress={() => {
+                  props.navigation.navigate('ManageBackup');
+                }}
+                style={styles.headerButton}
+              >
+                <Text style={styles.headerButtonText}>Manage Backup</Text>
+              </TouchableOpacity>
             </View>
             <View style={styles.headerToggleSwitchContainer}>
               <ToggleSwitch
@@ -2307,23 +2898,6 @@ export default function Home(props) {
                 }}
                 toggle={switchOn}
               />
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ flex: 7 }}>
-              {messageAsPerHealth(
-                overallHealth ? overallHealth.overallStatus : 0,
-              )}
-              <TouchableOpacity
-                onPress={() => {
-                  props.navigation.navigate('ManageBackup');
-                }}
-                style={styles.headerButton}
-              >
-                <Text style={styles.headerButtonText}>Manage Backup</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ flex: 4, alignItems: 'flex-end' }}>
               <TouchableOpacity
                 activeOpacity={10}
                 onPress={() => {
@@ -2331,7 +2905,9 @@ export default function Home(props) {
                 }}
               >
                 <HomePageShield
-                  shieldStatus={overallHealth ? overallHealth.overallStatus : 0}
+                  shieldStatus={
+                    overallHealth ? (overallHealth as any).overallStatus : 0
+                  }
                 />
               </TouchableOpacity>
             </View>
@@ -2345,10 +2921,10 @@ export default function Home(props) {
             showsHorizontalScrollIndicator={false}
             data={newData}
             extraData={{ balances, switchOn, walletName }}
-            renderItem={Items => {
+            renderItem={(Items) => {
               return (
                 <View style={{ flexDirection: 'column' }}>
-                  {Items.item.map(value => {
+                  {Items.item.map((value) => {
                     if (value.accountType === 'add') {
                       return (
                         <TouchableOpacity disabled={true}>
@@ -2440,6 +3016,7 @@ export default function Home(props) {
                               </Text>
                               <Text
                                 style={{
+                                  fontFamily: Fonts.FiraSansRegular,
                                   color: Colors.textColorGrey,
                                   fontSize: RFValue(11),
                                 }}
@@ -2458,6 +3035,8 @@ export default function Home(props) {
                                     style={styles.cardBitCoinImage}
                                     source={value.bitcoinicon}
                                   />
+                                ) : currencyCode.includes(CurrencyCode) ? (
+                                  getCurrencyImage(CurrencyCode, 'light_blue')
                                 ) : (
                                   <Image
                                     style={styles.cardBitCoinImage}
@@ -2553,10 +3132,19 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
-        renderContent={renderTransactionContent}
+        renderContent={() => (
+          <TransactionsContent
+            transactionLoading={transactionLoading}
+            transactions={transactions}
+            AtCloseEnd={AtCloseEnd}
+            setTransactionItem={setTransactionItem}
+            setTabBarZIndex={setTabBarZIndex}
+            TransactionDetailsBottomSheet={TransactionDetailsBottomSheet}
+          />
+        )}
         renderHeader={renderTransactionHeader}
       />
       <BottomSheet
@@ -2577,7 +3165,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
         ]}
         renderContent={renderAddContent}
         renderHeader={renderAddHeader}
@@ -2610,7 +3198,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
@@ -2633,7 +3221,7 @@ export default function Home(props) {
             : Platform.OS == 'android'
             ? hp('19%')
             : hp('18%'),
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('64%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('65%'),
         ]}
         renderContent={renderMoreContent}
         renderHeader={renderMoreHeader}
@@ -2666,7 +3254,7 @@ export default function Home(props) {
         renderContent={renderCustodianRequestModalContent}
         renderHeader={renderCustodianRequestModalHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         onCloseEnd={() => {
           setTimeout(() => {
             setTabBarZIndex(999);
@@ -2682,6 +3270,28 @@ export default function Home(props) {
         snapPoints={[-50, hp('60%')]}
         renderContent={renderRecoverySecretRequestModalContent}
         renderHeader={renderRecoverySecretRequestModalHeader}
+      /> */}
+      <BottomSheet
+        onCloseEnd={() => {
+          if (tabBarZIndex == 0 && !deepLinkModalOpen) {
+            setTabBarZIndex(999);
+          }
+        }}
+        onOpenEnd={() => {
+          if (tabBarZIndex == 999) {
+            setTabBarZIndex(0);
+          }
+          setDeepLinkModalOpen(true);
+        }}
+        enabledInnerScrolling={true}
+        ref={TrustedContactRequestBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('65%') : hp('70%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('95%') : hp('95%'),
+        ]}
+        renderContent={renderTrustedContactRequestContent}
+        renderHeader={renderTrustedContactRequestHeader}
       />
       {/* <BottomSheet
         onCloseEnd={() => {
@@ -2734,36 +3344,12 @@ export default function Home(props) {
             }
           }}
           enabledInnerScrolling={true}
-          ref={addressBookBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('65%')
-              : hp('64%'),
-          ]}
-          renderContent={renderAddressBookContents}
-          renderHeader={renderAddressBookHeader}
-        />
-      ) : null}
-      {KnowMoreBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(0);
-            }
-          }}
-          onCloseEnd={() => {
-            if (!deepLinkModalOpen) {
-              setTabBarZIndex(999);
-            }
-          }}
-          enabledInnerScrolling={true}
           ref={AllAccountsBottomSheet as any}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('64%'),
+              : hp('65%'),
           ]}
           renderContent={renderAllAccountsContents}
           renderHeader={renderAllAccountsHeader}
@@ -2787,7 +3373,7 @@ export default function Home(props) {
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
-              : hp('64%'),
+              : hp('65%'),
           ]}
           renderContent={renderSettingsContents}
           renderHeader={renderSettingsHeader}
@@ -2845,116 +3431,32 @@ export default function Home(props) {
         ref={TransactionDetailsBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('84%') : hp('83%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
         ]}
         renderContent={renderTransactionDetailsContents}
         renderHeader={renderTransactionDetailsHeader}
       />
-
-      {addBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-          }}
-          onCloseEnd={() => {
-            setTabBarZIndex(999);
-            setAddSubBottomSheetsFlag(false);
-          }}
-          enabledInnerScrolling={true}
-          ref={AddBottomSheet as any}
-          snapPoints={[-50, hp('63%')]}
-          renderContent={renderAddModalContents}
-          renderHeader={renderAddModalHeader}
-        />
-      ) : null}
-      {addSubBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-          }}
-          enabledInnerScrolling={true}
-          ref={fastBitcoinRedeemCalculationBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-            Platform.OS == 'ios' ? hp('90%') : hp('50%'),
-          ]}
-          renderContent={renderFastBitcoinRedeemCalculationContents}
-          renderHeader={renderFastBitcoinRedeemCalculationHeader}
-        />
-      ) : null}
-      {addSubBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-          }}
-          enabledInnerScrolling={true}
-          ref={fastBitcoinSellCalculationBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-            Platform.OS == 'ios' ? hp('90%') : hp('50%'),
-          ]}
-          renderContent={renderFastBitcoinSellCalculationContents}
-          renderHeader={renderFastBitcoinSellCalculationHeader}
-        />
-      ) : null}
-      {addSubBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {
-            setTabBarZIndex(0);
-            setFamilyAndFriendsBookBottomSheetsFlag(true);
-          }}
-          onCloseEnd={() => {
-            setTabBarZIndex(999);
-            setFamilyAndFriendsBookBottomSheetsFlag(false);
-          }}
-          enabledInnerScrolling={true}
-          ref={FamilyAndFriendAddressBookBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-          ]}
-          renderContent={renderFamilyAndFriendAddressBookContents}
-          renderHeader={renderFamilyAndFriendAddressBookHeader}
-        />
-      ) : null}
-      {familyAndFriendsBookBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {}}
-          enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-          ]}
-          renderContent={renderContactSelectedFromAddressBookContents}
-          renderHeader={renderContactSelectedFromAddressBookHeader}
-        />
-      ) : null}
-      {familyAndFriendsBookBottomSheetsFlag ? (
-        <BottomSheet
-          onOpenEnd={() => {}}
-          enabledInnerScrolling={true}
-          ref={ContactSelectedFromAddressBookQrCodeBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('90%')
-              : hp('90%'),
-          ]}
-          renderContent={renderContactSelectedFromAddressBookQrCodeContents}
-          renderHeader={renderContactSelectedFromAddressBookQrCodeHeader}
-        />
-      ) : null}
+      <BottomSheet
+        onOpenEnd={() => {
+          setTabBarZIndex(0);
+          // setFamilyAndFriendsBookBottomSheetsFlag(true);
+        }}
+        onOpenStart={() => {
+          setTabBarZIndex(0);
+        }}
+        onCloseStart={() => {
+          setTabBarZIndex(999);
+          setFamilyAndFriendsBookBottomSheetsFlag(false);
+        }}
+        enabledInnerScrolling={true}
+        ref={AddContactAddressBookBookBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+        ]}
+        renderContent={renderAddContactAddressBookContents}
+        renderHeader={renderAddContactAddressBookHeader}
+      />
 
       <BottomSheet
         onOpenEnd={() => {
@@ -2964,13 +3466,30 @@ export default function Home(props) {
           setTabBarZIndex(999);
         }}
         enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
+        ref={ErrorBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          onNotificationListOpen();
+          setTabBarZIndex(0);
+        }}
+        onCloseEnd={() => {
+          setTabBarZIndex(999);
+        }}
+        enabledInnerScrolling={true}
+        ref={notificationsListBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+        ]}
+        renderContent={renderNotificationsContent}
+        renderHeader={renderNotificationsHeader}
       />
       {/* <BottomSheet
         onOpenStart={() => {
@@ -3087,7 +3606,7 @@ export default function Home(props) {
             </View>
           )}
         </TouchableOpacity>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           onPress={() => selectTab('Add')}
           style={styles.tabBarTabView}
         >
@@ -3107,7 +3626,7 @@ export default function Home(props) {
               />
             </View>
           )}
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => selectTab('QR')}
           style={styles.tabBarTabView}
@@ -3168,6 +3687,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   cardTitle: {
+    fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,
     fontSize: RFValue(10),
   },
@@ -3184,7 +3704,7 @@ const styles = StyleSheet.create({
   activeTabTextStyle: {
     marginLeft: 8,
     color: Colors.blue,
-    fontFamily: Fonts.firasonsRegular,
+    fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(12),
   },
   bottomTabBarContainer: {
@@ -3258,26 +3778,22 @@ const styles = StyleSheet.create({
   },
   headerTitleViewContainer: {
     flex: 7,
-    marginBottom: hp('3%'),
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   headerTitleText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(25),
-    display: 'flex',
-    marginBottom: hp('0.8%'),
+    marginBottom: wp('3%'),
   },
   headerToggleSwitchContainer: {
     flex: 3,
     alignItems: 'flex-end',
-    justifyContent: 'center',
-    marginBottom: hp('3%'),
+    justifyContent: 'space-between',
   },
   headerInfoText: {
     fontSize: RFValue(12),
     color: Colors.white,
-    marginBottom: hp('3%'),
   },
   headerButton: {
     backgroundColor: Colors.homepageButtonColor,
@@ -3302,7 +3818,7 @@ const styles = StyleSheet.create({
   },
   cardAmountText: {
     color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.OpenSans,
     fontSize: RFValue(17),
     marginRight: 5,
     marginTop: 'auto',
@@ -3310,7 +3826,7 @@ const styles = StyleSheet.create({
   },
   cardAmountTextGrey: {
     color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.OpenSans,
     fontSize: RFValue(17),
     marginRight: 5,
     marginTop: 'auto',

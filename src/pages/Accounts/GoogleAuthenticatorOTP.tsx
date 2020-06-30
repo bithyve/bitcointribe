@@ -73,7 +73,7 @@ const GoogleAuthenticatorOTP = props => {
                 </Text>
                 <Text style={styles.commModeModalInfoText}>
                   {
-                    'This is the authenticator app, like Google Authenticator, that you must have installed on your secondary device'
+                    'This is the authenticator app, like Google Authenticator, that you must have installed on your Keeper device'
                   }
                 </Text>
               </View>

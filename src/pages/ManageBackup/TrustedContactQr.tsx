@@ -16,34 +16,57 @@ import {
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useSelector } from 'react-redux';
-import QRCode from 'react-native-qrcode-svg';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import QRCode from 'react-native-qrcode-svg';
+
 
 export default function TrustedContactQr(props) {
   const [trustedContactQR, setTrustedContactQR] = useState('');
 
   const SHARES_TRANSFER_DETAILS = useSelector(
-    state =>
+    (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
   const WALLET_SETUP = useSelector(
-    state => state.storage.database.WALLET_SETUP,
+    (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service,
   );
 
   useEffect(() => {
-    if (SHARES_TRANSFER_DETAILS[props.index]) {
-      setTrustedContactQR(
-        JSON.stringify({
-          requester: WALLET_SETUP.walletName,
-          ...SHARES_TRANSFER_DETAILS[props.index],
-          type: 'trustedContactQR',
-        }),
-      );
-    }
-  }, [SHARES_TRANSFER_DETAILS[props.index]]);
+    const { contact } = props;
+    if (contact) {
+      if (SHARES_TRANSFER_DETAILS[props.index]) {
+        // uploading of share is already done on the communication mode component
 
-  const getIconByStatus = useCallback(status => {
+        const contactName = `${contact.firstName} ${
+          contact.lastName ? contact.lastName : ''
+          }`
+          .toLowerCase()
+          .trim();
+        const publicKey =
+          trustedContacts.tc.trustedContacts[contactName].publicKey;
+        console.log({ contactName });
+
+        setTrustedContactQR(
+          JSON.stringify({
+            isGuardian: true,
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            uploadedAt: SHARES_TRANSFER_DETAILS[props.index].UPLOADED_AT,
+            type: 'trustedGuardian',
+          }),
+        );
+      }
+    }
+  }, [SHARES_TRANSFER_DETAILS[props.index], props.contact]);
+
+  const getIconByStatus = useCallback((status) => {
     if (status == 'Ugly') {
       return require('../../assets/images/icons/icon_error_red.png');
     } else if (status == 'Bad') {
@@ -76,7 +99,7 @@ export default function TrustedContactQr(props) {
             style={{ alignSelf: 'center', flex: 1, justifyContent: 'center' }}
           >
             <Text style={BackupStyles.modalHeaderTitleText}>
-              Trusted contact QR code
+              contact QR code
             </Text>
           </View>
         </View>
@@ -87,8 +110,8 @@ export default function TrustedContactQr(props) {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={trustedContactQR} size={hp('27%')} />
-        )}
+            <QRCode value={trustedContactQR} size={hp('27%')} />
+          )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{
@@ -114,9 +137,9 @@ export default function TrustedContactQr(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
-        title={'Share your Recovery Secret'}
+        title={'Send your Recovery Key'}
         infoText={
-          'Open the QR scanner at the bottom of the Home screen on your Secondary Device and scan this QR'
+          'Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR'
         }
       />
     </View>
