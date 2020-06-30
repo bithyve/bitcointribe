@@ -27,7 +27,7 @@ export default function TrustedContactRequest(props) {
   const [onBlurFocus, setOnBlurFocus] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeArray, setPasscodeArray] = useState([]);
-  console.log('props.hint', props.hint);
+
   function onPressNumber(text) {
     let tmpPasscode = passcodeArray;
     if (text) {
