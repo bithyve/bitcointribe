@@ -11,6 +11,7 @@ import {
   StatusBar,
   Alert,
   AsyncStorage,
+  Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -38,6 +39,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import DeviceInfo from 'react-native-device-info';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
@@ -441,7 +443,8 @@ export default function TwoFAToken(props) {
           }}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
-          snapPoints={[-50, hp('65%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('65%') : hp('70%')]}
           renderContent={renderSendUnSuccessContents}
           renderHeader={renderSendUnSuccessHeader}
         />

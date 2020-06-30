@@ -18,12 +18,12 @@ import {
 } from 'react-native-responsive-screen';
 import commonStyle from '../../common/Styles';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ScrollView } from 'react-native-gesture-handler';
 import RecipientComponent from './RecipientComponent';
+import DeviceInfo from 'react-native-device-info';
 
 export default function SendConfirmationContent(props) {
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -62,25 +62,29 @@ export default function SendConfirmationContent(props) {
       <ScrollView style={{ marginTop: hp('1.5%'), marginBottom: hp('2%') }}>
         {props.userInfo.map((item) => renderContacts(item))}
       </ScrollView>
-      <View
-        style={{
-          marginTop: hp('1%'),
-          marginBottom: hp('1%'),
-          marginRight: wp('8%'),
-          marginLeft: wp('8%'),
-        }}
-      >
-        <Text style={{ ...styles.modalInfoText }}>
-          {
-            props.infoText ? props.infoText : ''
-          }
-        </Text>
-      </View>
+      {props.infoText && (
+        <View
+          style={{
+            marginTop: hp('1%'),
+            marginBottom: hp('1%'),
+            marginRight: wp('8%'),
+            marginLeft: wp('8%'),
+          }}
+        >
+          <Text style={{ ...styles.modalInfoText }}>
+            {props.infoText ? props.infoText : ''}
+          </Text>
+        </View>
+      )}
       <View
         style={{
           flexDirection: 'row',
           marginTop: 'auto',
           alignItems: 'center',
+          marginBottom:
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? wp('5%')
+              : wp('15%'),
         }}
       >
         <AppBottomSheetTouchableWrapper
