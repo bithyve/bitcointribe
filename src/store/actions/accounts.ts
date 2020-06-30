@@ -41,13 +41,13 @@ export const fetchTransactions = (serviceType, service?) => {
 
 export const fetchBalanceTx = (
   serviceType,
-  options?: {
+  options: {
     service?;
     loader?;
     restore?;
     shouldNotInsert?;
     syncTrustedDerivative?;
-  },
+  } = {},
 ) => {
   return { type: FETCH_BALANCE_TX, payload: { serviceType, options } };
 };
@@ -114,7 +114,10 @@ export const syncAccounts = (restore?) => {
 };
 
 export const syncDerivativeAccounts = (serviceTypes: string[]) => {
-  return { type: SYNC_DERIVATIVE_ACCOUNTS, payload: { serviceTypes } };
+  return {
+    type: SYNC_DERIVATIVE_ACCOUNTS,
+    payload: { serviceTypes },
+  };
 };
 
 export const calculateExchangeRate = () => {

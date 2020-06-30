@@ -21,6 +21,7 @@ import axios, { AxiosResponse, AxiosInstance } from 'axios';
 import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
+  REGULAR_ACCOUNT,
 } from '../../../common/constants/serviceTypes';
 import { BH_AXIOS } from '../../../services/api';
 const { HEXA_ID, REQUEST_TIMEOUT } = config;
@@ -583,6 +584,7 @@ export default class HDSegwitWallet extends Bitcoin {
           };
 
           const txMap = new Map();
+
           for (const addressInfo of addressesInfo) {
             if (
               derivativeAccounts[accountNumber].usedAddresses.indexOf(
@@ -648,6 +650,11 @@ export default class HDSegwitWallet extends Bitcoin {
                     balances.unconfirmedBalance -= debited;
                   }
                 }
+
+                // over-ride sent transaction's accountType variable for derivative accounts
+                // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
+                if (transaction.transactionType === 'Sent')
+                  transaction.accountType = 'Checking Account';
 
                 transactions.transactionDetails.push(transaction);
               }
