@@ -809,6 +809,11 @@ export default class SecureHDWallet extends Bitcoin {
                   }
                 }
 
+                // over-ride sent transaction's accountType variable for derivative accounts
+                // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
+                if (transaction.transactionType === 'Sent')
+                  transaction.accountType = 'Savings Account';
+
                 transactions.transactionDetails.push(transaction);
               }
             });
