@@ -354,6 +354,9 @@ const PersonalCopyHistory = (props) => {
         // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
+        onBackPress={() => {
+          (QrBottomSheet.current as any).snapTo(0);
+        }}
         onQrScan={(qrData) => {
           if (QRModalHeader === 'Confirm Personal Copy') {
             const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
