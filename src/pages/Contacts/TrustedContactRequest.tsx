@@ -274,7 +274,9 @@ export default function TrustedContactRequest(props) {
                 <Text style={styles.modalTitleText}>Payment Request </Text>
               ) : (
                 <Text style={styles.modalTitleText}>
-                  {props.isGuardian ? 'Friends and Family\nRequest' : 'Keeper Reuest'}
+                  {props.isGuardian
+                    ? 'Friends and Family\nRequest'
+                    : 'Keeper Request'}
                 </Text>
               )
             ) : (
@@ -319,11 +321,22 @@ export default function TrustedContactRequest(props) {
                 marginBottom: wp('8%'),
               }}
             >
-              {props.inputType === 'phone'
-                ? 'Enter your 10 digit phone number  '
-                : props.inputType === 'email'
-                ? 'Enter your email ID  '
-                : null}
+              Enter{' '}
+              <Text style={{ fontFamily: Fonts.FiraSansMedium }}>your </Text>
+              <Text
+                style={{
+                  ...styles.modalInfoText,
+                  marginLeft: wp('8%'),
+                  marginRight: wp('8%'),
+                  marginBottom: wp('8%'),
+                }}
+              >
+                {props.inputType === 'phone'
+                  ? '10 digit phone number  '
+                  : props.inputType === 'email'
+                  ? 'email ID  '
+                  : null}
+              </Text>
               <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                 {props.inputType === 'phone'
                   ? `${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`
@@ -339,11 +352,6 @@ export default function TrustedContactRequest(props) {
           {!props.isQR ? (
             <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
               <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.phoneNumberInfoText}>
-                  {props.inputType === 'phone'
-                    ? 'Enter Phone Number'
-                    : 'Enter Email Address'}
-                </Text>
                 <Text style={styles.inputErrorText}>{WrongInputError}</Text>
               </View>
               {getInputBox()}
