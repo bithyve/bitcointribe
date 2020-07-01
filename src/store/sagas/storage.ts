@@ -9,7 +9,6 @@ import {
   dbInserted,
   ENRICH_SERVICES,
   servicesEnriched,
-  insertIntoDB,
 } from '../actions/storage';
 import dataManager from '../../storage/database-manager';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -18,7 +17,6 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { AsyncStorage } from 'react-native';
-import config from '../../bitcoin/HexaConfig';
 import DeviceInfo from 'react-native-device-info';
 
 function* initDBWorker() {
@@ -106,10 +104,6 @@ function* servicesEnricherWorker({ payload }) {
 
     let services;
     let migrated = false;
-    console.log({
-      storedVersion: database.VERSION,
-      app: DeviceInfo.getVersion(),
-    });
 
     if (parseFloat(database.VERSION) !== parseFloat(DeviceInfo.getVersion())) {
       if (!database.VERSION && parseFloat(DeviceInfo.getVersion()) >= 0.9) {
@@ -138,13 +132,15 @@ function* servicesEnricherWorker({ payload }) {
         TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
         SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
         S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
-        TRUSTED_CONTACTS: TrustedContactsService.fromJSON(TRUSTED_CONTACTS),
+        TRUSTED_CONTACTS: TRUSTED_CONTACTS
+          ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+          : new TrustedContactsService(),
       };
     }
 
     yield put(servicesEnriched(services));
     if (migrated) {
-      yield put(insertIntoDB(database));
+      yield call(insertDBWorker, { payload: database });
     }
   } catch (err) {
     console.log(err);
