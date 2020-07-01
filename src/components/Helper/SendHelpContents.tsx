@@ -29,7 +29,7 @@ export default function SendHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{

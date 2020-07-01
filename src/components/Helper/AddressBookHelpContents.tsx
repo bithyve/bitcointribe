@@ -28,7 +28,7 @@ export default function AddressBookHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -77,7 +77,7 @@ export default function AddressBookHelpContents(props) {
             >
                 Selecting a contact as Friends and Family{'\n'}creates a secure channel between you and the{'\n'}contact. This secure channel enables easy{'\n'}exchange of information without requiring{'\n'}user action
             </Text>
-            <Text
+            {/* <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
@@ -86,7 +86,7 @@ export default function AddressBookHelpContents(props) {
             }}
             >
                 The secure channel is a 2 party ECDH channel,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt information
-            </Text>
+            </Text> */}
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -109,8 +109,14 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                These ECDH channels are used to{'\n'}communicate your extended public key. An{'\n'}extended public key can be used by a peer to{'\n'}generate new addresses on your behalf.
+                Secure, encrypted channels are used to{'\n'}communicate your extended public key. An{'\n'}extended public key can be used by a peer to{'\n'}generate new addresses on your behalf.
             </Text>
+            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Image
+                    source={require('../../assets/images/icons/test_account_info_2.png')}
+                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
+                />
+            </View>
             <Text
             style={{
                 textAlign: 'center',
@@ -121,13 +127,7 @@ export default function AddressBookHelpContents(props) {
             >
                 Possessing an extended public key does not{'\n'}allow one to gain possession of funds. This is{'\n'}because the contact does not possess your private{'\n'}key which affirms ownership of funds
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/test_account_info_2.png')}
-                    style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+            {/* <Text
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
@@ -136,7 +136,7 @@ export default function AddressBookHelpContents(props) {
                 }}
             >
                 Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to all communications between the{'\n'}two parties
-            </Text>
+            </Text> */}
             <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
                 <Text
                     style={{

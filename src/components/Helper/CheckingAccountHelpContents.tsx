@@ -28,7 +28,7 @@ export default function CheckingAccountHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -75,7 +75,7 @@ export default function CheckingAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                  Since the Checking Account does not require{'\n'}2FA confirmation for spending, a person using your{'\n'}phone and knowing your passcode will {'\n'}be able to spend your bitcoin. Hence, for {'\n'}storing more funds or for spending infrequently, {'\n'}please store your funds in the Savings Account
+                  Since the Checking Account does not require{'\n'}2FA confirmation for spending, a person using your{'\n'}phone and knowing your passcode will {'\n'}be able to spend your bitcoin. Hence, for {'\n'}storing more funds or for spending infrequently, {'\n'}please store your bitcoin in the Savings Account
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View

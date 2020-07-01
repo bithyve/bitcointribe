@@ -17,7 +17,7 @@ export default function FriendsAndFamilyHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -89,7 +89,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 />
             </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
             <Text
             style={{
                 textAlign: 'center',

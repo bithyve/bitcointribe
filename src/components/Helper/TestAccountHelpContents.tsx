@@ -28,7 +28,7 @@ export default function TestAccountHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -114,7 +114,7 @@ export default function TestAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                bitcoin sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved.
+                Real bitcoin sent to a Test Bitcoin address and vice{'\n'}versa can not be retrieved
             </Text>
             <Text
                 style={{
