@@ -140,8 +140,8 @@ export default function SendConfirmation(props) {
     });
     const notification: INotification = {
       notificationType: notificationType.contact,
-      title: 'New Transaction',
-      body: `Transaction received from ${WALLET_SETUP.walletName}`,
+      title: 'Friends and Family notification',
+      body: `You have a new transaction from ${WALLET_SETUP.walletName}`,
       data: {},
       tag: notificationTag.IMP,
     };
@@ -185,8 +185,8 @@ export default function SendConfirmation(props) {
             id: createRandomString(36),
             title: 'Sent Amount',
             date: moment(Date.now()).valueOf(),
-            info:"",
-              // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            info: '',
+            // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
             selectedContactInfo: element,
           };
           if (element.selectedContact.isWard) {
