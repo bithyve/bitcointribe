@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Image, TouchableOpacity, Text, StyleSheet, Linking } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,6 +11,17 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TransactionHelperModalContents(props) {
+
+    const openLink = (url) => {
+        Linking.canOpenURL(url).then(supported => {
+          if (supported) {
+            Linking.openURL(url);
+          } else {
+            console.log("Don't know how to open URI: " + url);
+          }
+        })
+    }
+
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -132,7 +143,7 @@ export default function TransactionHelperModalContents(props) {
                 />
             </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
             <Text
             style={{
                 textAlign: 'center',
@@ -149,16 +160,31 @@ export default function TransactionHelperModalContents(props) {
                     style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
                 />
             </View>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                Know more: https://www.blockchain.com/charts/mempool-size
-            </Text>
+            <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
+                <Text
+                    style={{
+                        color: Colors.white,
+                        // textAlign: 'center',
+                        fontSize: RFValue(12),
+                        fontFamily: Fonts.FiraSansRegular,
+                    }}
+                >
+                    To know more,
+                </Text>
+                <TouchableOpacity style={{marginLeft: 5}} onPress={() => openLink("https://www.blockchain.com/charts/mempool-size")}> 
+                    <Text
+                        style={{
+                            color: Colors.white,
+                            fontSize: RFValue(12),
+                            fontFamily: Fonts.FiraSansRegular,
+                            textDecorationLine: 'underline',
+                            textAlign: 'center',
+                        }}
+                    >
+                        click here
+                    </Text>
+                </TouchableOpacity>
+            </View>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/rabbit.png')}
