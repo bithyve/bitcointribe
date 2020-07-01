@@ -160,7 +160,15 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     (async () => {
-      if (userKey1) {
+      
+      let FBTCAccountData = JSON.parse(
+        await AsyncStorage.getItem('FBTCAccount'),
+      );
+      //console.log("FBTCAccountData start", FBTCAccountData);
+      if (FBTCAccountData && FBTCAccountData.user_key) {
+        setIsUserRegistered(true);
+      }
+      if (userKey1 || FBTCAccountData && FBTCAccountData.user_key) {
         let voucherCodeTemp = JSON.parse(
           await AsyncStorage.getItem('voucherData'),
         );
@@ -168,12 +176,6 @@ const VoucherScanner = (props) => {
           setVoucherCode(voucherCodeTemp.voucher_code);
           setSelectedAccount(voucherCodeTemp.selectedAccount);
         }
-      }
-      let FBTCAccountData = JSON.parse(
-        await AsyncStorage.getItem('FBTCAccount'),
-      );
-      if (FBTCAccountData && FBTCAccountData.user_key) {
-        setIsUserRegistered(true);
       }
       if (!userKey) {
         setUserKey(FBTCAccountData.user_key);
@@ -318,7 +320,7 @@ const VoucherScanner = (props) => {
       fBTCAccount[accountType].voucher.push({
         voucherCode: voucherCode,
       });
-      if (fBTCAccount.redeem_vouchers) getQuoteDetailsMethod();
+      if (fBTCAccount.redeem_vouchers && voucherCode) getQuoteDetailsMethod();
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
     } else {
       setTimeout(() => {
@@ -505,7 +507,7 @@ const VoucherScanner = (props) => {
           let FBTCAccountData = JSON.parse(
             await AsyncStorage.getItem('FBTCAccount'),
           );
-          if (FBTCAccountData.redeem_vouchers) {
+          if (FBTCAccountData.redeem_vouchers && voucherCode) {
             getQuoteDetailsMethod();
             (RegistrationSuccessBottomSheet as any).current.snapTo(0);
           }

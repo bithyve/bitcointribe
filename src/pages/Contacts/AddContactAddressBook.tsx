@@ -170,8 +170,14 @@ export default function AddContactAddressBook(props) {
       let filterContactsForDisplay = [];
       for (let i = 0; i < contactData.length; i++) {
         if (
-          contactData[i].name &&
-          contactData[i].name.toLowerCase().startsWith(keyword.toLowerCase())
+          (contactData[i].firstName &&
+            contactData[i].firstName
+              .toLowerCase()
+              .startsWith(keyword.toLowerCase())) ||
+          (contactData[i].lastName &&
+            contactData[i].lastName
+              .toLowerCase()
+              .startsWith(keyword.toLowerCase()))
         ) {
           filterContactsForDisplay.push(contactData[i]);
         }
@@ -191,7 +197,7 @@ export default function AddContactAddressBook(props) {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -393,26 +399,26 @@ export default function AddContactAddressBook(props) {
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
               ? selectedContacts.map((value) => {
-                return (
-                  <View style={styles.selectedContactView}>
-                    <Text style={styles.selectedContactNameText}>
-                      {value.name ? value.name.split(' ')[0] : ''}{' '}
-                      <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-                        {value.name ? value.name.split(' ')[1] : ''}
+                  return (
+                    <View style={styles.selectedContactView}>
+                      <Text style={styles.selectedContactNameText}>
+                        {value.name ? value.name.split(' ')[0] : ''}{' '}
+                        <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                          {value.name ? value.name.split(' ')[1] : ''}
+                        </Text>
                       </Text>
-                    </Text>
-                    <AppBottomSheetTouchableWrapper
-                      onPress={() => onCancel(value)}
-                    >
-                      <AntDesign
-                        name="close"
-                        size={17}
-                        color={Colors.white}
-                      />
-                    </AppBottomSheetTouchableWrapper>
-                  </View>
-                );
-              })
+                      <AppBottomSheetTouchableWrapper
+                        onPress={() => onCancel(value)}
+                      >
+                        <AntDesign
+                          name="close"
+                          size={17}
+                          color={Colors.white}
+                        />
+                      </AppBottomSheetTouchableWrapper>
+                    </View>
+                  );
+                })
               : null}
           </View>
           <View style={[styles.searchBoxContainer]}>

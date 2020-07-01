@@ -36,6 +36,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
+  FAST_BITCOINS,
 } from '../common/constants/serviceTypes';
 import AllAccountsContents from '../components/AllAccountsContents';
 import SettingsContents from '../components/SettingsContents';
@@ -690,19 +691,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   getNewTransactionNotifications = async () => {
     let newTransactions = [];
-    const derivativeAccountType = 'FAST_BITCOINS';
     const { accounts, fetchDerivativeAccBalTx } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
     const secureAccount = accounts[SECURE_ACCOUNT].service.secureHDWallet;
 
     let newTransactionsRegular =
-      regularAccount.derivativeAccounts[derivativeAccountType][1] &&
-      regularAccount.derivativeAccounts[derivativeAccountType][1]
-        .newTransactions;
+      regularAccount.derivativeAccounts[FAST_BITCOINS][1] &&
+      regularAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
     let newTransactionsSecure =
-      secureAccount.derivativeAccounts[derivativeAccountType][1] &&
-      secureAccount.derivativeAccounts[derivativeAccountType][1]
-        .newTransactions;
+      secureAccount.derivativeAccounts[FAST_BITCOINS][1] &&
+      secureAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
 
     if (
       newTransactionsRegular &&
@@ -716,8 +714,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     else if (newTransactionsSecure && newTransactionsSecure.length)
       newTransactions = [...newTransactionsSecure];
 
-    //console.log('newTransactions', newTransactions);
-
     if (newTransactions.length) {
       let asyncNotification = JSON.parse(
         await AsyncStorage.getItem('notificationList'),
@@ -729,32 +725,37 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           asyncNotificationList.push(asyncNotification[i]);
         }
       }
-      let tmpList = asyncNotificationList;
-      let obj = {
-        type: 'contact',
-        isMandatory: false,
-        read: false,
-        title: 'New FastBitcoin Transactions',
-        time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
-        date: new Date(),
-        info: newTransactions.length + ' New FBTC transactions',
-        notificationId: createRandomString(17),
-      };
-      tmpList.push(obj);
 
-      await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
-      let notificationDetails = {
-        id: obj.notificationId,
-        title: obj.title,
-        body: obj.info,
-      };
-      this.localNotification(notificationDetails);
-      tmpList.sort(function (left, right) {
+      for (let i = 0; i < newTransactions.length; i++) {
+        let obj = {
+          type: 'contact',
+          isMandatory: false,
+          read: false,
+          title: 'Alert from FastBitcoins',
+          time: timeFormatter(moment(new Date()), moment(new Date()).valueOf()),
+          date: new Date(),
+          info: 'You have a new transaction',
+          notificationId: createRandomString(17),
+          notificationsData: newTransactions[i],
+        };
+        asyncNotificationList.push(obj);
+        let notificationDetails = {
+          id: obj.notificationId,
+          title: obj.title,
+          body: obj.info,
+        };
+        this.localNotification(notificationDetails);
+      }
+      await AsyncStorage.setItem(
+        'notificationList',
+        JSON.stringify(asyncNotificationList),
+      );
+      asyncNotificationList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setTimeout(() => {
         this.setState({
-          notificationData: tmpList,
+          notificationData: asyncNotificationList,
           notificationDataChange: !this.state.notificationDataChange,
         });
       }, 2);
@@ -1879,6 +1880,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           console.error(error);
         });
     }
+    if (value.type == 'contact') {
+      (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      this.selectTab('Transactions');
+    }
   };
 
   onPressElement = (item) => {
@@ -2037,7 +2042,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       downloadMShare,
       overallHealth,
     } = this.props;
-
     // const custodyRequest = navigation.getParam('custodyRequest');
     return (
       <ImageBackground
@@ -2055,7 +2059,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         >
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
-            notificationData={notificationList}
+            notificationData={notificationData}
             walletName={walletName}
             switchOn={switchOn}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
@@ -2196,6 +2200,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               onPressElements={(type) => {
                 if (type == 'buyBitcoins') {
                   this.props.navigation.navigate('VoucherScanner');
+                } else if(type == 'pairAccount'){
+                  this.props.navigation.navigate('PairNewWallet');
                 } else if (type == 'addContact') {
                   this.setState(
                     {

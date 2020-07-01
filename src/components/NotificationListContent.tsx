@@ -65,7 +65,6 @@ export default function NotificationListContent(props) {
                         : Colors.shadowBlue,
                     }}
                   >
-                    <View style={{ flexDirection: 'row' }}>
                       <View
                         style={{ flexDirection: 'row', alignItems: 'center' }}
                       >
@@ -77,11 +76,11 @@ export default function NotificationListContent(props) {
                           }
                           style={styles.notificationElementImage}
                         />
-                        <Text style={styles.notificationElementTitle}>
+                        <View style={{flex:1, justifyContent:'center'}}>
+                        <Text numberOfLines={1} style={styles.notificationElementTitle}>
                           {value.title}
                         </Text>
-                      </View>
-                      <View style={styles.notificationElementInfoView}>
+                        </View>
                         <Text style={styles.notificationElementTimeText}>
                           {value.time}
                         </Text>
@@ -94,7 +93,6 @@ export default function NotificationListContent(props) {
                         ) : (
                           <View style={{ width: 17 }} />
                         )}
-                      </View>
                     </View>
                     <Text style={styles.notificationElementInfoText}>
                       {value.info}
@@ -141,7 +139,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
   },
   notificationElement: {
-    paddingLeft: wp('7%'),
+    paddingLeft: wp('4%'),
     paddingRight: wp('4%'),
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderColor,
@@ -157,17 +155,15 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
-  },
-  notificationElementInfoView: {
-    flexDirection: 'row',
-    marginLeft: 'auto',
-    alignItems: 'center',
+    marginRight: wp('1.5%')
   },
   notificationElementTimeText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
-    marginRight: wp('5%'),
+    marginRight: wp('2%'),
+    width: 'auto',
+    marginLeft:'auto'
   },
   notificationElementInfoText: {
     color: Colors.textColorGrey,

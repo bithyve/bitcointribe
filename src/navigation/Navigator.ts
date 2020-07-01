@@ -79,6 +79,7 @@ import SendConfirmation from '../pages/Accounts/SendConfirmation';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive';
+import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -204,6 +205,7 @@ const HomeNavigator = createStackNavigator(
     AddContactSendRequest,
     ContactDetails,
     Receive,
+    PairNewWallet,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

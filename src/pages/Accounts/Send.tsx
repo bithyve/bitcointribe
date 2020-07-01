@@ -830,23 +830,24 @@ export default function Send(props) {
                   />
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
-                  <Text
+                  <TouchableOpacity
                     onPress={() => {
                       setRecipientAddress(
                         '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
                       );
                     }}
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(10),
-                      marginLeft: 'auto',
-                      fontFamily: Fonts.FiraSansItalic,
-                      marginTop: 10,
-                      paddingBottom: 50,
-                    }}
+                    style={{ padding: wp('2%'), marginLeft: 'auto' }}
                   >
-                    Send it to a sample address
-                  </Text>
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(10),
+                        fontFamily: Fonts.FiraSansItalic,
+                      }}
+                    >
+                      Send it to a sample address
+                    </Text>
+                  </TouchableOpacity>
                 ) : null}
                 {isInvalidAddress ? (
                   <View style={{ marginLeft: 'auto' }}>
