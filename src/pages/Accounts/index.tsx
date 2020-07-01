@@ -1290,11 +1290,11 @@ export default function Accounts(props) {
           setTimeout(() => {
             setIsSecureAccountHelperDone(true);
           }, 10);
-          setTimeout(() => {
-            if (SecureAccountHelperBottomSheet.current) {
-              (SecureAccountHelperBottomSheet.current as any).snapTo(1);
-            }
-          }, 1000);
+          // setTimeout(() => {
+          //   if (SecureAccountHelperBottomSheet.current) {
+          //     (SecureAccountHelperBottomSheet.current as any).snapTo(1);
+          //   }
+          // }, 1000);
         } else {
           setTimeout(() => {
             setIsSecureAccountHelperDone(false);
@@ -1310,9 +1310,9 @@ export default function Accounts(props) {
             setIsRegularAccountHelperDone(true);
           }, 10);
           setTimeout(() => {
-            if (RegularAccountHelperBottomSheet.current) {
-              (RegularAccountHelperBottomSheet as any).current.snapTo(1);
-            }
+            // if (RegularAccountHelperBottomSheet.current) {
+            //   (RegularAccountHelperBottomSheet as any).current.snapTo(1);
+            // }
           }, 1000);
         } else {
           setTimeout(() => {

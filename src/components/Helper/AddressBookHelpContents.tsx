@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Image, TouchableOpacity, Text, StyleSheet, Linking } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,6 +11,17 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function AddressBookHelpContents(props) {
+
+    const openLink = (url) => {
+        Linking.canOpenURL(url).then(supported => {
+          if (supported) {
+            Linking.openURL(url);
+          } else {
+            console.log("Don't know how to open URI: " + url);
+          }
+        })
+    }
+
   return (
     <ScrollView
         style={styles.modalContainer}
@@ -64,7 +75,7 @@ export default function AddressBookHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Selecting a contact as Friends and Family{'\n'}creates a secure channel betweem you and the{'\n'}contact. This secure channel enables easy{'\n'}exchange of information without requiring{'\n'}user action
+                Selecting a contact as Friends and Family{'\n'}creates a secure channel between you and the{'\n'}contact. This secure channel enables easy{'\n'}exchange of information without requiring{'\n'}user action
             </Text>
             <Text
             style={{
@@ -89,7 +100,7 @@ export default function AddressBookHelpContents(props) {
                 />
             </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
             <Text
             style={{
                 textAlign: 'center',
@@ -126,17 +137,31 @@ export default function AddressBookHelpContents(props) {
             >
                 Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to all communications between the{'\n'}two parties
             </Text>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                    marginHorizontal: wp('10%'),
-                }}
-            >
-                Know more: https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman
-            </Text>
+            <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
+                <Text
+                    style={{
+                        color: Colors.white,
+                        // textAlign: 'center',
+                        fontSize: RFValue(12),
+                        fontFamily: Fonts.FiraSansRegular,
+                    }}
+                >
+                    To know more,
+                </Text>
+                <TouchableOpacity style={{marginLeft: 5}} onPress={() => openLink("https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman")}> 
+                    <Text
+                        style={{
+                            color: Colors.white,
+                            fontSize: RFValue(12),
+                            fontFamily: Fonts.FiraSansRegular,
+                            textDecorationLine: 'underline',
+                            textAlign: 'center',
+                        }}
+                    >
+                        click here
+                    </Text>
+                </TouchableOpacity>
+            </View>
         </View>
     </ScrollView>
   );

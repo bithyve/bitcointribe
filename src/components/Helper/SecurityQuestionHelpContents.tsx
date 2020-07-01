@@ -17,7 +17,7 @@ export default function SecurityQuestionHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -74,7 +74,7 @@ export default function SecurityQuestionHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                  If a person gains knowledge of your Security {'\n'}Question and Answer, they can not steal or deny {'\n'}access to your funds. However, it is recommended{'\n'} that you keep the answer safe to provide{'\n'} for an extra layer of security
+                  If a person gains knowledge of your Security{'\n'}Question and Answer, they can not steal or deny {'\n'}access to your funds. However, it is recommended{'\n'} that you keep the answer safe to provide{'\n'} for an extra layer of security
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
