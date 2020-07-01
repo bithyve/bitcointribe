@@ -27,7 +27,7 @@ import {
   TrustedDataElements,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
-import { downloadMShare } from '../actions/sss';
+import { downloadMShare, updateWalletImage } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -327,6 +327,8 @@ export function* trustedChannelsSyncWorker() {
     DHInfos = [];
   }
 
+  const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   for (const contactName of Object.keys(contacts)) {
     let { trustedChannel, ephemeralChannel } = contacts[contactName];
@@ -479,6 +481,14 @@ export function* trustedChannelsSyncWorker() {
       }
     }
   }
+
+  const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+
+  if (preSyncTC !== postSyncTC) {
+    console.log('Updating WI...');
+    yield put(updateWalletImage());
+  }
+
   const { SERVICES } = yield select((state) => state.storage.database);
   const updatedSERVICES = {
     ...SERVICES,
