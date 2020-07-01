@@ -21,6 +21,12 @@ export default function AddModalContents( props ) {
 			type:'buyBitcoins'
 		},
 		{
+			title: `Pair your wallet with FastBitcoins account`, 
+			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
+			info: 'If you have completed your registration on FastBitcoins.com',
+			type:'pairAccount'
+		},
+		{
 			title: 'Add Contact', 
 			image: require( '../assets/images/icons/icon_addcontact.png' ), 
 			info: 'Add contacts from your Address Book',

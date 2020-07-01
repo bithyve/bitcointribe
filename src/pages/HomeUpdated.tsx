@@ -2196,6 +2196,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               onPressElements={(type) => {
                 if (type == 'buyBitcoins') {
                   this.props.navigation.navigate('VoucherScanner');
+                } else if(type == 'pairAccount'){
+                  this.props.navigation.navigate('PairNewWallet');
                 } else if (type == 'addContact') {
                   this.setState(
                     {
