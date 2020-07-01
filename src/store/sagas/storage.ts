@@ -9,6 +9,7 @@ import {
   dbInserted,
   ENRICH_SERVICES,
   servicesEnriched,
+  insertIntoDB,
 } from '../actions/storage';
 import dataManager from '../../storage/database-manager';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -104,10 +105,16 @@ function* servicesEnricherWorker({ payload }) {
     } = database.SERVICES;
 
     let services;
+    let migrated = false;
+    console.log({
+      storedVersion: database.VERSION,
+      app: DeviceInfo.getVersion(),
+    });
 
     if (parseFloat(database.VERSION) !== parseFloat(DeviceInfo.getVersion())) {
       if (!database.VERSION && parseFloat(DeviceInfo.getVersion()) >= 0.9) {
         // version 0.7 support
+        console.log('Migration running for 0.7');
         services = {
           REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
           TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
@@ -121,6 +128,9 @@ function* servicesEnricherWorker({ payload }) {
           'walletID',
           services.S3_SERVICE.sss.walletId,
         );
+
+        database.VERSION = DeviceInfo.getVersion();
+        migrated = true;
       }
     } else {
       services = {
@@ -133,6 +143,9 @@ function* servicesEnricherWorker({ payload }) {
     }
 
     yield put(servicesEnriched(services));
+    if (migrated) {
+      yield put(insertIntoDB(database));
+    }
   } catch (err) {
     console.log(err);
   }
