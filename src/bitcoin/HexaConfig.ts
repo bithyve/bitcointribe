@@ -8,6 +8,7 @@ import {
 import Config from 'react-native-config';
 
 class HexaConfig {
+  public VERSION: string = Config.VERSION.trim();
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
   public BITCOIN_NODE: Client;

@@ -16,6 +16,9 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { AsyncStorage } from 'react-native';
+import config from '../../bitcoin/HexaConfig';
+import DeviceInfo from 'react-native-device-info';
 
 function* initDBWorker() {
   try {
@@ -100,13 +103,34 @@ function* servicesEnricherWorker({ payload }) {
       TRUSTED_CONTACTS,
     } = database.SERVICES;
 
-    const services = {
-      REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-      TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-      SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-      S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
-      TRUSTED_CONTACTS: TrustedContactsService.fromJSON(TRUSTED_CONTACTS),
-    };
+    let services;
+
+    if (parseFloat(database.VERSION) !== parseFloat(DeviceInfo.getVersion())) {
+      if (!database.VERSION && parseFloat(DeviceInfo.getVersion()) >= 0.9) {
+        // version 0.7 support
+        services = {
+          REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+          TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+          SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+          S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+          TRUSTED_CONTACTS: new TrustedContactsService(),
+        };
+        // hydrating new/missing async storage variables
+        yield call(
+          AsyncStorage.setItem,
+          'walletID',
+          services.S3_SERVICE.sss.walletId,
+        );
+      }
+    } else {
+      services = {
+        REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+        TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+        SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+        S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+        TRUSTED_CONTACTS: TrustedContactsService.fromJSON(TRUSTED_CONTACTS),
+      };
+    }
 
     yield put(servicesEnriched(services));
   } catch (err) {
