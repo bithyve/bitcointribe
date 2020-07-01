@@ -338,12 +338,12 @@ function* uploadRequestedShareWorker({ payload }) {
     tag
   ];
 
-  // preventing re-uploads till expiry
-  if (TRANSFER_DETAILS) {
-    if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
-      return;
-    }
-  }
+  // // preventing re-uploads till expiry
+  // if (TRANSFER_DETAILS) {
+  //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
+  //     return;
+  //   }
+  // }
 
   // TODO: 10 min removal strategy
   yield put(switchS3Loader('uploadRequestedShare'));
@@ -383,6 +383,7 @@ function* uploadRequestedShareWorker({ payload }) {
     //   'Upload successful!',
     //   "Requester's share has been uploaded to the relay.",
     // );
+    Toast(`${tag}'s share uploaded`);
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(requestedShareUploaded(tag, false, res.err));
