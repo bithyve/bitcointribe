@@ -60,7 +60,7 @@ export default function NewWalletName(props) {
               secondLineTitle={''}
               infoTextNormal={'Please enter a '}
               infoTextBold={'display name.'}
-              infoTextNormal1={'Your contacts will use this to identify your wallet'}
+              infoTextNormal1={'Your contacts will see this'}
             />
             <TextInput
               style={inputStyle}
