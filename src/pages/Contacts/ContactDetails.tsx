@@ -1251,9 +1251,11 @@ export default function ContactDetails(props) {
                 <Text style={styles.buttonText}>
                   {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
                 </Text>
-                {encryptedExitKey ? <Text numberOfLines={1} style={styles.buttonInfo}>
-                  {'Help restore PDF'}
-                </Text> : null}
+                {encryptedExitKey ? (
+                  <Text numberOfLines={1} style={styles.buttonInfo}>
+                    {'Help restore PDF'}
+                  </Text>
+                ) : null}
               </View>
             </TouchableOpacity>
           </View>
