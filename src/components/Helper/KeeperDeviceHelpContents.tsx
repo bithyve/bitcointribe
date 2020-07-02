@@ -28,7 +28,7 @@ export default function KeeperDeviceHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -90,7 +90,7 @@ export default function KeeperDeviceHelpContents(props) {
                 />
             </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
             <Text
             style={{
                 textAlign: 'center',
@@ -127,7 +127,7 @@ export default function KeeperDeviceHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                  Your{'\n'}primary device has no access to the Exit Key. {'\n'}Therefore, a person with access to your{'\n'}primary device does not have access to{'\n'}your Savings Account
+                  Your primary device has no access to the Exit Key.{'\n'}Therefore, a person with access to your{'\n'}primary device does not have access to{'\n'}your Savings Account
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

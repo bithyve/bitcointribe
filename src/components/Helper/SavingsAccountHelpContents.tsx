@@ -28,7 +28,7 @@ export default function SavingsAccountHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Text
                     style={{
@@ -90,7 +90,7 @@ export default function SavingsAccountHelpContents(props) {
                 />
             </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
             <Text
             style={{
                 textAlign: 'center',
@@ -99,7 +99,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Savings Account is a 2 of 3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on a Keeper App), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper App can be used to migrate from Hexa{'\n'}
+                The Savings Account is a 2-of-3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on a Keeper App), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper App can be used to migrate from Hexa{'\n'}
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -115,7 +115,7 @@ export default function SavingsAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                  A multisignature account requires signatures from {'\n'}the keys defined during generation. Hexa{'\n'}requires signatures from 2 of 3 keys, of which{'\n'}one key belongs to BitHyve.
+                  A multi signature account requires signatures from {'\n'}multiple keys. Hexa requires signatures{'\n'}from 2-of-3 keys, of which{'\n'}one key belongs to BitHyve signing server
             </Text>
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
@@ -143,7 +143,8 @@ export default function SavingsAccountHelpContents(props) {
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
-                Your{'\n'}primary device has no access to the Exit Key. {'\n'}Therefore, a person with access to your{'\n'}primary device does not have access to{'\n'}your Savings Account            </Text>
+                Your primary device has no access to the Exit Key.{'\n'}Therefore, a person with access to your{'\n'}primary device cannot spend from{'\n'}your Savings Account
+            </Text>
             <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
                 <Text
                     style={{
