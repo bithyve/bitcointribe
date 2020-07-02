@@ -173,24 +173,13 @@ function* uploadEncMetaShareWorker({ payload }) {
   const trustedContacts = yield select(
     (state) => state.trustedContacts.service,
   );
-  const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
 
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
     (state) => state.storage.database,
   );
 
   if (payload.changingGuardian) {
-    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing secondary device's TC
-    const accountNumber =
-      regularService.hdWallet.trustedContactToDA[payload.contactName];
-    if (accountNumber) {
-      delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
-        accountNumber
-      ].contactDetails; // removing previous SDs xpub
-    }
-
+    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing SD
     yield call(s3Service.reshareMetaShare, payload.shareIndex);
     if (payload.previousGuardianName) {
       trustedContacts.tc.trustedContacts[
@@ -247,7 +236,6 @@ function* uploadEncMetaShareWorker({ payload }) {
 
     const updatedSERVICES = {
       ...SERVICES,
-      REGULAR_ACCOUNT: JSON.stringify(regularService),
       S3_SERVICE: JSON.stringify(s3Service),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
