@@ -1454,6 +1454,7 @@ function* recoverWalletWorker({ payload }) {
       yield delay(2000); // seconds delay prior to Wallet Image check
       yield put(fetchWalletImage());
 
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
       const securityQuestionHistory = {
