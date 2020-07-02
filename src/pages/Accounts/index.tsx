@@ -1466,7 +1466,7 @@ export default function Accounts(props) {
                 data={carouselData}
                 firstItem={carouselInitIndex}
                 onBeforeSnapToItem={(index) => {
-                  console.log('onBeforeSnapToItem', index);
+                  //console.log('onBeforeSnapToItem', index);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
@@ -1474,17 +1474,17 @@ export default function Accounts(props) {
                     : getServiceType(SECURE_ACCOUNT);
                   setTimeout(() => {
                     setCarouselInitIndex(index);
-                  }, 1000);
+                  }, 2500);
                 }}
                 renderItem={renderItem}
                 sliderWidth={sliderWidth}
                 itemWidth={sliderWidth * 0.95}
-                onSnapToItem={(index) => {
-                  //console.log('INDEX', index, carouselInitIndex);
-                  setTimeout(() => {
-                    setCarouselInitIndex(index);
-                  }, 1000);
-                }}
+                // onSnapToItem={(index) => {
+                //   //console.log('INDEX', index, carouselInitIndex);
+                //   setTimeout(() => {
+                //     setCarouselInitIndex(index);
+                //   }, 2500);
+                // }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}
                 slideInterpolatedStyle={slideInterpolatedStyle}
