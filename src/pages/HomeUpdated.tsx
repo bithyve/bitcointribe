@@ -218,7 +218,7 @@ interface HomeStateTypes {
   lastActiveTime: string;
   isContactOpen: boolean;
   isCameraOpen: boolean;
-  isLoading: boolean
+  isLoading: boolean;
 }
 
 interface HomePropsTypes {
@@ -296,7 +296,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isContactOpen: false,
       isCameraOpen: false,
       notificationLoading: true,
-      isLoading: true
+      isLoading: true,
     };
   }
 
@@ -613,9 +613,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => { })
+      .then(() => {})
       .catch(
-        (err) => { }, //console.log('err', err)
+        (err) => {}, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -646,7 +646,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   componentDidMount = () => {
@@ -691,16 +691,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // call this once deeplink is detected aswell
     this.handleDeeplinkModal();
 
-
     setTimeout(() => {
       this.setState({
-        isLoading: false
-      })
+        isLoading: false,
+      });
     }, 2000);
-
-
-
-
   };
 
   getNewTransactionNotifications = async () => {
@@ -716,17 +711,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       secureAccount.derivativeAccounts[FAST_BITCOINS][1] &&
       secureAccount.derivativeAccounts[FAST_BITCOINS][1].newTransactions;
 
-    if (
-      newTransactionsRegular &&
-      newTransactionsRegular.length &&
-      newTransactionsSecure &&
-      newTransactionsSecure.length
-    ) {
-      newTransactions = [...newTransactionsRegular, ...newTransactionsSecure];
-    } else if (newTransactionsRegular && newTransactionsRegular.length)
-      newTransactions = [...newTransactionsRegular];
-    else if (newTransactionsSecure && newTransactionsSecure.length)
-      newTransactions = [...newTransactionsSecure];
+    if (newTransactionsRegular && newTransactionsRegular.length)
+      newTransactions.push(...newTransactionsRegular);
+    if (newTransactionsSecure && newTransactionsSecure.length)
+      newTransactions.push(...newTransactionsSecure);
 
     if (newTransactions.length) {
       let asyncNotification = JSON.parse(
@@ -741,6 +729,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }
 
       for (let i = 0; i < newTransactions.length; i++) {
+        let present = false;
+        for (const tx of asyncNotificationList) {
+          if (newTransactions[i].txid === tx.notificationsData.txid)
+            present = true;
+        }
+        if (present) continue;
+
         let obj = {
           type: 'contact',
           isMandatory: false,
@@ -760,6 +755,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         };
         this.localNotification(notificationDetails);
       }
+
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -796,12 +792,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => { })
-      .catch((err) => { });
+      .then(() => {})
+      .catch((err) => {});
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => { });
+      .then((notifications) => {});
   };
 
   componentDidUpdate = (prevProps) => {
@@ -811,6 +807,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     if (prevProps.accounts !== this.props.accounts) {
       this.getBalances();
+      this.getNewTransactionNotifications();
     }
 
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
@@ -1034,7 +1031,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[3]
+            splits[3]
           }`,
         );
       } else {
@@ -1118,7 +1115,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.getAssociatedContact();
       this.checkFastBitcoin();
       this.props.fetchNotifications();
-      this.getNewTransactionNotifications();
       this.setState({
         lastActiveTime: moment().toISOString(),
       });
@@ -1356,7 +1352,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1365,19 +1361,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
+          .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1416,13 +1412,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+          .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1431,7 +1427,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1607,7 +1603,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -1747,7 +1743,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               postAssociation: (contact) => {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
-                  }`.toLowerCase();
+                }`.toLowerCase();
                 if (isGuardian) {
                   approveTrustedContact(
                     contactName,
@@ -1880,8 +1876,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                return el.build === value.info.split(' ')[1];
-              })
+                  return el.build === value.info.split(' ')[1];
+                })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1960,9 +1956,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-            asyncNotificationList.findIndex(
-              (value) => value.notificationId == element.notificationId,
-            )
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2045,7 +2041,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       recoveryRequest,
       custodyRequest,
       isLoadContacts,
-      isLoading
+      isLoading,
     } = this.state;
     const {
       navigation,
@@ -2122,15 +2118,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           selectTab={this.selectTab}
           selected={selectedBottomTab}
         />
-        {
-          isLoading ? <Loader /> : null
-        }
+        {isLoading ? <Loader /> : null}
 
         <BottomSheet
           onOpenEnd={() => {
             this.setState({
               atCloseEnd: true,
-              isLoading: false
+              isLoading: false,
             });
           }}
           onCloseEnd={() => {
@@ -2158,8 +2152,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2208,8 +2202,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2219,7 +2213,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               onPressElements={(type) => {
                 if (type == 'buyBitcoins') {
                   this.props.navigation.navigate('VoucherScanner');
-                } else if(type == 'pairAccount'){
+                } else if (type == 'pairAccount') {
                   this.props.navigation.navigate('PairNewWallet');
                 } else if (type == 'addContact') {
                   this.setState(
@@ -2279,8 +2273,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('82%')
               : hp('82%'),
@@ -2334,8 +2328,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2886,7 +2880,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -3017,8 +3011,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-          ? 43
-          : 40,
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
