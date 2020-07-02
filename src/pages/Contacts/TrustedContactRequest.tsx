@@ -28,6 +28,16 @@ export default function TrustedContactRequest(props) {
   const [passcode, setPasscode] = useState('');
   const [passcodeArray, setPasscodeArray] = useState([]);
 
+  useEffect(() => {
+    if (!props.isRequestModalOpened) {
+      setWrongInputError('');
+      setPhoneNumber('');
+      setEmailId('');
+      setPasscode('');
+      setPasscodeArray([]);
+    }
+  }, [props.isRequestModalOpened]);
+
   function onPressNumber(text) {
     let tmpPasscode = passcodeArray;
     if (text) {
@@ -100,6 +110,7 @@ export default function TrustedContactRequest(props) {
               setOnBlurFocus(false);
               props.bottomSheetRef.snapTo(1);
             }}
+            value={EmailId}
           />
           {/* <View style={styles.separatorView} />
           <Text
@@ -142,6 +153,7 @@ export default function TrustedContactRequest(props) {
               setOnBlurFocus(false);
               props.bottomSheetRef.snapTo(1);
             }}
+            value={PhoneNumber}
           />
         </View>
       );
@@ -202,6 +214,7 @@ export default function TrustedContactRequest(props) {
                     props.bottomSheetRef.snapTo(1);
                   }
                 }}
+                value={passcodeArray[i] ? passcodeArray[i] : ''}
               />
             );
           })}
@@ -271,7 +284,9 @@ export default function TrustedContactRequest(props) {
           <View style={styles.successModalHeaderView}>
             {!props.isRecovery ? (
               props.isPayment ? (
-                <Text style={styles.modalTitleText}>Payment Request </Text>
+                <Text style={styles.modalTitleText}>
+                  {'Friends and Family\nRequest'}
+                </Text>
               ) : (
                 <Text style={styles.modalTitleText}>
                   {props.isGuardian
@@ -318,11 +333,13 @@ export default function TrustedContactRequest(props) {
                 ...styles.modalInfoText,
                 marginLeft: wp('8%'),
                 marginRight: wp('8%'),
-                marginBottom: wp('8%'),
+                // marginBottom: wp('8%'),
               }}
             >
               Enter{' '}
-              <Text style={{ fontFamily: Fonts.FiraSansMedium }}>your </Text>
+              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                your{' '}
+              </Text>
               <Text
                 style={{
                   ...styles.modalInfoText,
@@ -484,7 +501,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMediumItalic,
     fontSize: RFValue(10),
     color: Colors.red,
-    marginBottom: wp('5%'),
+    marginTop: wp('2%'),
+    marginBottom: wp('3%'),
     marginLeft: 'auto',
   },
   textboxView: {
