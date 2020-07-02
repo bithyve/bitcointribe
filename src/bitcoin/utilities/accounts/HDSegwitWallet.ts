@@ -1330,8 +1330,9 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const txPrerequisites: TransactionPrerequisite = {};
     for (const priority of Object.keys(averageTxFees)) {
-      const netFeeByPriority =
-        (fee / feePerByte) * averageTxFees[priority].feePerByte;
+      const netFeeByPriority = Math.round(
+        (fee / feePerByte) * averageTxFees[priority].feePerByte,
+      );
       const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
 
       if (balance > netAmount + fee) {
