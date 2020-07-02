@@ -23,7 +23,7 @@ export default function AddModalContents( props ) {
 		{
 			title: `Pair your wallet with FastBitcoins account`, 
 			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
-			info: 'If you have completed your registration on FastBitcoins.com',
+			info: 'Pair with FastBitcoins account if you have completed your registration',
 			type:'pairAccount'
 		},
 		{
@@ -56,7 +56,7 @@ export default function AddModalContents( props ) {
 							<View style={ { justifyContent: "center", } }>
 								<Image source={ item.image } style={ { width: 25, height: 25 } } />
 							</View>
-							<View style={ { justifyContent: "center", marginLeft: 10 } }>
+							<View style={ { justifyContent: "center", marginLeft: 10, flexShrink: 1, } }>
 								<Text style={ styles.addModalTitleText }>{ item.title } </Text>
 								<Text style={ styles.addModalInfoText }>{ item.info }</Text>
 							</View>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create( {
 		flexDirection: 'row',
 		display: 'flex',
 		marginTop: 10,
-		justifyContent: "space-between"
+		justifyContent: "space-between",
 	},
 	addModalTitleText: {
 		color: Colors.blue,
@@ -88,13 +88,14 @@ const styles = StyleSheet.create( {
 	addModalInfoText: {
 		color: Colors.textColorGrey,
 		fontSize: RFValue( 11 ),
-		fontFamily: Fonts.FiraSansRegular
+		fontFamily: Fonts.FiraSansRegular,
+		flexWrap: 'wrap',
 	},
 	modalElementInfoView: {
 		padding: 10,
 		flexDirection: 'row',
 		justifyContent: "center",
-		alignItems: 'center'
+		alignItems: 'center',
 	},
 	separatorView: {
 		marginLeft: 15,

@@ -60,7 +60,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                A transction is identified by an alphanumeric{'\n'}string called the transaction ID, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
+                A transaction is identified by an alphanumeric{'\n'}string called the transaction ID, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -100,7 +100,7 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction. For most transactions, six{'\n'}confirmations is taken as reference
+                A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid for the transaction, and on the structure{'\n'}of the transaction. For most transactions, six{'\n'}confirmations is taken as reference
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -116,14 +116,8 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The fee paid by a transaction depends only on{'\n'}the transaction size, not on the transaction{'\n'}amount. This fee increases as the complexity{'\n'}of the transaction increases, which is why the{'\n'}Checking Account has lower fees compared to{'\n'}the Savings Account
+                The fee paid for a transaction depends only on{'\n'}the transaction size, not on the transaction{'\n'}amount. This fee increases as the complexity{'\n'}of the transaction increases, which is why the{'\n'}Checking Account has lower fees compared to{'\n'}the Savings Account
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -163,10 +157,10 @@ export default function TransactionHelperModalContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                On average, the mempool is cleared every{'\n'}three to six hours. This means the maximum{'\n'}amount of time you need to wait for a{'\n'}transaction to confirm is six hours on most{'\n'}days
+                On average, the mempool is cleared every{'\n'}three to six hours. This means the maximum{'\n'}amount of time you need to wait for a{'\n'}transaction to be confirmed is six hours on most{'\n'}days
                 {/* How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it */}
             </Text>
-            <Text
+            {/* <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
@@ -175,8 +169,8 @@ export default function TransactionHelperModalContents(props) {
             }}
             >
                 If the transaction takes time to confirm, you{'\n'}may increase the fee paid by RBF or Replace-{'\n'}By-Fee. This provides additional incentive for{'\n'}the miner to mine your transaction
-                {/* How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it */}
-            </Text>
+                {How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it}
+            </Text> */}
         </View>
     </ScrollView>
   );

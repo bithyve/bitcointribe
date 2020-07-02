@@ -78,16 +78,6 @@ export default function SendHelpContents(props) {
             >
                 Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
             </Text>
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                Once you press “Send” on Hexa, the transaction{'\n'}is relayed to a bitcoin full node. This full node{'\n'}then announces the transactions to other full{'\n'}nodes, including those of miners
-            </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
                     style={{
@@ -102,7 +92,7 @@ export default function SendHelpContents(props) {
             </View>
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
-            <Text
+            {/* <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
@@ -111,6 +101,16 @@ export default function SendHelpContents(props) {
             }}
             >
                 A transaction that is not confirmed stays in the{'\n'}pool of unconfirmed transactions, called the{'\n'}mempool. The mempool is routinely cleared by{'\n'}miners every three to six hours
+            </Text> */}
+            <Text
+            style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+            }}
+            >
+                Once you press “Send” on Hexa, the transaction{'\n'}is relayed to a bitcoin full node. This full node{'\n'}then announces the transactions to other full{'\n'}nodes, including those of miners
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image

@@ -67,7 +67,7 @@ export default function ReceiveHelpContents(props) {
                     style={{ width: wp('80%'), height: wp('80%'), resizeMode: 'contain' }}
                 />
             </View>
-            <Text
+            {/* <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
@@ -76,7 +76,7 @@ export default function ReceiveHelpContents(props) {
             }}
             >
                 Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
-            </Text>
+            </Text> */}
             <Text
             style={{
                 textAlign: 'center',
@@ -102,7 +102,7 @@ export default function ReceiveHelpContents(props) {
         </View>
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text
+                {/* <Text
                     style={{
                         textAlign: 'center',
                         color: Colors.white,
@@ -111,13 +111,8 @@ export default function ReceiveHelpContents(props) {
                     }}
                 >
                     Once the sender sends the transaction, the{'\n'}transaction is relayed to a bitcoin full node.{'\n'}This full node then announces the{'\n'}transactions to other full nodes, including{'\n'}those of miners
-                </Text>
-                <Image
-                    source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
-                    style={{ width: wp('75%'), height: wp('75%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+                </Text> */}
+                <Text
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
@@ -127,6 +122,11 @@ export default function ReceiveHelpContents(props) {
             >
                 A miner includes a transaction within a{'\n'}block only if the fee associated is{'\n'}sufficiently high. Please make sure the sender{'\n'}sends the transaction with appropriate fees{'\n'}for it to reach you faster
             </Text>
+                <Image
+                    source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+                    style={{ width: wp('75%'), height: wp('75%'), resizeMode: 'contain' }}
+                />
+            </View>
             <Text
                 style={{
                     textAlign: 'center',
