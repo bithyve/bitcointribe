@@ -105,7 +105,7 @@ function* servicesEnricherWorker({ payload }) {
     let services;
     let migrated = false;
 
-    if (parseFloat(database.VERSION) <= parseFloat(DeviceInfo.getVersion())) {
+    if (parseFloat(database.VERSION) < parseFloat(DeviceInfo.getVersion())) {
       if (!database.VERSION && parseFloat(DeviceInfo.getVersion()) >= 0.9) {
         // version 0.7 support
         console.log('Migration running for 0.7');
