@@ -271,11 +271,13 @@ function* fetchBalanceTxWorker({ payload }) {
   const postFetchTransactions =
     res.status === 200 ? res.data.transactions : preFetchTransactions;
 
+  let parentSynched = false;
   if (
     res.status === 200 &&
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
       JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
+    parentSynched = true;
     if (
       !payload.options.shouldNotInsert &&
       !payload.options.syncTrustedDerivative
@@ -299,7 +301,7 @@ function* fetchBalanceTxWorker({ payload }) {
   ) {
     try {
       yield call(syncDerivativeAccountsWorker, {
-        payload: { serviceTypes: [payload.serviceType] },
+        payload: { serviceTypes: [payload.serviceType], parentSynched },
       });
     } catch (err) {
       console.log({ err });
@@ -399,7 +401,10 @@ function* syncDerivativeAccountsWorker({ payload }) {
     );
 
     if (res.status === 200) {
-      if (postFetchDerivativeAccounts !== preFetchDerivativeAccounts) {
+      if (
+        postFetchDerivativeAccounts !== preFetchDerivativeAccounts ||
+        payload.parentSynched
+      ) {
         const { SERVICES } = yield select((state) => state.storage.database);
         const updatedSERVICES = {
           ...SERVICES,
