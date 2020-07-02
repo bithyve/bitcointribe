@@ -5,14 +5,9 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  Platform,
   SafeAreaView,
-  TextInput,
-  Keyboard,
   ScrollView,
-  Linking,
   AsyncStorage,
-  ActivityIndicator,
   Image,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -22,20 +17,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import DeviceInfo from 'react-native-device-info';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Feather from 'react-native-vector-icons/Feather';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  TEST_ACCOUNT,
-  FAST_BITCOINS,
 } from '../../common/constants/serviceTypes';
-import { fetchDerivativeAccBalTx } from '../../store/actions/accounts';
 import moment from 'moment';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import BottomInfoBox from '../../components/BottomInfoBox';
 
 export default function ExistingSavingMethods(props) {
@@ -75,7 +62,6 @@ export default function ExistingSavingMethods(props) {
             FBTCAccount.push(obj);
           }
         }
-        console.log('FBTCAccount', FBTCAccount);
         FBTCAccount.sort(function (left, right) {
           return (
             moment.utc(right.orderData.date).unix() -
@@ -84,7 +70,6 @@ export default function ExistingSavingMethods(props) {
         });
         setFBTCAccount(FBTCAccount);
       }
-      console.log('accounts', FBTCAccount);
     })();
   }, []);
 
@@ -418,13 +403,13 @@ export default function ExistingSavingMethods(props) {
               </Text>
               <Text
                 style={{
-                  color: Colors.darkGreen,
+                  color: FBTCAccountInfo.user_key ? Colors.darkGreen : Colors.red,
                   fontFamily: Fonts.FiraSansRegular,
                   fontSize: RFValue(12),
                   marginLeft: 'auto',
                 }}
               >
-                Active
+                {FBTCAccountInfo.user_key ? 'Active' : 'Inactive'}
               </Text>
             </View>
             <View
