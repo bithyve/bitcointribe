@@ -154,6 +154,7 @@ const TrustedContactRequestContent = ({
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
+  isRequestModalOpened
 }) => {
   if (!trustedContactRequest && !recoveryRequest) return;
   let { requester, hintType, hint, isGuardian, isQR, isRecovery } =
@@ -161,6 +162,7 @@ const TrustedContactRequestContent = ({
 
   return (
     <TrustedContactRequest
+      isRequestModalOpened={isRequestModalOpened}
       isQR={isQR}
       inputType={
         hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
@@ -219,6 +221,7 @@ interface HomeStateTypes {
   isContactOpen: boolean;
   isCameraOpen: boolean;
   isLoading: boolean;
+  isRequestModalOpened: boolean;
 }
 
 interface HomePropsTypes {
@@ -297,6 +300,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isCameraOpen: false,
       notificationLoading: true,
       isLoading: true,
+      isRequestModalOpened: false,
     };
   }
 
@@ -2042,6 +2046,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       custodyRequest,
       isLoadContacts,
       isLoading,
+      isRequestModalOpened,
     } = this.state;
     const {
       navigation,
@@ -2462,6 +2467,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 tabBarIndex: 999,
               });
             }
+            this.setState({
+              isRequestModalOpened: false
+            });
           }}
           onOpenEnd={() => {
             if (tabBarIndex === 999) {
@@ -2471,6 +2479,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             }
             this.setState({
               deepLinkModalOpen: true,
+              isRequestModalOpened: true
             });
           }}
           enabledInnerScrolling={true}
@@ -2490,6 +2499,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             }
             return (
               <TrustedContactRequestContent
+                isRequestModalOpened={this.state.isRequestModalOpened}
                 trustedContactRequest={trustedContactRequest}
                 recoveryRequest={recoveryRequest}
                 onPressAccept={this.onTrustedContactRequestAccept}

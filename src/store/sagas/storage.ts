@@ -105,8 +105,13 @@ function* servicesEnricherWorker({ payload }) {
     let services;
     let migrated = false;
 
-    if (parseFloat(database.VERSION) !== parseFloat(DeviceInfo.getVersion())) {
-      if (!database.VERSION && parseFloat(DeviceInfo.getVersion()) >= 0.9) {
+    if (!database.VERSION) database.VERSION = 0.7; // 0.7 patch
+
+    if (parseFloat(database.VERSION) < parseFloat(DeviceInfo.getVersion())) {
+      if (
+        parseFloat(database.VERSION) == 0.7 &&
+        parseFloat(DeviceInfo.getVersion()) >= 0.9
+      ) {
         // version 0.7 support
         console.log('Migration running for 0.7');
         services = {
@@ -125,6 +130,17 @@ function* servicesEnricherWorker({ payload }) {
 
         database.VERSION = DeviceInfo.getVersion();
         migrated = true;
+      } else {
+        // default enrichment (when database versions are different but migration is not available)
+        services = {
+          REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
+          TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
+          SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
+          S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+          TRUSTED_CONTACTS: TRUSTED_CONTACTS
+            ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+            : new TrustedContactsService(),
+        };
       }
     } else {
       services = {
