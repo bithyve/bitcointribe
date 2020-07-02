@@ -139,7 +139,7 @@ export default function Launch(props) {
               }
             }
           else props.navigation.replace('PasscodeConfirm');
-        }, 3500);
+        }, 4000);
       } catch (err) {
         (ErrorBottomSheet as any).current.snapTo(1);
         //Alert.alert('An err occured', err);

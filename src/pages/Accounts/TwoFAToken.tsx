@@ -11,6 +11,7 @@ import {
   StatusBar,
   Alert,
   AsyncStorage,
+  Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -38,9 +39,11 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../../common/constants/serviceTypes';
+import DeviceInfo from 'react-native-device-info';
 
 export default function TwoFAToken(props) {
   const [token, setToken] = useState('');
+  const [tokenArray, setTokenArray] = useState(['']);
   const serviceType = props.navigation.getParam('serviceType');
   const recipientAddress = props.navigation.getParam('recipientAddress');
   const [SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet] = useState(
@@ -51,10 +54,15 @@ export default function TwoFAToken(props) {
   );
 
   function onPressNumber(text) {
-    let tmpToken = token;
-    if (token.length < 6) {
-      tmpToken += text;
-      setToken(tmpToken);
+    let tmpToken = tokenArray;
+    if (text) {
+      tmpToken.push(text);
+    } else {
+      tmpToken.pop();
+    }
+    setTokenArray(tmpToken);
+    if (tmpToken.length > 0) {
+      setToken(tmpToken.join(''));
     }
   }
 
@@ -102,8 +110,8 @@ export default function TwoFAToken(props) {
             id: createRandomString(36),
             title: 'Sent Amount',
             date: moment(Date.now()).valueOf(),
-            info:"",
-              // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+            info: '',
+            // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
             selectedContactInfo: element,
           };
           if (element.selectedContact.isWard) {
@@ -435,7 +443,8 @@ export default function TwoFAToken(props) {
           }}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
-          snapPoints={[-50, hp('65%')]}
+          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('65%') : hp('70%')]}
           renderContent={renderSendUnSuccessContents}
           renderHeader={renderSendUnSuccessHeader}
         />

@@ -247,12 +247,11 @@ export const fetchTransactionsWatcher = createWatcher(
 );
 
 function* fetchBalanceTxWorker({ payload }) {
-  if (payload.options && payload.options.loader)
+  if (payload.options.loader)
     yield put(switchLoader(payload.serviceType, 'balanceTx'));
-  const service =
-    payload.options && payload.options.service
-      ? payload.options.service
-      : yield select((state) => state.accounts[payload.serviceType].service);
+  const service = payload.options.service
+    ? payload.options.service
+    : yield select((state) => state.accounts[payload.serviceType].service);
 
   const preFetchBalances =
     payload.serviceType === SECURE_ACCOUNT
@@ -277,7 +276,10 @@ function* fetchBalanceTxWorker({ payload }) {
     JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
       JSON.stringify({ postFetchBalances, postFetchTransactions })
   ) {
-    if (!payload.options.shouldNotInsert) {
+    if (
+      !payload.options.shouldNotInsert &&
+      !payload.options.syncTrustedDerivative
+    ) {
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
@@ -285,21 +287,23 @@ function* fetchBalanceTxWorker({ payload }) {
       };
       yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
-
-    if (
-      payload.options.syncTrustedDerivative &&
-      (payload.serviceType === REGULAR_ACCOUNT ||
-        payload.serviceType === SECURE_ACCOUNT)
-    ) {
-      try {
-        yield put(syncDerivativeAccounts([payload.serviceType]));
-      } catch (err) {
-        console.log({ err });
-      }
-    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log('Failed to fetch balance/transactions from the indexer');
+  }
+
+  if (
+    payload.options.syncTrustedDerivative &&
+    (payload.serviceType === REGULAR_ACCOUNT ||
+      payload.serviceType === SECURE_ACCOUNT)
+  ) {
+    try {
+      yield call(syncDerivativeAccountsWorker, {
+        payload: { serviceTypes: [payload.serviceType] },
+      });
+    } catch (err) {
+      console.log({ err });
+    }
   }
 
   if (payload.options.loader) {
@@ -372,7 +376,7 @@ function* syncDerivativeAccountsWorker({ payload }) {
   for (const serviceType of payload.serviceTypes) {
     console.log('Syncing DAs for: ', serviceType);
 
-    yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
+    // yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
     const service = yield select(
       (state) => state.accounts[serviceType].service,
     );
@@ -408,7 +412,7 @@ function* syncDerivativeAccountsWorker({ payload }) {
       console.log('Failed to sync derivative account');
     }
 
-    yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
+    // yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
   }
 }
 

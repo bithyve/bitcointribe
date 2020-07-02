@@ -24,13 +24,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { textWithoutEncoding, email } from 'react-native-communications';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import commonStyle from '../../common/Styles';
-import { requestShare } from '../../store/actions/sss';
+import { requestShare, downloadMShare } from '../../store/actions/sss';
 import { nameToInitials } from '../../common/CommonFunctions';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import RecoveryTrustedQR from './RecoveryTrustedQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import config from '../../bitcoin/HexaConfig';
+import Toast from '../../components/Toast';
 
 export default function RecoveryCommunication(props) {
   const contact = props.navigation.getParam('contact');
@@ -88,7 +89,7 @@ export default function RecoveryCommunication(props) {
       if (number || email) {
         return {
           id: index,
-          info: number || email,
+          info: number ? 'Send SMS (' + number + ')' : 'Send email (' + email + ')',
           isSelected: false,
           type: number ? 'number' : 'email',
         };
@@ -96,10 +97,18 @@ export default function RecoveryCommunication(props) {
     });
     contactInfoTemp.push({
       id: contactInfoTemp.length,
-      info: 'QR code',
+      info: 'Show QR code to scan',
       isSelected: false,
       type: 'qrcode',
     });
+
+    contactInfoTemp.push({
+      id: contactInfoTemp.length,
+      info: 'Scan QR from Keeper',
+      isSelected: false,
+      type: 'qrscanner',
+    })
+
     setContactInfo(contactInfoTemp);
   }, []);
 
@@ -182,8 +191,77 @@ export default function RecoveryCommunication(props) {
       case 'qrcode':
         (trustedContactQrBottomSheet as any).current.snapTo(1);
         break;
+      case 'qrscanner':
+        props.navigation.navigate('RecoveryQrScanner', {scanedCode: getQrCodeData});
+        break;
     }
   };
+
+  const getQrCodeData = useCallback((qrData) => {
+    try {
+      const scannedData = JSON.parse(qrData);
+      switch (scannedData.type) {
+        case 'ReverseRecoveryQR':
+          const recoveryRequest = {
+            requester: scannedData.requester,
+            publicKey: scannedData.publicKey,
+            uploadedAt: scannedData.UPLOADED_AT,
+            isQR: true,
+          };
+
+          // if (recoveryRequest.requester !== WALLET_SETUP.walletName) {
+          //   Alert.alert(
+          //     'Invalid share',
+          //     "Following share doesn't belong to your wallet",
+          //   );
+          //   return;
+          // }
+
+          if (
+            Date.now() - recoveryRequest.uploadedAt >
+            config.TC_REQUEST_EXPIRY
+          ) {
+            Alert.alert(
+              `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
+              `Please ask your Guardian to initiate a new ${
+                recoveryRequest.isQR ? 'QR' : 'Link'
+              }`,
+            );
+          }
+
+          downloadSecret(null, recoveryRequest.publicKey);
+          break;
+
+        default:
+          break;
+      }
+    } catch (err) {
+      Toast('Invalid QR');
+    }
+  }, []);
+
+  const downloadSecret = useCallback(
+    (shareIndex?, key?) => {
+      if (shareIndex) {
+        const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
+
+        if (!META_SHARE) {
+          const { KEY } = REQUEST_DETAILS;
+          console.log({ KEY });
+          dispatch(downloadMShare(KEY, null, 'recovery'));
+        } else {
+          Alert.alert(
+            'Key Exists',
+            'Following key already exists for recovery',
+          );
+        }
+      } else if (key) {
+        // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
+        dispatch(downloadMShare(key, null, 'recovery'));
+      }
+    },
+    [RECOVERY_SHARES],
+  );
 
   const renderTrustedContactQrContents = () => {
     return (

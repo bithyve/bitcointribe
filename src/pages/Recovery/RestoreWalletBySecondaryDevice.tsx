@@ -185,6 +185,7 @@ export default function RestoreWalletBySecondaryDevice(props) {
                   dispatch(
                     downloadMShare(REQUEST_DETAILS.KEY, null, 'recovery'),
                   );
+                  props.navigation.goBack();
                 }}
                 disabled={!!META_SHARE}
                 style={{

@@ -27,7 +27,17 @@ export default function TrustedContactRequest(props) {
   const [onBlurFocus, setOnBlurFocus] = useState(false);
   const [passcode, setPasscode] = useState('');
   const [passcodeArray, setPasscodeArray] = useState([]);
-  console.log('props.hint', props.hint);
+
+  useEffect(() => {
+    if (!props.isRequestModalOpened) {
+      setWrongInputError('');
+      setPhoneNumber('');
+      setEmailId('');
+      setPasscode('');
+      setPasscodeArray([]);
+    }
+  }, [props.isRequestModalOpened]);
+
   function onPressNumber(text) {
     let tmpPasscode = passcodeArray;
     if (text) {
@@ -100,6 +110,7 @@ export default function TrustedContactRequest(props) {
               setOnBlurFocus(false);
               props.bottomSheetRef.snapTo(1);
             }}
+            value={EmailId}
           />
           {/* <View style={styles.separatorView} />
           <Text
@@ -142,6 +153,7 @@ export default function TrustedContactRequest(props) {
               setOnBlurFocus(false);
               props.bottomSheetRef.snapTo(1);
             }}
+            value={PhoneNumber}
           />
         </View>
       );
@@ -202,6 +214,7 @@ export default function TrustedContactRequest(props) {
                     props.bottomSheetRef.snapTo(1);
                   }
                 }}
+                value={passcodeArray[i] ? passcodeArray[i] : ''}
               />
             );
           })}
@@ -271,10 +284,14 @@ export default function TrustedContactRequest(props) {
           <View style={styles.successModalHeaderView}>
             {!props.isRecovery ? (
               props.isPayment ? (
-                <Text style={styles.modalTitleText}>Payment Request </Text>
+                <Text style={styles.modalTitleText}>
+                  {'Friends and Family\nRequest'}
+                </Text>
               ) : (
                 <Text style={styles.modalTitleText}>
-                  {props.isGuardian ? 'Friends and Family\nRequest' : 'Keeper Reuest'}
+                  {props.isGuardian
+                    ? 'Friends and Family\nRequest'
+                    : 'Keeper Request'}
                 </Text>
               )
             ) : (
@@ -316,14 +333,27 @@ export default function TrustedContactRequest(props) {
                 ...styles.modalInfoText,
                 marginLeft: wp('8%'),
                 marginRight: wp('8%'),
-                marginBottom: wp('8%'),
+                // marginBottom: wp('8%'),
               }}
             >
-              {props.inputType === 'phone'
-                ? 'Enter your 10 digit phone number  '
-                : props.inputType === 'email'
-                ? 'Enter your email ID  '
-                : null}
+              Enter{' '}
+              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                your{' '}
+              </Text>
+              <Text
+                style={{
+                  ...styles.modalInfoText,
+                  marginLeft: wp('8%'),
+                  marginRight: wp('8%'),
+                  marginBottom: wp('8%'),
+                }}
+              >
+                {props.inputType === 'phone'
+                  ? '10 digit phone number  '
+                  : props.inputType === 'email'
+                  ? 'email ID  '
+                  : null}
+              </Text>
               <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                 {props.inputType === 'phone'
                   ? `${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`
@@ -339,11 +369,6 @@ export default function TrustedContactRequest(props) {
           {!props.isQR ? (
             <View style={{ marginLeft: wp('8%'), marginRight: wp('8%') }}>
               <View style={{ flexDirection: 'row' }}>
-                <Text style={styles.phoneNumberInfoText}>
-                  {props.inputType === 'phone'
-                    ? 'Enter Phone Number'
-                    : 'Enter Email Address'}
-                </Text>
                 <Text style={styles.inputErrorText}>{WrongInputError}</Text>
               </View>
               {getInputBox()}
@@ -476,7 +501,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMediumItalic,
     fontSize: RFValue(10),
     color: Colors.red,
-    marginBottom: wp('5%'),
+    marginTop: wp('2%'),
+    marginBottom: wp('3%'),
     marginLeft: 'auto',
   },
   textboxView: {

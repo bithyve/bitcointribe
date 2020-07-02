@@ -56,6 +56,7 @@ const PersonalCopyHistory = (props) => {
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QRModalHeader, setQRModalHeader] = useState('');
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [blockReshare, setBlockReshare] = useState('');
   const healthCheckFailed = useSelector(
     (state) => state.sss.pdfHealthCheckFailed,
   );
@@ -129,6 +130,15 @@ const PersonalCopyHistory = (props) => {
       dispatch(pdfHealthChecked(''));
     }
   }, [healthChecked]);
+
+  useEffect(() => {
+    (async () => {
+      const blockPCShare = await AsyncStorage.getItem('blockPCShare');
+      if (blockPCShare) {
+        setBlockReshare(blockPCShare);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (healthCheckFailed) {
@@ -347,14 +357,17 @@ const PersonalCopyHistory = (props) => {
             : 'Scan the Exit Key'
         }
         infoText={
-          'Open your PDF copy which is password protected with your Security Question\'s answer'
+          "Open your PDF copy which is password protected with your Security Question's answer"
         }
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
         // }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => {
+        onBackPress={() => {
+          (QrBottomSheet.current as any).snapTo(0);
+        }}
+        onQrScan={async (qrData) => {
           if (QRModalHeader === 'Confirm Personal Copy') {
             const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
             dispatch(checkPDFHealth(qrData, index));
@@ -428,18 +441,16 @@ const PersonalCopyHistory = (props) => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-            if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const renderHelpContent = () => {
-    return(
-      <PersonalCopyHelpContents />
-    );
-  }
+    return <PersonalCopyHelpContents />;
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -546,10 +557,14 @@ const PersonalCopyHistory = (props) => {
             (QrBottomSheet.current as any).snapTo(1);
           }}
           onPressReshare={async () => {
-            setTimeout(() => {
-              setQRModalHeader('Reshare Personal Copy');
-            }, 2);
-            (QrBottomSheet.current as any).snapTo(1);
+            if (blockReshare) {
+              setTimeout(() => {
+                setQRModalHeader('Reshare Personal Copy');
+              }, 2);
+              (QrBottomSheet.current as any).snapTo(1);
+            } else {
+              (PersonalCopyShareBottomSheet as any).current.snapTo(1);
+            }
           }}
           onPressContinue={() => {
             (PersonalCopyShareBottomSheet as any).current.snapTo(1);
@@ -591,7 +606,7 @@ const PersonalCopyHistory = (props) => {
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
       />
-      <BottomSheet 
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[

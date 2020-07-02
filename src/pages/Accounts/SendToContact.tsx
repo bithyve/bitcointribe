@@ -86,7 +86,11 @@ export default function SendToContact(props) {
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const [CurrencySymbol, setCurrencySymbol] = useState('$');
-  const [bitcoinAmount, setBitCoinAmount] = useState('');
+  const [bitcoinAmount, setBitCoinAmount] = useState(
+    props.navigation.getParam('bitcoinAmount')
+      ? props.navigation.getParam('bitcoinAmount')
+      : '',
+  );
   const [currencyAmount, setCurrencyAmount] = useState('');
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   const [note, setNote] = useState('');
@@ -116,7 +120,7 @@ export default function SendToContact(props) {
       const instance = service.hdWallet || service.secureHDWallet;
       let balance =
         instance.balances.balance + instance.balances.unconfirmedBalance;
-        if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
         for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
           let derivativeAccount;
 
@@ -495,7 +499,8 @@ export default function SendToContact(props) {
         >
           {switchOn
             ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
-            : CurrencySymbol +" "+
+            : CurrencySymbol +
+              ' ' +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
         </Text>
       </View>
@@ -584,7 +589,7 @@ export default function SendToContact(props) {
           flexDirection: 'row',
           width: wp('70%'),
           height: wp('13%'),
-          backgroundColor: switchOn ? Colors.white : Colors.backgroundColor
+          backgroundColor: switchOn ? Colors.white : Colors.backgroundColor,
         }}
         // onPress={()=>setSwitchOn(!switchOn)}
       >
@@ -596,8 +601,13 @@ export default function SendToContact(props) {
         </View>
         {renderVerticalDivider()}
         <TextInput
-          style={{ ...styles.textBox, flex: 1,paddingLeft: 10,
-            height: wp('13%'), width: wp('45%') }}
+          style={{
+            ...styles.textBox,
+            flex: 1,
+            paddingLeft: 10,
+            height: wp('13%'),
+            width: wp('45%'),
+          }}
           placeholder={
             switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
           }
@@ -624,7 +634,7 @@ export default function SendToContact(props) {
             }
           }}
         />
-        </TouchableOpacity>
+      </TouchableOpacity>
     );
   };
   const renderUSDInputText = () => {
@@ -637,9 +647,9 @@ export default function SendToContact(props) {
           flexDirection: 'row',
           width: wp('70%'),
           height: wp('13%'),
-          backgroundColor: !switchOn ? Colors.white : Colors.backgroundColor
+          backgroundColor: !switchOn ? Colors.white : Colors.backgroundColor,
         }}
-       // onPress={()=>setSwitchOn(!switchOn)}
+        // onPress={()=>setSwitchOn(!switchOn)}
       >
         <View style={styles.amountInputImage}>
           {currencyCode.includes(CurrencyCode) ? (
@@ -660,8 +670,13 @@ export default function SendToContact(props) {
         {renderVerticalDivider()}
 
         <TextInput
-          style={{ ...styles.textBox, paddingLeft: 10, flex: 1,
-            height: wp('13%'), width: wp('45%') }}
+          style={{
+            ...styles.textBox,
+            paddingLeft: 10,
+            flex: 1,
+            height: wp('13%'),
+            width: wp('45%'),
+          }}
           editable={!switchOn}
           placeholder={
             switchOn
@@ -690,7 +705,7 @@ export default function SendToContact(props) {
             }
           }}
         />
-        </TouchableOpacity>
+      </TouchableOpacity>
     );
   };
 

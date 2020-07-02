@@ -67,7 +67,7 @@ const HomeHeader = ({
                             style={{ width: wp('6%'), height: wp('6%') }}
                             resizeMode={'contain'}
                         >
-                            {(notificationData || {}).notifications.findIndex((value) => value.read == false) >
+                            {notificationData.findIndex((value) => value.read == false) >
                                 -1 ? (
                                     <View
                                         style={{

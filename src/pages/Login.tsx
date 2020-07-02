@@ -45,10 +45,15 @@ export default function Login(props) {
   const [passcode, setPasscode] = useState('');
   const [Elevation, setElevation] = useState(10);
   const [JailBrokenTitle, setJailBrokenTitle] = useState('');
+  const [JailBrokenInfo, setJailBrokenInfo] = useState('');
   const [passcodeFlag, setPasscodeFlag] = useState(true);
   const [checkAuth, setCheckAuth] = useState(false);
-  const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef<BottomSheet>());
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef<BottomSheet>());
+  const [loaderBottomSheet, setLoaderBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
   // const releases =[
   //       {
   //           "build": "40",
@@ -203,6 +208,7 @@ export default function Login(props) {
             ? 'Your device is Jail Broken'
             : 'Your device is Rooted',
         );
+        setJailBrokenInfo('');
         setElevation(0);
       }, 2);
     }
@@ -211,7 +217,10 @@ export default function Login(props) {
         ErrorBottomSheet.current.snapTo(1);
         setTimeout(() => {
           setJailBrokenTitle(
-            "Your Phone don't have any Secure entry like Pin or Biometric",
+            'Your phone does not have any secure entry like Pin or Biometric',
+          );
+          setJailBrokenInfo(
+            'This may be a security risk to your funds on Hexa',
           );
           setElevation(0);
         }, 2);
@@ -290,7 +299,7 @@ export default function Login(props) {
                 custodyRequest,
                 recoveryRequest,
                 trustedContactRequest,
-                userKey
+                userKey,
               });
             }, 2500);
             dispatch(startupSync());
@@ -354,7 +363,7 @@ export default function Login(props) {
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
         title={JailBrokenTitle}
-        info={''}
+        info={JailBrokenInfo}
         proceedButtonText={'Ok'}
         onPressProceed={() => {
           ErrorBottomSheet.current.snapTo(0);
@@ -378,21 +387,15 @@ export default function Login(props) {
   const proceedButton = () => {
     loaderBottomSheet.current.snapTo(1);
     setTimeout(() => {
-      setMessage(
-        'Hexa Test Account'
-      );
-      setSubTextMessage1(
-        'Test Account comes preloaded with test-sats',
-      );
-      setSubTextMessage2(
-        'Best place to start if you are new to Bitcoin',
-      );
+      setMessage('Hexa Test Account');
+      setSubTextMessage1('Test Account comes preloaded with test-sats');
+      setSubTextMessage2('Best place to start if you are new to Bitcoin');
     }, 3000);
     setTimeout(() => {
       setElevation(0);
     }, 2);
     dispatch(credsAuth(passcode));
-  }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -542,9 +545,7 @@ export default function Login(props) {
                 onPress={() => {
                   loaderBottomSheet.current.snapTo(1);
                   setTimeout(() => {
-                    setMessage(
-                      'Hexa Test Account'
-                    );
+                    setMessage('Hexa Test Account');
                     setSubTextMessage1(
                       'Test Account comes preloaded with test-sats',
                     );

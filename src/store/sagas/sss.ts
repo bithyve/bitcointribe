@@ -326,12 +326,12 @@ function* uploadRequestedShareWorker({ payload }) {
     tag
   ];
 
-  // preventing re-uploads till expiry
-  if (TRANSFER_DETAILS) {
-    if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
-      return;
-    }
-  }
+  // // preventing re-uploads till expiry
+  // if (TRANSFER_DETAILS) {
+  //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
+  //     return;
+  //   }
+  // }
 
   // TODO: 10 min removal strategy
   yield put(switchS3Loader('uploadRequestedShare'));
@@ -371,6 +371,7 @@ function* uploadRequestedShareWorker({ payload }) {
     //   'Upload successful!',
     //   "Requester's share has been uploaded to the relay.",
     // );
+    Toast(`${tag}'s share uploaded`);
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(requestedShareUploaded(tag, false, res.err));
@@ -605,11 +606,11 @@ function* generatePersonalCopyWorker({ payload }) {
 
     yield put(personalCopyGenerated({ [selectedPersonalCopy.type]: true }));
 
-    if (Object.keys(personalCopyDetails).length == 2) {
-      // remove sec-mne once both the personal copies are generated
-      const { removed } = secureAccount.removeSecondaryMnemonic();
-      if (!removed) console.log('Failed to remove sec-mne');
-    }
+    // if (Object.keys(personalCopyDetails).length == 2) {
+    //   // remove sec-mne once both the personal copies are generated
+    //   const { removed } = secureAccount.removeSecondaryMnemonic();
+    //   if (!removed) console.log('Failed to remove sec-mne');
+    // }
 
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
@@ -1103,6 +1104,29 @@ function* overallHealthWorker({ payload }) {
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
+
+    if (overallHealth.overallStatus === 100) {
+      const secureAccount: SecureAccount = yield select(
+        (state) => state.accounts[SECURE_ACCOUNT].service,
+      );
+
+      // remove sec-mne once health approaches 100 (disable PC share)
+      if (secureAccount.secureHDWallet.secondaryMnemonic) {
+        const { removed } = secureAccount.removeSecondaryMnemonic();
+        if (removed) {
+          const { SERVICES } = yield select((state) => state.storage.database);
+          const updatedSERVICES = {
+            ...SERVICES,
+            SECURE_ACCOUNT: JSON.stringify(secureAccount),
+          };
+
+          yield call(insertDBWorker, {
+            payload: { SERVICES: updatedSERVICES },
+          });
+          yield call(AsyncStorage.setItem, 'blockPCShare', 'true');
+        }
+      }
+    }
 
     yield put(updateShareHistory(overallHealth));
 

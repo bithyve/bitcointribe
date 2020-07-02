@@ -12,6 +12,7 @@ import Fonts from './../../common/Fonts';
 import moment from 'moment';
 import { UsNumberFormat } from '../../common/utilities';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { FAST_BITCOINS } from '../../common/constants/serviceTypes';
 
 interface transaction {
   transactionType?: string;
@@ -194,7 +195,7 @@ const TransactionsContent = ({
                         style={{ justifyContent: 'center', marginLeft: 10 }}
                       >
                         <Text style={styles.transactionModalTitleText}>
-                          {item.accountType}{' '}
+                          {item.accountType == FAST_BITCOINS ? "FastBitcoins" : item.accountType}{' '}
                         </Text>
                         <Text style={styles.transactionModalDateText}>
                           {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
@@ -202,7 +203,7 @@ const TransactionsContent = ({
                       </View>
                     </View>
                     <View style={styles.transactionModalAmountView}>
-                      {item.accountType == 'FAST_BITCOINS' && (
+                      {item.accountType == FAST_BITCOINS && (
                         <View
                           style={{
                             justifyContent: 'center',
