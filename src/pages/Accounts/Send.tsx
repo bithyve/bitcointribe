@@ -52,6 +52,7 @@ import {
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendHelpContents from '../../components/Helper/SendHelpContents';
 import Toast from '../../components/Toast';
+import config from '../../bitcoin/HexaConfig';
 
 export default function Send(props) {
   const dispatch = useDispatch();
@@ -92,15 +93,64 @@ export default function Send(props) {
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
         accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const secureBalance = accounts[SECURE_ACCOUNT].service
+    let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
+
+    let derivativeBalance = 0;
+    if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        let derivativeAccount;
+
+        // calculating opposite accounts derivative balance for account tiles
+        if (serviceType !== REGULAR_ACCOUNT) {
+          derivativeAccount =
+            accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+              dAccountType
+            ];
+        } else if (serviceType !== SECURE_ACCOUNT) {
+          derivativeAccount =
+            accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+              dAccountType
+            ];
+        }
+
+        if (
+          serviceType !== SECURE_ACCOUNT &&
+          dAccountType === TRUSTED_CONTACTS
+        ) {
+          continue;
+        }
+
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            // console.log({
+            //   accountNumber,
+            //   balances: trustedAccounts[accountNumber].balances,
+            //   transactions: trustedAccounts[accountNumber].transactions,
+            // });
+            if (derivativeAccount[accountNumber].balances) {
+              derivativeBalance +=
+                derivativeAccount[accountNumber].balances.balance +
+                derivativeAccount[accountNumber].balances.unconfirmedBalance;
+            }
+          }
+        }
+      }
+    }
+
+    if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
+    else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
     setBalances({
       testBalance,
       regularBalance,
@@ -359,12 +409,7 @@ export default function Send(props) {
               selectedContact: item,
               serviceType,
               sweepSecure,
-              netBalance:
-                serviceType === TEST_ACCOUNT
-                  ? balances.testBalance
-                  : serviceType === REGULAR_ACCOUNT
-                  ? balances.regularBalance
-                  : balances.secureBalance,
+              netBalance,
               bitcoinAmount: options.amount ? `${options.amount}` : '',
             });
             break;
@@ -1014,7 +1059,7 @@ export default function Send(props) {
                         showsHorizontalScrollIndicator={false}
                         showsVerticalScrollIndicator={false}
                         renderItem={renderAccounts}
-                        extraData={transfer.details}
+                        extraData={{ details: transfer.details, balances }}
                         //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>

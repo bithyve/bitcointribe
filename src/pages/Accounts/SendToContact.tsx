@@ -109,62 +109,11 @@ export default function SendToContact(props) {
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const service = useSelector((state) => state.accounts[serviceType].service);
+
   useEffect(() => {
     setCurrencyCodeFromAsync();
     if (bitcoinAmount) convertBitCoinToCurrency(bitcoinAmount);
     if (!averageTxFees) storeAverageTxFees();
-    let accountTypeArray = [REGULAR_ACCOUNT, SECURE_ACCOUNT];
-    for (let i = 0; i < accountTypeArray.length; i++) {
-      const element = accountTypeArray[i];
-      const service = accounts[element].service;
-      const instance = service.hdWallet || service.secureHDWallet;
-      let balance =
-        instance.balances.balance + instance.balances.unconfirmedBalance;
-      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-          let derivativeAccount;
-
-          if (serviceType === REGULAR_ACCOUNT) {
-            derivativeAccount =
-              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-                dAccountType
-              ];
-          } else if (serviceType === SECURE_ACCOUNT) {
-            derivativeAccount =
-              accounts[SECURE_ACCOUNT].service.secureHDWallet
-                .derivativeAccounts[dAccountType];
-          }
-
-          if (
-            serviceType === SECURE_ACCOUNT &&
-            dAccountType === TRUSTED_CONTACTS
-          ) {
-            continue;
-          }
-
-          if (derivativeAccount.instance.using) {
-            for (
-              let accountNumber = 1;
-              accountNumber <= derivativeAccount.instance.using;
-              accountNumber++
-            ) {
-              // console.log({
-              //   accountNumber,
-              //   balances: trustedAccounts[accountNumber].balances,
-              //   transactions: trustedAccounts[accountNumber].transactions,
-              // });
-              if (derivativeAccount[accountNumber].balances) {
-                balance +=
-                  derivativeAccount[accountNumber].balances.balance +
-                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
-              }
-            }
-          }
-        }
-      }
-      if (element == REGULAR_ACCOUNT) setRegularAccountBalance(balance);
-      if (element == SECURE_ACCOUNT) setSavingAccountBalance(balance);
-    }
   }, []);
 
   const setCurrencyCodeFromAsync = async () => {
@@ -213,40 +162,71 @@ export default function SendToContact(props) {
   }
 
   useEffect(() => {
-    if (isFromAddressBook) {
-      dispatch(clearTransfer(serviceType));
-      dispatch(addTransferDetails(serviceType, { selectedContact }));
-    }
+    // if (isFromAddressBook) {
+    //   dispatch(clearTransfer(serviceType));
+    //   dispatch(addTransferDetails(serviceType, { selectedContact }));
+    // } // already dispatching before navigation (ContactDetails)
 
     if (netBalance !== 0 && !netBalance) {
       const service = accounts[serviceType].service;
       const instance = service.hdWallet || service.secureHDWallet;
-
       let balance =
         instance.balances.balance + instance.balances.unconfirmedBalance;
 
-      if (serviceType === REGULAR_ACCOUNT) {
-        const trustedAccounts: TrustedContactDerivativeAccount =
-          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-            TRUSTED_CONTACTS
-          ];
-        if (trustedAccounts.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= trustedAccounts.instance.using;
-            accountNumber++
+      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+          let derivativeAccount;
+
+          if (serviceType === REGULAR_ACCOUNT) {
+            derivativeAccount =
+              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+                dAccountType
+              ];
+          } else if (serviceType === SECURE_ACCOUNT) {
+            derivativeAccount =
+              accounts[SECURE_ACCOUNT].service.secureHDWallet
+                .derivativeAccounts[dAccountType];
+          }
+
+          if (
+            serviceType === SECURE_ACCOUNT &&
+            dAccountType === TRUSTED_CONTACTS
           ) {
-            if (trustedAccounts[accountNumber].balances) {
-              balance +=
-                trustedAccounts[accountNumber].balances.balance +
-                trustedAccounts[accountNumber].balances.unconfirmedBalance;
+            continue;
+          }
+
+          if (derivativeAccount.instance.using) {
+            for (
+              let accountNumber = 1;
+              accountNumber <= derivativeAccount.instance.using;
+              accountNumber++
+            ) {
+              // console.log({
+              //   accountNumber,
+              //   balances: trustedAccounts[accountNumber].balances,
+              //   transactions: trustedAccounts[accountNumber].transactions,
+              // });
+              if (derivativeAccount[accountNumber].balances) {
+                balance +=
+                  derivativeAccount[accountNumber].balances.balance +
+                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
+              }
             }
           }
         }
       }
+
       setNetBalance(balance);
     }
   }, [serviceType]);
+
+  useEffect(() => {
+    if (serviceType == REGULAR_ACCOUNT) {
+      setRegularAccountBalance(netBalance);
+    } else if (serviceType == SECURE_ACCOUNT) {
+      setSavingAccountBalance(netBalance);
+    }
+  }, [netBalance]);
 
   const storeAverageTxFees = async () => {
     const storedAverageTxFees = await AsyncStorage.getItem(
