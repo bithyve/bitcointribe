@@ -11,6 +11,7 @@ import {
   StatusBar,
   ActivityIndicator,
   AsyncStorage,
+  Alert,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -69,6 +70,7 @@ export default function SendConfirmation(props) {
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const viewRef = useRef(null);
+  const [totalAmount, setTotalAmount] = useState(0);
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
   const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
@@ -160,6 +162,15 @@ export default function SendConfirmation(props) {
         updateDescription(transfer.txid, transfer.details[0].note);
       }
       storeTrustedContactsHistory(transfer.details);
+      dispatch(
+        fetchBalanceTx(serviceType, {
+          loader: true,
+          syncTrustedDerivative:
+            serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+              ? true
+              : false,
+        }),
+      );
       SendSuccessBottomSheet.current.snapTo(1);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
@@ -289,13 +300,15 @@ export default function SendConfirmation(props) {
     );
   };
 
-  const getTotalAmount = () => {
-    let totalAmount = 0;
-    transfer.details.map((item) => {
-      totalAmount += parseInt(item.bitcoinAmount);
-    });
-    return totalAmount;
-  };
+  useEffect(() => {
+    if (transfer.details) {
+      let totalAmount = 0;
+      transfer.details.map((item) => {
+        totalAmount += parseInt(item.bitcoinAmount);
+      });
+      if (totalAmount) setTotalAmount(totalAmount);
+    }
+  }, [transfer]);
 
   const renderBitCoinAmountText = () => {
     return (
@@ -321,7 +334,7 @@ export default function SendConfirmation(props) {
             marginLeft: 10,
           }}
         >
-          {getTotalAmount()}
+          {totalAmount}
         </Text>
         <Text
           style={{
@@ -361,17 +374,27 @@ export default function SendConfirmation(props) {
 
           dispatch(clearTransfer(serviceType));
           // dispatch(fetchTransactions(serviceType));
-          dispatch(
-            fetchBalanceTx(serviceType, {
-              loader: true,
-              syncTrustedDerivative:
-                serviceType === REGULAR_ACCOUNT ||
-                serviceType === SECURE_ACCOUNT
-                  ? true
-                  : false,
-            }),
-          );
-          props.navigation.navigate('Accounts');
+          // dispatch(
+          //   fetchBalanceTx(serviceType, {
+          //     loader: true,
+          //     syncTrustedDerivative:
+          //       serviceType === REGULAR_ACCOUNT ||
+          //       serviceType === SECURE_ACCOUNT
+          //         ? true
+          //         : false,
+          //   }),
+          // );
+
+          props.navigation.navigate('Accounts', {
+            serviceType,
+            index:
+              serviceType === TEST_ACCOUNT
+                ? 0
+                : serviceType === REGULAR_ACCOUNT
+                ? 1
+                : 2,
+            netBalance: netBalance - totalAmount,
+          });
         }}
         isSuccess={true}
       />
