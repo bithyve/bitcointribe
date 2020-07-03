@@ -160,7 +160,6 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     (async () => {
-      
       let FBTCAccountData = JSON.parse(
         await AsyncStorage.getItem('FBTCAccount'),
       );
@@ -168,7 +167,7 @@ const VoucherScanner = (props) => {
       if (FBTCAccountData && FBTCAccountData.user_key) {
         setIsUserRegistered(true);
       }
-      if (userKey1 || FBTCAccountData && FBTCAccountData.user_key) {
+      if (userKey1 || (FBTCAccountData && FBTCAccountData.user_key)) {
         let voucherCodeTemp = JSON.parse(
           await AsyncStorage.getItem('voucherData'),
         );
@@ -803,7 +802,7 @@ const VoucherScanner = (props) => {
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
-        <ScrollView style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1}}>
           <View style={{ height: '100%' }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
@@ -865,6 +864,7 @@ const VoucherScanner = (props) => {
               }}
               value={voucherCode}
             />
+            
           </View>
         </ScrollView>
         {hideShow ? (
@@ -928,6 +928,62 @@ const VoucherScanner = (props) => {
             })}
           </View>
         ) : null}
+        <TouchableOpacity
+              onPress={() => {
+                props.navigation.navigate('PairNewWallet');
+              }}
+              style={{
+                marginBottom: -20,}}
+            >
+              <View
+                style={{
+                  marginBottom: 25,
+                  padding: 20,
+                  backgroundColor: props.backgroundColor
+                    ? props.backgroundColor
+                    : Colors.backgroundColor,
+                  marginLeft: 20,
+                  marginRight: 20,
+                  borderRadius: 10,
+                  justifyContent: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: props.titleColor ? props.titleColor : Colors.blue,
+                    fontSize: RFValue(13),
+                    marginBottom: 2,
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  {'Already registered with FastBitcoins?'}
+                </Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textDecorationLine: 'underline',
+                    }}
+                    onPress={() => {
+                      props.navigation.navigate('PairNewWallet');
+                    }}
+                  >
+                    {'Click here'}
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(12),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    {' to link your Hexa wallet'}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
         <Text
           style={{
             marginTop: 'auto',
@@ -1193,7 +1249,6 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansMedium,
-    marginTop: wp('10%'),
   },
 });
 
