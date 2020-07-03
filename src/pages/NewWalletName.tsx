@@ -82,9 +82,9 @@ export default function NewWalletName(props) {
                 setInputStyle(styles.inputBox);
               }}
             />
-            <View style={{width: '100%', alignItems: 'center'}}>
+            <View style={{marginLeft: 20,}}>
               <Text style={{fontSize: RFValue(12), 
-                fontFamily: Fonts.FiraSansRegular }}>
+                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey, }}>
                   No numbers or special characters allowed</Text>
             </View>
           </ScrollView>
