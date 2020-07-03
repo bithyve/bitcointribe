@@ -1217,7 +1217,7 @@ export default function ContactDetails(props) {
               onPress={onHelpRestore}
             >
               <Image
-                source={require('../../assets/images/icons/icon_sell.png')}
+                source={require('../../assets/images/icons/icon_restore.png')}
                 style={styles.buttonImage}
               />
               <View>
@@ -1244,7 +1244,7 @@ export default function ContactDetails(props) {
               }}
             >
               <Image
-                source={require('../../assets/images/icons/icon_buy.png')}
+                source={require('../../assets/images/icons/icon_request.png')}
                 style={styles.buttonImage}
               />
               <View>
@@ -1406,7 +1406,6 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     resizeMode: 'contain',
-    tintColor: Colors.blue,
   },
   buttonText: {
     color: Colors.black,
