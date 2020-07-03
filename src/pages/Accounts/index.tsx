@@ -210,6 +210,10 @@ export default function Accounts(props) {
     //   setSellIsActive(false);
     //   props.stop();
     // }
+    const providedBalance = props.navigation.getParam('netBalance');
+    useEffect(() => {
+      if (providedBalance) setNetBalance(providedBalance);
+    }, [providedBalance]);
 
     if (
       !isTestAccountHelperDone &&
