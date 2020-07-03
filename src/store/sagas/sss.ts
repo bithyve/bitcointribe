@@ -624,6 +624,17 @@ function* generatePersonalCopyWorker({ payload }) {
     //   if (!removed) console.log('Failed to remove sec-mne');
     // }
 
+    // remove secondary mnemonic (if the secondary menmonic has been removed and re-injected)
+    const blockPCShare = yield call(AsyncStorage.getItem, 'blockPCShare');
+    if (blockPCShare) {
+      if (secureAccount.secureHDWallet.secondaryMnemonic) {
+        const { removed } = secureAccount.removeSecondaryMnemonic();
+        if (!removed) {
+          console.log('Failed to remove the secondary mnemonic');
+        }
+      }
+    }
+
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
