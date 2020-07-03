@@ -548,9 +548,11 @@ export default function Accounts(props) {
                     alignSelf: 'center',
                   }}
                   onPress={() => {
-                    props.navigation.navigate('TwoFASetup', {
-                      twoFASetup: service.secureHDWallet.twoFASetup,
-                    });
+                    if (service.secureHDWallet.twoFASetup) {
+                      props.navigation.navigate('TwoFASetup', {
+                        twoFASetup: service.secureHDWallet.twoFASetup,
+                      });
+                    }
                   }}
                 >
                   2FA
