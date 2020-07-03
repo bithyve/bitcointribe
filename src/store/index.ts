@@ -47,6 +47,7 @@ import {
   fetchDerivativeAccAddressWatcher,
   syncDerivativeAccountsWatcher,
   startupSyncWatcher,
+  removeTwoFAWatcher,
 } from './sagas/accounts';
 
 import {
@@ -146,6 +147,7 @@ const rootSaga = function* () {
     exchangeRateWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
+    removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
