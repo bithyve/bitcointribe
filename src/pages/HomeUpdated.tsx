@@ -223,6 +223,7 @@ interface HomeStateTypes {
   isLoading: boolean;
   isRequestModalOpened: boolean;
   isBalanceLoading: boolean;
+  addContactModalOpened: boolean;
 }
 
 interface HomePropsTypes {
@@ -303,6 +304,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isLoading: true,
       isRequestModalOpened: false,
       isBalanceLoading: true,
+      addContactModalOpened: false,
     };
   }
 
@@ -2051,6 +2053,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isLoading,
       isRequestModalOpened,
       isBalanceLoading,
+      addContactModalOpened,
     } = this.state;
     const {
       navigation,
@@ -2789,9 +2792,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         />
 
         <BottomSheet
+        onCloseEnd={()=>{
+          this.setState({
+            addContactModalOpened: false
+          });
+        }}
           onOpenEnd={() => {
             this.setState({
               tabBarIndex: 0,
+              addContactModalOpened: true
             });
           }}
           onOpenStart={() => {
@@ -2814,17 +2823,21 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <AddContactAddressBook
+              addContactModalOpened={addContactModalOpened}  
               isLoadContacts={isLoadContacts}
               modalRef={this.refs.addContactAddressBookBookBottomSheet}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
+                if(selectedContact && selectedContact.length){
                 navigation.navigate('AddContactSendRequest', {
                   SelectedContact: selectedContact,
                 });
-                (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+              (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
                   0,
                 );
+                }
               }}
+              
               onSelectContact={(selectedContact) => {
                 this.setState({
                   selectedContact,

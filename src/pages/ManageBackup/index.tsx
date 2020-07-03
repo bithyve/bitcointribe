@@ -1378,24 +1378,24 @@ export default function ManageBackup(props) {
 
   const getStatusIcon = (item) => {
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
-      return getIconByStatus(item.status);
+      return {icon:getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey};
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
-      return getIconByStatus(item.status);
+      return {icon:getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey};
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
-      return getIconByStatus(item.status);
+      return {icon:getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey};
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
-      return getIconByStatus(item.status);
+      return {icon:getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey};
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
-      return getIconByStatus(item.status);
+      return {icon:getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey};
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
-      return getIconByStatus(item.status);
+      return {icon:getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey};
     }
-    return require('../../assets/images/icons/settings.png');
+    return {icon:require('../../assets/images/icons/icon_error_gray.png'), color: Colors.lightTextColor};
   };
 
   const getImageIcon = (item) => {
@@ -1702,14 +1702,7 @@ export default function ManageBackup(props) {
                         }}
                         style={{
                           ...styles.manageBackupCard,
-                          borderColor:
-                            item.status == 'Ugly'
-                              ? Colors.red
-                              : item.status == 'Bad'
-                              ? Colors.yellow
-                              : item.status == 'Good'
-                              ? Colors.green
-                              : Colors.blue,
+                          borderColor:getStatusIcon(item).color,
                           elevation:
                             selectedType && item.type == selectedType ? 10 : 0,
                           shadowColor:
@@ -1750,7 +1743,7 @@ export default function ManageBackup(props) {
                         </View>
                         <Image
                           style={styles.cardIconImage}
-                          source={getStatusIcon(item)}
+                          source={getStatusIcon(item).icon}
                         />
                       </TouchableOpacity>
                     </View>
