@@ -48,6 +48,13 @@ export default function AddContactAddressBook(props) {
   ] = useState(React.createRef());
   const [contactData, setContactData] = useState([]);
 
+  useEffect(() => {
+    if (!props.addContactModalOpened) {
+      setSelectedContacts([]);
+      getContactsAsync();
+    }
+  }, [props.addContactModalOpened]);
+
   const requestContactsPermission = async () => {
     try {
       let isContactOpen = false;
