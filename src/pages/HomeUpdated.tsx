@@ -222,6 +222,7 @@ interface HomeStateTypes {
   isCameraOpen: boolean;
   isLoading: boolean;
   isRequestModalOpened: boolean;
+  isBalanceLoading: boolean;
 }
 
 interface HomePropsTypes {
@@ -301,6 +302,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationLoading: true,
       isLoading: true,
       isRequestModalOpened: false,
+      isBalanceLoading: true,
     };
   }
 
@@ -1489,6 +1491,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         accumulativeBalance,
       },
       transactions: accumulativeTransactions,
+      isBalanceLoading: false
     });
 
     // if (balancesParam) {
@@ -2047,6 +2050,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isLoadContacts,
       isLoading,
       isRequestModalOpened,
+      isBalanceLoading,
     } = this.state;
     const {
       navigation,
@@ -2104,6 +2108,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               }}
               renderItem={(Items) => (
                 <HomeList
+                  isBalanceLoading={isBalanceLoading}
                   Items={Items}
                   navigation={navigation}
                   getIconByAccountType={getIconByAccountType}
