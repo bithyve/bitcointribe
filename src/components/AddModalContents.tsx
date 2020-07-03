@@ -20,12 +20,12 @@ export default function AddModalContents( props ) {
 			info: 'Redeem a FastBitcoins voucher',
 			type:'buyBitcoins'
 		},
-		{
-			title: `Pair with FastBitcoins account`, 
-			image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
-			info: 'If you have completed your registration',
-			type:'pairAccount'
-		},
+		// {
+		// 	title: `Pair with FastBitcoins account`, 
+		// 	image: require( '../assets/images/icons/icon_fastbicoin.png' ), 
+		// 	info: 'If you have completed your registration',
+		// 	type:'pairAccount'
+		// },
 		{
 			title: 'Add Contact', 
 			image: require( '../assets/images/icons/icon_addcontact.png' ), 
