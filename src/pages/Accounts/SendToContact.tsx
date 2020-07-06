@@ -255,7 +255,16 @@ export default function SendToContact(props) {
 
   useEffect(() => {
     if (bitcoinAmount && currencyAmount && transfer.details.length) {
-      if (netBalance < Number(bitcoinAmount)) {
+      let amountStacked = 0;
+      transfer.details.forEach((recipient) => {
+        if (
+          recipient.bitcoinAmount &&
+          recipient.selectedContact.id !== selectedContact.id
+        ) {
+          amountStacked += parseInt(recipient.bitcoinAmount);
+        }
+      });
+      if (netBalance - amountStacked < Number(bitcoinAmount)) {
         setIsInvalidBalance(true);
         setIsConfirmDisabled(true);
       } else setIsConfirmDisabled(false);
@@ -304,7 +313,11 @@ export default function SendToContact(props) {
 
     const recipientsList = [];
     transfer.details.forEach((instance) => {
-      if (instance.bitcoinAmount) recipientsList.push(instance);
+      if (
+        instance.bitcoinAmount &&
+        instance.selectedContact.id !== selectedContact.id
+      )
+        recipientsList.push(instance);
     });
     recipientsList.push(currentRecipientInstance);
     const instance = service.hdWallet || service.secureHDWallet;
@@ -798,32 +811,27 @@ export default function SendToContact(props) {
     }
   };
 
-  const checkBalance = () => {
-    setIsConfirmDisabled(true);
-    if (netBalance < Number(bitcoinAmount)) {
-      setIsInvalidBalance(true);
-      setIsConfirmDisabled(true);
-    } else {
-      setIsConfirmDisabled(false);
-      if (transfer.details && transfer.details.length) {
-        for (let i = 0; i < transfer.details.length; i++) {
-          if (transfer.details[i].selectedContact.id == selectedContact.id) {
-            dispatch(removeTransferDetails(serviceType, transfer.details[i]));
-          }
+  const onConfirm = () => {
+    dispatch(clearTransfer(serviceType, 'stage1'));
+    setIsConfirmDisabled(false);
+    if (transfer.details && transfer.details.length) {
+      for (let i = 0; i < transfer.details.length; i++) {
+        if (transfer.details[i].selectedContact.id == selectedContact.id) {
+          dispatch(removeTransferDetails(serviceType, transfer.details[i]));
         }
-        dispatch(
-          addTransferDetails(serviceType, {
-            selectedContact,
-            bitcoinAmount,
-            currencyAmount,
-            note,
-          }),
-        );
       }
-      setTimeout(() => {
-        handleTrasferST1();
-      }, 10);
+      dispatch(
+        addTransferDetails(serviceType, {
+          selectedContact,
+          bitcoinAmount,
+          currencyAmount,
+          note,
+        }),
+      );
     }
+    setTimeout(() => {
+      handleTrasferST1();
+    }, 10);
   };
 
   const getBalanceText = () => {
@@ -1090,7 +1098,7 @@ export default function SendToContact(props) {
             >
               <TouchableOpacity
                 onPress={() => {
-                  checkBalance();
+                  onConfirm();
                 }}
                 disabled={isConfirmDisabled || loading.transfer}
                 style={{

@@ -98,8 +98,8 @@ export const removeTransferDetails = (serviceType, recipientData) => {
   };
 };
 
-export const clearTransfer = (serviceType) => {
-  return { type: CLEAR_TRANSFER, payload: { serviceType } };
+export const clearTransfer = (serviceType, stage?) => {
+  return { type: CLEAR_TRANSFER, payload: { serviceType, stage } };
 };
 
 export const accumulativeBalAndTx = () => {
