@@ -90,6 +90,7 @@ import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface'
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
+import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
