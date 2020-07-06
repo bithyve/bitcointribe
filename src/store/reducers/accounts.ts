@@ -177,7 +177,11 @@ export default (state = initialState, action) => {
           ...state[account],
           transfer: {
             ...state[account].transfer,
-            stage1: { ...state[account].transfer.stage1, failed: true },
+            stage1: {
+              ...state[account].transfer.stage1,
+              failed: true,
+              ...action.payload.errorDetails,
+            },
           },
           loading: {
             ...state[account].loading,
@@ -216,15 +220,55 @@ export default (state = initialState, action) => {
       };
 
     case CLEAR_TRANSFER:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          transfer: {
-            ...initialState[account].transfer,
+      if (!action.payload.stage)
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...initialState[account].transfer,
+            },
           },
-        },
-      };
+        };
+      else if (action.payload.stage === 'stage1')
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...state[account].transfer,
+              stage1: {},
+              stage2: {},
+              stage3: {},
+              executed: '',
+            },
+          },
+        };
+      else if (action.payload.stage === 'stage2')
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...state[account].transfer,
+              stage2: {},
+              stage3: {},
+              executed: 'ST1',
+            },
+          },
+        };
+      else if (action.payload.stage === 'stage3')
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...state[account].transfer,
+              stage3: {},
+              executed: 'ST2',
+            },
+          },
+        };
 
     case TRANSFER_ST2_EXECUTED:
       switch (action.payload.serviceType) {
