@@ -1,9 +1,9 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
+import { AsyncStorage as storage } from 'react-native'
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { call, all, spawn } from 'redux-saga/effects';
 import { composeWithDevTools } from 'redux-devtools-extension';
-
 import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
@@ -11,6 +11,15 @@ import sssReducer from './reducers/sss';
 import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
+import { persistStore, persistReducer } from "redux-persist";
+
+
+const config = {
+  key: "root", // key is required
+  storage, // storage is now required
+  // blacklist: []
+};
+
 
 import {
   initDBWatcher,
@@ -225,10 +234,15 @@ const rootReducer = combineReducers({
 });
 
 const sagaMiddleware = createSagaMiddleware();
+
+const reducers = persistReducer(config, rootReducer);
+
 const store = createStore(
-  rootReducer,
+  reducers,
   composeWithDevTools(applyMiddleware(sagaMiddleware)),
 );
 sagaMiddleware.run(rootSaga);
+const persistor = persistStore(store);
 
-export { store, Provider };
+
+export { store, Provider, persistor };
