@@ -162,7 +162,7 @@ export default function Accounts(props) {
   );
   const [transactionLoading, setTransactionLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
-  const [averageTxFees, setAverageTxFees] = useState();
+  const [averageTxFees, setAverageTxFees] = useState(null);
 
   const accounts = useSelector((state) => state.accounts);
   const [exchangeRates, setExchangeRates] = useState(accounts.exchangeRates);
@@ -1802,9 +1802,24 @@ export default function Accounts(props) {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
-                        Tran Fee :
-                        {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
-                        ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
+                        Avg. Fee :{' '}
+                        {switchOn || serviceType === TEST_ACCOUNT
+                          ? (averageTxFees
+                              ? averageTxFees['medium'].averageTxFee
+                              : 0) +
+                            ' ' +
+                            (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
+                          : exchangeRates
+                          ? (
+                              ((averageTxFees
+                                ? averageTxFees['medium'].averageTxFee
+                                : 0) /
+                                1e8) *
+                              exchangeRates[CurrencyCode].last
+                            ).toFixed(2) +
+                            ' ' +
+                            CurrencyCode.toLocaleLowerCase()
+                          : null}
                       </Text>
                     </View>
                   </TouchableOpacity>
