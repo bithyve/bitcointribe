@@ -524,7 +524,31 @@ export default function SendToContact(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={
+          'There seems to be a problem' + '\n' + transfer.stage1.failed
+            ? transfer.stage1.err === 'Insufficient balance'
+              ? `Insufficient balance to compensate the transfer amount: ${
+                  switchOn || serviceType === TEST_ACCOUNT
+                    ? transfer.stage1.netAmount
+                    : exchangeRates
+                    ? (
+                        (transfer.stage1.netAmount / 1e8) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : 0
+                } and the transaction fee: ${
+                  switchOn || serviceType === TEST_ACCOUNT
+                    ? transfer.stage1.fee
+                    : exchangeRates
+                    ? (
+                        (transfer.stage1.fee / 1e8) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : 0
+                }`
+              : transfer.stage1.err
+            : 'Something went wrong'
+        }
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
