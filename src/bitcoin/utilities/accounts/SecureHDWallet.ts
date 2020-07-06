@@ -1167,11 +1167,23 @@ export default class SecureHDWallet extends Bitcoin {
 
     const txPrerequisites: TransactionPrerequisite = {};
     for (const priority of Object.keys(averageTxFees)) {
-      const netFeeByPriority =
-        (fee / feePerByte) * averageTxFees[priority].feePerByte;
-      const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+      const debitedAmount = netAmount + fee;
+      if (debitedAmount <= balance) {
+        let netFeeByPriority;
+        let estimatedBlocks;
+        if (debitedAmount === balance) {
+          // fee defaults across priority
+          netFeeByPriority = Math.round(
+            (fee / feePerByte) * averageTxFees[defaultTxPriority].feePerByte,
+          );
+          estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+        } else {
+          netFeeByPriority = Math.round(
+            (fee / feePerByte) * averageTxFees[priority].feePerByte,
+          );
+          estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+        }
 
-      if (balance > netAmount + fee) {
         txPrerequisites[priority] = {
           inputs,
           outputs,
@@ -1179,6 +1191,11 @@ export default class SecureHDWallet extends Bitcoin {
           estimatedBlocks,
         };
       } else {
+        const netFeeByPriority = Math.round(
+          (fee / feePerByte) * averageTxFees[priority].feePerByte,
+        );
+        const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+
         txPrerequisites[priority] = {
           inputs: null, // if null >> insufficient balance to pay with fee corresponding to this tx priority
           outputs,
@@ -1201,10 +1218,12 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     try {
       const { inputs, outputs, fee } = txPrerequisites[txnPriority];
+      console.log({ inputs, outputs, fee });
 
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
         this.network,
       );
+      console.log({ txb });
 
       inputs.forEach((input) =>
         txb.addInput(input.txId, input.vout, nSequence),
@@ -1218,6 +1237,7 @@ export default class SecureHDWallet extends Bitcoin {
             output.value + txPrerequisites[defaultTxPriority].fee - fee;
         }
       });
+      console.log({ outputs });
 
       const sortedOuts = await this.sortOutputs(outputs);
       sortedOuts.forEach((output) => {
