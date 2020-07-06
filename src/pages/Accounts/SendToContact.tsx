@@ -534,31 +534,43 @@ export default function SendToContact(props) {
   };
 
   const renderSendUnSuccessContents = () => {
+    let netAmount: any = 0;
+    let fee: any = 0;
+    let balance = netBalance;
+    if (switchOn || serviceType === TEST_ACCOUNT) {
+      netAmount = transfer.stage1.netAmount;
+      fee = transfer.stage1.fee;
+    } else {
+      if (exchangeRates) {
+        netAmount = (
+          (transfer.stage1.netAmount / 1e8) *
+          exchangeRates[CurrencyCode].last
+        ).toFixed(2);
+        fee = (
+          (transfer.stage1.fee / 1e8) *
+          exchangeRates[CurrencyCode].last
+        ).toFixed(2);
+
+        balance = ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(
+          2,
+        );
+      }
+    }
+
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
         info={
           'There seems to be a problem' + '\n' + transfer.stage1.failed
             ? transfer.stage1.err === 'Insufficient balance'
-              ? `Insufficient balance to compensate the transfer amount: ${
-                  switchOn || serviceType === TEST_ACCOUNT
-                    ? transfer.stage1.netAmount
-                    : exchangeRates
-                    ? (
-                        (transfer.stage1.netAmount / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                    : 0
-                } and the transaction fee: ${
-                  switchOn || serviceType === TEST_ACCOUNT
-                    ? transfer.stage1.fee
-                    : exchangeRates
-                    ? (
-                        (transfer.stage1.fee / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                    : 0
-                }`
+              ? `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
+                `\n\nPlease reduce the transfer amount by ${(
+                  parseFloat(netAmount) +
+                  parseFloat(fee) -
+                  parseFloat(balance)
+                ).toFixed(
+                  switchOn ? 0 : 2,
+                )} in order to conduct this transaction`
               : transfer.stage1.err
             : 'Something went wrong'
         }
