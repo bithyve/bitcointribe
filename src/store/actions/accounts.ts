@@ -23,6 +23,7 @@ export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
 export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
+export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 
 export const fetchAddress = (serviceType) => {
   return { type: FETCH_ADDR, payload: { serviceType } };
@@ -120,6 +121,11 @@ export const syncDerivativeAccounts = (serviceTypes: string[]) => {
   };
 };
 
+export const removeTwoFA = () => {
+  return {
+    type: REMOVE_TWO_FA,
+  };
+};
 export const calculateExchangeRate = () => {
   return { type: EXCHANGE_RATE };
 };
