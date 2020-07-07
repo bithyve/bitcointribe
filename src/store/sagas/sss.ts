@@ -1392,7 +1392,7 @@ function* recoverWalletWorker({ payload }) {
     });
 
     console.log({ mappedMetaShares });
-    let restorationShares = [];
+    let restorationShares: MetaShare[] = [];
     Object.keys(mappedMetaShares).forEach((walletId) => {
       if (mappedMetaShares[walletId].length >= 3)
         restorationShares = mappedMetaShares[walletId];
@@ -1475,6 +1475,23 @@ function* recoverWalletWorker({ payload }) {
         'securityQuestionHistory',
         JSON.stringify(securityQuestionHistory),
       );
+
+      // personal copy health restoration
+      let updatedPDFHealth = {};
+      for (const share of restorationShares) {
+        if (share.meta.index > 2) {
+          updatedPDFHealth[share.meta.index] = {
+            shareId: `placeHolderID${share.meta.index}`,
+            updatedAt: Date.now(),
+          };
+        }
+      }
+      if (Object.keys(updatedPDFHealth).length)
+        yield call(
+          AsyncStorage.setItem,
+          'PDF Health',
+          JSON.stringify(updatedPDFHealth),
+        );
     } else {
       throw new Error(res.err);
     }
@@ -1524,12 +1541,24 @@ function* updateWalletImageWorker({ payload }) {
       hashesWI.SERVICES = currentSHash;
     }
 
+    // ASYNC DATA to backup
     const TrustedContactsInfo = yield call(
       AsyncStorage.getItem,
       'TrustedContactsInfo',
     ); // use multiGet while fetching multiple items
-    if (TrustedContactsInfo) {
-      const ASYNC_DATA = { TrustedContactsInfo };
+
+    const personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
+    );
+
+    const ASYNC_DATA = {};
+    if (TrustedContactsInfo)
+      ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
+    if (personalCopyDetails)
+      ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
+    console.log({ ASYNC_DATA });
+    if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
         walletImage['ASYNC_DATA'] = ASYNC_DATA;
@@ -1552,8 +1581,20 @@ function* updateWalletImageWorker({ payload }) {
       AsyncStorage.getItem,
       'TrustedContactsInfo',
     ); // use multiGet while fetching multiple items
-    if (TrustedContactsInfo) {
-      const ASYNC_DATA = { TrustedContactsInfo };
+
+    const personalCopyDetails = yield call(
+      AsyncStorage.getItem,
+      'personalCopyDetails',
+    );
+
+    const ASYNC_DATA = {};
+    if (TrustedContactsInfo)
+      ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
+    if (personalCopyDetails)
+      ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
+
+    console.log({ ASYNC_DATA });
+    if (Object.keys(ASYNC_DATA).length) {
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
       hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
     }
