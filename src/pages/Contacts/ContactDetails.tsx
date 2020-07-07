@@ -1197,7 +1197,7 @@ export default function ContactDetails(props) {
             )}
           </View>
         )}
-        {(contactsType == 'My Keepers' || contactsType == "I'm Keeper of") && (
+        {contactsType == "I'm Keeper of" && (
           <View
             style={{
               flexDirection: 'row',
@@ -1231,33 +1231,35 @@ export default function ContactDetails(props) {
                 </Text> */}
               </View>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-                opacity: encryptedExitKey ? 1 : 0.5,
-              }}
-              disabled={encryptedExitKey ? false : true}
-              onPress={() => {
-                if (encryptedExitKey) {
-                  (ExitKeyQRBottomSheet as any).current.snapTo(1);
-                }
-              }}
-            >
-              <Image
-                source={require('../../assets/images/icons/icon_request.png')}
-                style={styles.buttonImage}
-              />
-              <View>
-                <Text style={styles.buttonText}>
-                  {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
-                </Text>
-                {encryptedExitKey ? (
-                  <Text numberOfLines={1} style={styles.buttonInfo}>
-                    {'Help restore PDF'}
+            {encryptedExitKey ? (
+              <TouchableOpacity
+                style={{
+                  ...styles.bottomButton,
+                  opacity: encryptedExitKey ? 1 : 0.5,
+                }}
+                disabled={encryptedExitKey ? false : true}
+                onPress={() => {
+                  if (encryptedExitKey) {
+                    (ExitKeyQRBottomSheet as any).current.snapTo(1);
+                  }
+                }}
+              >
+                <Image
+                  source={require('../../assets/images/icons/icon_request.png')}
+                  style={styles.buttonImage}
+                />
+                <View>
+                  <Text style={styles.buttonText}>
+                    {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
                   </Text>
-                ) : null}
-              </View>
-            </TouchableOpacity>
+                  {encryptedExitKey ? (
+                    <Text numberOfLines={1} style={styles.buttonInfo}>
+                      {'Help restore PDF'}
+                    </Text>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            ) : null}
           </View>
         )}
       </View>
