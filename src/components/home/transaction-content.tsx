@@ -290,7 +290,7 @@ const TransactionsContent = ({
   }
 };
 
-export default memo(TransactionsContent);
+export default TransactionsContent;
 
 const styles = StyleSheet.create({
   modalContentContainer: {
