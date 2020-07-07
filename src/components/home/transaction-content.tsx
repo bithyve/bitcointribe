@@ -29,6 +29,7 @@ const TransactionsContent = ({
   setTransactionItem,
   setTabBarZIndex,
   transactionLoading,
+  isFromAccount
 }) => {
   if (transactionLoading) {
     return (
@@ -112,7 +113,7 @@ const TransactionsContent = ({
             style={{
               margin: 15,
               backgroundColor: Colors.backgroundColor,
-              marginBottom: hp('12%') + 15,
+              marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
               padding: 10,
               paddingTop: 20,
               paddingBottom: 20,
@@ -257,7 +258,7 @@ const TransactionsContent = ({
               style={{
                 margin: 15,
                 backgroundColor: Colors.backgroundColor,
-                marginBottom: AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
+                marginBottom: isFromAccount ? hp('3%') : AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
                 padding: 10,
                 paddingTop: 20,
                 paddingBottom: 20,
@@ -287,10 +288,48 @@ const TransactionsContent = ({
         </View>
       );
     }
+    else{
+      return <View style={styles.modalContentContainer}>
+        <View style={{ flex: 1 }}>
+        </View>
+        <View style={{ backgroundColor: Colors.white }}>
+          <View
+            style={{
+              margin: 15,
+              backgroundColor: Colors.backgroundColor,
+              marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
+              padding: 10,
+              paddingTop: 20,
+              paddingBottom: 20,
+              borderRadius: 7,
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.black,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              View your transactions here
+            </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              All your recent transactions across the accounts appear here
+            </Text>
+          </View>
+        </View>
+        </View>
+    }
   }
 };
 
-export default TransactionsContent;
+export default memo(TransactionsContent);
 
 const styles = StyleSheet.create({
   modalContentContainer: {

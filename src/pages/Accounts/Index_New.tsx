@@ -177,23 +177,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   wallet: any;
   balanceTxLoading: any;
   derivativeBalanceTxLoading: any;
-  dispatch: any;
   carousel: any;
-  TestAccountHelperBottomSheet: any;
-  bottomSheet: any;
-  SecureAccountHelperBottomSheet: any;
-  RegularAccountHelperBottomSheet: any;
-  TransactionDetailsBottomSheet: any;
-  TransactionDetailsHelperBottomSheet: any;
   constructor(props) {
     super(props);
     this.carousel = React.createRef<Carousel>();
-    this.TestAccountHelperBottomSheet = React.createRef<BottomSheet>();
-    this.bottomSheet = React.createRef<BottomSheet>();
-    this.SecureAccountHelperBottomSheet = React.createRef<BottomSheet>();
-    this.RegularAccountHelperBottomSheet = React.createRef<BottomSheet>();
-    this.TransactionDetailsBottomSheet = React.createRef<BottomSheet>();
-    this.TransactionDetailsHelperBottomSheet = React.createRef<BottomSheet>();
     this.sliderWidth = Dimensions.get('window').width;
     this.currencyCode = [
       'BRL',
@@ -246,7 +233,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       transactionLoading: true,
       transactions: [],
       averageTxFees: null,
-      exchangeRates: 0,
+      exchangeRates:  this.props.accounts.exchangeRates,
       transactionItem: {},
       isHelperDone: true,
       showLoader: true,
@@ -255,15 +242,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   }
 
   componentDidMount = () => {
-    console.log('this.carousel ', this.carousel);
-    console.log(
-      'this.TestAccountHelperBottomSheet',
-      this.TestAccountHelperBottomSheet,
-    );
     this.getBalance();
     let { serviceType } = this.state;
     let { accounts } = this.props;
-    console.log('accounts', accounts);
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
       accounts[serviceType].loading.derivativeBalanceTx;
@@ -373,10 +354,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       currentTransactions.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
-      console.log('currentTransactions', currentTransactions);
       this.setState({
         netBalance: currentBalance,
         transactions: currentTransactions,
+        transactionLoading: false,
       });
     }
   };
@@ -399,25 +380,18 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   componentDidUpdate = (prevProps) => {
-    // if (props.accounts.exchangeRates) setExchangeRates(props.accounts.exchangeRates);
+    if (prevProps.accounts.exchangeRates!==this.props.accounts.exchangeRates){
+      this.setState({exchangeRates: this.props.accounts.exchangeRates})
+    }
+    if(prevProps.accounts[this.state.serviceType].service!==this.props.accounts[this.state.serviceType].service){
+      this.getBalance();
+    }
+    if (prevProps.accounts.exchangeRates!== this.props.accounts.exchangeRates){
+      this.setState({exchangeRates: this.props.accounts.exchangeRates})
+    }
   };
 
   componentWillUnmount() {
-    // if (this.focusListener) {
-    //   this.focusListener();
-    // }
-    // if (this.unsubscribe) {
-    //   this.unsubscribe();
-    // }
-    // if (this.appStateListener) {
-    //   this.appStateListener();
-    // }
-    // if (this.firebaseNotificationListener) {
-    //   this.firebaseNotificationListener();
-    // }
-    // if (this.notificationOpenedListener) {
-    //   this.notificationOpenedListener();
-    // }
   }
 
   getServiceType = (serviceType) => {
@@ -453,7 +427,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       }, 10);
 
       setTimeout(() => {
-        this.TransactionDetailsHelperBottomSheet.current.snapTo(1);
+        (this.refs.TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -491,8 +465,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       }, 10);
 
       setTimeout(() => {
-        if ((this.TestAccountHelperBottomSheet as any).current) {
-          (this.TestAccountHelperBottomSheet as any).current.snapTo(1);
+        if (((this.refs.TestAccountHelperBottomSheet as any) as any).current) {
+          ((this.refs.TestAccountHelperBottomSheet as any) as any).current.snapTo(1);
         }
       }, 1000);
     } else {
@@ -609,14 +583,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               }}
               onPress={() => {
                 if (item.accountType == 'Test Account') {
-                  if (this.TestAccountHelperBottomSheet.current)
-                    this.TestAccountHelperBottomSheet.current.snapTo(1);
+                  if ((this.refs.TestAccountHelperBottomSheet as any).current)
+                    (this.refs.TestAccountHelperBottomSheet as any).current.snapTo(1);
                 } else if (item.accountType == 'Savings Account') {
-                  if (this.SecureAccountHelperBottomSheet.current)
-                    this.SecureAccountHelperBottomSheet.current.snapTo(1);
+                  if ((this.refs.SecureAccountHelperBottomSheet as any).current)
+                    (this.refs.SecureAccountHelperBottomSheet as any).current.snapTo(1);
                 } else if (item.accountType == 'Checking Account') {
-                  if (this.RegularAccountHelperBottomSheet.current)
-                    this.RegularAccountHelperBottomSheet.current.snapTo(1);
+                  if ((this.refs.RegularAccountHelperBottomSheet as any).current)
+                    (this.refs.RegularAccountHelperBottomSheet as any).current.snapTo(1);
                 }
               }}
             >
@@ -953,12 +927,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               </View>
               <TouchableWithoutFeedback
                 onPress={() => {
-                  if (this.TestAccountHelperBottomSheet.current)
-                    this.TestAccountHelperBottomSheet.current.snapTo(0);
-                  if (this.RegularAccountHelperBottomSheet.current)
-                    this.RegularAccountHelperBottomSheet.current.snapTo(0);
-                  if (this.SecureAccountHelperBottomSheet.current)
-                    this.SecureAccountHelperBottomSheet.current.snapTo(0);
+                  if ((this.refs.TestAccountHelperBottomSheet as any).current)
+                    (this.refs.TestAccountHelperBottomSheet as any).current.snapTo(0);
+                  if ((this.refs.RegularAccountHelperBottomSheet as any).current)
+                    (this.refs.RegularAccountHelperBottomSheet as any).current.snapTo(0);
+                  if ((this.refs.SecureAccountHelperBottomSheet as any).current)
+                    (this.refs.SecureAccountHelperBottomSheet as any).current.snapTo(0);
                 }}
               >
                 <View>
@@ -983,8 +957,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     </Text>
                     <Text
                       onPress={() => {
-                        if (this.bottomSheet.current)
-                          this.bottomSheet.current.snapTo(1);
+                        if ((this.refs.bottomSheet as any))
+                          (this.refs.bottomSheet as any).snapTo(1);
                       }}
                       style={{
                         color: Colors.textColorGrey,
@@ -1013,7 +987,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                           <TouchableOpacity
                             onPress={
                               () => {
-                                this.TransactionDetailsBottomSheet.current.snapTo(
+                                (this.refs.TransactionDetailsBottomSheet as any).current.snapTo(
                                   1,
                                 );
                                 this.checkNShowHelperModal();
@@ -1218,12 +1192,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               </TouchableWithoutFeedback>
               {/* <TouchableWithoutFeedback
                 onPress={() => {
-                  if (this.TestAccountHelperBottomSheet.current)
-                    this.TestAccountHelperBottomSheet.current.snapTo(0);
-                  if (this.RegularAccountHelperBottomSheet.current)
-                    this.RegularAccountHelperBottomSheet.current.snapTo(0);
-                  if (this.SecureAccountHelperBottomSheet.current)
-                    this.SecureAccountHelperBottomSheet.current.snapTo(0);
+                  if ((this.refs.TestAccountHelperBottomSheet as any).current)
+                    (this.refs.TestAccountHelperBottomSheet as any).current.snapTo(0);
+                  if ((this.refs.RegularAccountHelperBottomSheet as any).current)
+                    (this.refs.RegularAccountHelperBottomSheet as any).current.snapTo(0);
+                  if ((this.refs.SecureAccountHelperBottomSheet as any).current)
+                    (this.refs.SecureAccountHelperBottomSheet as any).current.snapTo(0);
                 }}
               > */}
               <View style={{ marginTop: hp('2%') }}>
@@ -1384,15 +1358,16 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
             <BottomSheet
               enabledInnerScrolling={true}
-              ref={this.bottomSheet}
+              ref={'bottomSheet'}
               snapPoints={[
                 -50,
                 Platform.OS == 'ios' && DeviceInfo.hasNotch()
                   ? hp('60%')
                   : hp('60%'),
               ]}
-              renderContent={() => (
-                <TransactionsContent
+              renderContent={() => {
+                return (<TransactionsContent
+                  isFromAccount={true}
                   transactionLoading={transactionLoading}
                   transactions={transactions}
                   AtCloseEnd={false}
@@ -1403,19 +1378,20 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     this.setState({ tabBarIndex: index })
                   }
                   TransactionDetailsBottomSheet={
-                    this.TransactionDetailsBottomSheet
+                    (this.refs.TransactionDetailsBottomSheet as any)
                   }
-                />
-              )}
+                />)
+              }}
               renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.white}
-                  backgroundColor={Colors.white}
-                  onPressHeader={() => {
-                    if (this.bottomSheet.current)
-                      this.bottomSheet.current.snapTo(0);
-                  }}
-                />
+                <TouchableOpacity
+                  activeOpacity={10}
+                  onPress={() => {if ((this.refs.bottomSheet as any))
+                    (this.refs.bottomSheet as any).snapTo(0);}}
+                  style={styles.transactionModalHeaderContainer}
+                >
+                  <View style={styles.transactionModalHeaderHandle} />
+                  <Text style={styles.transactionModalHeaderTitleText}>{'Transactions'}</Text>
+                </TouchableOpacity>
               )}
             />
 
@@ -1437,7 +1413,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
               }}
               enabledInnerScrolling={true}
-              ref={this.TestAccountHelperBottomSheet}
+              ref={'TestAccountHelperBottomSheet'}
               snapPoints={[
                 -50,
                 Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1454,16 +1430,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   borderColor={Colors.blue}
                   backgroundColor={Colors.blue}
                   onPressHeader={() => {
-                    //console.log('isTestHelperDone', isTestHelperDone);
                     if (isTestHelperDone) {
-                      if (this.TestAccountHelperBottomSheet.current)
-                        this.TestAccountHelperBottomSheet.current.snapTo(1);
+                      if ((this.refs.TestAccountHelperBottomSheet as any).current)
+                        (this.refs.TestAccountHelperBottomSheet as any).current.snapTo(1);
                       setTimeout(() => {
                         this.setState({ isTestHelperDone: false });
                       }, 10);
                     } else {
-                      if (this.TestAccountHelperBottomSheet.current)
-                        this.TestAccountHelperBottomSheet.current.snapTo(0);
+                      if ((this.refs.TestAccountHelperBottomSheet as any).current)
+                        (this.refs.TestAccountHelperBottomSheet as any).current.snapTo(0);
                     }
                   }}
                 />
@@ -1471,7 +1446,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             />
             <BottomSheet
               enabledInnerScrolling={true}
-              ref={this.SecureAccountHelperBottomSheet}
+              ref={'SecureAccountHelperBottomSheet'}
               snapPoints={[
                 -50,
                 Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1485,14 +1460,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   backgroundColor={Colors.blue}
                   onPressHeader={() => {
                     if (isSecureAccountHelperDone) {
-                      if (this.SecureAccountHelperBottomSheet.current)
-                        this.SecureAccountHelperBottomSheet.current.snapTo(1);
+                      if ((this.refs.SecureAccountHelperBottomSheet as any).current)
+                        (this.refs.SecureAccountHelperBottomSheet as any).current.snapTo(1);
                       setTimeout(() => {
                         this.setState({ isSecureAccountHelperDone: false });
                       }, 10);
                     } else {
-                      if (this.SecureAccountHelperBottomSheet.current)
-                        this.SecureAccountHelperBottomSheet.current.snapTo(0);
+                      if ((this.refs.SecureAccountHelperBottomSheet as any).current)
+                        (this.refs.SecureAccountHelperBottomSheet as any).current.snapTo(0);
                     }
                   }}
                 />
@@ -1500,7 +1475,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             />
             <BottomSheet
               enabledInnerScrolling={true}
-              ref={this.RegularAccountHelperBottomSheet}
+              ref={'RegularAccountHelperBottomSheet'}
               snapPoints={[
                 -50,
                 Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1513,16 +1488,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   borderColor={Colors.blue}
                   backgroundColor={Colors.blue}
                   onPressHeader={() => {
-                    //console.log('isRegularAccountHelperDone', isRegularAccountHelperDone);
                     if (isRegularAccountHelperDone) {
-                      if (this.RegularAccountHelperBottomSheet.current)
-                        this.RegularAccountHelperBottomSheet.current.snapTo(1);
+                      if ((this.refs.RegularAccountHelperBottomSheet as any).current)
+                        (this.refs.RegularAccountHelperBottomSheet as any).current.snapTo(1);
                       setTimeout(() => {
                         this.setState({ isRegularAccountHelperDone: false });
                       }, 10);
                     } else {
-                      if (this.RegularAccountHelperBottomSheet.current)
-                        this.RegularAccountHelperBottomSheet.current.snapTo(0);
+                      if ((this.refs.RegularAccountHelperBottomSheet as any).current)
+                        (this.refs.RegularAccountHelperBottomSheet as any).current.snapTo(0);
                     }
                   }}
                 />
@@ -1530,7 +1504,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             />
             <BottomSheet
               enabledInnerScrolling={true}
-              ref={this.TransactionDetailsBottomSheet}
+              ref={'TransactionDetailsBottomSheet'}
               snapPoints={[
                 -50,
                 Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1544,7 +1518,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   getServiceType={this.getServiceType}
                   onPressKnowMore={() => {
                     AsyncStorage.setItem('isTransactionHelperDone', 'true');
-                    this.TransactionDetailsHelperBottomSheet.current.snapTo(1);
+                    (this.refs.TransactionDetailsHelperBottomSheet as any).current.snapTo(1);
                   }}
                 />
               )}
@@ -1553,8 +1527,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   borderColor={Colors.white}
                   backgroundColor={Colors.white}
                   onPressHeader={() => {
-                    if (this.TransactionDetailsBottomSheet.current)
-                      this.TransactionDetailsBottomSheet.current.snapTo(0);
+                    if ((this.refs.TransactionDetailsBottomSheet as any).current)
+                      (this.refs.TransactionDetailsBottomSheet as any).current.snapTo(0);
                   }}
                 />
               )}
@@ -1562,7 +1536,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
             <BottomSheet
               enabledInnerScrolling={true}
-              ref={this.TransactionDetailsHelperBottomSheet}
+              ref={'TransactionDetailsHelperBottomSheet'}
               snapPoints={[
                 -50,
                 Platform.OS == 'ios' && deviceInfoModule.hasNotch()
@@ -1578,16 +1552,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   borderColor={Colors.blue}
                   backgroundColor={Colors.blue}
                   onPressHeader={() => {
-                    //console.log('isHelperDone', isHelperDone);
                     if (isHelperDone) {
-                      this.TransactionDetailsHelperBottomSheet.current.snapTo(
+                      (this.refs.TransactionDetailsHelperBottomSheet as any).current.snapTo(
                         1,
                       );
                       setTimeout(() => {
                         this.setState({ isHelperDone: false });
                       }, 10);
                     } else {
-                      this.TransactionDetailsHelperBottomSheet.current.snapTo(
+                      (this.refs.TransactionDetailsHelperBottomSheet as any).current.snapTo(
                         0,
                       );
                     }
@@ -1817,5 +1790,39 @@ const styles = StyleSheet.create({
     fontSize: 10,
     backgroundColor: 'transparent',
     color: '#FFFFFF',
+  },
+  transactionModalHeaderContainer: {
+    backgroundColor: Colors.white,
+    marginTop: 'auto',
+    flex: 1,
+    height:
+      Platform.OS == 'ios' && DeviceInfo.hasNotch()
+        ? 50
+        : Platform.OS == 'android'
+        ? 43
+        : 40,
+    borderTopLeftRadius: 10,
+    borderLeftColor: Colors.borderColor,
+    borderLeftWidth: 1,
+    borderTopRightRadius: 10,
+    borderRightColor: Colors.borderColor,
+    borderRightWidth: 1,
+    borderTopColor: Colors.borderColor,
+    borderTopWidth: 1,
+    zIndex: 9999,
+  },
+  transactionModalHeaderHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: 7,
+  },
+  transactionModalHeaderTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue(18),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 15,
   },
 });
