@@ -138,7 +138,7 @@ const ResetTwoFAHelp = (props) => {
     return (
       <QRModal
         QRModalHeader={QRModalHeader}
-        title={'Scan the Regenerate/ Exit Key'}
+        title={'Scan the Regenerate/Exit Key'}
         infoText={
           'This can be found on the last page of your PDF personal copy'
         }
