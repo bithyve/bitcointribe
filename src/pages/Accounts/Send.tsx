@@ -208,7 +208,10 @@ export default function Send(props) {
   }, []);
 
   const twoFASetupMethod = async () => {
-    if (!(await AsyncStorage.getItem('twoFASetup'))) {
+    if (
+      !(await AsyncStorage.getItem('twoFASetup')) &&
+      service.secureHDWallet.twoFASetup
+    ) {
       props.navigation.navigate('TwoFASetup', {
         twoFASetup: service.secureHDWallet.twoFASetup,
       });
