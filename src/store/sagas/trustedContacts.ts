@@ -413,6 +413,33 @@ export function* trustedChannelsSyncWorker() {
             }
           }
         }
+      } else {
+        const accountNumber =
+          regularService.hdWallet.trustedContactToDA[contactName];
+        if (accountNumber) {
+          const { contactDetails } = regularService.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ][accountNumber] as TrustedContactDerivativeAccountElements;
+          if (!contactDetails || !contactDetails.xpub) {
+            const contactsData = trustedChannel.data[1].data;
+            if (contactsData && contactsData.xpub) {
+              (regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+                accountNumber
+              ] as TrustedContactDerivativeAccountElements).contactDetails = {
+                xpub: contactsData.xpub,
+              };
+
+              console.log(
+                `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
+              );
+            } else {
+              console.log(
+                'Missing xpub corresponding to contact: ',
+                contactName,
+              );
+            }
+          }
+        }
       }
     } else {
       // generate a corresponding derivative acc and assign xpub
