@@ -977,7 +977,8 @@ export default class Bitcoin {
     type: string;
   } => {
     if (this.isPaymentURI(scannedStr)) {
-      return { type: 'paymentURI' };
+      const { address } = this.decodePaymentURI(scannedStr);
+      if (this.isValidAddress(address)) return { type: 'paymentURI' };
     } else if (this.isValidAddress(scannedStr)) {
       return { type: 'address' };
     }
