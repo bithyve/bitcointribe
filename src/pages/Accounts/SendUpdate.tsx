@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {Component } from 'react';
 import {
   View,
   Image,
@@ -27,7 +27,6 @@ import {
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { useDispatch, useSelector } from 'react-redux';
 import DeviceInfo from 'react-native-device-info';
 import BottomSheet from 'reanimated-bottom-sheet';
 import {
@@ -55,191 +54,359 @@ import Loader from '../../components/loader';
 import QRCodeThumbnail from './QRCodeThumbnail';
 import ContactListSend from './ContactListSend';
 import AccountsListSend from './AccountsListSend';
+import { connect } from 'react-redux';
+import { withNavigationFocus } from 'react-navigation';
+import idx from 'idx';
 
-export default function Send(props) {
-  const dispatch = useDispatch();
-  let [trustedContacts, setTrustedContacts] = useState([]);
-  let [isLoading, setIsLoading] = useState(true);
-  const [openCameraFlag, setOpenCameraFlag] = useState(false);
-  const [averageTxFees, setAverageTxFees] = useState(
-    props.navigation.getParam('averageTxFees'),
-  );
-  const [serviceType, setServiceType] = useState(
-    props.navigation.getParam('serviceType')
-      ? props.navigation.getParam('serviceType')
-      : REGULAR_ACCOUNT,
-  );
-  const sweepSecure = props.navigation.getParam('sweepSecure');
-  let netBalance = props.navigation.getParam('netBalance');
+interface SendPropsTypes {
+  navigation: any;
+  addTransferDetails: any;
+  removeTwoFA: any;
+  clearTransfer: any;
+  regularAccount: RegularAccount;
+  trustedContactsService: TrustedContactsService;
+  service: any;
+  transfer: any;
+  accounts: any;
 
-  const service = useSelector((state) => state.accounts[serviceType].service);
-  const transfer = useSelector((state) => state.accounts[serviceType].transfer);
+}
 
-  const getServiceType = props.navigation.getParam('getServiceType')
-    ? props.navigation.getParam('getServiceType')
-    : null;
-  const [recipientAddress, setRecipientAddress] = useState('');
-  const [isSendHelperDone, setIsSendHelperDone] = useState(true);
-  const [isInvalidAddress, setIsInvalidAddress] = useState(false);
-  const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
-    React.createRef<BottomSheet>(),
-  );
-  const [balances, setBalances] = useState({
-    testBalance: 0,
-    regularBalance: 0,
-    secureBalance: 0,
-  });
-  const [filterContactData, setFilterContactData] = useState([]);
-  const accounts = useSelector((state) => state.accounts);
-  useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    let regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    let secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
-      : 0;
+interface SendStateTypes {
+  trustedContacts: any[],
+  isLoading: boolean,
+  openCameraFlag: boolean,
+  serviceType: string,
+  recipientAddress: string,
+  isSendHelperDone: boolean,
+  isInvalidAddress: boolean,
+  balances: any;
+  isEditable: boolean,
+  accountData: any[],
+  sweepSecure: any,
+  netBalance: any,
+  getServiceType: any,
+  averageTxFees: any,
+}
 
-    let derivativeBalance = 0;
-    if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-        let derivativeAccount;
+class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      trustedContacts: [],
+      isLoading: true,
+      openCameraFlag: false,
+      serviceType: this.props.navigation.getParam('serviceType') ? this.props.navigation.getParam('serviceType') : REGULAR_ACCOUNT,
+      sweepSecure: this.props.navigation.getParam('sweepSecure'),
+      netBalance: this.props.navigation.getParam('netBalance'),
+      averageTxFees: this.props.navigation.getParam('averageTxFees'),
+      recipientAddress: '',
+      isSendHelperDone: true,
+      isInvalidAddress: false,
+      isEditable: true,
+      balances: {
+        testBalance: 0,
+        regularBalance: 0,
+        secureBalance: 0,
+      },
+      accountData: [
+        {
+          id: REGULAR_ACCOUNT,
+          account_name: 'Checking Account',
+          type: REGULAR_ACCOUNT,
+          checked: false,
+          image: require('../../assets/images/icons/icon_regular_account.png'),
+        },
+        {
+          id: SECURE_ACCOUNT,
+          account_name: 'Savings Account',
+          type: SECURE_ACCOUNT,
+          checked: false,
+          image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+        },
+      ],
+     getServiceType: this.props.navigation.getParam('getServiceType') ? this.props.navigation.getParam('getServiceType') : null,
 
-        // calculating opposite accounts derivative balance for account tiles
-        if (serviceType !== REGULAR_ACCOUNT) {
-          derivativeAccount =
-            accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-              dAccountType
-            ];
-        } else if (serviceType !== SECURE_ACCOUNT) {
-          derivativeAccount =
-            accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-              dAccountType
-            ];
-        }
-
-        if (
-          serviceType !== SECURE_ACCOUNT &&
-          dAccountType === TRUSTED_CONTACTS
-        ) {
-          continue;
-        }
-
-        if (derivativeAccount.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= derivativeAccount.instance.using;
-            accountNumber++
-          ) {
-            // console.log({
-            //   accountNumber,
-            //   balances: trustedAccounts[accountNumber].balances,
-            //   transactions: trustedAccounts[accountNumber].transactions,
-            // });
-            if (derivativeAccount[accountNumber].balances) {
-              derivativeBalance +=
-                derivativeAccount[accountNumber].balances.balance +
-                derivativeAccount[accountNumber].balances.unconfirmedBalance;
-            }
-          }
-        }
-      }
     }
+  }
 
-    if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
-    else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
-    setBalances({
-      testBalance,
-      regularBalance,
-      secureBalance,
-    });
-  }, [accounts]);
+  componentDidMount = () => {
+    this.getBalances();
+    if (this.state.serviceType === SECURE_ACCOUNT) this.twoFASetupMethod();
+    this.checkNShowHelperModal();
+    this.setRecipientAddress();
+    if (!this.state.averageTxFees) this.storeAverageTxFees();
+    if(this.props.regularAccount.hdWallet.derivativeAccounts) this.updateAddressBook();
 
-  const [isEditable, setIsEditable] = useState(true);
-  const [accountData, setAccountData] = useState([
-    {
-      id: REGULAR_ACCOUNT,
-      account_name: 'Checking Account',
-      type: REGULAR_ACCOUNT,
-      checked: false,
-      image: require('../../assets/images/icons/icon_regular_account.png'),
-    },
-    {
-      id: SECURE_ACCOUNT,
-      account_name: 'Savings Account',
-      type: SECURE_ACCOUNT,
-      checked: false,
-      image: require('../../assets/images/icons/icon_secureaccount_white.png'),
-    },
-    // {
-    //   id: '3',
-    //   account_name: 'Test Account',
-    //   type: TEST_ACCOUNT,
-    //   checked: false,
-    //   image: require('../../assets/images/icons/icon_test_white.png'),
-    // },
-  ]);
-  const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  const trustedContactsService: TrustedContactsService = useSelector(
-    (state) => state.trustedContacts.service,
-  );
-
-  useEffect(() => {
-    if (serviceType === SECURE_ACCOUNT) twoFASetupMethod();
-    checkNShowHelperModal();
-    if (!averageTxFees) storeAverageTxFees();
-    if (isLoading) {
+    if (this.state.isLoading) {
       InteractionManager.runAfterInteractions(() => {
         setTimeout(() => {
-          setIsLoading(false);
+          this.setState({isLoading: false});
         }, 2000);
       });
       InteractionManager.setDeadline(3);
     }
-  }, []);
+  }
 
-  const twoFASetupMethod = async () => {
-    if (
-      !(await AsyncStorage.getItem('twoFASetup')) &&
-      service.secureHDWallet.twoFASetup
-    ) {
-      props.navigation.navigate('TwoFASetup', {
-        twoFASetup: service.secureHDWallet.twoFASetup,
-      });
-      dispatch(removeTwoFA());
-      await AsyncStorage.setItem('twoFASetup', 'true');
+  componentDidUpdate = (prevProps, prevState) => {
+    if (prevProps.accounts !== this.props.accounts) {
+      this.getBalances();
+    }
+
+    if (prevProps.service[this.state.serviceType].service !== this.props.service[this.state.serviceType].service) {
+      this.storeAverageTxFees();
+    }
+    if(prevProps.regularAccount.hdWallet.derivativeAccounts !== this.props.regularAccount.hdWallet.derivativeAccounts){
+      this.updateAddressBook();
+    }
+
+    if (prevState.recipientAddress !== this.state.recipientAddress) {
+      this.setRecipientAddress();
+    }
+  }
+
+  getBalances = () =>{
+    const { accounts } = this.props;
+    const { serviceType } = this.state;
+
+    const testBalance = accounts[TEST_ACCOUNT].service
+    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  let regularBalance = accounts[REGULAR_ACCOUNT].service
+    ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+    : 0;
+  let secureBalance = accounts[SECURE_ACCOUNT].service
+    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
+    : 0;
+
+  let derivativeBalance = 0;
+  if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      let derivativeAccount;
+
+      // calculating opposite accounts derivative balance for account tiles
+      if (serviceType !== REGULAR_ACCOUNT) {
+        derivativeAccount =
+          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+            dAccountType
+          ];
+      } else if (serviceType !== SECURE_ACCOUNT) {
+        derivativeAccount =
+          accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+            dAccountType
+          ];
+      }
+
+      if (
+        serviceType !== SECURE_ACCOUNT &&
+        dAccountType === TRUSTED_CONTACTS
+      ) {
+        continue;
+      }
+
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            derivativeBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
+  }
+
+  if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
+  else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
+  this.setState({
+    balances: {
+    testBalance,
+    regularBalance,
+    secureBalance,
+  }
+});
+  }
+
+  checkNShowHelperModal = async () => {
+    let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
+    if (!isSendHelperDone && this.state.serviceType == TEST_ACCOUNT) {
+      await AsyncStorage.setItem('isSendHelperDone', 'true');
+      setTimeout(() => {
+        this.setState({ isSendHelperDone : true });
+      }, 10);
+      setTimeout(() => {
+        if (this.refs.SendHelperBottomSheet)
+        (this.refs.SendHelperBottomSheet as any).snapTo(1);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        this.setState({ isSendHelperDone : false });
+      }, 10);
     }
   };
 
-  const storeAverageTxFees = async () => {
+  setRecipientAddress = () => {
+    const { service } = this.props;
+    const { recipientAddress, serviceType } = this.state;
+    const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
+    console.log("instance setRecipientAddress", instance);
+    let isAddressValid = instance.isValidAddress(recipientAddress);
+    console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
+    if (isAddressValid) {
+      let item = {
+        id: recipientAddress, // address serves as the id during manual addition
+      };
+      this.onSelectContact(item);
+    }
+  }
+
+  barcodeRecognized = async (barcodes) => {
+    const { service } = this.props;
+    const {serviceType,
+      sweepSecure,
+      netBalance,} = this.state;
+    console.log('barcodes', barcodes);
+    if (barcodes.data) {
+      const { type } = service[serviceType].service.addressDiff(barcodes.data);
+      if (type) {
+        let item;
+        switch (type) {
+          case 'address':
+            const recipientAddress = barcodes.data;
+            item = {
+              id: recipientAddress,
+            };
+            this.onSelectContact(item);
+            break;
+
+          case 'paymentURI':
+            const { address, options } = service[serviceType].service.decodePaymentURI(
+              barcodes.data,
+            );
+            item = {
+              id: address,
+            };
+
+            this.props.addTransferDetails(serviceType, {
+                selectedContact: item,
+              });
+
+            this.props.navigation.navigate('SendToContact', {
+              selectedContact: item,
+              serviceType,
+              sweepSecure,
+              netBalance,
+              bitcoinAmount: options.amount ? `${options.amount}` : '',
+            });
+            break;
+
+          default:
+            Toast('Invalid QR');
+            break;
+        }
+
+        this.setState({ openCameraFlag : false });
+      } else {
+        this.setState({ isInvalidAddress: true });
+      }
+    }
+  };
+
+  onSelectContact = (item, bitcoinAmount?) => {
+    const {transfer} = this.props;
+    const {serviceType, averageTxFees, sweepSecure, netBalance,} = this.state;
+
+    let isNavigate = true;
+    console.log({ details: transfer[serviceType].transfer.details });
+    if (transfer[serviceType].transfer.details && transfer[serviceType].transfer.details.length === 0) {
+      console.log('dispatching');
+      this.props.addTransferDetails(serviceType, {
+          selectedContact: item,
+        });
+        this.setState({recipientAddress: ''})
+      this.props.navigation.navigate('SendToContact', {
+        selectedContact: item,
+        serviceType,
+        averageTxFees,
+        sweepSecure,
+        netBalance,
+        bitcoinAmount,
+      });
+    } else {
+      transfer[serviceType].transfer.details.length &&
+        transfer[serviceType].transfer.details.map((contact) => {
+          if (contact.selectedContact.id === item.id) {
+            return (isNavigate = false);
+          }
+        });
+      if (isNavigate) {
+        this.props.addTransferDetails(serviceType, {
+            selectedContact: item,
+          });
+          this.setState({recipientAddress: ''});
+        this.props.navigation.navigate('SendToContact', {
+          selectedContact: item,
+          serviceType,
+          averageTxFees,
+          sweepSecure,
+          netBalance,
+          bitcoinAmount,
+        });
+      }
+    }
+  };
+
+  twoFASetupMethod = async () => {
+    const { service } = this.props;
+    if (!(await AsyncStorage.getItem('twoFASetup') &&
+      service[this.state.serviceType].service.secureHDWallet.twoFASetup)) {
+      this.props.navigation.navigate('TwoFASetup', {
+        twoFASetup: service[this.state.serviceType].service.secureHDWallet.twoFASetup,
+      });
+      this.props.removeTwoFA();
+      await AsyncStorage.setItem('twoFASetup', 'true');
+    }
+  }
+
+  storeAverageTxFees = async () => {
+    const { service } = this.props;
+    const { serviceType } = this.state;
     const storedAverageTxFees = await AsyncStorage.getItem(
       'storedAverageTxFees',
     );
     if (storedAverageTxFees) {
       const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
       if (Date.now() - lastFetched < 1800000) {
-        setAverageTxFees(averageTxFees);
+        this.setState({ averageTxFees : averageTxFees});
         return;
       } // maintaining a half an hour difference b/w fetches
     }
-    const instance = service.hdWallet || service.secureHDWallet;
+    const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
+    console.log("instance storeAverageTxFees", instance, service[serviceType].service.hdWallet);
+
     const averageTxFees = await instance.averageTransactionFee();
-    setAverageTxFees(averageTxFees);
+    this.setState({ averageTxFees : averageTxFees});
     await AsyncStorage.setItem(
       'storedAverageTxFees',
       JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
     );
   };
 
-  const updateAddressBook = async () => {
+  updateAddressBook = async () => {
+    const {regularAccount, trustedContactsService}= this.props;
     let trustedContactsInfo: any = await AsyncStorage.getItem(
       'TrustedContactsInfo',
     );
@@ -315,169 +482,40 @@ export default function Send(props) {
           }
           return 0;
         });
-        setTrustedContacts(sortedTrustedContacts);
+        this.setState({ trustedContacts : sortedTrustedContacts});
       }
     }
-  };
+  }
 
-  useEffect(() => {
-    updateAddressBook();
-  }, [regularAccount.hdWallet.derivativeAccounts]);
-
-  const checkNShowHelperModal = async () => {
-    let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
-    if (!isSendHelperDone && serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isSendHelperDone', 'true');
-      setTimeout(() => {
-        setIsSendHelperDone(true);
-      }, 10);
-      setTimeout(() => {
-        if (SendHelperBottomSheet.current)
-          SendHelperBottomSheet.current.snapTo(1);
-      }, 1000);
-    } else {
-      setTimeout(() => {
-        setIsSendHelperDone(false);
-      }, 10);
-    }
-  };
-  
-  useEffect(() => {
-    const { type } = service.addressDiff(recipientAddress);
-    if (type) {
-      let item;
-      switch (type) {
-        case 'address':
-          item = {
-            id: recipientAddress, // address serves as the id during manual addition
-          };
-          onSelectContact(item);
-          break;
-
-        case 'paymentURI':
-          const { address, options } = service.decodePaymentURI(
-            recipientAddress,
-          );
-          item = {
-            id: address,
-          };
-
-          dispatch(
-            addTransferDetails(serviceType, {
-              selectedContact: item,
-            }),
-          );
-
-          props.navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-            sweepSecure,
-            netBalance,
-            bitcoinAmount: options.amount ? `${options.amount}` : '',
-          });
-          break;
-      }
-    }
-  }, [recipientAddress]);
-
-  const barcodeRecognized = async (barcodes) => {
-    console.log('barcodes', barcodes);
-    if (barcodes.data) {
-      const { type } = service.addressDiff(barcodes.data);
-      if (type) {
-        let item;
-        switch (type) {
-          case 'address':
-            const recipientAddress = barcodes.data;
-            item = {
-              id: recipientAddress,
-            };
-            onSelectContact(item);
-            break;
-
-          case 'paymentURI':
-            const { address, options } = service.decodePaymentURI(
-              barcodes.data,
-            );
-            item = {
-              id: address,
-            };
-
-            dispatch(
-              addTransferDetails(serviceType, {
-                selectedContact: item,
-              }),
-            );
-
-            props.navigation.navigate('SendToContact', {
-              selectedContact: item,
-              serviceType,
-              sweepSecure,
-              netBalance,
-              bitcoinAmount: options.amount ? `${options.amount}` : '',
-            });
-            break;
-
-          default:
-            Toast('Invalid QR');
-            break;
-        }
-
-        setOpenCameraFlag(false);
-      } else {
-        setIsInvalidAddress(true);
-      }
-    }
-  };
-
-  const onSelectContact = (item, bitcoinAmount?) => {
-    let isNavigate = true;
-    console.log({ details: transfer.details });
-    if (transfer.details && transfer.details.length === 0) {
-      console.log('dispatching');
-      dispatch(
-        addTransferDetails(serviceType, {
-          selectedContact: item,
-        }),
-      );
-      setRecipientAddress('');
-
-      props.navigation.navigate('SendToContact', {
-        selectedContact: item,
-        serviceType,
-        averageTxFees,
-        sweepSecure,
-        netBalance,
-        bitcoinAmount,
-      });
-    } else {
-      transfer.details.length &&
-        transfer.details.map((contact) => {
-          if (contact.selectedContact.id === item.id) {
-            return (isNavigate = false);
-          }
-        });
-      if (isNavigate) {
-        dispatch(
-          addTransferDetails(serviceType, {
-            selectedContact: item,
-          }),
-        );
-        setRecipientAddress('');
-        props.navigation.navigate('SendToContact', {
-          selectedContact: item,
-          serviceType,
-          averageTxFees,
-          sweepSecure,
-          netBalance,
-          bitcoinAmount,
-        });
-      }
-    }
-  };
-
-  return (
-    <View style={{ flex: 1 }}>
+  render() {
+    const {
+      trustedContacts,
+  isLoading,
+  openCameraFlag,
+  serviceType,
+  recipientAddress,
+  isSendHelperDone,
+  isInvalidAddress,
+  balances,
+  isEditable,
+  accountData,
+  sweepSecure,
+  netBalance,
+  averageTxFees,
+  getServiceType,
+    } = this.state;
+    const {
+      navigation,
+      addTransferDetails,
+      removeTwoFA,
+      clearTransfer,
+      regularAccount,
+      trustedContactsService,
+      service,
+      transfer,
+      accounts,
+    } = this.props;
+    return (<View style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 0 }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContentContainer}>
@@ -501,8 +539,8 @@ export default function Send(props) {
                       if (getServiceType) {
                         getServiceType(serviceType);
                       }
-                      dispatch(clearTransfer(serviceType));
-                      props.navigation.goBack();
+                      clearTransfer(serviceType);
+                      this.props.navigation.goBack();
                     }}
                     style={{
                       height: 30,
@@ -546,8 +584,8 @@ export default function Send(props) {
                     <Text
                       onPress={() => {
                         AsyncStorage.setItem('isSendHelperDone', 'true');
-                        if (SendHelperBottomSheet.current)
-                          SendHelperBottomSheet.current.snapTo(1);
+                        if (this.refs.SendHelperBottomSheet)
+                        (this.refs.SendHelperBottomSheet as any).snapTo(1);
                       }}
                       style={{
                         color: Colors.textColorGrey,
@@ -562,7 +600,7 @@ export default function Send(props) {
               </View>
               <QRCodeThumbnail
                 isOpenCameraFlag={openCameraFlag}
-                onQrScan={(qrData) => barcodeRecognized(qrData)}
+                onQrScan={(qrData) => this.barcodeRecognized(qrData)}
               />
               <View
                 style={{
@@ -582,31 +620,29 @@ export default function Send(props) {
                         : 'visible-password'
                     }
                     value={recipientAddress}
-                    onChangeText={setRecipientAddress}
+                    onChangeText={(text)=>this.setState({recipientAddress: text})}
                     placeholderTextColor={Colors.borderColor}
                     onKeyPress={(e) => {
                       if (e.nativeEvent.key === 'Backspace') {
                         setTimeout(() => {
-                          setIsInvalidAddress(false);
+                          this.setState({isInvalidAddress: false});
                         }, 10);
                       }
                     }}
                     onBlur={() => {
                       const instance =
-                        service.hdWallet || service.secureHDWallet;
+                        service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
                       let isAddressValid = instance.isValidAddress(
                         recipientAddress,
                       );
-                      setIsInvalidAddress(!isAddressValid);
+                      this.setState({ isInvalidAddress: !isAddressValid });
                     }}
                   />
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
                   <TouchableOpacity
                     onPress={() => {
-                      setRecipientAddress(
-                        '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8',
-                      );
+                      this.setState({ recipientAddress: '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8' });
                     }}
                     style={{ padding: wp('2%'), marginLeft: 'auto' }}
                   >
@@ -701,11 +737,11 @@ export default function Send(props) {
                             renderItem={(Items) => (
                               <ContactListSend
                                 Items={Items.item}
-                                transfer={transfer}
-                                onSelectContact={onSelectContact}
+                                transfer={transfer[serviceType].transfer}
+                                onSelectContact={this.onSelectContact}
                               />
                             )}
-                            extraData={transfer.details}
+                            extraData={transfer[serviceType].transfer.details}
                             keyExtractor={(item, index) => index.toString()}
                           />
                         </View>
@@ -793,8 +829,8 @@ export default function Send(props) {
                         showsVerticalScrollIndicator={false}
                         renderItem={(Items) => {
                           let checked = false;
-                          for (let i = 0; i < transfer.details.length; i++) {
-                            const element = transfer.details[i].selectedContact;
+                          for (let i = 0; i < transfer[serviceType].transfer.details.length; i++) {
+                            const element = transfer[serviceType].transfer.details[i].selectedContact;
                             if (element.id == Items.item.id) {
                               checked = true;
                             }
@@ -805,12 +841,12 @@ export default function Send(props) {
                                 accounts={Items.item}
                                 balances={balances}
                                 checkedItem={checked}
-                                onSelectContact={onSelectContact}
+                                onSelectContact={this.onSelectContact}
                               />
                             );
                           }
                         }}
-                        extraData={{ details: transfer.details, balances }}
+                        extraData={{ details: transfer[serviceType].transfer.details, balances }}
                         //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
@@ -824,35 +860,56 @@ export default function Send(props) {
       {isLoading ? <Loader /> : null}
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={SendHelperBottomSheet}
+        ref={'SendHelperBottomSheet'}
         snapPoints={[
           -50,
           hp('89%'),
           // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
-        renderContent={() => <SendHelpContents />}
+        renderContent={() => (<SendHelpContents />)}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.blue}
             backgroundColor={Colors.blue}
             onPressHeader={() => {
               if (isSendHelperDone) {
-                if (SendHelperBottomSheet.current)
-                  (SendHelperBottomSheet as any).current.snapTo(1);
+                if (this.refs.SendHelperBottomSheet)
+                  (this.refs.SendHelperBottomSheet as any).snapTo(1);
                 setTimeout(() => {
-                  setIsSendHelperDone(false);
+                  this.setState({isSendHelperDone: false})
                 }, 10);
               } else {
-                if (SendHelperBottomSheet.current)
-                  (SendHelperBottomSheet as any).current.snapTo(0);
+                if (this.refs.SendHelperBottomSheet)
+                  (this.refs.SendHelperBottomSheet as any).snapTo(0);
               }
             }}
           />
         )}
       />
     </View>
-  );
+    );
+  }
 }
+
+
+const mapStateToProps = (state) => {
+  return {
+   service: idx(state, (_) => _.accounts),
+   transfer: idx(state, (_) => _.accounts),
+   accounts: state.accounts || [],
+   regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+   trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+  };
+};
+
+export default withNavigationFocus(
+  connect(mapStateToProps, {
+    removeTwoFA,
+    addTransferDetails,
+    clearTransfer,
+
+  })(SendUpdate),
+);
 
 const styles = StyleSheet.create({
   modalContentContainer: {
