@@ -171,7 +171,9 @@ export default function SendConfirmation(props) {
               : false,
         }),
       );
-      SendSuccessBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        SendSuccessBottomSheet.current.snapTo(1);
+      }, 2);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,

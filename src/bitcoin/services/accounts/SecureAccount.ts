@@ -369,6 +369,23 @@ export default class SecureAccount {
     paymentURI: string;
   } => this.secureHDWallet.generatePaymentURI(address, options);
 
+  public addressDiff = (
+    scannedStr: string,
+  ): {
+    type: string;
+  } => this.secureHDWallet.addressDiff(scannedStr);
+
+  public decodePaymentURI = (
+    paymentURI: string,
+  ): {
+    address: string;
+    options: {
+      amount?: number;
+      label?: string;
+      message?: string;
+    };
+  } => this.secureHDWallet.decodePaymentURI(paymentURI);
+
   public getAddress = async (): Promise<
     | {
         status: number;
