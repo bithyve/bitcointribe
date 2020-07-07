@@ -208,7 +208,10 @@ export default function Send(props) {
   }, []);
 
   const twoFASetupMethod = async () => {
-    if (!(await AsyncStorage.getItem('twoFASetup'))) {
+    if (
+      !(await AsyncStorage.getItem('twoFASetup')) &&
+      service.secureHDWallet.twoFASetup
+    ) {
       props.navigation.navigate('TwoFASetup', {
         twoFASetup: service.secureHDWallet.twoFASetup,
       });
@@ -377,13 +380,40 @@ export default function Send(props) {
   };
 
   useEffect(() => {
-    const instance = service.hdWallet || service.secureHDWallet;
-    let isAddressValid = instance.isValidAddress(recipientAddress);
-    if (isAddressValid) {
-      let item = {
-        id: recipientAddress, // address serves as the id during manual addition
-      };
-      onSelectContact(item);
+    const { type } = service.addressDiff(recipientAddress);
+    if (type) {
+      let item;
+      switch (type) {
+        case 'address':
+          item = {
+            id: recipientAddress, // address serves as the id during manual addition
+          };
+          onSelectContact(item);
+          break;
+
+        case 'paymentURI':
+          const { address, options } = service.decodePaymentURI(
+            recipientAddress,
+          );
+          item = {
+            id: address,
+          };
+
+          dispatch(
+            addTransferDetails(serviceType, {
+              selectedContact: item,
+            }),
+          );
+
+          props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            sweepSecure,
+            netBalance,
+            bitcoinAmount: options.amount ? `${options.amount}` : '',
+          });
+          break;
+      }
     }
   }, [recipientAddress]);
 

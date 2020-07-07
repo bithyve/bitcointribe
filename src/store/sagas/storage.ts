@@ -18,6 +18,7 @@ import S3Service from '../../bitcoin/services/sss/S3Service';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { AsyncStorage } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import semver from 'semver';
 
 function* initDBWorker() {
   try {
@@ -104,16 +105,20 @@ function* servicesEnricherWorker({ payload }) {
 
     let services;
     let migrated = false;
+    if (!semver.valid(database.VERSION)) {
+      // handling exceptions: off standard versioning
+      if (!database.VERSION) database.VERSION = '0.7.0';
+      else if (database.VERSION === '0.9') database.VERSION = '0.9.0';
+      else if (database.VERSION === '1.0') database.VERSION = '1.0.0';
+    }
 
-    if (!database.VERSION) database.VERSION = 0.7; // 0.7 patch
-
-    if (parseFloat(database.VERSION) < parseFloat(DeviceInfo.getVersion())) {
+    if (semver.gt(DeviceInfo.getVersion(), database.VERSION)) {
       if (
-        parseFloat(database.VERSION) == 0.7 &&
-        parseFloat(DeviceInfo.getVersion()) >= 0.9
+        database.VERSION == '0.7.0' &&
+        semver.gte(DeviceInfo.getVersion(), '0.9.0')
       ) {
-        // version 0.7 support
-        console.log('Migration running for 0.7');
+        // version 0.7.0 support
+        console.log('Migration running for 0.7.0');
         services = {
           REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
           TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),

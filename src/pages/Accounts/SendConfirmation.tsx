@@ -171,7 +171,9 @@ export default function SendConfirmation(props) {
               : false,
         }),
       );
-      SendSuccessBottomSheet.current.snapTo(1);
+      setTimeout(() => {
+        SendSuccessBottomSheet.current.snapTo(1);
+      }, 2);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       props.navigation.navigate('TwoFAToken', {
         serviceType,
@@ -225,6 +227,7 @@ export default function SendConfirmation(props) {
   };
 
   const onConfirm = useCallback(() => {
+    dispatch(clearTransfer(serviceType, 'stage2'));
     const txPriority =
       sliderValueText === 'Low Fee'
         ? 'low'
@@ -473,6 +476,7 @@ export default function SendConfirmation(props) {
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack();
+              dispatch(clearTransfer(serviceType, 'stage1'));
             }}
             style={{
               height: 30,
@@ -800,6 +804,7 @@ export default function SendConfirmation(props) {
               width: wp('30%'),
             }}
             onPress={() => {
+              dispatch(clearTransfer(serviceType, 'stage1'));
               props.navigation.goBack();
             }}
           >

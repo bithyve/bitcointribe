@@ -501,7 +501,7 @@ export default function RestoreSelectedContactsList(props) {
       }
     });
     if (shares.length) setMetaShares(shares);
-  }, [RECOVERY_SHARES]);
+  }, [RECOVERY_SHARES, selectedDocuments]);
 
   useEffect(() => {
     setSecondaryDeviceRS(SD_META_SHARE);

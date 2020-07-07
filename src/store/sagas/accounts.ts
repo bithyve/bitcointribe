@@ -499,7 +499,7 @@ function* transferST1Worker({ payload }) {
   try {
     recipients = yield call(processRecipients, recipients);
   } catch (err) {
-    yield put(failedST1(payload.serviceType));
+    yield put(failedST1(payload.serviceType, { err }));
     return;
   }
   console.log({ recipients });
@@ -510,7 +510,7 @@ function* transferST1Worker({ payload }) {
   if (res.status === 200) yield put(executedST1(payload.serviceType, res.data));
   else {
     if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(failedST1(payload.serviceType));
+    yield put(failedST1(payload.serviceType, { ...res }));
     // yield put(switchLoader(payload.serviceType, 'transfer'));
   }
 }

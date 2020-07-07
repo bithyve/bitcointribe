@@ -1330,12 +1330,23 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const txPrerequisites: TransactionPrerequisite = {};
     for (const priority of Object.keys(averageTxFees)) {
-      const netFeeByPriority = Math.round(
-        (fee / feePerByte) * averageTxFees[priority].feePerByte,
-      );
-      const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+      const debitedAmount = netAmount + fee;
+      if (debitedAmount <= balance) {
+        let netFeeByPriority;
+        let estimatedBlocks;
+        if (debitedAmount === balance) {
+          // fee defaults across priority
+          netFeeByPriority = Math.round(
+            (fee / feePerByte) * averageTxFees[defaultTxPriority].feePerByte,
+          );
+          estimatedBlocks = averageTxFees[defaultTxPriority].estimatedBlocks;
+        } else {
+          netFeeByPriority = Math.round(
+            (fee / feePerByte) * averageTxFees[priority].feePerByte,
+          );
+          estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+        }
 
-      if (balance > netAmount + fee) {
         txPrerequisites[priority] = {
           inputs,
           outputs,
@@ -1343,6 +1354,11 @@ export default class HDSegwitWallet extends Bitcoin {
           estimatedBlocks,
         };
       } else {
+        const netFeeByPriority = Math.round(
+          (fee / feePerByte) * averageTxFees[priority].feePerByte,
+        );
+        const estimatedBlocks = averageTxFees[priority].estimatedBlocks;
+
         txPrerequisites[priority] = {
           inputs: null, // if null >> insufficient balance to pay with fee corresponding to this tx priority
           outputs,

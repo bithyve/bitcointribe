@@ -369,6 +369,23 @@ export default class SecureAccount {
     paymentURI: string;
   } => this.secureHDWallet.generatePaymentURI(address, options);
 
+  public addressDiff = (
+    scannedStr: string,
+  ): {
+    type: string;
+  } => this.secureHDWallet.addressDiff(scannedStr);
+
+  public decodePaymentURI = (
+    paymentURI: string,
+  ): {
+    address: string;
+    options: {
+      amount?: number;
+      label?: string;
+      message?: string;
+    };
+  } => this.secureHDWallet.decodePaymentURI(paymentURI);
+
   public getAddress = async (): Promise<
     | {
         status: number;
@@ -634,7 +651,14 @@ export default class SecureAccount {
         err?: undefined;
         message?: undefined;
       }
-    | { status: number; err: string; message: string; data?: undefined }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        fee?: number;
+        netAmount?: number;
+        data?: undefined;
+      }
   > => {
     try {
       // if (this.hdWallet.isValidAddress(recipientAddress)) {
@@ -663,8 +687,9 @@ export default class SecureAccount {
       if (balance < netAmount + fee) {
         return {
           status: 0o6,
-          err:
-            'Insufficient balance to compensate for transfer amount and the txn fee',
+          err: `Insufficient balance`,
+          fee,
+          netAmount,
           message: ErrMap[0o6],
         };
       }

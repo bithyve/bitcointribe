@@ -1392,7 +1392,7 @@ function* recoverWalletWorker({ payload }) {
     });
 
     console.log({ mappedMetaShares });
-    let restorationShares = [];
+    let restorationShares: MetaShare[] = [];
     Object.keys(mappedMetaShares).forEach((walletId) => {
       if (mappedMetaShares[walletId].length >= 3)
         restorationShares = mappedMetaShares[walletId];
@@ -1475,6 +1475,23 @@ function* recoverWalletWorker({ payload }) {
         'securityQuestionHistory',
         JSON.stringify(securityQuestionHistory),
       );
+
+      // personal copy health restoration
+      let updatedPDFHealth = {};
+      for (const share of restorationShares) {
+        if (share.meta.index > 2) {
+          updatedPDFHealth[share.meta.index] = {
+            shareId: `placeHolderID${share.meta.index}`,
+            updatedAt: Date.now(),
+          };
+        }
+      }
+      if (Object.keys(updatedPDFHealth).length)
+        yield call(
+          AsyncStorage.setItem,
+          'PDF Health',
+          JSON.stringify(updatedPDFHealth),
+        );
     } else {
       throw new Error(res.err);
     }
@@ -1495,6 +1512,28 @@ export const recoverWalletWatcher = createWatcher(
 const sha256 = crypto.createHash('sha256');
 const hash = (element) => {
   return sha256.update(JSON.stringify(element)).digest('hex');
+};
+
+const asyncDataToBackup = async () => {
+  // ASYNC DATA to backup
+
+  const [
+    [, TrustedContactsInfo],
+    [, personalCopyDetails],
+    [, FBTCAccount],
+  ] = await AsyncStorage.multiGet([
+    'TrustedContactsInfo',
+    'personalCopyDetails',
+    'FBTCAccount',
+  ]);
+  const ASYNC_DATA = {};
+  if (TrustedContactsInfo)
+    ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
+  if (personalCopyDetails)
+    ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
+  if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+
+  return ASYNC_DATA;
 };
 
 function* updateWalletImageWorker({ payload }) {
@@ -1524,12 +1563,8 @@ function* updateWalletImageWorker({ payload }) {
       hashesWI.SERVICES = currentSHash;
     }
 
-    const TrustedContactsInfo = yield call(
-      AsyncStorage.getItem,
-      'TrustedContactsInfo',
-    ); // use multiGet while fetching multiple items
-    if (TrustedContactsInfo) {
-      const ASYNC_DATA = { TrustedContactsInfo };
+    const ASYNC_DATA = yield call(asyncDataToBackup);
+    if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
         walletImage['ASYNC_DATA'] = ASYNC_DATA;
@@ -1547,13 +1582,8 @@ function* updateWalletImageWorker({ payload }) {
       SERVICES: hash(SERVICES),
     };
 
-    // ASYNC DATA to backup
-    const TrustedContactsInfo = yield call(
-      AsyncStorage.getItem,
-      'TrustedContactsInfo',
-    ); // use multiGet while fetching multiple items
-    if (TrustedContactsInfo) {
-      const ASYNC_DATA = { TrustedContactsInfo };
+    const ASYNC_DATA = yield call(asyncDataToBackup);
+    if (Object.keys(ASYNC_DATA).length) {
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
       hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
     }
