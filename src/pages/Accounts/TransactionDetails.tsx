@@ -103,6 +103,16 @@ export default function TransactionDetails(props) {
     }
   };
 
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -346,9 +356,9 @@ export default function TransactionDetails(props) {
           >
             Transaction ID
           </Text>
-          <TouchableOpacity
+          <AppBottomSheetTouchableWrapper
             onPress={() =>
-              Linking.openURL(
+              openLink(
                 `https://blockstream.info${
                   txDetails.accountType === 'Test Account' ? '/testnet' : ''
                 }/tx/${txDetails.txid}`,
@@ -365,7 +375,7 @@ export default function TransactionDetails(props) {
             >
               {txDetails.txid}
             </Text>
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
         </View>
         <View style={styles.infoCardView}>
           <Text

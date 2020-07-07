@@ -1514,6 +1514,28 @@ const hash = (element) => {
   return sha256.update(JSON.stringify(element)).digest('hex');
 };
 
+const asyncDataToBackup = async () => {
+  // ASYNC DATA to backup
+
+  const [
+    [, TrustedContactsInfo],
+    [, personalCopyDetails],
+    [, FBTCAccount],
+  ] = await AsyncStorage.multiGet([
+    'TrustedContactsInfo',
+    'personalCopyDetails',
+    'FBTCAccount',
+  ]);
+  const ASYNC_DATA = {};
+  if (TrustedContactsInfo)
+    ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
+  if (personalCopyDetails)
+    ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
+  if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+
+  return ASYNC_DATA;
+};
+
 function* updateWalletImageWorker({ payload }) {
   const s3Service: S3Service = yield select((state) => state.sss.service);
 
@@ -1541,23 +1563,7 @@ function* updateWalletImageWorker({ payload }) {
       hashesWI.SERVICES = currentSHash;
     }
 
-    // ASYNC DATA to backup
-    const TrustedContactsInfo = yield call(
-      AsyncStorage.getItem,
-      'TrustedContactsInfo',
-    ); // use multiGet while fetching multiple items
-
-    const personalCopyDetails = yield call(
-      AsyncStorage.getItem,
-      'personalCopyDetails',
-    );
-
-    const ASYNC_DATA = {};
-    if (TrustedContactsInfo)
-      ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
-    if (personalCopyDetails)
-      ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
-    console.log({ ASYNC_DATA });
+    const ASYNC_DATA = yield call(asyncDataToBackup);
     if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
@@ -1576,24 +1582,7 @@ function* updateWalletImageWorker({ payload }) {
       SERVICES: hash(SERVICES),
     };
 
-    // ASYNC DATA to backup
-    const TrustedContactsInfo = yield call(
-      AsyncStorage.getItem,
-      'TrustedContactsInfo',
-    ); // use multiGet while fetching multiple items
-
-    const personalCopyDetails = yield call(
-      AsyncStorage.getItem,
-      'personalCopyDetails',
-    );
-
-    const ASYNC_DATA = {};
-    if (TrustedContactsInfo)
-      ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
-    if (personalCopyDetails)
-      ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
-
-    console.log({ ASYNC_DATA });
+    const ASYNC_DATA = yield call(asyncDataToBackup);
     if (Object.keys(ASYNC_DATA).length) {
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
       hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
