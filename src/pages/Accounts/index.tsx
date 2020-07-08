@@ -157,9 +157,8 @@ export default function Accounts(props) {
 
   const wallet =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
-  const [netBalance, setNetBalance] = useState(
-    wallet.balances.balance + wallet.balances.unconfirmedBalance,
-  );
+  const [netBalance, setNetBalance] = useState();
+  const [spendableBalance, setSpendableBalance] = useState();
   const [transactionLoading, setTransactionLoading] = useState(true);
   const [transactions, setTransactions] = useState([]);
   const [averageTxFees, setAverageTxFees] = useState(null);
@@ -210,9 +209,9 @@ export default function Accounts(props) {
     //   setSellIsActive(false);
     //   props.stop();
     // }
-    const providedBalance = props.navigation.getParam('netBalance');
+    const providedBalance = props.navigation.getParam('spendableBalance');
     useEffect(() => {
-      if (providedBalance) setNetBalance(providedBalance);
+      if (providedBalance) setSpendableBalance(providedBalance);
     }, [providedBalance]);
 
     if (
@@ -1226,7 +1225,7 @@ export default function Accounts(props) {
     if (service) {
       let currentBalance =
         wallet.balances.balance + wallet.balances.unconfirmedBalance;
-
+      let spendableBalance = wallet.balances.balance;
       let currentTransactions = wallet.transactions.transactionDetails;
 
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
@@ -1266,6 +1265,9 @@ export default function Accounts(props) {
                 currentBalance +=
                   derivativeAccount[accountNumber].balances.balance +
                   derivativeAccount[accountNumber].balances.unconfirmedBalance;
+
+                spendableBalance +=
+                  derivativeAccount[accountNumber].balances.balance;
               }
 
               if (derivativeAccount[accountNumber].transactions) {
@@ -1291,6 +1293,7 @@ export default function Accounts(props) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNetBalance(currentBalance);
+      setSpendableBalance(spendableBalance);
       setTransactions(currentTransactions);
     }
   }, [service]);
@@ -1781,7 +1784,7 @@ export default function Accounts(props) {
                         serviceType,
                         getServiceType: getServiceType,
                         averageTxFees,
-                        netBalance,
+                        spendableBalance,
                       });
                     }}
                     style={styles.bottomCardView}

@@ -350,7 +350,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: (balances || {}).regularBalance,
           });
           break;
 
@@ -367,7 +366,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
             bitcoinAmount: options.amount ? `${options.amount}` : '',
           });
           break;
@@ -858,7 +856,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
-        netBalance: balances.regularBalance,
         bitcoinAmount: options.amount ? `${options.amount}` : '',
       });
     }
