@@ -605,6 +605,28 @@ export default function Accounts(props) {
                 : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.cardAmountText, fontSize: RFValue(13) }}>
+              Spendable:{' '}
+              {item.accountType == 'Test Account'
+                ? UsNumberFormat(spendableBalance)
+                : switchOn
+                ? UsNumberFormat(spendableBalance)
+                : exchangeRates
+                ? (
+                    (spendableBalance / 1e8) *
+                    exchangeRates[CurrencyCode].last
+                  ).toFixed(2)
+                : null}
+            </Text>
+            <Text style={styles.cardAmountUnitText}>
+              {item.accountType == 'Test Account'
+                ? 't-sats'
+                : switchOn
+                ? 'sats'
+                : CurrencyCode.toLocaleLowerCase()}
+            </Text>
+          </View>
         </View>
       </ImageBackground>
     );
@@ -1293,7 +1315,9 @@ export default function Accounts(props) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNetBalance(currentBalance);
-      setSpendableBalance(spendableBalance);
+      setSpendableBalance(
+        serviceType === TEST_ACCOUNT ? currentBalance : spendableBalance,
+      );
       setTransactions(currentTransactions);
     }
   }, [service]);
@@ -1784,10 +1808,7 @@ export default function Accounts(props) {
                         serviceType,
                         getServiceType: getServiceType,
                         averageTxFees,
-                        spendableBalance:
-                          serviceType === TEST_ACCOUNT
-                            ? netBalance
-                            : spendableBalance,
+                        spendableBalance,
                       });
                     }}
                     style={styles.bottomCardView}
