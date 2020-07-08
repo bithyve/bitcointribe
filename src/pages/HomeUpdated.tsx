@@ -91,13 +91,20 @@ import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
+import semver from 'semver';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
 }
 
 export const isCompatible = async (method: string, version: string) => {
-  if (parseFloat(version) > parseFloat(DeviceInfo.getVersion())) {
+  if (!semver.valid(version)) {
+    // handling exceptions: off standard versioning
+    if (version === '0.9') version = '0.9.0';
+    else if (version === '1.0') version = '1.0.0';
+  }
+
+  if (version && semver.gt(version, DeviceInfo.getVersion())) {
     // checking compatibility via Relay
     const res = await RelayServices.checkCompatibility(method, version);
     if (res.status !== 200) {
@@ -155,7 +162,7 @@ const TrustedContactRequestContent = ({
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
-  isRequestModalOpened
+  isRequestModalOpened,
 }) => {
   if (!trustedContactRequest && !recoveryRequest) return;
   let { requester, hintType, hint, isGuardian, isQR, isRecovery } =
@@ -344,7 +351,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: (balances || {}).regularBalance,
           });
           break;
 
@@ -361,7 +367,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
             bitcoinAmount: options.amount ? `${options.amount}` : '',
           });
           break;
@@ -852,7 +857,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
-        netBalance: balances.regularBalance,
         bitcoinAmount: options.amount ? `${options.amount}` : '',
       });
     }
@@ -1494,7 +1498,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         accumulativeBalance,
       },
       transactions: accumulativeTransactions,
-      isBalanceLoading: false
+      isBalanceLoading: false,
     });
 
     // if (balancesParam) {
@@ -2476,7 +2480,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               });
             }
             this.setState({
-              isRequestModalOpened: false
+              isRequestModalOpened: false,
             });
           }}
           onOpenEnd={() => {
@@ -2487,7 +2491,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             }
             this.setState({
               deepLinkModalOpen: true,
-              isRequestModalOpened: true
+              isRequestModalOpened: true,
             });
           }}
           enabledInnerScrolling={true}
@@ -2794,15 +2798,15 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         />
 
         <BottomSheet
-        onCloseEnd={()=>{
-          this.setState({
-            addContactModalOpened: false
-          });
-        }}
+          onCloseEnd={() => {
+            this.setState({
+              addContactModalOpened: false,
+            });
+          }}
           onOpenEnd={() => {
             this.setState({
               tabBarIndex: 0,
-              addContactModalOpened: true
+              addContactModalOpened: true,
             });
           }}
           onOpenStart={() => {
@@ -2825,21 +2829,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <AddContactAddressBook
-              addContactModalOpened={addContactModalOpened}  
+              addContactModalOpened={addContactModalOpened}
               isLoadContacts={isLoadContacts}
               modalRef={this.refs.addContactAddressBookBookBottomSheet}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
-                if(selectedContact && selectedContact.length){
-                navigation.navigate('AddContactSendRequest', {
-                  SelectedContact: selectedContact,
-                });
-              (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
-                  0,
-                );
+                if (selectedContact && selectedContact.length) {
+                  navigation.navigate('AddContactSendRequest', {
+                    SelectedContact: selectedContact,
+                  });
+                  (this.refs
+                    .addContactAddressBookBookBottomSheet as any).snapTo(0);
                 }
               }}
-              
               onSelectContact={(selectedContact) => {
                 this.setState({
                   selectedContact,

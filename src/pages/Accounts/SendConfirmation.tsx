@@ -66,7 +66,7 @@ export default function SendConfirmation(props) {
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const sweepSecure = props.navigation.getParam('sweepSecure');
-  const netBalance = props.navigation.getParam('netBalance');
+  const spendableBalance = props.navigation.getParam('spendableBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const viewRef = useRef(null);
@@ -396,7 +396,7 @@ export default function SendConfirmation(props) {
                 : serviceType === REGULAR_ACCOUNT
                 ? 1
                 : 2,
-            netBalance: netBalance - totalAmount,
+            spendableBalance: spendableBalance - totalAmount,
           });
         }}
         isSuccess={true}
@@ -556,12 +556,12 @@ export default function SendConfirmation(props) {
               }}
             >
               {serviceType == 'Test Account'
-                ? UsNumberFormat(netBalance)
+                ? UsNumberFormat(spendableBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
+                ? UsNumberFormat(spendableBalance)
                 : exchangeRates
                 ? (
-                    (netBalance / 1e8) *
+                    (spendableBalance / 1e8) *
                     exchangeRates[CurrencyCode].last
                   ).toFixed(2)
                 : null}
