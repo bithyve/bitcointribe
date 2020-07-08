@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   AsyncStorage,
+  Linking,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -102,10 +103,27 @@ export default function TransactionDetails(props) {
     }
   };
 
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
+
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <Text style={styles.modalHeaderTitleText}>
             {'Transaction Details'}
           </Text>
@@ -338,16 +356,26 @@ export default function TransactionDetails(props) {
           >
             Transaction ID
           </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontFamily: Fonts.FiraSansRegular,
-              fontSize: RFValue(12),
-              marginTop: hp('0.5%'),
-            }}
+          <AppBottomSheetTouchableWrapper
+            onPress={() =>
+              openLink(
+                `https://blockstream.info${
+                  txDetails.accountType === 'Test Account' ? '/testnet' : ''
+                }/tx/${txDetails.txid}`,
+              )
+            }
           >
-            {txDetails.txid}
-          </Text>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontFamily: Fonts.FiraSansRegular,
+                fontSize: RFValue(12),
+                marginTop: hp('0.5%'),
+              }}
+            >
+              {txDetails.txid}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
         </View>
         <View style={styles.infoCardView}>
           <Text

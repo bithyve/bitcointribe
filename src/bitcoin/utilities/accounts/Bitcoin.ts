@@ -925,8 +925,8 @@ export default class Bitcoin {
   };
 
   public averageTransactionFee = async () => {
-    const averageTxSize = 225; // the average Bitcoin transaction is about 225 bytes in size (1 Inp; 2 Out)
-    // const inputUTXOSize = 147; // in bytes
+    const averageTxSize = 226; // the average Bitcoin transaction is about 226 bytes in size (1 Inp (148); 2 Out)
+    // const inputUTXOSize = 148; // in bytes (in accordance with coinselect lib)
 
     const feeRatesByPriority = await this.feeRatesPerByte();
 
@@ -977,7 +977,8 @@ export default class Bitcoin {
     type: string;
   } => {
     if (this.isPaymentURI(scannedStr)) {
-      return { type: 'paymentURI' };
+      const { address } = this.decodePaymentURI(scannedStr);
+      if (this.isValidAddress(address)) return { type: 'paymentURI' };
     } else if (this.isValidAddress(scannedStr)) {
       return { type: 'address' };
     }
