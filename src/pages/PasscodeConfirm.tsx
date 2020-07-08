@@ -93,7 +93,7 @@ export default function PasscodeConfirm( props ) {
           <Text style={ styles.headerTitleText }>Hello!</Text>
           <View>
             <Text style={ styles.headerInfoText }>
-              Please enter a <Text style={ styles.boldItalicText }>passcode</Text>
+              Create a new <Text style={ styles.boldItalicText }>passcode</Text>
             </Text>
 
             <View>
