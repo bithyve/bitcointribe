@@ -899,18 +899,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   ref={this.carousel}
                   data={this.carouselData}
                   firstItem={carouselInitIndex}
-                  // onBeforeSnapToItem={(index) => {
-                  //   this.setState({ carouselInitIndex: index });
-                  //   index === 0
-                  //     ? this.getServiceType(TEST_ACCOUNT)
-                  //     : index === 1
-                  //     ? this.getServiceType(REGULAR_ACCOUNT)
-                  //     : this.getServiceType(SECURE_ACCOUNT);
-                  // }}
-                  renderItem={this.renderItem}
-                  sliderWidth={this.sliderWidth}
-                  itemWidth={this.sliderWidth * 0.95}
-                  onSnapToItem={(index) => {
+                  onBeforeSnapToItem={(index) => {
                     this.setState({ carouselInitIndex: index });
                     index === 0
                       ? this.getServiceType(TEST_ACCOUNT)
@@ -918,6 +907,17 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       ? this.getServiceType(REGULAR_ACCOUNT)
                       : this.getServiceType(SECURE_ACCOUNT);
                   }}
+                  renderItem={this.renderItem}
+                  sliderWidth={this.sliderWidth}
+                  itemWidth={this.sliderWidth * 0.95}
+                  // onSnapToItem={(index) => {
+                  //   this.setState({ carouselInitIndex: index });
+                  //   index === 0
+                  //     ? this.getServiceType(TEST_ACCOUNT)
+                  //     : index === 1
+                  //     ? this.getServiceType(REGULAR_ACCOUNT)
+                  //     : this.getServiceType(SECURE_ACCOUNT);
+                  // }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
                   slideInterpolatedStyle={this.slideInterpolatedStyle}
