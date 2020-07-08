@@ -1159,6 +1159,7 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.balances = balances;
     this.transactions = transactions;
+    console.log({ balances, transactions });
     return { balances, transactions };
   };
 
@@ -1279,7 +1280,7 @@ export default class HDSegwitWallet extends Bitcoin {
         balance?: undefined;
       }
   > => {
-    const inputUTXOs = await this.fetchUtxo(); // confirmed + unconfirmed UTXOs
+    const inputUTXOs = await this.fetchUtxo();
     console.log('Input UTXOs:', inputUTXOs);
 
     const outputUTXOs = [];
@@ -1521,7 +1522,33 @@ export default class HDSegwitWallet extends Bitcoin {
       ];
       console.log({ ownedAddresses });
       const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
-      return UTXOs;
+
+      if (this.isTest) return UTXOs;
+      const changeAddresses = [];
+      for (
+        let itr = 0;
+        itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+        itr++
+      ) {
+        changeAddresses.push(this.getInternalAddressByIndex(itr));
+      }
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+          else {
+            if (changeAddresses.includes(utxo.address)) {
+              // defaulting utxo's on the change branch to confirmed
+              confirmedUTXOs.push(utxo);
+            }
+          }
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+
+      return confirmedUTXOs;
     } catch (err) {
       throw new Error(`Fetch UTXOs failed: ${err.message}`);
     }

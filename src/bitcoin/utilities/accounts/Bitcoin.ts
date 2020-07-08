@@ -759,6 +759,7 @@ export default class Bitcoin {
       vout: number;
       value: number;
       address: string;
+      status?: any;
     }>;
   }> => {
     try {
@@ -776,16 +777,16 @@ export default class Bitcoin {
         );
         data = res.data;
       }
-
       const UTXOs = [];
       for (const addressSpecificUTXOs of data) {
         for (const utxo of addressSpecificUTXOs) {
-          const { txid, vout, value, Address } = utxo;
+          const { txid, vout, value, Address, status } = utxo;
           UTXOs.push({
             txId: txid,
             vout,
             value,
             address: Address,
+            status,
           });
         }
       }
