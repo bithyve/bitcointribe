@@ -254,29 +254,34 @@ function* fetchBalanceTxWorker({ payload }) {
     ? payload.options.service
     : yield select((state) => state.accounts[payload.serviceType].service);
 
-  const preFetchBalances =
+  const preFetchBalances = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.balances
-      : service.hdWallet.balances;
-  const preFetchTransactions =
+      : service.hdWallet.balances,
+  );
+
+  const preFetchTransactions = JSON.stringify(
     payload.serviceType === SECURE_ACCOUNT
       ? service.secureHDWallet.transactions
-      : service.hdWallet.transactions;
+      : service.hdWallet.transactions,
+  );
 
   const res = yield call(service.getBalanceTransactions, {
     restore: payload.options.restore,
   });
 
   const postFetchBalances =
-    res.status === 200 ? res.data.balances : preFetchBalances;
+    res.status === 200 ? JSON.stringify(res.data.balances) : preFetchBalances;
   const postFetchTransactions =
-    res.status === 200 ? res.data.transactions : preFetchTransactions;
+    res.status === 200
+      ? JSON.stringify(res.data.transactions)
+      : preFetchTransactions;
 
   let parentSynched = false;
   if (
     res.status === 200 &&
-    JSON.stringify({ preFetchBalances, preFetchTransactions }) !==
-      JSON.stringify({ postFetchBalances, postFetchTransactions })
+    (preFetchBalances !== postFetchBalances ||
+      preFetchTransactions !== postFetchTransactions)
   ) {
     parentSynched = true;
     if (
