@@ -173,6 +173,9 @@ export default function SendToContact(props) {
       let balance = instance.balances.balance;
       // instance.balances.balance + instance.balances.unconfirmedBalance;
 
+      if (serviceType === TEST_ACCOUNT)
+        balance += instance.balances.unconfirmedBalance;
+
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
         for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
           let derivativeAccount;

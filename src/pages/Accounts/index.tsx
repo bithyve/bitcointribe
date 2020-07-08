@@ -1784,7 +1784,10 @@ export default function Accounts(props) {
                         serviceType,
                         getServiceType: getServiceType,
                         averageTxFees,
-                        spendableBalance,
+                        spendableBalance:
+                          serviceType === TEST_ACCOUNT
+                            ? netBalance
+                            : spendableBalance,
                       });
                     }}
                     style={styles.bottomCardView}

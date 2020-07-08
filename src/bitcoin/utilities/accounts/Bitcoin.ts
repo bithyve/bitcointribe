@@ -286,9 +286,9 @@ export default class Bitcoin {
       }
 
       const { Balance, Txs } = res.data;
-      const balances = {
-        balance: Balance.Balance,
-        unconfirmedBalance: Balance.UnconfirmedBalance,
+      let balances = {
+        balance: 0,
+        unconfirmedBalance: 0,
       };
 
       const transactions: Transactions = {
@@ -338,6 +338,26 @@ export default class Bitcoin {
                 tx.transactionType === 'Self' ? [] : tx.senderAddresses,
               blockTime: tx.Status.block_time, // only available when tx is confirmed
             };
+
+            // update balance based on tx
+            if (
+              txObj.status === 'Confirmed' ||
+              txObj.transactionType === 'Sent'
+            ) {
+              if (txObj.transactionType === 'Received') {
+                balances.balance += txObj.amount;
+              } else {
+                const debited = txObj.amount + txObj.fee;
+                balances.balance -= debited;
+              }
+            } else {
+              if (txObj.transactionType === 'Received') {
+                balances.unconfirmedBalance += txObj.amount;
+              } else {
+                const debited = txObj.amount + txObj.fee;
+                balances.unconfirmedBalance -= debited;
+              }
+            }
 
             transactions.transactionDetails.push(txObj);
 
