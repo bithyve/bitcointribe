@@ -78,8 +78,11 @@ const PairNewWallet = (props) => {
       if (FBTCAccountData && FBTCAccountData.user_key) {
         setIsUserRegistered(true);
       }
-      if (!userKey) {
+      if (!userKey && FBTCAccountData) {
         setUserKey(FBTCAccountData.user_key);
+      }
+      if(userKey1 && !isUserRegistered){
+        setUserKey(userKey1);
       }
     })();
   }, []);

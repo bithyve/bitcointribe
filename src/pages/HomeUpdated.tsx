@@ -917,7 +917,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
 
     if (userKey) {
-      this.props.navigation.navigate('VoucherScanner', { userKey });
+      this.props.navigation.navigate('PairNewWallet', { userKey });
       return;
     }
 
@@ -1113,7 +1113,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     if (event.url.includes('fastbitcoins')) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
-      navigation.navigate('VoucherScanner', { userKey });
+      navigation.navigate('PairNewWallet', { userKey });
     }
   };
 
