@@ -81,6 +81,7 @@ import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import SendUpdate from '../pages/Accounts/SendUpdate';
+import SendToContactUpdate from '../pages/Accounts/SendToContactUpdate';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -208,6 +209,7 @@ const HomeNavigator = createStackNavigator(
     Receive,
     PairNewWallet,
     SendUpdate,
+    SendToContactUpdate,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

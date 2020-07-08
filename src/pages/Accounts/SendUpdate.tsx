@@ -304,7 +304,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
                 selectedContact: item,
               });
 
-            this.props.navigation.navigate('SendToContact', {
+            this.props.navigation.navigate('SendToContactUpdate', {
               selectedContact: item,
               serviceType,
               sweepSecure,
@@ -337,7 +337,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
           selectedContact: item,
         });
         this.setState({recipientAddress: ''})
-      this.props.navigation.navigate('SendToContact', {
+      this.props.navigation.navigate('SendToContactUpdate', {
         selectedContact: item,
         serviceType,
         averageTxFees,
@@ -357,7 +357,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
             selectedContact: item,
           });
           this.setState({recipientAddress: ''});
-        this.props.navigation.navigate('SendToContact', {
+        this.props.navigation.navigate('SendToContactUpdate', {
           selectedContact: item,
           serviceType,
           averageTxFees,
