@@ -1523,7 +1523,7 @@ export default class HDSegwitWallet extends Bitcoin {
       console.log({ ownedAddresses });
       const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
 
-      if (this.isTest) return UTXOs;
+      // if (this.isTest) return UTXOs;
       const changeAddresses = [];
       for (
         let itr = 0;
