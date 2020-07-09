@@ -56,6 +56,7 @@ import {
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import Config from 'react-native-config';
+import Loader from '../../components/loader';
 
 import Toast from '../../components/Toast';
 import moment from 'moment';
@@ -98,6 +99,7 @@ const VoucherScanner = (props) => {
   const [errorInfo, setErrorInfo] = useState('');
   const [errorNote, setErrorNote] = useState('');
   const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
 
   useEffect(() => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
@@ -319,7 +321,10 @@ const VoucherScanner = (props) => {
       fBTCAccount[accountType].voucher.push({
         voucherCode: voucherCode,
       });
-      if (fBTCAccount.redeem_vouchers && voucherCode) getQuoteDetailsMethod();
+      if (fBTCAccount.redeem_vouchers && voucherCode) {
+        setShowLoader(true);
+        getQuoteDetailsMethod();
+      }
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
     } else {
       setTimeout(() => {
@@ -372,6 +377,7 @@ const VoucherScanner = (props) => {
     let data = {
       userKey: userKey,
     };
+    setShowLoader(true);
     dispatch(accountSync(data));
   };
 
@@ -395,6 +401,7 @@ const VoucherScanner = (props) => {
           setTimeout(() => {
             (RegistrationSuccessBottomSheet as any).current.snapTo(1);
           }, 2);
+          setShowLoader(false);
           dispatch(ClearAccountSyncData());
         }
       })();
@@ -416,6 +423,7 @@ const VoucherScanner = (props) => {
   useEffect(() => {
     (async () => {
       if (QuoteDetails) {
+        setShowLoader(false);
         QuoteBottomSheet.current.snapTo(1);
         setTimeout(() => {
           setQuote(QuoteDetails);
@@ -507,6 +515,7 @@ const VoucherScanner = (props) => {
             await AsyncStorage.getItem('FBTCAccount'),
           );
           if (FBTCAccountData.redeem_vouchers && voucherCode) {
+            setShowLoader(true);
             getQuoteDetailsMethod();
             (RegistrationSuccessBottomSheet as any).current.snapTo(0);
           }
@@ -585,6 +594,9 @@ const VoucherScanner = (props) => {
         'FBTCAccount',
         JSON.stringify(fBTCAccountData),
       );
+      setTimeout(() => {
+        setShowLoader(false);
+      }, 2);
       VoucherRedeemSuccessBottomSheet.current.snapTo(1);
       await AsyncStorage.setItem('quoteData', '');
       await AsyncStorage.setItem('voucherData', '');
@@ -619,6 +631,7 @@ const VoucherScanner = (props) => {
     return (
       <QuoteConfirmation
         onPressRedeem={() => {
+          setShowLoader(true);
           storeQuotesDetails();
         }}
         onPressBack={() => {
@@ -706,6 +719,7 @@ const VoucherScanner = (props) => {
       setTimeout(() => {
         setErrorTitle(accountSyncFailMessage);
         setErrorProccedButtonText('Done');
+        setShowLoader(false);
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
       let data = {
@@ -719,6 +733,7 @@ const VoucherScanner = (props) => {
   useEffect(() => {
     if (IsGetQuoteFail && getQuoteFailMessage) {
       setTimeout(() => {
+        setShowLoader(false);
         setErrorTitle(getQuoteFailMessage);
         setErrorProccedButtonText('Done');
       }, 2);
@@ -736,6 +751,7 @@ const VoucherScanner = (props) => {
       setTimeout(() => {
         setErrorTitle(executeOrderFailMessage);
         setErrorProccedButtonText('Done');
+        setShowLoader(false);
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
       let data = {
@@ -1057,6 +1073,7 @@ const VoucherScanner = (props) => {
           </View>
         </TouchableOpacity>
       </View>
+      {showLoader ? <Loader /> : null}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={RegistrationSuccessBottomSheet as any}

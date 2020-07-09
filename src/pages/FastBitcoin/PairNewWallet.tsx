@@ -34,7 +34,7 @@ import {
   ClearAccountSyncData,
   accountSyncFail,
 } from '../../store/actions/fbtc';
-
+import Loader from '../../components/loader';
 import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
 
@@ -58,6 +58,7 @@ const PairNewWallet = (props) => {
   const [errorInfo, setErrorInfo] = useState('');
   const [errorNote, setErrorNote] = useState('');
   const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
 
   
   const [ErrorModalBottomSheet, setErrorModalBottomSheet] = useState(
@@ -144,6 +145,7 @@ const PairNewWallet = (props) => {
     let data = {
       userKey: userKey,
     };
+    setShowLoader(true);
     dispatch(accountSync(data));
   };
 
@@ -167,6 +169,7 @@ const PairNewWallet = (props) => {
           setTimeout(() => {
             (RegistrationSuccessBottomSheet as any).current.snapTo(1);
           }, 2);
+          setShowLoader(false);
           dispatch(ClearAccountSyncData());
         }
       })();
@@ -340,6 +343,7 @@ const PairNewWallet = (props) => {
             />
           </View>
         </ScrollView>
+        {showLoader ? <Loader /> : null}
         <BottomInfoBox
           title={'Pair Hexa with FastBitcoins'}
           infoText={
