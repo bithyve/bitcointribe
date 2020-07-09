@@ -12,6 +12,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Keyboard,
+  BackHandler,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -34,7 +35,7 @@ import {
   ClearAccountSyncData,
   accountSyncFail,
 } from '../../store/actions/fbtc';
-
+import Loader from '../../components/loader';
 import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
 
@@ -58,6 +59,7 @@ const PairNewWallet = (props) => {
   const [errorInfo, setErrorInfo] = useState('');
   const [errorNote, setErrorNote] = useState('');
   const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
 
   
   const [ErrorModalBottomSheet, setErrorModalBottomSheet] = useState(
@@ -78,12 +80,24 @@ const PairNewWallet = (props) => {
       if (FBTCAccountData && FBTCAccountData.user_key) {
         setIsUserRegistered(true);
       }
-      if (!userKey) {
+      if (!userKey && FBTCAccountData) {
         setUserKey(FBTCAccountData.user_key);
       }
+      if(userKey1 && !isUserRegistered){
+        setUserKey(userKey1);
+      }
     })();
+    BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
+        return () =>
+          BackHandler.removeEventListener(
+            'hardwareBackPress',
+            hardwareBackHandler,
+          );
   }, []);
 
+  const hardwareBackHandler = () => {
+    props.navigation.pop(2);
+  }; 
 
   useEffect(() => {
     if (voucherCode) {
@@ -141,6 +155,7 @@ const PairNewWallet = (props) => {
     let data = {
       userKey: userKey,
     };
+    setShowLoader(true);
     dispatch(accountSync(data));
   };
 
@@ -164,6 +179,7 @@ const PairNewWallet = (props) => {
           setTimeout(() => {
             (RegistrationSuccessBottomSheet as any).current.snapTo(1);
           }, 2);
+          setShowLoader(false);
           dispatch(ClearAccountSyncData());
         }
       })();
@@ -263,7 +279,7 @@ const PairNewWallet = (props) => {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.goBack();
+              props.navigation.pop(2);
             }}
             style={styles.backArrowView}
           >
@@ -337,6 +353,7 @@ const PairNewWallet = (props) => {
             />
           </View>
         </ScrollView>
+        {showLoader ? <Loader /> : null}
         <BottomInfoBox
           title={'Pair Hexa with FastBitcoins'}
           infoText={

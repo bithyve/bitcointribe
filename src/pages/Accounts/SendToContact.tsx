@@ -59,8 +59,11 @@ import { getCurrencyImageName } from '../../common/CommonFunctions/index';
 import config from '../../bitcoin/HexaConfig';
 
 export default function SendToContact(props) {
-  const [RegularAccountBalance, setRegularAccountBalance] = useState(0);
-  const [SavingAccountBalance, setSavingAccountBalance] = useState(0);
+  const [spendableBalances, setSpendableBalances] = useState({
+    testBalance: 0,
+    regularBalance: 0,
+    secureBalance: 0,
+  });
   const dispatch = useDispatch();
   const isFromAddressBook = props.navigation.getParam('isFromAddressBook')
     ? props.navigation.getParam('isFromAddressBook')
@@ -78,8 +81,8 @@ export default function SendToContact(props) {
   const [averageTxFees, setAverageTxFees] = useState(
     props.navigation.getParam('averageTxFees'),
   );
-  const [netBalance, setNetBalance] = useState(
-    props.navigation.getParam('netBalance'),
+  const [spendableBalance, setSpendableBalance] = useState(
+    props.navigation.getParam('spendableBalance'),
   );
   const sweepSecure = props.navigation.getParam('sweepSecure');
   const [removeItem, setRemoveItem] = useState({});
@@ -162,71 +165,84 @@ export default function SendToContact(props) {
   }
 
   useEffect(() => {
-    // if (isFromAddressBook) {
-    //   dispatch(clearTransfer(serviceType));
-    //   dispatch(addTransferDetails(serviceType, { selectedContact }));
-    // } // already dispatching before navigation (ContactDetails)
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
+      : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        0;
 
-    if (netBalance !== 0 && !netBalance) {
-      const service = accounts[serviceType].service;
-      const instance = service.hdWallet || service.secureHDWallet;
-      let balance =
-        instance.balances.balance + instance.balances.unconfirmedBalance;
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
+      : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        0;
 
-      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-          let derivativeAccount;
-
-          if (serviceType === REGULAR_ACCOUNT) {
-            derivativeAccount =
-              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-                dAccountType
-              ];
-          } else if (serviceType === SECURE_ACCOUNT) {
-            derivativeAccount =
-              accounts[SECURE_ACCOUNT].service.secureHDWallet
-                .derivativeAccounts[dAccountType];
-          }
-
-          if (
-            serviceType === SECURE_ACCOUNT &&
-            dAccountType === TRUSTED_CONTACTS
-          ) {
-            continue;
-          }
-
-          if (derivativeAccount.instance.using) {
-            for (
-              let accountNumber = 1;
-              accountNumber <= derivativeAccount.instance.using;
-              accountNumber++
-            ) {
-              // console.log({
-              //   accountNumber,
-              //   balances: trustedAccounts[accountNumber].balances,
-              //   transactions: trustedAccounts[accountNumber].transactions,
-              // });
-              if (derivativeAccount[accountNumber].balances) {
-                balance +=
-                  derivativeAccount[accountNumber].balances.balance +
-                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
-              }
-            }
+    // regular derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      const derivativeAccount =
+        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          if (derivativeAccount[accountNumber].balances) {
+            regularBalance += derivativeAccount[accountNumber].balances.balance;
+            // + derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
         }
       }
-
-      setNetBalance(balance);
     }
-  }, [serviceType]);
+
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
+      : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        //      .unconfirmedBalance
+        0;
+
+    // secure derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+
+      const derivativeAccount =
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            secureBalance += derivativeAccount[accountNumber].balances.balance;
+            // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
+    setSpendableBalances({
+      testBalance,
+      regularBalance,
+      secureBalance,
+    });
+  }, [accounts]);
 
   useEffect(() => {
-    if (serviceType == REGULAR_ACCOUNT) {
-      setRegularAccountBalance(netBalance);
+    if (serviceType === TEST_ACCOUNT) {
+      setSpendableBalance(spendableBalances.testBalance);
+    } else if (serviceType == REGULAR_ACCOUNT) {
+      setSpendableBalance(spendableBalances.regularBalance);
     } else if (serviceType == SECURE_ACCOUNT) {
-      setSavingAccountBalance(netBalance);
+      setSpendableBalance(spendableBalances.secureBalance);
     }
-  }, [netBalance]);
+  }, [spendableBalances, serviceType]);
 
   const storeAverageTxFees = async () => {
     const storedAverageTxFees = await AsyncStorage.getItem(
@@ -264,12 +280,13 @@ export default function SendToContact(props) {
           amountStacked += parseInt(recipient.bitcoinAmount);
         }
       });
-      if (netBalance - amountStacked < Number(bitcoinAmount)) {
+      if (spendableBalance - amountStacked < Number(bitcoinAmount)) {
         setIsInvalidBalance(true);
         setIsConfirmDisabled(true);
       } else setIsConfirmDisabled(false);
     } else {
       setIsConfirmDisabled(true);
+      console.log({ transfer });
       if (!transfer.details.length) {
         props.navigation.goBack();
       }
@@ -294,7 +311,7 @@ export default function SendToContact(props) {
         props.navigation.navigate('SendConfirmation', {
           serviceType,
           sweepSecure,
-          netBalance,
+          spendableBalance,
           recipients,
           averageTxFees,
         });
@@ -491,7 +508,7 @@ export default function SendToContact(props) {
           }}
         >
           {switchOn
-            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
+            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount}` + `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
             : CurrencySymbol +
               ' ' +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
@@ -639,7 +656,7 @@ export default function SendToContact(props) {
             width: wp('45%'),
           }}
           placeholder={
-            switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
+            switchOn ? serviceType == TEST_ACCOUNT ? 'Enter amount in t-sats' : 'Enter amount in sats' : serviceType == TEST_ACCOUNT ? 'Converted amount in t-sats' : 'Converted amount in sats'
           }
           editable={switchOn}
           value={bitcoinAmount}
@@ -757,6 +774,7 @@ export default function SendToContact(props) {
             }, 2);
             (RemoveBottomSheet as any).current.snapTo(0);
           }}
+          serviceType={serviceType}
         />
       );
     }
@@ -781,8 +799,8 @@ export default function SendToContact(props) {
   const renderAccountSelectionContents = useCallback(() => {
     return (
       <AccountSelectionModalContents
-        RegularAccountBalance={RegularAccountBalance}
-        SavingAccountBalance={SavingAccountBalance}
+        RegularAccountBalance={spendableBalances.regularBalance}
+        SavingAccountBalance={spendableBalances.secureBalance}
         onPressBack={() => {
           AccountSelectionBottomSheet.current.snapTo(0);
         }}
@@ -794,7 +812,7 @@ export default function SendToContact(props) {
         }}
       />
     );
-  }, [SavingAccountBalance, RegularAccountBalance]);
+  }, [spendableBalances]);
 
   const renderAccountSelectionHeader = useCallback(() => {
     return (
@@ -848,9 +866,11 @@ export default function SendToContact(props) {
   };
 
   const getBalanceText = () => {
-    let balance = netBalance;
-    if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
-    if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
+    let balance = spendableBalance;
+    if (serviceType == REGULAR_ACCOUNT)
+      balance = spendableBalances.regularBalance;
+    if (serviceType == SECURE_ACCOUNT)
+      balance = spendableBalances.secureBalance;
     return (
       <Text
         style={{

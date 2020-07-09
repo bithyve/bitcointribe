@@ -66,7 +66,7 @@ export default function SendConfirmation(props) {
   const loading = useSelector((state) => state.accounts[serviceType].loading);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
   const sweepSecure = props.navigation.getParam('sweepSecure');
-  const netBalance = props.navigation.getParam('netBalance');
+  const spendableBalance = props.navigation.getParam('spendableBalance');
   const [switchOn, setSwitchOn] = useState(true);
   const [CurrencyCode, setCurrencyCode] = useState('USD');
   const viewRef = useRef(null);
@@ -284,6 +284,7 @@ export default function SendConfirmation(props) {
         }}
         item={item}
         SelectedContactId={SelectedContactId}
+        serviceType={serviceType}
       />
     );
   };
@@ -347,7 +348,7 @@ export default function SendConfirmation(props) {
             marginRight: 5,
           }}
         >
-          {' sats'}
+          {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
         </Text>
       </View>
     );
@@ -396,10 +397,11 @@ export default function SendConfirmation(props) {
                 : serviceType === REGULAR_ACCOUNT
                 ? 1
                 : 2,
-            netBalance: netBalance - totalAmount,
+            spendableBalance: spendableBalance - totalAmount,
           });
         }}
         isSuccess={true}
+        serviceType={serviceType}
       />
     );
   };
@@ -555,13 +557,13 @@ export default function SendConfirmation(props) {
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {serviceType == 'Test Account'
-                ? UsNumberFormat(netBalance)
+              {serviceType == TEST_ACCOUNT
+                ? UsNumberFormat(spendableBalance)
                 : switchOn
-                ? UsNumberFormat(netBalance)
+                ? UsNumberFormat(spendableBalance)
                 : exchangeRates
                 ? (
-                    (netBalance / 1e8) *
+                    (spendableBalance / 1e8) *
                     exchangeRates[CurrencyCode].last
                   ).toFixed(2)
                 : null}
@@ -573,7 +575,7 @@ export default function SendConfirmation(props) {
                 fontFamily: Fonts.FiraSansMediumItalic,
               }}
             >
-              {serviceType == 'Test Account'
+              {serviceType == TEST_ACCOUNT
                 ? ' t-sats )'
                 : switchOn
                 ? ' sats )'
@@ -724,7 +726,7 @@ export default function SendConfirmation(props) {
                 {transfer.stage1.txPrerequisites
                   ? transfer.stage1.txPrerequisites['low'].fee
                   : ''}
-                {' sats'})
+                 {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
               </Text>
               <Text
                 style={{
@@ -766,7 +768,7 @@ export default function SendConfirmation(props) {
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
             }
           />
         </View>

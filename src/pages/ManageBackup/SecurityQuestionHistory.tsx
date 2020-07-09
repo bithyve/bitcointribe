@@ -112,8 +112,8 @@ const SecurityQuestionHistory = props => {
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
-        info={'Questions Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answers'}
+        info={'Question Successfully Backed Up'}
+        note={'Hexa will remind you to help\nremember the answer'}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
         onPressProceed={() => {

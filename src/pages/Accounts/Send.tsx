@@ -71,7 +71,7 @@ export default function Send(props) {
       : REGULAR_ACCOUNT,
   );
   const sweepSecure = props.navigation.getParam('sweepSecure');
-  let netBalance = props.navigation.getParam('netBalance');
+  let spendableBalance = props.navigation.getParam('spendableBalance');
 
   const service = useSelector((state) => state.accounts[serviceType].service);
   const transfer = useSelector((state) => state.accounts[serviceType].transfer);
@@ -409,7 +409,7 @@ export default function Send(props) {
             selectedContact: item,
             serviceType,
             sweepSecure,
-            netBalance,
+            spendableBalance,
             bitcoinAmount: options.amount ? `${options.amount}` : '',
           });
           break;
@@ -449,7 +449,7 @@ export default function Send(props) {
               selectedContact: item,
               serviceType,
               sweepSecure,
-              netBalance,
+              spendableBalance,
               bitcoinAmount: options.amount ? `${options.amount}` : '',
             });
             break;
@@ -594,7 +594,7 @@ export default function Send(props) {
         serviceType,
         averageTxFees,
         sweepSecure,
-        netBalance,
+        spendableBalance,
         bitcoinAmount,
       });
     } else {
@@ -616,7 +616,7 @@ export default function Send(props) {
           serviceType,
           averageTxFees,
           sweepSecure,
-          netBalance,
+          spendableBalance,
           bitcoinAmount,
         });
       }
@@ -939,8 +939,7 @@ export default function Send(props) {
                     <Text style={styles.errorText}>Enter correct address</Text>
                   </View>
                 ) : null}
-                {serviceType != TEST_ACCOUNT ? (
-                  <View style={{ paddingTop: wp('3%') }}>
+                <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -1035,7 +1034,6 @@ export default function Send(props) {
                       </View>
                     )}
                   </View>
-                ) : null}
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>

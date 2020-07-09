@@ -1395,7 +1395,6 @@ export default function Home(props) {
           props.navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
           });
           break;
 
@@ -1414,7 +1413,6 @@ export default function Home(props) {
           props.navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            netBalance: balances.regularBalance,
             bitcoinAmount: options.amount ? `${options.amount}` : '',
           });
           break;
@@ -2608,7 +2606,6 @@ export default function Home(props) {
       props.navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
-        netBalance: balances.regularBalance,
         bitcoinAmount: options.amount ? `${options.amount}` : '',
       });
     }
