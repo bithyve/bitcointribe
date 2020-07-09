@@ -656,7 +656,7 @@ export default function Receive(props) {
             <BottomInfoBox
               title={'Note'}
               infoText={
-                "Please ensure that you have 2FA setted up (preferably on your Keeper device), you'll require the 2FA token in order to send bitcoin from the Savings Account."
+                "Please ensure that you have 2FA set up (preferably on your Keeper Device), you'll require the 2FA token in order to send bitcoin from the Savings Account"
               }
             />
 
@@ -833,7 +833,7 @@ export default function Receive(props) {
                   </View>
                   <TextInput
                     style={{ ...styles.textBox, paddingLeft: 10 }}
-                    placeholder={'Enter Amount in sats'}
+                    placeholder={'Enter amount in sats'}
                     value={amount}
                     returnKeyLabel="Done"
                     returnKeyType="done"
