@@ -198,7 +198,7 @@ export default function RequestModalContents(props) {
               source={require('../assets/images/icons/openlink.png')}
               style={styles.buttonImage}
             />
-            <Text style={styles.buttonText}>Via Link</Text>
+            <Text style={styles.buttonText}>Share</Text>
           </AppBottomSheetTouchableWrapper>
           <View
             style={{ width: 1, height: 30, backgroundColor: Colors.white }}
@@ -211,7 +211,7 @@ export default function RequestModalContents(props) {
               source={require('../assets/images/icons/qr-code.png')}
               style={styles.buttonImage}
             />
-            <Text style={styles.buttonText}>Via QR</Text>
+            <Text style={styles.buttonText}>QR</Text>
           </AppBottomSheetTouchableWrapper>
         </View>
        

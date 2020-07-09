@@ -768,7 +768,7 @@ export default function Receive(props) {
                   </View>
                   <TextInput
                     style={{ ...styles.textBox, paddingLeft: 10 }}
-                    placeholder={'Enter Amount in sats'}
+                    placeholder={'Enter amount in sats'}
                     value={amount}
                     returnKeyLabel="Done"
                     returnKeyType="done"
