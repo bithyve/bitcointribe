@@ -990,6 +990,48 @@ export default class SecureHDWallet extends Bitcoin {
     return res.data;
   };
 
+  private getChangeAddress = async (): Promise<{ address: string }> => {
+    try {
+      // looking for free internal address
+      let freeAddress = '';
+      let itr;
+      for (itr = 0; itr < this.gapLimit; itr++) {
+        if (this.nextFreeChangeAddressIndex + itr < 0) {
+          continue;
+        }
+        const address = this.createSecureMultiSig(
+          this.nextFreeChangeAddressIndex + itr,
+          true,
+        ).address;
+
+        const txCounts = await this.getTxCounts([address]); // ensuring availability
+
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          this.nextFreeChangeAddressIndex += itr;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        console.log(
+          'Failed to find a free address in the change address cycle, using the next address without checking',
+        );
+        // giving up as we could find a free address in the above cycle
+        freeAddress = this.createSecureMultiSig(
+          this.nextFreeChangeAddressIndex + itr,
+          true,
+        ).address; // not checking this one, it might be free
+        this.nextFreeChangeAddressIndex += itr + 1;
+      }
+
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Change address generation failed: ${err.message}`);
+    }
+  };
+
   public sortOutputs = async (
     outputs: Array<{
       address: string;
@@ -1003,7 +1045,7 @@ export default class SecureHDWallet extends Bitcoin {
   > => {
     for (const output of outputs) {
       if (!output.address) {
-        const { address } = await this.getReceivingAddress();
+        const { address } = await this.getChangeAddress();
         output.address = address;
         console.log(`adding the change address: ${output.address}`);
       }
@@ -1416,7 +1458,7 @@ export default class SecureHDWallet extends Bitcoin {
     secondaryXpub?: string,
   ): { prepared: boolean } => {
     try {
-      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'/0`; // external chain
+      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`;
       const primaryXpub = this.getRecoverableXKey(
         this.primaryMnemonic,
         primaryPath,
@@ -1489,7 +1531,11 @@ export default class SecureHDWallet extends Bitcoin {
       if (multiSig.address === address) {
         return (this.signingEssentialsCache[address] = {
           multiSig,
-          primaryPriv: this.deriveChildXKey(this.primaryXpriv, itr, internal),
+          primaryPriv: this.derivePrimaryChildXKey(
+            this.primaryXpriv,
+            itr,
+            internal,
+          ),
           secondaryPriv: this.secondaryXpriv
             ? this.deriveChildXKey(this.secondaryXpriv, itr)
             : null,
@@ -1503,7 +1549,7 @@ export default class SecureHDWallet extends Bitcoin {
       if (multiSig.address === address) {
         return (this.signingEssentialsCache[address] = {
           multiSig,
-          primaryPriv: this.deriveChildXKey(this.primaryXpriv, itr),
+          primaryPriv: this.derivePrimaryChildXKey(this.primaryXpriv, itr),
           secondaryPriv: this.secondaryXpriv
             ? this.deriveChildXKey(this.secondaryXpriv, itr)
             : null,
@@ -1811,13 +1857,22 @@ export default class SecureHDWallet extends Bitcoin {
     return xKey.publicKey.toString('hex');
   };
 
-  private deriveChildXKey = (
+  private derivePrimaryChildXKey = (
     extendedKey: string,
     childIndex: number,
     internal: boolean = false,
   ): string => {
     const xKey = bip32.fromBase58(extendedKey, this.network);
     const childXKey = xKey.derive(internal ? 1 : 0).derive(childIndex);
+    return childXKey.toBase58();
+  };
+
+  private deriveChildXKey = (
+    extendedKey: string,
+    childIndex: number,
+  ): string => {
+    const xKey = bip32.fromBase58(extendedKey, this.network);
+    const childXKey = xKey.derive(childIndex);
     return childXKey.toBase58();
   };
 
@@ -1870,7 +1925,7 @@ export default class SecureHDWallet extends Bitcoin {
     let childPrimaryPub;
     if (!derivativeXpub)
       childPrimaryPub = this.getPub(
-        this.deriveChildXKey(this.xpubs.primary, childIndex, internal),
+        this.derivePrimaryChildXKey(this.xpubs.primary, childIndex, internal),
       );
     else
       childPrimaryPub = this.getPub(
