@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import {
   View,
   Text,
@@ -53,16 +53,73 @@ interface AddressBookContentsPropTypes {
   trustedChannelsSyncing: any,
 }
 interface AddressBookContentsStateTypes {
-  isLoadContacts: boolean, 
+  isLoadContacts: boolean,
   selectedContact: any[],
-  loading: boolean, 
+  loading: boolean,
   MyKeeper: any[],
   IMKeeper: any[],
   trustedContact: any[],
-  OtherTrustedContact: any[], 
+  OtherTrustedContact: any[],
   onRefresh: boolean
 }
-class AddressBookContents extends React.PureComponent<AddressBookContentsPropTypes, AddressBookContentsStateTypes> {
+
+const getWaterMark = () => {
+  return (
+    <View style={styles.waterMarkView}>
+      <View style={styles.waterMarkInnerView}>
+        <View>
+          <View style={styles.watermarkViewBigText} />
+          <View style={styles.watermarkViewSmallText} />
+        </View>
+        <View style={styles.watermarkViewButton} />
+        <View style={styles.watermarkViewArrow} />
+      </View>
+      <View style={styles.waterMarkBigView}>
+        <View>
+          <View style={styles.watermarkViewBigText} />
+          <View style={styles.watermarkViewSmallText} />
+        </View>
+        <View style={styles.watermarkViewButton} />
+        <View style={styles.watermarkViewArrow} />
+      </View>
+    </View>
+  );
+};
+
+const getImageIcon = (item) => {
+  if (item) {
+    if (item.image && item.image.uri) {
+      return (
+        <Image
+          source={item.image}
+          style={styles.imageIconStyle}
+        />
+      );
+    } else {
+      return (
+        <View style={styles.imageIconViewStyle}>
+          <Text style={styles.imageIconText}>
+            {item
+              ? nameToInitials(
+                item.firstName == 'Secondary' && item.lastName == 'Device'
+                  ? 'Keeper Device'
+                  : item.firstName && item.lastName
+                    ? item.firstName + ' ' + item.lastName
+                    : item.firstName && !item.lastName
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+              )
+              : ''}
+          </Text>
+        </View>
+      );
+    }
+  }
+};
+
+class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, AddressBookContentsStateTypes> {
   AddContactAddressBookBottomSheet: any;
   HelpBottomSheet: any;
   focusListener: any;
@@ -87,19 +144,22 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener('didFocus', () => {
       this.props.trustedChannelsSync();
+      this.updateAddressBook();
     });
   }
 
   componentDidUpdate(prevProps) {
-    if(prevProps.regularAccount.hdWallet.derivativeAccounts !== this.props.regularAccount.hdWallet.derivativeAccounts) {
+    const oldDerivativeAccounts = idx(prevProps, (_) => _.regularAccount.hdWallet.derivativeAccounts);
+    const newDerivativeAccounts = idx(this.props, (_) => _.regularAccount.hdWallet.derivativeAccounts);
+    if (oldDerivativeAccounts !== newDerivativeAccounts) {
       this.updateAddressBook();
     }
-    if(this.state.trustedContact) {
+    if (this.state.trustedContact) {
       this.setState({
         loading: false,
       });
     }
-    if(prevProps.trustedChannelsSyncing !== this.props.trustedChannelsSyncing) {
+    if (prevProps.trustedChannelsSyncing !== this.props.trustedChannelsSyncing) {
       this.setState({
         onRefresh: this.props.trustedChannelsSyncing,
       });
@@ -226,39 +286,6 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
     );
   }
 
-  getImageIcon = (item) => {
-    if (item) {
-      if (item.image && item.image.uri) {
-        return (
-          <Image
-            source={item.image}
-            style={styles.imageIconStyle}
-          />
-        );
-      } else {
-        return (
-          <View style={styles.imageIconViewStyle}>
-            <Text style={styles.imageIconText}>
-              {item
-                ? nameToInitials(
-                  item.firstName == 'Secondary' && item.lastName == 'Device'
-                    ? 'Keeper Device'
-                    : item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                )
-                : ''}
-            </Text>
-          </View>
-        );
-      }
-    }
-  };
-
   getElement = (contact, index, contactsType) => {
     const { navigation } = this.props;
     return (
@@ -274,7 +301,7 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
         }}
         style={styles.selectedContactsView}
       >
-        {this.getImageIcon(contact)}
+        {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
             {contact.contactName &&
@@ -323,29 +350,6 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
           </View>
         </View>
       </TouchableOpacity>
-    );
-  };
-
-  getWaterMark = () => {
-    return (
-      <View style={styles.waterMarkView}>
-        <View style={styles.waterMarkInnerView}>
-          <View>
-            <View style={styles.watermarkViewBigText} />
-            <View style={styles.watermarkViewSmallText} />
-          </View>
-          <View style={styles.watermarkViewButton} />
-          <View style={styles.watermarkViewArrow} />
-        </View>
-        <View style={styles.waterMarkBigView}>
-          <View>
-            <View style={styles.watermarkViewBigText} />
-            <View style={styles.watermarkViewSmallText} />
-          </View>
-          <View style={styles.watermarkViewButton} />
-          <View style={styles.watermarkViewArrow} />
-        </View>
-      </View>
     );
   };
 
@@ -450,7 +454,7 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
                   </View>
                 </View>
               ) : (
-                  this.getWaterMark()
+                  getWaterMark()
                 )}
             </View>
             <View style={{ marginTop: wp('5%') }}>
@@ -472,7 +476,7 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
                   </View>
                 </View>
               ) : (
-                  this.getWaterMark()
+                  getWaterMark()
                 )}
             </View>
             <View style={{ marginTop: wp('5%') }}>
@@ -507,11 +511,7 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
                       }}
                     >
                       <Image
-                        style={{
-                          width: wp('10%'),
-                          height: wp('10%'),
-                          marginLeft: 5,
-                        }}
+                        style={styles.addGrayImage}
                         source={require('../assets/images/icons/icon_add_grey.png')}
                       />
                       <View>
@@ -523,7 +523,7 @@ class AddressBookContents extends React.PureComponent<AddressBookContentsPropTyp
                   </View>
                 </View>
               ) : (
-                  this.getWaterMark()
+                  getWaterMark()
                 )}
             </View>
             {OtherTrustedContact.length == 0 &&
@@ -569,9 +569,9 @@ const mapDispatchToProps = (dispatch) => {
 }
 const mapStateToProps = (state) => {
   return {
-    regularAccount: state.accounts[REGULAR_ACCOUNT].service,
-    trustedContactsService: state.trustedContacts.service,
-    trustedChannelsSyncing: state.trustedContacts.loading.trustedChannelsSync,
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+    trustedChannelsSyncing: idx(state, (_) => _.trustedContacts.loading.trustedChannelsSync),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(AddressBookContents);
@@ -727,9 +727,9 @@ const styles = StyleSheet.create({
     marginLeft: wp('5%'),
     marginRight: wp('5%'),
   },
-  waterMarkInnerView: { 
+  waterMarkInnerView: {
     flexDirection: 'row',
-    alignItems: 'center', 
+    alignItems: 'center',
     padding: 15
   },
   waterMarkBigView: {
@@ -738,5 +738,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
+  },
+  addGrayImage: {
+    width: wp('10%'),
+    height: wp('10%'),
+    marginLeft: 5,
   }
 });
