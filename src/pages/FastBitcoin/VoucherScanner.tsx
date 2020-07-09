@@ -204,9 +204,11 @@ const VoucherScanner = (props) => {
   }, [selectedAccount, service]);
 
   useEffect(() => {
-    dispatch(
-      fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
-    );
+    if(selectedAccount){
+      dispatch(
+        fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
+      );
+    }
   }, [selectedAccount]);
 
   useEffect(() => {
@@ -235,7 +237,7 @@ const VoucherScanner = (props) => {
 
   useEffect(() => {
     if (voucherCode) {
-      if (selectedAccount.accountType != '') {
+      if (selectedAccount && selectedAccount.accountType != '') {
         (async () => {
           let voucherDataTemp = JSON.parse(
             await AsyncStorage.getItem('voucherData'),
@@ -660,6 +662,7 @@ const VoucherScanner = (props) => {
   }, []);
 
   const renderVoucherRedeemSuccessModalContent = useCallback(() => {
+    if(selectedAccount){
     return (
       <VoucherRedeemSuccess
         onPressRedeem={() => {
@@ -680,6 +683,7 @@ const VoucherScanner = (props) => {
         loading={false}
       />
     );
+      }
   }, [selectedAccount]);
 
   const renderVoucherRedeemSuccessModalHeader = useCallback(() => {
@@ -1032,7 +1036,7 @@ const VoucherScanner = (props) => {
             marginBottom: 20,
           }}
         >
-          {selectedAccount.accountType != '' && (
+          {selectedAccount && selectedAccount.accountType != '' && (
             <Image
               source={selectedAccount.image}
               style={{ width: wp('8%'), height: wp('8%') }}
@@ -1040,9 +1044,9 @@ const VoucherScanner = (props) => {
           )}
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.dropDownElementTitleText}>
-              {selectedAccount.accountName ? selectedAccount.accountName : ''}
+              {selectedAccount && selectedAccount.accountName ? selectedAccount.accountName : ''}
             </Text>
-            {selectedAccount.accountType != '' && (
+            {selectedAccount && selectedAccount.accountType != '' && (
               <View
                 style={{
                   flexDirection: 'row',
@@ -1054,9 +1058,9 @@ const VoucherScanner = (props) => {
                   source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                 />
                 <Text style={styles.cardAmountText}>
-                  {selectedAccount.accountType === TEST_ACCOUNT
+                  {selectedAccount && selectedAccount.accountType === TEST_ACCOUNT
                     ? UsNumberFormat(balances.testBalance)
-                    : selectedAccount.accountType === REGULAR_ACCOUNT
+                    : selectedAccount && selectedAccount.accountType === REGULAR_ACCOUNT
                     ? UsNumberFormat(balances.regularBalance)
                     : UsNumberFormat(balances.secureBalance)}
                 </Text>

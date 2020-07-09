@@ -493,7 +493,7 @@ export default function SendToContact(props) {
           }}
         >
           {switchOn
-            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount} sats`
+            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount}` + `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
             : CurrencySymbol +
               ' ' +
               `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
@@ -641,7 +641,7 @@ export default function SendToContact(props) {
             width: wp('45%'),
           }}
           placeholder={
-            switchOn ? 'Enter amount in sats' : 'Converted amount in sats'
+            switchOn ? serviceType == TEST_ACCOUNT ? 'Enter amount in t-sats' : 'Enter amount in sats' : serviceType == TEST_ACCOUNT ? 'Converted amount in t-sats' : 'Converted amount in sats'
           }
           editable={switchOn}
           value={bitcoinAmount}
@@ -759,6 +759,7 @@ export default function SendToContact(props) {
             }, 2);
             (RemoveBottomSheet as any).current.snapTo(0);
           }}
+          serviceType={serviceType}
         />
       );
     }
