@@ -621,9 +621,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        (err) => { }, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -634,7 +634,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
-    this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
       if (appState === nextAppState) return;
@@ -654,7 +653,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -800,12 +799,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => { })
+      .catch((err) => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {});
+      .then((notifications) => { });
   };
 
   componentDidUpdate = (prevProps) => {
@@ -941,35 +940,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-  handleAppStateChange = async (nextAppState) => {
-    let limit = 15;
-    const { isContactOpen, isCameraOpen } = this.state;
-    if (
-      Platform.OS == 'android'
-        ? nextAppState == 'active'
-        : nextAppState == 'inactive' || nextAppState == 'background'
-    ) {
-      this.setState({ lastActiveTime: moment().toISOString() });
-    } else {
-      let { lastActiveTime } = this.state;
-      let diff = moment().diff(moment(lastActiveTime), 'seconds');
-      if (diff >= limit) {
-        this.setState(
-          {
-            lastActiveTime: moment().toISOString(),
-          },
-          () => {
-            this.props.navigation.navigate('ReLogin');
-          },
-        );
-      } else {
-        this.setState({
-          lastActiveTime: moment().toISOString(),
-        });
-        return;
-      }
-    }
-  };
+
 
   handleDeepLink = async (event) => {
     const { navigation, isFocused } = this.props;
@@ -1039,7 +1010,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1360,7 +1331,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1369,19 +1340,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1420,13 +1391,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1435,7 +1406,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1612,7 +1583,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -1752,7 +1723,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               postAssociation: (contact) => {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
-                }`.toLowerCase();
+                  }`.toLowerCase();
                 if (isGuardian) {
                   approveTrustedContact(
                     contactName,
@@ -1885,8 +1856,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -1965,9 +1936,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2165,8 +2136,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2215,8 +2186,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2284,8 +2255,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('82%')
               : hp('82%'),
@@ -2339,8 +2310,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2792,11 +2763,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         />
 
         <BottomSheet
-        onCloseEnd={()=>{
-          this.setState({
-            addContactModalOpened: false
-          });
-        }}
+          onCloseEnd={() => {
+            this.setState({
+              addContactModalOpened: false
+            });
+          }}
           onOpenEnd={() => {
             this.setState({
               tabBarIndex: 0,
@@ -2823,21 +2794,21 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <AddContactAddressBook
-              addContactModalOpened={addContactModalOpened}  
+              addContactModalOpened={addContactModalOpened}
               isLoadContacts={isLoadContacts}
               modalRef={this.refs.addContactAddressBookBookBottomSheet}
               proceedButtonText={'Confirm & Proceed'}
               onPressContinue={() => {
-                if(selectedContact && selectedContact.length){
-                navigation.navigate('AddContactSendRequest', {
-                  SelectedContact: selectedContact,
-                });
-              (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
-                  0,
-                );
+                if (selectedContact && selectedContact.length) {
+                  navigation.navigate('AddContactSendRequest', {
+                    SelectedContact: selectedContact,
+                  });
+                  (this.refs.addContactAddressBookBookBottomSheet as any).snapTo(
+                    0,
+                  );
                 }
               }}
-              
+
               onSelectContact={(selectedContact) => {
                 this.setState({
                   selectedContact,
@@ -2906,7 +2877,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -3037,8 +3008,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

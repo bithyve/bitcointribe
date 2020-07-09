@@ -17,7 +17,7 @@ import { persistStore, persistReducer } from "redux-persist";
 const config = {
   key: "root", // key is required
   storage, // storage is now required
-  // blacklist: []
+  blacklist: ['setupAndAuth']
 };
 
 
