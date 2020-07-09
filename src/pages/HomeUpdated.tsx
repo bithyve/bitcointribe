@@ -1617,7 +1617,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => {}; 
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
