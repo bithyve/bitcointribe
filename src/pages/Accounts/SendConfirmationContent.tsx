@@ -41,6 +41,7 @@ export default function SendConfirmationContent(props) {
           }
         }}
         SelectedContactId={SelectedContactId}
+        serviceType={props.serviceType}  
       />
     );
   };

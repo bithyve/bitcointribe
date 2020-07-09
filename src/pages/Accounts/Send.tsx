@@ -626,8 +626,7 @@ export default function Send(props) {
                     <Text style={styles.errorText}>Enter correct address</Text>
                   </View>
                 ) : null}
-                {serviceType != TEST_ACCOUNT ? (
-                  <View style={{ paddingTop: wp('3%') }}>
+                <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -728,7 +727,6 @@ export default function Send(props) {
                       </View>
                     )}
                   </View>
-                ) : null}
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>

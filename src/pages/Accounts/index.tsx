@@ -989,9 +989,7 @@ export default function Accounts(props) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNetBalance(currentBalance);
-      setSpendableBalance(
-        serviceType === TEST_ACCOUNT ? currentBalance : spendableBalance,
-      );
+      setSpendableBalance(spendableBalance);
       setTransactions(currentTransactions);
     }
   }, [service]);

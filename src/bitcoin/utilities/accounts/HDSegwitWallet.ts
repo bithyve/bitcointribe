@@ -1000,68 +1000,68 @@ export default class HDSegwitWallet extends Bitcoin {
   //   }
   // };
 
-  public fetchBalance = async (options?: {
-    restore?;
-  }): Promise<{
-    balance: number;
-    unconfirmedBalance: number;
-  }> => {
-    try {
-      if (options && options.restore) {
-        if (!(await this.isWalletEmpty())) {
-          console.log('Executing internal binary search');
-          this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
-            config.BSI.INIT_INDEX,
-          );
-          console.log('Executing external binary search');
-          this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
-            config.BSI.INIT_INDEX,
-          );
-        }
-      }
+  // public fetchBalance = async (options?: {
+  //   restore?;
+  // }): Promise<{
+  //   balance: number;
+  //   unconfirmedBalance: number;
+  // }> => {
+  //   try {
+  //     if (options && options.restore) {
+  //       if (!(await this.isWalletEmpty())) {
+  //         console.log('Executing internal binary search');
+  //         this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
+  //           config.BSI.INIT_INDEX,
+  //         );
+  //         console.log('Executing external binary search');
+  //         this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
+  //           config.BSI.INIT_INDEX,
+  //         );
+  //       }
+  //     }
 
-      await this.gapLimitCatchUp();
+  //     await this.gapLimitCatchUp();
 
-      this.usedAddresses = [];
-      for (
-        let itr = 0;
-        itr < this.nextFreeAddressIndex + this.gapLimit;
-        itr++
-      ) {
-        this.usedAddresses.push(this.getExternalAddressByIndex(itr));
-      }
-      for (
-        let itr = 0;
-        itr < this.nextFreeChangeAddressIndex + this.gapLimit;
-        itr++
-      ) {
-        this.usedAddresses.push(this.getInternalAddressByIndex(itr));
-      }
+  //     this.usedAddresses = [];
+  //     for (
+  //       let itr = 0;
+  //       itr < this.nextFreeAddressIndex + this.gapLimit;
+  //       itr++
+  //     ) {
+  //       this.usedAddresses.push(this.getExternalAddressByIndex(itr));
+  //     }
+  //     for (
+  //       let itr = 0;
+  //       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+  //       itr++
+  //     ) {
+  //       this.usedAddresses.push(this.getInternalAddressByIndex(itr));
+  //     }
 
-      const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
-        this.usedAddresses,
-      );
-      return (this.balances = { balance, unconfirmedBalance });
-    } catch (err) {
-      throw new Error(`Unable to get balance: ${err.message}`);
-    }
-  };
+  //     const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
+  //       this.usedAddresses,
+  //     );
+  //     return (this.balances = { balance, unconfirmedBalance });
+  //   } catch (err) {
+  //     throw new Error(`Unable to get balance: ${err.message}`);
+  //   }
+  // };
 
-  public fetchTransactions = async (): Promise<{
-    transactions: Transactions;
-  }> => {
-    if (this.usedAddresses.length === 0) {
-      // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-      await this.fetchBalance();
-    }
+  // public fetchTransactions = async (): Promise<{
+  //   transactions: Transactions;
+  // }> => {
+  //   if (this.usedAddresses.length === 0) {
+  //     // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
+  //     await this.fetchBalance();
+  //   }
 
-    const { transactions } = await this.fetchTransactionsByAddresses(
-      this.usedAddresses,
-      this.isTest ? 'Test Account' : 'Checking Account',
-    );
-    this.transactions = transactions;
-    return { transactions };
-  };
+  //   const { transactions } = await this.fetchTransactionsByAddresses(
+  //     this.usedAddresses,
+  //     this.isTest ? 'Test Account' : 'Checking Account',
+  //   );
+  //   this.transactions = transactions;
+  //   return { transactions };
+  // };
 
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter
@@ -1488,7 +1488,7 @@ export default class HDSegwitWallet extends Bitcoin {
     try {
       if (this.usedAddresses.length === 0) {
         // refresh balance (it refreshes internal `this.usedAddresses`)
-        await this.fetchBalance();
+        await this.fetchBalanceTransaction();
       }
 
       const batchedDerivativeAddresses = [];
@@ -1523,7 +1523,7 @@ export default class HDSegwitWallet extends Bitcoin {
       console.log({ ownedAddresses });
       const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
 
-      if (this.isTest) return UTXOs;
+      // if (this.isTest) return UTXOs;
       const changeAddresses = [];
       for (
         let itr = 0;
