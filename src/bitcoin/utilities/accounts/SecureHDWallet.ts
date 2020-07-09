@@ -1665,7 +1665,32 @@ export default class SecureHDWallet extends Bitcoin {
         ...batchedDerivativeAddresses,
       ];
       const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
-      return UTXOs;
+
+      const changeAddresses = [];
+      for (
+        let itr = 0;
+        itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+        itr++
+      ) {
+        changeAddresses.push(this.createSecureMultiSig(itr, true).address);
+      }
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+          else {
+            if (changeAddresses.includes(utxo.address)) {
+              // defaulting utxo's on the change branch to confirmed
+              confirmedUTXOs.push(utxo);
+            }
+          }
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+
+      return confirmedUTXOs;
     } catch (err) {
       throw new Error(`Fetch UTXOs failed: ${err.message}`);
     }
