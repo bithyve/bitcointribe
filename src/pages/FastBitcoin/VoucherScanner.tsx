@@ -28,6 +28,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   FAST_BITCOINS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -57,7 +58,7 @@ import {
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import Config from 'react-native-config';
 import Loader from '../../components/loader';
-
+import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import moment from 'moment';
 
@@ -105,10 +106,8 @@ const VoucherScanner = (props) => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
   }, [accounts1.exchangeRates]);
   const [balances, setBalances] = useState({
-    testBalance: 0,
     regularBalance: 0,
     secureBalance: 0,
-    accumulativeBalance: 0,
   });
 
   const [ErrorModalBottomSheet, setErrorModalBottomSheet] = useState(
@@ -204,7 +203,7 @@ const VoucherScanner = (props) => {
   }, [selectedAccount, service]);
 
   useEffect(() => {
-    if(selectedAccount){
+    if (selectedAccount) {
       dispatch(
         fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
       );
@@ -212,26 +211,74 @@ const VoucherScanner = (props) => {
   }, [selectedAccount]);
 
   useEffect(() => {
-    const testBalance = accounts1[TEST_ACCOUNT].service
-      ? accounts1[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts1[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const regularBalance = accounts1[REGULAR_ACCOUNT].service
+    let regularBalance = accounts1[REGULAR_ACCOUNT].service
       ? accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const secureBalance = accounts1[SECURE_ACCOUNT].service
+
+    // regular derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      const derivativeAccount =
+        accounts1[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            regularBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
+
+    let secureBalance = accounts1[SECURE_ACCOUNT].service
       ? accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
+
+    // secure derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+
+      const derivativeAccount =
+        accounts1[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            secureBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
 
     setBalances({
-      testBalance,
       regularBalance,
       secureBalance,
-      accumulativeBalance,
     });
   }, [accounts1]);
 
@@ -662,28 +709,28 @@ const VoucherScanner = (props) => {
   }, []);
 
   const renderVoucherRedeemSuccessModalContent = useCallback(() => {
-    if(selectedAccount){
-    return (
-      <VoucherRedeemSuccess
-        onPressRedeem={() => {
-          props.navigation.navigate('Accounts', {
-            serviceType:
-              selectedAccount.accountName === 'Test Account'
-                ? TEST_ACCOUNT
-                : selectedAccount.accountName === 'Checking Account'
-                ? REGULAR_ACCOUNT
-                : SECURE_ACCOUNT,
-          });
-        }}
-        onPressBack={() => {
-          VoucherRedeemSuccessBottomSheet.current.snapTo(0);
-        }}
-        accountName={selectedAccount.accountName}
-        redeemAmount={'17,000'}
-        loading={false}
-      />
-    );
-      }
+    if (selectedAccount) {
+      return (
+        <VoucherRedeemSuccess
+          onPressRedeem={() => {
+            props.navigation.navigate('Accounts', {
+              serviceType:
+                selectedAccount.accountName === 'Test Account'
+                  ? TEST_ACCOUNT
+                  : selectedAccount.accountName === 'Checking Account'
+                  ? REGULAR_ACCOUNT
+                  : SECURE_ACCOUNT,
+            });
+          }}
+          onPressBack={() => {
+            VoucherRedeemSuccessBottomSheet.current.snapTo(0);
+          }}
+          accountName={selectedAccount.accountName}
+          redeemAmount={'17,000'}
+          loading={false}
+        />
+      );
+    }
   }, [selectedAccount]);
 
   const renderVoucherRedeemSuccessModalHeader = useCallback(() => {
@@ -822,7 +869,7 @@ const VoucherScanner = (props) => {
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
-        <ScrollView style={{ flex: 1}}>
+        <ScrollView style={{ flex: 1 }}>
           <View style={{ height: '100%' }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
@@ -884,7 +931,6 @@ const VoucherScanner = (props) => {
               }}
               value={voucherCode}
             />
-            
           </View>
         </ScrollView>
         {hideShow ? (
@@ -921,9 +967,7 @@ const VoucherScanner = (props) => {
                           source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                         />
                         <Text style={styles.cardAmountText}>
-                          {value.accountType === TEST_ACCOUNT
-                            ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === REGULAR_ACCOUNT
+                          {value.accountType === REGULAR_ACCOUNT
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)}
                         </Text>
@@ -949,61 +993,62 @@ const VoucherScanner = (props) => {
           </View>
         ) : null}
         <TouchableOpacity
-              onPress={() => {
-                props.navigation.navigate('PairNewWallet');
-              }}
+          onPress={() => {
+            props.navigation.navigate('PairNewWallet');
+          }}
+          style={{
+            marginBottom: -20,
+          }}
+        >
+          <View
+            style={{
+              marginBottom: 25,
+              padding: 20,
+              backgroundColor: props.backgroundColor
+                ? props.backgroundColor
+                : Colors.backgroundColor,
+              marginLeft: 20,
+              marginRight: 20,
+              borderRadius: 10,
+              justifyContent: 'center',
+            }}
+          >
+            <Text
               style={{
-                marginBottom: -20,}}
+                color: props.titleColor ? props.titleColor : Colors.blue,
+                fontSize: RFValue(13),
+                marginBottom: 2,
+                fontFamily: Fonts.FiraSansRegular,
+              }}
             >
-              <View
+              {'Already registered with FastBitcoins?'}
+            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text
                 style={{
-                  marginBottom: 25,
-                  padding: 20,
-                  backgroundColor: props.backgroundColor
-                    ? props.backgroundColor
-                    : Colors.backgroundColor,
-                  marginLeft: 20,
-                  marginRight: 20,
-                  borderRadius: 10,
-                  justifyContent: 'center',
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textDecorationLine: 'underline',
+                }}
+                onPress={() => {
+                  props.navigation.navigate('PairNewWallet');
                 }}
               >
-                <Text
-                  style={{
-                    color: props.titleColor ? props.titleColor : Colors.blue,
-                    fontSize: RFValue(13),
-                    marginBottom: 2,
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  {'Already registered with FastBitcoins?'}
-                </Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                      textDecorationLine: 'underline',
-                    }}
-                    onPress={() => {
-                      props.navigation.navigate('PairNewWallet');
-                    }}
-                  >
-                    {'Click here'}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    {' to link your Hexa wallet'}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+                {'Click here'}
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {' to link your Hexa wallet'}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
         <Text
           style={{
             marginTop: 'auto',
@@ -1044,7 +1089,9 @@ const VoucherScanner = (props) => {
           )}
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.dropDownElementTitleText}>
-              {selectedAccount && selectedAccount.accountName ? selectedAccount.accountName : ''}
+              {selectedAccount && selectedAccount.accountName
+                ? selectedAccount.accountName
+                : ''}
             </Text>
             {selectedAccount && selectedAccount.accountType != '' && (
               <View
@@ -1058,9 +1105,8 @@ const VoucherScanner = (props) => {
                   source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                 />
                 <Text style={styles.cardAmountText}>
-                  {selectedAccount && selectedAccount.accountType === TEST_ACCOUNT
-                    ? UsNumberFormat(balances.testBalance)
-                    : selectedAccount && selectedAccount.accountType === REGULAR_ACCOUNT
+                  {selectedAccount &&
+                  selectedAccount.accountType === REGULAR_ACCOUNT
                     ? UsNumberFormat(balances.regularBalance)
                     : UsNumberFormat(balances.secureBalance)}
                 </Text>
