@@ -1260,16 +1260,10 @@ export default function Accounts(props) {
                 dAccountType
               ];
           } else if (serviceType === SECURE_ACCOUNT) {
+            if (dAccountType === TRUSTED_CONTACTS) continue;
             derivativeAccount =
               accounts[SECURE_ACCOUNT].service.secureHDWallet
                 .derivativeAccounts[dAccountType];
-          }
-
-          if (
-            serviceType === SECURE_ACCOUNT &&
-            dAccountType === TRUSTED_CONTACTS
-          ) {
-            continue;
           }
 
           if (derivativeAccount.instance.using) {
