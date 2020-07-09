@@ -75,7 +75,7 @@ import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
 import SendToContact from '../pages/Accounts/SendToContact';
-import SendConfirmation from '../pages/Accounts/SendConfirmation';
+import SendConfirmation from '../pages/Accounts/SendConfirmation_updated';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive_updated';
