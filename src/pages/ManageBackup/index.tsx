@@ -1507,7 +1507,7 @@ export default function ManageBackup(props) {
       if (item.status === 'Ugly') {
         return 'Secure your Recovery Key as a file (pdf)';
       }
-      return 'The PDFs are locked with your Security Answers';
+      return 'The PDFs are locked with your Security Answer';
     }
 
     return 'Last Backup ';

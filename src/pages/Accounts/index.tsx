@@ -453,7 +453,7 @@ export default function Accounts(props) {
             {
               <Text
                 style={{
-                  marginRight: 10,
+                  // marginRight: 10,
                   fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(15),
                   color: Colors.white,
@@ -479,7 +479,7 @@ export default function Accounts(props) {
                 Know more
               </Text>
             }
-            <Image
+            {/* <Image
               style={{
                 marginLeft: 'auto',
                 width: wp('5%'),
@@ -488,7 +488,7 @@ export default function Accounts(props) {
                 padding: 10,
               }}
               source={require('../../assets/images/icons/icon_settings.png')}
-            />
+            /> */}
           </View>
           <View
             style={{

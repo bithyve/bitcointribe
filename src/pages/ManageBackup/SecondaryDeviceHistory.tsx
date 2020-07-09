@@ -587,7 +587,7 @@ const SecondaryDeviceHistory = (props) => {
                   ? getIconByStatus(
                       props.navigation.state.params.selectedStatus,
                     )
-                  : require('../../assets/images/icons/settings.png')
+                  : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
           </View>

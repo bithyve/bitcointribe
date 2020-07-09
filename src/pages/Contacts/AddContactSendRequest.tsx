@@ -283,7 +283,7 @@ export default function AddContactSendRequest(props) {
       <SendViaQR
         isFromReceive={true}
         headerText={'Friends and Family Request'}
-        subHeaderText={'Scan the QR from your contact’s Hexa app'}
+        subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         QR={trustedQR}
@@ -510,7 +510,7 @@ export default function AddContactSendRequest(props) {
             <BottomInfoBox
               title={'Friends and Family request'}
               infoText={
-                'Your contact will have to accept your request to add them'
+                'Your contact will have to accept your request for you to add them'
               }
             />
           </View>
