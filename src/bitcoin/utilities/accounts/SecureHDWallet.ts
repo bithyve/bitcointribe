@@ -77,8 +77,9 @@ export default class SecureHDWallet extends Bitcoin {
     primaryMnemonic: string,
     stateVars?: {
       secondaryMnemonic: string;
-      consumedAddresses: string[];
-      nextFreeChildIndex: number;
+      usedAddresses: string[];
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
@@ -115,7 +116,7 @@ export default class SecureHDWallet extends Bitcoin {
         ? stateVars.secondaryMnemonic
         : null;
     this.usedAddresses =
-      stateVars && stateVars.usedAddresses ? stateVars.consumedAddresses : [];
+      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : [];
     this.nextFreeAddressIndex =
       stateVars && stateVars.nextFreeAddressIndex
         ? stateVars.nextFreeAddressIndex

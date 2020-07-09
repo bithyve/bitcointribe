@@ -15,8 +15,9 @@ export default class SecureAccount {
     const {
       primaryMnemonic,
       secondaryMnemonic,
-      consumedAddresses,
-      nextFreeChildIndex,
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
       multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
@@ -33,8 +34,9 @@ export default class SecureAccount {
     }: {
       primaryMnemonic: string;
       secondaryMnemonic: string;
-      consumedAddresses: string[];
-      nextFreeChildIndex: number;
+      usedAddresses: string[];
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
@@ -59,8 +61,9 @@ export default class SecureAccount {
 
     return new SecureAccount(primaryMnemonic, {
       secondaryMnemonic,
-      consumedAddresses,
-      nextFreeChildIndex,
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
       multiSigCache,
       signingEssentialsCache,
       primaryXpriv,
@@ -83,8 +86,9 @@ export default class SecureAccount {
     primaryMnemonic: string,
     stateVars?: {
       secondaryMnemonic: string;
-      consumedAddresses: string[];
-      nextFreeChildIndex: number;
+      usedAddresses: string[];
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
