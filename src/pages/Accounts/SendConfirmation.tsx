@@ -412,8 +412,17 @@ export default function SendConfirmation(props) {
         onPressHeader={() => {
           if (SendSuccessBottomSheet.current)
             SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts');
-        }}
+            props.navigation.navigate('Accounts', {
+              serviceType,
+              index:
+                serviceType === TEST_ACCOUNT
+                  ? 0
+                  : serviceType === REGULAR_ACCOUNT
+                  ? 1
+                  : 2,
+              spendableBalance: spendableBalance - totalAmount,
+            });
+          }}
       />
     );
   };

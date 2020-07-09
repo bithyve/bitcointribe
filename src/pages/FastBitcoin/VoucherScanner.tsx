@@ -720,6 +720,12 @@ const VoucherScanner = (props) => {
                   : selectedAccount.accountName === 'Checking Account'
                   ? REGULAR_ACCOUNT
                   : SECURE_ACCOUNT,
+                  index:
+              selectedAccount.accountName === 'Test Account'
+                  ? 0
+                  : selectedAccount.accountName === 'Checking Account'
+                  ? 1
+                  : 2,    
             });
           }}
           onPressBack={() => {
