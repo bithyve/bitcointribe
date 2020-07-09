@@ -473,8 +473,8 @@ export default class SecureHDWallet extends Bitcoin {
     } = await this.fetchBalanceTransactionsByAddresses(
       this.usedAddresses,
       'Savings Account',
-      changeAddresses,
       ownedAddresses,
+      changeAddresses,
     );
 
     this.setNewTransactions(transactions);
@@ -629,9 +629,9 @@ export default class SecureHDWallet extends Bitcoin {
       accountNumber
     ];
 
-    const consumedAddresses = [];
+    const usedAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
-      consumedAddresses.push(
+      usedAddresses.push(
         this.createSecureMultiSig(
           itr,
           false,
@@ -642,16 +642,15 @@ export default class SecureHDWallet extends Bitcoin {
 
     this.derivativeAccounts[accountType][
       accountNumber
-    ].usedAddresses = consumedAddresses;
-    console.log({ derivativeAccConsumedAddresses: consumedAddresses });
+    ].usedAddresses = usedAddresses;
 
     const {
       balances,
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
-      consumedAddresses,
+      usedAddresses,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
-      consumedAddresses,
+      usedAddresses,
       null,
     );
 
