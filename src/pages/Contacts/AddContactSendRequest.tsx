@@ -100,7 +100,7 @@ export default function AddContactSendRequest(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact;
     }
-    console.log({ trustedContactsInfo });
+    console.log('TrustedContactsInfo ', { trustedContactsInfo });
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
