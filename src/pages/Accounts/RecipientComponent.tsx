@@ -22,6 +22,7 @@ import {
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { nameToInitials } from '../../common/CommonFunctions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 function RecipientComponent(props) {
   return (
@@ -130,7 +131,7 @@ function RecipientComponent(props) {
               }}
             >
               {props.item.bitcoinAmount
-                ? props.item.bitcoinAmount + ' Sats'
+                ? `${props.item.bitcoinAmount}` + `${props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
                 : '$ ' + props.item.currencyAmount
                 ? props.item.currencyAmount
                 : ''}
