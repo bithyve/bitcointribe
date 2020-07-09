@@ -12,6 +12,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Keyboard,
+  BackHandler,
 } from 'react-native';
 import Fonts from '../../common/Fonts';
 import DeviceInfo from 'react-native-device-info';
@@ -86,8 +87,17 @@ const PairNewWallet = (props) => {
         setUserKey(userKey1);
       }
     })();
+    BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
+        return () =>
+          BackHandler.removeEventListener(
+            'hardwareBackPress',
+            hardwareBackHandler,
+          );
   }, []);
 
+  const hardwareBackHandler = () => {
+    props.navigation.pop(2);
+  }; 
 
   useEffect(() => {
     if (voucherCode) {
@@ -269,7 +279,7 @@ const PairNewWallet = (props) => {
         <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.goBack();
+              props.navigation.pop(2);
             }}
             style={styles.backArrowView}
           >
