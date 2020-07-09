@@ -1494,6 +1494,21 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public rederivePrimaryXKeys = (): boolean => {
+    const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`;
+    const primaryXpub = this.getRecoverableXKey(
+      this.primaryMnemonic,
+      primaryPath,
+    );
+    this.primaryXpriv = this.getRecoverableXKey(
+      this.primaryMnemonic,
+      primaryPath,
+      true,
+    );
+    this.xpubs.primary = primaryXpub;
+    return true;
+  };
+
   public generateSecondaryXpriv = (secondaryMnemonic: string): Boolean => {
     const path = this.derivePath(this.xpubs.bh);
     const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);

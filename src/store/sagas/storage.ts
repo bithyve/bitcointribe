@@ -133,7 +133,6 @@ function* servicesEnricherWorker({ payload }) {
           services.S3_SERVICE.sss.walletId,
         );
 
-        database.VERSION = DeviceInfo.getVersion();
         migrated = true;
       } else {
         // default enrichment (when database versions are different but migration is not available)
@@ -146,6 +145,17 @@ function* servicesEnricherWorker({ payload }) {
             ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
             : new TrustedContactsService(),
         };
+      }
+
+      if (semver.eq(DeviceInfo.getVersion(), '1.0.1')) {
+        // vsersion 1.0 and lower support
+
+        // re-derive primary extended keys (standardization)
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT;
+        if (secureAccount.secureHDWallet.rederivePrimaryXKeys()) {
+          console.log('Standardized Primary XKeys for secure a/c');
+          migrated = true;
+        }
       }
     } else {
       services = {
@@ -161,6 +171,7 @@ function* servicesEnricherWorker({ payload }) {
 
     yield put(servicesEnriched(services));
     if (migrated) {
+      database.VERSION = DeviceInfo.getVersion();
       yield call(insertDBWorker, { payload: database });
     }
   } catch (err) {
