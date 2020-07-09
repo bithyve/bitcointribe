@@ -426,12 +426,16 @@ export default class SecureHDWallet extends Bitcoin {
     for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
       this.usedAddresses.push(this.createSecureMultiSig(itr).address);
     }
+
+    const changeAddresses = [];
     for (
       let itr = 0;
       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
       itr++
     ) {
-      this.usedAddresses.push(this.createSecureMultiSig(itr, true).address);
+      const internalAddress = this.createSecureMultiSig(itr, true).address;
+      this.usedAddresses.push(internalAddress);
+      changeAddresses.push(internalAddress);
     }
 
     const batchedDerivativeAddresses = [];
@@ -469,6 +473,7 @@ export default class SecureHDWallet extends Bitcoin {
     } = await this.fetchBalanceTransactionsByAddresses(
       this.usedAddresses,
       'Savings Account',
+      changeAddresses,
       ownedAddresses,
     );
 
@@ -647,6 +652,7 @@ export default class SecureHDWallet extends Bitcoin {
       consumedAddresses,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
       consumedAddresses,
+      null,
     );
 
     const lastSyncTime =
@@ -734,25 +740,21 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       if (this.network === bitcoinJS.networks.testnet) {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCETXN,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXOTXN,
           {
             addresses: batchedDerivativeAddresses,
           },
         );
       } else {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCETXN,
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXOTXN,
           {
             addresses: batchedDerivativeAddresses,
           },
         );
       }
 
-      const { Balance, Txs } = res.data;
-      // const netBalances = {
-      //   balance: Balance.Balance,
-      //   unconfirmedBalance: Balance.UnconfirmedBalance,
-      // };
+      const { Utxos, Txs } = res.data;
 
       const addressesInfo = Txs;
       console.log({ addressesInfo });
@@ -772,6 +774,19 @@ export default class SecureHDWallet extends Bitcoin {
             unconfirmedBalance: 0,
           };
 
+          const addressInUse = derivativeAccounts[accountNumber].usedAddresses;
+          for (const addressSpecificUTXOs of Utxos) {
+            for (const utxo of addressSpecificUTXOs) {
+              const { value, Address, status } = utxo;
+              if (addressInUse.includes(Address)) {
+                if (status.confirmed) balances.balance += value;
+                // else if (changeAddresses && changeAddresses.includes(Address))
+                //   balances.balance += value;
+                else balances.unconfirmedBalance += value;
+              }
+            }
+          }
+
           const transactions: Transactions = {
             totalTransactions: 0,
             confirmedTransactions: 0,
@@ -781,12 +796,7 @@ export default class SecureHDWallet extends Bitcoin {
 
           const txMap = new Map();
           for (const addressInfo of addressesInfo) {
-            if (
-              derivativeAccounts[accountNumber].usedAddresses.indexOf(
-                addressInfo.Address,
-              ) == -1
-            )
-              continue;
+            if (!addressInUse.includes(addressInfo.Address)) continue;
             if (addressInfo.TotalTransactions === 0) continue;
 
             transactions.totalTransactions += addressInfo.TotalTransactions;
@@ -821,22 +831,22 @@ export default class SecureHDWallet extends Bitcoin {
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
                 };
 
-                // update balance based on tx
-                if (transaction.status === 'Confirmed') {
-                  if (transaction.transactionType === 'Received') {
-                    balances.balance += transaction.amount;
-                  } else {
-                    const debited = transaction.amount + transaction.fee;
-                    balances.balance -= debited;
-                  }
-                } else {
-                  if (transaction.transactionType === 'Received') {
-                    balances.unconfirmedBalance += transaction.amount;
-                  } else {
-                    const debited = transaction.amount + transaction.fee;
-                    balances.unconfirmedBalance -= debited;
-                  }
-                }
+                // // update balance based on tx
+                // if (transaction.status === 'Confirmed') {
+                //   if (transaction.transactionType === 'Received') {
+                //     balances.balance += transaction.amount;
+                //   } else {
+                //     const debited = transaction.amount + transaction.fee;
+                //     balances.balance -= debited;
+                //   }
+                // } else {
+                //   if (transaction.transactionType === 'Received') {
+                //     balances.unconfirmedBalance += transaction.amount;
+                //   } else {
+                //     const debited = transaction.amount + transaction.fee;
+                //     balances.unconfirmedBalance -= debited;
+                //   }
+                // }
 
                 // over-ride sent transaction's accountType variable for derivative accounts
                 // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
