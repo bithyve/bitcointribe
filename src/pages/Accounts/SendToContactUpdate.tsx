@@ -230,6 +230,7 @@ class SendToContact extends Component<
     if (
       prevState.bitcoinAmount !== this.state.bitcoinAmount ||
       prevState.currencyAmount !== this.state.currencyAmount ||
+      prevState.spendableBalance !== this.state.spendableBalance ||
       prevProps.transfer[this.state.serviceType].transfer.details.length !==
         this.props.transfer[this.state.serviceType].transfer.details.length
     ) {
@@ -431,7 +432,7 @@ class SendToContact extends Component<
       });
       if (spendableBalance - amountStacked < Number(bitcoinAmount)) {
         this.setState({ isInvalidBalance: true, isConfirmDisabled: true });
-      } else this.setState({ isConfirmDisabled: false });
+      } else this.setState({ isConfirmDisabled: false, isInvalidBalance: false });
     } else {
       this.setState({ isConfirmDisabled: true });
       if (!transfer[serviceType].transfer.details.length) {
