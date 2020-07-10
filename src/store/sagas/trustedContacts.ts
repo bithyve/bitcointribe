@@ -208,7 +208,11 @@ function* updateEphemeralChannelWorker({ payload }) {
           const { walletName } = yield select(
             (state) => state.storage.database.WALLET_SETUP,
           );
-          sendNotification(trustedContacts, contactName, walletName);
+          sendNotification(
+            trustedContacts,
+            contactName.toLowerCase().trim(),
+            walletName,
+          );
         } else console.log('Xpub updation to TC failed for: ', contactName);
       } else {
         console.log('Derivative xpub generation failed for: ', contactName);
