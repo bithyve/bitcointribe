@@ -145,25 +145,6 @@ export default function SendToContact(props) {
     'EUR',
   ];
 
-  function setCurrencyCodeToImage(currencyName, currencyColor) {
-    return (
-      <View
-        style={{
-          width: wp('6%'),
-          height: wp('6%'),
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <MaterialCommunityIcons
-          name={currencyName}
-          color={Colors.currencyGray}
-          size={wp('6%')}
-        />
-      </View>
-    );
-  }
-
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
@@ -289,7 +270,7 @@ export default function SendToContact(props) {
       }
     } else {
       setIsConfirmDisabled(true);
-      console.log({ transfer });
+      //console.log({ transfer });
       if (!transfer.details.length) {
         props.navigation.goBack();
       }
@@ -1024,7 +1005,147 @@ export default function SendToContact(props) {
       <View style={{ width: wp('85%'), alignSelf: 'center' }}>
         {transfer.details && transfer.details.length > 0 ? (
           <ScrollView horizontal={true}>
-            {transfer.details.map((item) => renderMultipleContacts(item))}
+            {transfer.details.map((item) => {
+              //console.log('ITEM in list', item);
+              return (
+                <View
+                  style={{
+                    marginRight: 20,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: wp('15%'),
+                  }}
+                >
+                  <View style={{ flexDirection: 'row' }}>
+                    {item.selectedContact &&
+                    item.selectedContact.account_name ? (
+                      <Image
+                        source={
+                          item.selectedContact.account_name ===
+                          'Checking Account'
+                            ? require('../../assets/images/icons/icon_regular.png')
+                            : item.selectedContact.account_name ===
+                              'Savings Account'
+                            ? require('../../assets/images/icons/icon_secureaccount.png')
+                            : item.selectedContact.account_name ===
+                              'Test Account'
+                            ? require('../../assets/images/icons/icon_test_white.png')
+                            : require('../../assets/images/icons/icon_user.png')
+                        }
+                        style={styles.circleShapeView}
+                      />
+                    ) : item.selectedContact.image ? (
+                      <Image
+                        source={item.selectedContact.image}
+                        style={styles.circleShapeView}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          ...styles.circleShapeView,
+                          backgroundColor: Colors.shadowBlue,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {item.selectedContact &&
+                        item.selectedContact.firstName ? (
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              fontSize: 13,
+                              lineHeight: 13, //... One for top and one for bottom alignment
+                            }}
+                          >
+                            {item && item.selectedContact
+                              ? nameToInitials(
+                                  item.selectedContact.firstName &&
+                                    item.selectedContact.lastName
+                                    ? item.selectedContact.firstName +
+                                        ' ' +
+                                        item.selectedContact.lastName
+                                    : item.selectedContact.firstName &&
+                                      !item.selectedContact.lastName
+                                    ? item.selectedContact.firstName
+                                    : !item.selectedContact.firstName &&
+                                      item.selectedContact.lastName
+                                    ? item.selectedContact.lastName
+                                    : '',
+                                )
+                              : ''}
+                          </Text>
+                        ) : item &&
+                          item.selectedContact &&
+                          item.selectedContact.id ? (
+                          <Text
+                            style={{
+                              textAlign: 'center',
+                              fontSize: 18,
+                              lineHeight: 18, //... One for top and one for bottom alignment
+                            }}
+                          >
+                            @
+                          </Text>
+                        ) : (
+                          <Image
+                            source={require('../../assets/images/icons/icon_user.png')}
+                            style={styles.circleShapeView}
+                          />
+                        )}
+                      </View>
+                    )}
+                    {/* {getImageIcon(item.selectedContact)} */}
+                    <TouchableOpacity
+                      style={styles.closeMarkStyle}
+                      onPress={() => removeFromSendStorage(item)}
+                    >
+                      <AntDesign
+                        size={16}
+                        color={Colors.blue}
+                        name={'closecircle'}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <Text
+                    style={{
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(13),
+                      fontFamily: Fonts.FiraSansRegular,
+                      textAlign: 'center',
+                      marginTop: 5,
+                      width: wp('15%'),
+                    }}
+                    numberOfLines={1}
+                  >
+                    {item.selectedContact.name ||
+                      item.selectedContact.account_name ||
+                      item.selectedContact.id}
+                  </Text>
+                  <Text
+                    style={{
+                      color: Colors.blue,
+                      fontSize: RFValue(10),
+                      fontFamily: Fonts.FiraSansRegular,
+                    }}
+                  >
+                    {switchOn
+                      ? `${
+                          item.bitcoinAmount
+                            ? item.bitcoinAmount
+                            : bitcoinAmount
+                        } sats`
+                      : CurrencySymbol +
+                        ' ' +
+                        `${
+                          item.currencyAmount
+                            ? item.currencyAmount
+                            : currencyAmount
+                        }`}
+                  </Text>
+                </View>
+              );
+            })}
+            {/* renderMultipleContacts(item))} */}
           </ScrollView>
         ) : null}
       </View>
@@ -1049,13 +1170,170 @@ export default function SendToContact(props) {
           <ScrollView>
             <View style={{ flex: 1, flexDirection: 'row' }}>
               <View style={{ flex: 1, flexDirection: 'column' }}>
-                {renderUSDInputText()}
+                <TouchableOpacity
+                  style={{
+                    ...InputStyle1,
+                    marginBottom: wp('1.5%'),
+                    marginTop: wp('1.5%'),
+                    flexDirection: 'row',
+                    width: wp('70%'),
+                    height: wp('13%'),
+                    backgroundColor: !switchOn
+                      ? Colors.white
+                      : Colors.backgroundColor,
+                  }}
+                  // onPress={()=>setSwitchOn(!switchOn)}
+                >
+                  <View style={styles.amountInputImage}>
+                    {currencyCode.includes(CurrencyCode) ? (
+                      <View
+                        style={{
+                          width: wp('6%'),
+                          height: wp('6%'),
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <MaterialCommunityIcons
+                          name={getCurrencyImageName(CurrencyCode)}
+                          color={Colors.currencyGray}
+                          size={wp('6%')}
+                        />
+                      </View>
+                    ) : (
+                      <Image
+                        style={{
+                          ...styles.textBoxImage,
+                        }}
+                        source={getCurrencyImageByRegion(CurrencyCode, 'gray')}
+                      />
+                    )}
+                    {/* <Image
+            style={styles.textBoxImage}
+            source={require('../../assets/images/icons/dollar_grey.png')}
+          /> */}
+                  </View>
+                  <View
+                    style={{
+                      width: 2,
+                      height: '60%',
+                      backgroundColor: Colors.borderColor,
+                      marginRight: 5,
+                      marginLeft: 5,
+                      alignSelf: 'center',
+                    }}
+                  />
+                  <TextInput
+                    style={{
+                      ...styles.textBox,
+                      paddingLeft: 10,
+                      flex: 1,
+                      height: wp('13%'),
+                      width: wp('45%'),
+                    }}
+                    editable={!switchOn}
+                    placeholder={
+                      switchOn
+                        ? 'Converted amount in ' + CurrencyCode
+                        : 'Enter amount in ' + CurrencyCode
+                    }
+                    value={currencyAmount}
+                    returnKeyLabel="Done"
+                    returnKeyType="done"
+                    keyboardType={'numeric'}
+                    onChangeText={(value) => {
+                      convertBitCoinToCurrency(value);
+                    }}
+                    placeholderTextColor={Colors.borderColor}
+                    onFocus={() => {
+                      setInputStyle1(styles.inputBoxFocused);
+                    }}
+                    onBlur={() => {
+                      setInputStyle1(styles.textBoxView);
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.nativeEvent.key === 'Backspace') {
+                        setTimeout(() => {
+                          setIsInvalidBalance(false);
+                        }, 10);
+                      }
+                    }}
+                  />
+                </TouchableOpacity>
+                {/* {renderUSDInputText()} */}
                 {isInvalidBalance ? (
                   <View style={{ marginLeft: 'auto' }}>
                     <Text style={styles.errorText}>Insufficient balance</Text>
                   </View>
                 ) : null}
-                {renderBitCoinInputText()}
+                <TouchableOpacity
+                  style={{
+                    ...InputStyle,
+                    marginBottom: wp('1.5%'),
+                    marginTop: wp('1.5%'),
+                    flexDirection: 'row',
+                    width: wp('70%'),
+                    height: wp('13%'),
+                    backgroundColor: switchOn
+                      ? Colors.white
+                      : Colors.backgroundColor,
+                  }}
+                  // onPress={()=>setSwitchOn(!switchOn)}
+                >
+                  <View style={styles.amountInputImage}>
+                    <Image
+                      style={styles.textBoxImage}
+                      source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                    />
+                  </View>
+                  <View
+                    style={{
+                      width: 2,
+                      height: '60%',
+                      backgroundColor: Colors.borderColor,
+                      marginRight: 5,
+                      marginLeft: 5,
+                      alignSelf: 'center',
+                    }}
+                  />
+                  <TextInput
+                    style={{
+                      ...styles.textBox,
+                      flex: 1,
+                      paddingLeft: 10,
+                      height: wp('13%'),
+                      width: wp('45%'),
+                    }}
+                    placeholder={
+                      switchOn
+                        ? 'Enter amount in sats'
+                        : 'Converted amount in sats'
+                    }
+                    editable={switchOn}
+                    value={bitcoinAmount}
+                    returnKeyLabel="Done"
+                    returnKeyType="done"
+                    keyboardType={'numeric'}
+                    onChangeText={(value) => {
+                      convertBitCoinToCurrency(value);
+                    }}
+                    placeholderTextColor={Colors.borderColor}
+                    onFocus={() => {
+                      setInputStyle(styles.inputBoxFocused);
+                    }}
+                    onBlur={() => {
+                      setInputStyle(styles.textBoxView);
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.nativeEvent.key === 'Backspace') {
+                        setTimeout(() => {
+                          setIsInvalidBalance(false);
+                        }, 10);
+                      }
+                    }}
+                  />
+                </TouchableOpacity>
+                {/* {renderBitCoinInputText()} */}
               </View>
               <View
                 style={{
@@ -1218,8 +1496,43 @@ export default function SendToContact(props) {
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('50%') : hp('50%'),
         ]}
-        renderContent={renderRemoveSelectedContents}
-        renderHeader={renderRemoveSelectedHeader}
+        renderContent={() => {
+          if (
+            Object.keys(removeItem).length != 0 &&
+            removeItem.constructor === Object
+          ) {
+            return (
+              <RemoveSelectedTransaction
+                selectedContact={removeItem}
+                onPressBack={() => {
+                  if (RemoveBottomSheet.current)
+                    (RemoveBottomSheet as any).current.snapTo(0);
+                }}
+                onPressDone={() => {
+                  setTimeout(() => {
+                    dispatch(removeTransferDetails(serviceType, removeItem));
+                  }, 2);
+                  (RemoveBottomSheet as any).current.snapTo(0);
+                }}
+              />
+            );
+          }
+        }}
+        renderHeader={() => {
+          if (
+            Object.keys(removeItem).length === 0 &&
+            removeItem.constructor === Object
+          ) {
+            return (
+              <ModalHeader
+                onPressHeader={() => {
+                  if (RemoveBottomSheet.current)
+                    (RemoveBottomSheet as any).current.snapTo(0);
+                }}
+              />
+            );
+          }
+        }}
       />
       <BottomSheet
         onCloseStart={() => {
@@ -1228,8 +1541,53 @@ export default function SendToContact(props) {
         enabledInnerScrolling={true}
         ref={SendUnSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
-        renderContent={renderSendUnSuccessContents}
-        renderHeader={renderSendUnSuccessHeader}
+        renderContent={() => (
+          <SendConfirmationContent
+            title={'Sent Unsuccessful'}
+            info={
+              'There seems to be a problem' + '\n' + transfer.stage1.failed
+                ? transfer.stage1.err === 'Insufficient balance'
+                  ? // `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
+                    //   `\n\nPlease reduce the transfer amount by ${(
+                    //     parseFloat(netAmount) +
+                    //     parseFloat(fee) -
+                    //     parseFloat(balance)
+                    //   ).toFixed(
+                    //     switchOn ? 0 : 2,
+                    //   )} in order to conduct this transaction`
+                    'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
+                  : transfer.stage1.err
+                : 'Something went wrong'
+            }
+            userInfo={transfer.details}
+            isFromContact={false}
+            okButtonText={'Try Again'}
+            cancelButtonText={'Back'}
+            isCancel={true}
+            onPressOk={() => {
+              //dispatch(clearTransfer(serviceType));
+              if (SendUnSuccessBottomSheet.current)
+                SendUnSuccessBottomSheet.current.snapTo(0);
+            }}
+            onPressCancel={() => {
+              dispatch(clearTransfer(serviceType));
+              if (SendUnSuccessBottomSheet.current)
+                SendUnSuccessBottomSheet.current.snapTo(0);
+
+              props.navigation.navigate('Accounts');
+            }}
+            isUnSuccess={true}
+          />
+        )}
+        renderHeader={() => (
+          <ModalHeader
+            onPressHeader={() => {
+              //  dispatch(clearTransfer(serviceType));
+              if (SendUnSuccessBottomSheet.current)
+                SendUnSuccessBottomSheet.current.snapTo(0);
+            }}
+          />
+        )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
@@ -1238,8 +1596,28 @@ export default function SendToContact(props) {
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('55%') : hp('60%'),
         ]}
-        renderContent={renderAccountSelectionContents}
-        renderHeader={renderAccountSelectionHeader}
+        renderContent={() => (
+          <AccountSelectionModalContents
+            RegularAccountBalance={spendableBalances.regularBalance}
+            SavingAccountBalance={spendableBalances.secureBalance}
+            onPressBack={() => {
+              AccountSelectionBottomSheet.current.snapTo(0);
+            }}
+            onPressConfirm={(type) => {
+              AccountSelectionBottomSheet.current.snapTo(0);
+              setTimeout(() => {
+                setServiceType(type);
+              }, 2);
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            onPressHeader={() => {
+              AccountSelectionBottomSheet.current.snapTo(0);
+            }}
+          />
+        )}
       />
     </View>
   );
