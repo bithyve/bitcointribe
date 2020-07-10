@@ -649,16 +649,6 @@ const PersonalCopyHistory = (props) => {
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
       />
-      <BottomSheet
-        enabledInnerScrolling={false}
-        ref={mailOptionsBottomSheet as any}
-        snapPoints={[
-          -50,
-          hp('10%')
-        ]}
-        renderHeader={renderMailOptionsHeader}
-        renderContent={renderMailOptionsContent}
-      />
     </View>
   );
 };
