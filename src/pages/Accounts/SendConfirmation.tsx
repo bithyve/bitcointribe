@@ -137,7 +137,11 @@ export default function SendConfirmation(props) {
           .trim();
         const recipient =
           trustedContactsService.tc.trustedContacts[contactName];
-        receivers.push({ walletId: recipient.walletID, FCMs: recipient.FCMs });
+        if (recipient.walletID && recipient.FCMs.length)
+          receivers.push({
+            walletId: recipient.walletID,
+            FCMs: recipient.FCMs,
+          });
       }
     });
     const notification: INotification = {
@@ -412,7 +416,16 @@ export default function SendConfirmation(props) {
         onPressHeader={() => {
           if (SendSuccessBottomSheet.current)
             SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts');
+          props.navigation.navigate('Accounts', {
+            serviceType,
+            index:
+              serviceType === TEST_ACCOUNT
+                ? 0
+                : serviceType === REGULAR_ACCOUNT
+                ? 1
+                : 2,
+            spendableBalance: spendableBalance - totalAmount,
+          });
         }}
       />
     );
@@ -726,7 +739,7 @@ export default function SendConfirmation(props) {
                 {transfer.stage1.txPrerequisites
                   ? transfer.stage1.txPrerequisites['low'].fee
                   : ''}
-                 {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                {serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
               </Text>
               <Text
                 style={{

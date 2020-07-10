@@ -744,7 +744,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < newTransactions.length; i++) {
         let present = false;
         for (const tx of asyncNotificationList) {
-          if (newTransactions[i].txid === tx.notificationsData.txid)
+          if (
+            tx.notificationsData &&
+            newTransactions[i].txid === tx.notificationsData.txid
+          )
             present = true;
         }
         if (present) continue;
@@ -1876,7 +1879,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         });
     }
     if (value.type == 'contact') {
-      (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      setTimeout(() => {
+        (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      }, 2);
       this.selectTab('Transactions');
     }
   };

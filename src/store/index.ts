@@ -92,7 +92,7 @@ import {
 
 import {
   updateFCMTokensWatcher,
-  sendNotificationWatcher,
+  // sendNotificationWatcher,
   fetchNotificationsWatcher,
 } from './sagas/notifications';
 
@@ -195,7 +195,7 @@ const rootSaga = function* () {
     // Notifications
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
-    sendNotificationWatcher,
+    // sendNotificationWatcher,
 
     // Trusted Contacts
     initializedTrustedContactWatcher,

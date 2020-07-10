@@ -26,16 +26,42 @@ import {
   TrustedData,
   TrustedDataElements,
   TrustedContactDerivativeAccountElements,
+  INotification,
+  notificationType,
+  notificationTag,
 } from '../../bitcoin/utilities/Interface';
 import { downloadMShare, updateWalletImage } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { insertDBWorker } from './storage';
 import { AsyncStorage } from 'react-native';
 import { fetchNotificationsWorker } from './notifications';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import RelayServices from '../../bitcoin/services/RelayService';
+
+const sendNotification = (trustedContacts, contactName, walletName) => {
+  const receivers = [];
+  const recipient = trustedContacts.tc.trustedContacts[contactName];
+  if (recipient.walletID && recipient.FCMs.length)
+    receivers.push({
+      walletId: recipient.walletID,
+      FCMs: recipient.FCMs,
+    });
+
+  const notification: INotification = {
+    notificationType: notificationType.contact,
+    title: 'Friends and Family notification',
+    body: `Trusted Contact request accepted by ${walletName}`,
+    data: {},
+    tag: notificationTag.IMP,
+  };
+  if (receivers.length)
+    RelayServices.sendNotifications(receivers, notification).then(console.log);
+};
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -123,6 +149,9 @@ function* updateEphemeralChannelWorker({ payload }) {
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
+  const testService: TestAccount = yield select(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
 
   const { contactName, data, fetch } = payload;
 
@@ -156,11 +185,13 @@ function* updateEphemeralChannelWorker({ payload }) {
 
       if (res.status === 200) {
         const xpub = res.data;
+        const tpub = testService.getTestXpub();
         const walletID = yield call(AsyncStorage.getItem, 'walletID');
         const FCM = yield call(AsyncStorage.getItem, 'fcmToken');
 
         const data: TrustedDataElements = {
           xpub,
+          tpub,
           walletID,
           FCM,
         };
@@ -170,9 +201,19 @@ function* updateEphemeralChannelWorker({ payload }) {
           data,
           true,
         );
-        if (updateRes.status === 200)
+        if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactName);
-        else console.log('Xpub updation to TC failed for: ', contactName);
+
+          // send acceptance notification
+          const { walletName } = yield select(
+            (state) => state.storage.database.WALLET_SETUP,
+          );
+          sendNotification(
+            trustedContacts,
+            contactName.toLowerCase().trim(),
+            walletName,
+          );
+        } else console.log('Xpub updation to TC failed for: ', contactName);
       } else {
         console.log('Derivative xpub generation failed for: ', contactName);
       }
@@ -318,6 +359,9 @@ export function* trustedChannelsSyncWorker() {
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
+  const testService: TestAccount = yield select(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
 
   yield call(fetchNotificationsWorker); // refreshes DHInfos
   let DHInfos = yield call(AsyncStorage.getItem, 'DHInfos');
@@ -394,6 +438,7 @@ export function* trustedChannelsSyncWorker() {
                   accountNumber
                 ] as TrustedContactDerivativeAccountElements).contactDetails = {
                   xpub: contactsData.xpub,
+                  tpub: contactsData.tpub,
                 };
 
                 console.log(
@@ -427,6 +472,7 @@ export function* trustedChannelsSyncWorker() {
                 accountNumber
               ] as TrustedContactDerivativeAccountElements).contactDetails = {
                 xpub: contactsData.xpub,
+                tpub: contactsData.tpub,
               };
 
               console.log(
@@ -452,9 +498,10 @@ export function* trustedChannelsSyncWorker() {
 
       if (res.status === 200) {
         const xpub = res.data;
-
+        const tpub = testService.getTestXpub();
         const data: TrustedDataElements = {
           xpub,
+          tpub,
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
@@ -483,6 +530,7 @@ export function* trustedChannelsSyncWorker() {
                     accountNumber
                   ] as TrustedContactDerivativeAccountElements).contactDetails = {
                     xpub: contactsData.xpub,
+                    tpub: contactsData.tpub,
                   };
 
                   console.log(

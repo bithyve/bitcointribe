@@ -262,6 +262,7 @@ export default class Bitcoin {
     addresses: string[],
     accountType: string,
     ownedAddresses: string[],
+    changeAddresses: string[],
     contactName?: string,
   ): Promise<{
     balances: { balance: number; unconfirmedBalance: number };
@@ -271,25 +272,35 @@ export default class Bitcoin {
     try {
       if (this.network === bitcoinJS.networks.testnet) {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCETXN,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXOTXN,
           {
             addresses,
           },
         );
       } else {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCETXN,
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXOTXN,
           {
             addresses,
           },
         );
       }
 
-      const { Balance, Txs } = res.data;
+      const { Utxos, Txs } = res.data;
       let balances = {
         balance: 0,
         unconfirmedBalance: 0,
       };
+
+      for (const addressSpecificUTXOs of Utxos) {
+        for (const utxo of addressSpecificUTXOs) {
+          const { value, Address, status } = utxo;
+          if (status.confirmed) balances.balance += value;
+          else if (changeAddresses && changeAddresses.includes(Address))
+            balances.balance += value;
+          else balances.unconfirmedBalance += value;
+        }
+      }
 
       const transactions: Transactions = {
         totalTransactions: 0,
@@ -315,7 +326,7 @@ export default class Bitcoin {
             // check for duplicate tx (fetched against sending and  then again for change address)
             txMap.set(tx.txid, true);
             this.categorizeTx(tx, ownedAddresses, accountType);
-            const txObj = {
+            const transaction = {
               txid: tx.txid,
               confirmations: tx.NumberofConfirmations,
               status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -339,27 +350,7 @@ export default class Bitcoin {
               blockTime: tx.Status.block_time, // only available when tx is confirmed
             };
 
-            // update balance based on tx
-            if (
-              txObj.status === 'Confirmed' ||
-              txObj.transactionType === 'Sent'
-            ) {
-              if (txObj.transactionType === 'Received') {
-                balances.balance += txObj.amount;
-              } else {
-                const debited = txObj.amount + txObj.fee;
-                balances.balance -= debited;
-              }
-            } else {
-              if (txObj.transactionType === 'Received') {
-                balances.unconfirmedBalance += txObj.amount;
-              } else {
-                const debited = txObj.amount + txObj.fee;
-                balances.unconfirmedBalance -= debited;
-              }
-            }
-
-            transactions.transactionDetails.push(txObj);
+            transactions.transactionDetails.push(transaction);
 
             // if (tx.transactionType === 'Self') {
             //   // injecting receive(2) tx when tx is from and to self
