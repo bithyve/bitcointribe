@@ -376,9 +376,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
            }, 1000);
         }
       }
-    setTimeout(() => {
-      this.setState({ serviceType: serviceType });
-    }, 2);
+    this.setState({ serviceType: serviceType });
     if (serviceType == TEST_ACCOUNT) this.checkNHighlight();
     setTimeout(() => {
       this.getBalance();
