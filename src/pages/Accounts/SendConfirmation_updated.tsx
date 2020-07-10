@@ -49,7 +49,6 @@ import {
   notificationTag,
   notificationType,
 } from '../../bitcoin/utilities/Interface';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
@@ -211,7 +210,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       })
       setTimeout(() => {
         (this.refs.SendSuccessBottomSheet as any).snapTo(1);
-      }, 2);
+      }, 10);
     } else if (!transfer.txid && transfer.executed === 'ST2') {
       this.props.navigation.navigate('TwoFAToken', {
         serviceType: this.serviceType,
@@ -791,16 +790,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
             onPressHeader={() => {
               if ((this.refs.SendSuccessBottomSheet as any))
                 (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-              navigation.navigate('Accounts', {
-                serviceType: this.serviceType,
-                index:
-                this.serviceType === TEST_ACCOUNT
-                    ? 0
-                    : this.serviceType === REGULAR_ACCOUNT
-                    ? 1
-                    : 2,
-                spendableBalance: this.spendableBalance - totalAmount,
-              });
+              navigation.navigate('Accounts');
             }}
           />
         )}
@@ -851,6 +841,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
 
 const mapStateToProps = (state) => {
   return {
+    trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
     accounts: idx(state, (_) => _.accounts) || [],
     WALLET_SETUP: idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
