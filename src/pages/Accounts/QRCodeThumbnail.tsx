@@ -68,16 +68,13 @@ function QRCodeThumbnail(props) {
           />
         </View>
         <View
-          style={{
-            ...styles.view1,
-            marginTop: 'auto',
-          }}
+          style={styles.view6}
         >
-          <View
-            style={styles.view2}
+           <View
+            style={styles.view4}
           />
           <View
-            style={styles.view3}
+            style={styles.view5}
           />
         </View>
       </ImageBackground>
@@ -119,6 +116,31 @@ const styles = StyleSheet.create({
     height: hp('5%'),
     width: hp('5%'),
     marginLeft: 'auto',
+  },
+  view4:{
+    borderLeftWidth: 1,
+    borderBottomColor: 'white',
+    borderLeftColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    borderBottomWidth: 1,
+  },
+  view5:{
+    borderBottomWidth: 1,
+    borderRightWidth: 1,
+    borderRightColor: 'white',
+    borderBottomColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    marginLeft: 'auto',
+  },
+  view6:{
+    marginTop: 'auto',
+    flexDirection: 'row',
+    paddingBottom: 12,
+    paddingRight: 12,
+    paddingLeft: 12,
+    width: '100%',
   },
   cameraView: {
     width: wp('90%'),
