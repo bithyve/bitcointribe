@@ -206,7 +206,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       transactionLoading: true,
       transactions: [],
       averageTxFees: null,
-      exchangeRates:  this.props.accounts.exchangeRates,
+      exchangeRates: this.props.accounts.exchangeRates,
       transactionItem: {},
       isHelperDone: true,
       showLoader: true,
@@ -474,7 +474,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     );
   };
 
-  renderItem = ({ item, index }) => {
+  RenderItem = ({ item, index }) => {
     let {spendableBalance, switchOn, exchangeRates, CurrencyCode} = this.state;
     return (
       <ImageBackground
@@ -883,7 +883,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   //     ? this.getServiceType(REGULAR_ACCOUNT)
                   //     : this.getServiceType(SECURE_ACCOUNT);
                   // }}
-                  renderItem={this.renderItem}
+                  renderItem={this.RenderItem}
                   sliderWidth={this.sliderWidth}
                   itemWidth={this.sliderWidth * 0.95}
                   onSnapToItem={(index) => {
@@ -935,178 +935,176 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                           <View style={styles.separatorView} />
                         </View>
                       )}
-                      renderItem={({ item, index }) => {
-                        return (
-                          <TouchableOpacity
-                            onPress={
-                              () => {
-                                (this.refs.TransactionDetailsBottomSheet as any).current.snapTo(
-                                  1,
-                                );
-                                this.checkNShowHelperModal();
-                                setTimeout(() => {
-                                  this.setState({ transactionItem: item });
-                                }, 10);
-                              }
-                              // props.navigation.navigate('TransactionDetails', {
-                              //   item,
-                              //   serviceType,
-                              //   getServiceType: getServiceType,
-                              // })
+                      renderItem={({ item, index }) => (
+                        <TouchableOpacity
+                          onPress={
+                            () => {
+                              (this.refs.TransactionDetailsBottomSheet as any).current.snapTo(
+                                1,
+                              );
+                              this.checkNShowHelperModal();
+                              setTimeout(() => {
+                                this.setState({ transactionItem: item });
+                              }, 10);
                             }
-                            style={styles.transactionModalElementView}
-                          >
-                            {index == 0 ? (
-                              <View style={styles.modalElementInfoView}>
-                                <View style={{ justifyContent: 'center' }}>
-                                  <FontAwesome
-                                    name={
-                                      item.transactionType == 'Received'
-                                        ? 'long-arrow-down'
-                                        : 'long-arrow-up'
-                                    }
-                                    size={15}
-                                    color={
-                                      item.transactionType == 'Received'
-                                        ? Colors.green
-                                        : Colors.red
-                                    }
-                                  />
-                                </View>
-                                <View
-                                  style={{
-                                    justifyContent: 'center',
-                                    marginLeft: 10,
-                                  }}
-                                >
-                                  <Text
-                                    style={styles.transactionModalTitleText}
-                                  >
-                                    {item.accountType}{' '}
-                                  </Text>
-                                  <Text style={styles.transactionModalDateText}>
-                                    {moment(item.date)
-                                      .utc()
-                                      .format('DD MMMM YYYY')}{' '}
-                                    {/* <Entypo
-                              size={10}
-                              name={"dot-single"}
-                              color={Colors.textColorGrey}
-                            /> */}
-                                    {/* {item.time} */}
-                                  </Text>
-                                </View>
+                            // props.navigation.navigate('TransactionDetails', {
+                            //   item,
+                            //   serviceType,
+                            //   getServiceType: getServiceType,
+                            // })
+                          }
+                          style={styles.transactionModalElementView}
+                        >
+                          {index == 0 ? (
+                            <View style={styles.modalElementInfoView}>
+                              <View style={{ justifyContent: 'center' }}>
+                                <FontAwesome
+                                  name={
+                                    item.transactionType == 'Received'
+                                      ? 'long-arrow-down'
+                                      : 'long-arrow-up'
+                                  }
+                                  size={15}
+                                  color={
+                                    item.transactionType == 'Received'
+                                      ? Colors.green
+                                      : Colors.red
+                                  }
+                                />
                               </View>
-                            ) : (
-                              <View style={styles.modalElementInfoView}>
-                                <View style={{ justifyContent: 'center' }}>
-                                  <FontAwesome
-                                    name={
-                                      item.transactionType == 'Received'
-                                        ? 'long-arrow-down'
-                                        : 'long-arrow-up'
-                                    }
-                                    size={15}
-                                    color={
-                                      item.transactionType == 'Received'
-                                        ? Colors.green
-                                        : Colors.red
-                                    }
-                                  />
-                                </View>
-                                <View
-                                  style={{
-                                    justifyContent: 'center',
-                                    marginLeft: 10,
-                                  }}
-                                >
-                                  <Text
-                                    style={styles.transactionModalTitleText}
-                                  >
-                                    {item.accountType}{' '}
-                                  </Text>
-                                  <Text style={styles.transactionModalDateText}>
-                                    {moment(item.date)
-                                      .utc()
-                                      .format('DD MMMM YYYY')}{' '}
-                                    {/* <Entypo
-                              size={10}
-                              name={"dot-single"}
-                              color={Colors.textColorGrey}
-                            /> */}
-                                    {/* {item.time} */}
-                                  </Text>
-                                </View>
-                              </View>
-                            )}
-                            <View style={styles.transactionModalAmountView}>
-                              <Image
-                                source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                                style={styles.bitcoinImage}
-                              />
-                              <View style={styles.transactionBalanceTextView}>
+                              <View
+                                style={{
+                                  justifyContent: 'center',
+                                  marginLeft: 10,
+                                }}
+                              >
                                 <Text
-                                  style={{
-                                    ...styles.transactionModalAmountText,
-                                    color:
-                                      item.transactionType == 'Received'
-                                        ? Colors.green
-                                        : Colors.red,
-                                    alignSelf: 'center',
-                                  }}
+                                  style={styles.transactionModalTitleText}
                                 >
-                                  {item.accountType == 'Test Account'
-                                    ? UsNumberFormat(item.amount)
-                                    : switchOn
-                                    ? UsNumberFormat(item.amount)
-                                    : exchangeRates
-                                    ? (
-                                        (item.amount / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                    : null}
-
-                                  {/* {UsNumberFormat(item.amount)} */}
+                                  {item.accountType}{' '}
                                 </Text>
-                                <Text style={styles.transactionBalanceUnitTextView}>
-                                  {item.accountType == 'Test Account'
-                                    ? 't-sats'
-                                    : switchOn
-                                    ? 'sats'
-                                    : CurrencyCode.toLocaleLowerCase()}
+                                <Text style={styles.transactionModalDateText}>
+                                  {moment(item.date)
+                                    .utc()
+                                    .format('DD MMMM YYYY')}{' '}
+                                  {/* <Entypo
+                            size={10}
+                            name={"dot-single"}
+                            color={Colors.textColorGrey}
+                          /> */}
+                                  {/* {item.time} */}
                                 </Text>
                               </View>
+                            </View>
+                          ) : (
+                            <View style={styles.modalElementInfoView}>
+                              <View style={{ justifyContent: 'center' }}>
+                                <FontAwesome
+                                  name={
+                                    item.transactionType == 'Received'
+                                      ? 'long-arrow-down'
+                                      : 'long-arrow-up'
+                                  }
+                                  size={15}
+                                  color={
+                                    item.transactionType == 'Received'
+                                      ? Colors.green
+                                      : Colors.red
+                                  }
+                                />
+                              </View>
+                              <View
+                                style={{
+                                  justifyContent: 'center',
+                                  marginLeft: 10,
+                                }}
+                              >
+                                <Text
+                                  style={styles.transactionModalTitleText}
+                                >
+                                  {item.accountType}{' '}
+                                </Text>
+                                <Text style={styles.transactionModalDateText}>
+                                  {moment(item.date)
+                                    .utc()
+                                    .format('DD MMMM YYYY')}{' '}
+                                  {/* <Entypo
+                            size={10}
+                            name={"dot-single"}
+                            color={Colors.textColorGrey}
+                          /> */}
+                                  {/* {item.time} */}
+                                </Text>
+                              </View>
+                            </View>
+                          )}
+                          <View style={styles.transactionModalAmountView}>
+                            <Image
+                              source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                              style={styles.bitcoinImage}
+                            />
+                            <View style={styles.transactionBalanceTextView}>
                               <Text
                                 style={{
-                                  ...styles.transactionModalAmountUnitText,
+                                  ...styles.transactionModalAmountText,
+                                  color:
+                                    item.transactionType == 'Received'
+                                      ? Colors.green
+                                      : Colors.red,
                                   alignSelf: 'center',
                                 }}
                               >
-                                {item.confirmations < 6
-                                  ? item.confirmations
-                                  : '6+'}
+                                {item.accountType == 'Test Account'
+                                  ? UsNumberFormat(item.amount)
+                                  : switchOn
+                                  ? UsNumberFormat(item.amount)
+                                  : exchangeRates
+                                  ? (
+                                      (item.amount / 1e8) *
+                                      exchangeRates[CurrencyCode].last
+                                    ).toFixed(2)
+                                  : null}
+
+                                {/* {UsNumberFormat(item.amount)} */}
                               </Text>
-                              {index == 0 ? (
-                                <View style={styles.forwardIconView}>
-                                  <Ionicons
-                                    name="ios-arrow-forward"
-                                    color={Colors.textColorGrey}
-                                    size={12}
-                                  />
-                                </View>
-                              ) : (
-                                <View style={styles.forwardIconView}>
-                                  <Ionicons
-                                    name="ios-arrow-forward"
-                                    color={Colors.textColorGrey}
-                                    size={12}
-                                  />
-                                </View>
-                              )}
+                              <Text style={styles.transactionBalanceUnitTextView}>
+                                {item.accountType == 'Test Account'
+                                  ? 't-sats'
+                                  : switchOn
+                                  ? 'sats'
+                                  : CurrencyCode.toLocaleLowerCase()}
+                              </Text>
                             </View>
-                          </TouchableOpacity>
-                        );
-                      }}
+                            <Text
+                              style={{
+                                ...styles.transactionModalAmountUnitText,
+                                alignSelf: 'center',
+                              }}
+                            >
+                              {item.confirmations < 6
+                                ? item.confirmations
+                                : '6+'}
+                            </Text>
+                            {index == 0 ? (
+                              <View style={styles.forwardIconView}>
+                                <Ionicons
+                                  name="ios-arrow-forward"
+                                  color={Colors.textColorGrey}
+                                  size={12}
+                                />
+                              </View>
+                            ) : (
+                              <View style={styles.forwardIconView}>
+                                <Ionicons
+                                  name="ios-arrow-forward"
+                                  color={Colors.textColorGrey}
+                                  size={12}
+                                />
+                              </View>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      )}
                     />
                   </View>
                 </View>
