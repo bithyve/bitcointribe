@@ -42,51 +42,51 @@ export const updateFCMTokensWatcher = createWatcher(
   UPDATE_FCM_TOKENS,
 );
 
-function* sendNotificationWorker({ payload }) {
-  const { contactName, notificationType, title, body, data, tag } = payload;
+// function* sendNotificationWorker({ payload }) {
+//   const { contactName, notificationType, title, body, data, tag } = payload;
 
-  const notification: INotification = {
-    notificationType,
-    title,
-    body,
-    data: {
-      ...data,
-    },
-    tag,
-  };
+//   const notification: INotification = {
+//     notificationType,
+//     title,
+//     body,
+//     data: {
+//       ...data,
+//     },
+//     tag,
+//   };
 
-  const trustedContacts: TrustedContactsService = yield select(
-    (state) => state.trustedContacts.service,
-  );
-  const contacts: Contacts = trustedContacts.tc.trustedContacts;
-  if (
-    !contacts[contactName] ||
-    !contactName[contactName].walletId ||
-    !contactName[contactName].FCMs
-  )
-    throw new Error('Failed to send notification; contact assets missing');
+//   const trustedContacts: TrustedContactsService = yield select(
+//     (state) => state.trustedContacts.service,
+//   );
+//   const contacts: Contacts = trustedContacts.tc.trustedContacts;
+//   if (
+//     !contacts[contactName] ||
+//     !contactName[contactName].walletId ||
+//     !contactName[contactName].FCMs
+//   )
+//     throw new Error('Failed to send notification; contact assets missing');
 
-  const receiverWalletID = contactName[contactName].walletId;
-  const receiverFCMs = contactName[contactName].FCMs;
+//   const receiverWalletID = contactName[contactName].walletId;
+//   const receiverFCMs = contactName[contactName].FCMs;
 
-  const res = yield call(
-    RelayServices.sendNotification,
-    receiverWalletID,
-    receiverFCMs,
-    notification,
-  );
-  if (res.status === 200) {
-    const { delivered } = res.data;
-    console.log({ delivered });
-  } else {
-    console.log('Failed to deliver notification');
-  }
-}
+//   const res = yield call(
+//     RelayServices.sendNotification,
+//     receiverWalletID,
+//     receiverFCMs,
+//     notification,
+//   );
+//   if (res.status === 200) {
+//     const { delivered } = res.data;
+//     console.log({ delivered });
+//   } else {
+//     console.log('Failed to deliver notification');
+//   }
+// }
 
-export const sendNotificationWatcher = createWatcher(
-  sendNotificationWorker,
-  SEND_NOTIFICATION,
-);
+// export const sendNotificationWatcher = createWatcher(
+//   sendNotificationWorker,
+//   SEND_NOTIFICATION,
+// );
 
 export function* fetchNotificationsWorker() {
   const service: RegularAccount = yield select(
