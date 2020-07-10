@@ -538,11 +538,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             <View onStartShouldSetResponder={() => true}>
               <View style={styles.modalHeaderTitleView}>
                 <View
-                  style={{
-                    flex: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
+                  style={styles.modalHeader}
                 >
                   <TouchableOpacity
                     onPress={() => {
@@ -552,11 +548,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       clearTransfer(serviceType);
                       this.props.navigation.goBack();
                     }}
-                    style={{
-                      height: 30,
-                      width: 30,
-                      justifyContent: 'center',
-                    }}
+                    style={styles.backButton}
                   >
                     <FontAwesome
                       name="long-arrow-left"
@@ -577,11 +569,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   <View style={{ marginLeft: wp('2.5%') }}>
                     <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
                     <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontFamily: Fonts.FiraSansRegular,
-                        fontSize: RFValue(12),
-                      }}
+                      style={styles.accountText}
                     >
                       {serviceType == TEST_ACCOUNT
                         ? 'Test Account'
@@ -597,11 +585,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         if (this.refs.SendHelperBottomSheet)
                         (this.refs.SendHelperBottomSheet as any).snapTo(1);
                       }}
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
-                        marginLeft: 'auto',
-                      }}
+                      style={styles.knowmoreText}
                     >
                       Know more
                     </Text>
@@ -613,11 +597,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                 onQrScan={(qrData) => this.barcodeRecognized(qrData)}
               />
               <View
-                style={{
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                  paddingTop: wp('5%'),
-                }}
+                style={styles.view1}
               >
                 <View style={styles.textBoxView}>
                   <TextInput
@@ -657,11 +637,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     style={{ padding: wp('2%'), marginLeft: 'auto' }}
                   >
                     <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansItalic,
-                      }}
+                      style={styles.sampleText}
                     >
                       Send it to a sample address !
                     </Text>
@@ -675,23 +651,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                 <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
-                        style={{
-                          color: Colors.blue,
-                          fontSize: RFValue(13),
-                          fontFamily: Fonts.FiraSansRegular,
-                          marginBottom: wp('3%'),
-                        }}
+                        style={styles.sendToContactText}
                       >
                         Send to Contact
                       </Text>
                       <TouchableOpacity
                         onPress={() => {}}
-                        style={{
-                          height: 20,
-                          width: 20,
-                          justifyContent: 'center',
-                          marginLeft: 'auto',
-                        }}
+                        style={styles.icon}
                       >
                         <SimpleLineIcons
                           name="options-vertical"
@@ -702,35 +668,14 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                     </View>
                     {trustedContacts.length ? (
                       <View
-                        style={{
-                          ...styles.textBoxView,
-                          paddingTop: hp('1%'),
-                          paddingBottom: hp('1%'),
-                          height: hp('15%'),
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          borderColor: Colors.backgroundColor,
-                        }}
+                        style={styles.trustedContactView}
                       >
                         <View
-                          style={{
-                            flex: 1,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                          }}
+                          style={styles.modalHeader}
                         >
                           <TouchableOpacity
-                            style={{
-                              backgroundColor: Colors.white,
-                              height: wp('12%'),
-                              width: wp('6%'),
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              alignSelf: 'center',
-                              borderRadius: 5,
-                              marginLeft: 10,
-                              marginRight: 15,
-                            }}
+                            style={{...styles.trustedContactForwardIcon,        
+    marginRight: 15,}}
                           >
                             <Ionicons
                               name={'ios-arrow-back'}
@@ -757,12 +702,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       </View>
                     ) : (
                       <View
-                        style={{
-                          marginBottom: -25,
-                          padding: -20,
-                          marginLeft: -20,
-                          marginRight: -20,
-                        }}
+                        style={styles.note}
                       >
                         <BottomInfoBox
                           title={'You have not added any Contact'}
@@ -777,23 +717,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
-                        style={{
-                          color: Colors.blue,
-                          fontSize: RFValue(13),
-                          fontFamily: Fonts.FiraSansRegular,
-                          marginBottom: wp('3%'),
-                        }}
+                        style={styles.sendToContactText}
                       >
                         Send to Account
                       </Text>
                       <TouchableOpacity
                         onPress={() => {}}
-                        style={{
-                          height: 20,
-                          width: 20,
-                          justifyContent: 'center',
-                          marginLeft: 'auto',
-                        }}
+                        style={styles.icon}
                       >
                         <SimpleLineIcons
                           name="options-vertical"
@@ -803,25 +733,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       </TouchableOpacity>
                     </View>
                     <View
-                      style={{
-                        flexDirection: 'row',
-                        borderRadius: 10,
-                        height: wp('40%'),
-                        alignItems: 'center',
-                        backgroundColor: Colors.backgroundColor,
-                      }}
+                      style={styles.iconBackView}
                     >
                       <TouchableOpacity
-                        style={{
-                          backgroundColor: Colors.white,
-                          height: wp('12%'),
-                          width: wp('6%'),
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          alignSelf: 'center',
-                          borderRadius: 5,
-                          marginLeft: 10,
-                        }}
+                        style={{...styles.trustedContactForwardIcon}}
                       >
                         <Ionicons
                           name={'ios-arrow-back'}
@@ -924,6 +839,82 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
     paddingBottom: wp('10%'),
+  },
+  modalHeader: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    height: 30,
+    width: 30,
+    justifyContent: 'center',
+  },
+  accountText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(12),
+  },
+  view1:{
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: wp('5%'),
+  },
+  iconBackView:{
+    flexDirection: 'row',
+    borderRadius: 10,
+    height: wp('40%'),
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundColor,
+  },
+  sampleText:{
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  sendToContactText:{
+    color: Colors.blue,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginBottom: wp('3%'),
+  },
+  icon:{
+    height: 20,
+    width: 20,
+    justifyContent: 'center',
+    marginLeft: 'auto',
+  },
+  trustedContactView:{
+    flexDirection: 'row',
+    borderRadius: 10,
+    borderWidth: 1,
+    paddingTop: hp('1%'),
+    paddingBottom: hp('1%'),
+    height: hp('15%'),
+    justifyContent: 'center',
+    backgroundColor: Colors.backgroundColor,
+    borderColor: Colors.backgroundColor,
+  },
+  trustedContactForwardIcon: {
+    backgroundColor: Colors.white,
+    height: wp('12%'),
+    width: wp('6%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  knowmoreText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    marginLeft: 'auto',
+  },
+  note:{
+    marginBottom: -25,
+    padding: -20,
+    marginLeft: -20,
+    marginRight: -20,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,

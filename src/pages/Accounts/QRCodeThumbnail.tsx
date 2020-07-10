@@ -55,74 +55,29 @@ function QRCodeThumbnail(props) {
     >
       <ImageBackground
         source={require('../../assets/images/icons/iPhone-QR.png')}
-        style={{
-          width: wp('90%'),
-          height: wp('70%'),
-          overflow: 'hidden',
-          borderRadius: 20,
-        }}
+        style={styles.image}
       >
         <View
-          style={{
-            flexDirection: 'row',
-            paddingTop: 12,
-            paddingRight: 12,
-            paddingLeft: 12,
-            width: '100%',
-          }}
+          style={styles.view1}
         >
           <View
-            style={{
-              borderLeftWidth: 1,
-              borderTopColor: 'white',
-              borderLeftColor: 'white',
-              height: hp('5%'),
-              width: hp('5%'),
-              borderTopWidth: 1,
-            }}
+            style={styles.view2}
           />
           <View
-            style={{
-              borderTopWidth: 1,
-              borderRightWidth: 1,
-              borderRightColor: 'white',
-              borderTopColor: 'white',
-              height: hp('5%'),
-              width: hp('5%'),
-              marginLeft: 'auto',
-            }}
+            style={styles.view3}
           />
         </View>
         <View
           style={{
+            ...styles.view1,
             marginTop: 'auto',
-            flexDirection: 'row',
-            paddingBottom: 12,
-            paddingRight: 12,
-            paddingLeft: 12,
-            width: '100%',
           }}
         >
           <View
-            style={{
-              borderLeftWidth: 1,
-              borderBottomColor: 'white',
-              borderLeftColor: 'white',
-              height: hp('5%'),
-              width: hp('5%'),
-              borderBottomWidth: 1,
-            }}
+            style={styles.view2}
           />
           <View
-            style={{
-              borderBottomWidth: 1,
-              borderRightWidth: 1,
-              borderRightColor: 'white',
-              borderBottomColor: 'white',
-              height: hp('5%'),
-              width: hp('5%'),
-              marginLeft: 'auto',
-            }}
+            style={styles.view3}
           />
         </View>
       </ImageBackground>
@@ -134,7 +89,37 @@ function QRCodeThumbnail(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
 		backgroundColor: 'white',
-	},
+  },
+  image:{
+    width: wp('90%'),
+    height: wp('70%'),
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+  view1:{
+    flexDirection: 'row',
+    paddingTop: 12,
+    paddingRight: 12,
+    paddingLeft: 12,
+    width: '100%',
+  },
+  view2:{
+    borderLeftWidth: 1,
+    borderTopColor: 'white',
+    borderLeftColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    borderTopWidth: 1,
+  },
+  view3:{
+    borderTopWidth: 1,
+    borderRightWidth: 1,
+    borderRightColor: 'white',
+    borderTopColor: 'white',
+    height: hp('5%'),
+    width: hp('5%'),
+    marginLeft: 'auto',
+  },
   cameraView: {
     width: wp('90%'),
     height: wp('90%'),

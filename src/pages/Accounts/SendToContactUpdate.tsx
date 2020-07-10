@@ -604,16 +604,11 @@ class SendToContact extends Component<
 
   render() {
     const {
-      RegularAccountBalance,
-      SavingAccountBalance,
       isFromAddressBook,
       isOpen,
       exchangeRates,
       selectedContact,
       serviceType,
-      averageTxFees,
-      spendableBalance,
-      sweepSecure,
       removeItem,
       switchOn,
       CurrencyCode,
@@ -630,8 +625,6 @@ class SendToContact extends Component<
       spendableBalances,
     } = this.state;
     const {
-      navigation,
-      service,
       transfer,
       accounts,
       loading,
@@ -652,22 +645,14 @@ class SendToContact extends Component<
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
           <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
+            style={styles.view}
           >
             <TouchableOpacity
               onPress={() => {
                 this.checkRecordsHavingPrice();
                 this.props.navigation.goBack();
               }}
-              style={{
-                height: 30,
-                width: 30,
-                justifyContent: 'center',
-              }}
+              style={styles.backArrow}
             >
               <FontAwesome
                 name="long-arrow-left"
@@ -688,11 +673,7 @@ class SendToContact extends Component<
             <View style={{ marginLeft: wp('2.5%') }}>
               <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
               <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontFamily: Fonts.FiraSansRegular,
-                  fontSize: RFValue(12),
-                }}
+                style={styles.sendText}
               >
                 {serviceType == TEST_ACCOUNT
                   ? 'Test Account'
@@ -704,15 +685,7 @@ class SendToContact extends Component<
           </View>
         </View>
         <View
-          style={{
-            alignSelf: 'center',
-            width: wp('90%'),
-            marginBottom: hp('2%'),
-            marginTop: hp('2%'),
-            flexDirection: 'row',
-            paddingBottom: hp('1.5%'),
-            paddingTop: hp('1%'),
-          }}
+          style={styles.availableToSpendView}
         >
           <TouchableOpacity
             activeOpacity={10}
@@ -740,30 +713,16 @@ class SendToContact extends Component<
                 : ''}
             </Text>
             <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansItalic,
-                lineHeight: 15,
-                textAlign: 'center',
-              }}
+              style={styles.availableToSpendText}
             >
               {' (Available to spend '}
               <Text
-                style={{
-                  color: Colors.blue,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansItalic,
-                }}
+                style={styles.balanceText}
               >
                 {this.getBalanceText()}
               </Text>
               <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(7),
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                }}
+                style={styles.textTsats}
               >
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
@@ -790,12 +749,7 @@ class SendToContact extends Component<
                 //console.log('ITEM in list', item);
                 return (
                   <View
-                    style={{
-                      marginRight: 20,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      width: wp('15%'),
-                    }}
+                    style={styles.view1}
                   >
                     <View style={{ flexDirection: 'row' }}>
                       {item.selectedContact &&
@@ -893,14 +847,7 @@ class SendToContact extends Component<
                       </TouchableOpacity>
                     </View>
                     <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
-                        textAlign: 'center',
-                        marginTop: 5,
-                        width: wp('15%'),
-                      }}
+                      style={styles.name}
                       numberOfLines={1}
                     >
                       {item.selectedContact.name ||
@@ -908,11 +855,7 @@ class SendToContact extends Component<
                         item.selectedContact.id}
                     </Text>
                     <Text
-                      style={{
-                        color: Colors.blue,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
+                      style={styles.amountText}
                     >
                      {switchOn
             ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount}` +
@@ -929,14 +872,7 @@ class SendToContact extends Component<
           ) : null}
         </View>
         <View
-          style={{
-            alignSelf: 'center',
-            width: wp('90%'),
-            borderBottomWidth: 1,
-            borderColor: Colors.borderColor,
-            marginBottom: hp('1%'),
-            marginTop: hp('2%'),
-          }}
+          style={styles.dividerView}
         />
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -944,7 +880,7 @@ class SendToContact extends Component<
           enabled
         >
           <View
-            style={{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') }}
+            style={styles.parentView}
           >
             <ScrollView>
               <View style={{ flex: 1, flexDirection: 'row' }}>
@@ -966,12 +902,7 @@ class SendToContact extends Component<
                     <View style={styles.amountInputImage}>
                       {currencyCode.includes(CurrencyCode) ? (
                         <View
-                          style={{
-                            width: wp('6%'),
-                            height: wp('6%'),
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}
+                          style={styles.currencyImageView}
                         >
                           <MaterialCommunityIcons
                             name={getCurrencyImageName(CurrencyCode)}
@@ -996,14 +927,7 @@ class SendToContact extends Component<
           /> */}
                     </View>
                     <View
-                      style={{
-                        width: 2,
-                        height: '60%',
-                        backgroundColor: Colors.borderColor,
-                        marginRight: 5,
-                        marginLeft: 5,
-                        alignSelf: 'center',
-                      }}
+                      style={styles.convertText}
                     />
                     <TextInput
                       style={{
@@ -1069,14 +993,7 @@ class SendToContact extends Component<
                       />
                     </View>
                     <View
-                      style={{
-                        width: 2,
-                        height: '60%',
-                        backgroundColor: Colors.borderColor,
-                        marginRight: 5,
-                        marginLeft: 5,
-                        alignSelf: 'center',
-                      }}
+                      style={styles.enterAmountView}
                     />
                     <TextInput
                       style={{
@@ -1122,11 +1039,7 @@ class SendToContact extends Component<
                   {/* {renderBitCoinInputText()} */}
                 </View>
                 <View
-                  style={{
-                    marginLeft: 'auto',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
+                  style={styles.toggleSwitchView}
                 >
                   <ToggleSwitch
                     currencyCodeValue={CurrencyCode}
@@ -1142,13 +1055,7 @@ class SendToContact extends Component<
               </View>
               {serviceType == TEST_ACCOUNT ? (
                 <View
-                  style={{
-                    marginTop: wp('1.5%'),
-                    marginBottom: -25,
-                    padding: -20,
-                    marginLeft: -20,
-                    marginRight: -20,
-                  }}
+                  style={styles.bottomInfoView}
                 >
                   <BottomInfoBox
                     title={'Value of your test-sats'}
@@ -1197,11 +1104,7 @@ class SendToContact extends Component<
                 />
               </View>
               <View
-                style={{
-                  flexDirection: 'row',
-                  marginTop: hp('3%'),
-                  marginBottom: hp('5%'),
-                }}
+                style={styles.confirmView}
               >
                 <TouchableOpacity
                   onPress={() => {
@@ -1240,10 +1143,6 @@ class SendToContact extends Component<
                       isConfirmDisabled || loading[serviceType].loading.transfer
                     }
                     onPress={() => {
-                      // dispatch(clearTransfer(serviceType));
-                      // if (getServiceType) {
-                      //   getServiceType(serviceType);
-                      // }
                       if (
                         transfer[serviceType].transfer.details &&
                         transfer[serviceType].transfer.details.length
@@ -1448,6 +1347,114 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
   },
+  view:{
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  view1:{
+    marginRight: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: wp('15%'),
+  },
+  name:{
+    color: Colors.textColorGrey,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'center',
+    marginTop: 5,
+    width: wp('15%'),
+  },
+  amountText:{
+    color: Colors.blue,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  dividerView:{
+    alignSelf: 'center',
+    width: wp('90%'),
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    marginBottom: hp('1%'),
+    marginTop: hp('2%'),
+  },
+  parentView:{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') },
+  backArrow:{
+    height: 30,
+    width: 30,
+    justifyContent: 'center',
+  },
+  sendText:{
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(12),
+  },
+  confirmView:{
+    flexDirection: 'row',
+    marginTop: hp('3%'),
+    marginBottom: hp('5%'),
+  },
+  currencyImageView:{
+    width: wp('6%'),
+    height: wp('6%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  convertText:{
+    width: 2,
+    height: '60%',
+    backgroundColor: Colors.borderColor,
+    marginRight: 5,
+    marginLeft: 5,
+    alignSelf: 'center',
+  },
+  enterAmountView:{
+    width: 2,
+    height: '60%',
+    backgroundColor: Colors.borderColor,
+    marginRight: 5,
+    marginLeft: 5,
+    alignSelf: 'center',
+  },
+  toggleSwitchView:{
+    marginLeft: 'auto',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bottomInfoView:{
+    marginTop: wp('1.5%'),
+    marginBottom: -25,
+    padding: -20,
+    marginLeft: -20,
+    marginRight: -20,
+  },
+  availableToSpendView:{
+    alignSelf: 'center',
+    width: wp('90%'),
+    marginBottom: hp('2%'),
+    marginTop: hp('2%'),
+    flexDirection: 'row',
+    paddingBottom: hp('1.5%'),
+    paddingTop: hp('1%'),
+  },
+  availableToSpendText:{
+    color: Colors.blue,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansItalic,
+    lineHeight: 15,
+    textAlign: 'center',
+  },
+  balanceText:{
+    color: Colors.blue,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  textTsats:{
+  color: Colors.textColorGrey,
+  fontSize: RFValue(7),
+  fontFamily: Fonts.FiraSansMediumItalic,
+},
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,

@@ -43,65 +43,27 @@ const TransactionsContent = ({
             return (
               <View
                 key={value}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  paddingTop: wp('5%'),
-                  paddingBottom: wp('5%'),
-                  borderBottomWidth: 0.5,
-                  borderColor: Colors.borderColor,
-                }}
+                style={styles.view}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
+                    style={styles.view1}
                   />
                   <View>
                     <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('25%'),
-                        borderRadius: 10,
-                      }}
+                      style={styles.view2}
                     />
                     <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('35%'),
-                        marginTop: 5,
-                        borderRadius: 10,
-                      }}
+                      style={styles.view3}
                     />
                   </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('7%'),
-                      width: wp('20%'),
-                      borderRadius: 10,
-                    }}
+                    style={styles.view4}
                   />
                   <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      height: wp('5%'),
-                      width: wp('5%'),
-                      borderRadius: wp('5%') / 2,
-                      marginLeft: 10,
-                      marginRight: 10,
-                    }}
+                    style={styles.view1}
                   />
                 </View>
               </View>
@@ -110,31 +72,16 @@ const TransactionsContent = ({
         </View>
         <View style={{ backgroundColor: Colors.white }}>
           <View
-            style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
-              marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              borderRadius: 7,
-            }}
+            style={{...styles.viewTransaction,
+    marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,}}
           >
             <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
+              style={styles.viewTransactionText}
             >
               View your transactions here
             </Text>
             <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
+              style={styles.textNote}
             >
               All your recent transactions across the accounts appear here
             </Text>
@@ -206,16 +153,7 @@ const TransactionsContent = ({
                     <View style={styles.transactionModalAmountView}>
                       {item.accountType == FAST_BITCOINS && (
                         <View
-                          style={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            borderColor: Colors.borderColor,
-                            borderWidth: 0.5,
-                            borderRadius: wp('8%') / 2,
-                            width: wp('8%'),
-                            height: wp('8%'),
-                            backgroundColor: Colors.white,
-                          }}
+                          style={styles.view5}
                         >
                           <Image
                             source={require('../../assets/images/icons/fastbitcoin_dark.png')}
@@ -256,20 +194,13 @@ const TransactionsContent = ({
           {transactions.length <= 1 && (
             <View
               style={{
-                margin: 15,
-                backgroundColor: Colors.backgroundColor,
                 marginBottom: isFromAccount ? hp('3%') : AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
-                padding: 10,
-                paddingTop: 20,
-                paddingBottom: 20,
-                borderRadius: 7,
+                ...styles.viewTransaction
               }}
             >
               <Text
-                style={{
+                style={{...styles.viewTransactionText,
                   color: Colors.blue,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
                 }}
               >
                 View your transactions here
@@ -295,21 +226,12 @@ const TransactionsContent = ({
         <View style={{ backgroundColor: Colors.white }}>
           <View
             style={{
-              margin: 15,
-              backgroundColor: Colors.backgroundColor,
+              ...styles.viewTransaction,
               marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
-              padding: 10,
-              paddingTop: 20,
-              paddingBottom: 20,
-              borderRadius: 7,
             }}
           >
             <Text
-              style={{
-                color: Colors.black,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
+              style={styles.viewTransactionText}
             >
               View your transactions here
             </Text>
@@ -335,6 +257,70 @@ const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
+  },
+  view:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: wp('5%'),
+    paddingBottom: wp('5%'),
+    borderBottomWidth: 0.5,
+    borderColor: Colors.borderColor,
+  },
+  view1:{
+    backgroundColor: Colors.backgroundColor,
+    height: wp('5%'),
+    width: wp('5%'),
+    borderRadius: wp('5%') / 2,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  view2:{
+    backgroundColor: Colors.backgroundColor,
+    height: wp('5%'),
+    width: wp('25%'),
+    borderRadius: 10,
+  },
+  view3:{
+    backgroundColor: Colors.backgroundColor,
+    height: wp('5%'),
+    width: wp('35%'),
+    marginTop: 5,
+    borderRadius: 10,
+  },
+  view4:{
+    backgroundColor: Colors.backgroundColor,
+    height: wp('7%'),
+    width: wp('20%'),
+    borderRadius: 10,
+  },
+  view5:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: Colors.borderColor,
+    borderWidth: 0.5,
+    borderRadius: wp('8%') / 2,
+    width: wp('8%'),
+    height: wp('8%'),
+    backgroundColor: Colors.white,
+  },
+  viewTransaction:{
+    margin: 15,
+    backgroundColor: Colors.backgroundColor,
+    padding: 10,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderRadius: 7,
+  },
+  textNote:{
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  viewTransactionText:{
+    color: Colors.black,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
   },
   separatorView: {
     marginLeft: 15,
