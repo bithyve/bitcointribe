@@ -111,6 +111,7 @@ export interface TrustedContactDerivativeAccountElements {
   contactName: string;
   contactDetails?: {
     xpub: string;
+    tpub?: string;
     receivingAddress?: string;
     usedAddresses?: string[];
     nextFreeAddressIndex?: number;
@@ -190,6 +191,7 @@ export interface EphemeralData {
 
 export interface TrustedDataElements {
   xpub?: string;
+  tpub?: string;
   walletID?: string;
   FCM?: string;
 }

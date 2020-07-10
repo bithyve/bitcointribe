@@ -157,6 +157,20 @@ export default class HDSegwitWallet extends Bitcoin {
     return { mnemonic: this.mnemonic };
   };
 
+  public getTestXPub = (): string => {
+    if (this.isTest) {
+      if (this.xpub) {
+        return this.xpub;
+      }
+      const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
+      const root = bip32.fromSeed(seed, this.network);
+      const child = root.derivePath(this.derivationPath).neutered();
+      this.xpub = child.toBase58();
+
+      return this.xpub;
+    }
+  };
+
   public getWalletId = (): { walletId: string } => {
     const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
     return {
@@ -705,6 +719,37 @@ export default class HDSegwitWallet extends Bitcoin {
         `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
       );
       throw new Error('Fetching balance-txn by addresses failed');
+    }
+  };
+
+  public deriveReceivingAddress = async (
+    xpub: string,
+  ): Promise<{ address: string }> => {
+    try {
+      // finding free external address
+      let freeAddress = '';
+      let itr;
+      for (itr = 0; itr < this.gapLimit + 1; itr++) {
+        const address = this.getExternalAddressByIndex(itr, xpub);
+        const txCounts = await this.getTxCounts([address]); // ensuring availability
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        console.log(
+          'Failed to find a free address in the external address cycle, using the next address without checking',
+        );
+        // giving up as we couldn't find a free address in the above cycle
+        freeAddress = this.getExternalAddressByIndex(itr); // not checking this one, it might be free
+      }
+
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
   };
 
