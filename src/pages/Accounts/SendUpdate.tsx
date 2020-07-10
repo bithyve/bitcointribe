@@ -88,7 +88,7 @@ interface SendStateTypes {
   averageTxFees: any,
 }
 
-class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
+class Send extends Component<SendPropsTypes, SendStateTypes> {
   
   constructor(props) {
     super(props);
@@ -304,7 +304,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
                 selectedContact: item,
               });
 
-            this.props.navigation.navigate('SendToContactUpdate', {
+            this.props.navigation.navigate('SendToContact', {
               selectedContact: item,
               serviceType,
               sweepSecure,
@@ -337,7 +337,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
           selectedContact: item,
         });
         this.setState({recipientAddress: ''})
-      this.props.navigation.navigate('SendToContactUpdate', {
+      this.props.navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
         averageTxFees,
@@ -357,7 +357,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
             selectedContact: item,
           });
           this.setState({recipientAddress: ''});
-        this.props.navigation.navigate('SendToContactUpdate', {
+        this.props.navigation.navigate('SendToContact', {
           selectedContact: item,
           serviceType,
           averageTxFees,
@@ -407,6 +407,8 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
 
   updateAddressBook = async () => {
     const {regularAccount, trustedContactsService}= this.props;
+    const { serviceType } = this.state;
+
     let trustedContactsInfo: any = await AsyncStorage.getItem(
       'TrustedContactsInfo',
     );
@@ -434,17 +436,25 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
           } = regularAccount.hdWallet;
           const accountNumber =
             trustedContactToDA[contactName.toLowerCase().trim()];
-          if (accountNumber) {
-            const trustedContact: TrustedContactDerivativeAccountElements =
-              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
-            if (
-              trustedContact.contactDetails &&
-              trustedContact.contactDetails.xpub
-            ) {
-              hasXpub = true;
+            if (accountNumber) {
+              const trustedContact: TrustedContactDerivativeAccountElements =
+                derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
+              if (serviceType === TEST_ACCOUNT) {
+                if (
+                  trustedContact.contactDetails &&
+                  trustedContact.contactDetails.tpub
+                ) {
+                  hasXpub = true;
+                }
+              } else {
+                if (
+                  trustedContact.contactDetails &&
+                  trustedContact.contactDetails.xpub
+                ) {
+                  hasXpub = true;
+                }
+              }
             }
-          }
-
           const isWard =
             trustedContactsService.tc.trustedContacts[
               contactName.toLowerCase().trim()
@@ -662,8 +672,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
                     <Text style={styles.errorText}>Enter correct address</Text>
                   </View>
                 ) : null}
-                {serviceType != TEST_ACCOUNT ? (
-                  <View style={{ paddingTop: wp('3%') }}>
+                <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
                       <Text
                         style={{
@@ -764,7 +773,6 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
                       </View>
                     )}
                   </View>
-                ) : null}
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
@@ -908,7 +916,7 @@ export default withNavigationFocus(
     addTransferDetails,
     clearTransfer,
 
-  })(SendUpdate),
+  })(Send),
 );
 
 const styles = StyleSheet.create({

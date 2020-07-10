@@ -164,9 +164,13 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
         }`
           .toLowerCase()
           .trim();
-        const recipient =
+          const recipient =
           trustedContactsService.tc.trustedContacts[contactName];
-        receivers.push({ walletId: recipient.walletID, FCMs: recipient.FCMs });
+        if (recipient.walletID && recipient.FCMs.length)
+          receivers.push({
+            walletId: recipient.walletID,
+            FCMs: recipient.FCMs,
+          });
       }
     });
     const notification: INotification = {

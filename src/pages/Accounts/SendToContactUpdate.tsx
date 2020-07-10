@@ -112,7 +112,7 @@ interface SendToContactStateTypes {
   spendableBalances: any;
 }
 
-class SendToContactUpdate extends Component<
+class SendToContact extends Component<
   SendToContactPropsTypes,
   SendToContactStateTypes
 > {
@@ -451,10 +451,10 @@ class SendToContactUpdate extends Component<
     const { transfer } = this.props;
     if (!recipients.length) return;
     if (transfer[serviceType].transfer.stage1.failed) {
+      this.setState({ isConfirmDisabled: false });
       setTimeout(() => {
-        this.setState({ isConfirmDisabled: false });
-      }, 10);
       (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
+      }, 2)
     } else if (transfer[serviceType].transfer.executed === 'ST1') {
       if (transfer[serviceType].transfer.details.length) {
         this.props.navigation.navigate('SendConfirmation', {
@@ -913,19 +913,12 @@ class SendToContactUpdate extends Component<
                         fontFamily: Fonts.FiraSansRegular,
                       }}
                     >
-                      {switchOn
-                        ? `${
-                            item.bitcoinAmount
-                              ? item.bitcoinAmount
-                              : bitcoinAmount
-                          } sats`
-                        : CurrencySymbol +
-                          ' ' +
-                          `${
-                            item.currencyAmount
-                              ? item.currencyAmount
-                              : currencyAmount
-                          }`}
+                     {switchOn
+            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount}` +
+              `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
+            : CurrencySymbol +
+              ' ' +
+              `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
                     </Text>
                   </View>
                 );
@@ -1094,8 +1087,12 @@ class SendToContactUpdate extends Component<
                       }}
                       placeholder={
                         switchOn
-                          ? 'Enter amount in sats'
-                          : 'Converted amount in sats'
+                        ? serviceType == TEST_ACCOUNT
+                          ? 'Enter amount in t-sats'
+                          : 'Enter amount in sats'
+                        : serviceType == TEST_ACCOUNT
+                        ? 'Converted amount in t-sats'
+                        : 'Converted amount in sats'
                       }
                       editable={switchOn}
                       value={bitcoinAmount}
@@ -1232,8 +1229,7 @@ class SendToContactUpdate extends Component<
                   )}
                   {/* )} */}
                 </TouchableOpacity>
-                {serviceType != 'TEST_ACCOUNT' ? (
-                  <TouchableOpacity
+                <TouchableOpacity
                     style={{
                       ...styles.confirmButtonView,
                       width: wp('30%'),
@@ -1280,7 +1276,6 @@ class SendToContactUpdate extends Component<
                       Add Recipient
                     </Text>
                   </TouchableOpacity>
-                ) : null}
               </View>
             </ScrollView>
           </View>
@@ -1312,6 +1307,7 @@ class SendToContactUpdate extends Component<
                     }, 2);
                     (this.refs.RemoveBottomSheet as any).snapTo(0);
                   }}
+                  serviceType={serviceType}
                 />
               );
             }
@@ -1442,7 +1438,7 @@ export default withNavigationFocus(
     removeTransferDetails,
     clearTransfer,
     addTransferDetails,
-  })(SendToContactUpdate),
+  })(SendToContact),
 );
 
 const styles = StyleSheet.create({

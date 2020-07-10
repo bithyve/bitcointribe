@@ -30,7 +30,7 @@ import QuestionRecovery from '../pages/Recovery/QuestionRecovery';
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication';
 import ReceivingAddress from '../pages/Accounts/ReceivingAddress';
 //import TransactionDetails from '../pages/Accounts/TransactionDetails';
-import Send from '../pages/Accounts/Send';
+import Send from '../pages/Accounts/SendUpdate';
 import TwoFAToken from '../pages/Accounts/TwoFAToken';
 import RecoveryRequestOTP from '../pages/Recovery/RecoveryRequestOTP';
 import SettingManagePin from '../pages/SettingManagePin';
@@ -74,14 +74,12 @@ import SettingWalletNameChange from '../pages/SettingWalletNameChange';
 import SettingNewWalletName from '../pages/SettingNewWalletName';
 import SendRequest from '../pages/Contacts/SendRequest';
 import VoucherScanner from '../pages/FastBitcoin/VoucherScanner';
-import SendToContact from '../pages/Accounts/SendToContact';
+import SendToContact from '../pages/Accounts/SendToContactUpdate';
 import SendConfirmation from '../pages/Accounts/SendConfirmation_updated';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
-import SendUpdate from '../pages/Accounts/SendUpdate';
-import SendToContactUpdate from '../pages/Accounts/SendToContactUpdate';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -208,8 +206,6 @@ const HomeNavigator = createStackNavigator(
     ContactDetails,
     Receive,
     PairNewWallet,
-    SendUpdate,
-    SendToContactUpdate,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

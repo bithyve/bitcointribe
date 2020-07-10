@@ -1479,7 +1479,7 @@ export default function Accounts(props) {
                 >
                   <TouchableOpacity
                     onPress={() => {
-                      props.navigation.navigate('SendUpdate', {
+                      props.navigation.navigate('Send', {
                         serviceType,
                         getServiceType: getServiceType,
                         averageTxFees,
