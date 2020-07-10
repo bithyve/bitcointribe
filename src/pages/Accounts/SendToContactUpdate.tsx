@@ -94,7 +94,7 @@ interface SendToContactStateTypes {
   selectedContact: any;
   serviceType: string;
   averageTxFees: any;
-  netBalance: any;
+  spendableBalance: any;
   sweepSecure: any;
   removeItem: any;
   switchOn: boolean;
@@ -109,6 +109,7 @@ interface SendToContactStateTypes {
   InputStyleNote: any;
   isInvalidBalance: boolean;
   recipients: any[];
+  spendableBalances: any;
 }
 
 class SendToContactUpdate extends Component<
@@ -128,7 +129,7 @@ class SendToContactUpdate extends Component<
       selectedContact: this.props.navigation.getParam('selectedContact'),
       serviceType: this.props.navigation.getParam('serviceType'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
-      netBalance: this.props.navigation.getParam('netBalance'),
+      spendableBalance: this.props.navigation.getParam('spendableBalance'),
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
       removeItem: {},
       switchOn: true,
@@ -145,6 +146,11 @@ class SendToContactUpdate extends Component<
       InputStyleNote: styles.textBoxView,
       isInvalidBalance: false,
       recipients: [],
+      spendableBalances: {
+        testBalance: 0,
+        regularBalance: 0,
+        secureBalance: 0,
+      },
     };
   }
 
@@ -154,7 +160,8 @@ class SendToContactUpdate extends Component<
       bitcoinAmount,
       averageTxFees,
       serviceType,
-      netBalance,
+      spendableBalance,
+      spendableBalances,
     } = this.state;
     BackHandler.addEventListener('hardwareBackPress', () => {
       this.checkRecordsHavingPrice();
@@ -166,12 +173,25 @@ class SendToContactUpdate extends Component<
     if (!averageTxFees) this.storeAverageTxFees();
 
     if (serviceType == REGULAR_ACCOUNT) {
-      this.setState({ RegularAccountBalance: netBalance });
+      this.setState({ RegularAccountBalance: spendableBalance });
     } else if (serviceType == SECURE_ACCOUNT) {
-      this.setState({ SavingAccountBalance: netBalance });
+      this.setState({ SavingAccountBalance: spendableBalance });
     }
 
+    this.updateSpendableBalance();
+
     this.amountCalculation();
+  };
+
+  updateSpendableBalance = () => {
+    const { serviceType, spendableBalances } = this.state;
+    if (serviceType === TEST_ACCOUNT) {
+      this.setState({ spendableBalance: spendableBalances.testBalance });
+    } else if (serviceType == REGULAR_ACCOUNT) {
+      this.setState({ spendableBalance: spendableBalances.regularBalance });
+    } else if (serviceType == SECURE_ACCOUNT) {
+      this.setState({ spendableBalance: spendableBalances.secureBalance });
+    }
   };
 
   componentDidUpdate = (prevProps, prevState) => {
@@ -186,12 +206,17 @@ class SendToContactUpdate extends Component<
       this.storeAverageTxFees();
     }
 
-    if (prevState.netBalance !== this.state.netBalance) {
+    if (prevState.spendableBalance !== this.state.spendableBalance) {
       if (this.state.serviceType == REGULAR_ACCOUNT) {
-        this.setState({ RegularAccountBalance: this.state.netBalance });
+        this.setState({ RegularAccountBalance: this.state.spendableBalance });
       } else if (this.state.serviceType == SECURE_ACCOUNT) {
-        this.setState({ SavingAccountBalance: this.state.netBalance });
+        this.setState({ SavingAccountBalance: this.state.spendableBalance });
       }
+      this.updateSpendableBalance();
+    }
+
+    if (prevState.serviceType !== this.state.serviceType) {
+      this.updateSpendableBalance();
     }
 
     if (
@@ -211,65 +236,87 @@ class SendToContactUpdate extends Component<
       this.amountCalculation();
     }
 
-    if(prevProps.transfer[this.state.serviceType].transfer !== this.props.transfer[this.state.serviceType].transfer){
+    if (
+      prevProps.transfer[this.state.serviceType].transfer !==
+      this.props.transfer[this.state.serviceType].transfer
+    ) {
       this.sendConfirmation();
-      }
+    }
   };
 
   getBalances = () => {
-    const { netBalance, serviceType } = this.state;
+    const { spendableBalance, serviceType } = this.state;
     const { accounts } = this.props;
 
-    if (netBalance !== 0 && !netBalance) {
-      const service = accounts[serviceType].service;
-      const instance = service.hdWallet || service.secureHDWallet;
-      let balance =
-        instance.balances.balance + instance.balances.unconfirmedBalance;
+    const testBalance = accounts[TEST_ACCOUNT].service
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
+      : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        0;
 
-      if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-        for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-          let derivativeAccount;
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
+      : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        0;
 
-          if (serviceType === REGULAR_ACCOUNT) {
-            derivativeAccount =
-              accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-                dAccountType
-              ];
-          } else if (serviceType === SECURE_ACCOUNT) {
-            derivativeAccount =
-              accounts[SECURE_ACCOUNT].service.secureHDWallet
-                .derivativeAccounts[dAccountType];
-          }
-
-          if (
-            serviceType === SECURE_ACCOUNT &&
-            dAccountType === TRUSTED_CONTACTS
-          ) {
-            continue;
-          }
-
-          if (derivativeAccount.instance.using) {
-            for (
-              let accountNumber = 1;
-              accountNumber <= derivativeAccount.instance.using;
-              accountNumber++
-            ) {
-              // console.log({
-              //   accountNumber,
-              //   balances: trustedAccounts[accountNumber].balances,
-              //   transactions: trustedAccounts[accountNumber].transactions,
-              // });
-              if (derivativeAccount[accountNumber].balances) {
-                balance +=
-                  derivativeAccount[accountNumber].balances.balance +
-                  derivativeAccount[accountNumber].balances.unconfirmedBalance;
-              }
-            }
+    // regular derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      const derivativeAccount =
+        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          if (derivativeAccount[accountNumber].balances) {
+            regularBalance += derivativeAccount[accountNumber].balances.balance;
+            // + derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
         }
       }
-      this.setState({ netBalance: balance });
     }
+
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
+      : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        //      .unconfirmedBalance
+        0;
+
+    // secure derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+
+      const derivativeAccount =
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            secureBalance += derivativeAccount[accountNumber].balances.balance;
+            // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
+    this.setState({
+      spendableBalances: {
+        testBalance,
+        regularBalance,
+        secureBalance,
+      },
+    });
   };
 
   setCurrencyCodeFromAsync = async () => {
@@ -364,7 +411,7 @@ class SendToContactUpdate extends Component<
       bitcoinAmount,
       currencyAmount,
       serviceType,
-      netBalance,
+      spendableBalance,
       selectedContact,
     } = this.state;
     const { transfer } = this.props;
@@ -382,7 +429,7 @@ class SendToContactUpdate extends Component<
           amountStacked += parseInt(recipient.bitcoinAmount);
         }
       });
-      if (netBalance - amountStacked < Number(bitcoinAmount)) {
+      if (spendableBalance - amountStacked < Number(bitcoinAmount)) {
         this.setState({ isInvalidBalance: true, isConfirmDisabled: true });
       } else this.setState({ isConfirmDisabled: false });
     } else {
@@ -394,12 +441,18 @@ class SendToContactUpdate extends Component<
   };
 
   sendConfirmation = () => {
-    const {recipients, serviceType, sweepSecure,netBalance,averageTxFees} = this.state;
-    const {transfer} = this.props;
+    const {
+      recipients,
+      serviceType,
+      sweepSecure,
+      spendableBalance,
+      averageTxFees,
+    } = this.state;
+    const { transfer } = this.props;
     if (!recipients.length) return;
     if (transfer[serviceType].transfer.stage1.failed) {
       setTimeout(() => {
-        this.setState({ isConfirmDisabled : false })
+        this.setState({ isConfirmDisabled: false });
       }, 10);
       (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
     } else if (transfer[serviceType].transfer.executed === 'ST1') {
@@ -407,17 +460,24 @@ class SendToContactUpdate extends Component<
         this.props.navigation.navigate('SendConfirmation', {
           serviceType,
           sweepSecure,
-          netBalance,
+          spendableBalance,
           recipients,
           averageTxFees,
         });
       }
     }
-  }
+  };
 
   handleTrasferST1 = () => {
-    const {selectedContact, bitcoinAmount, currencyAmount, note, serviceType, averageTxFees} = this.state;
-    const {transfer, service, transferST1} = this.props;
+    const {
+      selectedContact,
+      bitcoinAmount,
+      currencyAmount,
+      note,
+      serviceType,
+      averageTxFees,
+    } = this.state;
+    const { transfer, service, transferST1 } = this.props;
 
     const recipients = [];
     const currentRecipientInstance = {
@@ -436,7 +496,9 @@ class SendToContactUpdate extends Component<
         recipientsList.push(instance);
     });
     recipientsList.push(currentRecipientInstance);
-    const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
+    const instance =
+      service[serviceType].service.hdWallet ||
+      service[serviceType].service.secureHDWallet;
 
     recipientsList.map((item) => {
       const recipientId = item.selectedContact.id;
@@ -469,85 +531,113 @@ class SendToContactUpdate extends Component<
         }
       }
     });
-    this.setState({recipients: recipients});
+    this.setState({ recipients: recipients });
     transferST1(serviceType, recipients, averageTxFees);
   };
 
   onConfirm = () => {
-    const {clearTransfer, transfer, removeTransferDetails, addTransferDetails,} =  this.props;
-    const {bitcoinAmount,currencyAmount, note,} = this.state;
-    const {serviceType, selectedContact} = this.state;
+    const {
+      clearTransfer,
+      transfer,
+      removeTransferDetails,
+      addTransferDetails,
+    } = this.props;
+    const { bitcoinAmount, currencyAmount, note } = this.state;
+    const { serviceType, selectedContact } = this.state;
     clearTransfer(serviceType, 'stage1');
-    this.setState({isConfirmDisabled: false});
-    if (transfer[serviceType].transfer.details && transfer[serviceType].transfer.details.length) {
+    this.setState({ isConfirmDisabled: false });
+    if (
+      transfer[serviceType].transfer.details &&
+      transfer[serviceType].transfer.details.length
+    ) {
       for (let i = 0; i < transfer[serviceType].transfer.details.length; i++) {
-        if (transfer[serviceType].transfer.details[i].selectedContact.id == selectedContact.id) {
-          removeTransferDetails(serviceType, transfer[serviceType].transfer.details[i]);
+        if (
+          transfer[serviceType].transfer.details[i].selectedContact.id ==
+          selectedContact.id
+        ) {
+          removeTransferDetails(
+            serviceType,
+            transfer[serviceType].transfer.details[i],
+          );
         }
       }
       addTransferDetails(serviceType, {
-          selectedContact,
-          bitcoinAmount,
-          currencyAmount,
-          note,
-        })
+        selectedContact,
+        bitcoinAmount,
+        currencyAmount,
+        note,
+      });
     }
     setTimeout(() => {
       this.handleTrasferST1();
     }, 10);
-  }
+  };
 
-  getBalanceText = () =>{
-    const {serviceType, netBalance, RegularAccountBalance, SavingAccountBalance,switchOn,exchangeRates,CurrencyCode} = this.state;
-      let balance = netBalance;
-      if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
-      if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
+  getBalanceText = () => {
+    const {
+      serviceType,
+      spendableBalance,
+      RegularAccountBalance,
+      SavingAccountBalance,
+      switchOn,
+      exchangeRates,
+      CurrencyCode,
+      spendableBalances,
+    } = this.state;
+    let balance = spendableBalance;
+    if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
+    if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
+    if (serviceType == REGULAR_ACCOUNT)
+      balance = spendableBalances.regularBalance;
+    if (serviceType == SECURE_ACCOUNT)
+      balance = spendableBalances.secureBalance;
 
-      return (serviceType == TEST_ACCOUNT
-        ? UsNumberFormat(balance)
-        : switchOn
-        ? UsNumberFormat(balance)
-        : exchangeRates
-        ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-        : null) 
-  }
+    return serviceType == TEST_ACCOUNT
+      ? UsNumberFormat(balance)
+      : switchOn
+      ? UsNumberFormat(balance)
+      : exchangeRates
+      ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+      : null;
+  };
 
   render() {
     const {
       RegularAccountBalance,
-  SavingAccountBalance,
-  isFromAddressBook,
-  isOpen,
-  exchangeRates,
-  selectedContact,
-  serviceType,
-  averageTxFees,
-  netBalance,
-  sweepSecure,
-  removeItem,
-  switchOn,
-  CurrencyCode,
-  CurrencySymbol,
-  bitcoinAmount,
-  currencyAmount,
-  isConfirmDisabled,
-  note,
-  InputStyle,
-  InputStyle1,
-  InputStyleNote,
-  isInvalidBalance,
-  recipients,
+      SavingAccountBalance,
+      isFromAddressBook,
+      isOpen,
+      exchangeRates,
+      selectedContact,
+      serviceType,
+      averageTxFees,
+      spendableBalance,
+      sweepSecure,
+      removeItem,
+      switchOn,
+      CurrencyCode,
+      CurrencySymbol,
+      bitcoinAmount,
+      currencyAmount,
+      isConfirmDisabled,
+      note,
+      InputStyle,
+      InputStyle1,
+      InputStyleNote,
+      isInvalidBalance,
+      recipients,
+      spendableBalances,
     } = this.state;
     const {
       navigation,
-  service,
-  transfer,
-  accounts,
-  loading,
-  transferST1,
-  removeTransferDetails,
-  clearTransfer,
-  addTransferDetails,
+      service,
+      transfer,
+      accounts,
+      loading,
+      transferST1,
+      removeTransferDetails,
+      clearTransfer,
+      addTransferDetails,
     } = this.props;
 
     return (
@@ -638,10 +728,15 @@ class SendToContactUpdate extends Component<
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {serviceType == 'TEST_ACCOUNT' ? 'Test Account' :
-            serviceType == 'SECURE_ACCOUNT' ? 'Savings Account' :
-          serviceType == 'REGULAR_ACCOUNT' ? 'Checking Account' : 
-            serviceType == 'S3_SERVICE' ? 'S3 Service' : ''}
+              {serviceType == 'TEST_ACCOUNT'
+                ? 'Test Account'
+                : serviceType == 'SECURE_ACCOUNT'
+                ? 'Savings Account'
+                : serviceType == 'REGULAR_ACCOUNT'
+                ? 'Checking Account'
+                : serviceType == 'S3_SERVICE'
+                ? 'S3 Service'
+                : ''}
             </Text>
             <Text
               style={{
@@ -654,14 +749,14 @@ class SendToContactUpdate extends Component<
             >
               {' (Available to spend '}
               <Text
-        style={{
-          color: Colors.blue,
-          fontSize: RFValue(10),
-          fontFamily: Fonts.FiraSansItalic,
-        }}
-      >
-        {this.getBalanceText()}
-      </Text>
+                style={{
+                  color: Colors.blue,
+                  fontSize: RFValue(10),
+                  fontFamily: Fonts.FiraSansItalic,
+                }}
+              >
+                {this.getBalanceText()}
+              </Text>
               <Text
                 style={{
                   color: Colors.textColorGrey,
@@ -687,7 +782,8 @@ class SendToContactUpdate extends Component<
           </TouchableOpacity>
         </View>
         <View style={{ width: wp('85%'), alignSelf: 'center' }}>
-          {transfer[serviceType].transfer.details && transfer[serviceType].transfer.details.length > 0 ? (
+          {transfer[serviceType].transfer.details &&
+          transfer[serviceType].transfer.details.length > 0 ? (
             <ScrollView horizontal={true}>
               {transfer[serviceType].transfer.details.map((item) => {
                 console.log('ITEM in list', item);
@@ -783,7 +879,7 @@ class SendToContactUpdate extends Component<
                         style={styles.closeMarkStyle}
                         onPress={() => {
                           setTimeout(() => {
-                            this.setState({removeItem: item});
+                            this.setState({ removeItem: item });
                           }, 2);
                           (this.refs.RemoveBottomSheet as any).snapTo(1);
                         }}
@@ -938,15 +1034,15 @@ class SendToContactUpdate extends Component<
                       }}
                       placeholderTextColor={Colors.borderColor}
                       onFocus={() => {
-                        this.setState({InputStyle1: styles.inputBoxFocused})
+                        this.setState({ InputStyle1: styles.inputBoxFocused });
                       }}
                       onBlur={() => {
-                        this.setState({InputStyle1: styles.textBoxView})
+                        this.setState({ InputStyle1: styles.textBoxView });
                       }}
                       onKeyPress={(e) => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
-                            this.setState({isInvalidBalance: false})
+                            this.setState({ isInvalidBalance: false });
                           }, 10);
                         }
                       }}
@@ -1011,15 +1107,15 @@ class SendToContactUpdate extends Component<
                       }}
                       placeholderTextColor={Colors.borderColor}
                       onFocus={() => {
-                        this.setState({InputStyle: styles.inputBoxFocused})
+                        this.setState({ InputStyle: styles.inputBoxFocused });
                       }}
                       onBlur={() => {
-                        this.setState({InputStyle: styles.textBoxView})
+                        this.setState({ InputStyle: styles.textBoxView });
                       }}
                       onKeyPress={(e) => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
-                            this.setState({isInvalidBalance: false})
+                            this.setState({ isInvalidBalance: false });
                           }, 10);
                         }
                       }}
@@ -1037,7 +1133,7 @@ class SendToContactUpdate extends Component<
                   <ToggleSwitch
                     currencyCodeValue={CurrencyCode}
                     onpress={async () => {
-                      this.setState({switchOn: !switchOn});
+                      this.setState({ switchOn: !switchOn });
                       let temp = !switchOn ? 'true' : '';
                       await AsyncStorage.setItem('currencyToggleValue', temp);
                     }}
@@ -1092,13 +1188,13 @@ class SendToContactUpdate extends Component<
                   }
                   placeholder={'Add a Note ( Optional )'}
                   value={note}
-                  onChangeText={(text) => this.setState({note: text})}
+                  onChangeText={(text) => this.setState({ note: text })}
                   placeholderTextColor={Colors.borderColor}
                   onFocus={() => {
-                    this.setState({InputStyleNote: styles.inputBoxFocused});
+                    this.setState({ InputStyleNote: styles.inputBoxFocused });
                   }}
                   onBlur={() => {
-                    this.setState({InputStyleNote: styles.textBoxView});
+                    this.setState({ InputStyleNote: styles.textBoxView });
                   }}
                 />
               </View>
@@ -1113,7 +1209,9 @@ class SendToContactUpdate extends Component<
                   onPress={() => {
                     this.onConfirm();
                   }}
-                  disabled={isConfirmDisabled || loading[serviceType].loading.transfer}
+                  disabled={
+                    isConfirmDisabled || loading[serviceType].loading.transfer
+                  }
                   style={{
                     ...styles.confirmButtonView,
                     backgroundColor: Colors.blue,
@@ -1141,30 +1239,39 @@ class SendToContactUpdate extends Component<
                       width: wp('30%'),
                       marginLeft: 10,
                     }}
-                    disabled={isConfirmDisabled || loading[serviceType].loading.transfer}
+                    disabled={
+                      isConfirmDisabled || loading[serviceType].loading.transfer
+                    }
                     onPress={() => {
                       // dispatch(clearTransfer(serviceType));
                       // if (getServiceType) {
                       //   getServiceType(serviceType);
                       // }
-                      if (transfer[serviceType].transfer.details && transfer[serviceType].transfer.details.length) {
-                        for (let i = 0; i < transfer[serviceType].transfer.details.length; i++) {
+                      if (
+                        transfer[serviceType].transfer.details &&
+                        transfer[serviceType].transfer.details.length
+                      ) {
+                        for (
+                          let i = 0;
+                          i < transfer[serviceType].transfer.details.length;
+                          i++
+                        ) {
                           if (
-                            transfer[serviceType].transfer.details[i].selectedContact.id ==
-                            selectedContact.id
+                            transfer[serviceType].transfer.details[i]
+                              .selectedContact.id == selectedContact.id
                           ) {
                             removeTransferDetails(
-                                serviceType,
-                                transfer[serviceType].transfer.details[i],
-                              )
+                              serviceType,
+                              transfer[serviceType].transfer.details[i],
+                            );
                           }
                         }
                         addTransferDetails(serviceType, {
-                            selectedContact,
-                            bitcoinAmount,
-                            currencyAmount,
-                            note,
-                          })
+                          selectedContact,
+                          bitcoinAmount,
+                          currencyAmount,
+                          note,
+                        });
                         this.props.navigation.goBack();
                       }
                     }}
@@ -1236,8 +1343,11 @@ class SendToContactUpdate extends Component<
             <SendConfirmationContent
               title={'Sent Unsuccessful'}
               info={
-                'There seems to be a problem' + '\n' + transfer[serviceType].transfer.stage1.failed
-                  ? transfer[serviceType].transfer.stage1.err === 'Insufficient balance'
+                'There seems to be a problem' +
+                '\n' +
+                transfer[serviceType].transfer.stage1.failed
+                  ? transfer[serviceType].transfer.stage1.err ===
+                    'Insufficient balance'
                     ? // `Insufficient balance to compensate the transfer amount: ${netAmount} and the transaction fee: ${fee}` +
                       //   `\n\nPlease reduce the transfer amount by ${(
                       //     parseFloat(netAmount) +
@@ -1291,15 +1401,15 @@ class SendToContactUpdate extends Component<
           ]}
           renderContent={() => (
             <AccountSelectionModalContents
-              RegularAccountBalance={RegularAccountBalance}
-              SavingAccountBalance={SavingAccountBalance}
+              RegularAccountBalance={spendableBalances.regularBalance}
+              SavingAccountBalance={spendableBalances.secureBalance}
               onPressBack={() => {
                 (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
               }}
               onPressConfirm={(type) => {
                 (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
                 setTimeout(() => {
-                  this.setState({serviceType: type});
+                  this.setState({ serviceType: type });
                 }, 2);
               }}
             />

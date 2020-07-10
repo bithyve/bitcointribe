@@ -152,6 +152,7 @@ interface AccountsStateTypes {
   loading: boolean;
   selectedTransactionItem: any;
   currencyCode: string;
+  spendableBalance: any;
 }
 
 interface AccountsPropsTypes {
@@ -238,6 +239,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       isHelperDone: true,
       showLoader: true,
       netBalance: 0,
+      spendableBalance: 0,
     };
   }
 
@@ -291,7 +293,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     if (service) {
       let currentBalance =
         wallet.balances.balance + wallet.balances.unconfirmedBalance;
-
+      let spendableBalance = wallet.balances.balance;
       let currentTransactions = wallet.transactions.transactionDetails;
 
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
@@ -304,16 +306,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 dAccountType
               ];
           } else if (serviceType === SECURE_ACCOUNT) {
+            if (dAccountType === TRUSTED_CONTACTS) continue;
             derivativeAccount =
               accounts[SECURE_ACCOUNT].service.secureHDWallet
                 .derivativeAccounts[dAccountType];
-          }
-
-          if (
-            serviceType === SECURE_ACCOUNT &&
-            dAccountType === TRUSTED_CONTACTS
-          ) {
-            continue;
           }
 
           if (derivativeAccount.instance.using) {
@@ -331,6 +327,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 currentBalance +=
                   derivativeAccount[accountNumber].balances.balance +
                   derivativeAccount[accountNumber].balances.unconfirmedBalance;
+                spendableBalance +=
+                  derivativeAccount[accountNumber].balances.balance;
               }
 
               if (derivativeAccount[accountNumber].transactions) {
@@ -356,6 +354,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       });
       this.setState({
         netBalance: currentBalance,
+        spendableBalance: spendableBalance,
         transactions: currentTransactions,
         transactionLoading: false,
       });
@@ -396,17 +395,21 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   getServiceType = (serviceType) => {
     if (!serviceType) return;
-    setTimeout(() => {
       if (this.carousel.current) {
         if (serviceType == TEST_ACCOUNT) {
-          this.carousel.current.snapToItem(0, true, true);
+          setTimeout(() => {
+            (this.carousel.current as any).snapToItem(0, true, false);
+           }, 1000);
         } else if (serviceType == REGULAR_ACCOUNT) {
-          this.carousel.current.snapToItem(1, true, true);
+          setTimeout(() => {
+            (this.carousel.current as any).snapToItem(1, true, false);
+           }, 1000);
         } else if (serviceType == SECURE_ACCOUNT) {
-          this.carousel.current.snapToItem(2, true, true);
+          setTimeout(() => {
+            (this.carousel.current as any).snapToItem(2, true, false);
+           }, 1000);
         }
       }
-    }, 2000);
     setTimeout(() => {
       this.setState({ serviceType: serviceType });
     }, 2);
@@ -452,7 +455,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     //   props.stop();
     // }
     // const providedBalance = this.props.navigation.getParam('netBalance');
-    // if(providedBalance) this.setState({netBalance: providedBalance});
+    // if(providedBalance) this.setState({ spendableBalance: providedBalance});
 
     if (
       !isTestAccountHelperDone &&
@@ -509,6 +512,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   renderItem = ({ item, index }) => {
+    let {spendableBalance, switchOn, exchangeRates, CurrencyCode} = this.state;
     return (
       <ImageBackground
         source={item.backgroundImage}
@@ -574,12 +578,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text
               style={{
-                marginRight: 10,
                 fontFamily: Fonts.FiraSansMedium,
                 fontSize: RFValue(15),
                 color: Colors.white,
                 alignSelf: 'center',
                 padding: 10,
+                marginLeft: 'auto',
               }}
               onPress={() => {
                 if (item.accountType == 'Test Account') {
@@ -596,7 +600,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             >
               Know more
             </Text>
-            <Image
+            {/* <Image
               style={{
                 marginLeft: 'auto',
                 width: wp('5%'),
@@ -605,7 +609,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 padding: 10,
               }}
               source={require('../../assets/images/icons/icon_settings.png')}
-            />
+            /> */}
           </View>
           <View
             style={{
@@ -725,6 +729,28 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 : this.state.CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.cardAmountText, fontSize: RFValue(13) }}>
+              Spendable:{' '}
+              {item.accountType == 'Test Account'
+                ? UsNumberFormat(spendableBalance)
+                : switchOn
+                ? UsNumberFormat(spendableBalance)
+                : exchangeRates
+                ? (
+                    (spendableBalance / 1e8) *
+                    exchangeRates[CurrencyCode].last
+                  ).toFixed(2)
+                : null}
+            </Text>
+            <Text style={styles.cardAmountUnitText}>
+              {item.accountType == 'Test Account'
+                ? 't-sats'
+                : switchOn
+                ? 'sats'
+                : CurrencyCode.toLocaleLowerCase()}
+            </Text>
+          </View>
         </View>
       </ImageBackground>
     );
@@ -785,6 +811,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       tabBarIndex,
       loading,
       currencyCode,
+      spendableBalance
     } = this.state;
     const { navigation, exchangeRates, accounts } = this.props;
     return (
@@ -899,18 +926,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   ref={this.carousel}
                   data={this.carouselData}
                   firstItem={carouselInitIndex}
-                  onBeforeSnapToItem={(index) => {
-                    this.setState({ carouselInitIndex: index });
-                    index === 0
-                      ? this.getServiceType(TEST_ACCOUNT)
-                      : index === 1
-                      ? this.getServiceType(REGULAR_ACCOUNT)
-                      : this.getServiceType(SECURE_ACCOUNT);
-                  }}
-                  renderItem={this.renderItem}
-                  sliderWidth={this.sliderWidth}
-                  itemWidth={this.sliderWidth * 0.95}
-                  // onSnapToItem={(index) => {
+                  initialNumToRender={carouselInitIndex}
+                  // onBeforeSnapToItem={(index) => {
                   //   this.setState({ carouselInitIndex: index });
                   //   index === 0
                   //     ? this.getServiceType(TEST_ACCOUNT)
@@ -918,6 +935,16 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   //     ? this.getServiceType(REGULAR_ACCOUNT)
                   //     : this.getServiceType(SECURE_ACCOUNT);
                   // }}
+                  renderItem={this.renderItem}
+                  sliderWidth={this.sliderWidth}
+                  itemWidth={this.sliderWidth * 0.95}
+                  onSnapToItem={(index) => {
+                    index === 0
+                      ? this.getServiceType(TEST_ACCOUNT)
+                      : index === 1
+                      ? this.getServiceType(REGULAR_ACCOUNT)
+                      : this.getServiceType(SECURE_ACCOUNT);
+                  }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
                   slideInterpolatedStyle={this.slideInterpolatedStyle}
@@ -1214,7 +1241,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         serviceType,
                         getServiceType: this.getServiceType,
                         averageTxFees,
-                        netBalance,
+                        spendableBalance,
                       });
                     }}
                     style={styles.bottomCardView}

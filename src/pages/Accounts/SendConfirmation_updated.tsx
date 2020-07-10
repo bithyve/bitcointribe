@@ -420,7 +420,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {this.serviceType == 'Test Account'
+              {this.serviceType == TEST_ACCOUNT
                 ? UsNumberFormat(this.spendableBalance)
                 : switchOn
                 ? UsNumberFormat(this.spendableBalance)
@@ -438,7 +438,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
                 fontFamily: Fonts.FiraSansMediumItalic,
               }}
             >
-              {this.serviceType == 'Test Account'
+              {this.serviceType == TEST_ACCOUNT
                 ? ' t-sats )'
                 : switchOn
                 ? ' sats )'
@@ -459,6 +459,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
                 }}
                 item={item}
                 SelectedContactId={SelectedContactId}
+                serviceType={this.serviceType}
               />
             ))}
           </ScrollView>
@@ -536,7 +537,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
                   marginRight: 5,
                 }}
               >
-                {' sats'}
+                {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
               </Text>
             </View>
           </View>
@@ -644,7 +645,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
                 {transfer.stage1 && transfer.stage1.txPrerequisites
                   ? transfer.stage1.txPrerequisites['low'].fee
                   : ''}
-                {' sats'})
+                {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
               </Text>
               <Text
                 style={{
@@ -686,7 +687,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
           <BottomInfoBox
             title={'Note'}
             infoText={
-              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/ app or copy address into the address field'
+              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
             }
           />
         </View>
@@ -778,6 +779,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
               });
             }}
             isSuccess={true}
+            serviceType={this.serviceType}
           />
         )}
         renderHeader={() => (
@@ -785,7 +787,16 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
             onPressHeader={() => {
               if ((this.refs.SendSuccessBottomSheet as any))
                 (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-              navigation.navigate('Accounts');
+              navigation.navigate('Accounts', {
+                serviceType: this.serviceType,
+                index:
+                this.serviceType === TEST_ACCOUNT
+                    ? 0
+                    : this.serviceType === REGULAR_ACCOUNT
+                    ? 1
+                    : 2,
+                spendableBalance: this.spendableBalance - totalAmount,
+              });
             }}
           />
         )}

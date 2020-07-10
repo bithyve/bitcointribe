@@ -83,7 +83,7 @@ interface SendStateTypes {
   isEditable: boolean,
   accountData: any[],
   sweepSecure: any,
-  netBalance: any,
+  spendableBalance: any,
   getServiceType: any,
   averageTxFees: any,
 }
@@ -98,7 +98,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
       openCameraFlag: false,
       serviceType: this.props.navigation.getParam('serviceType') ? this.props.navigation.getParam('serviceType') : REGULAR_ACCOUNT,
       sweepSecure: this.props.navigation.getParam('sweepSecure'),
-      netBalance: this.props.navigation.getParam('netBalance'),
+      spendableBalance: this.props.navigation.getParam('spendableBalance'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
       recipientAddress: '',
       isSendHelperDone: true,
@@ -277,7 +277,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
     const { service } = this.props;
     const {serviceType,
       sweepSecure,
-      netBalance,} = this.state;
+      spendableBalance,} = this.state;
     console.log('barcodes', barcodes);
     if (barcodes.data) {
       const { type } = service[serviceType].service.addressDiff(barcodes.data);
@@ -308,7 +308,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
               selectedContact: item,
               serviceType,
               sweepSecure,
-              netBalance,
+              spendableBalance,
               bitcoinAmount: options.amount ? `${options.amount}` : '',
             });
             break;
@@ -327,7 +327,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
 
   onSelectContact = (item, bitcoinAmount?) => {
     const {transfer} = this.props;
-    const {serviceType, averageTxFees, sweepSecure, netBalance,} = this.state;
+    const {serviceType, averageTxFees, sweepSecure, spendableBalance,} = this.state;
 
     let isNavigate = true;
     console.log({ details: transfer[serviceType].transfer.details });
@@ -342,7 +342,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
         serviceType,
         averageTxFees,
         sweepSecure,
-        netBalance,
+        spendableBalance,
         bitcoinAmount,
       });
     } else {
@@ -362,7 +362,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
           serviceType,
           averageTxFees,
           sweepSecure,
-          netBalance,
+          spendableBalance,
           bitcoinAmount,
         });
       }
@@ -500,7 +500,7 @@ class SendUpdate extends Component<SendPropsTypes, SendStateTypes> {
   isEditable,
   accountData,
   sweepSecure,
-  netBalance,
+  spendableBalance,
   averageTxFees,
   getServiceType,
     } = this.state;
