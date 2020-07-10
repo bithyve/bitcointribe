@@ -1905,7 +1905,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         });
     }
     if (value.type == 'contact') {
-      (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      setTimeout(() => {
+        (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      }, 2);
       this.selectTab('Transactions');
     }
   };

@@ -32,10 +32,12 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import { insertDBWorker } from './storage';
 import { AsyncStorage } from 'react-native';
 import { fetchNotificationsWorker } from './notifications';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -123,6 +125,9 @@ function* updateEphemeralChannelWorker({ payload }) {
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
+  const testService: TestAccount = yield select(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
 
   const { contactName, data, fetch } = payload;
 
@@ -156,11 +161,13 @@ function* updateEphemeralChannelWorker({ payload }) {
 
       if (res.status === 200) {
         const xpub = res.data;
+        const tpub = testService.getTestXpub();
         const walletID = yield call(AsyncStorage.getItem, 'walletID');
         const FCM = yield call(AsyncStorage.getItem, 'fcmToken');
 
         const data: TrustedDataElements = {
           xpub,
+          tpub,
           walletID,
           FCM,
         };
@@ -318,6 +325,9 @@ export function* trustedChannelsSyncWorker() {
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
+  const testService: TestAccount = yield select(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
 
   yield call(fetchNotificationsWorker); // refreshes DHInfos
   let DHInfos = yield call(AsyncStorage.getItem, 'DHInfos');
@@ -394,6 +404,7 @@ export function* trustedChannelsSyncWorker() {
                   accountNumber
                 ] as TrustedContactDerivativeAccountElements).contactDetails = {
                   xpub: contactsData.xpub,
+                  tpub: contactsData.tpub,
                 };
 
                 console.log(
@@ -427,6 +438,7 @@ export function* trustedChannelsSyncWorker() {
                 accountNumber
               ] as TrustedContactDerivativeAccountElements).contactDetails = {
                 xpub: contactsData.xpub,
+                tpub: contactsData.tpub,
               };
 
               console.log(
@@ -452,9 +464,10 @@ export function* trustedChannelsSyncWorker() {
 
       if (res.status === 200) {
         const xpub = res.data;
-
+        const tpub = testService.getTestXpub();
         const data: TrustedDataElements = {
           xpub,
+          tpub,
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
@@ -483,6 +496,7 @@ export function* trustedChannelsSyncWorker() {
                     accountNumber
                   ] as TrustedContactDerivativeAccountElements).contactDetails = {
                     xpub: contactsData.xpub,
+                    tpub: contactsData.tpub,
                   };
 
                   console.log(

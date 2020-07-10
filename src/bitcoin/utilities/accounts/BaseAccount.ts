@@ -125,6 +125,8 @@ export default class BaseAccount {
     }
   };
 
+  public getTestXpub = (): string => this.hdWallet.getTestXPub();
+
   public getPaymentURI = (
     address: string,
     options?: {
@@ -312,6 +314,34 @@ export default class BaseAccount {
         err: err.message,
         message: "Failed to sync derivative account's balance and transactions",
       };
+    }
+  };
+
+  public deriveReceivingAddress = async (
+    xpub: string,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          address: string;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.hdWallet.deriveReceivingAddress(xpub),
+      };
+    } catch (err) {
+      return { status: 0o1, err: err.message, message: ErrMap[0o1] };
     }
   };
 
