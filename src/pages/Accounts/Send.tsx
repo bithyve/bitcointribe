@@ -271,11 +271,20 @@ export default function Send(props) {
           if (accountNumber) {
             const trustedContact: TrustedContactDerivativeAccountElements =
               derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
-            if (
-              trustedContact.contactDetails &&
-              trustedContact.contactDetails.xpub
-            ) {
-              hasXpub = true;
+            if (serviceType === TEST_ACCOUNT) {
+              if (
+                trustedContact.contactDetails &&
+                trustedContact.contactDetails.tpub
+              ) {
+                hasXpub = true;
+              }
+            } else {
+              if (
+                trustedContact.contactDetails &&
+                trustedContact.contactDetails.xpub
+              ) {
+                hasXpub = true;
+              }
             }
           }
 
@@ -939,103 +948,101 @@ export default function Send(props) {
                     <Text style={styles.errorText}>Enter correct address</Text>
                   </View>
                 ) : null}
-                {serviceType != TEST_ACCOUNT ? (
-                  <View style={{ paddingTop: wp('3%') }}>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text
-                        style={{
-                          color: Colors.blue,
-                          fontSize: RFValue(13),
-                          fontFamily: Fonts.FiraSansRegular,
-                          marginBottom: wp('3%'),
-                        }}
-                      >
-                        Send to Contact
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        style={{
-                          height: 20,
-                          width: 20,
-                          justifyContent: 'center',
-                          marginLeft: 'auto',
-                        }}
-                      >
-                        <SimpleLineIcons
-                          name="options-vertical"
-                          color={Colors.blue}
-                          size={RFValue(13)}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    {trustedContacts.length ? (
+                <View style={{ paddingTop: wp('3%') }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text
+                      style={{
+                        color: Colors.blue,
+                        fontSize: RFValue(13),
+                        fontFamily: Fonts.FiraSansRegular,
+                        marginBottom: wp('3%'),
+                      }}
+                    >
+                      Send to Contact
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {}}
+                      style={{
+                        height: 20,
+                        width: 20,
+                        justifyContent: 'center',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                      <SimpleLineIcons
+                        name="options-vertical"
+                        color={Colors.blue}
+                        size={RFValue(13)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {trustedContacts.length ? (
+                    <View
+                      style={{
+                        ...styles.textBoxView,
+                        paddingTop: hp('1%'),
+                        paddingBottom: hp('1%'),
+                        height: hp('15%'),
+                        justifyContent: 'center',
+                        backgroundColor: Colors.backgroundColor,
+                        borderColor: Colors.backgroundColor,
+                      }}
+                    >
                       <View
                         style={{
-                          ...styles.textBoxView,
-                          paddingTop: hp('1%'),
-                          paddingBottom: hp('1%'),
-                          height: hp('15%'),
-                          justifyContent: 'center',
-                          backgroundColor: Colors.backgroundColor,
-                          borderColor: Colors.backgroundColor,
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
                         }}
                       >
-                        <View
+                        <TouchableOpacity
                           style={{
-                            flex: 1,
-                            flexDirection: 'row',
+                            backgroundColor: Colors.white,
+                            height: wp('12%'),
+                            width: wp('6%'),
+                            justifyContent: 'center',
                             alignItems: 'center',
+                            alignSelf: 'center',
+                            borderRadius: 5,
+                            marginLeft: 10,
+                            marginRight: 15,
                           }}
                         >
-                          <TouchableOpacity
-                            style={{
-                              backgroundColor: Colors.white,
-                              height: wp('12%'),
-                              width: wp('6%'),
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              alignSelf: 'center',
-                              borderRadius: 5,
-                              marginLeft: 10,
-                              marginRight: 15,
-                            }}
-                          >
-                            <Ionicons
-                              name={'ios-arrow-back'}
-                              size={RFValue(20)}
-                              color={Colors.borderColor}
-                            />
-                          </TouchableOpacity>
-                          <FlatList
-                            horizontal
-                            nestedScrollEnabled={true}
-                            showsHorizontalScrollIndicator={false}
-                            data={trustedContacts}
-                            renderItem={renderContacts}
-                            extraData={transfer.details}
-                            keyExtractor={(item, index) => index.toString()}
+                          <Ionicons
+                            name={'ios-arrow-back'}
+                            size={RFValue(20)}
+                            color={Colors.borderColor}
                           />
-                        </View>
-                      </View>
-                    ) : (
-                      <View
-                        style={{
-                          marginBottom: -25,
-                          padding: -20,
-                          marginLeft: -20,
-                          marginRight: -20,
-                        }}
-                      >
-                        <BottomInfoBox
-                          title={'You have not added any Contact'}
-                          infoText={
-                            'Add a Contact to send them sats without having to scan an address'
-                          }
+                        </TouchableOpacity>
+                        <FlatList
+                          horizontal
+                          nestedScrollEnabled={true}
+                          showsHorizontalScrollIndicator={false}
+                          data={trustedContacts}
+                          renderItem={renderContacts}
+                          extraData={transfer.details}
+                          keyExtractor={(item, index) => index.toString()}
                         />
                       </View>
-                    )}
-                  </View>
-                ) : null}
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        marginBottom: -25,
+                        padding: -20,
+                        marginLeft: -20,
+                        marginRight: -20,
+                      }}
+                    >
+                      <BottomInfoBox
+                        title={'You have not added any Contact'}
+                        infoText={
+                          'Add a Contact to send them sats without having to scan an address'
+                        }
+                      />
+                    </View>
+                  )}
+                </View>
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>

@@ -218,7 +218,7 @@ export default function TwoFASweepFunds(props) {
                           editable={sweepSecure ? false : isEditable}
                           // ref={refs => setTextAmountRef(refs)}
                           style={{ ...styles.textBox, paddingLeft: 10 }}
-                          placeholder={'Enter Amount in sats'}
+                          placeholder={'Enter amount in sats'}
                           value={amount}
                           returnKeyLabel="Done"
                           returnKeyType="done"

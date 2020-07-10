@@ -347,17 +347,22 @@ export default function Accounts(props) {
     if (!serviceType) return;
     setServiceType(serviceType);
     //console.log('Service type', serviceType);
-    setTimeout(() => {
-      if (carousel.current) {
+    if (carousel.current) {
         if (serviceType == TEST_ACCOUNT) {
-          (carousel.current as any).snapToItem(0, true, true);
+          setTimeout(() => {
+           (carousel.current as any).snapToItem(0, true, false);
+          }, 1000);
+          
         } else if (serviceType == REGULAR_ACCOUNT) {
-          (carousel.current as any).snapToItem(1, true, true);
+          setTimeout(() => {
+           (carousel.current as any).snapToItem(1, true, false);
+          }, 1000);
         } else if (serviceType == SECURE_ACCOUNT) {
-          (carousel.current as any).snapToItem(2, true, true);
+          setTimeout(() => {
+          (carousel.current as any).snapToItem(2, true, false);
+          }, 1000);
         }
       }
-    }, 2000);
 
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
   };
@@ -453,12 +458,13 @@ export default function Accounts(props) {
             {
               <Text
                 style={{
-                  marginRight: 10,
+                  // marginRight: 10,
                   fontFamily: Fonts.FiraSansMedium,
                   fontSize: RFValue(15),
                   color: Colors.white,
                   alignSelf: 'center',
                   padding: 10,
+                  marginLeft: 'auto',
                 }}
                 onPress={() => {
                   //console.log('item.accountType', item.accountType);
@@ -479,7 +485,7 @@ export default function Accounts(props) {
                 Know more
               </Text>
             }
-            <Image
+            {/* <Image
               style={{
                 marginLeft: 'auto',
                 width: wp('5%'),
@@ -488,7 +494,7 @@ export default function Accounts(props) {
                 padding: 10,
               }}
               source={require('../../assets/images/icons/icon_settings.png')}
-            />
+            /> */}
           </View>
           <View
             style={{
@@ -1260,16 +1266,10 @@ export default function Accounts(props) {
                 dAccountType
               ];
           } else if (serviceType === SECURE_ACCOUNT) {
+            if (dAccountType === TRUSTED_CONTACTS) continue;
             derivativeAccount =
               accounts[SECURE_ACCOUNT].service.secureHDWallet
                 .derivativeAccounts[dAccountType];
-          }
-
-          if (
-            serviceType === SECURE_ACCOUNT &&
-            dAccountType === TRUSTED_CONTACTS
-          ) {
-            continue;
           }
 
           if (derivativeAccount.instance.using) {
@@ -1315,9 +1315,7 @@ export default function Accounts(props) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
       });
       setNetBalance(currentBalance);
-      setSpendableBalance(
-        serviceType === TEST_ACCOUNT ? currentBalance : spendableBalance,
-      );
+      setSpendableBalance(spendableBalance);
       setTransactions(currentTransactions);
     }
   }, [service]);
@@ -1498,26 +1496,29 @@ export default function Accounts(props) {
                 ref={carousel}
                 data={carouselData}
                 firstItem={carouselInitIndex}
-                onBeforeSnapToItem={(index) => {
-                  //console.log('onBeforeSnapToItem', index);
+                initialNumToRender={carouselInitIndex}
+                // onBeforeSnapToItem={(index) => {
+                //   console.log('onBeforeSnapToItem', index);
+                //   index === 0
+                //     ? getServiceType(TEST_ACCOUNT)
+                //     : index === 1
+                //     ? getServiceType(REGULAR_ACCOUNT)
+                //     : getServiceType(SECURE_ACCOUNT);
+                //   // setTimeout(() => {
+                //   //   setCarouselInitIndex(index);
+                //   // }, 200);
+                // }}
+                renderItem={renderItem}
+                sliderWidth={sliderWidth}
+                itemWidth={sliderWidth * 0.95}
+                onSnapToItem={(index) => {
+                  console.log('onSnapToItem', index, carouselInitIndex);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
                     ? getServiceType(REGULAR_ACCOUNT)
                     : getServiceType(SECURE_ACCOUNT);
-                  setTimeout(() => {
-                    setCarouselInitIndex(index);
-                  }, 2500);
                 }}
-                renderItem={renderItem}
-                sliderWidth={sliderWidth}
-                itemWidth={sliderWidth * 0.95}
-                // onSnapToItem={(index) => {
-                //   //console.log('INDEX', index, carouselInitIndex);
-                //   setTimeout(() => {
-                //     setCarouselInitIndex(index);
-                //   }, 2500);
-                // }}
                 style={{ activeSlideAlignment: 'center' }}
                 scrollInterpolator={scrollInterpolator}
                 slideInterpolatedStyle={slideInterpolatedStyle}

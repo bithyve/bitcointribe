@@ -18,7 +18,7 @@ export default function VoucherRedeemSuccess(props) {
           Voucher redeemed successfully
           </Text>
           <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-          Congratulations, you have successfully redeemed the voucher
+          Congratulations, the voucher has been redeemed successfully but bitcoin will be delivered and they should receive an email when that happens
           </Text>
         </View>
         <View style={styles.box}>

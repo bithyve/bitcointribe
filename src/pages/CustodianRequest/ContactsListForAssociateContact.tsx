@@ -117,11 +117,16 @@ const ContactsListForAssociateContact = (props) => {
                 size={17}
               />
             </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>
-              {'Associate a contact'}
-            </Text>
+            <View>
+              <Text style={styles.modalHeaderTitleText}>
+                {'Associate a contact'}
+              </Text>
+            </View>
           </View>
         </View>
+        <Text style={styles.modalSubheaderText}>
+          Associate a contact from your address book. This will help you remember who the request was from
+        </Text>
       <ContactList
         isTrustedContact={true}
         style={{}}
@@ -150,5 +155,11 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansMedium,
   },
+  modalSubheaderText: {
+		color: Colors.textColorGrey,
+		fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 20,
+	},
 });
 export default ContactsListForAssociateContact;

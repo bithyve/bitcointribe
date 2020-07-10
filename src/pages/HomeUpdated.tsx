@@ -90,6 +90,7 @@ import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface'
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
+import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
 
 function isEmpty(obj) {
@@ -744,7 +745,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < newTransactions.length; i++) {
         let present = false;
         for (const tx of asyncNotificationList) {
-          if (newTransactions[i].txid === tx.notificationsData.txid)
+          if (
+            tx.notificationsData &&
+            newTransactions[i].txid === tx.notificationsData.txid
+          )
             present = true;
         }
         if (present) continue;
@@ -920,7 +924,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
 
     if (userKey) {
-      this.props.navigation.navigate('VoucherScanner', { userKey });
+      this.props.navigation.navigate('PairNewWallet', { userKey });
       return;
     }
 
@@ -1116,7 +1120,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     if (event.url.includes('fastbitcoins')) {
       const userKey = event.url.substr(event.url.lastIndexOf('/') + 1);
-      navigation.navigate('VoucherScanner', { userKey });
+      navigation.navigate('PairNewWallet', { userKey });
     }
   };
 
@@ -1904,7 +1908,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         });
     }
     if (value.type == 'contact') {
-      (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      setTimeout(() => {
+        (this.refs.notificationsListBottomSheet as any).snapTo(0);
+      }, 2);
       this.selectTab('Transactions');
     }
   };

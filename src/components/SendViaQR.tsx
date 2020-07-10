@@ -122,7 +122,7 @@ export default function SendViaQR(props) {
             >
               {props.subHeaderText
                 ? props.subHeaderText
-                : 'Scan the QR from your contact’s Hexa app'}
+                : 'Scan the QR from your Contact\'s Hexa Wallet'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper

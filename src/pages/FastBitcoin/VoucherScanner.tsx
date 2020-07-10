@@ -28,6 +28,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   FAST_BITCOINS,
+  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -56,7 +57,8 @@ import {
 } from '../../store/actions/fbtc';
 import { fetchDerivativeAccAddress } from '../../store/actions/accounts';
 import Config from 'react-native-config';
-
+import Loader from '../../components/loader';
+import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import moment from 'moment';
 
@@ -98,15 +100,14 @@ const VoucherScanner = (props) => {
   const [errorInfo, setErrorInfo] = useState('');
   const [errorNote, setErrorNote] = useState('');
   const [errorProccedButtonText, setErrorProccedButtonText] = useState('');
+  const [showLoader, setShowLoader] = useState(false);
 
   useEffect(() => {
     if (accounts1.exchangeRates) setExchangeRates(accounts1.exchangeRates);
   }, [accounts1.exchangeRates]);
   const [balances, setBalances] = useState({
-    testBalance: 0,
     regularBalance: 0,
     secureBalance: 0,
-    accumulativeBalance: 0,
   });
 
   const [ErrorModalBottomSheet, setErrorModalBottomSheet] = useState(
@@ -202,38 +203,88 @@ const VoucherScanner = (props) => {
   }, [selectedAccount, service]);
 
   useEffect(() => {
-    dispatch(
-      fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
-    );
+    if (selectedAccount) {
+      dispatch(
+        fetchDerivativeAccAddress(selectedAccount.accountType, FAST_BITCOINS),
+      );
+    }
   }, [selectedAccount]);
 
   useEffect(() => {
-    const testBalance = accounts1[TEST_ACCOUNT].service
-      ? accounts1[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts1[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const regularBalance = accounts1[REGULAR_ACCOUNT].service
+    let regularBalance = accounts1[REGULAR_ACCOUNT].service
       ? accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
         accounts1[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
-    const secureBalance = accounts1[SECURE_ACCOUNT].service
+
+    // regular derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      const derivativeAccount =
+        accounts1[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            regularBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
+
+    let secureBalance = accounts1[SECURE_ACCOUNT].service
       ? accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
         accounts1[SECURE_ACCOUNT].service.secureHDWallet.balances
           .unconfirmedBalance
       : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
+
+    // secure derivative accounts
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+
+      const derivativeAccount =
+        accounts1[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+          dAccountType
+        ];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          // console.log({
+          //   accountNumber,
+          //   balances: trustedAccounts[accountNumber].balances,
+          //   transactions: trustedAccounts[accountNumber].transactions,
+          // });
+          if (derivativeAccount[accountNumber].balances) {
+            secureBalance +=
+              derivativeAccount[accountNumber].balances.balance +
+              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          }
+        }
+      }
+    }
 
     setBalances({
-      testBalance,
       regularBalance,
       secureBalance,
-      accumulativeBalance,
     });
   }, [accounts1]);
 
   useEffect(() => {
     if (voucherCode) {
-      if (selectedAccount.accountType != '') {
+      if (selectedAccount && selectedAccount.accountType != '') {
         (async () => {
           let voucherDataTemp = JSON.parse(
             await AsyncStorage.getItem('voucherData'),
@@ -319,7 +370,10 @@ const VoucherScanner = (props) => {
       fBTCAccount[accountType].voucher.push({
         voucherCode: voucherCode,
       });
-      if (fBTCAccount.redeem_vouchers && voucherCode) getQuoteDetailsMethod();
+      if (fBTCAccount.redeem_vouchers && voucherCode) {
+        setShowLoader(true);
+        getQuoteDetailsMethod();
+      }
       await AsyncStorage.setItem('FBTCAccount', JSON.stringify(fBTCAccount));
     } else {
       setTimeout(() => {
@@ -372,6 +426,7 @@ const VoucherScanner = (props) => {
     let data = {
       userKey: userKey,
     };
+    setShowLoader(true);
     dispatch(accountSync(data));
   };
 
@@ -395,6 +450,7 @@ const VoucherScanner = (props) => {
           setTimeout(() => {
             (RegistrationSuccessBottomSheet as any).current.snapTo(1);
           }, 2);
+          setShowLoader(false);
           dispatch(ClearAccountSyncData());
         }
       })();
@@ -416,6 +472,7 @@ const VoucherScanner = (props) => {
   useEffect(() => {
     (async () => {
       if (QuoteDetails) {
+        setShowLoader(false);
         QuoteBottomSheet.current.snapTo(1);
         setTimeout(() => {
           setQuote(QuoteDetails);
@@ -507,6 +564,7 @@ const VoucherScanner = (props) => {
             await AsyncStorage.getItem('FBTCAccount'),
           );
           if (FBTCAccountData.redeem_vouchers && voucherCode) {
+            setShowLoader(true);
             getQuoteDetailsMethod();
             (RegistrationSuccessBottomSheet as any).current.snapTo(0);
           }
@@ -585,6 +643,9 @@ const VoucherScanner = (props) => {
         'FBTCAccount',
         JSON.stringify(fBTCAccountData),
       );
+      setTimeout(() => {
+        setShowLoader(false);
+      }, 2);
       VoucherRedeemSuccessBottomSheet.current.snapTo(1);
       await AsyncStorage.setItem('quoteData', '');
       await AsyncStorage.setItem('voucherData', '');
@@ -619,6 +680,7 @@ const VoucherScanner = (props) => {
     return (
       <QuoteConfirmation
         onPressRedeem={() => {
+          setShowLoader(true);
           storeQuotesDetails();
         }}
         onPressBack={() => {
@@ -647,26 +709,34 @@ const VoucherScanner = (props) => {
   }, []);
 
   const renderVoucherRedeemSuccessModalContent = useCallback(() => {
-    return (
-      <VoucherRedeemSuccess
-        onPressRedeem={() => {
-          props.navigation.navigate('Accounts', {
-            serviceType:
+    if (selectedAccount) {
+      return (
+        <VoucherRedeemSuccess
+          onPressRedeem={() => {
+            props.navigation.navigate('Accounts', {
+              serviceType:
+                selectedAccount.accountName === 'Test Account'
+                  ? TEST_ACCOUNT
+                  : selectedAccount.accountName === 'Checking Account'
+                  ? REGULAR_ACCOUNT
+                  : SECURE_ACCOUNT,
+                  index:
               selectedAccount.accountName === 'Test Account'
-                ? TEST_ACCOUNT
-                : selectedAccount.accountName === 'Checking Account'
-                ? REGULAR_ACCOUNT
-                : SECURE_ACCOUNT,
-          });
-        }}
-        onPressBack={() => {
-          VoucherRedeemSuccessBottomSheet.current.snapTo(0);
-        }}
-        accountName={selectedAccount.accountName}
-        redeemAmount={'17,000'}
-        loading={false}
-      />
-    );
+                  ? 0
+                  : selectedAccount.accountName === 'Checking Account'
+                  ? 1
+                  : 2,    
+            });
+          }}
+          onPressBack={() => {
+            VoucherRedeemSuccessBottomSheet.current.snapTo(0);
+          }}
+          accountName={selectedAccount.accountName}
+          redeemAmount={'17,000'}
+          loading={false}
+        />
+      );
+    }
   }, [selectedAccount]);
 
   const renderVoucherRedeemSuccessModalHeader = useCallback(() => {
@@ -706,6 +776,7 @@ const VoucherScanner = (props) => {
       setTimeout(() => {
         setErrorTitle(accountSyncFailMessage);
         setErrorProccedButtonText('Done');
+        setShowLoader(false);
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
       let data = {
@@ -719,6 +790,7 @@ const VoucherScanner = (props) => {
   useEffect(() => {
     if (IsGetQuoteFail && getQuoteFailMessage) {
       setTimeout(() => {
+        setShowLoader(false);
         setErrorTitle(getQuoteFailMessage);
         setErrorProccedButtonText('Done');
       }, 2);
@@ -736,6 +808,7 @@ const VoucherScanner = (props) => {
       setTimeout(() => {
         setErrorTitle(executeOrderFailMessage);
         setErrorProccedButtonText('Done');
+        setShowLoader(false);
       }, 2);
       (ErrorModalBottomSheet as any).current.snapTo(1);
       let data = {
@@ -802,7 +875,7 @@ const VoucherScanner = (props) => {
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
-        <ScrollView style={{ flex: 1}}>
+        <ScrollView style={{ flex: 1 }}>
           <View style={{ height: '100%' }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
@@ -864,7 +937,6 @@ const VoucherScanner = (props) => {
               }}
               value={voucherCode}
             />
-            
           </View>
         </ScrollView>
         {hideShow ? (
@@ -901,9 +973,7 @@ const VoucherScanner = (props) => {
                           source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                         />
                         <Text style={styles.cardAmountText}>
-                          {value.accountType === TEST_ACCOUNT
-                            ? UsNumberFormat(balances.testBalance)
-                            : value.accountType === REGULAR_ACCOUNT
+                          {value.accountType === REGULAR_ACCOUNT
                             ? UsNumberFormat(balances.regularBalance)
                             : UsNumberFormat(balances.secureBalance)}
                         </Text>
@@ -929,61 +999,62 @@ const VoucherScanner = (props) => {
           </View>
         ) : null}
         <TouchableOpacity
-              onPress={() => {
-                props.navigation.navigate('PairNewWallet');
-              }}
+          onPress={() => {
+            props.navigation.navigate('PairNewWallet');
+          }}
+          style={{
+            marginBottom: -20,
+          }}
+        >
+          <View
+            style={{
+              marginBottom: 25,
+              padding: 20,
+              backgroundColor: props.backgroundColor
+                ? props.backgroundColor
+                : Colors.backgroundColor,
+              marginLeft: 20,
+              marginRight: 20,
+              borderRadius: 10,
+              justifyContent: 'center',
+            }}
+          >
+            <Text
               style={{
-                marginBottom: -20,}}
+                color: props.titleColor ? props.titleColor : Colors.blue,
+                fontSize: RFValue(13),
+                marginBottom: 2,
+                fontFamily: Fonts.FiraSansRegular,
+              }}
             >
-              <View
+              {'Already registered with FastBitcoins?'}
+            </Text>
+            <View style={{ flexDirection: 'row' }}>
+              <Text
                 style={{
-                  marginBottom: 25,
-                  padding: 20,
-                  backgroundColor: props.backgroundColor
-                    ? props.backgroundColor
-                    : Colors.backgroundColor,
-                  marginLeft: 20,
-                  marginRight: 20,
-                  borderRadius: 10,
-                  justifyContent: 'center',
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                  textDecorationLine: 'underline',
+                }}
+                onPress={() => {
+                  props.navigation.navigate('PairNewWallet');
                 }}
               >
-                <Text
-                  style={{
-                    color: props.titleColor ? props.titleColor : Colors.blue,
-                    fontSize: RFValue(13),
-                    marginBottom: 2,
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  {'Already registered with FastBitcoins?'}
-                </Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                      textDecorationLine: 'underline',
-                    }}
-                    onPress={() => {
-                      props.navigation.navigate('PairNewWallet');
-                    }}
-                  >
-                    {'Click here'}
-                  </Text>
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
-                      fontFamily: Fonts.FiraSansRegular,
-                    }}
-                  >
-                    {' to link your Hexa wallet'}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+                {'Click here'}
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {' to link your Hexa wallet'}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
         <Text
           style={{
             marginTop: 'auto',
@@ -1016,7 +1087,7 @@ const VoucherScanner = (props) => {
             marginBottom: 20,
           }}
         >
-          {selectedAccount.accountType != '' && (
+          {selectedAccount && selectedAccount.accountType != '' && (
             <Image
               source={selectedAccount.image}
               style={{ width: wp('8%'), height: wp('8%') }}
@@ -1024,9 +1095,11 @@ const VoucherScanner = (props) => {
           )}
           <View style={{ flex: 1, marginLeft: 10 }}>
             <Text style={styles.dropDownElementTitleText}>
-              {selectedAccount.accountName ? selectedAccount.accountName : ''}
+              {selectedAccount && selectedAccount.accountName
+                ? selectedAccount.accountName
+                : ''}
             </Text>
-            {selectedAccount.accountType != '' && (
+            {selectedAccount && selectedAccount.accountType != '' && (
               <View
                 style={{
                   flexDirection: 'row',
@@ -1038,9 +1111,8 @@ const VoucherScanner = (props) => {
                   source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                 />
                 <Text style={styles.cardAmountText}>
-                  {selectedAccount.accountType === TEST_ACCOUNT
-                    ? UsNumberFormat(balances.testBalance)
-                    : selectedAccount.accountType === REGULAR_ACCOUNT
+                  {selectedAccount &&
+                  selectedAccount.accountType === REGULAR_ACCOUNT
                     ? UsNumberFormat(balances.regularBalance)
                     : UsNumberFormat(balances.secureBalance)}
                 </Text>
@@ -1057,6 +1129,7 @@ const VoucherScanner = (props) => {
           </View>
         </TouchableOpacity>
       </View>
+      {showLoader ? <Loader /> : null}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={RegistrationSuccessBottomSheet as any}

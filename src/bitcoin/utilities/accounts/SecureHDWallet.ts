@@ -51,8 +51,9 @@ export default class SecureHDWallet extends Bitcoin {
 
   private primaryMnemonic: string;
   private walletID: string;
-  private consumedAddresses: string[];
-  private nextFreeChildIndex: number;
+  private usedAddresses: string[];
+  private nextFreeAddressIndex: number;
+  private nextFreeChangeAddressIndex: number;
   private primaryXpriv: string;
   private secondaryXpriv: string;
   private multiSigCache;
@@ -76,8 +77,9 @@ export default class SecureHDWallet extends Bitcoin {
     primaryMnemonic: string,
     stateVars?: {
       secondaryMnemonic: string;
-      consumedAddresses: string[];
-      nextFreeChildIndex: number;
+      usedAddresses: string[];
+      nextFreeAddressIndex: number;
+      nextFreeChangeAddressIndex: number;
       multiSigCache: {};
       signingEssentialsCache: {};
       primaryXpriv: string;
@@ -113,13 +115,15 @@ export default class SecureHDWallet extends Bitcoin {
       stateVars && stateVars.secondaryMnemonic
         ? stateVars.secondaryMnemonic
         : null;
-    this.consumedAddresses =
-      stateVars && stateVars.consumedAddresses
-        ? stateVars.consumedAddresses
-        : [];
-    this.nextFreeChildIndex =
-      stateVars && stateVars.nextFreeChildIndex
-        ? stateVars.nextFreeChildIndex
+    this.usedAddresses =
+      stateVars && stateVars.usedAddresses ? stateVars.usedAddresses : [];
+    this.nextFreeAddressIndex =
+      stateVars && stateVars.nextFreeAddressIndex
+        ? stateVars.nextFreeAddressIndex
+        : 0;
+    this.nextFreeChangeAddressIndex =
+      stateVars && stateVars.nextFreeChangeAddressIndex
+        ? stateVars.nextFreeChangeAddressIndex
         : 0;
     this.multiSigCache =
       stateVars && stateVars.multiSigCache ? stateVars.multiSigCache : {};
@@ -302,72 +306,72 @@ export default class SecureHDWallet extends Bitcoin {
     return { isValid: res.data.isValid };
   };
 
-  public fetchBalance = async (options?: {
-    restore?;
-  }): Promise<{
-    balance: number;
-    unconfirmedBalance: number;
-  }> => {
-    try {
-      if (options && options.restore) {
-        if (!(await this.isWalletEmpty())) {
-          console.log('Executing consumed binary search');
-          this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
-            config.BSI.INIT_INDEX,
-          );
-        }
-      }
+  // public fetchBalance = async (options?: {
+  //   restore?;
+  // }): Promise<{
+  //   balance: number;
+  //   unconfirmedBalance: number;
+  // }> => {
+  //   try {
+  //     if (options && options.restore) {
+  //       if (!(await this.isWalletEmpty())) {
+  //         console.log('Executing consumed binary search');
+  //         this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
+  //           config.BSI.INIT_INDEX,
+  //         );
+  //       }
+  //     }
 
-      await this.gapLimitCatchUp();
+  //     await this.gapLimitCatchUp();
 
-      this.consumedAddresses = [];
-      // generating all consumed addresses:
-      for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
-        const multiSig = this.createSecureMultiSig(itr);
-        this.consumedAddresses.push(multiSig.address);
-      }
+  //     this.consumedAddresses = [];
+  //     // generating all consumed addresses:
+  //     for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
+  //       const multiSig = this.createSecureMultiSig(itr);
+  //       this.consumedAddresses.push(multiSig.address);
+  //     }
 
-      const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
-        this.consumedAddresses,
-      );
+  //     const { balance, unconfirmedBalance } = await this.getBalanceByAddresses(
+  //       this.consumedAddresses,
+  //     );
 
-      return (this.balances = { balance, unconfirmedBalance });
-    } catch (err) {
-      throw new Error(`Unable to get balance: ${err.message}`);
-    }
-  };
+  //     return (this.balances = { balance, unconfirmedBalance });
+  //   } catch (err) {
+  //     throw new Error(`Unable to get balance: ${err.message}`);
+  //   }
+  // };
 
-  public fetchTransactions = async (): Promise<{
-    transactions: {
-      totalTransactions: number;
-      confirmedTransactions: number;
-      unconfirmedTransactions: number;
-      transactionDetails: Array<{
-        txid: string;
-        status: string;
-        confirmations: number;
-        fee: string;
-        date: string;
-        transactionType: string;
-        amount: number;
-        accountType: string;
-        recipientAddresses?: string[];
-        senderAddresses?: string[];
-      }>;
-    };
-  }> => {
-    if (this.consumedAddresses.length === 0) {
-      // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-      await this.fetchBalance();
-    }
+  // public fetchTransactions = async (): Promise<{
+  //   transactions: {
+  //     totalTransactions: number;
+  //     confirmedTransactions: number;
+  //     unconfirmedTransactions: number;
+  //     transactionDetails: Array<{
+  //       txid: string;
+  //       status: string;
+  //       confirmations: number;
+  //       fee: string;
+  //       date: string;
+  //       transactionType: string;
+  //       amount: number;
+  //       accountType: string;
+  //       recipientAddresses?: string[];
+  //       senderAddresses?: string[];
+  //     }>;
+  //   };
+  // }> => {
+  //   if (this.consumedAddresses.length === 0) {
+  //     // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
+  //     await this.fetchBalance();
+  //   }
 
-    const { transactions } = await this.fetchTransactionsByAddresses(
-      this.consumedAddresses,
-      'Savings Account',
-    );
-    this.transactions = transactions;
-    return { transactions };
-  };
+  //   const { transactions } = await this.fetchTransactionsByAddresses(
+  //     this.consumedAddresses,
+  //     'Savings Account',
+  //   );
+  //   this.transactions = transactions;
+  //   return { transactions };
+  // };
 
   public setNewTransactions = (transactions: Transactions) => {
     // delta transactions setter
@@ -398,8 +402,12 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     if (options && options.restore) {
       if (!(await this.isWalletEmpty())) {
-        console.log('Executing consumed binary search');
-        this.nextFreeChildIndex = await this.binarySearchIterationForConsumedAddresses(
+        console.log('Executing internal binary search');
+        this.nextFreeChangeAddressIndex = await this.binarySearchIterationForInternalAddress(
+          config.BSI.INIT_INDEX,
+        );
+        console.log('Executing external binary search');
+        this.nextFreeAddressIndex = await this.binarySearchIterationForExternalAddress(
           config.BSI.INIT_INDEX,
         );
       }
@@ -407,11 +415,27 @@ export default class SecureHDWallet extends Bitcoin {
 
     await this.gapLimitCatchUp();
 
-    this.consumedAddresses = [];
-    // generating all consumed addresses:
-    for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
-      const multiSig = this.createSecureMultiSig(itr);
-      this.consumedAddresses.push(multiSig.address);
+    // this.consumedAddresses = [];
+    // // generating all consumed addresses:
+    // for (let itr = 0; itr < this.nextFreeChildIndex + this.gapLimit; itr++) {
+    //   const multiSig = this.createSecureMultiSig(itr);
+    //   this.consumedAddresses.push(multiSig.address);
+    // }
+
+    this.usedAddresses = [];
+    for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
+      this.usedAddresses.push(this.createSecureMultiSig(itr).address);
+    }
+
+    const changeAddresses = [];
+    for (
+      let itr = 0;
+      itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+      itr++
+    ) {
+      const internalAddress = this.createSecureMultiSig(itr, true).address;
+      this.usedAddresses.push(internalAddress);
+      changeAddresses.push(internalAddress);
     }
 
     const batchedDerivativeAddresses = [];
@@ -439,7 +463,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     const ownedAddresses = [
-      ...this.consumedAddresses,
+      ...this.usedAddresses,
       ...batchedDerivativeAddresses,
     ]; // owned addresses are used for apt tx categorization and transfer amount calculation
 
@@ -447,9 +471,10 @@ export default class SecureHDWallet extends Bitcoin {
       balances,
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
-      this.consumedAddresses,
+      this.usedAddresses,
       'Savings Account',
       ownedAddresses,
+      changeAddresses,
     );
 
     this.setNewTransactions(transactions);
@@ -465,18 +490,18 @@ export default class SecureHDWallet extends Bitcoin {
       let freeAddress = '';
       let itr;
       for (itr = 0; itr < this.gapLimit + 1; itr++) {
-        if (this.nextFreeChildIndex + itr < 0) {
+        if (this.nextFreeAddressIndex + itr < 0) {
           continue;
         }
         const { address } = this.createSecureMultiSig(
-          this.nextFreeChildIndex + itr,
+          this.nextFreeAddressIndex + itr,
         );
 
         const txCounts = await this.getTxCounts([address]);
         if (txCounts[address] === 0) {
           // free address found
           freeAddress = address;
-          this.nextFreeChildIndex += itr;
+          this.nextFreeAddressIndex += itr;
           break;
         }
       }
@@ -488,10 +513,10 @@ export default class SecureHDWallet extends Bitcoin {
           'Failed to find a free address in the above cycle, using the next address without checking',
         );
         const multiSig = this.createSecureMultiSig(
-          this.nextFreeChildIndex + itr,
+          this.nextFreeAddressIndex + itr,
         );
         freeAddress = multiSig.address; // not checking this one, it might be free
-        this.nextFreeChildIndex += itr + 1;
+        this.nextFreeAddressIndex += itr + 1;
       }
 
       this.receivingAddress = freeAddress;
@@ -539,6 +564,7 @@ export default class SecureHDWallet extends Bitcoin {
         const { address } = this.createSecureMultiSig(
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex + itr,
+          false,
           this.derivativeAccounts[accountType][accountNumber].xpub,
         );
 
@@ -562,6 +588,7 @@ export default class SecureHDWallet extends Bitcoin {
         const multiSig = this.createSecureMultiSig(
           this.derivativeAccounts[accountType][accountNumber]
             .nextFreeAddressIndex + itr,
+          false,
           this.derivativeAccounts[accountType][accountNumber].xpub,
         );
         freeAddress = multiSig.address; // not checking this one, it might be free
@@ -602,11 +629,12 @@ export default class SecureHDWallet extends Bitcoin {
       accountNumber
     ];
 
-    const consumedAddresses = [];
+    const usedAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
-      consumedAddresses.push(
+      usedAddresses.push(
         this.createSecureMultiSig(
           itr,
+          false,
           this.derivativeAccounts[accountType][accountNumber].xpub,
         ).address,
       );
@@ -614,16 +642,16 @@ export default class SecureHDWallet extends Bitcoin {
 
     this.derivativeAccounts[accountType][
       accountNumber
-    ].usedAddresses = consumedAddresses;
-    console.log({ derivativeAccConsumedAddresses: consumedAddresses });
+    ].usedAddresses = usedAddresses;
 
     const {
       balances,
       transactions,
     } = await this.fetchBalanceTransactionsByAddresses(
-      consumedAddresses,
+      usedAddresses,
       accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
-      consumedAddresses,
+      usedAddresses,
+      null,
     );
 
     const lastSyncTime =
@@ -691,6 +719,7 @@ export default class SecureHDWallet extends Bitcoin {
           consumedAddresses.push(
             this.createSecureMultiSig(
               itr,
+              false,
               this.derivativeAccounts[dAccountType][accountNumber].xpub,
             ).address,
           );
@@ -710,25 +739,21 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       if (this.network === bitcoinJS.networks.testnet) {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIBALANCETXN,
+          config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXOTXN,
           {
             addresses: batchedDerivativeAddresses,
           },
         );
       } else {
         res = await bitcoinAxios.post(
-          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIBALANCETXN,
+          config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXOTXN,
           {
             addresses: batchedDerivativeAddresses,
           },
         );
       }
 
-      const { Balance, Txs } = res.data;
-      // const netBalances = {
-      //   balance: Balance.Balance,
-      //   unconfirmedBalance: Balance.UnconfirmedBalance,
-      // };
+      const { Utxos, Txs } = res.data;
 
       const addressesInfo = Txs;
       console.log({ addressesInfo });
@@ -748,6 +773,19 @@ export default class SecureHDWallet extends Bitcoin {
             unconfirmedBalance: 0,
           };
 
+          const addressInUse = derivativeAccounts[accountNumber].usedAddresses;
+          for (const addressSpecificUTXOs of Utxos) {
+            for (const utxo of addressSpecificUTXOs) {
+              const { value, Address, status } = utxo;
+              if (addressInUse.includes(Address)) {
+                if (status.confirmed) balances.balance += value;
+                // else if (changeAddresses && changeAddresses.includes(Address))
+                //   balances.balance += value;
+                else balances.unconfirmedBalance += value;
+              }
+            }
+          }
+
           const transactions: Transactions = {
             totalTransactions: 0,
             confirmedTransactions: 0,
@@ -757,12 +795,7 @@ export default class SecureHDWallet extends Bitcoin {
 
           const txMap = new Map();
           for (const addressInfo of addressesInfo) {
-            if (
-              derivativeAccounts[accountNumber].usedAddresses.indexOf(
-                addressInfo.Address,
-              ) == -1
-            )
-              continue;
+            if (!addressInUse.includes(addressInfo.Address)) continue;
             if (addressInfo.TotalTransactions === 0) continue;
 
             transactions.totalTransactions += addressInfo.TotalTransactions;
@@ -797,22 +830,22 @@ export default class SecureHDWallet extends Bitcoin {
                   blockTime: tx.Status.block_time, // only available when tx is confirmed
                 };
 
-                // update balance based on tx
-                if (transaction.status === 'Confirmed') {
-                  if (transaction.transactionType === 'Received') {
-                    balances.balance += transaction.amount;
-                  } else {
-                    const debited = transaction.amount + transaction.fee;
-                    balances.balance -= debited;
-                  }
-                } else {
-                  if (transaction.transactionType === 'Received') {
-                    balances.unconfirmedBalance += transaction.amount;
-                  } else {
-                    const debited = transaction.amount + transaction.fee;
-                    balances.unconfirmedBalance -= debited;
-                  }
-                }
+                // // update balance based on tx
+                // if (transaction.status === 'Confirmed') {
+                //   if (transaction.transactionType === 'Received') {
+                //     balances.balance += transaction.amount;
+                //   } else {
+                //     const debited = transaction.amount + transaction.fee;
+                //     balances.balance -= debited;
+                //   }
+                // } else {
+                //   if (transaction.transactionType === 'Received') {
+                //     balances.unconfirmedBalance += transaction.amount;
+                //   } else {
+                //     const debited = transaction.amount + transaction.fee;
+                //     balances.unconfirmedBalance -= debited;
+                //   }
+                // }
 
                 // over-ride sent transaction's accountType variable for derivative accounts
                 // covers situations when a complete UTXO is spent from the dAccount without a change being sent to the parent account
@@ -967,6 +1000,48 @@ export default class SecureHDWallet extends Bitcoin {
     return res.data;
   };
 
+  private getChangeAddress = async (): Promise<{ address: string }> => {
+    try {
+      // looking for free internal address
+      let freeAddress = '';
+      let itr;
+      for (itr = 0; itr < this.gapLimit; itr++) {
+        if (this.nextFreeChangeAddressIndex + itr < 0) {
+          continue;
+        }
+        const address = this.createSecureMultiSig(
+          this.nextFreeChangeAddressIndex + itr,
+          true,
+        ).address;
+
+        const txCounts = await this.getTxCounts([address]); // ensuring availability
+
+        if (txCounts[address] === 0) {
+          // free address found
+          freeAddress = address;
+          this.nextFreeChangeAddressIndex += itr;
+          break;
+        }
+      }
+
+      if (!freeAddress) {
+        console.log(
+          'Failed to find a free address in the change address cycle, using the next address without checking',
+        );
+        // giving up as we could find a free address in the above cycle
+        freeAddress = this.createSecureMultiSig(
+          this.nextFreeChangeAddressIndex + itr,
+          true,
+        ).address; // not checking this one, it might be free
+        this.nextFreeChangeAddressIndex += itr + 1;
+      }
+
+      return { address: freeAddress };
+    } catch (err) {
+      throw new Error(`Change address generation failed: ${err.message}`);
+    }
+  };
+
   public sortOutputs = async (
     outputs: Array<{
       address: string;
@@ -980,7 +1055,7 @@ export default class SecureHDWallet extends Bitcoin {
   > => {
     for (const output of outputs) {
       if (!output.address) {
-        const { address } = await this.getReceivingAddress();
+        const { address } = await this.getChangeAddress();
         output.address = address;
         console.log(`adding the change address: ${output.address}`);
       }
@@ -1393,7 +1468,7 @@ export default class SecureHDWallet extends Bitcoin {
     secondaryXpub?: string,
   ): { prepared: boolean } => {
     try {
-      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'/0`; // external chain
+      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`;
       const primaryXpub = this.getRecoverableXKey(
         this.primaryMnemonic,
         primaryPath,
@@ -1429,6 +1504,21 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public rederivePrimaryXKeys = (): boolean => {
+    const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`;
+    const primaryXpub = this.getRecoverableXKey(
+      this.primaryMnemonic,
+      primaryPath,
+    );
+    this.primaryXpriv = this.getRecoverableXKey(
+      this.primaryMnemonic,
+      primaryPath,
+      true,
+    );
+    this.xpubs.primary = primaryXpub;
+    return true;
+  };
+
   public generateSecondaryXpriv = (secondaryMnemonic: string): Boolean => {
     const path = this.derivePath(this.xpubs.bh);
     const currentXpub = this.getRecoverableXKey(secondaryMnemonic, path);
@@ -1456,59 +1546,81 @@ export default class SecureHDWallet extends Bitcoin {
       } // cache hit
     }
 
-    for (let itr = 0; itr <= this.nextFreeChildIndex + this.gapLimit; itr++) {
-      const multiSig = this.createSecureMultiSig(itr);
-
+    for (
+      let itr = 0;
+      itr <= this.nextFreeChangeAddressIndex + this.gapLimit;
+      itr++
+    ) {
+      const internal = true;
+      const multiSig = this.createSecureMultiSig(itr, internal);
       if (multiSig.address === address) {
         return (this.signingEssentialsCache[address] = {
           multiSig,
-          primaryPriv: this.deriveChildXKey(this.primaryXpriv, itr),
+          primaryPriv: this.derivePrimaryChildXKey(
+            this.primaryXpriv,
+            itr,
+            internal,
+          ),
           secondaryPriv: this.secondaryXpriv
             ? this.deriveChildXKey(this.secondaryXpriv, itr)
             : null,
           childIndex: itr,
         });
       }
+    }
 
-      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-        if (dAccountType === TRUSTED_CONTACTS) continue;
-        const derivativeAccount = this.derivativeAccounts[dAccountType];
-        if (derivativeAccount.instance.using) {
-          for (
-            let accountNumber = 1;
-            accountNumber <= derivativeAccount.instance.using;
-            accountNumber++
+    for (let itr = 0; itr <= this.nextFreeAddressIndex + this.gapLimit; itr++) {
+      const multiSig = this.createSecureMultiSig(itr);
+      if (multiSig.address === address) {
+        return (this.signingEssentialsCache[address] = {
+          multiSig,
+          primaryPriv: this.derivePrimaryChildXKey(this.primaryXpriv, itr),
+          secondaryPriv: this.secondaryXpriv
+            ? this.deriveChildXKey(this.secondaryXpriv, itr)
+            : null,
+          childIndex: itr,
+        });
+      }
+    }
+
+    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+      if (dAccountType === TRUSTED_CONTACTS) continue;
+      const derivativeAccount = this.derivativeAccounts[dAccountType];
+      if (derivativeAccount.instance.using) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          const derivativeInstance = derivativeAccount[accountNumber];
+          if (
+            derivativeInstance.usedAddresses &&
+            derivativeInstance.usedAddresses.length
           ) {
-            const derivativeInstance = derivativeAccount[accountNumber];
-            if (
-              derivativeInstance.usedAddresses &&
-              derivativeInstance.usedAddresses.length
+            for (
+              let itr = 0;
+              itr <=
+              derivativeInstance.nextFreeAddressIndex + this.derivativeGapLimit;
+              itr++
             ) {
-              for (
-                let itr = 0;
-                itr <=
-                derivativeInstance.nextFreeAddressIndex +
-                  this.derivativeGapLimit;
-                itr++
-              ) {
-                const multiSig = this.createSecureMultiSig(
-                  itr,
-                  derivativeInstance.xpub,
-                );
-                const possibleAddress = multiSig.address;
-                if (possibleAddress === address) {
-                  return (this.signingEssentialsCache[address] = {
-                    multiSig,
-                    primaryPriv: this.deriveDerivativeChildXKey(
-                      derivativeInstance.xpriv,
-                      itr,
-                    ),
-                    secondaryPriv: this.secondaryXpriv
-                      ? this.deriveChildXKey(this.secondaryXpriv, itr)
-                      : null,
-                    childIndex: itr,
-                  });
-                }
+              const multiSig = this.createSecureMultiSig(
+                itr,
+                false,
+                derivativeInstance.xpub,
+              );
+              const possibleAddress = multiSig.address;
+              if (possibleAddress === address) {
+                return (this.signingEssentialsCache[address] = {
+                  multiSig,
+                  primaryPriv: this.deriveDerivativeChildXKey(
+                    derivativeInstance.xpriv,
+                    itr,
+                  ),
+                  secondaryPriv: this.secondaryXpriv
+                    ? this.deriveChildXKey(this.secondaryXpriv, itr)
+                    : null,
+                  childIndex: itr,
+                });
               }
             }
           }
@@ -1528,9 +1640,9 @@ export default class SecureHDWallet extends Bitcoin {
     }>
   > => {
     try {
-      if (this.consumedAddresses.length === 0) {
+      if (this.usedAddresses.length === 0) {
         // just for any case, refresh balance (it refreshes internal `this.usedAddresses`)
-        await this.fetchBalance();
+        await this.fetchBalanceTransaction();
       }
 
       const batchedDerivativeAddresses = [];
@@ -1558,11 +1670,36 @@ export default class SecureHDWallet extends Bitcoin {
       }
 
       const ownedAddresses = [
-        ...this.consumedAddresses,
+        ...this.usedAddresses,
         ...batchedDerivativeAddresses,
       ];
       const { UTXOs } = await this.multiFetchUnspentOutputs(ownedAddresses);
-      return UTXOs;
+
+      const changeAddresses = [];
+      for (
+        let itr = 0;
+        itr < this.nextFreeChangeAddressIndex + this.gapLimit;
+        itr++
+      ) {
+        changeAddresses.push(this.createSecureMultiSig(itr, true).address);
+      }
+      const confirmedUTXOs = [];
+      for (const utxo of UTXOs) {
+        if (utxo.status) {
+          if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
+          else {
+            if (changeAddresses.includes(utxo.address)) {
+              // defaulting utxo's on the change branch to confirmed
+              confirmedUTXOs.push(utxo);
+            }
+          }
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push(utxo);
+        }
+      }
+
+      return confirmedUTXOs;
     } catch (err) {
       throw new Error(`Fetch UTXOs failed: ${err.message}`);
     }
@@ -1572,14 +1709,24 @@ export default class SecureHDWallet extends Bitcoin {
     // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
     let tryAgain = false;
 
-    const multiSig = this.createSecureMultiSig(
-      this.nextFreeChildIndex + this.gapLimit - 1,
-    );
+    const externalAddress = this.createSecureMultiSig(
+      this.nextFreeAddressIndex + this.gapLimit - 1,
+    ).address;
 
-    const txCounts = await this.getTxCounts([multiSig.address]);
-    if (txCounts[multiSig.address] > 0) {
-      //  someone uses our wallet outside! better catch up
-      this.nextFreeChildIndex += this.gapLimit;
+    const internalAddress = this.createSecureMultiSig(
+      this.nextFreeChangeAddressIndex + this.gapLimit - 1,
+      true,
+    ).address;
+
+    const txCounts = await this.getTxCounts([externalAddress, internalAddress]);
+
+    if (txCounts[externalAddress] > 0) {
+      this.nextFreeAddressIndex += this.gapLimit;
+      tryAgain = true;
+    }
+
+    if (txCounts[internalAddress] > 0) {
+      this.nextFreeChangeAddressIndex += this.gapLimit;
       tryAgain = true;
     }
 
@@ -1589,15 +1736,27 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   private isWalletEmpty = async (): Promise<boolean> => {
-    if (this.nextFreeChildIndex === 0) {
+    if (
+      this.nextFreeChangeAddressIndex === 0 &&
+      this.nextFreeAddressIndex === 0
+    ) {
       // assuming that this is freshly created wallet, with no funds and default internal variables
       let emptyWallet = false;
-      const multiSig = this.createSecureMultiSig(0);
-      const txCounts = await this.getTxCounts([multiSig.address]);
+      const initialExternalAddress = this.createSecureMultiSig(0).address;
+      const initialInternalAddress = this.createSecureMultiSig(0).address;
 
-      if (txCounts[multiSig.address] === 0) {
+      const txCounts = await this.getTxCounts([
+        initialExternalAddress,
+        initialInternalAddress,
+      ]);
+
+      if (
+        txCounts[initialExternalAddress] === 0 &&
+        txCounts[initialInternalAddress] === 0
+      ) {
         emptyWallet = true;
       }
+
       return emptyWallet;
     } else {
       return false;
@@ -1647,6 +1806,83 @@ export default class SecureHDWallet extends Bitcoin {
     );
   };
 
+  private binarySearchIterationForInternalAddress = async (
+    index: number,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
+  ): Promise<number> => {
+    console.log({ index, depth });
+    if (depth >= config.BSI.DEPTH.LIMIT) {
+      return maxUsedIndex + 1;
+    } // fail
+
+    const indexAddress = this.createSecureMultiSig(index, true).address;
+    const adjacentAddress = this.createSecureMultiSig(index + 1, true).address;
+    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
+
+    if (txCounts[indexAddress] === 0) {
+      if (index === 0) {
+        return 0;
+      }
+      minUnusedIndex = Math.min(minUnusedIndex, index); // set
+      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
+    } else {
+      maxUsedIndex = Math.max(maxUsedIndex, index); // set
+      if (txCounts[adjacentAddress] === 0) {
+        return index + 1;
+      } // thats our next free address
+
+      index = Math.round((minUnusedIndex - index) / 2 + index);
+    }
+
+    return this.binarySearchIterationForInternalAddress(
+      index,
+      maxUsedIndex,
+      minUnusedIndex,
+      depth + 1,
+    );
+  };
+
+  private binarySearchIterationForExternalAddress = async (
+    index: number,
+    maxUsedIndex: number = config.BSI.MAXUSEDINDEX,
+    minUnusedIndex: number = config.BSI.MINUNUSEDINDEX,
+    depth: number = config.BSI.DEPTH.INIT,
+  ): Promise<number> => {
+    console.log({ index, depth });
+
+    if (depth >= config.BSI.DEPTH.LIMIT) {
+      return maxUsedIndex + 1;
+    } // fail
+
+    const indexAddress = this.createSecureMultiSig(index).address;
+    const adjacentAddress = this.createSecureMultiSig(index + 1).address;
+    const txCounts = await this.getTxCounts([indexAddress, adjacentAddress]);
+
+    if (txCounts[indexAddress] === 0) {
+      if (index === 0) {
+        return 0;
+      }
+      minUnusedIndex = Math.min(minUnusedIndex, index); // set
+      index = Math.floor((index - maxUsedIndex) / 2 + maxUsedIndex);
+    } else {
+      maxUsedIndex = Math.max(maxUsedIndex, index); // set
+      if (txCounts[adjacentAddress] === 0) {
+        return index + 1;
+      } // thats our next free address
+
+      index = Math.round((minUnusedIndex - index) / 2 + index);
+    }
+
+    return this.binarySearchIterationForExternalAddress(
+      index,
+      maxUsedIndex,
+      minUnusedIndex,
+      depth + 1,
+    );
+  };
+
   private getRecoverableXKey = (
     mnemonic: string,
     path: string,
@@ -1669,6 +1905,16 @@ export default class SecureHDWallet extends Bitcoin {
   private getPub = (extendedKey: string): string => {
     const xKey = bip32.fromBase58(extendedKey, this.network);
     return xKey.publicKey.toString('hex');
+  };
+
+  private derivePrimaryChildXKey = (
+    extendedKey: string,
+    childIndex: number,
+    internal: boolean = false,
+  ): string => {
+    const xKey = bip32.fromBase58(extendedKey, this.network);
+    const childXKey = xKey.derive(internal ? 1 : 0).derive(childIndex);
+    return childXKey.toBase58();
   };
 
   private deriveChildXKey = (
@@ -1711,6 +1957,7 @@ export default class SecureHDWallet extends Bitcoin {
 
   private createSecureMultiSig = (
     childIndex: number,
+    internal: boolean = false,
     derivativeXpub?: string,
   ): {
     scripts: {
@@ -1719,16 +1966,16 @@ export default class SecureHDWallet extends Bitcoin {
     };
     address: string;
   } => {
-    if (!derivativeXpub && this.multiSigCache[childIndex]) {
-      return this.multiSigCache[childIndex];
-    } // cache hit
+    // if (!derivativeXpub && this.multiSigCache[childIndex]) {
+    //   return this.multiSigCache[childIndex];
+    // } // cache hit
 
     // console.log(`creating multiSig against index: ${childIndex}`);
 
     let childPrimaryPub;
     if (!derivativeXpub)
       childPrimaryPub = this.getPub(
-        this.deriveChildXKey(this.xpubs.primary, childIndex),
+        this.derivePrimaryChildXKey(this.xpubs.primary, childIndex, internal),
       );
     else
       childPrimaryPub = this.getPub(
@@ -1755,9 +2002,9 @@ export default class SecureHDWallet extends Bitcoin {
       },
       address: multiSig.address,
     };
-    if (!derivativeXpub) {
-      this.multiSigCache[childIndex] = construct;
-    }
+    // if (!derivativeXpub) {
+    //   this.multiSigCache[childIndex] = construct;
+    // }
     return construct;
   };
 
@@ -1786,6 +2033,7 @@ export default class SecureHDWallet extends Bitcoin {
       this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex +
         this.derivativeGapLimit -
         1,
+      false,
       this.derivativeAccounts[accountType][accountNumber].xpub,
     );
 
@@ -1841,6 +2089,7 @@ export default class SecureHDWallet extends Bitcoin {
         accountNumber
       ].receivingAddress = this.createSecureMultiSig(
         0,
+        false,
         this.derivativeAccounts[accountType][accountNumber].xpub,
       ).address;
       return xpub;
