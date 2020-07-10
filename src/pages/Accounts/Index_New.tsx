@@ -83,7 +83,6 @@ export const isCompatible = async (method: string, version: string) => {
     // checking compatibility via Relay
     const res = await RelayServices.checkCompatibility(method, version);
     if (res.status !== 200) {
-     // console.log('Failed to check compatibility');
       return true;
     }
 
@@ -101,33 +100,6 @@ export const isCompatible = async (method: string, version: string) => {
     return true;
   }
   return true;
-};
-
-const getIconByAccountType = (type) => {
-  if (type == 'saving') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'regular') {
-    return require('../../assets/images/icons/icon_regular.png');
-  } else if (type == 'secure') {
-    return require('../../assets/images/icons/icon_secureaccount.png');
-  } else if (type == 'test') {
-    return require('../../assets/images/icons/icon_test.png');
-  } else {
-    return require('../../assets/images/icons/icon_test.png');
-  }
-};
-
-const TransactionHeader = ({ openCloseModal }) => {
-  return (
-    <TouchableOpacity
-      activeOpacity={10}
-      onPress={() => openCloseModal()}
-      style={styles.modalHeaderContainer}
-    >
-      <View style={styles.modalHeaderHandle} />
-      <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-    </TouchableOpacity>
-  );
 };
 
 interface AccountsStateTypes {
@@ -318,11 +290,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               accountNumber <= derivativeAccount.instance.using;
               accountNumber++
             ) {
-              // console.log({
-              //   accountNumber,
-              //   balances: trustedAccounts[accountNumber].balances,
-              //   transactions: trustedAccounts[accountNumber].transactions,
-              // });
               if (derivativeAccount[accountNumber].balances) {
                 currentBalance +=
                   derivativeAccount[accountNumber].balances.balance +
@@ -374,7 +341,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   checkFastBitcoin = async () => {
     let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    //console.log('getFBTCAccount', getFBTCAccount);
     // setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
   };
 
@@ -480,7 +446,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   renderFBTC = (FBTCAccount, accountType) => {
-    //console.log('FBTCAccount, renderFBTC', isEmpty(FBTCAccount), accountType);
     if (accountType) {
       if (accountType == 'Test Account')
         return (
@@ -821,17 +786,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           backgroundColor={Colors.backgroundColor}
           barStyle="dark-content"
         />
-
-        <View
-          style={{
-            ...CommonStyles.headerContainer,
-            justifyContent: 'space-between',
-            backgroundColor: Colors.backgroundColor,
-            borderBottomWidth: 0,
-          }}
-        >
+        <View style={styles.headerContainer}>
           <TouchableOpacity
-            style={{ ...CommonStyles.headerLeftIconContainer }}
+            style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
               this.props.navigation.navigate('Home');
             }}
@@ -844,14 +801,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               />
             </View>
           </TouchableOpacity>
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(20),
-              fontFamily: Fonts.FiraSansRegular,
-              textAlign: 'center',
-            }}
-          >
+          <Text style={styles.headerText}>
             Accounts
           </Text>
           <TouchableOpacity
@@ -963,23 +913,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 }}
               >
                 <View>
-                  <View
-                    style={{
-                      backgroundColor: Colors.backgroundColor,
-                      flexDirection: 'row',
-                      marginLeft: 20,
-                      marginRight: 20,
-                      marginBottom: hp('2%'),
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(13),
-                        fontFamily: Fonts.FiraSansRegular,
-                        padding: 10,
-                      }}
-                    >
+                  <View style={styles.transactionTitle}>
+                    <Text style={styles.transactionTitleDateText}>
                       Today
                     </Text>
                     <Text
@@ -987,14 +922,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         if ((this.refs.bottomSheet as any))
                           (this.refs.bottomSheet as any).snapTo(1);
                       }}
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansItalic,
-                        textDecorationLine: 'underline',
-                        marginLeft: 'auto',
-                        padding: 10,
-                      }}
+                      style={styles.viewMoreText}
                     >
                       View more
                     </Text>
@@ -1116,21 +1044,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                             <View style={styles.transactionModalAmountView}>
                               <Image
                                 source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                                style={{
-                                  width: 12,
-                                  height: 12,
-                                  resizeMode: 'contain',
-                                  alignSelf: 'center',
-                                }}
+                                style={styles.bitcoinImage}
                               />
-                              <View
-                                style={{
-                                  marginLeft: 5,
-                                  alignSelf: 'center',
-                                  marginRight: 5,
-                                  flexDirection: 'row',
-                                }}
-                              >
+                              <View style={styles.transactionBalanceTextView}>
                                 <Text
                                   style={{
                                     ...styles.transactionModalAmountText,
@@ -1154,15 +1070,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
                                   {/* {UsNumberFormat(item.amount)} */}
                                 </Text>
-                                <Text
-                                  style={{
-                                    alignSelf: 'center',
-                                    fontSize: RFValue(13),
-                                    fontFamily: Fonts.OpenSans,
-                                    color: Colors.textColorGrey,
-                                    lineHeight: 19,
-                                  }}
-                                >
+                                <Text style={styles.transactionBalanceUnitTextView}>
                                   {item.accountType == 'Test Account'
                                     ? 't-sats'
                                     : switchOn
@@ -1181,13 +1089,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                   : '6+'}
                               </Text>
                               {index == 0 ? (
-                                <View
-                                  style={{
-                                    padding: 10,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                  }}
-                                >
+                                <View style={styles.forwardIconView}>
                                   <Ionicons
                                     name="ios-arrow-forward"
                                     color={Colors.textColorGrey}
@@ -1195,13 +1097,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                   />
                                 </View>
                               ) : (
-                                <View
-                                  style={{
-                                    padding: 10,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                  }}
-                                >
+                                <View style={styles.forwardIconView}>
                                   <Ionicons
                                     name="ios-arrow-forward"
                                     color={Colors.textColorGrey}
@@ -1228,13 +1124,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 }}
               > */}
               <View style={{ marginTop: hp('2%') }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginLeft: 10,
-                    marginRight: 10,
-                  }}
-                >
+                <View style={styles.bottomButtonView}>
                   <TouchableOpacity
                     onPress={() => {
                       this.props.navigation.navigate('Send', {
@@ -1246,14 +1136,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     }}
                     style={styles.bottomCardView}
                   >
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 10,
-                      }}
-                    >
+                    <View style={styles.sendButtonImageView}>
                       <Image
                         source={require('../../assets/images/icons/icon_send.png')}
                         style={styles.bottomCardSendReceiveImage}
@@ -1278,14 +1161,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     }}
                     style={styles.bottomCardView}
                   >
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 10,
-                      }}
-                    >
+                    <View style={styles.sendButtonImageView}>
                       <Image
                         source={require('../../assets/images/icons/icon_recieve.png')}
                         style={styles.bottomCardSendReceiveImage}
@@ -1733,91 +1609,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue(15),
   },
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-  },
-  modalHeaderTitleText: {
-    color: Colors.blue,
-    fontSize: RFValue(18),
-    fontFamily: Fonts.FiraSansRegular,
-    // marginLeft: 15
-  },
-  cardIconImage: {
-    width: 12,
-    height: 14,
-    resizeMode: 'contain',
-    marginLeft: 'auto',
-  },
-  modalContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderTopWidth: 1,
-    borderColor: Colors.borderColor,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  modalHeaderTitleView: {
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingBottom: 15,
-    paddingTop: 10,
-    marginLeft: 20,
-    marginTop: 20,
-    marginRight: 20,
-    marginBottom: 15,
-  },
-  modalHeaderInfoText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
-    marginTop: 5,
-  },
-  modalContentView: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalHeaderHandle: {
-    width: 50,
-    height: 5,
-    backgroundColor: Colors.borderColor,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 7,
-  },
-  modalHeaderContainer: {
-    paddingTop: 20,
-  },
-  copilotTooltip: {
-    backgroundColor: 'rgba(0,0,0,0)',
-    paddingTop: 5,
-    marginBottom: 30,
-  },
-  stepNumber: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderRadius: 14,
-    borderColor: '#FFFFFF',
-    backgroundColor: '#27ae60',
-  },
-  stepNumberText: {
-    fontSize: 10,
-    backgroundColor: 'transparent',
-    color: '#FFFFFF',
-  },
   transactionModalHeaderContainer: {
     backgroundColor: Colors.white,
     marginTop: 'auto',
@@ -1852,4 +1643,72 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 15,
   },
+  headerContainer: {
+    ...CommonStyles.headerContainer,
+    justifyContent: 'space-between',
+    backgroundColor: Colors.backgroundColor,
+    borderBottomWidth: 0,
+  },
+  headerText: {
+    color: Colors.blue,
+    fontSize: RFValue(20),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'center',
+  },
+  transactionTitle: {
+    backgroundColor: Colors.backgroundColor,
+    flexDirection: 'row',
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: hp('2%'),
+  },
+  transactionTitleDateText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    padding: 10,
+  },
+  viewMoreText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansItalic,
+    textDecorationLine: 'underline',
+    marginLeft: 'auto',
+    padding: 10,
+  },
+  bitcoinImage: {
+    width: 12,
+    height: 12,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+  },
+  transactionBalanceTextView: {
+    marginLeft: 5,
+    alignSelf: 'center',
+    marginRight: 5,
+    flexDirection: 'row',
+  },
+  transactionBalanceUnitTextView: {
+    alignSelf: 'center',
+    fontSize: RFValue(13),
+    fontFamily: Fonts.OpenSans,
+    color: Colors.textColorGrey,
+    lineHeight: 19,
+  },
+  forwardIconView: {
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomButtonView: {
+    flexDirection: 'row',
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  sendButtonImageView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  }
 });

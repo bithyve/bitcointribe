@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback, Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import {
   View,
   Image,
@@ -21,9 +23,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
 import {
-  transferST1,
   transferST2,
   clearTransfer,
   fetchBalanceTx,
@@ -61,8 +61,8 @@ interface SendConfirmationStateTypes {
   sliderValueText: string;
   exchangeRates: any;
   SelectedContactId: any;
-  transfer: {},
-  loading: {}
+  transfer: any;
+  loading: any;
 }
 
 interface SendConfirmationPropsTypes {
@@ -76,7 +76,10 @@ interface SendConfirmationPropsTypes {
   alternateTransferST2: any;
   transferST2: any;
 }
-class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, SendConfirmationStateTypes> {
+class SendConfirmation_updated extends Component<
+  SendConfirmationPropsTypes,
+  SendConfirmationStateTypes
+> {
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
@@ -92,7 +95,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
 
   constructor(props) {
     super(props);
-    this.serviceType = this.props.navigation.getParam('serviceType')
+    this.serviceType = this.props.navigation.getParam('serviceType');
     this.sweepSecure = props.navigation.getParam('sweepSecure');
     this.spendableBalance = props.navigation.getParam('spendableBalance');
     this.viewRef = React.createRef();
@@ -105,11 +108,11 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       exchangeRates: this.props.exchangeRates,
       SelectedContactId: 0,
       transfer: {},
-      loading: {}
-    }
+      loading: {},
+    };
   }
 
-  componentDidMount = () =>{
+  componentDidMount = () => {
     this.onChangeInTransfer();
     let { accounts } = this.props;
     if (accounts[this.serviceType].transfer.details) {
@@ -117,23 +120,34 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       accounts[this.serviceType].transfer.details.map((item) => {
         totalAmount += parseInt(item.bitcoinAmount);
       });
-      if (totalAmount) this.setState({totalAmount: totalAmount})
+      if (totalAmount) this.setState({ totalAmount: totalAmount });
     }
-    this.setState({transfer: accounts[this.serviceType].transfer, loading: accounts[this.serviceType].loading});
-  }
+    this.setState({
+      transfer: accounts[this.serviceType].transfer,
+      loading: accounts[this.serviceType].loading,
+    });
+  };
 
   componentDidUpdate = (prevProps) => {
     if (prevProps.exchangeRates !== this.props.exchangeRates) {
-      this.setState({exchangeRates: this.props.exchangeRates});
+      this.setState({ exchangeRates: this.props.exchangeRates });
     }
 
-    if (prevProps.accounts[this.serviceType].transfer !== this.props.accounts[this.serviceType].transfer) {
-      this.setState({transfer: this.props.accounts[this.serviceType].transfer});
+    if (
+      prevProps.accounts[this.serviceType].transfer !==
+      this.props.accounts[this.serviceType].transfer
+    ) {
+      this.setState({
+        transfer: this.props.accounts[this.serviceType].transfer,
+      });
       this.onChangeInTransfer();
     }
 
-    if (prevProps.accounts[this.serviceType].loading !== this.props.accounts[this.serviceType].loading) {
-      this.setState({loading: this.props.accounts[this.serviceType].loading});
+    if (
+      prevProps.accounts[this.serviceType].loading !==
+      this.props.accounts[this.serviceType].loading
+    ) {
+      this.setState({ loading: this.props.accounts[this.serviceType].loading });
     }
   };
 
@@ -148,11 +162,11 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       'descriptionHistory',
       JSON.stringify(descriptionHistory),
     );
-  }
+  };
 
   sendNotifications = () => {
-    let {WALLET_SETUP, trustedContactsService} = this.props;
-    let {transfer} = this.state;
+    let { WALLET_SETUP, trustedContactsService } = this.props;
+    let { transfer } = this.state;
     const receivers = [];
     transfer.details.forEach((details) => {
       if (details.selectedContact && details.selectedContact.firstName) {
@@ -163,7 +177,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
         }`
           .toLowerCase()
           .trim();
-          const recipient =
+        const recipient =
           trustedContactsService.tc.trustedContacts[contactName];
         if (recipient.walletID && recipient.FCMs.length)
           receivers.push({
@@ -180,16 +194,16 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       tag: notificationTag.IMP,
     };
     RelayServices.sendNotifications(receivers, notification).then(console.log);
-  }
+  };
 
-  onChangeInTransfer = () =>{
-    let {transfer} = this.state;
+  onChangeInTransfer = () => {
+    let { transfer } = this.state;
     if (transfer.details) {
       let totalAmount = 0;
       transfer.details.map((item) => {
         totalAmount += parseInt(item.bitcoinAmount);
       });
-      if (totalAmount) this.setState({totalAmount: totalAmount})
+      if (totalAmount) this.setState({ totalAmount: totalAmount });
     }
     if (transfer.stage2 && transfer.stage2.failed) {
       setTimeout(() => {
@@ -202,12 +216,13 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       }
       this.storeTrustedContactsHistory(transfer.details);
       this.props.fetchBalanceTx(this.serviceType, {
-          loader: true,
-          syncTrustedDerivative:
-          this.serviceType === REGULAR_ACCOUNT || this.serviceType === SECURE_ACCOUNT
-              ? true
-              : false,
-      })
+        loader: true,
+        syncTrustedDerivative:
+          this.serviceType === REGULAR_ACCOUNT ||
+          this.serviceType === SECURE_ACCOUNT
+            ? true
+            : false,
+      });
       setTimeout(() => {
         (this.refs.SendSuccessBottomSheet as any).snapTo(1);
       }, 10);
@@ -218,7 +233,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
         onTransactionSuccess: this.onTransactionSuccess,
       });
     }
-  }
+  };
 
   storeTrustedContactsHistory = async (details) => {
     if (details && details.length > 0) {
@@ -264,7 +279,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
   };
 
   onConfirm = () => {
-    let {sliderValueText} = this.state;
+    let { sliderValueText } = this.state;
     this.props.clearTransfer(this.serviceType, 'stage2');
     const txPriority =
       sliderValueText === 'Low Fee'
@@ -277,18 +292,18 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
     } else {
       this.props.transferST2(this.serviceType, txPriority);
     }
-  }
+  };
 
   tapSliderHandler = (evt) => {
     if (this.viewRef.current) {
       this.viewRef.current.measure((fx, fy, width, height, px) => {
         const location = (evt.nativeEvent.locationX - px) / width;
         if (location >= -0.1 && location <= 0.2) {
-          this.setState({sliderValue: 0})
+          this.setState({ sliderValue: 0 });
         } else if (location >= 0.3 && location <= 0.6) {
-          this.setState({sliderValue: 5})
+          this.setState({ sliderValue: 5 });
         } else if (location >= 0.7 && location <= 1) {
-          this.setState({sliderValue: 10})
+          this.setState({ sliderValue: 10 });
         }
       });
     }
@@ -307,7 +322,7 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
   };
 
   onTransactionSuccess = () => {
-    if ((this.refs.SendSuccessBottomSheet as any))
+    if (this.refs.SendSuccessBottomSheet as any)
       (this.refs.SendSuccessBottomSheet as any).snapTo(1);
   };
 
@@ -323,520 +338,357 @@ class SendConfirmation_updated extends Component<SendConfirmationPropsTypes, Sen
       loading,
     } = this.state;
     const { navigation, exchangeRates } = this.props;
-  return (
-    <View
-      style={{
-        height: '100%',
-        backgroundColor: Colors.white,
-        alignSelf: 'center',
-        width: '100%',
-      }}
-    >
-      <SafeAreaView style={{ flex: 0 }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={styles.modalHeaderTitleView}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-              this.props.clearTransfer(this.serviceType, 'stage1');
-            }}
-            style={{
-              height: 30,
-              width: 30,
-              justifyContent: 'center',
-            }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </TouchableOpacity>
-          <Image
-            source={
-              this.serviceType == TEST_ACCOUNT
-                ? require('../../assets/images/icons/icon_test.png')
-                : this.serviceType == REGULAR_ACCOUNT
-                ? require('../../assets/images/icons/icon_regular.png')
-                : require('../../assets/images/icons/icon_secureaccount.png')
-            }
-            style={{ width: wp('10%'), height: wp('10%') }}
-          />
-          <View style={{ marginLeft: wp('2.5%') }}>
-            <Text style={styles.modalHeaderTitleText}>
-              {'Send Confirmation'}
-            </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
+    return (
+      <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 0 }} />
+        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+        <View style={styles.modalHeaderTitleView}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.goBack();
+                this.props.clearTransfer(this.serviceType, 'stage1');
               }}
+              style={{ height: 30, width: 30, justifyContent: 'center' }}
             >
-              {this.serviceType == TEST_ACCOUNT
-                ? 'Test Account'
-                : this.serviceType == REGULAR_ACCOUNT
-                ? 'Checking Account'
-                : 'Savings Account'}
-            </Text>
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </TouchableOpacity>
+            <Image
+              source={
+                this.serviceType == TEST_ACCOUNT
+                  ? require('../../assets/images/icons/icon_test.png')
+                  : this.serviceType == REGULAR_ACCOUNT
+                  ? require('../../assets/images/icons/icon_regular.png')
+                  : require('../../assets/images/icons/icon_secureaccount.png')
+              }
+              style={{ width: wp('10%'), height: wp('10%') }}
+            />
+            <View style={{ marginLeft: wp('2.5%') }}>
+              <Text style={styles.modalHeaderTitleText}>
+                {'Send Confirmation'}
+              </Text>
+              <Text style={styles.headerText}>
+                {this.serviceType == TEST_ACCOUNT
+                  ? 'Test Account'
+                  : this.serviceType == REGULAR_ACCOUNT
+                  ? 'Checking Account'
+                  : 'Savings Account'}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <ScrollView>
-        <View
-          style={{
-            paddingBottom: hp('1%'),
-            paddingTop: hp('0.7%'),
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-            marginBottom: hp('1%'),
-            marginTop: hp('1%'),
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(12),
-              fontFamily: Fonts.FiraSansItalic,
-            }}
-          >
-            {this.getServiceTypeAccount()}
-          </Text>
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(10),
-              fontFamily: Fonts.FiraSansItalic,
-              lineHeight: 15,
-              textAlign: 'center',
-            }}
-          >
-            {' (Available to spend '}
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(10),
-                fontFamily: Fonts.FiraSansItalic,
-              }}
-            >
-              {this.serviceType == TEST_ACCOUNT
-                ? UsNumberFormat(this.spendableBalance)
-                : switchOn
-                ? UsNumberFormat(this.spendableBalance)
-                : exchangeRates
-                ? (
-                    (this.spendableBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
+        <ScrollView>
+          <View style={styles.availableBalanceView}>
+            <Text style={styles.accountTypeTextBalanceView}>
+              {this.getServiceTypeAccount()}
             </Text>
-            <Text
-              style={{
-                color: Colors.blue,
-                fontSize: RFValue(9),
-                fontFamily: Fonts.FiraSansMediumItalic,
-              }}
-            >
-              {this.serviceType == TEST_ACCOUNT
-                ? ' t-sats )'
-                : switchOn
-                ? ' sats )'
-                : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+            <Text style={styles.availableToSpendText}>
+              {' (Available to spend '}
+              <Text style={styles.availableBalanceText}>
+                {this.serviceType == TEST_ACCOUNT
+                  ? UsNumberFormat(this.spendableBalance)
+                  : switchOn
+                  ? UsNumberFormat(this.spendableBalance)
+                  : exchangeRates
+                  ? (
+                      (this.spendableBalance / 1e8) *
+                      exchangeRates[CurrencyCode].last
+                    ).toFixed(2)
+                  : null}
+              </Text>
+              <Text style={styles.availableBalanceUnitText}>
+                {this.serviceType == TEST_ACCOUNT
+                  ? ' t-sats )'
+                  : switchOn
+                  ? ' sats )'
+                  : ' ' + CurrencyCode.toLocaleLowerCase() + ' )'}
+              </Text>
             </Text>
-          </Text>
-        </View>
-        {transfer.details && transfer.details.length > 0 ? (
-          <ScrollView>
-            {transfer.details.map((item) => (
-              <RecipientComponent
-                onPressElement={() => {
-                  if (item.note) {
-                    if (SelectedContactId == item.selectedContact.id)
-                      this.setState({SelectedContactId: 0});
-                    else this.setState({SelectedContactId: item.selectedContact.id});
-                  }
-                }}
-                item={item}
-                SelectedContactId={SelectedContactId}
-                serviceType={this.serviceType}
-              />
-            ))}
-          </ScrollView>
-        ) : null}
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginTop: hp('2%'),
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-            borderTopWidth: 1,
-            borderBottomWidth: 1,
-            borderColor: Colors.borderColor,
-            paddingBottom: hp('1.5%'),
-            paddingTop: hp('1.5%'),
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              marginLeft: 5,
-            }}
-          >
-            Total Amount
-          </Text>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              alignItems: 'flex-end',
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <View style={styles.amountInputImage}>
-                <Image
-                  style={styles.textBoxImage}
-                  source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+          </View>
+          {transfer.details && transfer.details.length > 0 ? (
+            <ScrollView>
+              {transfer.details.map((item) => (
+                <RecipientComponent
+                  onPressElement={() => {
+                    if (item.note) {
+                      if (SelectedContactId == item.selectedContact.id)
+                        this.setState({ SelectedContactId: 0 });
+                      else
+                        this.setState({
+                          SelectedContactId: item.selectedContact.id,
+                        });
+                    }
+                  }}
+                  item={item}
+                  SelectedContactId={SelectedContactId}
+                  serviceType={this.serviceType}
                 />
+              ))}
+            </ScrollView>
+          ) : null}
+
+          <View style={styles.totalMountView}>
+            <Text style={styles.totalAmountText}>
+              Total Amount
+            </Text>
+            <View style={styles.totalAmountOuterView}>
+              <View style={styles.totalAmountInnerView}>
+                <View style={styles.amountInputImage}>
+                  <Image
+                    style={styles.textBoxImage}
+                    source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                  />
+                </View>
+                <View style={styles.totalAmountView}/>
+                <Text style={styles.amountText}>
+                  {totalAmount}
+                </Text>
+                <Text style={styles.amountUnitText}>
+                  {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
+                </Text>
               </View>
-              <View
-                style={{
-                  width: 1,
-                  height: '60%',
-                  backgroundColor: Colors.borderColor,
-                  marginRight: 5,
-                  marginLeft: 5,
-                  alignSelf: 'center',
-                }}
-              />
-              <Text
-                style={{
-                  color: Colors.black,
-                  fontSize: RFValue(20),
-                  fontFamily: Fonts.FiraSansRegular,
-                  marginLeft: 10,
-                }}
-              >
-                {totalAmount}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                  marginRight: 5,
-                }}
-              >
-                {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
-              </Text>
             </View>
           </View>
-        </View>
 
-        <View
-          style={{
-            marginRight: wp('6%'),
-            marginLeft: wp('6%'),
-            marginTop: hp('2%'),
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.blue,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-              marginLeft: 5,
-            }}
-          >
-            Transaction Priority
-          </Text>
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(12),
-              fontFamily: Fonts.FiraSansRegular,
-              marginLeft: 5,
-            }}
-          >
-            Set priority for your transaction
-          </Text>
+          <View style={styles.transactionPriorityView}>
+            <Text style={styles.transactionPriorityText}>
+              Transaction Priority
+            </Text>
+            <Text style={styles.transactionPriorityInfoText}>
+              Set priority for your transaction
+            </Text>
 
-          <View
-            style={{
-              ...styles.textBoxView,
-              flexDirection: 'column',
-              height: 'auto',
-              marginTop: hp('2%'),
-              alignItems: 'center',
-              paddingLeft: 10,
-              paddingRight: 10,
-            }}
-          >
-            <View
-              style={{ flexDirection: 'row' }}
-              ref={this.viewRef}
-              collapsable={false}
-            >
-              <TouchableWithoutFeedback onPressIn={this.tapSliderHandler}>
-                <Slider
-                  style={{ flex: 1 }}
-                  minimumValue={0}
-                  maximumValue={10}
-                  step={5}
-                  minimumTrackTintColor={Colors.blue}
-                  maximumTrackTintColor={Colors.borderColor}
-                  thumbStyle={{
-                    borderWidth: 5,
-                    borderColor: Colors.white,
-                    backgroundColor: Colors.blue,
-                    height: 30,
-                    width: 30,
-                    borderRadius: 15,
-                  }}
-                  trackStyle={{ height: 8, borderRadius: 10 }}
-                  thumbTouchSize={{
-                    width: 30,
-                    height: 30,
-                    backgroundColor: 'blue',
-                  }}
-                  value={sliderValue}
-                  onValueChange={(value) => {
-                    this.setState({sliderValue:value});
-                  }}
-                  onSlidingComplete={(value) => {
-                    value == 0
-                      ? this.setState({sliderValueText: 'Low Fee'})
-                      : value == 5
-                      ? this.setState({sliderValueText: 'In the middle'})
-                      :this.setState({sliderValueText: 'Fast Transaction'});
-                  }}
-                />
-              </TouchableWithoutFeedback>
-            </View>
             <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginBottom: 10,
+                ...styles.textBoxView,
+                flexDirection: 'column',
+                height: 'auto',
+                marginTop: hp('2%'),
+                alignItems: 'center',
+                paddingLeft: 10,
+                paddingRight: 10,
               }}
             >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  flex: 1,
-                  flexWrap: 'wrap',
-                  marginRight: 5,
-                }}
+              <View
+                style={{ flexDirection: 'row' }}
+                ref={this.viewRef}
+                collapsable={false}
               >
-                {'Low Fee\n'} (
-                {transfer.stage1 && transfer.stage1.txPrerequisites
-                  ? transfer.stage1.txPrerequisites['low'].fee
-                  : ''}
-                {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  flex: 1,
-                  flexWrap: 'wrap',
-                  marginRight: 5,
-                }}
-              >
-                {'In the middle\n'} (
-                {transfer.stage1 && transfer.stage1.txPrerequisites
-                  ? transfer.stage1.txPrerequisites['medium'].fee
-                  : ''}
-                {' sats'})
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textAlign: 'center',
-                  flex: 1,
-                  flexWrap: 'wrap',
-                }}
-              >
-                {'Fast Transaction\n'} (
-                {transfer.stage1 && transfer.stage1.txPrerequisites
-                  ? transfer.stage1.txPrerequisites['high'].fee
-                  : ''}
-                {' sats'})
-              </Text>
+                <TouchableWithoutFeedback onPressIn={this.tapSliderHandler}>
+                  <Slider
+                    style={{ flex: 1 }}
+                    minimumValue={0}
+                    maximumValue={10}
+                    step={5}
+                    minimumTrackTintColor={Colors.blue}
+                    maximumTrackTintColor={Colors.borderColor}
+                    thumbStyle={{
+                      borderWidth: 5,
+                      borderColor: Colors.white,
+                      backgroundColor: Colors.blue,
+                      height: 30,
+                      width: 30,
+                      borderRadius: 15,
+                    }}
+                    trackStyle={{ height: 8, borderRadius: 10 }}
+                    thumbTouchSize={{
+                      width: 30,
+                      height: 30,
+                      backgroundColor: 'blue',
+                    }}
+                    value={sliderValue}
+                    onValueChange={(value) => {
+                      this.setState({ sliderValue: value });
+                    }}
+                    onSlidingComplete={(value) => {
+                      value == 0
+                        ? this.setState({ sliderValueText: 'Low Fee' })
+                        : value == 5
+                        ? this.setState({ sliderValueText: 'In the middle' })
+                        : this.setState({
+                            sliderValueText: 'Fast Transaction',
+                          });
+                    }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+              <View style={styles.sliderTextView}>
+                <Text style={styles.sliderText}>
+                  {'Low Fee\n'} (
+                  {transfer.stage1 && transfer.stage1.txPrerequisites
+                    ? transfer.stage1.txPrerequisites['low'].fee
+                    : ''}
+                  {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                </Text>
+                <Text style={styles.sliderText}>
+                  {'In the middle\n'} (
+                  {transfer.stage1 && transfer.stage1.txPrerequisites
+                    ? transfer.stage1.txPrerequisites['medium'].fee
+                    : ''}
+                  {' sats'})
+                </Text>
+                <Text
+                  style={{
+                    ...styles.sliderText,
+                    marginRight: 0
+                  }}
+                >
+                  {'Fast Transaction\n'} (
+                  {transfer.stage1 && transfer.stage1.txPrerequisites
+                    ? transfer.stage1.txPrerequisites['high'].fee
+                    : ''}
+                  {' sats'})
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-        <View style={{ marginTop: hp('3%') }}>
-          <BottomInfoBox
-            title={'Note'}
-            infoText={
-              'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
-            }
-          />
-        </View>
+          <View style={{ marginTop: hp('3%') }}>
+            <BottomInfoBox
+              title={'Note'}
+              infoText={
+                'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
+              }
+            />
+          </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            marginTop: hp('3%'),
-            marginBottom: hp('5%'),
-            marginLeft: wp('6%'),
-            marginRight: wp('6%'),
+          <View style={styles.bottomButtonView}>
+            <TouchableOpacity
+              onPress={this.onConfirm}
+              disabled={loading.transfer}
+              style={{
+                ...styles.confirmButtonView,
+                backgroundColor: Colors.blue,
+                elevation: 10,
+                shadowColor: Colors.shadowBlue,
+                shadowOpacity: 1,
+                shadowOffset: { width: 15, height: 15 },
+              }}
+            >
+              {loading.transfer ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                ...styles.confirmButtonView,
+                width: wp('30%'),
+              }}
+              onPress={() => {
+                this.props.clearTransfer(this.serviceType, 'stage1');
+                navigation.goBack();
+              }}
+            >
+              <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                Back
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+        <BottomSheet
+          onCloseStart={() => {}}
+          enabledInnerScrolling={true}
+          ref={'SendSuccessBottomSheet'}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={() => (
+            <SendConfirmationContent
+              title={'Sent Successfully'}
+              info={'Transaction(s) successfully submitted'}
+              infoText={
+                'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
+              }
+              userInfo={transfer.details ? transfer.details : []}
+              isFromContact={false}
+              okButtonText={'View Account'}
+              cancelButtonText={'Back'}
+              isCancel={false}
+              onPressOk={() => {
+                if (this.refs.SendSuccessBottomSheet as any)
+                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+
+                this.props.clearTransfer(this.serviceType);
+                // this.props.fetchTransactions(serviceType);
+                // this.props.fetchBalanceTx(serviceType, {
+                //     loader: true,
+                //     syncTrustedDerivative:
+                //       serviceType === REGULAR_ACCOUNT ||
+                //       serviceType === SECURE_ACCOUNT
+                //         ? true
+                //         : false,
+                //   })
+
+                navigation.navigate('Accounts', {
+                  serviceType: this.serviceType,
+                  index:
+                    this.serviceType === TEST_ACCOUNT
+                      ? 0
+                      : this.serviceType === REGULAR_ACCOUNT
+                      ? 1
+                      : 2,
+                  spendableBalance: this.spendableBalance - totalAmount,
+                });
+              }}
+              isSuccess={true}
+              serviceType={this.serviceType}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => {
+                if (this.refs.SendSuccessBottomSheet as any)
+                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+                navigation.navigate('Accounts');
+              }}
+            />
+          )}
+        />
+
+        <BottomSheet
+          onCloseStart={() => {
+            (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
           }}
-        >
-          <TouchableOpacity
-            onPress={this.onConfirm}
-            disabled={loading.transfer}
-            style={{
-              ...styles.confirmButtonView,
-              backgroundColor: Colors.blue,
-              elevation: 10,
-              shadowColor: Colors.shadowBlue,
-              shadowOpacity: 1,
-              shadowOffset: { width: 15, height: 15 },
-            }}
-          >
-            {loading.transfer ? (
-              <ActivityIndicator size="small" />
-            ) : (
-              <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              ...styles.confirmButtonView,
-              width: wp('30%'),
-            }}
-            onPress={() => {
-              this.props.clearTransfer(this.serviceType, 'stage1');
-              navigation.goBack();
-            }}
-          >
-            <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-              Back
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-      <BottomSheet
-        onCloseStart={() => {}}
-        enabledInnerScrolling={true}
-        ref={'SendSuccessBottomSheet'}
-        snapPoints={[-50, hp('65%')]}
-        renderContent={() => (
-          <SendConfirmationContent
-            title={'Sent Successfully'}
-            info={'Transaction(s) successfully submitted'}
-            infoText={
-              'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
-            }
-            userInfo={transfer.details ? transfer.details : []}
-            isFromContact={false}
-            okButtonText={'View Account'}
-            cancelButtonText={'Back'}
-            isCancel={false}
-            onPressOk={() => {
-              if ((this.refs.SendSuccessBottomSheet as any))
-                (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-
-              this.props.clearTransfer(this.serviceType);
-              // this.props.fetchTransactions(serviceType);
-              // this.props.fetchBalanceTx(serviceType, {
-              //     loader: true,
-              //     syncTrustedDerivative:
-              //       serviceType === REGULAR_ACCOUNT ||
-              //       serviceType === SECURE_ACCOUNT
-              //         ? true
-              //         : false,
-              //   })
-
-              navigation.navigate('Accounts', {
-                serviceType: this.serviceType,
-                index:
-                this.serviceType === TEST_ACCOUNT
-                    ? 0
-                    : this.serviceType === REGULAR_ACCOUNT
-                    ? 1
-                    : 2,
-                spendableBalance: this.spendableBalance - totalAmount,
-              });
-            }}
-            isSuccess={true}
-            serviceType={this.serviceType}
-          />
-        )}
-        renderHeader={() => (
-          <ModalHeader
-            onPressHeader={() => {
-              if ((this.refs.SendSuccessBottomSheet as any))
-                (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-              navigation.navigate('Accounts');
-            }}
-          />
-        )}
-      />
-
-      <BottomSheet
-        onCloseStart={() => {
-          (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-        }}
-        enabledInnerScrolling={true}
-        ref={'SendUnSuccessBottomSheet'}
-        snapPoints={[-50, hp('65%')]}
-        renderContent={() => (
-          <SendConfirmationContent
-            title={'Sent Unsuccessful'}
-            info={'There seems to be a problem'}
-            userInfo={transfer.details?transfer.details:[]}
-            isFromContact={false}
-            okButtonText={'Try Again'}
-            cancelButtonText={'Back'}
-            isCancel={true}
-            onPressOk={() => {
-              if ((this.refs.SendUnSuccessBottomSheet as any))
-                (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-            }}
-            onPressCancel={() => {
-              this.props.clearTransfer(this.serviceType);
-              if ((this.refs.SendUnSuccessBottomSheet as any))
-                (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              navigation.navigate('Accounts');
-            }}
-            isUnSuccess={true}
-          />
-        )}
-        renderHeader={() => (
-          <ModalHeader
-            onPressHeader={() => {
-              if ((this.refs.SendUnSuccessBottomSheet as any))
-                (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-            }}
-          />
-        )}
-      />
-    </View>
-  );
-          }
+          enabledInnerScrolling={true}
+          ref={'SendUnSuccessBottomSheet'}
+          snapPoints={[-50, hp('65%')]}
+          renderContent={() => (
+            <SendConfirmationContent
+              title={'Sent Unsuccessful'}
+              info={'There seems to be a problem'}
+              userInfo={transfer.details ? transfer.details : []}
+              isFromContact={false}
+              okButtonText={'Try Again'}
+              cancelButtonText={'Back'}
+              isCancel={true}
+              onPressOk={() => {
+                if (this.refs.SendUnSuccessBottomSheet as any)
+                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              }}
+              onPressCancel={() => {
+                this.props.clearTransfer(this.serviceType);
+                if (this.refs.SendUnSuccessBottomSheet as any)
+                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+                navigation.navigate('Accounts');
+              }}
+              isUnSuccess={true}
+            />
+          )}
+          renderHeader={() => (
+            <ModalHeader
+              onPressHeader={() => {
+                if (this.refs.SendUnSuccessBottomSheet as any)
+                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+        />
+      </View>
+    );
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -844,7 +696,8 @@ const mapStateToProps = (state) => {
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
     accounts: idx(state, (_) => _.accounts) || [],
-    WALLET_SETUP: idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
+    WALLET_SETUP:
+      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
   };
 };
 
@@ -858,10 +711,6 @@ export default withNavigationFocus(
 );
 
 const styles = StyleSheet.create({
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
-  },
   modalHeaderTitleText: {
     color: Colors.blue,
     fontSize: RFValue(18),
@@ -884,20 +733,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: Colors.borderColor,
   },
-  inputBoxFocused: {
-    borderWidth: 0.5,
-    borderRadius: 10,
-    elevation: 10,
-    borderColor: Colors.borderColor,
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.7,
-    shadowRadius: 10,
-    shadowColor: Colors.borderColor,
-    backgroundColor: Colors.white,
-  },
   textBoxImage: {
     width: wp('6%'),
     height: wp('6%'),
@@ -911,14 +746,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
   },
-  textBox: {
-    flex: 1,
-    height: 50,
-    fontSize: RFValue(13),
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    paddingLeft: 15,
-  },
   confirmButtonView: {
     width: wp('50%'),
     height: wp('13%'),
@@ -931,25 +758,127 @@ const styles = StyleSheet.create({
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansMedium,
   },
-  closemarkStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    top: 0,
-    right: 0,
+  headerText: {
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(12),
   },
-  contactProfileView: {
+  availableBalanceView: {
+    paddingBottom: hp('1%'),
+    paddingTop: hp('0.7%'),
+    marginRight: wp('6%'),
+    marginLeft: wp('6%'),
+    marginBottom: hp('1%'),
+    marginTop: hp('1%'),
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  accountTypeTextBalanceView: {
+    color: Colors.blue,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  availableToSpendText: {
+    color: Colors.blue,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansItalic,
+    lineHeight: 15,
+    textAlign: 'center',
+  },
+  availableBalanceText: {
+    color: Colors.blue,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansItalic,
+  },
+  availableBalanceUnitText: {
+    color: Colors.blue,
+    fontSize: RFValue(9),
+    fontFamily: Fonts.FiraSansMediumItalic,
+  },
+  totalMountView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp('1.7%'),
+    marginTop: hp('2%'),
+    marginRight: wp('6%'),
+    marginLeft: wp('6%'),
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    paddingBottom: hp('1.5%'),
+    paddingTop: hp('1.5%'),
   },
-  contactProfileImage: {
-    borderRadius: 60 / 2,
-    width: 60,
-    height: 60,
-    resizeMode: 'cover',
-    shadowColor: Colors.shadowBlue,
-    shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+  totalAmountText: {
+    color: Colors.blue,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 5,
   },
+  totalAmountOuterView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  totalAmountInnerView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  totalAmountView: {
+    width: 1,
+    height: '60%',
+    backgroundColor: Colors.borderColor,
+    marginRight: 5,
+    marginLeft: 5,
+    alignSelf: 'center',
+  },
+  amountText: {
+    color: Colors.black,
+    fontSize: RFValue(20),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 10,
+  },
+  amountUnitText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginRight: 5,
+  },
+  transactionPriorityView: {
+    marginRight: wp('6%'),
+    marginLeft: wp('6%'),
+    marginTop: hp('2%'),
+  },
+  transactionPriorityText: {
+    color: Colors.blue,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 5,
+  },
+  transactionPriorityInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(12),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: 5,
+  },
+  sliderTextView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  sliderText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'center',
+    flex: 1,
+    flexWrap: 'wrap',
+    marginRight: 5,
+  },
+  bottomButtonView: {
+    flexDirection: 'row',
+    marginTop: hp('3%'),
+    marginBottom: hp('5%'),
+    marginLeft: wp('6%'),
+    marginRight: wp('6%'),
+  }
 });
