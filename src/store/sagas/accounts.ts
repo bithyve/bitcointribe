@@ -295,7 +295,7 @@ function* fetchBalanceTxWorker({ payload }) {
       };
       yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
-  } else {
+  } else if (res.status !== 200) {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log('Failed to fetch balance/transactions from the indexer');
   }
@@ -369,7 +369,7 @@ function* fetchDerivativeAccBalanceTxWorker({ payload }) {
       [serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  } else {
+  } else if (res.status !== 200) {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to fetch balance/transactions from the indexer');
   }
