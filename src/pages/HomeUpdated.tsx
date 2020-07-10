@@ -745,7 +745,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < newTransactions.length; i++) {
         let present = false;
         for (const tx of asyncNotificationList) {
-          if (newTransactions[i].txid === tx.notificationsData.txid)
+          if (
+            tx.notificationsData &&
+            newTransactions[i].txid === tx.notificationsData.txid
+          )
             present = true;
         }
         if (present) continue;

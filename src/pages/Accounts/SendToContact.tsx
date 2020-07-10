@@ -264,7 +264,10 @@ export default function SendToContact(props) {
       if (spendableBalance - amountStacked < Number(bitcoinAmount)) {
         setIsInvalidBalance(true);
         setIsConfirmDisabled(true);
-      } else setIsConfirmDisabled(false);
+      } else {
+        setIsInvalidBalance(false);
+        setIsConfirmDisabled(false);
+      }
     } else {
       setIsConfirmDisabled(true);
       console.log({ transfer });
@@ -272,7 +275,7 @@ export default function SendToContact(props) {
         props.navigation.goBack();
       }
     }
-  }, [bitcoinAmount, currencyAmount, transfer]);
+  }, [bitcoinAmount, currencyAmount, transfer, spendableBalance]);
 
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', () => {
