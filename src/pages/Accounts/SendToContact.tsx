@@ -1161,50 +1161,49 @@ export default function SendToContact(props) {
                 )}
                 {/* )} */}
               </TouchableOpacity>
-              {serviceType != 'TEST_ACCOUNT' ? (
-                <TouchableOpacity
-                  style={{
-                    ...styles.confirmButtonView,
-                    width: wp('30%'),
-                    marginLeft: 10,
-                  }}
-                  disabled={isConfirmDisabled || loading.transfer}
-                  onPress={() => {
-                    // dispatch(clearTransfer(serviceType));
-                    // if (getServiceType) {
-                    //   getServiceType(serviceType);
-                    // }
-                    if (transfer.details && transfer.details.length) {
-                      for (let i = 0; i < transfer.details.length; i++) {
-                        if (
-                          transfer.details[i].selectedContact.id ==
-                          selectedContact.id
-                        ) {
-                          dispatch(
-                            removeTransferDetails(
-                              serviceType,
-                              transfer.details[i],
-                            ),
-                          );
-                        }
+
+              <TouchableOpacity
+                style={{
+                  ...styles.confirmButtonView,
+                  width: wp('30%'),
+                  marginLeft: 10,
+                }}
+                disabled={isConfirmDisabled || loading.transfer}
+                onPress={() => {
+                  // dispatch(clearTransfer(serviceType));
+                  // if (getServiceType) {
+                  //   getServiceType(serviceType);
+                  // }
+                  if (transfer.details && transfer.details.length) {
+                    for (let i = 0; i < transfer.details.length; i++) {
+                      if (
+                        transfer.details[i].selectedContact.id ==
+                        selectedContact.id
+                      ) {
+                        dispatch(
+                          removeTransferDetails(
+                            serviceType,
+                            transfer.details[i],
+                          ),
+                        );
                       }
-                      dispatch(
-                        addTransferDetails(serviceType, {
-                          selectedContact,
-                          bitcoinAmount,
-                          currencyAmount,
-                          note,
-                        }),
-                      );
-                      props.navigation.goBack();
                     }
-                  }}
-                >
-                  <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                    Add Recipient
-                  </Text>
-                </TouchableOpacity>
-              ) : null}
+                    dispatch(
+                      addTransferDetails(serviceType, {
+                        selectedContact,
+                        bitcoinAmount,
+                        currencyAmount,
+                        note,
+                      }),
+                    );
+                    props.navigation.goBack();
+                  }
+                }}
+              >
+                <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                  Add Recipient
+                </Text>
+              </TouchableOpacity>
             </View>
           </ScrollView>
         </View>

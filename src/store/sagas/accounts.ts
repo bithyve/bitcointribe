@@ -56,6 +56,8 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { insertDBWorker } from './storage';
 import { trustedChannelsSyncWorker } from './trustedContacts';
 import config from '../../bitcoin/HexaConfig';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 
 function* fetchAddrWorker({ payload }) {
   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -434,8 +436,12 @@ export const syncDerivativeAccountsWatcher = createWatcher(
 
 function* processRecipients(
   recipients: [{ id: string; address: string; amount: number }],
+  serviceType: string,
 ) {
   const addressedRecipients = [];
+  const testAccount: TestAccount = yield select(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
   const regularAccount: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
@@ -472,13 +478,42 @@ function* processRecipients(
       } else {
         // recipient: Trusted Contact
         const contactName = recipient.id;
+        let res;
 
-        const res = yield call(
-          regularAccount.getDerivativeAccAddress,
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        );
+        if (serviceType !== TEST_ACCOUNT) {
+          res = yield call(
+            regularAccount.getDerivativeAccAddress,
+            TRUSTED_CONTACTS,
+            null,
+            contactName,
+          );
+        } else {
+          console.log(regularAccount.hdWallet.trustedContactToDA);
+          const accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[
+              contactName.toLowerCase().trim()
+            ];
+          if (accountNumber) {
+            const { contactDetails } = regularAccount.hdWallet
+              .derivativeAccounts[TRUSTED_CONTACTS][
+              accountNumber
+            ] as TrustedContactDerivativeAccountElements;
+
+            if (contactDetails && contactDetails.tpub) {
+              res = yield call(
+                testAccount.deriveReceivingAddress,
+                contactDetails.tpub,
+              );
+            } else {
+              throw new Error('Failed fetch testnet address, tpub missing');
+            }
+          } else {
+            throw new Error(
+              'Failed fetch testnet address, accountNumber missing',
+            );
+          }
+        }
+
         console.log({ res });
         if (res.status === 200) {
           const receivingAddress = res.data.address;
@@ -502,7 +537,7 @@ function* transferST1Worker({ payload }) {
   console.log({ recipients });
 
   try {
-    recipients = yield call(processRecipients, recipients);
+    recipients = yield call(processRecipients, recipients, payload.serviceType);
   } catch (err) {
     yield put(failedST1(payload.serviceType, { err }));
     return;
