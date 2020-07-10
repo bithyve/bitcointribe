@@ -26,6 +26,9 @@ import {
   TrustedData,
   TrustedDataElements,
   TrustedContactDerivativeAccountElements,
+  INotification,
+  notificationType,
+  notificationTag,
 } from '../../bitcoin/utilities/Interface';
 import { downloadMShare, updateWalletImage } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -38,6 +41,27 @@ import { insertDBWorker } from './storage';
 import { AsyncStorage } from 'react-native';
 import { fetchNotificationsWorker } from './notifications';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import RelayServices from '../../bitcoin/services/RelayService';
+
+const sendNotification = (trustedContacts, contactName, walletName) => {
+  const receivers = [];
+  const recipient = trustedContacts.tc.trustedContacts[contactName];
+  if (recipient.walletID && recipient.FCMs.length)
+    receivers.push({
+      walletId: recipient.walletID,
+      FCMs: recipient.FCMs,
+    });
+
+  const notification: INotification = {
+    notificationType: notificationType.contact,
+    title: 'Friends and Family notification',
+    body: `Trusted Contact request accepted by ${walletName}`,
+    data: {},
+    tag: notificationTag.IMP,
+  };
+  if (receivers.length)
+    RelayServices.sendNotifications(receivers, notification).then(console.log);
+};
 
 function* initializedTrustedContactWorker({ payload }) {
   const service: TrustedContactsService = yield select(
@@ -177,9 +201,15 @@ function* updateEphemeralChannelWorker({ payload }) {
           data,
           true,
         );
-        if (updateRes.status === 200)
+        if (updateRes.status === 200) {
           console.log('Xpub updated to TC for: ', contactName);
-        else console.log('Xpub updation to TC failed for: ', contactName);
+
+          // send acceptance notification
+          const { walletName } = yield select(
+            (state) => state.storage.database.WALLET_SETUP,
+          );
+          sendNotification(trustedContacts, contactName, walletName);
+        } else console.log('Xpub updation to TC failed for: ', contactName);
       } else {
         console.log('Derivative xpub generation failed for: ', contactName);
       }
