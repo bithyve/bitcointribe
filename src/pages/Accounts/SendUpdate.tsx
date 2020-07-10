@@ -262,9 +262,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { service } = this.props;
     const { recipientAddress, serviceType } = this.state;
     const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-    console.log("instance setRecipientAddress", instance);
+   // console.log("instance setRecipientAddress", instance);
     let isAddressValid = instance.isValidAddress(recipientAddress);
-    console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
+    //console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
     if (isAddressValid) {
       let item = {
         id: recipientAddress, // address serves as the id during manual addition
@@ -278,7 +278,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const {serviceType,
       sweepSecure,
       spendableBalance,} = this.state;
-    console.log('barcodes', barcodes);
+    //console.log('barcodes', barcodes);
     if (barcodes.data) {
       const { type } = service[serviceType].service.addressDiff(barcodes.data);
       if (type) {
@@ -330,9 +330,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const {serviceType, averageTxFees, sweepSecure, spendableBalance,} = this.state;
 
     let isNavigate = true;
-    console.log({ details: transfer[serviceType].transfer.details });
+   // console.log({ details: transfer[serviceType].transfer.details });
     if (transfer[serviceType].transfer.details && transfer[serviceType].transfer.details.length === 0) {
-      console.log('dispatching');
+    //  console.log('dispatching');
       this.props.addTransferDetails(serviceType, {
           selectedContact: item,
         });
@@ -395,7 +395,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       } // maintaining a half an hour difference b/w fetches
     }
     const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-    console.log("instance storeAverageTxFees", instance, service[serviceType].service.hdWallet);
+   // console.log("instance storeAverageTxFees", instance, service[serviceType].service.hdWallet);
 
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees : averageTxFees});

@@ -21,7 +21,7 @@ import {
   } from '../../common/constants/serviceTypes';
   
 const AccountsListSend = ({ balances, accounts, onSelectContact, checkedItem }) => {
-    console.log("Items,", accounts);
+   // console.log("Items,", accounts);
   return (
     <TouchableOpacity
           style={{

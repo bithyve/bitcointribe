@@ -158,7 +158,7 @@ export default function Receive(props) {
   useEffect(() => {
     if (!AsTrustedContact) return;
     if (!selectedContact || !selectedContact.firstName) {
-      console.log('Err: Contact missing');
+      //console.log('Err: Contact missing');
       return;
     }
     if (updateEphemeralChannelLoader) {
@@ -175,10 +175,10 @@ export default function Receive(props) {
 
     if (trustedContact) {
       if (!trustedContact.ephemeralChannel) {
-        console.log(
-          'Err: Ephemeral Channel does not exists for contact: ',
-          contactName,
-        );
+        // console.log(
+        //   'Err: Ephemeral Channel does not exists for contact: ',
+        //   contactName,
+        // );
         return;
       }
 
@@ -193,7 +193,7 @@ export default function Receive(props) {
           selectedContact.phoneNumbers.length
         ) {
           const phoneNumber = selectedContact.phoneNumbers[0].number;
-          console.log({ phoneNumber });
+         // console.log({ phoneNumber });
           let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
           number = number.slice(number.length - 10); // last 10 digits only
           const numHintType = 'num';
@@ -211,7 +211,7 @@ export default function Receive(props) {
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
-          console.log({ numberDL });
+         // console.log({ numberDL });
           setReceiveLink(numberDL);
         } else if (selectedContact.emails && selectedContact.emails.length) {
           const email = selectedContact.emails[0].email;
@@ -232,7 +232,7 @@ export default function Receive(props) {
             `/${trustedContact.ephemeralChannel.initiatedAt}` +
             `/v${appVersion}`;
 
-          console.log({ emailDL });
+          //console.log({ emailDL });
           setReceiveLink(emailDL);
         } else {
           Alert.alert(
@@ -332,7 +332,7 @@ export default function Receive(props) {
           contactName,
         );
         if (res.status !== 200) {
-          console.log('Err occurred while generating derivative account');
+         // console.log('Err occurred while generating derivative account');
         } else {
           // refresh the account number
           accountNumber =

@@ -1186,7 +1186,7 @@ export default function Accounts(props) {
                 sliderWidth={sliderWidth}
                 itemWidth={sliderWidth * 0.95}
                 onSnapToItem={(index) => {
-                  console.log('onSnapToItem', index, carouselInitIndex);
+                  //console.log('onSnapToItem', index, carouselInitIndex);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1

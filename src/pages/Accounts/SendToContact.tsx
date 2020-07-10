@@ -270,7 +270,7 @@ export default function SendToContact(props) {
       }
     } else {
       setIsConfirmDisabled(true);
-      console.log({ transfer });
+      //console.log({ transfer });
       if (!transfer.details.length) {
         props.navigation.goBack();
       }
@@ -1006,7 +1006,7 @@ export default function SendToContact(props) {
         {transfer.details && transfer.details.length > 0 ? (
           <ScrollView horizontal={true}>
             {transfer.details.map((item) => {
-              console.log('ITEM in list', item);
+              //console.log('ITEM in list', item);
               return (
                 <View
                   style={{

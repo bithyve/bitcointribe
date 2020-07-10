@@ -787,7 +787,7 @@ class SendToContact extends Component<
           transfer[serviceType].transfer.details.length > 0 ? (
             <ScrollView horizontal={true}>
               {transfer[serviceType].transfer.details.map((item) => {
-                console.log('ITEM in list', item);
+                //console.log('ITEM in list', item);
                 return (
                   <View
                     style={{

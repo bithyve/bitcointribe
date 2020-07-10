@@ -83,7 +83,7 @@ export const isCompatible = async (method: string, version: string) => {
     // checking compatibility via Relay
     const res = await RelayServices.checkCompatibility(method, version);
     if (res.status !== 200) {
-      console.log('Failed to check compatibility');
+     // console.log('Failed to check compatibility');
       return true;
     }
 

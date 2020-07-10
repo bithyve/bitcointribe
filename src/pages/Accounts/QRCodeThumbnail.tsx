@@ -13,7 +13,7 @@ import { RNCamera } from 'react-native-camera';
 
 function QRCodeThumbnail(props) {
   const [openCameraFlag, setOpenCameraFlag] = useState(false);
-  console.log('QRCodeThumbnail', props.isOpenCameraFlag);
+  //console.log('QRCodeThumbnail', props.isOpenCameraFlag);
   const barcodeRecognized = async (barcodes) => {
     if (barcodes.data) {
       setTimeout(() => {

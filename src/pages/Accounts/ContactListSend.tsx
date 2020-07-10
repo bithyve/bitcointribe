@@ -55,7 +55,7 @@ function getImageIcon(item) {
 }
 
 const ContactListSend = ({ transfer, Items, onSelectContact }) => {
-    console.log("Items,", Items);
+    //console.log("Items,", Items);
   return (
     <TouchableOpacity onPress={() => onSelectContact(Items)}>
           <View style={{ justifyContent: 'center', marginRight: hp('4%') }}>
