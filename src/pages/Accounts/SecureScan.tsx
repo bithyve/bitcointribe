@@ -34,7 +34,7 @@ const SecureScan = props => {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector(state => state.sss.errorSending);
-  console.log('isErrorSendingFailed', isErrorSendingFailed);
+ // console.log('isErrorSendingFailed', isErrorSendingFailed);
   const getServiceType = props.navigation.state.params.getServiceType
     ? props.navigation.state.params.getServiceType
     : null;

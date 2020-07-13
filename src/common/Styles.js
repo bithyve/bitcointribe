@@ -55,5 +55,22 @@ export default StyleSheet.create({
         marginRight: 5, 
         marginBottom: wp('1%'), 
         resizeMode: 'contain' 
+    },
+    rootView: { 
+        flex: 1, 
+        backgroundColor: 'white' 
+    },
+    statusBarStyle: {
+        flex: 0,
+    },
+    backIconRootContainer: { 
+        flex: 1, 
+        flexDirection: 'row', 
+        alignItems: 'center' 
+    },
+    backIconTouchContainer: { 
+        height: 30, 
+        width: 30, 
+        justifyContent: 'center' 
     }
 });

@@ -1620,7 +1620,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => {}; 
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -2186,6 +2186,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}
               AtCloseEnd={atCloseEnd}

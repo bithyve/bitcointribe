@@ -63,11 +63,11 @@ const ReceivingAddress = (props) => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem(
       'isReceiveHelperDone',
     );
-    console.log(
-      'isReceiveHelperDone1',
-      isReceiveHelperDone,
-      isReceiveHelperDone1,
-    );
+    // console.log(
+    //   'isReceiveHelperDone1',
+    //   isReceiveHelperDone,
+    //   isReceiveHelperDone1,
+    // );
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
@@ -126,7 +126,7 @@ const ReceivingAddress = (props) => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log('isReceiveHelperDone', isReceiveHelperDone);
+          //console.log('isReceiveHelperDone', isReceiveHelperDone);
           if (isReceiveHelperDone) {
             if (ReceiveHelperBottomSheet.current)
               (ReceiveHelperBottomSheet as any).current.snapTo(1);
