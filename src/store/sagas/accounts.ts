@@ -1,7 +1,7 @@
 import { call, put, select, delay, all } from 'redux-saga/effects';
 import { createWatcher, requestTimedout } from '../utils/utilities';
 import {
-  FETCH_ADDR,
+  // FETCH_ADDR,
   addressFetched,
   FETCH_BALANCE,
   balanceFetched,
@@ -59,36 +59,36 @@ import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
 
-function* fetchAddrWorker({ payload }) {
-  yield put(switchLoader(payload.serviceType, 'receivingAddress'));
-  const service = yield select(
-    (state) => state.accounts[payload.serviceType].service,
-  );
-  const preFetchAddress =
-    payload.serviceType === SECURE_ACCOUNT
-      ? service.secureHDWallet.receivingAddress
-      : service.hdWallet.receivingAddress;
-  const res = yield call(service.getAddress);
-  const postFetchAddress =
-    res.status === 200 ? res.data.address : preFetchAddress;
-  if (
-    res.status === 200 &&
-    JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
-  ) {
-    yield put(addressFetched(payload.serviceType, postFetchAddress));
-    const { SERVICES } = yield select((state) => state.storage.database);
-    const updatedSERVICES = {
-      ...SERVICES,
-      [payload.serviceType]: JSON.stringify(service),
-    };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-  } else {
-    if (res.err === 'ECONNABORTED') requestTimedout();
-    yield put(switchLoader(payload.serviceType, 'receivingAddress'));
-  }
-}
+// function* fetchAddrWorker({ payload }) {
+//   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
+//   const service = yield select(
+//     (state) => state.accounts[payload.serviceType].service,
+//   );
+//   const preFetchAddress =
+//     payload.serviceType === SECURE_ACCOUNT
+//       ? service.secureHDWallet.receivingAddress
+//       : service.hdWallet.receivingAddress;
+//   const res = yield call(service.getAddress);
+//   const postFetchAddress =
+//     res.status === 200 ? res.data.address : preFetchAddress;
+//   if (
+//     res.status === 200 &&
+//     JSON.stringify(preFetchAddress) !== JSON.stringify(postFetchAddress)
+//   ) {
+//     yield put(addressFetched(payload.serviceType, postFetchAddress));
+//     const { SERVICES } = yield select((state) => state.storage.database);
+//     const updatedSERVICES = {
+//       ...SERVICES,
+//       [payload.serviceType]: JSON.stringify(service),
+//     };
+//     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+//   } else {
+//     if (res.err === 'ECONNABORTED') requestTimedout();
+//     yield put(switchLoader(payload.serviceType, 'receivingAddress'));
+//   }
+// }
 
-export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
+// export const fetchAddrWatcher = createWatcher(fetchAddrWorker, FETCH_ADDR);
 
 function* fetchDerivativeAccXpubWorker({ payload }) {
   const { accountType, accountNumber } = payload;
@@ -464,14 +464,9 @@ function* processRecipients(
             : secureAccount.secureHDWallet;
         let { receivingAddress } = subInstance; // available based on serviceType
         if (!receivingAddress) {
-          const res = yield call(instance.getAddress);
-          if (res.status === 200) {
-            receivingAddress = res.data.address;
-          } else {
-            throw new Error(
-              `Failed to generate receiving address for recipient: ${recipient.id}`,
-            );
-          }
+          throw new Error(
+            `Failed to generate receiving address for recipient: ${recipient.id}`,
+          );
         }
         recipient.address = receivingAddress;
         addressedRecipients.push(recipient);
