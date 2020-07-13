@@ -7,9 +7,11 @@ import {
   Alert,
   AsyncStorage,
   Platform,
+  AppState,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Video from 'react-native-video';
+import moment from 'moment';
 import Colors from '../common/Colors';
 
 import { initializeDB } from '../store/actions/storage';
@@ -27,10 +29,39 @@ import { isCompatible } from './Home';
 export default function Launch(props) {
   const dispatch = useDispatch();
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [lastActiveTime, setLastActiveTime] = useState(moment().toString())
+
+
+  let timer = null
 
   useEffect(() => {
     dispatch(initializeDB());
   }, []);
+
+
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
+  }, []);
+
+
+  const handleAppStateChange = async (nextAppState) => {
+    let limit = 15000;
+    if (
+      Platform.OS == 'android'
+        ? nextAppState == 'active'
+        : nextAppState == 'inactive' || nextAppState == 'background'
+    ) {
+      // going to background
+      // start the timer , if comes back in time cancel it
+      timer = setTimeout(() => {
+        props.navigation.navigate('ReLogin');
+      }, limit);
+    } else {
+      if (timer !== null) {
+        clearTimeout(timer)
+      }
+    }
+  };
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -93,7 +124,7 @@ export default function Launch(props) {
                   Alert.alert(
                     'Invalid deeplink',
                     `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                      splits[3]
+                    splits[3]
                     }`,
                   );
                 } else {

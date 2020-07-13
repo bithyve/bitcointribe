@@ -78,7 +78,7 @@ const ReceivingAddress = props => {
       }, 10);
       setTimeout(() => {
         if (ReceiveHelperBottomSheet.current)
-          ReceiveHelperBottomSheet.current.snapTo(1);
+          (ReceiveHelperBottomSheet.current as any).snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -94,7 +94,7 @@ const ReceivingAddress = props => {
         if (!(await AsyncStorage.getItem('savingsWarning'))) {
           // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
           if (SecureReceiveWarningBottomSheet.current)
-            SecureReceiveWarningBottomSheet.current.snapTo(1);
+            (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
           await AsyncStorage.setItem('savingsWarning', 'true');
         }
       }
