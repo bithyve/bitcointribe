@@ -2157,6 +2157,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}
               AtCloseEnd={atCloseEnd}

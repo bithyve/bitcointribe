@@ -34,7 +34,7 @@ export default function QRModal(props) {
       let isCameraOpen;
       AsyncStorage.getItem('isCameraOpen', (err, value) => {
         if (err) {
-          console.log(err);
+          //console.log(err);
         } else {
           isCameraOpen = JSON.parse(value); // boolean false
         }
