@@ -310,7 +310,6 @@ export default function Receive(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
-    console.log({ trustedContactsInfo });
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),

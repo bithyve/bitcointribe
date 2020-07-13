@@ -214,7 +214,7 @@ PODS:
     - React
   - RNSVG (9.13.6):
     - React
-  - RNVectorIcons (6.6.0):
+  - RNVectorIcons (6.7.0):
     - React
   - TcpSockets (3.3.2):
     - React
@@ -513,7 +513,7 @@ SPEC CHECKSUMS:
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
   RNShare: 48cf88cadf9ca2143cdaa557c1ec7f8808040ffc
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
-  RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
+  RNVectorIcons: 368d6d8b8301224e5ffb6254191f4f8876c2be0d
   TcpSockets: 14306fb79f9750ea7d2ddd02d8bed182abb01797
   UMBarCodeScannerInterface: d5a6fdc98ed6241225b0a8432a7f4e2b397668bc
   UMCameraInterface: 68870a3197fee85bd5afca5609ba4a5b7257d19d
@@ -531,4 +531,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: ee84328f93944edd163ed35f7bf5ce0383faa559
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.8.4
