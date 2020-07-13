@@ -215,11 +215,6 @@ export default function SendToContact(props) {
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
           if (derivativeAccount[accountNumber].balances) {
             secureBalance += derivativeAccount[accountNumber].balances.balance;
             // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
@@ -289,10 +284,9 @@ export default function SendToContact(props) {
       }
     } else {
       setIsConfirmDisabled(true);
-      console.log({ transfer });
-      if (!transfer.details.length) {
-        props.navigation.goBack();
-      }
+      // if (!transfer.details.length) {
+      //   props.navigation.goBack();
+      // }
     }
   }, [bitcoinAmount, currencyAmount, transfer, spendableBalance]);
 
@@ -815,14 +809,41 @@ export default function SendToContact(props) {
           AccountSelectionBottomSheet.current.snapTo(0);
         }}
         onPressConfirm={(type) => {
-          AccountSelectionBottomSheet.current.snapTo(0);
+          if (transfer.details && transfer.details.length) {
+            for (let i = 0; i < transfer.details.length; i++) {
+              if (
+                transfer.details[i].selectedContact.id ==
+                selectedContact.id
+              ) {
+                dispatch(
+                  removeTransferDetails(
+                    serviceType,
+                    transfer.details[i],
+                  ),
+                );
+                break;
+              }
+            }
+            dispatch(
+              addTransferDetails(type, {
+                selectedContact,
+                bitcoinAmount,
+                currencyAmount,
+                note,
+              }),
+            );
+          }
           setTimeout(() => {
             setServiceType(type);
           }, 2);
+          AccountSelectionBottomSheet.current.snapTo(0);
         }}
       />
     );
-  }, [spendableBalances]);
+  }, [spendableBalances, transfer, selectedContact,
+    bitcoinAmount,
+    currencyAmount,
+    note,]);
 
   const renderAccountSelectionHeader = useCallback(() => {
     return (
@@ -835,7 +856,7 @@ export default function SendToContact(props) {
   }, []);
 
   const checkRecordsHavingPrice = () => {
-    if (transfer.details && transfer.details.length) {
+   if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
         if (
           !transfer.details[i].selectedContact.hasOwnProperty(
