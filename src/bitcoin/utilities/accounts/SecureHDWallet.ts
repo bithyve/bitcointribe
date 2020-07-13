@@ -636,9 +636,12 @@ export default class SecureHDWallet extends Bitcoin {
 
     // await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
-    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
+    let { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
+    // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
+    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+      nextFreeAddressIndex = 0;
 
     const externalAddresses = [];
     for (let itr = 0; itr < nextFreeAddressIndex + this.gapLimit; itr++) {
@@ -694,6 +697,13 @@ export default class SecureHDWallet extends Bitcoin {
     ].transactions = transactions;
     this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
       res.nextFreeAddressIndex;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].receivingAddress = this.createSecureMultiSig(
+      res.nextFreeAddressIndex,
+      false,
+      this.derivativeAccounts[accountType][accountNumber].xpub,
+    ).address;
 
     return { balances, transactions };
   };
@@ -717,9 +727,13 @@ export default class SecureHDWallet extends Bitcoin {
         accountNumber++
       ) {
         // await this.derivativeAccGapLimitCatchup(dAccountType, accountNumber);
-        const { nextFreeAddressIndex } = this.derivativeAccounts[dAccountType][
+        let { nextFreeAddressIndex } = this.derivativeAccounts[dAccountType][
           accountNumber
         ];
+        // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
+        if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+          nextFreeAddressIndex = 0;
+
         const consumedAddresses = [];
         for (
           let itr = 0;
@@ -843,7 +857,10 @@ export default class SecureHDWallet extends Bitcoin {
                     ? new Date(tx.Status.block_time * 1000).toUTCString()
                     : new Date(Date.now()).toUTCString(),
                   transactionType: tx.transactionType,
-                  amount: tx.amount,
+                  amount:
+                    tx.transactionType === 'Sent'
+                      ? tx.amount + tx.fee
+                      : tx.amount,
                   accountType: tx.accountType,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
@@ -918,6 +935,13 @@ export default class SecureHDWallet extends Bitcoin {
           this.derivativeAccounts[dAccountType][
             accountNumber
           ].nextFreeAddressIndex = lastUsedAddressIndex + 1;
+          this.derivativeAccounts[dAccountType][
+            accountNumber
+          ].receivingAddress = this.createSecureMultiSig(
+            lastUsedAddressIndex + 1,
+            false,
+            this.derivativeAccounts[dAccountType][accountNumber].xpub,
+          ).address;
         }
         //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
@@ -2113,6 +2137,7 @@ export default class SecureHDWallet extends Bitcoin {
         xpub,
         xpriv,
         ypub,
+        nextFreeAddressIndex: 0,
       };
       this.derivativeAccounts[accountType].instance.using++;
 

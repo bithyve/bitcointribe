@@ -439,9 +439,13 @@ export default class HDSegwitWallet extends Bitcoin {
 
     // await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
-    const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
+    let { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
+
+    // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
+    if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+      nextFreeAddressIndex = 0;
 
     const externalAddresses = [];
     for (
@@ -502,6 +506,12 @@ export default class HDSegwitWallet extends Bitcoin {
     ].transactions = transactions;
     this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
       res.nextFreeAddressIndex;
+    this.derivativeAccounts[accountType][
+      accountNumber
+    ].receivingAddress = this.getExternalAddressByIndex(
+      res.nextFreeAddressIndex,
+      this.derivativeAccounts[accountType][accountNumber].xpub,
+    );
 
     return { balances, transactions };
   };
@@ -523,9 +533,14 @@ export default class HDSegwitWallet extends Bitcoin {
         accountNumber++
       ) {
         // await this.derivativeAccGapLimitCatchup(dAccountType, accountNumber);
-        const { nextFreeAddressIndex } = this.derivativeAccounts[dAccountType][
+        let { nextFreeAddressIndex } = this.derivativeAccounts[dAccountType][
           accountNumber
         ];
+
+        // supports upgrading from a previous version containing TC (where nextFreeAddressIndex is undefined)
+        if (nextFreeAddressIndex !== 0 && !nextFreeAddressIndex)
+          nextFreeAddressIndex = 0;
+
         const usedAddresses = [];
         for (
           let itr = 0;
@@ -647,7 +662,10 @@ export default class HDSegwitWallet extends Bitcoin {
                     ? new Date(tx.Status.block_time * 1000).toUTCString()
                     : new Date(Date.now()).toUTCString(),
                   transactionType: tx.transactionType,
-                  amount: tx.amount,
+                  amount:
+                    tx.transactionType === 'Sent'
+                      ? tx.amount + tx.fee
+                      : tx.amount,
                   accountType:
                     tx.accountType === TRUSTED_CONTACTS
                       ? derivativeAccounts[accountNumber].contactName
@@ -730,6 +748,12 @@ export default class HDSegwitWallet extends Bitcoin {
           this.derivativeAccounts[dAccountType][
             accountNumber
           ].nextFreeAddressIndex = lastUsedAddressIndex + 1;
+          this.derivativeAccounts[dAccountType][
+            accountNumber
+          ].receivingAddress = this.getExternalAddressByIndex(
+            lastUsedAddressIndex + 1,
+            this.derivativeAccounts[dAccountType][accountNumber].xpub,
+          );
         }
         //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
@@ -1906,7 +1930,6 @@ export default class HDSegwitWallet extends Bitcoin {
     if (this.derivativeAccounts[accountType][accountNumber]) {
       return this.derivativeAccounts[accountType][accountNumber]['xpub'];
     } else {
-      console.log('creating derivative account: ', accountNumber, contactName);
       const seed = bip39.mnemonicToSeedSync(this.mnemonic, this.passphrase);
       const root = bip32.fromSeed(seed, this.network);
       const path = `m/${this.purpose}'/${
@@ -1919,6 +1942,7 @@ export default class HDSegwitWallet extends Bitcoin {
         xpriv,
         xpub,
         ypub,
+        nextFreeAddressIndex: 0,
       };
       this.derivativeAccounts[accountType].instance.using++;
 
