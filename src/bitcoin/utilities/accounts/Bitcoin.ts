@@ -373,13 +373,7 @@ export default class Bitcoin {
         });
 
         const addressIndex = externalAddresses.indexOf(addressInfo.Address);
-        console.log({
-          externalAddresses,
-          address: addressInfo.Address,
-          txns: addressInfo.TotalTransactions,
-        });
         if (addressIndex > -1) {
-          console.log({ addressIndex });
           lastUsedAddressIndex =
             addressIndex > lastUsedAddressIndex
               ? addressIndex

@@ -773,49 +773,49 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public getReceivingAddress = async (): Promise<{ address: string }> => {
-    try {
-      // // finding free external address
-      // let freeAddress = '';
-      // let itr;
-      // for (itr = 0; itr < this.gapLimit + 1; itr++) {
-      //   if (this.nextFreeAddressIndex + itr < 0) {
-      //     continue;
-      //   }
-      //   console.log({ itr });
-      //   const address = this.getExternalAddressByIndex(
-      //     this.nextFreeAddressIndex + itr,
-      //   );
-      //   this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address;
-      //   const txCounts = await this.getTxCounts([address]); // ensuring availability
-      //   if (txCounts[address] === 0) {
-      //     // free address found
-      //     freeAddress = address;
-      //     this.nextFreeAddressIndex += itr;
-      //     break;
-      //   }
-      // }
+  // public getReceivingAddress = async (): Promise<{ address: string }> => {
+  //   try {
+  //     // // finding free external address
+  //     // let freeAddress = '';
+  //     // let itr;
+  //     // for (itr = 0; itr < this.gapLimit + 1; itr++) {
+  //     //   if (this.nextFreeAddressIndex + itr < 0) {
+  //     //     continue;
+  //     //   }
+  //     //   console.log({ itr });
+  //     //   const address = this.getExternalAddressByIndex(
+  //     //     this.nextFreeAddressIndex + itr,
+  //     //   );
+  //     //   this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address;
+  //     //   const txCounts = await this.getTxCounts([address]); // ensuring availability
+  //     //   if (txCounts[address] === 0) {
+  //     //     // free address found
+  //     //     freeAddress = address;
+  //     //     this.nextFreeAddressIndex += itr;
+  //     //     break;
+  //     //   }
+  //     // }
 
-      // if (!freeAddress) {
-      //   console.log(
-      //     'Failed to find a free address in the external address cycle, using the next address without checking',
-      //   );
-      //   // giving up as we couldn't find a free address in the above cycle
-      //   freeAddress = this.getExternalAddressByIndex(
-      //     this.nextFreeAddressIndex + itr,
-      //   ); // not checking this one, it might be free
-      //   this.nextFreeAddressIndex += itr + 1;
-      // }
-      //   this.receivingAddress = freeAddress;
+  //     // if (!freeAddress) {
+  //     //   console.log(
+  //     //     'Failed to find a free address in the external address cycle, using the next address without checking',
+  //     //   );
+  //     //   // giving up as we couldn't find a free address in the above cycle
+  //     //   freeAddress = this.getExternalAddressByIndex(
+  //     //     this.nextFreeAddressIndex + itr,
+  //     //   ); // not checking this one, it might be free
+  //     //   this.nextFreeAddressIndex += itr + 1;
+  //     // }
+  //     //   this.receivingAddress = freeAddress;
 
-      this.receivingAddress = this.getExternalAddressByIndex(
-        this.nextFreeAddressIndex,
-      );
-      return { address: this.receivingAddress };
-    } catch (err) {
-      throw new Error(`Unable to generate receiving address: ${err.message}`);
-    }
-  };
+  //     this.receivingAddress = this.getExternalAddressByIndex(
+  //       this.nextFreeAddressIndex,
+  //     );
+  //     return { address: this.receivingAddress };
+  //   } catch (err) {
+  //     throw new Error(`Unable to generate receiving address: ${err.message}`);
+  //   }
+  // };
 
   public testnetFaucet = async (): Promise<{
     txid: any;
@@ -1235,6 +1235,9 @@ export default class HDSegwitWallet extends Bitcoin {
       this.isTest ? 'Test Account' : 'Checking Account',
     );
     this.nextFreeAddressIndex = nextFreeAddressIndex;
+    this.receivingAddress = this.getExternalAddressByIndex(
+      this.nextFreeAddressIndex,
+    );
 
     this.setNewTransactions(transactions);
 

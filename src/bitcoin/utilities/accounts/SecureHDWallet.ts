@@ -480,6 +480,9 @@ export default class SecureHDWallet extends Bitcoin {
     );
 
     this.nextFreeAddressIndex = nextFreeAddressIndex;
+    this.receivingAddress = this.createSecureMultiSig(
+      this.nextFreeAddressIndex,
+    ).address;
 
     this.setNewTransactions(transactions);
 
@@ -488,51 +491,51 @@ export default class SecureHDWallet extends Bitcoin {
     return { balances, transactions };
   };
 
-  public getReceivingAddress = async (): Promise<{ address: string }> => {
-    try {
-      //   // looking for free external address
-      //   let freeAddress = '';
-      //   let itr;
-      //   for (itr = 0; itr < this.gapLimit + 1; itr++) {
-      //     if (this.nextFreeAddressIndex + itr < 0) {
-      //       continue;
-      //     }
-      //     const { address } = this.createSecureMultiSig(
-      //       this.nextFreeAddressIndex + itr,
-      //     );
+  // public getReceivingAddress = async (): Promise<{ address: string }> => {
+  //   try {
+  //     //   // looking for free external address
+  //     //   let freeAddress = '';
+  //     //   let itr;
+  //     //   for (itr = 0; itr < this.gapLimit + 1; itr++) {
+  //     //     if (this.nextFreeAddressIndex + itr < 0) {
+  //     //       continue;
+  //     //     }
+  //     //     const { address } = this.createSecureMultiSig(
+  //     //       this.nextFreeAddressIndex + itr,
+  //     //     );
 
-      //     const txCounts = await this.getTxCounts([address]);
-      //     if (txCounts[address] === 0) {
-      //       // free address found
-      //       freeAddress = address;
-      //       this.nextFreeAddressIndex += itr;
-      //       break;
-      //     }
-      //   }
+  //     //     const txCounts = await this.getTxCounts([address]);
+  //     //     if (txCounts[address] === 0) {
+  //     //       // free address found
+  //     //       freeAddress = address;
+  //     //       this.nextFreeAddressIndex += itr;
+  //     //       break;
+  //     //     }
+  //     //   }
 
-      //   if (!freeAddress) {
-      //     // giving up as we could find a free address in the above cycle
+  //     //   if (!freeAddress) {
+  //     //     // giving up as we could find a free address in the above cycle
 
-      //     console.log(
-      //       'Failed to find a free address in the above cycle, using the next address without checking',
-      //     );
-      //     const multiSig = this.createSecureMultiSig(
-      //       this.nextFreeAddressIndex + itr,
-      //     );
-      //     freeAddress = multiSig.address; // not checking this one, it might be free
-      //     this.nextFreeAddressIndex += itr + 1;
-      //   }
+  //     //     console.log(
+  //     //       'Failed to find a free address in the above cycle, using the next address without checking',
+  //     //     );
+  //     //     const multiSig = this.createSecureMultiSig(
+  //     //       this.nextFreeAddressIndex + itr,
+  //     //     );
+  //     //     freeAddress = multiSig.address; // not checking this one, it might be free
+  //     //     this.nextFreeAddressIndex += itr + 1;
+  //     //   }
 
-      //   this.receivingAddress = freeAddress;
+  //     //   this.receivingAddress = freeAddress;
 
-      this.receivingAddress = this.createSecureMultiSig(
-        this.nextFreeAddressIndex,
-      ).address;
-      return { address: this.receivingAddress };
-    } catch (err) {
-      throw new Error(`Unable to generate receiving address: ${err.message}`);
-    }
-  };
+  //     this.receivingAddress = this.createSecureMultiSig(
+  //       this.nextFreeAddressIndex,
+  //     ).address;
+  //     return { address: this.receivingAddress };
+  //   } catch (err) {
+  //     throw new Error(`Unable to generate receiving address: ${err.message}`);
+  //   }
+  // };
 
   public getDerivativeAccReceivingAddress = async (
     accountType: string,
