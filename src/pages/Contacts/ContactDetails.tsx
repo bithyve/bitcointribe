@@ -181,7 +181,9 @@ export default function ContactDetails(props) {
 
   const onPressResendRequest = () => {
     if (index < 3) {
-      (ReshareBottomSheet as any).current.snapTo(1);
+      setTimeout(() => {
+        (ReshareBottomSheet as any).current.snapTo(1);
+      }, 2);
     } else {
       props.navigation.navigate('AddContactSendRequest', {
         SelectedContact: [Contact],
