@@ -105,16 +105,16 @@ export default function PersonalCopyShareModal(props) {
             setIsShared(true);
           }}
         >
-          <Image style={{height: wp('10%'), width: wp('15%')}} source={require('../assets/images/icons/icon_email.png')} />
-          <Text style={{}}>Default App</Text>
+          <Image style={{height: wp('15%'), width: wp('15%')}} source={require('../assets/images/icons/ios_mail.png')} />
+          <Text style={{color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: 5,}}>Mail</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
             onShare(personalCopyShareOptions[0], true);
             setIsShared(true);
           }}
         >
-          <Image style={{height: wp('10%'), width: wp('10%')}} source={require('../assets/images/icons/openlink.png')} />
-          <Text style={{}}>More Options</Text>
+          <Image style={{height: wp('15%'), width: wp('15%'), borderWidth: 1, borderColor: Colors.textColorGrey, borderRadius: 10}} source={require('../assets/images/icons/icon_more.png')} />
+          <Text style={{color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: 5,}}>More Options</Text>
         </TouchableOpacity>
       </View>
     );

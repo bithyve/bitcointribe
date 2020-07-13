@@ -427,7 +427,7 @@ const SecondaryDeviceHistory = (props) => {
         QRModalHeader={'Keeper Reshare'}
         title={'Scan the Exit Key'}
         infoText={
-          "Open your PDF copy which is password protected with your Secret Question's answer"
+          'For re-sharing the Recovery Key for the Keeper Device, you will have to scan the Exit Key from the Personal Copies (pdfs). Please scan it here to proceed'
         }
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
