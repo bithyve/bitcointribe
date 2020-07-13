@@ -379,7 +379,7 @@ export default class SecureHDWallet extends Bitcoin {
     let latestSyncTime = this.lastBalTxSync;
     this.newTransactions = []; // delta transactions
     for (const tx of transactions.transactionDetails) {
-      if (tx.status === 'Confirmed') {
+      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
         if (tx.blockTime > lastSyncTime) {
           this.newTransactions.push(tx);
         }
@@ -675,7 +675,7 @@ export default class SecureHDWallet extends Bitcoin {
       this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
     const newTransactions: Array<TransactionDetails> = []; // delta transactions
     for (const tx of transactions.transactionDetails) {
-      if (tx.status === 'Confirmed') {
+      if (tx.status === 'Confirmed' && tx.transactionType === 'Received') {
         if (tx.blockTime > lastSyncTime) {
           newTransactions.push(tx);
         }
@@ -910,7 +910,10 @@ export default class SecureHDWallet extends Bitcoin {
               .lastBalTxSync || 0;
           const newTransactions: Array<TransactionDetails> = []; // delta transactions
           for (const tx of transactions.transactionDetails) {
-            if (tx.status === 'Confirmed') {
+            if (
+              tx.status === 'Confirmed' &&
+              tx.transactionType === 'Received'
+            ) {
               if (tx.blockTime > lastSyncTime) {
                 newTransactions.push(tx);
               }
