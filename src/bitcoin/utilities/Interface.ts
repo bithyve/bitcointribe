@@ -119,8 +119,8 @@ export interface TrustedContactDerivativeAccountElements {
   xpub: string;
   xpriv: string;
   ypub?: string;
+  nextFreeAddressIndex: number;
   usedAddresses?: string[];
-  nextFreeAddressIndex?: number;
   receivingAddress?: string;
   balances?: {
     balance: number;

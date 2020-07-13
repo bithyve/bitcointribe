@@ -342,7 +342,8 @@ export default class Bitcoin {
                 : new Date(Date.now()).toUTCString(),
               transactionType:
                 tx.transactionType === 'Self' ? 'Sent' : tx.transactionType, // injecting sent(1) tx when tx is from and to self
-              amount: tx.amount,
+              amount:
+                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
               accountType:
                 tx.accountType === TRUSTED_CONTACTS
                   ? contactName
@@ -373,13 +374,7 @@ export default class Bitcoin {
         });
 
         const addressIndex = externalAddresses.indexOf(addressInfo.Address);
-        console.log({
-          externalAddresses,
-          address: addressInfo.Address,
-          txns: addressInfo.TotalTransactions,
-        });
         if (addressIndex > -1) {
-          console.log({ addressIndex });
           lastUsedAddressIndex =
             addressIndex > lastUsedAddressIndex
               ? addressIndex
@@ -517,7 +512,8 @@ export default class Bitcoin {
                 ? new Date(tx.Status.block_time * 1000).toUTCString()
                 : new Date(Date.now()).toUTCString(),
               transactionType: tx.transactionType,
-              amount: tx.amount,
+              amount:
+                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
               accountType: tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
@@ -558,7 +554,10 @@ export default class Bitcoin {
                   fee: tx.fees,
                   date: new Date(tx.confirmed).toUTCString(),
                   transactionType: tx.transactionType,
-                  amount: tx.amount,
+                  amount:
+                    tx.transactionType === 'Sent'
+                      ? tx.amount + tx.fees
+                      : tx.amount,
                   accountType: tx.accountType,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
