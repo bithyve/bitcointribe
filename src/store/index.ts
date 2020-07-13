@@ -1,8 +1,10 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
+import thunk from "redux-thunk";
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { call, all, spawn } from 'redux-saga/effects';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import preferences from './reducers/preferences'
 
 import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
@@ -222,12 +224,13 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
+  preferences
 });
 
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
   rootReducer,
-  composeWithDevTools(applyMiddleware(sagaMiddleware)),
+  composeWithDevTools(applyMiddleware(sagaMiddleware, thunk)),
 );
 sagaMiddleware.run(rootSaga);
 

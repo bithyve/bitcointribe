@@ -50,7 +50,7 @@ class App extends Component {
     return route.routeName;
   }
 
-  componentWillUnmount = async() =>{
+  componentWillUnmount = async () => {
     await AsyncStorage.setItem(
       'isInternetModalCome',
       JSON.stringify(false),
@@ -61,18 +61,18 @@ class App extends Component {
     return (
       <Provider store={store} uriPrefix={prefix}>
         <Navigator
-          onNavigationStateChange={ async(prevState, currentState) => {
+          onNavigationStateChange={async (prevState, currentState) => {
             const currentScreen = this.getActiveRouteName(currentState);
             const prevScreen = this.getActiveRouteName(prevState);
             let isInternetModalCome = JSON.parse(
               await AsyncStorage.getItem('isInternetModalCome'),
-            );  
+            );
             if (
               currentScreen != 'Login' &&
               currentScreen != 'Launch' &&
               currentScreen != 'ReLogin' && !isInternetModalCome
             ) {
-              console.log("global.isInternetModalCome",isInternetModalCome, typeof isInternetModalCome);
+              console.log("global.isInternetModalCome", isInternetModalCome, typeof isInternetModalCome);
               NetInfo.addEventListener((state) => {
                 setTimeout(() => {
                   if (state.isInternetReachable === null) {
@@ -92,7 +92,7 @@ class App extends Component {
           }}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -101,7 +101,7 @@ class App extends Component {
               onPressTryAgain={() => {
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
-              onPressIgnore={async() => {
+              onPressIgnore={async () => {
                 await AsyncStorage.setItem(
                   'isInternetModalCome',
                   JSON.stringify(true),
@@ -112,7 +112,7 @@ class App extends Component {
           )}
           renderHeader={() => (
             <ModalHeader
-            onPressHeader={() => {
+              onPressHeader={() => {
                 (this.NoInternetBottomSheet as any).current.snapTo(0);
               }}
             />

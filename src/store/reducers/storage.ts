@@ -1,3 +1,4 @@
+import { chain } from 'icepick'
 import {
   DB_INITIALIZED,
   DB_FETCHED,
@@ -25,40 +26,24 @@ const initialState: {
 export default (state = initialState, action) => {
   switch (action.type) {
     case DB_INITIALIZED:
-      return {
-        ...state,
-        databaseInitialized: action.payload.initialized,
-      };
+      return chain(state).setIn(["databaseInitialized"], action.payload.initialized).value()
+
 
     case DB_FETCHED:
-      const newState = {
-        ...state,
-        database: action.payload.database,
-        insertedIntoDB: true,
-        dbFetched: true,
-      };
-      return {
-        ...newState,
-      };
+      return chain(state).setIn(['database'], action.payload.database)
+        .setIn(['insertedIntoDB'], true)
+        .setIn(['dbFetched'], true).value()
 
     case DB_INSERTED:
-      const updatedState = {
-        ...state,
-        database: {
-          ...state.database,
-          ...action.payload.updatedEntity,
-        },
-        insertedIntoDB: true,
-      };
-      return {
-        ...updatedState,
-      };
+      return chain(state).setIn(['database'], {
+        ...state.database,
+        ...action.payload.updatedEntity,
+      }).setIn(['insertedIntoDB'], true).value()
 
     case KEY_FETCHED:
-      return {
-        ...state,
-        key: action.payload.key,
-      };
+      return chain(state).setIn(['key'], action.payload.key).value()
+
+
   }
   return state;
 };
