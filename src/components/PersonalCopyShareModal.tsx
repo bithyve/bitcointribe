@@ -59,8 +59,8 @@ export default function PersonalCopyShareModal(props) {
 
   const dispatch = useDispatch();
 
-  const onShare = async (shareOption) => {
-    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy));
+  const onShare = async (shareOption, isEmailOtherOptions) => {
+    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions));
     props.onPressShare();
   };
 
@@ -101,7 +101,7 @@ export default function PersonalCopyShareModal(props) {
     return(
       <View style={{height:hp('20%'), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: Colors.white}}>
         <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
-            onShare(personalCopyShareOptions[0]);
+            onShare(personalCopyShareOptions[0], false);
             setIsShared(true);
           }}
         >
@@ -109,7 +109,7 @@ export default function PersonalCopyShareModal(props) {
           <Text style={{}}>Default App</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
-            onShare(personalCopyShareOptions[2]);
+            onShare(personalCopyShareOptions[0], true);
             setIsShared(true);
           }}
         >
@@ -154,11 +154,11 @@ export default function PersonalCopyShareModal(props) {
             <View>
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
-                  if(item.type === 'Email') {
+                  if(item.type === 'Email' && Platform.OS == 'ios') {
                     (mailOptionsBottomSheet as any).current.snapTo(1);
                   }
                   else {
-                    onShare(item);
+                    onShare(item, false);
                     setIsShared(true)
                   }
                 }}
