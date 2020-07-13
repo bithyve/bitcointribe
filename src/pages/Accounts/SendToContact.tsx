@@ -215,11 +215,6 @@ export default function SendToContact(props) {
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
           if (derivativeAccount[accountNumber].balances) {
             secureBalance += derivativeAccount[accountNumber].balances.balance;
             // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
@@ -235,7 +230,6 @@ export default function SendToContact(props) {
   }, [accounts]);
 
   useEffect(() => {
-    console.log("inseide serviceType", serviceType)
     if (serviceType === TEST_ACCOUNT) {
       setSpendableBalance(spendableBalances.testBalance);
     } else if (serviceType == REGULAR_ACCOUNT) {
@@ -271,7 +265,6 @@ export default function SendToContact(props) {
   }, [accounts.exchangeRates]);
 
   useEffect(() => {
-    console.log("bitcoinAmount && currencyAmount && transfer.details.length",bitcoinAmount, currencyAmount, transfer.details.length)
     if (bitcoinAmount && currencyAmount && transfer.details.length) {
       let amountStacked = 0;
       transfer.details.forEach((recipient) => {
@@ -290,10 +283,7 @@ export default function SendToContact(props) {
         setIsConfirmDisabled(false);
       }
     } else {
-      console.log("inide else transfer.details.length",bitcoinAmount, currencyAmount, transfer.details.length)
-
       setIsConfirmDisabled(true);
-      console.log({ transfer });
       // if (!transfer.details.length) {
       //   props.navigation.goBack();
       // }
@@ -866,8 +856,7 @@ export default function SendToContact(props) {
   }, []);
 
   const checkRecordsHavingPrice = () => {
-    console.log("inside checkRecordsHavingPrice", transfer.details.length)
-    if (transfer.details && transfer.details.length) {
+   if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
         if (
           !transfer.details[i].selectedContact.hasOwnProperty(
