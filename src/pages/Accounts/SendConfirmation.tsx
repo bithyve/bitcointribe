@@ -109,7 +109,7 @@ export default function SendConfirmation(props) {
     if (storedHistory) descriptionHistory = JSON.parse(storedHistory);
     descriptionHistory[txid] = description;
 
-    console.log(descriptionHistory[txid]);
+    //console.log(descriptionHistory[txid]);
     await AsyncStorage.setItem(
       'descriptionHistory',
       JSON.stringify(descriptionHistory),
@@ -155,7 +155,7 @@ export default function SendConfirmation(props) {
   }, []);
 
   useEffect(() => {
-    console.log('transfer', transfer);
+    //console.log('transfer', transfer);
     if (transfer.stage2.failed) {
       setTimeout(() => {
         SendUnSuccessBottomSheet.current.snapTo(1);

@@ -14,7 +14,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 export default function RemoveSelectedTrasaction(props) {
   const [SelectedContactId, setSelectedContactId] = useState(0);
   const contactInfo = props.selectedContact ? props.selectedContact : {};
-  console.log("props.serviceType", props.serviceType);
+  //console.log("props.serviceType", props.serviceType);
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
       <View

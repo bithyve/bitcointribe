@@ -642,7 +642,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
-    this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
       if (appState === nextAppState) return;
@@ -955,35 +954,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-  handleAppStateChange = async (nextAppState) => {
-    let limit = 15;
-    const { isContactOpen, isCameraOpen } = this.state;
-    if (
-      Platform.OS == 'android'
-        ? nextAppState == 'active'
-        : nextAppState == 'inactive' || nextAppState == 'background'
-    ) {
-      this.setState({ lastActiveTime: moment().toISOString() });
-    } else {
-      let { lastActiveTime } = this.state;
-      let diff = moment().diff(moment(lastActiveTime), 'seconds');
-      if (diff >= limit) {
-        this.setState(
-          {
-            lastActiveTime: moment().toISOString(),
-          },
-          () => {
-            this.props.navigation.navigate('ReLogin');
-          },
-        );
-      } else {
-        this.setState({
-          lastActiveTime: moment().toISOString(),
-        });
-        return;
-      }
-    }
-  };
+
 
   handleDeepLink = async (event) => {
     const { navigation, isFocused } = this.props;
@@ -2192,6 +2163,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}
               AtCloseEnd={atCloseEnd}

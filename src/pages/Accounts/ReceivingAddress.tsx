@@ -66,11 +66,11 @@ const ReceivingAddress = props => {
     let isReceiveHelperDone1 = await AsyncStorage.getItem(
       'isReceiveHelperDone',
     );
-    console.log(
-      'isReceiveHelperDone1',
-      isReceiveHelperDone,
-      isReceiveHelperDone1,
-    );
+    // console.log(
+    //   'isReceiveHelperDone1',
+    //   isReceiveHelperDone,
+    //   isReceiveHelperDone1,
+    // );
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
@@ -78,7 +78,7 @@ const ReceivingAddress = props => {
       }, 10);
       setTimeout(() => {
         if (ReceiveHelperBottomSheet.current)
-          ReceiveHelperBottomSheet.current.snapTo(1);
+          (ReceiveHelperBottomSheet.current as any).snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
@@ -94,7 +94,7 @@ const ReceivingAddress = props => {
         if (!(await AsyncStorage.getItem('savingsWarning'))) {
           // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
           if (SecureReceiveWarningBottomSheet.current)
-            SecureReceiveWarningBottomSheet.current.snapTo(1);
+            (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
           await AsyncStorage.setItem('savingsWarning', 'true');
         }
       }
@@ -129,7 +129,7 @@ const ReceivingAddress = props => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          console.log('isReceiveHelperDone', isReceiveHelperDone);
+          //console.log('isReceiveHelperDone', isReceiveHelperDone);
           if (isReceiveHelperDone) {
             if (ReceiveHelperBottomSheet.current)
               (ReceiveHelperBottomSheet as any).current.snapTo(1);
