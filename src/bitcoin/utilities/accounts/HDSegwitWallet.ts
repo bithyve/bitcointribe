@@ -437,19 +437,19 @@ export default class HDSegwitWallet extends Bitcoin {
       this.generateDerivativeXpub(accountType, accountNumber);
     }
 
-    await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
+    // await this.derivativeAccGapLimitCatchup(accountType, accountNumber);
 
     const { nextFreeAddressIndex } = this.derivativeAccounts[accountType][
       accountNumber
     ];
 
-    const usedAddresses = [];
+    const externalAddresses = [];
     for (
       let itr = 0;
       itr < nextFreeAddressIndex + this.derivativeGapLimit;
       itr++
     ) {
-      usedAddresses.push(
+      externalAddresses.push(
         this.getExternalAddressByIndex(
           itr,
           this.derivativeAccounts[accountType][accountNumber].xpub,
@@ -459,19 +459,20 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.derivativeAccounts[accountType][accountNumber][
       'usedAddresses'
-    ] = usedAddresses;
-    console.log({ derivativeAccUsedAddresses: usedAddresses });
+    ] = externalAddresses;
+    console.log({ derivativeAccUsedAddresses: externalAddresses });
 
-    const {
-      balances,
-      transactions,
-    } = await this.fetchBalanceTransactionsByAddresses(
-      usedAddresses,
+    const res = await this.fetchBalanceTransactionsByAddresses(
+      externalAddresses,
+      [],
+      externalAddresses,
+      this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex -
+        1,
       accountType,
-      usedAddresses,
-      null,
       contactName,
     );
+
+    const { balances, transactions } = res;
 
     const lastSyncTime =
       this.derivativeAccounts[accountType][accountNumber].lastBalTxSync || 0;
@@ -499,6 +500,8 @@ export default class HDSegwitWallet extends Bitcoin {
     this.derivativeAccounts[accountType][
       accountNumber
     ].transactions = transactions;
+    this.derivativeAccounts[accountType][accountNumber].nextFreeAddressIndex =
+      res.nextFreeAddressIndex;
 
     return { balances, transactions };
   };
@@ -519,11 +522,7 @@ export default class HDSegwitWallet extends Bitcoin {
         accountNumber <= derivativeAccounts.instance.using;
         accountNumber++
       ) {
-        console.log(
-          'synching account: ',
-          this.derivativeAccounts[dAccountType][accountNumber],
-        );
-        await this.derivativeAccGapLimitCatchup(dAccountType, accountNumber);
+        // await this.derivativeAccGapLimitCatchup(dAccountType, accountNumber);
         const { nextFreeAddressIndex } = this.derivativeAccounts[dAccountType][
           accountNumber
         ];
@@ -569,7 +568,15 @@ export default class HDSegwitWallet extends Bitcoin {
         );
       }
 
-      const { Utxos, Txs } = res.data;
+      let { Utxos, Txs } = res.data;
+
+      Utxos = Utxos.filter(
+        (addressSpecificUTXOs) => !!addressSpecificUTXOs.length,
+      );
+
+      Txs = Txs.filter(
+        (addressSpecificTxs) => !!addressSpecificTxs.TotalTransactions,
+      );
 
       const addressesInfo = Txs;
       console.log({ addressesInfo });
@@ -609,6 +616,8 @@ export default class HDSegwitWallet extends Bitcoin {
 
           const txMap = new Map();
 
+          let lastUsedAddressIndex =
+            derivativeAccounts[accountNumber].nextFreeAddressIndex - 1;
           for (const addressInfo of addressesInfo) {
             if (!addressInUse.includes(addressInfo.Address)) continue;
             if (addressInfo.TotalTransactions === 0) continue;
@@ -678,6 +687,14 @@ export default class HDSegwitWallet extends Bitcoin {
                 transactions.transactionDetails.push(transaction);
               }
             });
+
+            const addressIndex = addressInUse.indexOf(addressInfo.Address);
+            if (addressIndex > -1) {
+              lastUsedAddressIndex =
+                addressIndex > lastUsedAddressIndex
+                  ? addressIndex
+                  : lastUsedAddressIndex;
+            }
           }
 
           const lastSyncTime =
@@ -710,6 +727,9 @@ export default class HDSegwitWallet extends Bitcoin {
           this.derivativeAccounts[dAccountType][
             accountNumber
           ].transactions = transactions;
+          this.derivativeAccounts[dAccountType][
+            accountNumber
+          ].nextFreeAddressIndex = lastUsedAddressIndex + 1;
         }
         //  Derivative accounts will not have change addresses(will use Regular's change chain)
       }
@@ -755,39 +775,43 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public getReceivingAddress = async (): Promise<{ address: string }> => {
     try {
-      // finding free external address
-      let freeAddress = '';
-      let itr;
-      for (itr = 0; itr < this.gapLimit + 1; itr++) {
-        if (this.nextFreeAddressIndex + itr < 0) {
-          continue;
-        }
-        const address = this.getExternalAddressByIndex(
-          this.nextFreeAddressIndex + itr,
-        );
-        this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address;
-        const txCounts = await this.getTxCounts([address]); // ensuring availability
-        if (txCounts[address] === 0) {
-          // free address found
-          freeAddress = address;
-          this.nextFreeAddressIndex += itr;
-          break;
-        }
-      }
+      // // finding free external address
+      // let freeAddress = '';
+      // let itr;
+      // for (itr = 0; itr < this.gapLimit + 1; itr++) {
+      //   if (this.nextFreeAddressIndex + itr < 0) {
+      //     continue;
+      //   }
+      //   console.log({ itr });
+      //   const address = this.getExternalAddressByIndex(
+      //     this.nextFreeAddressIndex + itr,
+      //   );
+      //   this.externalAddressesCache[this.nextFreeAddressIndex + itr] = address;
+      //   const txCounts = await this.getTxCounts([address]); // ensuring availability
+      //   if (txCounts[address] === 0) {
+      //     // free address found
+      //     freeAddress = address;
+      //     this.nextFreeAddressIndex += itr;
+      //     break;
+      //   }
+      // }
 
-      if (!freeAddress) {
-        console.log(
-          'Failed to find a free address in the external address cycle, using the next address without checking',
-        );
-        // giving up as we couldn't find a free address in the above cycle
-        freeAddress = this.getExternalAddressByIndex(
-          this.nextFreeAddressIndex + itr,
-        ); // not checking this one, it might be free
-        this.nextFreeAddressIndex += itr + 1;
-      }
+      // if (!freeAddress) {
+      //   console.log(
+      //     'Failed to find a free address in the external address cycle, using the next address without checking',
+      //   );
+      //   // giving up as we couldn't find a free address in the above cycle
+      //   freeAddress = this.getExternalAddressByIndex(
+      //     this.nextFreeAddressIndex + itr,
+      //   ); // not checking this one, it might be free
+      //   this.nextFreeAddressIndex += itr + 1;
+      // }
+      //   this.receivingAddress = freeAddress;
 
-      this.receivingAddress = freeAddress;
-      return { address: freeAddress };
+      this.receivingAddress = this.getExternalAddressByIndex(
+        this.nextFreeAddressIndex,
+      );
+      return { address: this.receivingAddress };
     } catch (err) {
       throw new Error(`Unable to generate receiving address: ${err.message}`);
     }
@@ -1153,22 +1177,22 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
-    await this.gapLimitCatchUp();
-
-    this.usedAddresses = [];
+    // await this.gapLimitCatchUp();
+    const externalAddresses = [];
     for (let itr = 0; itr < this.nextFreeAddressIndex + this.gapLimit; itr++) {
-      this.usedAddresses.push(this.getExternalAddressByIndex(itr));
+      externalAddresses.push(this.getExternalAddressByIndex(itr));
     }
 
-    const changeAddresses = [];
+    const internalAddresses = [];
     for (
       let itr = 0;
       itr < this.nextFreeChangeAddressIndex + this.gapLimit;
       itr++
     ) {
-      this.usedAddresses.push(this.getInternalAddressByIndex(itr));
-      changeAddresses.push(this.getInternalAddressByIndex(itr));
+      internalAddresses.push(this.getInternalAddressByIndex(itr));
     }
+
+    this.usedAddresses = [...externalAddresses, ...internalAddresses];
 
     const batchedDerivativeAddresses = [];
     if (!this.isTest) {
@@ -1202,12 +1226,15 @@ export default class HDSegwitWallet extends Bitcoin {
     const {
       balances,
       transactions,
+      nextFreeAddressIndex,
     } = await this.fetchBalanceTransactionsByAddresses(
-      this.usedAddresses,
-      this.isTest ? 'Test Account' : 'Checking Account',
+      externalAddresses,
+      internalAddresses,
       ownedAddresses,
-      changeAddresses,
+      this.nextFreeAddressIndex - 1,
+      this.isTest ? 'Test Account' : 'Checking Account',
     );
+    this.nextFreeAddressIndex = nextFreeAddressIndex;
 
     this.setNewTransactions(transactions);
 
