@@ -150,7 +150,9 @@ export default function RecoveryCommunication(props) {
           `/${numHint}` +
           `/v${appVersion}`;
 
-        textWithoutEncoding(selectedContactMode.info, numberDL);
+        const smsInfoText = `Click here to help ${WALLET_SETUP.walletName} restore their Hexa wallet- link will expire in 10 minutes`
+
+        textWithoutEncoding(selectedContactMode.info, smsInfoText + '\n' +numberDL);
         // props.navigation.navigate('ShareRecoveryOTP', {
         //   OTP: REQUEST_DETAILS.OTP,
         // });
@@ -177,12 +179,14 @@ export default function RecoveryCommunication(props) {
           `/${emailHint}` +
           `/v${appVersion}`;
 
+        const emailInfoText = `Click here to help ${WALLET_SETUP.walletName} restore their Hexa wallet- link will expire in 10 minutes`
+
         email(
           [selectedContactMode.info],
           null,
           null,
           'Keeper request',
-          emailDL,
+          emailInfoText + '\n' + emailDL,
         );
         // props.navigation.navigate('ShareRecoveryOTP', {
         //   OTP: REQUEST_DETAILS.OTP,
