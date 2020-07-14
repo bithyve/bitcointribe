@@ -375,7 +375,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           break;
 
         case 'paymentURI':
-          const { address, options } = regularService.decodePaymentURI(qrData);
+          let address, options;
+          try {
+            const res = regularService.decodePaymentURI(qrData);
+            address = res.address;
+            options = res.options;
+          } catch (err) {
+            Alert.alert('Unable to decode payment URI');
+            return;
+          }
+
           item = {
             id: address,
           };
@@ -387,7 +396,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           navigation.navigate('SendToContact', {
             selectedContact: item,
             serviceType,
-            bitcoinAmount: options.amount ? `${options.amount}` : '',
+            bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
           });
           break;
 
@@ -860,11 +871,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       let { address, paymentURI } = paymentDetails;
       let options: any = {};
       if (paymentURI) {
-        const details = accounts[serviceType].service.decodePaymentURI(
-          paymentURI,
-        );
-        address = details.address;
-        options = details.options;
+        try {
+          const details = accounts[serviceType].service.decodePaymentURI(
+            paymentURI,
+          );
+          address = details.address;
+          options = details.options;
+        } catch (err) {
+          Alert.alert('Unable to decode payment URI');
+          return;
+        }
       }
 
       const item = {
@@ -880,7 +896,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
-        bitcoinAmount: options.amount ? `${options.amount}` : '',
+        bitcoinAmount: options.amount
+          ? `${Math.round(options.amount * 1e8)}`
+          : '',
       });
     }
   };
