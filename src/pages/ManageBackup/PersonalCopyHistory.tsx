@@ -114,6 +114,8 @@ const PersonalCopyHistory = (props) => {
 
   const dispatch = useDispatch();
 
+  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(React.createRef());
+
   useEffect(() => {
     if (personalCopiesGenerated === false) {
       Alert.alert(
@@ -454,6 +456,34 @@ const PersonalCopyHistory = (props) => {
   const renderHelpContent = () => {
     return <PersonalCopyHelpContents />;
   };
+
+  const renderMailOptionsHeader = () => {
+    return(
+      <ModalHeader
+        onPressHeader={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (mailOptionsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const renderMailOptionsContent = () => {
+    return(
+      <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity style={{flexDirection: 'column'}} onPress={() => {}}>
+          <Image style={{}} source={require('../../assets/images/icons/icon_email.png')} />
+          <Text style={{}}>Default App</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{flexDirection: 'column'}} onPress={() => {}}>
+          <Image style={{}} source={require('../../assets/images/icons/openlink.png')} />
+          <Text style={{}}>Default App</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>

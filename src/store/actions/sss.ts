@@ -74,10 +74,11 @@ export const generatePersonalCopy = (selectedPersonalCopy) => {
 export const sharePersonalCopy = (
   shareVia: string,
   selectedPersonalCopy: { type: string; title: string },
+  isEmailOtherOptions
 ) => {
   return {
     type: SHARE_PERSONAL_COPY,
-    payload: { shareVia, selectedPersonalCopy },
+    payload: { shareVia, selectedPersonalCopy, isEmailOtherOptions },
   };
 };
 
