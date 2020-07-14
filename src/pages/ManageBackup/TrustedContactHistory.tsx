@@ -1102,7 +1102,11 @@ const TrustedContactHistory = (props) => {
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
-          infoText={`Click here to accept Keeper request for ${WALLET_SETUP.walletName} Hexa wallet- link will expire in 10 minutes`}
+          infoText={`Click here to accept Keeper request for ${
+            WALLET_SETUP.walletName
+          } Hexa wallet- link will expire in ${
+            config.TC_REQUEST_EXPIRY / 60000
+          } minutes`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
@@ -1168,18 +1172,16 @@ const TrustedContactHistory = (props) => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-            if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const renderHelpContent = () => {
-    return(
-      <FriendsAndFamilyHelpContents />
-    );
-  }
+    return <FriendsAndFamilyHelpContents />;
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -1417,7 +1419,7 @@ const TrustedContactHistory = (props) => {
         renderContent={renderSendViaQRContents}
         renderHeader={renderSendViaQRHeader}
       />
-      <BottomSheet 
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[
