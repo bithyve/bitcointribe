@@ -316,10 +316,30 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     };
   }
 
-  onPressNotifications = () => {
+  onPressNotifications = async() => {
+    let notificationList = JSON.parse(await AsyncStorage.getItem('notificationList'));
+    let tmpList = [];
+    if(notificationList){
+      for (let i = 0; i < notificationList.length; i++) {
+        const element = notificationList[i];
+        let obj = {
+          ...element,
+          read: element.isMandatory ? false : true,
+        };
+        tmpList.push(obj);
+      }
+    }
+    await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
+    tmpList.sort(function (left, right) {
+      return moment.utc(right.date).unix() - moment.utc(left.date).unix();
+    });
+    this.setState({
+      notificationData: tmpList,
+      notificationDataChange: !this.state.notificationDataChange,
+    });
     setTimeout(() => {
       this.setState({ notificationLoading: false });
-    }, 2000);
+    }, 500);
     (this.refs.notificationsListBottomSheet as any).snapTo(1);
   };
 
@@ -1379,6 +1399,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationData: asyncNotificationList,
       notificationDataChange: !this.state.notificationDataChange,
     });
+    this.onPressNotifications();
   };
 
   getBalances = () => {
@@ -1904,6 +1925,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationData: tempNotificationData,
       notificationDataChange: !this.state.notificationDataChange,
     });
+
+    if(value.info.includes('Trusted Contact request accepted by')){
+      navigation.navigate("AddressBookContents");
+      return;
+    }
 
     if (value.type == 'release') {
       RelayServices.fetchReleases(value.info.split(' ')[1])
