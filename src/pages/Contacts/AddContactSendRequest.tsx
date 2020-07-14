@@ -254,6 +254,7 @@ export default function AddContactSendRequest(props) {
         subHeaderText={'Send to your contact'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
+        infoText={`Click here to accept contact request from ${WALLET_SETUP.walletName} Hexa wallet - link will expire in 10 minutes`}
         link={trustedLink}
         contactEmail={''}
         onPressBack={() => {
