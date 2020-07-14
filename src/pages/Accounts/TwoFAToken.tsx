@@ -42,6 +42,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 
 export default function TwoFAToken(props) {
+  const [Elevation, setElevation] = useState(10);
   const [token, setToken] = useState('');
   const [tokenArray, setTokenArray] = useState(['']);
   const serviceType = props.navigation.getParam('serviceType');
@@ -140,6 +141,9 @@ export default function TwoFAToken(props) {
 
   useEffect(() => {
     if (!transfer.txid && transfer.stage3.failed) {
+      setTimeout(() => {
+        setElevation(0);
+      }, 4);
       setTimeout(() => {
         SendUnSuccessBottomSheet.current.snapTo(1);
       }, 2);
@@ -388,7 +392,7 @@ export default function TwoFAToken(props) {
               onPress={() => {
                 dispatch(transferST3(serviceType, token));
               }}
-              style={{ ...styles.confirmModalButtonView }}
+              style={{ ...styles.confirmModalButtonView, elevation: Elevation }}
             >
               {loading.transfer ? (
                 <ActivityIndicator size="small" />
@@ -441,6 +445,7 @@ export default function TwoFAToken(props) {
           onCloseStart={() => {
             SendUnSuccessBottomSheet.current.snapTo(0);
           }}
+          onCloseEnd={()=>setElevation(10)}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
           snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -529,7 +534,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
