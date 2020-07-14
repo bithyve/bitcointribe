@@ -30,6 +30,7 @@ export default function SendViaLink(props) {
   const [contactName, setContactName] = useState('');
 
   const [shareLink, setShareLink] = useState('');
+  const [infoText, setInfoText] = useState('');
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxList, setDropdownBoxList] = useState([
     {
@@ -115,7 +116,7 @@ export default function SendViaLink(props) {
   }, [contact]);
 
   function writeToClipboard() {
-    Clipboard.setString(shareLink);
+    Clipboard.setString(infoText + '\n' + shareLink);
     Toast('Copied Successfully');
   }
 
@@ -136,11 +137,13 @@ export default function SendViaLink(props) {
 
   useEffect(() => {
     setShareLink(props.link);
+    if (props.infoText)
+      setInfoText(props.infoText);
   }, [props.link]);
 
   const openWhatsApp = (appUrl) => {
     if (shareLink) {
-      let url = appUrl + 'text=' + shareLink; //+ '&phone=' + mobile;
+      let url = appUrl + 'text=' + infoText + '\n' +  shareLink; //+ '&phone=' + mobile;
       Linking.openURL(url)
         .then((data) => {
           ////console.log('WhatsApp Opened');
@@ -153,7 +156,7 @@ export default function SendViaLink(props) {
 
   const openTelegram = (appUrl) => {
     if (shareLink) {
-      let url = appUrl + shareLink;
+      let url = appUrl + infoText + '\n' +shareLink;
       Linking.openURL(url)
         .then((data) => {
           ////console.log('Telegram Opened');
