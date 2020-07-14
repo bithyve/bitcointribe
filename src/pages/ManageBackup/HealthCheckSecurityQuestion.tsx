@@ -265,7 +265,7 @@ export default function HealthCheckSecurityQuestion(props) {
               style={styles.questionConfirmButton}
             >
               <Text style={styles.proceedButtonText}>
-                {errorText || !answer ? 'Try Again' : 'Confirm'}
+                {!errorText ? 'Confirm' : 'Try Again'}
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>

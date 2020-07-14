@@ -22,10 +22,13 @@ import { useDispatch } from 'react-redux';
 import BottomInfoBox from './BottomInfoBox';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { sharePersonalCopy } from '../store/actions/sss';
+import BottomSheet from 'reanimated-bottom-sheet';
+import ModalHeader from './ModalHeader';
 
 export default function PersonalCopyShareModal(props) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
   const [isShared, setIsShared] = useState(false)
+  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(React.createRef());
   const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
     {
       id: 1,
@@ -56,8 +59,8 @@ export default function PersonalCopyShareModal(props) {
 
   const dispatch = useDispatch();
 
-  const onShare = async (shareOption) => {
-    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy));
+  const onShare = async (shareOption, isEmailOtherOptions) => {
+    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions));
     props.onPressShare();
   };
 
@@ -83,6 +86,39 @@ export default function PersonalCopyShareModal(props) {
     },
     [props.personalCopyDetails, props.selectedPersonalCopy],
   );
+
+  const renderMailOptionsHeader = () => {
+    return(
+      <ModalHeader
+        onPressHeader={() => {
+          (mailOptionsBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const renderMailOptionsContent = () => {
+    return(
+      <View style={{height:hp('20%'), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: Colors.white}}>
+        <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
+            onShare(personalCopyShareOptions[0], false);
+            setIsShared(true);
+          }}
+        >
+          <Image style={{height: wp('15%'), width: wp('15%')}} source={require('../assets/images/icons/ios_mail.png')} />
+          <Text style={{color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: 5,}}>Mail</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
+            onShare(personalCopyShareOptions[0], true);
+            setIsShared(true);
+          }}
+        >
+          <Image style={{height: wp('15%'), width: wp('15%'), borderWidth: 1, borderColor: Colors.textColorGrey, borderRadius: 10}} source={require('../assets/images/icons/icon_more.png')} />
+          <Text style={{color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: 5,}}>More Options</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.modalContainer]}>
@@ -118,8 +154,13 @@ export default function PersonalCopyShareModal(props) {
             <View>
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
-                  onShare(item);
-                  setIsShared(true)
+                  if(item.type === 'Email' && Platform.OS == 'ios') {
+                    (mailOptionsBottomSheet as any).current.snapTo(1);
+                  }
+                  else {
+                    onShare(item, false);
+                    setIsShared(true)
+                  }
                 }}
                 disabled={disableSharingOption(item)}
                 style={[
@@ -181,6 +222,16 @@ export default function PersonalCopyShareModal(props) {
         infoText={
           'The answer to your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
         }
+      />
+      <BottomSheet
+        enabledInnerScrolling={false}
+        ref={mailOptionsBottomSheet as any}
+        snapPoints={[
+          -50,
+          hp('20%')
+        ]}
+        renderHeader={renderMailOptionsHeader}
+        renderContent={renderMailOptionsContent}
       />
     </View>
   );
