@@ -13,7 +13,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import DeviceInfo from 'react-native-device-info';
 
 export default function NotificationListContent(props) {
-
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>

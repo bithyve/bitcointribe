@@ -1908,6 +1908,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: !this.state.notificationDataChange,
     });
 
+    if(value.info.includes('Trusted Contact request accepted by')){
+      navigation.navigate("AddressBookContents");
+      return;
+    }
+
     if (value.type == 'release') {
       RelayServices.fetchReleases(value.info.split(' ')[1])
         .then(async (res) => {
