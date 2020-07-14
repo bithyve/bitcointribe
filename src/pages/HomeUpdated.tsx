@@ -339,7 +339,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     });
     setTimeout(() => {
       this.setState({ notificationLoading: false });
-    }, 2000);
+    }, 500);
     (this.refs.notificationsListBottomSheet as any).snapTo(1);
   };
 
@@ -1381,6 +1381,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationData: asyncNotificationList,
       notificationDataChange: !this.state.notificationDataChange,
     });
+    this.onPressNotifications();
   };
 
   getBalances = () => {
