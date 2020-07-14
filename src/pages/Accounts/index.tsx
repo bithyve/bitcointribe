@@ -611,28 +611,6 @@ export default function Accounts(props) {
                 : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.cardAmountText, fontSize: RFValue(13) }}>
-              Spendable:{' '}
-              {item.accountType == 'Test Account'
-                ? UsNumberFormat(spendableBalance)
-                : switchOn
-                ? UsNumberFormat(spendableBalance)
-                : exchangeRates
-                ? (
-                    (spendableBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : null}
-            </Text>
-            <Text style={styles.cardAmountUnitText}>
-              {item.accountType == 'Test Account'
-                ? 't-sats'
-                : switchOn
-                ? 'sats'
-                : CurrencyCode.toLocaleLowerCase()}
-            </Text>
-          </View>
         </View>
       </ImageBackground>
     );
@@ -1537,6 +1515,29 @@ export default function Accounts(props) {
               }}
             >
               <View>
+              <View style={{ flexDirection: 'row', marginLeft: 30,
+                    marginRight: 20, }}>
+                <Text style={{ ...styles.cardAmountText, color: Colors.textColorGrey, fontSize: RFValue(13) }}>
+                  Available to spend:{' '}
+                  {serviceType == TEST_ACCOUNT
+                    ? UsNumberFormat(spendableBalance)
+                    : switchOn
+                    ? UsNumberFormat(spendableBalance)
+                    : exchangeRates
+                    ? (
+                        (spendableBalance / 1e8) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : null}
+                </Text>
+                <Text style={{...styles.cardAmountUnitText, color: Colors.textColorGrey}}>
+                  {serviceType == TEST_ACCOUNT
+                    ? 't-sats'
+                    : switchOn
+                    ? 'sats'
+                    : CurrencyCode.toLocaleLowerCase()}
+                </Text>
+              </View>
                 <View
                   style={{
                     backgroundColor: Colors.backgroundColor,
