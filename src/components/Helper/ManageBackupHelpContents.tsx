@@ -29,28 +29,6 @@ export default function ManageBackupHelpContents(props) {
         decelerationRate='fast'
     >
         <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text
-                    style={{
-                        color: Colors.white,
-                        fontFamily: Fonts.FiraSansMedium,
-                        fontSize: RFValue(20),
-                        marginTop: hp('1%'),
-                        marginBottom: hp('1%'),
-                    }}
-                >
-                    Health of the App
-                </Text>
-            </View>
-            <View
-                style={{
-                backgroundColor: Colors.homepageButtonColor,
-                height: 1,
-                marginLeft: wp('5%'),
-                marginRight: wp('5%'),
-                marginBottom: hp('1%'),
-                }}
-            />
             <Text
             style={{
                 textAlign: 'center',
