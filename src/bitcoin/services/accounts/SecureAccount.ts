@@ -390,31 +390,31 @@ export default class SecureAccount {
     };
   } => this.secureHDWallet.decodePaymentURI(paymentURI);
 
-  public getAddress = async (): Promise<
-    | {
-        status: number;
-        data: {
-          address: string;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.getReceivingAddress(),
-      };
-    } catch (err) {
-      return { status: 0o1, err: err.message, message: ErrMap[0o1] };
-    }
-  };
+  // public getAddress = async (): Promise<
+  //   | {
+  //       status: number;
+  //       data: {
+  //         address: string;
+  //       };
+  //       err?: undefined;
+  //       message?: undefined;
+  //     }
+  //   | {
+  //       status: number;
+  //       err: string;
+  //       message: string;
+  //       data?: undefined;
+  //     }
+  // > => {
+  //   try {
+  //     return {
+  //       status: config.STATUS.SUCCESS,
+  //       data: await this.secureHDWallet.getReceivingAddress(),
+  //     };
+  //   } catch (err) {
+  //     return { status: 0o1, err: err.message, message: ErrMap[0o1] };
+  //   }
+  // };
 
   public isValidAddress = (recipientAddress: string): Boolean =>
     this.secureHDWallet.isValidAddress(recipientAddress);

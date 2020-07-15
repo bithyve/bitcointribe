@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-export const FETCH_ADDR = 'FETCH_ADDR';
+// export const FETCH_ADDR = 'FETCH_ADDR';
 export const FETCH_BALANCE = 'FETCH_BALANCE';
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
@@ -25,9 +25,9 @@ export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 
-export const fetchAddress = (serviceType) => {
-  return { type: FETCH_ADDR, payload: { serviceType } };
-};
+// export const fetchAddress = (serviceType) => {
+//   return { type: FETCH_ADDR, payload: { serviceType } };
+// };
 
 export const fetchBalance = (
   serviceType,

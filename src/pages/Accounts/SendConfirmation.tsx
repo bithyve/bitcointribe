@@ -12,7 +12,9 @@ import {
   ActivityIndicator,
   AsyncStorage,
   Alert,
+  Platform,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -50,6 +52,8 @@ import {
   notificationType,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -80,6 +84,7 @@ export default function SendConfirmation(props) {
     React.createRef<BottomSheet>(),
   );
   const [SelectedContactId, setSelectedContactId] = useState(0);
+  const [KnowMoreBottomSheet, setKnowMoreBottomSheet] = useState(React.createRef<BottomSheet>())
   // const [amount, setAmount] = useState('');
 
   // useEffect(() => {
@@ -470,6 +475,36 @@ export default function SendConfirmation(props) {
     );
   };
 
+  const renderKnowMoreContents = () => {
+    return(
+      <TestAccountHelperModalContents
+        topButtonText={'Note'}
+        // image={require('../../assets/images/icons/regular.png')}
+        boldPara={''}
+        helperInfo={
+          'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
+        }
+        // continueButtonText={'Ok, got it'}
+        // onPressContinue={() => {
+        //   if (KnowMoreBottomSheet.current)
+        //     (KnowMoreBottomSheet as any).current.snapTo(0);
+        // }}
+      />
+    );
+  }
+
+  const renderKnowMoreHeader = useCallback(() => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          KnowMoreBottomSheet.current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
   return (
     <View
       style={{
@@ -484,6 +519,7 @@ export default function SendConfirmation(props) {
       <View style={styles.modalHeaderTitleView}>
         <View
           style={{
+            flex: 1,
             flexDirection: 'row',
             alignItems: 'center',
           }}
@@ -529,6 +565,17 @@ export default function SendConfirmation(props) {
                 : 'Savings Account'}
             </Text>
           </View>
+          <TouchableOpacity onPress={() => {KnowMoreBottomSheet.current.snapTo(1)}} style={{marginLeft: 'auto'}}>
+            <Text
+              style={{
+                color: Colors.textColorGrey,
+                fontSize: RFValue(12),
+                // marginLeft: 'auto',
+              }}
+            >
+              Know more
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView>
@@ -777,14 +824,14 @@ export default function SendConfirmation(props) {
             </View>
           </View>
         </View>
-        <View style={{ marginTop: hp('3%') }}>
+        {/* <View style={{ marginTop: hp('3%') }}>
           <BottomInfoBox
             title={'Note'}
             infoText={
               'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
             }
           />
-        </View>
+        </View> */}
 
         <View
           style={{
@@ -847,6 +894,20 @@ export default function SendConfirmation(props) {
         snapPoints={[-50, hp('65%')]}
         renderContent={renderSendUnSuccessContents}
         renderHeader={renderSendUnSuccessHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={false}
+        ref={KnowMoreBottomSheet}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch()
+          ? hp('20%')
+          : Platform.OS == 'android'
+          ? hp('21%')
+          : hp('20%'),
+        ]}
+        renderContent={renderKnowMoreContents}
+        renderHeader={renderKnowMoreHeader}
       />
     </View>
   );

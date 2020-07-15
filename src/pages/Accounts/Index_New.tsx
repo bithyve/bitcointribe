@@ -211,7 +211,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       isHelperDone: true,
       showLoader: true,
       netBalance: 0,
-      spendableBalance: 0,
+      spendableBalance: 0
     };
   }
 
@@ -418,8 +418,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     //   setSellIsActive(false);
     //   props.stop();
     // }
-    // const providedBalance = this.props.navigation.getParam('netBalance');
-    // if(providedBalance) this.setState({ spendableBalance: providedBalance});
+    const providedBalance = this.props.navigation.getParam('spendableBalance');
+    if(providedBalance) this.setState({ spendableBalance: providedBalance});
 
     if (
       !isTestAccountHelperDone &&
