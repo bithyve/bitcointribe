@@ -352,21 +352,28 @@ export default function Send(props) {
   };
   
   useEffect(() => {
-    const { type } = service.addressDiff(recipientAddress);
+    const { type } = service.addressDiff(recipientAddress.trim());
     if (type) {
       let item;
       switch (type) {
         case 'address':
           item = {
-            id: recipientAddress, // address serves as the id during manual addition
+            id: recipientAddress.trim(), // address serves as the id during manual addition
           };
           onSelectContact(item);
           break;
 
         case 'paymentURI':
-          const { address, options } = service.decodePaymentURI(
-            recipientAddress,
-          );
+          let address, options;
+          try {
+            const res = service.decodePaymentURI(recipientAddress.trim());
+            address = res.address;
+            options = res.options;
+          } catch (err) {
+            Alert.alert('Unable to decode payment URI');
+            return;
+          }
+
           item = {
             id: address,
           };
@@ -382,7 +389,9 @@ export default function Send(props) {
             serviceType,
             sweepSecure,
             spendableBalance,
-            bitcoinAmount: options.amount ? `${options.amount}` : '',
+            bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
           });
           break;
       }
@@ -392,7 +401,7 @@ export default function Send(props) {
   const barcodeRecognized = async (barcodes) => {
     console.log('barcodes', barcodes);
     if (barcodes.data) {
-      const { type } = service.addressDiff(barcodes.data);
+      const { type } = service.addressDiff(barcodes.data.trim());
       if (type) {
         let item;
         switch (type) {
@@ -405,9 +414,16 @@ export default function Send(props) {
             break;
 
           case 'paymentURI':
-            const { address, options } = service.decodePaymentURI(
-              barcodes.data,
-            );
+            let address, options;
+            try {
+              const res = service.decodePaymentURI(barcodes.data);
+              address = res.address;
+              options = res.options;
+            } catch (err) {
+              Alert.alert('Unable to decode payment URI');
+              return;
+            }
+
             item = {
               id: address,
             };
@@ -423,7 +439,9 @@ export default function Send(props) {
               serviceType,
               sweepSecure,
               spendableBalance,
-              bitcoinAmount: options.amount ? `${options.amount}` : '',
+              bitcoinAmount: options.amount
+                ? `${Math.round(options.amount * 1e8)}`
+                : '',
             });
             break;
 
