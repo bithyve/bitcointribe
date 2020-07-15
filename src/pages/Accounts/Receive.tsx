@@ -49,7 +49,6 @@ import {
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { fetchAddress } from '../../store/actions/accounts';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import {
   EphemeralData,
@@ -68,7 +67,7 @@ export default function Receive(props) {
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
-  let [isLoading, setIsLoading] = useState(true);
+  // let [isLoading, setIsLoading] = useState(true);
 
   const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
     React.createRef(),
@@ -153,17 +152,17 @@ export default function Receive(props) {
     }
   }, [AsTrustedContact]);
 
-  useEffect(() => {
-    dispatch(fetchAddress(serviceType));
-    if (isLoading) {
-      InteractionManager.runAfterInteractions(() => {
-        setTimeout(() => {
-          setIsLoading(false)
-        }, 2000);
-      })
-      InteractionManager.setDeadline(3)
-    }
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchAddress(serviceType));
+  //   if (isLoading) {
+  //     InteractionManager.runAfterInteractions(() => {
+  //       setTimeout(() => {
+  //         setIsLoading(false);
+  //       }, 2000);
+  //     });
+  //     InteractionManager.setDeadline(3);
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!AsTrustedContact) return;
@@ -346,9 +345,7 @@ export default function Receive(props) {
           contactName,
         );
         if (res.status !== 200) {
-          console.log(
-            'Err occurred while generating derivative account',
-          );
+          console.log('Err occurred while generating derivative account');
         } else {
           // refresh the account number
           accountNumber =
@@ -1034,9 +1031,7 @@ export default function Receive(props) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      {
-        isLoading ? <Loader /> : null
-      }
+      {/* {isLoading ? <Loader /> : null} */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}

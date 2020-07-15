@@ -53,6 +53,7 @@ const SecondaryDeviceHistory = (props) => {
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [blockReshare, setBlockReshare] = useState('');
   const SHARES_TRANSFER_DETAILS = useSelector(
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
@@ -253,6 +254,19 @@ const SecondaryDeviceHistory = (props) => {
     updateEphemeralChannelLoader,
   ]);
 
+  useEffect(() => {
+    (async () => {
+      // blocking keeper reshare till 100% health
+      const blockPCShare = await AsyncStorage.getItem('blockPCShare');
+      if (blockPCShare) {
+        setBlockReshare(blockPCShare);
+      } else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
+        AsyncStorage.setItem('blockPCShare', 'true');
+        setBlockReshare(blockPCShare);
+      }
+    })();
+  }, []);
+
   const renderSecondaryDeviceContents = useCallback(() => {
     return (
       <SecondaryDevice
@@ -409,7 +423,7 @@ const SecondaryDeviceHistory = (props) => {
         QRModalHeader={'Keeper Reshare'}
         title={'Scan the Exit Key'}
         infoText={
-          'Open your PDF copy which is password protected with your Secret Question\'s answer'
+          'For re-sharing the Recovery Key for the Keeper Device, you will have to scan the Exit Key from the Personal Copies (pdfs). Please scan it here to proceed'
         }
         onBackPress={() => {
           (QrBottomSheet as any).current.snapTo(0);
@@ -460,6 +474,12 @@ const SecondaryDeviceHistory = (props) => {
             (QrBottomSheet.current as any).snapTo(0);
           }, 2);
         }}
+        onBackPress={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, [QrBottomSheetsFlag]);
@@ -490,10 +510,8 @@ const SecondaryDeviceHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return (
-      <KeeperDeviceHelpContents />
-    );
-  }
+    return <KeeperDeviceHelpContents />;
+  };
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
@@ -606,8 +624,12 @@ const SecondaryDeviceHistory = (props) => {
             // setTimeout(() => {
             //   setQRModalHeader('Reshare Personal Copy');
             // }, 2);
-
-            (QrBottomSheet.current as any).snapTo(1);
+            if (blockReshare) {
+              (QrBottomSheet.current as any).snapTo(1);
+            } else {
+              createGuardian();
+              (secondaryDeviceBottomSheet as any).current.snapTo(1);
+            }
           }}
           onPressConfirm={() => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);

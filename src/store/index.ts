@@ -40,7 +40,7 @@ import {
 } from './sagas/setupAndAuth';
 
 import {
-  fetchAddrWatcher,
+  // fetchAddrWatcher,
   fetchBalanceWatcher,
   fetchTransactionsWatcher,
   transferST1Watcher,
@@ -145,7 +145,7 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchAddrWatcher,
+    // fetchAddrWatcher,
     fetchBalanceWatcher,
     fetchTransactionsWatcher,
     fetchBalanceTxWatcher,

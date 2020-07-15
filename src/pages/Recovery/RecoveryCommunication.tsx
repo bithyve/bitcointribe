@@ -89,7 +89,8 @@ export default function RecoveryCommunication(props) {
       if (number || email) {
         return {
           id: index,
-          info: number ? 'Send SMS (' + number + ')' : 'Send email (' + email + ')',
+          info: number ? number : email,
+          infoText: number ? 'Send SMS (' + number + ')' : 'Send email (' + email + ')',
           isSelected: false,
           type: number ? 'number' : 'email',
         };
@@ -97,6 +98,7 @@ export default function RecoveryCommunication(props) {
     });
     contactInfoTemp.push({
       id: contactInfoTemp.length,
+      infoText: 'Show QR code to scan',
       info: 'Show QR code to scan',
       isSelected: false,
       type: 'qrcode',
@@ -104,6 +106,7 @@ export default function RecoveryCommunication(props) {
 
     contactInfoTemp.push({
       id: contactInfoTemp.length,
+      infoText: 'Scan QR from Keeper',
       info: 'Scan QR from Keeper',
       isSelected: false,
       type: 'qrscanner',
@@ -399,7 +402,7 @@ export default function RecoveryCommunication(props) {
                         isChecked={item.isSelected}
                         onpress={() => onContactSelect(index)}
                       />
-                      <Text style={styles.contactInfoText}>{item.info}</Text>
+                      <Text style={styles.contactInfoText}>{item.infoText}</Text>
                     </TouchableOpacity>
                   );
                 })}

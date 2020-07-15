@@ -656,7 +656,7 @@ export const generatePersonalCopyWatcher = createWatcher(
 );
 
 function* sharePersonalCopyWorker({ payload }) {
-  const { shareVia, selectedPersonalCopy } = payload;
+  const { shareVia, selectedPersonalCopy, isEmailOtherOptions } = payload;
 
   try {
     let personalCopyDetails = yield call(
@@ -675,35 +675,59 @@ function* sharePersonalCopyWorker({ payload }) {
 
     switch (shareVia) {
       case 'Email':
-        yield call(
-          Mailer.mail,
-          {
-            subject: selectedPersonalCopy.title,
-            body: `<b>Please find attached the personal copy ${
-              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-            } share pdf, it is password protected by the answer to the security question.</b>`,
-            isHTML: true,
-            attachment: {
-              path:
-                Platform.OS == 'android'
-                  ? 'file://' +
-                    personalCopyDetails[selectedPersonalCopy.type].path
-                  : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
-              type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-              name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+        if (!isEmailOtherOptions) {
+          yield call(
+            Mailer.mail,
+            {
+              subject: selectedPersonalCopy.title,
+              body: `<b>Please find attached the personal copy ${
+                selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+              } share pdf, it is password protected by the answer to the security question.</b>`,
+              isHTML: true,
+              attachment: {
+                path:
+                  Platform.OS == 'android'
+                    ? 'file://' +
+                      personalCopyDetails[selectedPersonalCopy.type].path
+                    : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
+                type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+              },
             },
-          },
-          (err, event) => {
-            console.log({ event, err });
-            // on delayed error (rollback the changes that happened post switch case)
-            setTimeout(() => {
-              AsyncStorage.setItem(
-                'personalCopyDetails',
-                JSON.stringify(personalCopyDetails),
-              );
-            }, 1000);
-          },
-        );
+            (err, event) => {
+              console.log({ event, err });
+              // on delayed error (rollback the changes that happened post switch case)
+              setTimeout(() => {
+                AsyncStorage.setItem(
+                  'personalCopyDetails',
+                  JSON.stringify(personalCopyDetails),
+                );
+              }, 1000);
+            },
+          );
+        }
+        else {
+          let shareOptions = {
+            title: selectedPersonalCopy.title,
+            message: `Please find attached the personal copy ${
+              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+            } share pdf, it is password protected by the answer to the security question.`,
+            url:
+              Platform.OS == 'android'
+                ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+                : personalCopyDetails[selectedPersonalCopy.type].path,
+            type: 'application/pdf',
+            showAppsToView: true,
+            subject: selectedPersonalCopy.title,
+          };
+  
+          try {
+            yield call(Share.open, shareOptions);
+          } catch (err) {
+            console.log({ err });
+            throw new Error(`Share failed: ${err}`);
+          }
+        }
         break;
 
       case 'Print':

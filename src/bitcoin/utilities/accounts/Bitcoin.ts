@@ -259,14 +259,16 @@ export default class Bitcoin {
   };
 
   public fetchBalanceTransactionsByAddresses = async (
-    addresses: string[],
-    accountType: string,
+    externalAddresses: string[],
+    internalAddresses: string[],
     ownedAddresses: string[],
-    changeAddresses: string[],
+    lastUsedAddressIndex: number,
+    accountType: string,
     contactName?: string,
   ): Promise<{
     balances: { balance: number; unconfirmedBalance: number };
     transactions: Transactions;
+    nextFreeAddressIndex: number;
   }> => {
     let res: AxiosResponse;
     try {
@@ -274,14 +276,14 @@ export default class Bitcoin {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.MULTIUTXOTXN,
           {
-            addresses,
+            addresses: [...externalAddresses, ...internalAddresses],
           },
         );
       } else {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.MULTIUTXOTXN,
           {
-            addresses,
+            addresses: [...externalAddresses, ...internalAddresses],
           },
         );
       }
@@ -296,7 +298,10 @@ export default class Bitcoin {
         for (const utxo of addressSpecificUTXOs) {
           const { value, Address, status } = utxo;
           if (status.confirmed) balances.balance += value;
-          else if (changeAddresses && changeAddresses.includes(Address))
+          else if (
+            internalAddresses.length &&
+            internalAddresses.includes(Address)
+          )
             balances.balance += value;
           else balances.unconfirmedBalance += value;
         }
@@ -312,6 +317,7 @@ export default class Bitcoin {
       const addressesInfo = Txs;
       console.log({ addressesInfo });
       const txMap = new Map();
+
       for (const addressInfo of addressesInfo) {
         if (addressInfo.TotalTransactions === 0) {
           continue;
@@ -336,7 +342,8 @@ export default class Bitcoin {
                 : new Date(Date.now()).toUTCString(),
               transactionType:
                 tx.transactionType === 'Self' ? 'Sent' : tx.transactionType, // injecting sent(1) tx when tx is from and to self
-              amount: tx.amount,
+              amount:
+                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
               accountType:
                 tx.accountType === TRUSTED_CONTACTS
                   ? contactName
@@ -365,9 +372,21 @@ export default class Bitcoin {
             // }
           }
         });
+
+        const addressIndex = externalAddresses.indexOf(addressInfo.Address);
+        if (addressIndex > -1) {
+          lastUsedAddressIndex =
+            addressIndex > lastUsedAddressIndex
+              ? addressIndex
+              : lastUsedAddressIndex;
+        }
       }
 
-      return { balances, transactions };
+      return {
+        balances,
+        transactions,
+        nextFreeAddressIndex: lastUsedAddressIndex + 1,
+      };
     } catch (err) {
       console.log(
         `An error occurred while fetching balance-txnn via Esplora: ${err.response.data.err}`,
@@ -493,7 +512,8 @@ export default class Bitcoin {
                 ? new Date(tx.Status.block_time * 1000).toUTCString()
                 : new Date(Date.now()).toUTCString(),
               transactionType: tx.transactionType,
-              amount: tx.amount,
+              amount:
+                tx.transactionType === 'Sent' ? tx.amount + tx.fee : tx.amount,
               accountType: tx.accountType,
               recipientAddresses: tx.recipientAddresses,
               senderAddresses: tx.senderAddresses,
@@ -534,7 +554,10 @@ export default class Bitcoin {
                   fee: tx.fees,
                   date: new Date(tx.confirmed).toUTCString(),
                   transactionType: tx.transactionType,
-                  amount: tx.amount,
+                  amount:
+                    tx.transactionType === 'Sent'
+                      ? tx.amount + tx.fees
+                      : tx.amount,
                   accountType: tx.accountType,
                   recipientAddresses: tx.recipientAddresses,
                   senderAddresses: tx.senderAddresses,
