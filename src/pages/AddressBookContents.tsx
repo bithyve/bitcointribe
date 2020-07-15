@@ -190,18 +190,16 @@ export default function AddressBookContents(props) {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-            if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const renderHelpContent = () => {
-    return(
-      <AddressBookHelpContents />
-    );
-  }
+    return <AddressBookHelpContents />;
+  };
 
   const getImageIcon = (item) => {
     if (item) {
@@ -273,21 +271,16 @@ export default function AddressBookContents(props) {
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.contactName &&
-            contact.contactName.split(' ')[0] &&
-            contact.contactName != 'Secondary Device'
-              ? contact.contactName.split(' ')[0]
-              : contact.contactName && contact.contactName == 'Secondary Device'
-              ? 'Keeper'
-              : ''}{' '}
+            {contact.firstName && contact.firstName != 'Secondary'
+              ? contact.firstName + ' '
+              : contact.firstName && contact.firstName == 'Secondary'
+              ? 'Keeper '
+              : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.contactName &&
-              contact.contactName.split(' ')[1] &&
-              contact.contactName != 'Secondary Device'
-                ? contact.contactName.split(' ')[1]
-                : contact.contactName &&
-                  contact.contactName == 'Secondary Device'
-                ? 'Device'
+              {contact.lastName && contact.lastName != 'Device'
+                ? contact.lastName + ' '
+                : contact.lastName && contact.lastName == 'Device'
+                ? 'Device '
                 : ''}
             </Text>
           </Text>
@@ -446,16 +439,16 @@ export default function AddressBookContents(props) {
             </Text>
           </View>
           <KnowMoreButton
-              onpress={() => {
-                (HelpBottomSheet as any).current.snapTo(1);
-              }}
-              containerStyle={{
-                marginTop: 'auto',
-                marginBottom: 'auto',
-                marginRight: 10,
-              }}
-              textStyle={{}}
-            />
+            onpress={() => {
+              (HelpBottomSheet as any).current.snapTo(1);
+            }}
+            containerStyle={{
+              marginTop: 'auto',
+              marginBottom: 'auto',
+              marginRight: 10,
+            }}
+            textStyle={{}}
+          />
         </View>
         <ScrollView
           refreshControl={
@@ -549,9 +542,7 @@ export default function AddressBookContents(props) {
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>
-                        Add Contact
-                      </Text>
+                      <Text style={styles.contactText}>Add Contact</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -582,7 +573,7 @@ export default function AddressBookContents(props) {
         renderContent={renderAddContactAddressBookContents}
         renderHeader={renderAddContactAddressBookHeader}
       />
-      <BottomSheet 
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[

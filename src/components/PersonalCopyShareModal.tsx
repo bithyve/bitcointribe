@@ -220,7 +220,7 @@ export default function PersonalCopyShareModal(props) {
       <BottomInfoBox
         title={'Security question and answer'}
         infoText={
-          'The answer to your security question is used to password protect personal copies. Please use your answer, in all lowercase, to open these copies'
+          'The answer to your security question is used to password protect personal copies. Please use your answer (case sensitive) to open these copies'
         }
       />
       <BottomSheet
