@@ -1,9 +1,11 @@
 // types and action creators: dispatched by components and sagas
-
 import {
   TrustedDataElements,
   EphemeralData,
 } from '../../bitcoin/utilities/Interface';
+
+import { createAction } from 'redux-actions';
+import { UPDATE_ADDRESS_BOOK_LOCALLY, UPDATE_TRUSTED_CONTACT_INFO } from '../constants'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
@@ -172,3 +174,11 @@ export const switchTCLoading = (beingLoaded) => {
     payload: { beingLoaded },
   };
 };
+
+
+
+const updateAddressBookLocallyRequest = createAction(UPDATE_ADDRESS_BOOK_LOCALLY);
+export const updateAddressBookLocally = (payload) => dispatch => dispatch(updateAddressBookLocallyRequest(payload))
+
+const updateTrustedContactInfoRequest = createAction(UPDATE_TRUSTED_CONTACT_INFO);
+export const updateTrustedContactInfoLocally = (payload) => dispatch => dispatch(updateTrustedContactInfoRequest(payload))

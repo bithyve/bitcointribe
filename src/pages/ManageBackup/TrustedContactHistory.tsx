@@ -51,9 +51,10 @@ import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents';
+import idx from 'idx';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -188,12 +189,8 @@ const TrustedContactHistory = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-
+    let trustedContactsInfo: any = useSelector(state => idx(state, _ => _.trustedContacts.trustedContactInfo))
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setSelectedContacts(selectedContacts);
 
@@ -246,7 +243,7 @@ const TrustedContactHistory = (props) => {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
 
@@ -762,14 +759,14 @@ const TrustedContactHistory = (props) => {
             >
               {chosenContact && chosenContact.name
                 ? nameToInitials(
-                    chosenContact.firstName && chosenContact.lastName
-                      ? chosenContact.firstName + ' ' + chosenContact.lastName
-                      : chosenContact.firstName && !chosenContact.lastName
+                  chosenContact.firstName && chosenContact.lastName
+                    ? chosenContact.firstName + ' ' + chosenContact.lastName
+                    : chosenContact.firstName && !chosenContact.lastName
                       ? chosenContact.firstName
                       : !chosenContact.firstName && chosenContact.lastName
-                      ? chosenContact.lastName
-                      : '',
-                  )
+                        ? chosenContact.lastName
+                        : '',
+                )
                 : ''}
             </Text>
           </View>
@@ -815,7 +812,7 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-    }`
+      }`
       .toLowerCase()
       .trim();
 
@@ -890,13 +887,8 @@ const TrustedContactHistory = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      let trustedContactsInfo: any = await AsyncStorage.getItem(
-        'TrustedContactsInfo',
-      );
-
+      let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
       if (trustedContactsInfo) {
-        trustedContactsInfo = JSON.parse(trustedContactsInfo);
-
         if (trustedContactsInfo[index]) {
           let found = false;
           for (let i = 3; i < trustedContactsInfo.length; i++) {
@@ -930,6 +922,7 @@ const TrustedContactHistory = (props) => {
         trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
       await AsyncStorage.setItem(
         'TrustedContactsInfo',
         JSON.stringify(trustedContactsInfo),
@@ -951,7 +944,7 @@ const TrustedContactHistory = (props) => {
 
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       let data: EphemeralData = {
@@ -965,10 +958,7 @@ const TrustedContactHistory = (props) => {
         setTrustedLink('');
         setTrustedQR('');
         // remove the previous TC
-        let trustedContactsInfo: any = await AsyncStorage.getItem(
-          'TrustedContactsInfo',
-        );
-
+        let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
         let previousGuardianName;
         if (trustedContactsInfo) {
           trustedContactsInfo = JSON.parse(trustedContactsInfo);
@@ -976,7 +966,7 @@ const TrustedContactHistory = (props) => {
           if (previousGuardian) {
             previousGuardianName = `${previousGuardian.firstName} ${
               previousGuardian.lastName ? previousGuardian.lastName : ''
-            }`
+              }`
               .toLowerCase()
               .trim();
           } else {
@@ -993,7 +983,7 @@ const TrustedContactHistory = (props) => {
       } else if (
         !SHARES_TRANSFER_DETAILS[index] ||
         Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         setTrustedLink('');
         setTrustedQR('');
@@ -1006,7 +996,7 @@ const TrustedContactHistory = (props) => {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+        config.TC_REQUEST_EXPIRY
       ) {
         setTrustedLink('');
         setTrustedQR('');
@@ -1030,7 +1020,7 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-      }`
+        }`
         .toLowerCase()
         .trim();
       console.log({ contactName });
@@ -1180,8 +1170,10 @@ const TrustedContactHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <FriendsAndFamilyHelpContents />;
-  };
+    return (
+      <FriendsAndFamilyHelpContents />
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -1219,10 +1211,10 @@ const TrustedContactHistory = (props) => {
                 {chosenContact.firstName && chosenContact.lastName
                   ? chosenContact.firstName + ' ' + chosenContact.lastName
                   : chosenContact.firstName && !chosenContact.lastName
-                  ? chosenContact.firstName
-                  : !chosenContact.firstName && chosenContact.lastName
-                  ? chosenContact.lastName
-                  : 'Friends and Family'}
+                    ? chosenContact.firstName
+                    : !chosenContact.firstName && chosenContact.lastName
+                      ? chosenContact.lastName
+                      : 'Friends and Family'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -1259,8 +1251,8 @@ const TrustedContactHistory = (props) => {
               source={
                 shared || activateReshare
                   ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
+                    props.navigation.state.params.selectedStatus,
+                  )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />

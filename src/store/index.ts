@@ -1,9 +1,11 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
 import { AsyncStorage as storage } from 'react-native'
+import thunk from "redux-thunk";
 import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { call, all, spawn } from 'redux-saga/effects';
 import { composeWithDevTools } from 'redux-devtools-extension';
+
 import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
 import accountsReducer from './reducers/accounts';
@@ -241,7 +243,7 @@ const reducers = persistReducer(config, rootReducer);
 
 const store = createStore(
   reducers,
-  composeWithDevTools(applyMiddleware(sagaMiddleware)),
+  composeWithDevTools(applyMiddleware(sagaMiddleware, thunk)),
 );
 sagaMiddleware.run(rootSaga);
 const persistor = persistStore(store);

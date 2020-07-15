@@ -1,4 +1,4 @@
-import React, {Component } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Image,
@@ -68,7 +68,7 @@ interface SendPropsTypes {
   service: any;
   transfer: any;
   accounts: any;
-
+  trustedContactsInfo: any
 }
 
 interface SendStateTypes {
@@ -89,7 +89,7 @@ interface SendStateTypes {
 }
 
 class Send extends Component<SendPropsTypes, SendStateTypes> {
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -125,7 +125,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           image: require('../../assets/images/icons/icon_secureaccount_white.png'),
         },
       ],
-     getServiceType: this.props.navigation.getParam('getServiceType') ? this.props.navigation.getParam('getServiceType') : null,
+      getServiceType: this.props.navigation.getParam('getServiceType') ? this.props.navigation.getParam('getServiceType') : null,
 
     }
   }
@@ -136,12 +136,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     this.checkNShowHelperModal();
     this.setRecipientAddress();
     if (!this.state.averageTxFees) this.storeAverageTxFees();
-    if(this.props.regularAccount.hdWallet.derivativeAccounts) this.updateAddressBook();
+    if (this.props.regularAccount.hdWallet.derivativeAccounts) this.updateAddressBook();
 
     if (this.state.isLoading) {
       InteractionManager.runAfterInteractions(() => {
         setTimeout(() => {
-          this.setState({isLoading: false});
+          this.setState({ isLoading: false });
         }, 2000);
       });
       InteractionManager.setDeadline(3);
@@ -156,7 +156,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     if (prevProps.service[this.state.serviceType].service !== this.props.service[this.state.serviceType].service) {
       this.storeAverageTxFees();
     }
-    if(prevProps.regularAccount.hdWallet.derivativeAccounts !== this.props.regularAccount.hdWallet.derivativeAccounts){
+    if (prevProps.regularAccount.hdWallet.derivativeAccounts !== this.props.regularAccount.hdWallet.derivativeAccounts) {
       this.updateAddressBook();
     }
 
@@ -165,79 +165,79 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     }
   }
 
-  getBalances = () =>{
+  getBalances = () => {
     const { accounts } = this.props;
     const { serviceType } = this.state;
 
     const testBalance = accounts[TEST_ACCOUNT].service
-    ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
       accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-    : 0;
-  let regularBalance = accounts[REGULAR_ACCOUNT].service
-    ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+      : 0;
+    let regularBalance = accounts[REGULAR_ACCOUNT].service
+      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
       accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-    : 0;
-  let secureBalance = accounts[SECURE_ACCOUNT].service
-    ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+      : 0;
+    let secureBalance = accounts[SECURE_ACCOUNT].service
+      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
       accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
         .unconfirmedBalance
-    : 0;
+      : 0;
 
-  let derivativeBalance = 0;
-  if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-      let derivativeAccount;
+    let derivativeBalance = 0;
+    if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
+      for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+        let derivativeAccount;
 
-      // calculating opposite accounts derivative balance for account tiles
-      if (serviceType !== REGULAR_ACCOUNT) {
-        derivativeAccount =
-          accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        // calculating opposite accounts derivative balance for account tiles
+        if (serviceType !== REGULAR_ACCOUNT) {
+          derivativeAccount =
+            accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
             dAccountType
-          ];
-      } else if (serviceType !== SECURE_ACCOUNT) {
-        derivativeAccount =
-          accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+            ];
+        } else if (serviceType !== SECURE_ACCOUNT) {
+          derivativeAccount =
+            accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
             dAccountType
-          ];
-      }
+            ];
+        }
 
-      if (
-        serviceType !== SECURE_ACCOUNT &&
-        dAccountType === TRUSTED_CONTACTS
-      ) {
-        continue;
-      }
-
-      if (derivativeAccount.instance.using) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
+        if (
+          serviceType !== SECURE_ACCOUNT &&
+          dAccountType === TRUSTED_CONTACTS
         ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
-          if (derivativeAccount[accountNumber].balances) {
-            derivativeBalance +=
-              derivativeAccount[accountNumber].balances.balance +
-              derivativeAccount[accountNumber].balances.unconfirmedBalance;
+          continue;
+        }
+
+        if (derivativeAccount.instance.using) {
+          for (
+            let accountNumber = 1;
+            accountNumber <= derivativeAccount.instance.using;
+            accountNumber++
+          ) {
+            // console.log({
+            //   accountNumber,
+            //   balances: trustedAccounts[accountNumber].balances,
+            //   transactions: trustedAccounts[accountNumber].transactions,
+            // });
+            if (derivativeAccount[accountNumber].balances) {
+              derivativeBalance +=
+                derivativeAccount[accountNumber].balances.balance +
+                derivativeAccount[accountNumber].balances.unconfirmedBalance;
+            }
           }
         }
       }
     }
-  }
 
-  if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
-  else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
-  this.setState({
-    balances: {
-    testBalance,
-    regularBalance,
-    secureBalance,
-  }
-});
+    if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
+    else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
+    this.setState({
+      balances: {
+        testBalance,
+        regularBalance,
+        secureBalance,
+      }
+    });
   }
 
   checkNShowHelperModal = async () => {
@@ -245,15 +245,15 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     if (!isSendHelperDone && this.state.serviceType == TEST_ACCOUNT) {
       await AsyncStorage.setItem('isSendHelperDone', 'true');
       setTimeout(() => {
-        this.setState({ isSendHelperDone : true });
+        this.setState({ isSendHelperDone: true });
       }, 10);
       setTimeout(() => {
         if (this.refs.SendHelperBottomSheet)
-        (this.refs.SendHelperBottomSheet as any).snapTo(1);
+          (this.refs.SendHelperBottomSheet as any).snapTo(1);
       }, 1000);
     } else {
       setTimeout(() => {
-        this.setState({ isSendHelperDone : false });
+        this.setState({ isSendHelperDone: false });
       }, 10);
     }
   };
@@ -262,7 +262,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { service } = this.props;
     const { recipientAddress, serviceType } = this.state;
     const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-   // console.log("instance setRecipientAddress", instance);
+    // console.log("instance setRecipientAddress", instance);
     let isAddressValid = instance.isValidAddress(recipientAddress);
     //console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
     if (isAddressValid) {
@@ -275,9 +275,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   barcodeRecognized = async (barcodes) => {
     const { service } = this.props;
-    const {serviceType,
+    const { serviceType,
       sweepSecure,
-      spendableBalance,} = this.state;
+      spendableBalance, } = this.state;
     //console.log('barcodes', barcodes);
     if (barcodes.data) {
       const { type } = service[serviceType].service.addressDiff(barcodes.data);
@@ -301,8 +301,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             };
 
             this.props.addTransferDetails(serviceType, {
-                selectedContact: item,
-              });
+              selectedContact: item,
+            });
 
             this.props.navigation.navigate('SendToContact', {
               selectedContact: item,
@@ -318,7 +318,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             break;
         }
 
-        this.setState({ openCameraFlag : false });
+        this.setState({ openCameraFlag: false });
       } else {
         this.setState({ isInvalidAddress: true });
       }
@@ -326,17 +326,17 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   onSelectContact = (item, bitcoinAmount?) => {
-    const {transfer} = this.props;
-    const {serviceType, averageTxFees, sweepSecure, spendableBalance,} = this.state;
+    const { transfer } = this.props;
+    const { serviceType, averageTxFees, sweepSecure, spendableBalance, } = this.state;
 
     let isNavigate = true;
-   // console.log({ details: transfer[serviceType].transfer.details });
+    // console.log({ details: transfer[serviceType].transfer.details });
     if (transfer[serviceType].transfer.details && transfer[serviceType].transfer.details.length === 0) {
-    //  console.log('dispatching');
+      //  console.log('dispatching');
       this.props.addTransferDetails(serviceType, {
-          selectedContact: item,
-        });
-        this.setState({recipientAddress: ''})
+        selectedContact: item,
+      });
+      this.setState({ recipientAddress: '' })
       this.props.navigation.navigate('SendToContact', {
         selectedContact: item,
         serviceType,
@@ -354,9 +354,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         });
       if (isNavigate) {
         this.props.addTransferDetails(serviceType, {
-            selectedContact: item,
-          });
-          this.setState({recipientAddress: ''});
+          selectedContact: item,
+        });
+        this.setState({ recipientAddress: '' });
         this.props.navigation.navigate('SendToContact', {
           selectedContact: item,
           serviceType,
@@ -390,15 +390,15 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     if (storedAverageTxFees) {
       const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
       if (Date.now() - lastFetched < 1800000) {
-        this.setState({ averageTxFees : averageTxFees});
+        this.setState({ averageTxFees: averageTxFees });
         return;
       } // maintaining a half an hour difference b/w fetches
     }
     const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-   // console.log("instance storeAverageTxFees", instance, service[serviceType].service.hdWallet);
+    // console.log("instance storeAverageTxFees", instance, service[serviceType].service.hdWallet);
 
     const averageTxFees = await instance.averageTransactionFee();
-    this.setState({ averageTxFees : averageTxFees});
+    this.setState({ averageTxFees: averageTxFees });
     await AsyncStorage.setItem(
       'storedAverageTxFees',
       JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
@@ -406,12 +406,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   updateAddressBook = async () => {
-    const {regularAccount, trustedContactsService}= this.props;
+    const { regularAccount, trustedContactsService } = this.props;
     const { serviceType } = this.state;
-
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
+    let { trustedContactsInfo } = this.props
     if (trustedContactsInfo) {
       trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
@@ -421,7 +418,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
+            }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -436,25 +433,25 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           } = regularAccount.hdWallet;
           const accountNumber =
             trustedContactToDA[contactName.toLowerCase().trim()];
-            if (accountNumber) {
-              const trustedContact: TrustedContactDerivativeAccountElements =
-                derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
-              if (serviceType === TEST_ACCOUNT) {
-                if (
-                  trustedContact.contactDetails &&
-                  trustedContact.contactDetails.tpub
-                ) {
-                  hasXpub = true;
-                }
-              } else {
-                if (
-                  trustedContact.contactDetails &&
-                  trustedContact.contactDetails.xpub
-                ) {
-                  hasXpub = true;
-                }
+          if (accountNumber) {
+            const trustedContact: TrustedContactDerivativeAccountElements =
+              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
+            if (serviceType === TEST_ACCOUNT) {
+              if (
+                trustedContact.contactDetails &&
+                trustedContact.contactDetails.tpub
+              ) {
+                hasXpub = true;
+              }
+            } else {
+              if (
+                trustedContact.contactDetails &&
+                trustedContact.contactDetails.xpub
+              ) {
+                hasXpub = true;
               }
             }
+          }
           const isWard =
             trustedContactsService.tc.trustedContacts[
               contactName.toLowerCase().trim()
@@ -492,7 +489,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           }
           return 0;
         });
-        this.setState({ trustedContacts : sortedTrustedContacts});
+        this.setState({ trustedContacts: sortedTrustedContacts });
       }
     }
   }
@@ -500,19 +497,19 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   render() {
     const {
       trustedContacts,
-  isLoading,
-  openCameraFlag,
-  serviceType,
-  recipientAddress,
-  isSendHelperDone,
-  isInvalidAddress,
-  balances,
-  isEditable,
-  accountData,
-  sweepSecure,
-  spendableBalance,
-  averageTxFees,
-  getServiceType,
+      isLoading,
+      openCameraFlag,
+      serviceType,
+      recipientAddress,
+      isSendHelperDone,
+      isInvalidAddress,
+      balances,
+      isEditable,
+      accountData,
+      sweepSecure,
+      spendableBalance,
+      averageTxFees,
+      getServiceType,
     } = this.state;
     const {
       navigation,
@@ -561,8 +558,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       serviceType == TEST_ACCOUNT
                         ? require('../../assets/images/icons/icon_test.png')
                         : serviceType == REGULAR_ACCOUNT
-                        ? require('../../assets/images/icons/icon_regular.png')
-                        : require('../../assets/images/icons/icon_secureaccount.png')
+                          ? require('../../assets/images/icons/icon_regular.png')
+                          : require('../../assets/images/icons/icon_secureaccount.png')
                     }
                     style={{ width: wp('10%'), height: wp('10%') }}
                   />
@@ -574,8 +571,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? 'Test Account'
                         : serviceType == REGULAR_ACCOUNT
-                        ? 'Checking Account'
-                        : 'Savings Account'}
+                          ? 'Checking Account'
+                          : 'Savings Account'}
                     </Text>
                   </View>
                   {serviceType == TEST_ACCOUNT ? (
@@ -583,7 +580,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       onPress={() => {
                         AsyncStorage.setItem('isSendHelperDone', 'true');
                         if (this.refs.SendHelperBottomSheet)
-                        (this.refs.SendHelperBottomSheet as any).snapTo(1);
+                          (this.refs.SendHelperBottomSheet as any).snapTo(1);
                       }}
                       style={styles.knowmoreText}
                     >
@@ -610,12 +607,12 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         : 'visible-password'
                     }
                     value={recipientAddress}
-                    onChangeText={(text)=>this.setState({recipientAddress: text})}
+                    onChangeText={(text) => this.setState({ recipientAddress: text })}
                     placeholderTextColor={Colors.borderColor}
                     onKeyPress={(e) => {
                       if (e.nativeEvent.key === 'Backspace') {
                         setTimeout(() => {
-                          this.setState({isInvalidAddress: false});
+                          this.setState({ isInvalidAddress: false });
                         }, 10);
                       }
                     }}
@@ -649,58 +646,60 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   </View>
                 ) : null}
                 <View style={{ paddingTop: wp('3%') }}>
-                    <View style={{ flexDirection: 'row' }}>
-                      <Text
-                        style={styles.sendToContactText}
-                      >
-                        Send to Contact
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text
+                      style={styles.sendToContactText}
+                    >
+                      Send to Contact
                       </Text>
-                      <TouchableOpacity
-                        onPress={() => {}}
-                        style={styles.icon}
-                      >
-                        <SimpleLineIcons
-                          name="options-vertical"
-                          color={Colors.blue}
-                          size={RFValue(13)}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    {trustedContacts.length ? (
+                    <TouchableOpacity
+                      onPress={() => { }}
+                      style={styles.icon}
+                    >
+                      <SimpleLineIcons
+                        name="options-vertical"
+                        color={Colors.blue}
+                        size={RFValue(13)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {trustedContacts.length ? (
+                    <View
+                      style={styles.trustedContactView}
+                    >
                       <View
-                        style={styles.trustedContactView}
+                        style={styles.modalHeader}
                       >
-                        <View
-                          style={styles.modalHeader}
+                        <TouchableOpacity
+                          style={{
+                            ...styles.trustedContactForwardIcon,
+                            marginRight: 15,
+                          }}
                         >
-                          <TouchableOpacity
-                            style={{...styles.trustedContactForwardIcon,        
-    marginRight: 15,}}
-                          >
-                            <Ionicons
-                              name={'ios-arrow-back'}
-                              size={RFValue(20)}
-                              color={Colors.borderColor}
-                            />
-                          </TouchableOpacity>
-                          <FlatList
-                            horizontal
-                            nestedScrollEnabled={true}
-                            showsHorizontalScrollIndicator={false}
-                            data={trustedContacts}
-                            renderItem={(Items) => (
-                              <ContactListSend
-                                Items={Items.item}
-                                transfer={transfer[serviceType].transfer}
-                                onSelectContact={this.onSelectContact}
-                              />
-                            )}
-                            extraData={transfer[serviceType].transfer.details}
-                            keyExtractor={(item, index) => index.toString()}
+                          <Ionicons
+                            name={'ios-arrow-back'}
+                            size={RFValue(20)}
+                            color={Colors.borderColor}
                           />
-                        </View>
+                        </TouchableOpacity>
+                        <FlatList
+                          horizontal
+                          nestedScrollEnabled={true}
+                          showsHorizontalScrollIndicator={false}
+                          data={trustedContacts}
+                          renderItem={(Items) => (
+                            <ContactListSend
+                              Items={Items.item}
+                              transfer={transfer[serviceType].transfer}
+                              onSelectContact={this.onSelectContact}
+                            />
+                          )}
+                          extraData={transfer[serviceType].transfer.details}
+                          keyExtractor={(item, index) => index.toString()}
+                        />
                       </View>
-                    ) : (
+                    </View>
+                  ) : (
                       <View
                         style={styles.note}
                       >
@@ -712,7 +711,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         />
                       </View>
                     )}
-                  </View>
+                </View>
                 {serviceType != TEST_ACCOUNT ? (
                   <View style={{ paddingTop: wp('3%') }}>
                     <View style={{ flexDirection: 'row' }}>
@@ -722,7 +721,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                         Send to Account
                       </Text>
                       <TouchableOpacity
-                        onPress={() => {}}
+                        onPress={() => { }}
                         style={styles.icon}
                       >
                         <SimpleLineIcons
@@ -736,7 +735,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       style={styles.iconBackView}
                     >
                       <TouchableOpacity
-                        style={{...styles.trustedContactForwardIcon}}
+                        style={{ ...styles.trustedContactForwardIcon }}
                       >
                         <Ionicons
                           name={'ios-arrow-back'}
@@ -770,7 +769,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                           }
                         }}
                         extraData={{ details: transfer[serviceType].transfer.details, balances }}
-                        //keyExtractor={(item, index) => index.toString()}
+                      //keyExtractor={(item, index) => index.toString()}
                       />
                     </View>
                   </View>
@@ -799,7 +798,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                 if (this.refs.SendHelperBottomSheet)
                   (this.refs.SendHelperBottomSheet as any).snapTo(1);
                 setTimeout(() => {
-                  this.setState({isSendHelperDone: false})
+                  this.setState({ isSendHelperDone: false })
                 }, 10);
               } else {
                 if (this.refs.SendHelperBottomSheet)
@@ -816,12 +815,14 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
 
 const mapStateToProps = (state) => {
+  let trustedContactsInfo = idx(state, _ => _.trustedContacts.trustedContactsInfo)
   return {
-   service: idx(state, (_) => _.accounts),
-   transfer: idx(state, (_) => _.accounts),
-   accounts: state.accounts || [],
-   regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
-   trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+    service: idx(state, (_) => _.accounts),
+    transfer: idx(state, (_) => _.accounts),
+    accounts: state.accounts || [],
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+    trustedContactsInfo
   };
 };
 
@@ -855,36 +856,36 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(12),
   },
-  view1:{
+  view1: {
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: wp('5%'),
   },
-  iconBackView:{
+  iconBackView: {
     flexDirection: 'row',
     borderRadius: 10,
     height: wp('40%'),
     alignItems: 'center',
     backgroundColor: Colors.backgroundColor,
   },
-  sampleText:{
+  sampleText: {
     color: Colors.textColorGrey,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansItalic,
   },
-  sendToContactText:{
+  sendToContactText: {
     color: Colors.blue,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
     marginBottom: wp('3%'),
   },
-  icon:{
+  icon: {
     height: 20,
     width: 20,
     justifyContent: 'center',
     marginLeft: 'auto',
   },
-  trustedContactView:{
+  trustedContactView: {
     flexDirection: 'row',
     borderRadius: 10,
     borderWidth: 1,
@@ -910,7 +911,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     marginLeft: 'auto',
   },
-  note:{
+  note: {
     marginBottom: -25,
     padding: -20,
     marginLeft: -20,

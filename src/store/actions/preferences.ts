@@ -1,3 +1,6 @@
+import { createAction } from 'redux-actions';
+import { UPDATE_APP_PREFERENCE } from '../constants'
+
 export const CURRENCY_CODE = 'CURRENCY_CODE';
 export const CURRENCY_TOGGLE_VALUE = 'CURRENCY_TOGGLE_VALUE';
 
@@ -15,3 +18,7 @@ export const setCurrencyToggleValue = (data) => {
       payload: { currencyToggleValue: data },
     };
   };
+
+
+const updatePereferenceRequest = createAction(UPDATE_APP_PREFERENCE);
+export const updatePreference = (payload) => dispatch => dispatch(updatePereferenceRequest(payload))
