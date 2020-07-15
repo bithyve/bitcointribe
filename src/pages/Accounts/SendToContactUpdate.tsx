@@ -60,6 +60,7 @@ import config from '../../bitcoin/HexaConfig';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
+import {setCurrencyToggleValue} from '../../store/actions/preferences';
 
 const currencyCode = [
   'BRL',
@@ -83,6 +84,9 @@ interface SendToContactPropsTypes {
   removeTransferDetails: any;
   clearTransfer: any;
   addTransferDetails: any;
+  currencyCode: any;
+  currencyToggleValue: any;
+  setCurrencyToggleValue: any;
 }
 
 interface SendToContactStateTypes {
@@ -321,10 +325,12 @@ class SendToContact extends Component<
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyToggleValueTmp = await AsyncStorage.getItem(
-      'currencyToggleValue',
-    );
-    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    let currencyToggleValueTmp = this.props.currencyToggleValue;
+    // await AsyncStorage.getItem(
+    //   'currencyToggleValue',
+    // );
+    let currencyCodeTmp = this.props.currencyCode; 
+    //await AsyncStorage.getItem('currencyCode');
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
@@ -1046,7 +1052,9 @@ class SendToContact extends Component<
                     onpress={async () => {
                       this.setState({ switchOn: !switchOn });
                       let temp = !switchOn ? 'true' : '';
-                      await AsyncStorage.setItem('currencyToggleValue', temp);
+                      this.props.setCurrencyToggleValue(temp);
+
+                      //await AsyncStorage.setItem('currencyToggleValue', temp);
                     }}
                     toggle={switchOn}
                     transform={true}
@@ -1329,6 +1337,9 @@ const mapStateToProps = (state) => {
     transfer: idx(state, (_) => _.accounts),
     loading: idx(state, (_) => _.accounts),
     accounts: state.accounts || [],
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+
   };
 };
 
@@ -1338,6 +1349,7 @@ export default withNavigationFocus(
     removeTransferDetails,
     clearTransfer,
     addTransferDetails,
+    setCurrencyToggleValue
   })(SendToContact),
 );
 

@@ -38,8 +38,15 @@ import {
 import Loader from '../../components/loader';
 import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import {
+  storeFbtcData
+} from '../../store/actions/fbtc';
+
+import {isEmpty} from '../../common/CommonFunctions/index';
 
 const PairNewWallet = (props) => {
+  const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
+  const [FBTCAccount_Data, setFBTCAccount_Data] = useState({});
   const userKey1 = props.navigation.state.params
     ? props.navigation.state.params.userKey
     : '';
@@ -73,10 +80,18 @@ const PairNewWallet = (props) => {
   const [selectedAccount, setSelectedAccount] = useState({});
 
   useEffect(() => {
+    if(FBTCAccountData){
+      //console.log("FBTCAccountData------- in useEffect", FBTCAccountData)
+      setFBTCAccount_Data(FBTCAccountData);
+    }
+  }, [FBTCAccountData]);
+
+  useEffect(() => {
     (async () => {
-      let FBTCAccountData = JSON.parse(
-        await AsyncStorage.getItem('FBTCAccount'),
-      );
+      let FBTCAccountData = FBTCAccount_Data;
+      // JSON.parse(
+      //   await AsyncStorage.getItem('FBTCAccount'),
+      // );
       if (FBTCAccountData && FBTCAccountData.user_key) {
         setIsUserRegistered(true);
       }
@@ -111,8 +126,7 @@ const PairNewWallet = (props) => {
   }, [voucherCode]);
 
   const barcodeRecognized = async (barcodes) => {
-      console.log("barcodes.data", barcodes);
-    if (barcodes.data && barcodes.data.length == 36) {
+      if (barcodes.data && barcodes.data.length == 36) {
       setVoucherCode(barcodes.data);
       }
       setOpenCameraFlag(false);
@@ -123,9 +137,12 @@ const PairNewWallet = (props) => {
   }, [userKey]);
 
   const createFBTCAccount = async () => {
-    let FBTCAccountData = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+    let FBTCAccountData = FBTCAccount_Data; 
+    //console.log('FBTCAccountData', FBTCAccountData);
+
+    //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
     let obj;
-    if (!FBTCAccountData) {
+    if (isEmpty(FBTCAccountData)) {
       obj = {
         user_key: userKey,
         registrationDate: moment(new Date()).valueOf(),
@@ -140,8 +157,11 @@ const PairNewWallet = (props) => {
         },
       };
     } else {
+      //console.log('FBTCAccountData in else', FBTCAccountData);
       obj = FBTCAccountData;
     }
+    //console.log('obj', obj);
+    dispatch(storeFbtcData(obj));
     await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
     if (
       !obj.hasOwnProperty('redeem_vouchers') &&
@@ -161,10 +181,12 @@ const PairNewWallet = (props) => {
 
   useEffect(() => {
     if (accountSyncDetails) {
+      //console.log("FBTCAccount_Data accountSync", FBTCAccount_Data);
       (async () => {
-        let FBTCAccountData = JSON.parse(
-          await AsyncStorage.getItem('FBTCAccount'),
-        );
+        let FBTCAccountData = FBTCAccount_Data;
+        // JSON.parse(
+        //   await AsyncStorage.getItem('FBTCAccount'),
+        // );
         let obj;
         if (FBTCAccountData) {
           obj = {
@@ -173,6 +195,7 @@ const PairNewWallet = (props) => {
             exchange_balances: accountSyncDetails.exchange_balances,
             sell_bitcoins: accountSyncDetails.sell_bitcoins,
           };
+          dispatch(storeFbtcData(obj));
           await AsyncStorage.setItem('FBTCAccount', JSON.stringify(obj));
         }
         if (accountSyncDetails.redeem_vouchers) {
@@ -184,7 +207,7 @@ const PairNewWallet = (props) => {
         }
       })();
     }
-  }, [accountSyncDetails]);
+  }, [accountSyncDetails, FBTCAccount_Data]);
 
   const renderRegistrationSuccessModalContent = useCallback(() => {
     return (
@@ -197,10 +220,11 @@ const PairNewWallet = (props) => {
         }
         proceedButtonText={'Redeem Voucher'}
         onPressProceed={async () => {
-          let FBTCAccountData = JSON.parse(
-            await AsyncStorage.getItem('FBTCAccount'),
-          );
-          if (FBTCAccountData.redeem_vouchers) {
+          let FBTCAccountData = FBTCAccount_Data;
+          // JSON.parse(
+          //   await AsyncStorage.getItem('FBTCAccount'),
+          // );
+          if (FBTCAccountData && FBTCAccountData.redeem_vouchers) {
             (RegistrationSuccessBottomSheet as any).current.snapTo(0);
             props.navigation.replace("VoucherScanner");
           }
@@ -212,7 +236,7 @@ const PairNewWallet = (props) => {
         bottomImage={require('../../assets/images/icons/illustration.png')}
       />
     );
-  }, []);
+  }, [FBTCAccount_Data]);
 
   const renderRegistrationSuccessModalHeader = useCallback(() => {
     return (
