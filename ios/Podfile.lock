@@ -121,7 +121,7 @@ PODS:
     - React
   - react-native-camera/RN (3.28.0):
     - React
-  - react-native-config (1.2.1):
+  - react-native-config (1.3.1):
     - React
   - react-native-contacts (5.0.6):
     - React
@@ -195,7 +195,7 @@ PODS:
     - React/Core
     - React/fishhook
     - React/RCTBlob
-  - RNDeviceInfo (5.6.1):
+  - RNDeviceInfo (5.6.2):
     - React
   - RNFirebase (5.3.1):
     - Firebase/Core
@@ -495,7 +495,7 @@ SPEC CHECKSUMS:
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   React: 36d0768f9e93be2473b37e7fa64f92c1d5341eef
   react-native-camera: 8ab02aac456a7db830980cef5f3772644fe96e1f
-  react-native-config: ae9ef3bdbf539f2d14ebaf4ebeba508f766e066a
+  react-native-config: 54f023214af396f21ff0a9e0fed22620d676c8a1
   react-native-contacts: 9c89131a1f63af0618d54af5ca1cd88b06d41a05
   react-native-in-app-utils: 07ea1df4bb6e8cbb27337d42a65ffe4cf7a35e97
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
@@ -504,7 +504,7 @@ SPEC CHECKSUMS:
   react-native-randombytes: 3638d24759d67c68f6ccba60c52a7a8a8faa6a23
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
   react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
-  RNDeviceInfo: b6e650fbd234732c759544218657d549b4339038
+  RNDeviceInfo: ed8557a8bd6443cbc0ab5d375e6808a38a279744
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796

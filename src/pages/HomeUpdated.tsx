@@ -92,6 +92,7 @@ import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
+import { updatePreference } from '../store/actions/preferences'
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -256,6 +257,7 @@ interface HomePropsTypes {
   clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
+  updatePreference: any
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -652,6 +654,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             this.scheduleNotification();
           }
           if (nextAppState === 'inactive' || nextAppState == 'background') {
+            this.props.updatePreference({
+              key: 'isInternetModalCome',
+              value: false
+            })
             await AsyncStorage.setItem(
               'isInternetModalCome',
               JSON.stringify(false),
@@ -2943,6 +2949,7 @@ export default withNavigationFocus(
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,
+    updatePreference
   })(HomeUpdated),
 );
 

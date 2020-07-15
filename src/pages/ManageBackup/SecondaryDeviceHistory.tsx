@@ -36,7 +36,7 @@ import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
 import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
@@ -149,19 +149,15 @@ const SecondaryDeviceHistory = (props) => {
   };
 
   const updateTrustedContactsInfo = useCallback(async (contact) => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-    console.log({ trustedContactsInfo });
-
+    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       trustedContactsInfo[0] = contact;
     } else {
       trustedContactsInfo = [];
       trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
       trustedContactsInfo[0] = contact;
     }
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
@@ -193,7 +189,7 @@ const SecondaryDeviceHistory = (props) => {
         if (
           !SHARES_TRANSFER_DETAILS[0] ||
           Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT >
-            config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
           dispatch(uploadEncMShare(0, contactName, data));
@@ -204,7 +200,7 @@ const SecondaryDeviceHistory = (props) => {
           trustedContact.ephemeralChannel &&
           trustedContact.ephemeralChannel.initiatedAt &&
           Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-            config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
           dispatch(
@@ -429,6 +425,9 @@ const SecondaryDeviceHistory = (props) => {
         infoText={
           'For re-sharing the Recovery Key for the Keeper Device, you will have to scan the Exit Key from the Personal Copies (pdfs). Please scan it here to proceed'
         }
+        onBackPress={() => {
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
         // }
@@ -603,8 +602,8 @@ const SecondaryDeviceHistory = (props) => {
               source={
                 isReshare
                   ? getIconByStatus(
-                      props.navigation.state.params.selectedStatus,
-                    )
+                    props.navigation.state.params.selectedStatus,
+                  )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
@@ -682,7 +681,7 @@ const SecondaryDeviceHistory = (props) => {
           setQrBottomSheetsFlag(false);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        onCloseStart={() => {}}
+        onCloseStart={() => { }}
         enabledInnerScrolling={true}
         ref={QrBottomSheet as any}
         snapPoints={[

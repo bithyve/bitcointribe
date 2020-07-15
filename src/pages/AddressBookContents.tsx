@@ -24,8 +24,7 @@ import Styles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import { trustedChannelsSync } from '../store/actions/trustedContacts';
+import { trustedChannelsSync, updateAddressBookLocally } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -51,6 +50,9 @@ interface AddressBookContentsPropTypes {
   trustedContactsService: TrustedContactsService,
   trustedChannelsSync: any,
   trustedChannelsSyncing: any,
+  updateAddressBookLocally: any,
+  addressBookData: any,
+  trustedContactsInfo: any
 }
 interface AddressBookContentsStateTypes {
   isLoadContacts: boolean,
@@ -63,7 +65,7 @@ interface AddressBookContentsStateTypes {
   onRefresh: boolean
 }
 
-const getWaterMark = () => {
+const WaterMark = () => {
   return (
     <View style={styles.waterMarkView}>
       <View style={styles.waterMarkInnerView}>
@@ -134,17 +136,18 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
       isLoadContacts: false,
       selectedContact: [],
       loading: true,
-      trustedContact: [],
-      MyKeeper: [],
-      IMKeeper: [],
-      OtherTrustedContact: [],
+      trustedContact: idx(props, _ => _.addressBookData.trustedContact) || [],
+      MyKeeper: idx(props, _ => _.addressBookData.MyKeeper) || [],
+      IMKeeper: idx(props, _ => _.addressBookData.IMKeeper) || [],
+      OtherTrustedContact: idx(props, _ => _.addressBookData.OtherTrustedContact) || [],
     }
   }
+
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener('didFocus', () => {
       this.props.trustedChannelsSync();
-      this.updateAddressBook();
+      this.updateAddressBook()
     });
   }
 
@@ -161,7 +164,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
     }
     if (prevProps.trustedChannelsSyncing !== this.props.trustedChannelsSyncing) {
       this.setState({
-        onRefresh: this.props.trustedChannelsSyncing,
+        loading: this.props.trustedChannelsSyncing
       });
     }
   }
@@ -172,14 +175,11 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
 
   updateAddressBook = async () => {
     const { regularAccount, trustedContactsService } = this.props;
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
+    const { trustedContactsInfo } = this.props
     let myKeepers = [];
     let imKeepers = [];
     let otherTrustedContact = [];
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
         const trustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
@@ -262,7 +262,12 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           IMKeeper: imKeepers,
           OtherTrustedContact: otherTrustedContact,
           trustedContact: trustedContacts,
-        });
+        }, () => this.props.updateAddressBookLocally({
+          MyKeeper: myKeepers,
+          IMKeeper: imKeepers,
+          OtherTrustedContact: otherTrustedContact,
+          trustedContact: trustedContacts,
+        }));
       }
     }
   };
@@ -391,7 +396,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
 
   render() {
     const { navigation, trustedChannelsSync } = this.props;
-    const { loading, MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
+    const { MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
     return (
       <View style={Styles.rootView}>
         <SafeAreaView style={Styles.statusBarStyle} />
@@ -441,90 +446,78 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
               <Text style={styles.pageInfoText}>
                 Contacts who can help me restore my wallet
               </Text>
-              {!loading ? (
-                <View style={{ marginBottom: 15 }}>
-                  <View style={{ height: 'auto' }}>
-                    {MyKeeper.length > 0 ? (
-                      MyKeeper.map((item, index) => {
-                        return this.getElement(item, index, 'My Keepers');
-                      })
-                    ) : (
-                        <View style={{ height: wp('22%') + 30 }} />
-                      )}
-                  </View>
+              <View style={{ marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                  {MyKeeper.length > 0 ? (
+                    MyKeeper.map((item, index) => {
+                      return this.getElement(item, index, 'My Keepers');
+                    })
+                  ) : (
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                 </View>
-              ) : (
-                  getWaterMark()
-                )}
+              </View>
             </View>
             <View style={{ marginTop: wp('5%') }}>
               <Text style={styles.pageTitle}>I am the Keeper of</Text>
               <Text style={styles.pageInfoText}>
                 Contacts who I can help restore their wallets
               </Text>
-
-              {!loading ? (
-                <View style={{ marginBottom: 15 }}>
-                  <View style={{ height: 'auto' }}>
-                    {IMKeeper.length > 0 ? (
-                      IMKeeper.map((item, index) => {
-                        return this.getElement(item, index, "I'm Keeper of");
-                      })
-                    ) : (
-                        <View style={{ height: wp('22%') + 30 }} />
-                      )}
-                  </View>
+              <View style={{ marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                  {IMKeeper.length > 0 ? (
+                    IMKeeper.map((item, index) => {
+                      return this.getElement(item, index, "I'm Keeper of");
+                    })
+                  ) : (
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                 </View>
-              ) : (
-                  getWaterMark()
-                )}
+              </View>
             </View>
             <View style={{ marginTop: wp('5%') }}>
               <Text style={styles.pageTitle}>Other Contacts</Text>
               <Text style={styles.pageInfoText}>
                 Contacts who I can pay directly
               </Text>
-              {!loading ? (
-                <View style={{ marginBottom: 15 }}>
-                  <View style={{ height: 'auto' }}>
-                    {OtherTrustedContact.length > 0 ? (
-                      OtherTrustedContact.map((item, index) => {
-                        return this.getElement(item, index, 'Other Contacts');
-                      })
-                    ) : (
-                        <View style={{ height: wp('22%') + 30 }} />
-                      )}
-                    <TouchableOpacity
-                      onPress={() => {
-                        setTimeout(() => {
-                          this.setState({
-                            isLoadContacts: true
-                          });
-                        }, 2);
-                        this.AddContactAddressBookBottomSheet.current.snapTo(1);
-                      }}
-                      style={{
-                        ...styles.selectedContactsView,
-                        paddingBottom: 7,
-                        paddingTop: 7,
-                        marginTop: 0,
-                      }}
-                    >
-                      <Image
-                        style={styles.addGrayImage}
-                        source={require('../assets/images/icons/icon_add_grey.png')}
-                      />
-                      <View>
-                        <Text style={styles.contactText}>
-                          Add Contact
+
+              <View style={{ marginBottom: 15 }}>
+                <View style={{ height: 'auto' }}>
+                  {OtherTrustedContact.length > 0 ? (
+                    OtherTrustedContact.map((item, index) => {
+                      return this.getElement(item, index, 'Other Contacts');
+                    })
+                  ) : (
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
+                  <TouchableOpacity
+                    onPress={() => {
+                      setTimeout(() => {
+                        this.setState({
+                          isLoadContacts: true
+                        });
+                      }, 2);
+                      this.AddContactAddressBookBottomSheet.current.snapTo(1);
+                    }}
+                    style={{
+                      ...styles.selectedContactsView,
+                      paddingBottom: 7,
+                      paddingTop: 7,
+                      marginTop: 0,
+                    }}
+                  >
+                    <Image
+                      style={styles.addGrayImage}
+                      source={require('../assets/images/icons/icon_add_grey.png')}
+                    />
+                    <View>
+                      <Text style={styles.contactText}>
+                        Add Contact
                         </Text>
-                      </View>
-                    </TouchableOpacity>
-                  </View>
+                    </View>
+                  </TouchableOpacity>
                 </View>
-              ) : (
-                  getWaterMark()
-                )}
+              </View>
             </View>
             {OtherTrustedContact.length == 0 &&
               IMKeeper.length == 0 &&
@@ -562,19 +555,19 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
     );
   }
 }
-const mapDispatchToProps = (dispatch) => {
-  return {
-    trustedChannelsSync: () => dispatch(trustedChannelsSync())
-  }
-}
+
 const mapStateToProps = (state) => {
+  let addressBookData = idx(state, _ => _.trustedContacts.addressBook)
+  let trustedContactsInfo = idx(state, _ => _.trustedContacts.trustedContactsInfo)
   return {
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     trustedChannelsSyncing: idx(state, (_) => _.trustedContacts.loading.trustedChannelsSync),
+    addressBookData,
+    trustedContactsInfo
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(AddressBookContents);
+export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally })(AddressBookContents);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
