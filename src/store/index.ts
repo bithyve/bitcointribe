@@ -12,6 +12,7 @@ import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 import { persistStore, persistReducer } from "redux-persist";
+import preferencesReducer from './reducers/preferences';
 
 
 const config = {
@@ -231,6 +232,7 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
+  preferences: preferencesReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

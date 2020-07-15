@@ -8,6 +8,7 @@ import {
 export const UPDATE_FCM_TOKENS = 'UPDATE_FCM_TOKENS';
 export const SEND_NOTIFICATION = 'SEND_NOTIFICATION';
 export const FETCH_NOTIFICATIONS = 'FETCH_NOTIFICATIONS';
+export const NOTIFICATION_UPDATED = 'NOTIFICATION_UPDATED';
 
 export const updateFCMTokens = (FCMs: string[]) => {
   return {
@@ -44,5 +45,12 @@ export const notificationsFetched = (notifications) => {
   return {
     type: NOTIFICATIONS_FETCHED,
     payload: { notifications },
+  };
+};
+
+export const notificationsUpdated = (notifications) => {
+  return {
+    type: NOTIFICATION_UPDATED,
+    payload: { notificationListNew: notifications },
   };
 };

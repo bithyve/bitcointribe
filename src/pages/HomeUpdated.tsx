@@ -57,8 +57,15 @@ import {
 } from '../store/actions/trustedContacts';
 import {
   updateFCMTokens,
-  fetchNotifications,
+  fetchNotifications, notificationsUpdated
 } from '../store/actions/notifications';
+import {
+  storeFbtcData
+} from '../store/actions/fbtc';
+import {
+  setCurrencyCode,
+  setCurrencyToggleValue
+} from '../store/actions/preferences';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -256,6 +263,14 @@ interface HomePropsTypes {
   clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
+  notificationListNew: any;
+  notificationsUpdated: any;
+  FBTCAccountData: any;
+  storeFbtcData: any;
+  setCurrencyCode: any;
+  currencyCode: any;
+  setCurrencyToggleValue: any;
+  currencyToggleValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -743,6 +758,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
+    const {notificationListNew} = this.props;
     let newTransactions = [];
     const { accounts, fetchDerivativeAccBalTx } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
@@ -761,6 +777,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       newTransactions.push(...newTransactionsSecure);
 
     if (newTransactions.length) {
+     // let asyncNotification = notificationListNew;
       let asyncNotification = JSON.parse(
         await AsyncStorage.getItem('notificationList'),
       );
@@ -802,7 +819,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         };
         this.localNotification(notificationDetails);
       }
-
+      //this.props.notificationsUpdated(asyncNotificationList);
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -1158,8 +1175,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   checkFastBitcoin = async () => {
-    let getFBTCAccount =
-      JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+    const {FBTCAccountData} = this.props;
+    let getFBTCAccount = FBTCAccountData || {};
+     // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
     this.setState({ fbBTCAccount: getFBTCAccount });
     return;
   };
@@ -1204,9 +1222,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    const { currencyCode, currencyToggleValue } = this.props;
+    let currencyCodeTmp = currencyCode;
+    //await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+      this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
+      //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
       this.setState({
         currencyCode: RNLocalize.getCurrencies()[0],
       });
@@ -1215,9 +1236,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         currencyCode: currencyCodeTmp,
       });
     }
-    let currencyToggleValueTmp = await AsyncStorage.getItem(
-      'currencyToggleValue',
-    );
+    let currencyToggleValueTmp = currencyToggleValue;
+    // await AsyncStorage.getItem(
+    //   'currencyToggleValue',
+    // );
 
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
@@ -1331,6 +1353,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
+    const {notificationListNew} = this.props;
+   // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1359,6 +1383,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationId: content.notificationId,
     };
     asyncNotificationList.push(obj);
+   // this.props.notificationsUpdated(asyncNotificationList);
+
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotificationList),
@@ -1544,13 +1570,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressSettingsElements = async (type, currencycode) => {
-    const { navigation } = this.props;
+    const { navigation, currencyCode } = this.props;
     if (type == 'ManagePin') {
       return navigation.navigate('SettingManagePin', {
         managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
       });
     } else if (type == 'ChangeCurrency') {
-      let currency = await AsyncStorage.getItem('currencyCode');
+      let currency = currencyCode; 
+      //await AsyncStorage.getItem('currencyCode');
       navigation.navigate('ChangeCurrency');
       this.setState({
         currencyCode: currency,
@@ -1572,6 +1599,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationListOpen = async () => {
+    const {notificationListNew} = this.props;
+   // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1584,6 +1613,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           );
         }
       }
+     // this.props.notificationsUpdated(asyncNotificationList);
+
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -1862,6 +1893,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async (value) => {
+    const {notificationListNew} = this.props;
+    //let asyncNotifications = notificationListNew;
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1887,6 +1920,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         tempNotificationData[i].read = true;
       }
     }
+   // this.props.notificationsUpdated(asyncNotifications);
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotifications),
@@ -1952,6 +1986,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
+    const {notificationListNew} = this.props;
+   // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -2034,6 +2070,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           tmpList.push(obj);
         }
       }
+      //this.props.notificationsUpdated(tmpList);
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -2045,6 +2082,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }
   };
+
+  setCurrencyToggleValue = (temp) => {
+    this.props.setCurrencyToggleValue(temp);
+  }
 
   render() {
     const {
@@ -2117,6 +2158,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             navigation={this.props.navigation}
             overallHealth={overallHealth}
             onSwitchToggle={this.onSwitchToggle}
+            setCurrencyToggleValue={this.setCurrencyToggleValue}
           />
         </View>
 
@@ -2972,6 +3014,11 @@ const mapStateToProps = (state) => {
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
+    notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
+    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+
   };
 };
 
@@ -2987,6 +3034,10 @@ export default withNavigationFocus(
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,
+    notificationsUpdated,
+    storeFbtcData,
+    setCurrencyCode,
+    setCurrencyToggleValue
   })(HomeUpdated),
 );
 

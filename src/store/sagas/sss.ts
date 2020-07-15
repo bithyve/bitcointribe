@@ -1540,7 +1540,9 @@ const hash = (element) => {
 
 const asyncDataToBackup = async () => {
   // ASYNC DATA to backup
-
+  // const FBTCAccount = select(
+  //   (state) => state.fbtc.FBTCAccountData,
+  // );
   const [
     [, TrustedContactsInfo],
     [, personalCopyDetails],

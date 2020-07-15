@@ -49,6 +49,7 @@ import {
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
 } from '../../store/actions/accounts';
+import {setCurrencyToggleValue} from '../../store/actions/preferences';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
@@ -103,7 +104,7 @@ export const isCompatible = async (method: string, version: string) => {
 };
 
 interface AccountsStateTypes {
-  FBTCAccount: any[];
+  FBTCAccount: any;
   serviceType: any;
   isHelperDone: boolean;
   isTestHelperDone: boolean;
@@ -141,6 +142,10 @@ interface AccountsPropsTypes {
   balanceTxLoading: any;
   derivativeBalanceTxLoading: any;
   accounts: any;
+  FBTCAccountData: any;
+  currencyCode: any;
+  currencyToggleValue: any;
+  setCurrencyToggleValue: any;
 }
 
 class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
@@ -190,7 +195,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       },
     ];
     this.state = {
-      FBTCAccount: {},
       CurrencyCode: 'USD',
       serviceType: this.props.navigation.state.params
         ? this.props.navigation.getParam('serviceType')
@@ -211,7 +215,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       isHelperDone: true,
       showLoader: true,
       netBalance: 0,
-      spendableBalance: 0
+      spendableBalance: 0,
+      FBTCAccount: {},
     };
   }
 
@@ -329,10 +334,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyToggleValueTmp = await AsyncStorage.getItem(
-      'currencyToggleValue',
-    );
-    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    let currencyToggleValueTmp = this.props.currencyToggleValue;
+    // await AsyncStorage.getItem(
+    //   'currencyToggleValue',
+    // );
+    let currencyCodeTmp = this.props.currencyCode;
+    //await AsyncStorage.getItem('currencyCode');
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
       CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
@@ -340,8 +347,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   checkFastBitcoin = async () => {
-    let getFBTCAccount = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
-    // setFBTCAccount(getFBTCAccount ? getFBTCAccount : {});
+    const {FBTCAccountData} = this.props;
+    let getFBTCAccount = FBTCAccountData || {};
+     // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+    this.setState({ FBTCAccount: getFBTCAccount });
+    return;
   };
 
   componentDidUpdate = (prevProps) => {
@@ -444,22 +454,25 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   renderFBTC = (FBTCAccount, accountType) => {
-    if (accountType) {
-      if (accountType == 'Test Account')
-        return (
-          FBTCAccount.test_account.voucher.length &&
-          FBTCAccount.test_account.voucher[0].hasOwnProperty('quotes')
-        );
-      else if (accountType == 'Checking Account')
-        return (
-          FBTCAccount.checking_account.voucher.length &&
-          FBTCAccount.checking_account.voucher[0].hasOwnProperty('quotes')
-        );
-      else if (accountType == 'Savings Account')
-        return (
-          FBTCAccount.saving_account.length &&
-          FBTCAccount.saving_account.voucher[0].hasOwnProperty('quotes')
-        );
+   if (accountType) {
+      if (accountType == 'Test Account'){
+      for(let i=0;i<FBTCAccount.test_account.voucher.length ; i++){
+        if(FBTCAccount.test_account.voucher[i].hasOwnProperty('quotes'))
+          return true;
+      }
+    }else if (accountType == 'Checking Account')
+        {
+          for(let i=0;i<FBTCAccount.checking_account.voucher.length ; i++){
+            if(FBTCAccount.checking_account.voucher[i].hasOwnProperty('quotes'))
+              return true;
+          }
+      }
+      else if (accountType == 'Savings Account'){
+        for(let i=0;i<FBTCAccount.saving_account.voucher.length ; i++){
+          if(FBTCAccount.saving_account.voucher[i].hasOwnProperty('quotes'))
+            return true;
+        }
+      }
     }
     return false;
   };
@@ -759,7 +772,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       averageTxFees,
       netBalance,
       carouselInitIndex,
-      FBTCAccount,
       showLoader,
       transactionLoading,
       isTestHelperDone,
@@ -770,10 +782,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       switchOn,
       CurrencyCode,
       transactions,
-      selectedTransactionItem,
-      tabBarIndex,
-      loading,
-      currencyCode,
       spendableBalance
     } = this.state;
     const { navigation, exchangeRates, accounts } = this.props;
@@ -837,7 +845,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 onpress={async () => {
                   this.setState({ switchOn: !this.state.switchOn });
                   let temp = !switchOn ? 'true' : '';
-                  await AsyncStorage.setItem('currencyToggleValue', temp);
+                  this.props.setCurrencyToggleValue(temp);
+                  //await AsyncStorage.setItem('currencyToggleValue', temp);
                 }}
                 toggle={switchOn}
               />
@@ -1487,6 +1496,10 @@ const mapStateToProps = (state) => {
   return {
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
     accounts: idx(state, (_) => _.accounts) || [],
+    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+
     // service: idx(state, (_) => _.accounts)
   };
 };
@@ -1500,6 +1513,7 @@ export default withNavigationFocus(
     fetchDerivativeAccXpub,
     fetchDerivativeAccBalTx,
     fetchDerivativeAccAddress,
+    setCurrencyToggleValue
   })(Accounts),
 );
 
