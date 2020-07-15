@@ -14,16 +14,20 @@ export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
 
-export const initializeTrustedContact = (contactName: string) => {
+export const initializeTrustedContact = (
+  contactName: string,
+  encKey: string,
+) => {
   return {
     type: INITIALIZE_TRUSTED_CONTACT,
-    payload: { contactName },
+    payload: { contactName, encKey },
   };
 };
 
 export const approveTrustedContact = (
   contactName: string,
   contactsPublicKey: string,
+  encKey: string,
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
 ) => {
@@ -32,6 +36,7 @@ export const approveTrustedContact = (
     payload: {
       contactName,
       contactsPublicKey,
+      encKey,
       updateEphemeralChannel,
       contactsWalletName,
     },
@@ -41,13 +46,14 @@ export const approveTrustedContact = (
 export const updateEphemeralChannel = (
   contactName: string,
   data: EphemeralDataElements,
+  encKey: string,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch, trustedContacts, uploadXpub },
+    payload: { contactName, data, encKey, fetch, trustedContacts, uploadXpub },
   };
 };
 

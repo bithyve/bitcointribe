@@ -160,6 +160,7 @@ export default class TrustedContacts {
 
   public initializeContact = (
     contactName: string,
+    encKey: string,
   ): { publicKey: string; ephemeralAddress: string } => {
     if (this.trustedContacts[contactName]) {
       throw new Error(
@@ -179,6 +180,7 @@ export default class TrustedContacts {
     this.trustedContacts[contactName] = {
       privateKey,
       publicKey,
+      encKey,
       ephemeralChannel: { address: ephemeralAddress },
     };
 
@@ -188,6 +190,7 @@ export default class TrustedContacts {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
+    encKey: string,
     contactsWalletName?: string,
   ): {
     channelAddress: string;
@@ -195,7 +198,7 @@ export default class TrustedContacts {
     publicKey: string;
   } => {
     if (!this.trustedContacts[contactName]) {
-      this.initializeContact(contactName); // case: trusted contact setup has been requested
+      this.initializeContact(contactName, encKey); // case: trusted contact setup has been requested
     }
 
     if (
@@ -324,7 +327,7 @@ export default class TrustedContacts {
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
-        this.initializeContact(contactName);
+        this.initializeContact(contactName, encKey);
       }
 
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
@@ -392,6 +395,7 @@ export default class TrustedContacts {
   }> => {
     try {
       let res: AxiosResponse;
+
       if (!publicKey) {
         if (!this.trustedContacts[contactName]) {
           throw new Error(`No contact exist with contact name: ${contactName}`);
@@ -441,7 +445,7 @@ export default class TrustedContacts {
           );
         }
 
-        this.finalizeContact(contactName, contactsPublicKey);
+        this.finalizeContact(contactName, contactsPublicKey, encKey);
       }
 
       return { data };

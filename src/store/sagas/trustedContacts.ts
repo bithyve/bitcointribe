@@ -68,8 +68,8 @@ function* initializedTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName } = payload;
-  const res = yield call(service.initializeContact, contactName);
+  const { contactName, encKey } = payload;
+  const res = yield call(service.initializeContact, contactName, encKey);
   if (res.status === 200) {
     const { publicKey } = res.data;
     yield put(trustedContactInitialized(contactName, publicKey));
@@ -95,12 +95,18 @@ function* approveTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, contactsPublicKey, contactsWalletName } = payload;
+  const {
+    contactName,
+    encKey,
+    contactsPublicKey,
+    contactsWalletName,
+  } = payload;
 
   const res = yield call(
     trustedContacts.finalizeContact,
     contactName,
     contactsPublicKey,
+    encKey,
     contactsWalletName,
   );
   if (res.status === 200) {
@@ -116,6 +122,7 @@ function* approveTrustedContactWorker({ payload }) {
         updateEphemeralChannel(
           contactName,
           data,
+          encKey,
           true,
           trustedContacts,
           uploadXpub,
@@ -153,12 +160,13 @@ function* updateEphemeralChannelWorker({ payload }) {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  const { contactName, data, fetch } = payload;
+  const { contactName, encKey, data, fetch } = payload;
 
   const res = yield call(
     trustedContacts.updateEphemeralChannel,
     contactName,
     data,
+    encKey,
     fetch,
   );
   console.log({ res });
@@ -375,7 +383,7 @@ export function* trustedChannelsSyncWorker() {
 
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   for (const contactName of Object.keys(contacts)) {
-    let { trustedChannel, ephemeralChannel } = contacts[contactName];
+    let { trustedChannel, ephemeralChannel, encKey } = contacts[contactName];
 
     if (!trustedChannel) {
       // trusted channel not setup; probably need to still get the counter party's pubKey
@@ -392,6 +400,7 @@ export function* trustedChannelsSyncWorker() {
           trustedContacts.finalizeContact,
           contactName,
           contactsPublicKey,
+          encKey,
         );
 
         if (res.status !== 200) {

@@ -196,7 +196,7 @@ export interface EphemeralData {
 
 export interface EncryptedEphemeralData {
   publicKey: string;
-  encryptedData: string; // encrypted TrustedData
+  encryptedData: string; // encrypted EphemeralData
 }
 
 export interface TrustedDataElements {
@@ -219,6 +219,7 @@ export interface Contacts {
   [contactName: string]: {
     privateKey: string;
     publicKey: string;
+    encKey: string;
     symmetricKey?: string;
     contactsPubKey?: string;
     contactsWalletName?: string;

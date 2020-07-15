@@ -46,6 +46,7 @@ export default class TrustedContactsService {
 
   public initializeContact = (
     contactName: string,
+    encKey: string,
   ):
     | {
         status: number;
@@ -64,7 +65,10 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.initializeContact(contactName.toLowerCase().trim()),
+        data: this.tc.initializeContact(
+          contactName.toLowerCase().trim(),
+          encKey,
+        ),
       };
     } catch (err) {
       return {
@@ -78,6 +82,7 @@ export default class TrustedContactsService {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
+    encKey: string,
     contactsWalletName?: string,
   ):
     | {
@@ -102,6 +107,7 @@ export default class TrustedContactsService {
         data: this.tc.finalizeContact(
           contactName.toLowerCase().trim(),
           encodedPublicKey,
+          encKey,
           contactsWalletName,
         ),
       };
@@ -117,6 +123,7 @@ export default class TrustedContactsService {
   public updateEphemeralChannel = async (
     contactName: string,
     dataElements: EphemeralDataElements,
+    encKey: string,
     fetch?: Boolean,
   ): Promise<
     | {
@@ -148,6 +155,7 @@ export default class TrustedContactsService {
         data: await this.tc.updateEphemeralChannel(
           contactName.toLowerCase().trim(),
           dataElements,
+          encKey,
           fetch,
         ),
       };
@@ -162,6 +170,7 @@ export default class TrustedContactsService {
 
   public fetchEphemeralChannel = async (
     contactName: string,
+    encKey: string,
     approveTC?: Boolean,
     publicKey?: string,
   ): Promise<
@@ -185,6 +194,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.fetchEphemeralChannel(
           contactName ? contactName.toLowerCase().trim() : contactName,
+          encKey,
           approveTC,
           publicKey,
         ),
