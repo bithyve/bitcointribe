@@ -1099,6 +1099,8 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaLink
+          headerText={"Send Request"}
+          subHeaderText={'Send a Keeper request link'}
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
