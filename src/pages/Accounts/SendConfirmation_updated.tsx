@@ -1,6 +1,4 @@
-import React, {
-  Component
-} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Image,
@@ -13,7 +11,7 @@ import {
   StatusBar,
   ActivityIndicator,
   AsyncStorage,
-  Alert,
+  Platform,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -52,6 +50,9 @@ import {
 import { withNavigationFocus } from 'react-navigation';
 import { connect } from 'react-redux';
 import idx from 'idx';
+import DeviceInfo from 'react-native-device-info';
+import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
+import SmallHeaderModal from '../../components/SmallHeaderModal';
 
 interface SendConfirmationStateTypes {
   switchOn: boolean;
@@ -113,7 +114,6 @@ class SendConfirmation_updated extends Component<
   }
 
   componentDidMount = () => {
-    this.onChangeInTransfer();
     let { accounts } = this.props;
     if (accounts[this.serviceType].transfer.details) {
       let totalAmount = 0;
@@ -126,6 +126,8 @@ class SendConfirmation_updated extends Component<
       transfer: accounts[this.serviceType].transfer,
       loading: accounts[this.serviceType].loading,
     });
+    this.onChangeInTransfer();
+    
   };
 
   componentDidUpdate = (prevProps) => {
@@ -138,9 +140,11 @@ class SendConfirmation_updated extends Component<
       this.props.accounts[this.serviceType].transfer
     ) {
       this.setState({
-        transfer: this.props.accounts[this.serviceType].transfer,
-      });
+          transfer: this.props.accounts[this.serviceType].transfer,
+        });
+      setTimeout(() => {
       this.onChangeInTransfer();
+      }, 10);
     }
 
     if (
@@ -205,6 +209,7 @@ class SendConfirmation_updated extends Component<
       });
       if (totalAmount) this.setState({ totalAmount: totalAmount });
     }
+
     if (transfer.stage2 && transfer.stage2.failed) {
       setTimeout(() => {
         (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
@@ -343,7 +348,7 @@ class SendConfirmation_updated extends Component<
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
               onPress={() => {
                 navigation.goBack();
@@ -379,6 +384,22 @@ class SendConfirmation_updated extends Component<
                   : 'Savings Account'}
               </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => {
+                (this.refs.KnowMoreBottomSheet as any).snapTo(1);
+              }}
+              style={{ marginLeft: 'auto' }}
+            >
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  // marginLeft: 'auto',
+                }}
+              >
+                Know more
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         <ScrollView>
@@ -432,9 +453,7 @@ class SendConfirmation_updated extends Component<
           ) : null}
 
           <View style={styles.totalMountView}>
-            <Text style={styles.totalAmountText}>
-              Total Amount
-            </Text>
+            <Text style={styles.totalAmountText}>Total Amount</Text>
             <View style={styles.totalAmountOuterView}>
               <View style={styles.totalAmountInnerView}>
                 <View style={styles.amountInputImage}>
@@ -443,10 +462,8 @@ class SendConfirmation_updated extends Component<
                     source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                   />
                 </View>
-                <View style={styles.totalAmountView}/>
-                <Text style={styles.amountText}>
-                  {totalAmount}
-                </Text>
+                <View style={styles.totalAmountView} />
+                <Text style={styles.amountText}>{totalAmount}</Text>
                 <Text style={styles.amountUnitText}>
                   {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
                 </Text>
@@ -534,7 +551,7 @@ class SendConfirmation_updated extends Component<
                 <Text
                   style={{
                     ...styles.sliderText,
-                    marginRight: 0
+                    marginRight: 0,
                   }}
                 >
                   {'Fast Transaction\n'} (
@@ -546,14 +563,14 @@ class SendConfirmation_updated extends Component<
               </View>
             </View>
           </View>
-          <View style={{ marginTop: hp('3%') }}>
+          {/* <View style={{ marginTop: hp('3%') }}>
             <BottomInfoBox
               title={'Note'}
               infoText={
                 'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
               }
             />
-          </View>
+          </View> */}
 
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
@@ -682,6 +699,46 @@ class SendConfirmation_updated extends Component<
               onPressHeader={() => {
                 if (this.refs.SendUnSuccessBottomSheet as any)
                   (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+        />
+
+        <BottomSheet
+          onCloseStart={() => {
+            (this.refs.KnowMoreBottomSheet as any).snapTo(0);
+          }}
+          enabledInnerScrolling={false}
+          ref={'KnowMoreBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('20%')
+              : Platform.OS == 'android'
+              ? hp('21%')
+              : hp('20%'),
+          ]}
+          renderContent={() => (
+            <TestAccountHelperModalContents
+              topButtonText={'Note'}
+              // image={require('../../assets/images/icons/regular.png')}
+              boldPara={''}
+              helperInfo={
+                'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
+              }
+              // continueButtonText={'Ok, got it'}
+              // onPressContinue={() => {
+              //   if (KnowMoreBottomSheet.current)
+              //     (KnowMoreBottomSheet as any).current.snapTo(0);
+              // }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.blue}
+              backgroundColor={Colors.blue}
+              onPressHeader={() => {
+                (this.refs.KnowMoreBottomSheet as any).snapTo(0);
               }}
             />
           )}
@@ -880,5 +937,5 @@ const styles = StyleSheet.create({
     marginBottom: hp('5%'),
     marginLeft: wp('6%'),
     marginRight: wp('6%'),
-  }
+  },
 });

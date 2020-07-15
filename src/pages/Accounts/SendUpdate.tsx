@@ -259,17 +259,59 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   setRecipientAddress = () => {
-    const { service } = this.props;
-    const { recipientAddress, serviceType } = this.state;
-    const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
-    // console.log("instance setRecipientAddress", instance);
-    let isAddressValid = instance.isValidAddress(recipientAddress);
-    //console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
-    if (isAddressValid) {
-      let item = {
-        id: recipientAddress, // address serves as the id during manual addition
-      };
-      this.onSelectContact(item);
+     const { service } = this.props;
+     const { recipientAddress, serviceType, sweepSecure, spendableBalance, } = this.state;
+    // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
+    // // console.log("instance setRecipientAddress", instance);
+    // let isAddressValid = instance.isValidAddress(recipientAddress);
+    // //console.log("isAddressValid setRecipientAddress", isAddressValid, recipientAddress);
+    // if (isAddressValid) {
+    //   let item = {
+    //     id: recipientAddress, // address serves as the id during manual addition
+    //   };
+    //   this.onSelectContact(item);
+    // }
+    const { type } = service[serviceType].service.addressDiff(recipientAddress.trim());
+    if (type) {
+      let item;
+      switch (type) {
+        case 'address':
+          item = {
+            id: recipientAddress.trim(), // address serves as the id during manual addition
+          };
+          this.onSelectContact(item);
+          break;
+
+        case 'paymentURI':
+          let address, options;
+          try {
+            const res = service[serviceType].service.decodePaymentURI(recipientAddress.trim());
+            address = res.address;
+            options = res.options;
+          } catch (err) {
+            Alert.alert('Unable to decode payment URI');
+            return;
+          }
+
+          item = {
+            id: address,
+          };
+
+          this.props.addTransferDetails(serviceType, {
+              selectedContact: item,
+            })
+
+          this.props.navigation.navigate('SendToContact', {
+            selectedContact: item,
+            serviceType,
+            sweepSecure,
+            spendableBalance,
+            bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
+          });
+          break;
+      }
     }
   }
 
@@ -280,7 +322,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       spendableBalance, } = this.state;
     //console.log('barcodes', barcodes);
     if (barcodes.data) {
-      const { type } = service[serviceType].service.addressDiff(barcodes.data);
+      const { type } = service[serviceType].service.addressDiff(barcodes.data.trim());
       if (type) {
         let item;
         switch (type) {
@@ -293,9 +335,15 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             break;
 
           case 'paymentURI':
-            const { address, options } = service[serviceType].service.decodePaymentURI(
-              barcodes.data,
-            );
+            let address, options;
+            try {
+              const res = service[serviceType].service.decodePaymentURI(barcodes.data);
+              address = res.address;
+              options = res.options;
+            } catch (err) {
+              Alert.alert('Unable to decode payment URI');
+              return;
+            }
             item = {
               id: address,
             };
@@ -309,7 +357,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               serviceType,
               sweepSecure,
               spendableBalance,
-              bitcoinAmount: options.amount ? `${options.amount}` : '',
+              bitcoinAmount: options.amount
+              ? `${Math.round(options.amount * 1e8)}`
+              : '',
             });
             break;
 
