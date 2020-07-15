@@ -242,7 +242,7 @@ const sagaMiddleware = createSagaMiddleware();
 const reducers = persistReducer(config, rootReducer);
 
 const store = createStore(
-  rootReducer,
+  reducers,
   composeWithDevTools(applyMiddleware(sagaMiddleware, thunk)),
 );
 sagaMiddleware.run(rootSaga);

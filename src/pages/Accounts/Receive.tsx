@@ -50,7 +50,7 @@ import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { fetchAddress } from '../../store/actions/accounts';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import {
   EphemeralData,
   TrustedContactDerivativeAccount,
@@ -276,13 +276,8 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-    console.log({ trustedContactsInfo });
-
+    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
@@ -311,6 +306,7 @@ export default function Receive(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
@@ -644,11 +640,11 @@ export default function Receive(props) {
   const renderSecureReceiveWarningContents = useCallback(() => {
     return (
       <TwoFASetupWarningModal
-        onPressOk={()=>{
+        onPressOk={() => {
           if (SecureReceiveWarningBottomSheet.current)
             (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
         }}
-        onPressManageBackup={()=>props.navigation.replace('ManageBackup')}
+        onPressManageBackup={() => props.navigation.replace('ManageBackup')}
       />
     );
   }, [serviceType]);
