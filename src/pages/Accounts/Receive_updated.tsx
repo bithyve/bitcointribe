@@ -43,7 +43,6 @@ import {
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
-import { fetchAddress } from '../../store/actions/accounts';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import {
   EphemeralData,
@@ -62,7 +61,7 @@ export default function Receive(props) {
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
-  let [isLoading, setIsLoading] = useState(true);
+  //let [isLoading, setIsLoading] = useState(true);
   const [ReceiveHelperBottomSheet, setReceiveHelperBottomSheet] = useState(
     React.createRef(),
   );
@@ -124,7 +123,7 @@ export default function Receive(props) {
         let receiveAt = receivingAddress;
         if (amount) {
           receiveAt = service.getPaymentURI(receiveAt, {
-            amount: parseInt(amount),
+            amount: parseInt(amount) / 1e8,
           }).paymentURI;
         }
         setReceiveLink(receiveAt);
@@ -144,17 +143,17 @@ export default function Receive(props) {
     }
   }, [AsTrustedContact]);
 
-  useEffect(() => {
-    dispatch(fetchAddress(serviceType));
-    if (isLoading) {
-      InteractionManager.runAfterInteractions(() => {
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 2000);
-      });
-      InteractionManager.setDeadline(3);
-    }
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchAddress(serviceType));
+  //   if (isLoading) {
+  //     InteractionManager.runAfterInteractions(() => {
+  //       setTimeout(() => {
+  //         setIsLoading(false);
+  //       }, 2000);
+  //     });
+  //     InteractionManager.setDeadline(3);
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!AsTrustedContact) return;
@@ -318,7 +317,7 @@ export default function Receive(props) {
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
-          amount: parseInt(amount),
+          amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
       let accountNumber =
@@ -347,7 +346,7 @@ export default function Receive(props) {
       let trustedPaymentURI;
       if (amount) {
         trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
-          amount: parseInt(amount),
+          amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
 
@@ -734,7 +733,7 @@ export default function Receive(props) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-      {isLoading ? <Loader /> : null}
+      {/* {isLoading ? <Loader /> : null} */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}

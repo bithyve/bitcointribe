@@ -3043,7 +3043,7 @@ export default withNavigationFocus(
     notificationsUpdated,
     storeFbtcData,
     setCurrencyCode,
-    setCurrencyToggleValue
+    setCurrencyToggleValue,
     updatePreference
   })(HomeUpdated),
 );
