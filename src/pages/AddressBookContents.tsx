@@ -297,7 +297,13 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
       <TouchableOpacity
         key={contact.id}
         onPress={() => {
-          navigation.navigate('ContactDetails', {
+          // navigation.navigate('ContactDetails', {
+          //   contactsType,
+          //   contact,
+          //   index,
+          //   shareIndex: contact.shareIndex,
+          // });
+          navigation.navigate('ContactDetailsNew', {
             contactsType,
             contact,
             index,
