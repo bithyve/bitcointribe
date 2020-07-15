@@ -182,9 +182,11 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing secondary device's TC
+    delete trustedContacts.tc.trustedContacts[payload.contactInfo.contactName]; // removing secondary device's TC
     const accountNumber =
-      regularService.hdWallet.trustedContactToDA[payload.contactName];
+      regularService.hdWallet.trustedContactToDA[
+        payload.contactInfo.contactName
+      ];
     if (accountNumber) {
       delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
         accountNumber
@@ -228,7 +230,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   const res = yield call(
     s3Service.uploadShare,
     payload.shareIndex,
-    payload.contactName,
+    payload.contactInfo.contactName,
   ); // contact injection (requires database insertion)
 
   if (res.status === 200) {
@@ -271,7 +273,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     });
 
-    yield put(updateEphemeralChannel(payload.contactName, data));
+    yield put(updateEphemeralChannel(payload.contactInfo, data));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));

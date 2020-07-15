@@ -95,22 +95,17 @@ function* approveTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const {
-    contactName,
-    encKey,
-    contactsPublicKey,
-    contactsWalletName,
-  } = payload;
+  const { contactInfo, contactsPublicKey, contactsWalletName } = payload;
 
   const res = yield call(
     trustedContacts.finalizeContact,
-    contactName,
+    contactInfo.contactName,
     contactsPublicKey,
     encKey,
     contactsWalletName,
   );
   if (res.status === 200) {
-    yield put(trustedContactApproved(contactName, true));
+    yield put(trustedContactApproved(contactInfo.contactName, true));
     if (payload.updateEphemeralChannel) {
       const uploadXpub = true;
       const data = {
@@ -120,9 +115,8 @@ function* approveTrustedContactWorker({ payload }) {
       };
       yield put(
         updateEphemeralChannel(
-          contactName,
+          contactInfo,
           data,
-          encKey,
           true,
           trustedContacts,
           uploadXpub,
@@ -160,11 +154,11 @@ function* updateEphemeralChannelWorker({ payload }) {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  const { contactName, encKey, data, fetch } = payload;
+  const { contactInfo, data, fetch } = payload;
 
   const res = yield call(
     trustedContacts.updateEphemeralChannel,
-    contactName,
+    contactInfo.contactName,
     data,
     encKey,
     fetch,
@@ -179,16 +173,20 @@ function* updateEphemeralChannelWorker({ payload }) {
     }
 
     yield put(
-      ephemeralChannelUpdated(contactName, res.data.updated, res.data.data),
+      ephemeralChannelUpdated(
+        contactInfo.contactName,
+        res.data.updated,
+        res.data.data,
+      ),
     );
 
     if (payload.uploadXpub) {
-      console.log('Uploading xpub for: ', contactName);
+      console.log('Uploading xpub for: ', contactInfo.contactName);
       const res = yield call(
         regularService.getDerivativeAccXpub,
         TRUSTED_CONTACTS,
         null,
-        contactName,
+        contactInfo.contactName,
       );
 
       if (res.status === 200) {
@@ -205,12 +203,12 @@ function* updateEphemeralChannelWorker({ payload }) {
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
-          contactName,
+          contactInfo.contactName,
           data,
           true,
         );
         if (updateRes.status === 200) {
-          console.log('Xpub updated to TC for: ', contactName);
+          console.log('Xpub updated to TC for: ', contactInfo.contactName);
 
           // send acceptance notification
           const { walletName } = yield select(
@@ -218,12 +216,19 @@ function* updateEphemeralChannelWorker({ payload }) {
           );
           sendNotification(
             trustedContacts,
-            contactName.toLowerCase().trim(),
+            contactInfo.contactName.toLowerCase().trim(),
             walletName,
           );
-        } else console.log('Xpub updation to TC failed for: ', contactName);
+        } else
+          console.log(
+            'Xpub updation to TC failed for: ',
+            contactInfo.contactName,
+          );
       } else {
-        console.log('Derivative xpub generation failed for: ', contactName);
+        console.log(
+          'Derivative xpub generation failed for: ',
+          contactInfo.contactName,
+        );
       }
     }
 
@@ -257,10 +262,11 @@ function* fetchEphemeralChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
+  const { contactInfo, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
   const res = yield call(
     trustedContacts.fetchEphemeralChannel,
-    contactName,
+    contactInfo.contactName,
+    encKey,
     approveTC,
     publicKey,
   );
@@ -281,7 +287,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
       downloadMShare(encryptedKey, otp);
     }
 
-    yield put(ephemeralChannelFetched(contactName, data));
+    yield put(ephemeralChannelFetched(contactInfo.contactName, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,

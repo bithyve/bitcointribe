@@ -39,7 +39,7 @@ export const prepareMShares = () => {
 
 export const uploadEncMShare = (
   shareIndex: number,
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   data: EphemeralDataElements,
   changingGuardian?: boolean,
   previousGuardianName?: string,
@@ -48,7 +48,7 @@ export const uploadEncMShare = (
     type: UPLOAD_ENC_MSHARE,
     payload: {
       shareIndex,
-      contactName,
+      contactInfo,
       data,
       changingGuardian,
       previousGuardianName,
