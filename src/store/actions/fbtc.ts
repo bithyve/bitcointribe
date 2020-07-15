@@ -17,6 +17,10 @@ export const GET_BALANCES = 'GET_BALANCES';
 export const GET_BALANCES_FAIL = 'GET_BALANCES_FAIL';
 export const GET_BALANCES_SUCCESS = 'GET_BALANCES_SUCCESS';
 
+export const STORE_FBTC_ACC_DATA = 'STORE_FBTC_ACC_DATA';
+export const FBTC_VOUCHER = 'FBTC_VOUCHER';
+export const CLEAR_FBTC_VOUCHER = 'CLEAR_FBTC_VOUCHER';
+
 export const accountSync = (data) => {
   return {
     type: ACCOUNT_SYNC,
@@ -121,6 +125,35 @@ export const getBalancesFail = () => {
     type: GET_BALANCES_FAIL,
     payload: {
       getBalancesDetails: null,
+    },
+  };
+};
+
+export const storeFbtcData = (FBTCAccount) => {
+  //console.log('INSIDE Action FBTC',FBTCAccount)
+  return {
+    type: STORE_FBTC_ACC_DATA,
+    payload: {
+      FBTCAccountData: FBTCAccount
+    },
+  };
+};
+
+export const storeFbtcVoucher = (voucher) => {
+  //console.log('INSIDE Action storeFbtcVoucher',voucher)
+  return {
+    type: FBTC_VOUCHER,
+    payload: {
+      FBTCVoucher: voucher
+    },
+  };
+};
+
+export const clearFbtcVoucher = () => {
+  return {
+    type: CLEAR_FBTC_VOUCHER,
+    payload: {
+      FBTCVoucher: null
     },
   };
 };

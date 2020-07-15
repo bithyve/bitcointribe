@@ -33,16 +33,21 @@ import { EphemeralData } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
+import TimerModalContents from './TimerModalContents';
 
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
-
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
+  const [TimerModalBottomSheet, setTimerModalBottomSheet] = useState(
+    React.createRef(),
+  );
+  const [renderTimer, setRenderTimer] = useState(false);
+  
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
@@ -241,6 +246,17 @@ export default function AddContactSendRequest(props) {
     }
   }, [Contact, trustedContacts, updateEphemeralChannelLoader]);
 
+  const openTimer = async() => {
+    setTimeout(() => {
+      setRenderTimer(true);
+    }, 2);
+    let TCRequestTimer = JSON.parse(await AsyncStorage.getItem("TCRequestTimer"));
+    (SendViaLinkBottomSheet as any).current.snapTo(0);
+    if(!TCRequestTimer){
+      (TimerModalBottomSheet as any).current.snapTo(1);
+    }
+  }
+
   const renderSendViaLinkContents = useCallback(() => {
     return (
       <SendViaLink
@@ -249,14 +265,20 @@ export default function AddContactSendRequest(props) {
         subHeaderText={'Send to your contact'}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
+        infoText={`Click here to accept contact request from ${
+          WALLET_SETUP.walletName
+        } Hexa wallet - link will expire in ${
+          config.TC_REQUEST_EXPIRY / 60000
+        } minutes`}
         link={trustedLink}
         contactEmail={''}
         onPressBack={() => {
           if (SendViaLinkBottomSheet.current)
             (SendViaLinkBottomSheet as any).current.snapTo(0);
         }}
-        onPressDone={() => {
+        onPressDone={async() => {
           (SendViaLinkBottomSheet as any).current.snapTo(0);
+          openTimer();
         }}
       />
     );
@@ -278,7 +300,7 @@ export default function AddContactSendRequest(props) {
       <SendViaQR
         isFromReceive={true}
         headerText={'Friends and Family Request'}
-        subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
+        subHeaderText={"Scan the QR from your Contact's Hexa Wallet"}
         contactText={'Adding to Friends and Family:'}
         contact={Contact}
         QR={trustedQR}
@@ -289,10 +311,37 @@ export default function AddContactSendRequest(props) {
         }}
         onPressDone={() => {
           (SendViaQRBottomSheet as any).current.snapTo(0);
+          openTimer();
         }}
       />
     );
   }, [Contact, trustedQR]);
+
+  const renderTimerModalContents = useCallback(() => {
+    return (
+      <TimerModalContents
+        renderTimer={renderTimer}
+        onTimerFinish={()=>onContinueWithTimer()}
+        onPressContinue={()=>onContinueWithTimer()}
+      />
+    );
+  }, [renderTimer]);
+
+  const renderTimerModalHeader = useCallback(() => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          if (TimerModalBottomSheet.current)
+            (TimerModalBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }, []);
+
+  const onContinueWithTimer = () => {
+    (TimerModalBottomSheet as any).current.snapTo(0); 
+    props.navigation.goBack();
+  }
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
@@ -581,6 +630,18 @@ export default function AddContactSendRequest(props) {
           ]}
           renderContent={renderSendViaQRContents}
           renderHeader={renderSendViaQRHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={TimerModalBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('46%')
+              : hp('46%'),
+          ]}
+          renderContent={renderTimerModalContents}
+          renderHeader={renderTimerModalHeader}
         />
       </View>
     </SafeAreaView>

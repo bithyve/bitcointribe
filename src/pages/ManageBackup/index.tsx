@@ -41,6 +41,7 @@ import CloudHealthCheck from '../HealthCheck/CloudHealthCheck';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function ManageBackup(props) {
   const [
@@ -255,13 +256,21 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryHeader = () => {
     return (
-      <ModalHeader
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      <AppBottomSheetTouchableWrapper
+        activeOpacity={10}
+        style={styles.modalHeaderContainer}
+        onPress={() => (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0)}
+      >
+        <View style={{ height: 20 }}>
+          <View style={styles.modalHeaderHandle} />
+        </View>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={styles.healthOfAppText}>
+            Health of the App
+          </Text>
+        </View>
+        <View style={styles.healthOfAppDivider}/>
+      </AppBottomSheetTouchableWrapper>
     );
   };
 
@@ -446,8 +455,7 @@ export default function ManageBackup(props) {
     ) {
       title = 'Reshare Recovery Key\nwith Keeper';
       info = 'Did your Keeper not receive the Recovery Key?';
-      note =
-        'You can reshare the Recovery Key with your Keeper';
+      note = 'You can reshare the Recovery Key with your Keeper';
     } else if (
       SelectTypeToReshare == 'copy1' ||
       SelectTypeToReshare == 'copy2'
@@ -1372,24 +1380,87 @@ export default function ManageBackup(props) {
 
   const getStatusIcon = (item) => {
     if (item.type == 'secondaryDevice' && autoHighlightFlags.secondaryDevice) {
-      return { icon: getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey };
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
-      return { icon: getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey };
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
-      return { icon: getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey };
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
-      return { icon: getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey };
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
-      return { icon: getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey };
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
-      return { icon: getIconByStatus(item.status), color: item.status == 'Ugly' ? Colors.red : item.status == 'Bad' ? Colors.yellow : item.status == 'Good' ? Colors.green : Colors.textColorGrey };
+      return {
+        icon: getIconByStatus(item.status),
+        color:
+          item.status == 'Ugly'
+            ? Colors.red
+            : item.status == 'Bad'
+            ? Colors.yellow
+            : item.status == 'Good'
+            ? Colors.green
+            : Colors.textColorGrey,
+      };
     }
-    return { icon: require('../../assets/images/icons/icon_error_gray.png'), color: Colors.lightTextColor };
+    return {
+      icon: require('../../assets/images/icons/icon_error_gray.png'),
+      color: Colors.lightTextColor,
+    };
   };
 
   const getImageIcon = (item) => {
@@ -1918,4 +1989,37 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginLeft: 'auto',
   },
+  modalHeaderHandle: {
+    width: 50,
+    height: 5,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: 7,
+  },
+  modalHeaderContainer: {
+    borderTopLeftRadius: 10,
+    borderLeftWidth: 1,
+    borderTopRightRadius: 10,
+    borderRightWidth: 1,
+    borderTopWidth: 1,
+    backgroundColor: Colors.blue,
+    borderLeftColor: Colors.blue,
+    borderRightColor: Colors.blue,
+    borderTopColor: Colors.blue,
+  },
+  healthOfAppText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  healthOfAppDivider: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginBottom: hp('1%'),
+  }
 });

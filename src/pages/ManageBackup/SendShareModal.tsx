@@ -47,7 +47,7 @@ export default function SendShareModal(props) {
       <View style={{ height: '100%' }}>
         <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
           <Text style={styles.commModeModalHeaderText}>
-            Send Recovery Key{'\n'}with contact
+            Send Recovery Key{'\n'}to contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
             Send Key to Keeper, you can change your Keeper,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -24,8 +24,10 @@ import {
 } from '../../common/constants/serviceTypes';
 import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import { useSelector } from 'react-redux';
 
 export default function ExistingSavingMethods(props) {
+  const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
   const [FBTCAccount, setFBTCAccount] = useState([]);
   const [FBTCAccountInfo, setFBTCAccountInfo] = useState({});
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,8 @@ export default function ExistingSavingMethods(props) {
   useEffect(() => {
     (async () => {
       let FBTCAccount = [];
-      let accounts = JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
+      let accounts = FBTCAccountData;
+      //JSON.parse(await AsyncStorage.getItem('FBTCAccount'));
       setFBTCAccountInfo(accounts);
       if (accounts) {
         if (accounts.checking_account.voucher.length) {

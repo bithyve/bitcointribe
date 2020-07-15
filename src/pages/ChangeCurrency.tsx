@@ -20,9 +20,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BottomInfoBox from '../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCurrencyCode } from '../store/actions/preferences';
 
 export default function ChangeCurrency(props) {
   const [currencyList, setCurrencyList] = useState(Currencies);
+  const CurrencyCode = useSelector((state) => state.preferences.currencyCode);
+  const dispatch = useDispatch();
 
   const [isVisible, setIsVisible] = useState(false);
   const [currency, setCurrency] = useState({
@@ -32,7 +36,8 @@ export default function ChangeCurrency(props) {
 
   useEffect(() => {
     (async () => {
-      let currencyCode = await AsyncStorage.getItem('currencyCode');
+      let currencyCode = CurrencyCode;
+      //await AsyncStorage.getItem('currencyCode');
       setCurrency(
         currencyList[
         currencyList.findIndex((value) => value.code == currencyCode)
@@ -42,7 +47,8 @@ export default function ChangeCurrency(props) {
   }, []);
 
   const setNewCurrency = async () => {
-    await AsyncStorage.setItem('currencyCode', currency.code);
+    dispatch(setCurrencyCode(currency.code))
+    //await AsyncStorage.setItem('currencyCode', currency.code);
     props.navigation.goBack();
   };
 

@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import createSagaMiddleware from 'redux-saga';
 import { call, all, spawn } from 'redux-saga/effects';
 import { composeWithDevTools } from 'redux-devtools-extension';
-import preferences from './reducers/preferences'
 
 import storageReducer from './reducers/storage';
 import setupAndAuthReducer from './reducers/setupAndAuth';
@@ -15,6 +14,7 @@ import fBTCReducers from './reducers/fbtc';
 import notificationsReducer from './reducers/notifications';
 import trustedContactsReducer from './reducers/trustedContacts';
 import { persistStore, persistReducer } from "redux-persist";
+import preferencesReducer from './reducers/preferences';
 
 
 const config = {
@@ -234,7 +234,7 @@ const rootReducer = combineReducers({
   fbtc: fBTCReducers,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
-  preferences
+  preferences: preferencesReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

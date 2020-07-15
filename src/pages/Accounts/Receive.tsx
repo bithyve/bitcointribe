@@ -132,7 +132,7 @@ export default function Receive(props) {
         let receiveAt = receivingAddress;
         if (amount) {
           receiveAt = service.getPaymentURI(receiveAt, {
-            amount: parseInt(amount),
+            amount: parseInt(amount) / 1e8,
           }).paymentURI;
         }
         setReceiveLink(receiveAt);
@@ -331,7 +331,7 @@ export default function Receive(props) {
       let paymentURI;
       if (amount) {
         paymentURI = service.getPaymentURI(receivingAddress, {
-          amount: parseInt(amount),
+          amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
 
@@ -361,7 +361,7 @@ export default function Receive(props) {
       let trustedPaymentURI;
       if (amount) {
         trustedPaymentURI = service.getPaymentURI(trustedReceivingAddress, {
-          amount: parseInt(amount),
+          amount: parseInt(amount) / 1e8,
         }).paymentURI;
       }
 

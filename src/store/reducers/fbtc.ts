@@ -10,6 +10,9 @@ import {
   GET_BALANCES_SUCCESS,
   CLEAR_QUOTE_DETAILS,
   CLEAR_ORDER_DETAILS,
+  STORE_FBTC_ACC_DATA,
+  FBTC_VOUCHER,
+  CLEAR_FBTC_VOUCHER
 } from '../actions/fbtc';
 
 const INITIAL_STATE = {
@@ -27,6 +30,8 @@ const INITIAL_STATE = {
   getQuoteFailMessage: null,
   executeOrderFail: false,
   executeOrderFailMessage: null,
+  FBTCAccountData: null,
+  FBTCVoucher: null,
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
@@ -111,6 +116,21 @@ const reducer = (state = INITIAL_STATE, action) => {
         ...state,
         getBalancesRequest: false,
         getBalancesDetails: action.payload.getBalancesDetails,
+      };
+      case STORE_FBTC_ACC_DATA:
+      return {
+        ...state,
+        FBTCAccountData: action.payload.FBTCAccountData,
+      };
+      case FBTC_VOUCHER:
+      return {
+        ...state,
+        FBTCVoucher: action.payload.FBTCVoucher,
+      };
+      case CLEAR_FBTC_VOUCHER:
+      return {
+        ...state,
+        FBTCVoucher: null,
       };
     default:
       return state;

@@ -1092,6 +1092,11 @@ const TrustedContactHistory = (props) => {
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
+          infoText={`Click here to accept Keeper request for ${
+            WALLET_SETUP.walletName
+          } Hexa wallet- link will expire in ${
+            config.TC_REQUEST_EXPIRY / 60000
+          } minutes`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
