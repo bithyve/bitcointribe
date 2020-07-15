@@ -42,6 +42,7 @@ import { AsyncStorage } from 'react-native';
 import { fetchNotificationsWorker } from './notifications';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
+import SSS from '../../bitcoin/utilities/sss/SSS';
 
 const sendNotification = (trustedContacts, contactName, walletName) => {
   const receivers = [];
@@ -96,7 +97,7 @@ function* approveTrustedContactWorker({ payload }) {
   );
 
   const { contactInfo, contactsPublicKey, contactsWalletName } = payload;
-
+  const encKey = SSS.strechKey(contactInfo.info);
   const res = yield call(
     trustedContacts.finalizeContact,
     contactInfo.contactName,
@@ -155,7 +156,8 @@ function* updateEphemeralChannelWorker({ payload }) {
   );
 
   const { contactInfo, data, fetch } = payload;
-
+  const encKey = SSS.strechKey(contactInfo.info);
+  console.log({ KeyLength: encKey.length, encKey });
   const res = yield call(
     trustedContacts.updateEphemeralChannel,
     contactInfo.contactName,
@@ -263,6 +265,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
   );
 
   const { contactInfo, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
+  const encKey = SSS.strechKey(contactInfo.info);
   const res = yield call(
     trustedContacts.fetchEphemeralChannel,
     contactInfo.contactName,

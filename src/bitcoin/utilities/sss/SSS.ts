@@ -406,6 +406,18 @@ export default class SSS {
       .update(JSON.stringify(encryptedSecret))
       .digest('hex');
 
+  public static strechKey = (password: string): string => {
+    return crypto
+      .pbkdf2Sync(
+        password,
+        config.HEXA_ID,
+        config.KEY_STRECH_ITERATIONS,
+        SSS.cipherSpec.keyLength / 2,
+        'sha256',
+      )
+      .toString('hex');
+  };
+
   public static generateKey = (length: number): string => {
     let result = '';
     const characters =

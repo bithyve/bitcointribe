@@ -32,6 +32,10 @@ class HexaConfig {
     keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
     iv: Buffer.alloc(16, 0),
   };
+  public KEY_STRECH_ITERATIONS = parseInt(
+    Config.BIT_KEY_STRECH_ITERATIONS.trim(),
+    10,
+  );
   public BH_SERVERS = {
     RELAY: Config.BIT_API_URLS_RELAY.trim(),
     SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),
