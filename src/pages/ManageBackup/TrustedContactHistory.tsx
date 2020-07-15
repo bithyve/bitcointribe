@@ -954,6 +954,21 @@ const TrustedContactHistory = (props) => {
       }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+        const phoneNumber = chosenContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (chosenContact.emails && chosenContact.emails.length) {
+        info = chosenContact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
       let data: EphemeralDataElements = {
         walletID,
         FCM,
@@ -985,7 +1000,7 @@ const TrustedContactHistory = (props) => {
         }
 
         dispatch(
-          uploadEncMShare(index, contactName, data, true, previousGuardianName),
+          uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
         );
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
@@ -997,7 +1012,7 @@ const TrustedContactHistory = (props) => {
       ) {
         setTrustedLink('');
         setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactName, data));
+        dispatch(uploadEncMShare(index, contactInfo, data));
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
       } else if (
@@ -1012,7 +1027,7 @@ const TrustedContactHistory = (props) => {
         setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );

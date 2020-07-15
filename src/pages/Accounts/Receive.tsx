@@ -325,6 +325,21 @@ export default function Receive(props) {
       }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (selectedContact.phoneNumbers && selectedContact.phoneNumbers.length) {
+        const phoneNumber = selectedContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (selectedContact.emails && selectedContact.emails.length) {
+        info = selectedContact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const { receivingAddress } =
@@ -388,7 +403,7 @@ export default function Receive(props) {
               },
             },
           };
-          dispatch(updateEphemeralChannel(contactName, data));
+          dispatch(updateEphemeralChannel(contactInfo, data));
         })();
       } else if (
         !trustedContact.symmetricKey &&
@@ -401,7 +416,7 @@ export default function Receive(props) {
 
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -430,7 +445,7 @@ export default function Receive(props) {
             },
           },
         };
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       }
     }
   }, [

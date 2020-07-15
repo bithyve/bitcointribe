@@ -116,6 +116,21 @@ export default function AddContactSendRequest(props) {
       }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+        const phoneNumber = Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (Contact.emails && Contact.emails.length) {
+        info = Contact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const walletID = await AsyncStorage.getItem('walletID');
@@ -127,7 +142,7 @@ export default function AddContactSendRequest(props) {
       };
 
       if (!trustedContact) {
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       } else if (
         !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel &&
@@ -138,7 +153,7 @@ export default function AddContactSendRequest(props) {
         // re-initiating expired EC
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );

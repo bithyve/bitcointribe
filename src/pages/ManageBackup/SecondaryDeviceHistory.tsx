@@ -44,6 +44,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
+import SSS from '../../bitcoin/utilities/sss/SSS';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -179,6 +180,11 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
+      const contactInfo = {
+        contactName,
+        info: SSS.generateKey(SSS.cipherSpec.keyLength),
+      };
+
       let data: EphemeralDataElements = {
         walletID,
         FCM,
@@ -187,7 +193,7 @@ const SecondaryDeviceHistory = (props) => {
 
       if (reshare) {
         setSecondaryQR('');
-        dispatch(uploadEncMShare(0, contactName, data, true));
+        dispatch(uploadEncMShare(0, contactInfo, data, true));
         updateTrustedContactsInfo({ firstName, lastName });
       } else {
         if (
@@ -196,7 +202,7 @@ const SecondaryDeviceHistory = (props) => {
             config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
-          dispatch(uploadEncMShare(0, contactName, data));
+          dispatch(uploadEncMShare(0, contactInfo, data));
           updateTrustedContactsInfo({ firstName, lastName });
         } else if (
           trustedContact &&
@@ -209,7 +215,7 @@ const SecondaryDeviceHistory = (props) => {
           setSecondaryQR('');
           dispatch(
             updateEphemeralChannel(
-              contactName,
+              contactInfo,
               trustedContact.ephemeralChannel.data[0],
             ),
           );
