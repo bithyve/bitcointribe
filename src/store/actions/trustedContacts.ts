@@ -2,7 +2,7 @@
 
 import {
   TrustedDataElements,
-  EphemeralData,
+  EphemeralDataElements,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
@@ -40,7 +40,7 @@ export const approveTrustedContact = (
 
 export const updateEphemeralChannel = (
   contactName: string,
-  data: EphemeralData,
+  data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,

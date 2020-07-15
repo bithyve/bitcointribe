@@ -32,7 +32,7 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import ModalHeader from '../../components/ModalHeader';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import config from '../../bitcoin/HexaConfig';
 
@@ -202,7 +202,7 @@ export default function CommunicationMode(props) {
         const contactName = `${contact.firstName} ${
           contact.lastName ? contact.lastName : ''
         }`.toLowerCase();
-        const data: EphemeralData = {
+        const data: EphemeralDataElements = {
           walletID,
           FCM,
         };

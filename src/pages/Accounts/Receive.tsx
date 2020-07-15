@@ -51,7 +51,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import {
-  EphemeralData,
+  EphemeralDataElements,
   TrustedContactDerivativeAccount,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
@@ -374,7 +374,7 @@ export default function Receive(props) {
           const walletID = await AsyncStorage.getItem('walletID');
           const FCM = await AsyncStorage.getItem('fcmToken');
 
-          const data: EphemeralData = {
+          const data: EphemeralDataElements = {
             walletID,
             FCM,
             paymentDetails: {
@@ -418,7 +418,7 @@ export default function Receive(props) {
             .paymentURI === paymentURI
         )
           return;
-        const data: EphemeralData = {
+        const data: EphemeralDataElements = {
           paymentDetails: {
             trusted: {
               address: trustedReceivingAddress,

@@ -3,7 +3,7 @@ import config from '../HexaConfig';
 import {
   Contacts,
   TrustedData,
-  EphemeralData,
+  EphemeralDataElements,
   TrustedDataElements,
 } from '../utilities/Interface';
 
@@ -116,7 +116,7 @@ export default class TrustedContactsService {
 
   public updateEphemeralChannel = async (
     contactName: string,
-    dataElements: EphemeralData,
+    dataElements: EphemeralDataElements,
     fetch?: Boolean,
   ): Promise<
     | {
@@ -125,7 +125,7 @@ export default class TrustedContactsService {
           | {
               updated: any;
               publicKey: string;
-              data: EphemeralData;
+              data: EphemeralDataElements;
             }
           | {
               updated: any;
@@ -168,7 +168,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          data: EphemeralData;
+          data: EphemeralDataElements;
         };
         err?: undefined;
         message?: undefined;

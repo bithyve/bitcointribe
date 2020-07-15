@@ -47,7 +47,7 @@ import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
@@ -954,7 +954,7 @@ const TrustedContactHistory = (props) => {
       }`
         .toLowerCase()
         .trim();
-      let data: EphemeralData = {
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };

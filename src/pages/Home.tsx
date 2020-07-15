@@ -113,7 +113,7 @@ import {
 } from '../store/actions/accounts';
 import {
   TrustedContactDerivativeAccount,
-  EphemeralData,
+  EphemeralDataElements,
 } from '../bitcoin/utilities/Interface';
 import * as RNLocalize from 'react-native-localize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';

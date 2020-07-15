@@ -57,7 +57,7 @@ import {
 import {
   EncDynamicNonPMDD,
   MetaShare,
-  EphemeralData,
+  EphemeralDataElements,
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
@@ -237,7 +237,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     console.log({ otp, encryptedKey });
 
     // adding transfer details to he ephemeral data
-    const data: EphemeralData = {
+    const data: EphemeralDataElements = {
       ...payload.data,
       shareTransferDetails: {
         otp,
@@ -705,8 +705,7 @@ function* sharePersonalCopyWorker({ payload }) {
               }, 1000);
             },
           );
-        }
-        else {
+        } else {
           let shareOptions = {
             title: selectedPersonalCopy.title,
             message: `Please find attached the personal copy ${
@@ -714,13 +713,14 @@ function* sharePersonalCopyWorker({ payload }) {
             } share pdf, it is password protected by the answer to the security question.`,
             url:
               Platform.OS == 'android'
-                ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+                ? 'file://' +
+                  personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
             subject: selectedPersonalCopy.title,
           };
-  
+
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {

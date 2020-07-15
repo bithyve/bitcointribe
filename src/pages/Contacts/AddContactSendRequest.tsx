@@ -29,7 +29,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
@@ -121,7 +121,7 @@ export default function AddContactSendRequest(props) {
       const walletID = await AsyncStorage.getItem('walletID');
       const FCM = await AsyncStorage.getItem('fcmToken');
 
-      const data: EphemeralData = {
+      const data: EphemeralDataElements = {
         walletID,
         FCM,
       };

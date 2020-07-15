@@ -20,7 +20,7 @@ import {
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
-  EphemeralData,
+  EphemeralDataElements,
   DerivativeAccount,
   Contacts,
   TrustedData,
@@ -163,7 +163,7 @@ function* updateEphemeralChannelWorker({ payload }) {
   );
   console.log({ res });
   if (res.status === 200) {
-    const ephData: EphemeralData = res.data.data;
+    const ephData: EphemeralDataElements = res.data.data;
     if (ephData && ephData.paymentDetails) {
       // using trusted details on TC approval
       const { trusted } = ephData.paymentDetails;
@@ -227,7 +227,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
-    const data: EphemeralData = res.data.data;
+    const data: EphemeralDataElements = res.data.data;
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
       yield delay(1000); // introducing delay in order to evade database insertion collision
@@ -257,7 +257,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
     publicKey,
   );
   if (res.status === 200) {
-    const data: EphemeralData = res.data.data;
+    const data: EphemeralDataElements = res.data.data;
     if (publicKey) {
       if (data && data.paymentDetails) {
         // using alternate details on TC rejection

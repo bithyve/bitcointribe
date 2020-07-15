@@ -34,7 +34,7 @@ import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
@@ -179,7 +179,7 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
-      let data: EphemeralData = {
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
