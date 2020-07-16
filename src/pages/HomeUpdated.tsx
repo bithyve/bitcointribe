@@ -99,7 +99,7 @@ import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
-import { updatePreference, setFCMToken } from '../store/actions/preferences'
+import { updatePreference, setFCMToken, setSecondaryDeviceAddress } from '../store/actions/preferences'
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -275,6 +275,8 @@ interface HomePropsTypes {
   updatePreference: any;
   fcmTokenValue: any;
   setFCMToken: any;
+  setSecondaryDeviceAddress: any;
+  secondaryDeviceAddressValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -886,6 +888,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.storeFCMToken();
     }
 
+    if (prevProps.secondaryDeviceAddressValue !== this.props.secondaryDeviceAddressValue) {
+      this.setSecondaryDeviceAddresses();
+    }
+
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
       const serviceType = REGULAR_ACCOUNT;
       const {
@@ -1195,9 +1201,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setSecondaryDeviceAddresses = async () => {
-    let secondaryDeviceOtpTemp = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
+    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
+    // JSON.parse(
+    //   await AsyncStorage.getItem('secondaryDeviceAddress'),
+    // );
     if (!secondaryDeviceOtpTemp) {
       secondaryDeviceOtpTemp = [];
     }
@@ -1207,10 +1214,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
-      await AsyncStorage.setItem(
-        'secondaryDeviceAddress',
-        JSON.stringify(secondaryDeviceOtpTemp),
-      );
+      this.props.setSecondaryDeviceAddress(secondaryDeviceOtpTemp);
+      // await AsyncStorage.setItem(
+      //   'secondaryDeviceAddress',
+      //   JSON.stringify(secondaryDeviceOtpTemp),
+      // );
     }
   };
 
@@ -3035,7 +3043,8 @@ const mapStateToProps = (state) => {
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-    fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue)
+    fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
+    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue)
   };
 };
 
@@ -3056,7 +3065,8 @@ export default withNavigationFocus(
     setCurrencyCode,
     setCurrencyToggleValue,
     updatePreference,
-    setFCMToken
+    setFCMToken,
+    setSecondaryDeviceAddress
   })(HomeUpdated),
 );
 
