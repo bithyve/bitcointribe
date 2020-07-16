@@ -309,22 +309,17 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.contactName &&
-              contact.contactName.split(' ')[0] &&
-              contact.contactName != 'Secondary Device'
-              ? contact.contactName.split(' ')[0]
-              : contact.contactName && contact.contactName == 'Secondary Device'
-                ? 'Keeper'
-                : ''}{' '}
+            {contact.firstName && contact.firstName != 'Secondary'
+              ? contact.firstName + ' '
+              : contact.firstName && contact.firstName == 'Secondary'
+              ? 'Keeper '
+              : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.contactName &&
-                contact.contactName.split(' ')[1] &&
-                contact.contactName != 'Secondary Device'
-                ? contact.contactName.split(' ')[1]
-                : contact.contactName &&
-                  contact.contactName == 'Secondary Device'
-                  ? 'Device'
-                  : ''}
+              {contact.lastName && contact.lastName != 'Device'
+                ? contact.lastName + ' '
+                : contact.lastName && contact.lastName == 'Device'
+                ? 'Device '
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
