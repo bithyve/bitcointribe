@@ -78,6 +78,7 @@ import SendToContact from '../pages/Accounts/SendToContactUpdate';
 import SendConfirmation from '../pages/Accounts/SendConfirmation_updated';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
+import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 
@@ -204,6 +205,7 @@ const HomeNavigator = createStackNavigator(
     VoucherScanner,
     AddContactSendRequest,
     ContactDetails,
+    ContactDetailsNew,
     Receive,
     PairNewWallet,
     UpdateApp: {
