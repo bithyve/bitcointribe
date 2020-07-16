@@ -102,7 +102,7 @@ export function* fetchNotificationsWorker() {
     yield call(AsyncStorage.setItem, 'DHInfos', JSON.stringify(DHInfos));
     yield put(notificationsFetched(notifications));
   } else {
-    console.log('Failed to deliver notification');
+    console.log('Failed to fetch notification');
   }
 }
 

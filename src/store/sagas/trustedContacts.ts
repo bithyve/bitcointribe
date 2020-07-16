@@ -157,7 +157,7 @@ function* updateEphemeralChannelWorker({ payload }) {
 
   const { contactInfo, data, fetch } = payload;
   const encKey = SSS.strechKey(contactInfo.info);
-  console.log({ KeyLength: encKey.length, encKey });
+
   const res = yield call(
     trustedContacts.updateEphemeralChannel,
     contactInfo.contactName,

@@ -248,10 +248,21 @@ export default function AddContactSendRequest(props) {
       }
 
       if (!trustedQR) {
+        let info = '';
+        if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+          const phoneNumber = Contact.phoneNumbers[0].number;
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
+          info = number;
+        } else if (Contact.emails && Contact.emails.length) {
+          info = Contact.emails[0].email;
+        }
+
         setTrustedQR(
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            info: info.trim(),
             uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'trustedContactQR',
             ver: appVersion,

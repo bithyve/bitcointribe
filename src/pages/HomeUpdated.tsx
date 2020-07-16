@@ -316,10 +316,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     };
   }
 
-  onPressNotifications = async() => {
-    let notificationList = JSON.parse(await AsyncStorage.getItem('notificationList'));
+  onPressNotifications = async () => {
+    let notificationList = JSON.parse(
+      await AsyncStorage.getItem('notificationList'),
+    );
     let tmpList = [];
-    if(notificationList){
+    if (notificationList) {
       for (let i = 0; i < notificationList.length; i++) {
         const element = notificationList[i];
         let obj = {
@@ -458,6 +460,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             isGuardian: scannedData.isGuardian,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            encKey: scannedData.encKey,
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
@@ -1731,6 +1734,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isGuardian,
       encryptedKey,
       publicKey,
+      info,
       isQR,
       uploadedAt,
       isRecovery,
@@ -1772,6 +1776,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             try {
               publicKey = TrustedContactsService.decryptPub(encryptedKey, key)
                 .decryptedPub;
+              info = key;
             } catch (err) {
               Alert.alert(
                 'Invalid Number/Email',
@@ -1779,7 +1784,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               );
             }
           }
-
           let pubExists = false;
           Object.keys(trustedContacts.tc.trustedContacts).forEach(
             (contactName) => {
@@ -1800,22 +1804,26 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
                 }`.toLowerCase();
+                const contactInfo = {
+                  contactName,
+                  info,
+                };
                 if (isGuardian) {
                   approveTrustedContact(
-                    contactName,
+                    contactInfo,
                     publicKey,
                     true,
                     requester,
                   );
                 } else {
-                  approveTrustedContact(contactName, publicKey, true);
+                  approveTrustedContact(contactInfo, publicKey, true);
                 }
               },
               isGuardian,
             });
           } else if (publicKey && rejected) {
             // don't associate; only fetch the payment details from EC
-            fetchEphemeralChannel(null, null, publicKey);
+            // fetchEphemeralChannel(null, null, publicKey);
           }
         }
       }
@@ -1926,8 +1934,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: !this.state.notificationDataChange,
     });
 
-    if(value.info.includes('Trusted Contact request accepted by')){
-      navigation.navigate("AddressBookContents");
+    if (value.info.includes('Trusted Contact request accepted by')) {
+      navigation.navigate('AddressBookContents');
       return;
     }
 

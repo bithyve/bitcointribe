@@ -1052,6 +1052,17 @@ const TrustedContactHistory = (props) => {
       if (!trustedContacts.tc.trustedContacts[contactName]) return;
 
       createDeepLink();
+
+      let info = '';
+      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+        const phoneNumber = chosenContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (chosenContact.emails && chosenContact.emails.length) {
+        info = chosenContact.emails[0].email;
+      }
+
       const publicKey =
         trustedContacts.tc.trustedContacts[contactName].publicKey;
       setTrustedQR(
@@ -1059,6 +1070,7 @@ const TrustedContactHistory = (props) => {
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info: info.trim(),
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,
