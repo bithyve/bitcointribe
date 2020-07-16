@@ -423,6 +423,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             isGuardian: scannedData.isGuardian,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
@@ -460,7 +461,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             isGuardian: scannedData.isGuardian,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
-            encKey: scannedData.encKey,
+            info: scannedData.info,
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
@@ -498,6 +499,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           const tcRequest = {
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             type: scannedData.type,
             isQR: true,
           };
@@ -535,6 +537,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             isPaymentRequest: true,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
+            info: scannedData.info,
             type: scannedData.type,
             isQR: true,
           };
@@ -1748,6 +1751,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       walletName,
       trustedContacts,
     } = this.props;
+
+    console.log({ info });
 
     if (!isRecovery) {
       if (requester === walletName) {
