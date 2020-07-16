@@ -47,7 +47,7 @@ import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
@@ -954,7 +954,22 @@ const TrustedContactHistory = (props) => {
       }`
         .toLowerCase()
         .trim();
-      let data: EphemeralData = {
+
+      let info = '';
+      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+        const phoneNumber = chosenContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (chosenContact.emails && chosenContact.emails.length) {
+        info = chosenContact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
@@ -985,7 +1000,7 @@ const TrustedContactHistory = (props) => {
         }
 
         dispatch(
-          uploadEncMShare(index, contactName, data, true, previousGuardianName),
+          uploadEncMShare(index, contactInfo, data, true, previousGuardianName),
         );
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
@@ -997,7 +1012,7 @@ const TrustedContactHistory = (props) => {
       ) {
         setTrustedLink('');
         setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactName, data));
+        dispatch(uploadEncMShare(index, contactInfo, data));
         updateTrustedContactsInfo(chosenContact);
         onOTPShare(index); // enables reshare
       } else if (
@@ -1012,7 +1027,7 @@ const TrustedContactHistory = (props) => {
         setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -1037,6 +1052,17 @@ const TrustedContactHistory = (props) => {
       if (!trustedContacts.tc.trustedContacts[contactName]) return;
 
       createDeepLink();
+
+      let info = '';
+      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+        const phoneNumber = chosenContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (chosenContact.emails && chosenContact.emails.length) {
+        info = chosenContact.emails[0].email;
+      }
+
       const publicKey =
         trustedContacts.tc.trustedContacts[contactName].publicKey;
       setTrustedQR(
@@ -1044,6 +1070,7 @@ const TrustedContactHistory = (props) => {
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info: info.trim(),
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,

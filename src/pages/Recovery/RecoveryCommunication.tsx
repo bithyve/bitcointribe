@@ -90,7 +90,9 @@ export default function RecoveryCommunication(props) {
         return {
           id: index,
           info: number ? number : email,
-          infoText: number ? 'Send SMS (' + number + ')' : 'Send email (' + email + ')',
+          infoText: number
+            ? 'Send SMS (' + number + ')'
+            : 'Send email (' + email + ')',
           isSelected: false,
           type: number ? 'number' : 'email',
         };
@@ -110,7 +112,7 @@ export default function RecoveryCommunication(props) {
       info: 'Scan QR from Keeper',
       isSelected: false,
       type: 'qrscanner',
-    })
+    });
 
     setContactInfo(contactInfoTemp);
   }, []);
@@ -150,9 +152,16 @@ export default function RecoveryCommunication(props) {
           `/${numHint}` +
           `/v${appVersion}`;
 
-        const smsInfoText = `Click here to help ${WALLET_SETUP.walletName} restore their Hexa wallet- link will expire in 10 minutes`
+        const smsInfoText = `Click here to help ${
+          WALLET_SETUP.walletName
+        } restore their Hexa wallet- link will expire in ${
+          config.TC_REQUEST_EXPIRY / 60000
+        } minutes`;
 
-        textWithoutEncoding(selectedContactMode.info, smsInfoText + '\n' +numberDL);
+        textWithoutEncoding(
+          selectedContactMode.info,
+          smsInfoText + '\n' + numberDL,
+        );
         // props.navigation.navigate('ShareRecoveryOTP', {
         //   OTP: REQUEST_DETAILS.OTP,
         // });
@@ -179,7 +188,11 @@ export default function RecoveryCommunication(props) {
           `/${emailHint}` +
           `/v${appVersion}`;
 
-        const emailInfoText = `Click here to help ${WALLET_SETUP.walletName} restore their Hexa wallet- link will expire in 10 minutes`
+        const emailInfoText = `Click here to help ${
+          WALLET_SETUP.walletName
+        } restore their Hexa wallet- link will expire in ${
+          config.TC_REQUEST_EXPIRY / 60000
+        } minutes`;
 
         email(
           [selectedContactMode.info],
@@ -199,7 +212,9 @@ export default function RecoveryCommunication(props) {
         (trustedContactQrBottomSheet as any).current.snapTo(1);
         break;
       case 'qrscanner':
-        props.navigation.navigate('RecoveryQrScanner', {scanedCode: getQrCodeData});
+        props.navigation.navigate('RecoveryQrScanner', {
+          scanedCode: getQrCodeData,
+        });
         break;
     }
   };
@@ -406,7 +421,9 @@ export default function RecoveryCommunication(props) {
                         isChecked={item.isSelected}
                         onpress={() => onContactSelect(index)}
                       />
-                      <Text style={styles.contactInfoText}>{item.infoText}</Text>
+                      <Text style={styles.contactInfoText}>
+                        {item.infoText}
+                      </Text>
                     </TouchableOpacity>
                   );
                 })}

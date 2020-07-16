@@ -12,7 +12,7 @@ import {
   CLEAR_PAYMENT_DETAILS,
   SWITCH_TC_LOADING,
 } from '../actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 
 const initialState: {
   service: TrustedContactsService;
@@ -24,7 +24,7 @@ const initialState: {
     };
   };
   ephemeralChannel: {
-    [contactName: string]: { updated: Boolean; data?: EphemeralData };
+    [contactName: string]: { updated: Boolean; data?: EphemeralDataElements };
   };
   trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
   paymentDetails: {

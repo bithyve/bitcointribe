@@ -2,7 +2,7 @@
 
 import {
   TrustedDataElements,
-  EphemeralData,
+  EphemeralDataElements,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
@@ -14,15 +14,18 @@ export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
 
-export const initializeTrustedContact = (contactName: string) => {
+export const initializeTrustedContact = (contactInfo: {
+  contactName: string;
+  info: string;
+}) => {
   return {
     type: INITIALIZE_TRUSTED_CONTACT,
-    payload: { contactName },
+    payload: { contactInfo },
   };
 };
 
 export const approveTrustedContact = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   contactsPublicKey: string,
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
@@ -30,7 +33,7 @@ export const approveTrustedContact = (
   return {
     type: APPROVE_TRUSTED_CONTACT,
     payload: {
-      contactName,
+      contactInfo,
       contactsPublicKey,
       updateEphemeralChannel,
       contactsWalletName,
@@ -39,26 +42,26 @@ export const approveTrustedContact = (
 };
 
 export const updateEphemeralChannel = (
-  contactName: string,
-  data: EphemeralData,
+  contactInfo: { contactName: string; info: string },
+  data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch, trustedContacts, uploadXpub },
+    payload: { contactInfo, data, fetch, trustedContacts, uploadXpub },
   };
 };
 
 export const fetchEphemeralChannel = (
-  contactName?: string,
+  contactInfo: { contactName: string; info: string },
   approveTC?: Boolean,
   publicKey?: string,
 ) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payload: { contactName, approveTC, publicKey },
+    payload: { contactInfo, approveTC, publicKey },
   };
 };
 

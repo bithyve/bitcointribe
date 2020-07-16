@@ -34,7 +34,7 @@ import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
@@ -44,6 +44,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
+import SSS from '../../bitcoin/utilities/sss/SSS';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -179,15 +180,25 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
-      let data: EphemeralData = {
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
+      let info = null;
+      if (trustedContact && trustedContact.secondaryKey) {
+        info = trustedContact.secondaryKey;
+      }
+
+      const contactInfo = {
+        contactName,
+        info,
+      };
+
       if (reshare) {
         setSecondaryQR('');
-        dispatch(uploadEncMShare(0, contactName, data, true));
+        dispatch(uploadEncMShare(0, contactInfo, data, true));
         updateTrustedContactsInfo({ firstName, lastName });
       } else {
         if (
@@ -196,7 +207,7 @@ const SecondaryDeviceHistory = (props) => {
             config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
-          dispatch(uploadEncMShare(0, contactName, data));
+          dispatch(uploadEncMShare(0, contactInfo, data));
           updateTrustedContactsInfo({ firstName, lastName });
         } else if (
           trustedContact &&
@@ -209,7 +220,7 @@ const SecondaryDeviceHistory = (props) => {
           setSecondaryQR('');
           dispatch(
             updateEphemeralChannel(
-              contactName,
+              contactInfo,
               trustedContact.ephemeralChannel.data[0],
             ),
           );
@@ -235,14 +246,16 @@ const SecondaryDeviceHistory = (props) => {
       trustedContacts.tc.trustedContacts[contactName] &&
       trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
     ) {
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
 
       setSecondaryQR(
         JSON.stringify({
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info: secondaryKey,
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,
