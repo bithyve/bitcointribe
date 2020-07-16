@@ -2,7 +2,8 @@ import {
     CURRENCY_CODE,
     CURRENCY_TOGGLE_VALUE,
     FCM_TOKEN_VALUE,
-    SECONDARY_DEVICE_ADDRESS_VALUE
+    SECONDARY_DEVICE_ADDRESS_VALUE,
+    RELEASE_CASES_VALUE
   } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
 import { chain } from 'icepick';
@@ -13,6 +14,7 @@ const initialState = {
     currencyToggleValue: null,
     fcmTokenValue: '',
     secondaryDeviceAddressValue: '',
+    releaseCasesValue: null,
 }
 
 export default (state = initialState, { type, payload }) => {
@@ -38,6 +40,11 @@ export default (state = initialState, { type, payload }) => {
               return {
                 ...state,
                 secondaryDeviceAddressValue: payload.secondaryDeviceAddressValue,
+              };
+              case RELEASE_CASES_VALUE:
+              return {
+                ...state,
+                releaseCasesValue: payload.releaseCasesValue,
               };
         default:
             return state

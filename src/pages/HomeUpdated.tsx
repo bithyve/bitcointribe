@@ -277,6 +277,7 @@ interface HomePropsTypes {
   setFCMToken: any;
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
+  releaseCasesValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -881,7 +882,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps) => {
-    if (prevProps.notificationList !== this.props.notificationList) {
+    if ((prevProps.notificationList !== this.props.notificationList) || (prevProps.releaseCasesValue !== this.props.releaseCasesValue)) {
       this.setupNotificationList();
     }
 
@@ -1229,22 +1230,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-
     // TODO -- need to check this
     let AssociatedContact = JSON.parse(
       await AsyncStorage.getItem('AssociatedContacts'),
     );
     // setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
     this.setSecondaryDeviceAddresses();
-    this.setState({
-      selectedContact: SelectedContacts,
-    });
   };
 
   setCurrencyCodeFromAsync = async () => {
@@ -1394,7 +1385,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
     let readStatus = true;
     if (content.notificationType == 'release') {
-      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      let releaseCases = this.props.releaseCasesValue; 
+      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
         readStatus = true;
       } else if (releaseCases.remindMeLaterClick) {
@@ -2043,9 +2035,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         const element = notificationList['notifications'][i];
         let readStatus = false;
         if (element.notificationType == 'release') {
-          let releaseCases = JSON.parse(
-            await AsyncStorage.getItem('releaseCases'),
-          );
+          let releaseCases = this.props.releaseCasesValue;
+          // JSON.parse(
+          //   await AsyncStorage.getItem('releaseCases'),
+          // );
           if (element.body.split(' ')[1] == releaseCases.build) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
@@ -3057,7 +3050,8 @@ const mapStateToProps = (state) => {
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
-    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue)
+    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue),
+    releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
   };
 };
 

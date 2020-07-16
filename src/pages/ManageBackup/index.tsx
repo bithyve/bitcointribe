@@ -804,33 +804,6 @@ export default function ManageBackup(props) {
       }
       setPageData([...pageData]);
     }
-
-    // let contactList = JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-
-    // setContacts(contactList);
-    // if (contactList.length) {
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact1') !=
-    //     -1
-    //   ) {
-    //     pageData[1].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact1')
-    //       ];
-    //   }
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact2') !=
-    //     -1
-    //   ) {
-    //     pageData[2].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact2')
-    //       ];
-    //   }
-    // }
-    // setPageData([...pageData]);
   };
 
   const setAutoHighlightFlagsFromAsync = async () => {
