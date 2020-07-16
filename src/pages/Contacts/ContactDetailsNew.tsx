@@ -428,7 +428,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   };
 
   SelectOption = (Id) => {
-    if (Id == this.state.SelectedOption) {
+    if (Id === this.state.SelectedOption) {
       this.setState({
         SelectedOption: 0,
       });
