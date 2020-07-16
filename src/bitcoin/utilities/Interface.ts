@@ -197,6 +197,12 @@ export interface EphemeralData {
 export interface EncryptedEphemeralData {
   publicKey: string;
   encryptedData: string; // encrypted EphemeralData
+  // add ons for optimisation
+  walletID?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
 }
 
 export interface TrustedDataElements {
