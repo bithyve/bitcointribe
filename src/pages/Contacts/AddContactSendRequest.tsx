@@ -50,6 +50,7 @@ export default function AddContactSendRequest(props) {
   
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
+  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
@@ -119,7 +120,8 @@ export default function AddContactSendRequest(props) {
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
 
       const data: EphemeralData = {
         walletID,

@@ -83,7 +83,7 @@ const TrustedContactHistory = (props) => {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
-
+  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
@@ -939,7 +939,8 @@ const TrustedContactHistory = (props) => {
         (chosenContact.emails && chosenContact.emails.length))
     ) {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
       const contactName = `${chosenContact.firstName} ${
