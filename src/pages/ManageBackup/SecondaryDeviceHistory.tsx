@@ -180,16 +180,21 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
-      const contactInfo = {
-        contactName,
-        info: SSS.generateKey(SSS.cipherSpec.keyLength),
-      };
-
       let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
+
+      let info = null;
+      if (trustedContact && trustedContact.secondaryKey) {
+        info = trustedContact.secondaryKey;
+      }
+
+      const contactInfo = {
+        contactName,
+        info,
+      };
 
       if (reshare) {
         setSecondaryQR('');
@@ -241,14 +246,16 @@ const SecondaryDeviceHistory = (props) => {
       trustedContacts.tc.trustedContacts[contactName] &&
       trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
     ) {
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
 
       setSecondaryQR(
         JSON.stringify({
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info: secondaryKey,
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,

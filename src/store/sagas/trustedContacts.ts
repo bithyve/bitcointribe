@@ -156,6 +156,13 @@ function* updateEphemeralChannelWorker({ payload }) {
   );
 
   const { contactInfo, data, fetch } = payload;
+
+  let generatedKey = false;
+  if (!contactInfo.info) {
+    // contact info = null, for secondary device (initially)
+    contactInfo.info = SSS.generateKey(SSS.cipherSpec.keyLength);
+    generatedKey = true;
+  }
   const encKey = SSS.strechKey(contactInfo.info);
 
   const res = yield call(
@@ -165,6 +172,13 @@ function* updateEphemeralChannelWorker({ payload }) {
     encKey,
     fetch,
   );
+
+  if (generatedKey) {
+    trustedContacts.tc.trustedContacts[
+      contactInfo.contactName.toLowerCase().trim()
+    ].secondaryKey = contactInfo.info;
+  }
+
   console.log({ res });
   if (res.status === 200) {
     const ephData: EphemeralDataElements = res.data.data;

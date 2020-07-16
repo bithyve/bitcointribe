@@ -227,6 +227,7 @@ export interface Contacts {
     publicKey: string;
     encKey: string;
     symmetricKey?: string;
+    secondaryKey?: string;
     contactsPubKey?: string;
     contactsWalletName?: string;
     isWard?: Boolean;
