@@ -29,7 +29,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralData, EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
@@ -117,19 +117,34 @@ export default function AddContactSendRequest(props) {
         }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+        const phoneNumber = Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (Contact.emails && Contact.emails.length) {
+        info = Contact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const walletID = await AsyncStorage.getItem('walletID');
       const FCM = fcmTokenValue;
       //await AsyncStorage.getItem('fcmToken');
 
-      const data: EphemeralData = {
+      const data: EphemeralDataElements = {
         walletID,
         FCM,
       };
 
       if (!trustedContact) {
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       } else if (
         !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel &&
@@ -140,7 +155,7 @@ export default function AddContactSendRequest(props) {
         // re-initiating expired EC
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -235,10 +250,21 @@ export default function AddContactSendRequest(props) {
       }
 
       if (!trustedQR) {
+        let info = '';
+        if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+          const phoneNumber = Contact.phoneNumbers[0].number;
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
+          info = number;
+        } else if (Contact.emails && Contact.emails.length) {
+          info = Contact.emails[0].email;
+        }
+
         setTrustedQR(
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            info: info.trim(),
             uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'trustedContactQR',
             ver: appVersion,

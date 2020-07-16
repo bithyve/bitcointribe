@@ -19,7 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import config from '../../bitcoin/HexaConfig';
 import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
@@ -50,8 +50,8 @@ export default function SendShareModal(props) {
             Send Recovery Key{'\n'}to contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Send Key to Keeper, you can change your Keeper,
-            or their primary mode of contact
+            Send Key to Keeper, you can change your Keeper, or their primary
+            mode of contact
           </Text>
         </View>
         <View style={styles.contactProfileView}>
