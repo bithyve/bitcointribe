@@ -102,6 +102,7 @@ export default function Receive(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
+  const fcmTokenValue =  useSelector((state) => idx(state, (_) => _.preferences.fcmTokenValue));
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -353,7 +354,9 @@ export default function Receive(props) {
       if (!trustedContact) {
         (async () => {
           const walletID = await AsyncStorage.getItem('walletID');
-          const FCM = await AsyncStorage.getItem('fcmToken');
+          const FCM = fcmTokenValue;
+          console.log("FCM TOKEN in receive", fcmTokenValue, FCM); 
+          //await AsyncStorage.getItem('fcmToken');
 
           const data: EphemeralData = {
             walletID,

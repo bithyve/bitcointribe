@@ -99,7 +99,7 @@ import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
-import { updatePreference } from '../store/actions/preferences'
+import { updatePreference, setFCMToken, setSecondaryDeviceAddress } from '../store/actions/preferences'
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -272,7 +272,11 @@ interface HomePropsTypes {
   currencyCode: any;
   setCurrencyToggleValue: any;
   currencyToggleValue: any;
-  updatePreference: any
+  updatePreference: any;
+  fcmTokenValue: any;
+  setFCMToken: any;
+  setSecondaryDeviceAddress: any;
+  secondaryDeviceAddressValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -880,6 +884,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.getNewTransactionNotifications();
     }
 
+    if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
+      this.storeFCMToken();
+    }
+
+    if (prevProps.secondaryDeviceAddressValue !== this.props.secondaryDeviceAddressValue) {
+      this.setSecondaryDeviceAddresses();
+    }
+
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
       const serviceType = REGULAR_ACCOUNT;
       const {
@@ -1189,9 +1201,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setSecondaryDeviceAddresses = async () => {
-    let secondaryDeviceOtpTemp = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
+    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
+    // JSON.parse(
+    //   await AsyncStorage.getItem('secondaryDeviceAddress'),
+    // );
     if (!secondaryDeviceOtpTemp) {
       secondaryDeviceOtpTemp = [];
     }
@@ -1201,10 +1214,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
-      await AsyncStorage.setItem(
-        'secondaryDeviceAddress',
-        JSON.stringify(secondaryDeviceOtpTemp),
-      );
+      this.props.setSecondaryDeviceAddress(secondaryDeviceOtpTemp);
+      // await AsyncStorage.setItem(
+      //   'secondaryDeviceAddress',
+      //   JSON.stringify(secondaryDeviceOtpTemp),
+      // );
     }
   };
 
@@ -1281,11 +1295,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
-    if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
+    let fcmTokenFromAsync = this.props.fcmTokenValue;
+    //await AsyncStorage.getItem('fcmToken');
+    if (fcmTokenFromAsync && fcmTokenFromAsync != fcmToken) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem 
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     } else if (!fcmTokenFromAsync) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem 
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     }
@@ -3024,7 +3043,8 @@ const mapStateToProps = (state) => {
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-
+    fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
+    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue)
   };
 };
 
@@ -3044,7 +3064,9 @@ export default withNavigationFocus(
     storeFbtcData,
     setCurrencyCode,
     setCurrencyToggleValue,
-    updatePreference
+    updatePreference,
+    setFCMToken,
+    setSecondaryDeviceAddress
   })(HomeUpdated),
 );
 

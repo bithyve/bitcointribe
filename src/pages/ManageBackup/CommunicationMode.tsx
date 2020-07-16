@@ -41,7 +41,8 @@ export default function CommunicationMode(props) {
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
-
+  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
+  
   const contact = props.contact;
   const index = props.index; // synching w/ share indexes in DB
   if (!contact) return <View></View>;
@@ -195,7 +196,8 @@ export default function CommunicationMode(props) {
   useEffect(() => {
     (async () => {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue; 
+      //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
       if (contact && contact.firstName) {

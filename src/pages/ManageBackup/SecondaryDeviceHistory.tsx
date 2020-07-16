@@ -58,7 +58,8 @@ const SecondaryDeviceHistory = (props) => {
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
-
+  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
+  
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
   );
@@ -167,7 +168,8 @@ const SecondaryDeviceHistory = (props) => {
   const createGuardian = useCallback(
     async (reshare?: boolean) => {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue; 
+      //await AsyncStorage.getItem('fcmToken');
 
       const firstName = 'Secondary';
       const lastName = 'Device';
