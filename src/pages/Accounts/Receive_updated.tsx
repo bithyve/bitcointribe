@@ -45,7 +45,7 @@ import {
 import BackupStyles from '../ManageBackup/Styles';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import {
-  EphemeralData,
+  EphemeralDataElements,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -246,10 +246,23 @@ export default function Receive(props) {
       }
 
       if (!receiveQR) {
+        let info = '';
+        if (
+          selectedContact.phoneNumbers &&
+          selectedContact.phoneNumbers.length
+        ) {
+          const phoneNumber = selectedContact.phoneNumbers[0].number;
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
+          info = number;
+        } else if (selectedContact.emails && selectedContact.emails.length) {
+          info = selectedContact.emails[0].email;
+        }
         setReceiveQR(
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            info: info.trim(),
             uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'paymentTrustedContactQR',
             ver: appVersion,
@@ -310,6 +323,22 @@ export default function Receive(props) {
         }`
         .toLowerCase()
         .trim();
+        
+      let info = '';
+      if (selectedContact.phoneNumbers && selectedContact.phoneNumbers.length) {
+        const phoneNumber = selectedContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (selectedContact.emails && selectedContact.emails.length) {
+        info = selectedContact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
+
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const { receivingAddress } =
         serviceType === SECURE_ACCOUNT
@@ -358,7 +387,7 @@ export default function Receive(props) {
           console.log("FCM TOKEN in receive", fcmTokenValue, FCM); 
           //await AsyncStorage.getItem('fcmToken');
 
-          const data: EphemeralData = {
+          const data: EphemeralDataElements = {
             walletID,
             FCM,
             paymentDetails: {
@@ -372,7 +401,7 @@ export default function Receive(props) {
               },
             },
           };
-          dispatch(updateEphemeralChannel(contactName, data));
+          dispatch(updateEphemeralChannel(contactInfo, data));
         })();
       } else if (
         !trustedContact.symmetricKey &&
@@ -384,7 +413,7 @@ export default function Receive(props) {
         // re-initiating expired EC
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -401,7 +430,7 @@ export default function Receive(props) {
             .paymentURI === paymentURI
         )
           return;
-        const data: EphemeralData = {
+        const data: EphemeralDataElements = {
           paymentDetails: {
             trusted: {
               address: trustedReceivingAddress,
@@ -413,7 +442,7 @@ export default function Receive(props) {
             },
           },
         };
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       }
     }
   }, [
@@ -800,6 +829,11 @@ export default function Receive(props) {
             info={
               'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
             }
+            infoText={`Click here to accept contact request from ${
+              WALLET_SETUP.walletName
+            } Hexa wallet - link will expire in ${
+              config.TC_REQUEST_EXPIRY / 60000
+            } minutes`}
             amount={amount === '' ? null : amount}
             link={receiveLink}
             serviceType={serviceType}

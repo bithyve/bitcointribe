@@ -19,9 +19,8 @@ import { useSelector } from 'react-redux';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import QRCode from 'react-native-qrcode-svg';
-
 
 export default function TrustedContactQr(props) {
   const [trustedContactQR, setTrustedContactQR] = useState('');
@@ -46,7 +45,7 @@ export default function TrustedContactQr(props) {
 
         const contactName = `${contact.firstName} ${
           contact.lastName ? contact.lastName : ''
-          }`
+        }`
           .toLowerCase()
           .trim();
         const publicKey =
@@ -110,8 +109,8 @@ export default function TrustedContactQr(props) {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-            <QRCode value={trustedContactQR} size={hp('27%')} />
-          )}
+          <QRCode value={trustedContactQR} size={hp('27%')} />
+        )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{

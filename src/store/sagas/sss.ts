@@ -57,7 +57,7 @@ import {
 import {
   EncDynamicNonPMDD,
   MetaShare,
-  EphemeralData,
+  EphemeralDataElements,
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
@@ -182,9 +182,11 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing secondary device's TC
+    delete trustedContacts.tc.trustedContacts[payload.contactInfo.contactName]; // removing secondary device's TC
     const accountNumber =
-      regularService.hdWallet.trustedContactToDA[payload.contactName];
+      regularService.hdWallet.trustedContactToDA[
+        payload.contactInfo.contactName
+      ];
     if (accountNumber) {
       delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
         accountNumber
@@ -228,7 +230,7 @@ function* uploadEncMetaShareWorker({ payload }) {
   const res = yield call(
     s3Service.uploadShare,
     payload.shareIndex,
-    payload.contactName,
+    payload.contactInfo.contactName,
   ); // contact injection (requires database insertion)
 
   if (res.status === 200) {
@@ -237,7 +239,7 @@ function* uploadEncMetaShareWorker({ payload }) {
     console.log({ otp, encryptedKey });
 
     // adding transfer details to he ephemeral data
-    const data: EphemeralData = {
+    const data: EphemeralDataElements = {
       ...payload.data,
       shareTransferDetails: {
         otp,
@@ -271,7 +273,7 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     });
 
-    yield put(updateEphemeralChannel(payload.contactName, data));
+    yield put(updateEphemeralChannel(payload.contactInfo, data));
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
@@ -705,8 +707,7 @@ function* sharePersonalCopyWorker({ payload }) {
               }, 1000);
             },
           );
-        }
-        else {
+        } else {
           let shareOptions = {
             title: selectedPersonalCopy.title,
             message: `Please find attached the personal copy ${
@@ -714,13 +715,14 @@ function* sharePersonalCopyWorker({ payload }) {
             } share pdf, it is password protected by the answer to the security question.`,
             url:
               Platform.OS == 'android'
-                ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+                ? 'file://' +
+                  personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
             subject: selectedPersonalCopy.title,
           };
-  
+
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {

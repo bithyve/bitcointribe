@@ -45,7 +45,10 @@ import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendShareModal from '../ManageBackup/SendShareModal';
-import { EphemeralData, MetaShare } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralDataElements,
+  MetaShare,
+} from '../../bitcoin/utilities/Interface';
 import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
@@ -695,7 +698,7 @@ export default function ContactDetails(props) {
       }`
         .toLowerCase()
         .trim();
-      let data: EphemeralData = {
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
