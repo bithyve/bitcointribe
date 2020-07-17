@@ -698,6 +698,22 @@ export default function ContactDetails(props) {
       }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+        const phoneNumber = Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (Contact.emails && Contact.emails.length) {
+        info = Contact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
+
       let data: EphemeralDataElements = {
         walletID,
         FCM,
@@ -748,7 +764,7 @@ export default function ContactDetails(props) {
       ) {
         setTrustedLink('');
         setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactName, data));
+        dispatch(uploadEncMShare(index, contactInfo, data));
       } else if (
         trustedContact &&
         !trustedContact.symmetricKey &&
@@ -761,7 +777,7 @@ export default function ContactDetails(props) {
         setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );

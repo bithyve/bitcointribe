@@ -449,6 +449,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
           this.setState(
             {
@@ -487,6 +488,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -524,6 +526,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -562,6 +565,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -1115,6 +1119,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           hintType: splits[7],
           hint: splits[8],
           uploadedAt: splits[9],
+          version,
         };
 
         this.setState(
@@ -1760,6 +1765,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isQR,
       uploadedAt,
       isRecovery,
+      version,
     } = trustedContactRequest || recoveryRequest;
     const {
       UNDER_CUSTODY,
@@ -1771,14 +1777,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       trustedContacts,
     } = this.props;
 
-    console.log({ info });
-
     if (!isRecovery) {
       if (requester === walletName) {
         Toast('Cannot be your own Contact/Guardian');
         return;
       }
-      if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
+
+      let expiry = config.TC_REQUEST_EXPIRY;
+      if (!semver.valid(version)) {
+        // expiry support for 0.7, 0.9 and 1.0
+        expiry = config.LEGACY_TC_REQUEST_EXPIRY;
+      }
+
+      if (uploadedAt && Date.now() - uploadedAt > expiry) {
         Alert.alert(
           `${isQR ? 'QR' : 'Link'} expired!`,
           `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
@@ -1828,6 +1839,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
                 }`.toLowerCase();
+
+                if (!semver.valid(version)) {
+                  // for 0.7, 0.9 and 1.0: info remains null
+                  info = null;
+                }
+
                 const contactInfo = {
                   contactName,
                   info,

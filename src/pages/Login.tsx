@@ -57,6 +57,7 @@ export default function Login(props) {
   const releaseCasesValue = useSelector(
     (state) => state.preferences.releaseCasesValue,
   );
+  const [isDisabledProceed, setIsDisabledProceed] = useState(false);
   // const releases =[
   //       {
   //           "build": "40",
@@ -120,6 +121,12 @@ export default function Login(props) {
     },
     [passcode],
   );
+
+  useEffect(()=>{
+    if(passcode.length==4){
+      setIsDisabledProceed(false);
+    }
+  }, [passcode])
 
   const DECENTRALIZED_BACKUP = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
@@ -545,8 +552,12 @@ export default function Login(props) {
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
-                disabled={passcode.length == 4 ? false : true}
+                disabled={isDisabledProceed}
                 onPress={() => {
+                  setTimeout(() => {
+                    setIsDisabledProceed(true);
+                    setElevation(0);
+                  }, 2);
                   loaderBottomSheet.current.snapTo(1);
                   setTimeout(() => {
                     setMessage('Hexa Test Account');
@@ -557,16 +568,13 @@ export default function Login(props) {
                       'Best place to start if you are new to Bitcoin',
                     );
                   }, 3000);
-                  setTimeout(() => {
-                    setElevation(0);
-                  }, 2);
                   dispatch(credsAuth(passcode));
                 }}
                 style={{
                   ...styles.proceedButtonView,
                   elevation: Elevation,
                   backgroundColor:
-                    passcode.length == 4 ? Colors.blue : Colors.lightBlue,
+                  isDisabledProceed ? Colors.lightBlue : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>

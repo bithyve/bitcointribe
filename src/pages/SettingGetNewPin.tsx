@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -39,8 +39,11 @@ export default function SettingGetNewPin(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isPinChangedFailed = useSelector(state => state.setupAndAuth.pinChangedFailed);
-  console.log("isPinChangedFailed", isPinChangedFailed);
+  const isPinChangedFailed = useSelector(
+    (state) => state.setupAndAuth.pinChangedFailed,
+  );
+  const [isDisabled, setIsDisabled] = useState(true);
+  console.log('isPinChangedFailed', isPinChangedFailed);
 
   function onPressNumber(text) {
     let tmpPasscode = passcode;
@@ -110,11 +113,12 @@ export default function SettingGetNewPin(props) {
   }, [passcode, confirmPasscode]);
 
   const dispatch = useDispatch();
-  const { credsChanged } = useSelector(state => state.setupAndAuth);
+  const { credsChanged } = useSelector((state) => state.setupAndAuth);
 
   useEffect(() => {
     if (credsChanged == 'changed') {
-    props.navigation.navigate("PasscodeChangeSuccessPage");
+      setIsDisabled(false);
+      props.navigation.navigate('PasscodeChangeSuccessPage');
     }
   }, [credsChanged]);
 
@@ -132,7 +136,7 @@ export default function SettingGetNewPin(props) {
         bottomImage={require('../assets/images/icons/errorImage.png')}
       />
     );
-  }, [errorMessage,errorMessageHeader]);
+  }, [errorMessage, errorMessageHeader]);
 
   const renderErrorModalHeader = useCallback(() => {
     return (
@@ -144,7 +148,7 @@ export default function SettingGetNewPin(props) {
     );
   }, []);
 
-  if(isPinChangedFailed){
+  if (isPinChangedFailed) {
     setTimeout(() => {
       setErrorMessageHeader('Passcode change error');
       setErrorMessage(
@@ -154,6 +158,14 @@ export default function SettingGetNewPin(props) {
     (ErrorBottomSheet as any).current.snapTo(1);
     dispatch(pinChangedFailed(null));
   }
+
+  useEffect(() => {
+    if (passcode == confirmPasscode) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
+  }, [passcode, confirmPasscode]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -172,7 +184,9 @@ export default function SettingGetNewPin(props) {
                   size={17}
                 />
               </TouchableOpacity>
-              <Text style={styles.modalHeaderTitleText}>{'Manage Passcode'}</Text>
+              <Text style={styles.modalHeaderTitleText}>
+                {'Manage Passcode'}
+              </Text>
             </View>
           </View>
           {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
@@ -495,14 +509,16 @@ export default function SettingGetNewPin(props) {
                 </View>
               </View>
               <TouchableOpacity
-                disabled={passcode == confirmPasscode ? false : true}
-                onPress={() => dispatch(changeAuthCred(oldPasscode, passcode))}
+                disabled={isDisabled}
+                onPress={() => {
+                  dispatch(changeAuthCred(oldPasscode, passcode));
+                  setTimeout(() => {
+                    setIsDisabled(true);
+                  }, 2);
+                }}
                 style={{
                   ...styles.proceedButtonView,
-                  backgroundColor:
-                    passcode == confirmPasscode
-                      ? Colors.blue
-                      : Colors.lightBlue,
+                  backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>
@@ -645,15 +661,17 @@ export default function SettingGetNewPin(props) {
           </View>
         </View>
         <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
+          enabledInnerScrolling={true}
+          ref={ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('35%')
+              : hp('40%'),
+          ]}
+          renderContent={renderErrorModalContent}
+          renderHeader={renderErrorModalHeader}
+        />
       </View>
     </SafeAreaView>
   );
