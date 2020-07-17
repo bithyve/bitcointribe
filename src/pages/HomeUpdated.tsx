@@ -1763,7 +1763,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Toast('Cannot be your own Contact/Guardian');
         return;
       }
-      if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
+
+      let expiry = config.TC_REQUEST_EXPIRY;
+      if (!semver.valid(version)) {
+        // expiry support for 0.7, 0.9 and 1.0
+        expiry = config.LEGACY_TC_REQUEST_EXPIRY;
+      }
+
+      if (uploadedAt && Date.now() - uploadedAt > expiry) {
         Alert.alert(
           `${isQR ? 'QR' : 'Link'} expired!`,
           `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
