@@ -1126,7 +1126,7 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaLink
-          headerText={"Send Request"}
+          headerText={'Send Request'}
           subHeaderText={'Send a Keeper request link'}
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
@@ -1134,8 +1134,8 @@ const TrustedContactHistory = (props) => {
           infoText={`Click here to accept Keeper request for ${
             WALLET_SETUP.walletName
           } Hexa wallet- link will expire in ${
-            config.TC_REQUEST_EXPIRY / 60000
-          } minutes`}
+            config.TC_REQUEST_EXPIRY / (60000 * 60)
+          } hours`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)

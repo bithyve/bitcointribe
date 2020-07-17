@@ -155,8 +155,8 @@ export default function RecoveryCommunication(props) {
         const smsInfoText = `Click here to help ${
           WALLET_SETUP.walletName
         } restore their Hexa wallet- link will expire in ${
-          config.TC_REQUEST_EXPIRY / 60000
-        } minutes`;
+          config.TC_REQUEST_EXPIRY / (60000 * 60)
+        } hours`;
 
         textWithoutEncoding(
           selectedContactMode.info,
@@ -191,8 +191,8 @@ export default function RecoveryCommunication(props) {
         const emailInfoText = `Click here to help ${
           WALLET_SETUP.walletName
         } restore their Hexa wallet- link will expire in ${
-          config.TC_REQUEST_EXPIRY / 60000
-        } minutes`;
+          config.TC_REQUEST_EXPIRY / (60000 * 60)
+        } hours`;
 
         email(
           [selectedContactMode.info],

@@ -46,7 +46,7 @@ export default function AddContactSendRequest(props) {
     React.createRef(),
   );
   const [renderTimer, setRenderTimer] = useState(false);
-  
+
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
@@ -277,16 +277,18 @@ export default function AddContactSendRequest(props) {
     }
   }, [Contact, trustedContacts, updateEphemeralChannelLoader]);
 
-  const openTimer = async() => {
+  const openTimer = async () => {
     setTimeout(() => {
       setRenderTimer(true);
     }, 2);
-    let TCRequestTimer = JSON.parse(await AsyncStorage.getItem("TCRequestTimer"));
+    let TCRequestTimer = JSON.parse(
+      await AsyncStorage.getItem('TCRequestTimer'),
+    );
     (SendViaLinkBottomSheet as any).current.snapTo(0);
-    if(!TCRequestTimer){
+    if (!TCRequestTimer) {
       (TimerModalBottomSheet as any).current.snapTo(1);
     }
-  }
+  };
 
   const renderSendViaLinkContents = useCallback(() => {
     return (
@@ -299,15 +301,15 @@ export default function AddContactSendRequest(props) {
         infoText={`Click here to accept contact request from ${
           WALLET_SETUP.walletName
         } Hexa wallet - link will expire in ${
-          config.TC_REQUEST_EXPIRY / 60000
-        } minutes`}
+          config.TC_REQUEST_EXPIRY / (60000 * 60)
+        } hours`}
         link={trustedLink}
         contactEmail={''}
         onPressBack={() => {
           if (SendViaLinkBottomSheet.current)
             (SendViaLinkBottomSheet as any).current.snapTo(0);
         }}
-        onPressDone={async() => {
+        onPressDone={async () => {
           (SendViaLinkBottomSheet as any).current.snapTo(0);
           openTimer();
         }}
@@ -352,8 +354,8 @@ export default function AddContactSendRequest(props) {
     return (
       <TimerModalContents
         renderTimer={renderTimer}
-        onTimerFinish={()=>onContinueWithTimer()}
-        onPressContinue={()=>onContinueWithTimer()}
+        onTimerFinish={() => onContinueWithTimer()}
+        onPressContinue={() => onContinueWithTimer()}
       />
     );
   }, [renderTimer]);
@@ -370,9 +372,9 @@ export default function AddContactSendRequest(props) {
   }, []);
 
   const onContinueWithTimer = () => {
-    (TimerModalBottomSheet as any).current.snapTo(0); 
+    (TimerModalBottomSheet as any).current.snapTo(0);
     props.navigation.goBack();
-  }
+  };
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
