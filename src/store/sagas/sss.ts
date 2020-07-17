@@ -66,7 +66,11 @@ import {
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
-import { updateEphemeralChannel } from '../actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  trustedContactApproved,
+  updateTrustedChannel,
+} from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import crypto from 'crypto';
@@ -170,7 +174,7 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
-  const trustedContacts = yield select(
+  const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
   const regularService: RegularAccount = yield select(
@@ -236,16 +240,6 @@ function* uploadEncMetaShareWorker({ payload }) {
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
-    console.log({ otp, encryptedKey });
-
-    // adding transfer details to he ephemeral data
-    const data: EphemeralDataElements = {
-      ...payload.data,
-      shareTransferDetails: {
-        otp,
-        encryptedKey,
-      },
-    };
 
     const updatedSERVICES = {
       ...SERVICES,
@@ -273,7 +267,30 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     });
 
-    yield put(updateEphemeralChannel(payload.contactInfo, data));
+    const contact =
+      trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
+    if (contact && contact.symmetricKey) {
+      // has trusted channel
+      const data: TrustedDataElements = {
+        // won't include elements from payload.data
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+      yield put(updateTrustedChannel(payload.contactInfo, data));
+    } else {
+      // adding transfer details to he ephemeral data
+      const data: EphemeralDataElements = {
+        ...payload.data,
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+
+      yield put(updateEphemeralChannel(payload.contactInfo, data));
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
