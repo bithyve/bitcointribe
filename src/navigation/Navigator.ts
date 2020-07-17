@@ -22,7 +22,6 @@ import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
 import SecondaryDevice from '../pages/ManageBackup/SecondaryDevice';
-import CommunicationMode from '../pages/ManageBackup/CommunicationMode';
 import TrustedContacts from '../pages/ManageBackup/TrustedContacts';
 import Cloud from '../pages/ManageBackup/Cloud';
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
@@ -117,7 +116,6 @@ const SetupNavigator = createStackNavigator(
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
-  'CommunicationMode',
   'TrustedContacts',
   'Cloud',
   'CustodianRequestOTP',
@@ -144,7 +142,6 @@ const HomeNavigator = createStackNavigator(
     Accounts,
     ManageBackup,
     SecondaryDevice,
-    CommunicationMode,
     TrustedContacts,
     Cloud,
     CustodianRequestOTP,

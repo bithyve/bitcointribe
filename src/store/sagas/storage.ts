@@ -147,8 +147,8 @@ function* servicesEnricherWorker({ payload }) {
         };
       }
 
-      if (semver.eq(DeviceInfo.getVersion(), '1.0.1')) {
-        // vsersion 1.0 and lower support
+      if (semver.eq(DeviceInfo.getVersion(), '1.1.0')) {
+        // version 1.0 and lower support
 
         // re-derive primary extended keys (standardization)
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT;

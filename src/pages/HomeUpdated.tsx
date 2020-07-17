@@ -277,6 +277,7 @@ interface HomePropsTypes {
   setFCMToken: any;
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
+  releaseCasesValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -448,6 +449,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
           this.setState(
             {
@@ -486,6 +488,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -523,6 +526,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -561,6 +565,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -881,7 +886,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = (prevProps) => {
-    if (prevProps.notificationList !== this.props.notificationList) {
+    if ((prevProps.notificationList !== this.props.notificationList) || (prevProps.releaseCasesValue !== this.props.releaseCasesValue)) {
       this.setupNotificationList();
     }
 
@@ -1114,6 +1119,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           hintType: splits[7],
           hint: splits[8],
           uploadedAt: splits[9],
+          version,
         };
 
         this.setState(
@@ -1229,22 +1235,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-
     // TODO -- need to check this
     let AssociatedContact = JSON.parse(
       await AsyncStorage.getItem('AssociatedContacts'),
     );
     // setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
     this.setSecondaryDeviceAddresses();
-    this.setState({
-      selectedContact: SelectedContacts,
-    });
   };
 
   setCurrencyCodeFromAsync = async () => {
@@ -1394,7 +1390,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
     let readStatus = true;
     if (content.notificationType == 'release') {
-      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      let releaseCases = this.props.releaseCasesValue; 
+      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
         readStatus = true;
       } else if (releaseCases.remindMeLaterClick) {
@@ -1768,6 +1765,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isQR,
       uploadedAt,
       isRecovery,
+      version,
     } = trustedContactRequest || recoveryRequest;
     const {
       UNDER_CUSTODY,
@@ -1779,14 +1777,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       trustedContacts,
     } = this.props;
 
-    console.log({ info });
-
     if (!isRecovery) {
       if (requester === walletName) {
         Toast('Cannot be your own Contact/Guardian');
         return;
       }
-      if (uploadedAt && Date.now() - uploadedAt > config.TC_REQUEST_EXPIRY) {
+
+      let expiry = config.TC_REQUEST_EXPIRY;
+      if (!semver.valid(version)) {
+        // expiry support for 0.7, 0.9 and 1.0
+        expiry = config.LEGACY_TC_REQUEST_EXPIRY;
+      }
+
+      if (uploadedAt && Date.now() - uploadedAt > expiry) {
         Alert.alert(
           `${isQR ? 'QR' : 'Link'} expired!`,
           `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
@@ -1836,6 +1839,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
                 }`.toLowerCase();
+
+                if (!semver.valid(version)) {
+                  // for 0.7, 0.9 and 1.0: info remains null
+                  info = null;
+                }
+
                 const contactInfo = {
                   contactName,
                   info,
@@ -2043,9 +2052,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         const element = notificationList['notifications'][i];
         let readStatus = false;
         if (element.notificationType == 'release') {
-          let releaseCases = JSON.parse(
-            await AsyncStorage.getItem('releaseCases'),
-          );
+          let releaseCases = this.props.releaseCasesValue;
+          // JSON.parse(
+          //   await AsyncStorage.getItem('releaseCases'),
+          // );
           if (element.body.split(' ')[1] == releaseCases.build) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
@@ -3057,7 +3067,8 @@ const mapStateToProps = (state) => {
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
-    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue)
+    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue),
+    releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
   };
 };
 

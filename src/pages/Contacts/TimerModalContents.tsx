@@ -78,7 +78,7 @@ export default function TimerModalContents(props) {
             {props.renderTimer ?
             <CountDown
               size={15}
-              until={10}
+              until={1200}
               onFinish={() => props.onTimerFinish()}
               digitStyle={{
                 backgroundColor: '#FFF',

@@ -37,14 +37,6 @@ import SecurityQuestionHelpContents from '../../components/Helper/SecurityQuesti
 
 const SecurityQuestionHistory = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
-  const SelectOption = Id => {
-    if (Id == SelectedOption) {
-      setSelectedOption(0);
-    } else {
-      setSelectedOption(Id);
-    }
-  };
-
   const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
@@ -314,14 +306,14 @@ const SecurityQuestionHistory = props => {
       </View>
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={SecurityQuestionBottomSheet}
+        ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet}
+        ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),

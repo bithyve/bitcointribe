@@ -832,8 +832,8 @@ export default function Receive(props) {
             infoText={`Click here to accept contact request from ${
               WALLET_SETUP.walletName
             } Hexa wallet - link will expire in ${
-              config.TC_REQUEST_EXPIRY / 60000
-            } minutes`}
+              config.TC_REQUEST_EXPIRY / (60000 * 60)
+             } hours`}
             amount={amount === '' ? null : amount}
             link={receiveLink}
             serviceType={serviceType}

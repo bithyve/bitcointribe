@@ -232,6 +232,13 @@ class SendToContact extends Component<
     }
 
     if (
+      prevProps.accounts[serviceType].loading.transfer !==
+      this.props.accounts[serviceType].loading.transfer
+    ) {
+      this.setState({ isConfirmDisabled: false});
+    }
+
+    if (
       prevState.bitcoinAmount !== this.state.bitcoinAmount ||
       prevState.currencyAmount !== this.state.currencyAmount ||
       prevState.spendableBalance !== this.state.spendableBalance ||
@@ -551,6 +558,7 @@ class SendToContact extends Component<
     } = this.props;
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
+    this.setState({isConfirmDisabled: true});
     clearTransfer(serviceType, 'stage1');
     this.setState({ isConfirmDisabled: false });
     if (
@@ -1119,11 +1127,13 @@ class SendToContact extends Component<
                     this.onConfirm();
                   }}
                   disabled={
-                    isConfirmDisabled || loading[serviceType].loading.transfer
+                    isConfirmDisabled
                   }
                   style={{
                     ...styles.confirmButtonView,
-                    backgroundColor: Colors.blue,
+                    backgroundColor: isConfirmDisabled
+                    ? Colors.lightBlue
+                    : Colors.blue,
                     elevation: 10,
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
@@ -1134,7 +1144,8 @@ class SendToContact extends Component<
                   {/* {loading[serviceType].loading.transfer && !isInvalidBalance ? (
                         <ActivityIndicator size="small" color={Colors.white} />
                       ) : ( */}
-                  {loading[serviceType].loading.transfer ? (
+                  {(!isConfirmDisabled && loading[serviceType].loading.transfer) ||
+                  (isConfirmDisabled && loading[serviceType].loading.transfer) ? (
                     <ActivityIndicator size="small" />
                   ) : (
                     <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
@@ -1148,7 +1159,7 @@ class SendToContact extends Component<
                       marginLeft: 10,
                     }}
                     disabled={
-                      isConfirmDisabled || loading[serviceType].loading.transfer
+                      isConfirmDisabled
                     }
                     onPress={() => {
                       if (

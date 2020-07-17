@@ -29,7 +29,6 @@ import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
 import TrustedContacts from './TrustedContacts';
-import CommunicationMode from './CommunicationMode';
 import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
@@ -92,27 +91,8 @@ const TrustedContactHistory = (props) => {
     shareOtpWithTrustedContactBottomSheet,
     setShareOtpWithTrustedContactBottomSheet,
   ] = useState(React.createRef());
-  const [
-    CommunicationModeBottomSheet,
-    setCommunicationModeBottomSheet,
-  ] = useState(React.createRef());
   const [LoadContacts, setLoadContacts] = useState(false);
   let [SelectedContacts, setSelectedContacts] = useState([]);
-  // const [isSecretShared1, setIsSecretShared1] = useState(false);
-  // const [isSecretShared2, setIsSecretShared2] = useState(false);
-  // const [
-  //   trustedContactQrBottomSheet,
-  //   setTrustedContactQrBottomSheet,
-  // ] = useState(React.createRef());
-  // const [Temp, setTemp] = useState(false);
-  //   const [autoHighlightFlags, setAutoHighlightFlags] = useState({
-  //     secondaryDevice: false,
-  //     trustedContact1: false,
-  //     trustedContact2: false,
-  //     personalCopy1: false,
-  //     personalCopy2: false,
-  //     securityAns: false,
-  //   });
   const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
     (state) => state.storage.database,
   );
@@ -200,21 +180,6 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[1]);
       }
     }
-
-    // let SelectedContactsTemp = JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-    // if (SelectedContactsTemp) {
-    //   setSelectedContacts(SelectedContactsTemp);
-    //   if (selectedTitle == 'Trusted Contact 1' && SelectedContactsTemp[0]) {
-    //     setChosenContact(SelectedContactsTemp[0]);
-    //   } else if (
-    //     selectedTitle == 'Trusted Contact 2' &&
-    //     SelectedContactsTemp[1]
-    //   ) {
-    //     setChosenContact(SelectedContactsTemp[1]);
-    //   }
-    // }
   }, [selectedTitle]);
 
   const getContacts = useCallback(
@@ -233,7 +198,6 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[0]);
       }, 2);
       (trustedContactsBottomSheet as any).current.snapTo(0);
-      //(CommunicationModeBottomSheet as any).current.snapTo(1);
       (shareBottomSheet as any).current.snapTo(1);
     },
     [SelectedContacts, chosenContact],
@@ -288,69 +252,6 @@ const TrustedContactHistory = (props) => {
     );
   }, []);
 
-  // const renderCommunicationModeModalContent = useCallback(() => {
-  //   return (
-  //     <CommunicationMode
-  //       onContactUpdate={(contact) => {
-  //         setTimeout(() => {
-  //           setChosenContact(contact);
-  //           setTemp(!Temp);
-  //         }, 2);
-  //       }}
-  //       contact={chosenContact ? chosenContact : null}
-  //       index={index}
-  //       changeContact={changeContact}
-  //       onPressBack={() => {
-  //         (CommunicationModeBottomSheet as any).current.snapTo(0);
-  //       }}
-  //       onPressContinue={async (OTP, index, selectedContactMode, contact) => {
-  //         let selectedContactModeTemp = JSON.parse(
-  //           await AsyncStorage.getItem('selectedContactMode'),
-  //         );
-  //         if (!selectedContactModeTemp) {
-  //           selectedContactModeTemp = [];
-  //         }
-  //         if (index == 1) {
-  //           selectedContactModeTemp[0] = selectedContactMode;
-  //         }
-  //         if (index == 2) {
-  //           selectedContactModeTemp[1] = selectedContactMode;
-  //         }
-  //         await AsyncStorage.setItem(
-  //           'selectedContactMode',
-  //           JSON.stringify(selectedContactModeTemp),
-  //         );
-  //         setSelectedContactMode(selectedContactModeTemp);
-  //         if (selectedContactMode.type == 'qrcode') {
-  //           setContactForTrustedQR(contact);
-  //           (trustedContactQrBottomSheet as any).current.snapTo(1);
-  //           (CommunicationModeBottomSheet as any).current.snapTo(0);
-  //         } else {
-  //           // setTimeout(() => {
-  //           //   setRenderTimer(true);
-  //           //   setOTP(OTP);
-  //           //   setChosenContactIndex(index);
-  //           // }, 10);
-  //           setChosenContactIndex(index);
-  //           onOTPShare(index); // enables reshare
-  //           (CommunicationModeBottomSheet as any).current.snapTo(0);
-  //           // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
-  //         }
-  //       }}
-  //     />
-  //   );
-  // }, [chosenContact, index, selectedContactMode]);
-
-  // const renderCommunicationModeModalHeader = useCallback(() => {
-  //   return (
-  //     <ModalHeader
-  //       onPressHeader={() => {
-  //         (CommunicationModeBottomSheet as any).current.snapTo(0);
-  //       }}
-  //     />
-  //   );
-  // }, []);
-
   const updateHistory = useCallback(
     (shareHistory) => {
       const updatedTrustedContactHistory = [...trustedContactHistory];
@@ -388,25 +289,6 @@ const TrustedContactHistory = (props) => {
 
   const onOTPShare = useCallback(
     async (index) => {
-      // (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(0);
-      // (trustedContactQrBottomSheet.current as any).snapTo(0); // closes either of them based on which was on.
-
-      // let selectedContactList = JSON.parse(
-      //   await AsyncStorage.getItem('SelectedContacts'),
-      // );
-      // if (!selectedContactList) {
-      //   selectedContactList = [];
-      // }
-      // if (index == 2) {
-      //   selectedContactList[1] = chosenContact;
-      // } else if (index == 1) {
-      //   selectedContactList[0] = chosenContact;
-      // }
-      // await AsyncStorage.setItem(
-      //   'SelectedContacts',
-      //   JSON.stringify(selectedContactList),
-      // );
-
       updateAutoHighlightFlags();
       saveInTransitHistory();
       setActivateReshare(true);
@@ -575,17 +457,6 @@ const TrustedContactHistory = (props) => {
   // }, [SHARES_TRANSFER_DETAILS[index]]);
 
   const onPressReshare = useCallback(async () => {
-    // let selectedContactList = JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-    //console.log({ selectedContactList });
-    //console.log({ chosenContact });
-    // if (selectedTitle == 'Trusted Contact 1') {
-    //   setChosenContact(selectedContactList[0]);
-    // } else if (selectedTitle == 'Trusted Contact 2') {
-    //   setChosenContact(selectedContactList[1]);
-    // }
-    // (CommunicationModeBottomSheet as any).current.snapTo(1);
     (shareBottomSheet as any).current.snapTo(1);
     (ReshareBottomSheet as any).current.snapTo(0);
   }, [selectedTitle, chosenContact]);
@@ -1117,7 +988,7 @@ const TrustedContactHistory = (props) => {
     if (!isEmpty(chosenContact)) {
       return (
         <SendViaLink
-          headerText={"Send Request"}
+          headerText={'Send Request'}
           subHeaderText={'Send a Keeper request link'}
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
@@ -1125,8 +996,8 @@ const TrustedContactHistory = (props) => {
           infoText={`Click here to accept Keeper request for ${
             WALLET_SETUP.walletName
           } Hexa wallet- link will expire in ${
-            config.TC_REQUEST_EXPIRY / 60000
-          } minutes`}
+            config.TC_REQUEST_EXPIRY / (60000 * 60)
+          } hours`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
@@ -1338,13 +1209,6 @@ const TrustedContactHistory = (props) => {
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       />
-      {/* <BottomSheet
-        enabledInnerScrolling={true}
-        ref={CommunicationModeBottomSheet as any}
-        snapPoints={[-30, hp('75%')]}
-        renderContent={renderCommunicationModeModalContent}
-        renderHeader={renderCommunicationModeModalHeader}
-      /> */}
       <BottomSheet
         onCloseEnd={() => {
           if (Object.keys(chosenContact).length > 0) {

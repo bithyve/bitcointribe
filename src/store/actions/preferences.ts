@@ -5,6 +5,7 @@ export const CURRENCY_CODE = 'CURRENCY_CODE';
 export const CURRENCY_TOGGLE_VALUE = 'CURRENCY_TOGGLE_VALUE';
 export const FCM_TOKEN_VALUE = 'FCM_TOKEN_VALUE';
 export const SECONDARY_DEVICE_ADDRESS_VALUE = 'SECONDARY_DEVICE_ADDRESS_VALUE';
+export const RELEASE_CASES_VALUE = 'RELEASE_CASES_VALUE';
 
 export const setCurrencyCode = (data) => {
   return {
@@ -30,6 +31,13 @@ export const setCurrencyToggleValue = (data) => {
     return {
       type: SECONDARY_DEVICE_ADDRESS_VALUE,
       payload: { secondaryDeviceAddressValue: data },
+    };
+  };
+
+  export const setReleaseCases = (data) => {
+    return {
+      type: RELEASE_CASES_VALUE,
+      payload: { releaseCasesValue: data },
     };
   };
 
