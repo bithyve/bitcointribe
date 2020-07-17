@@ -23,7 +23,10 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
-import { trustedChannelsSync } from '../store/actions/trustedContacts';
+import {
+  trustedChannelsSync,
+  removeTrustedContact,
+} from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -172,7 +175,7 @@ export default function AddressBookContents(props) {
 
   useEffect(() => {
     updateAddressBook();
-  }, [regularAccount.hdWallet.derivativeAccounts]);
+  }, [regularAccount.hdWallet.derivativeAccounts, trustedContactsService]);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -265,6 +268,9 @@ export default function AddressBookContents(props) {
             index,
             shareIndex: contact.shareIndex,
           });
+        }}
+        onLongPress={() => {
+          dispatch(removeTrustedContact(contact.contactName));
         }}
         style={styles.selectedContactsView}
       >

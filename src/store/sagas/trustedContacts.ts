@@ -16,6 +16,7 @@ import {
   TRUSTED_CHANNELS_SYNC,
   paymentDetailsFetched,
   switchTCLoading,
+  REMOVE_TRUSTED_CONTACT,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -143,6 +144,58 @@ function* approveTrustedContactWorker({ payload }) {
 export const approveTrustedContactWatcher = createWatcher(
   approveTrustedContactWorker,
   APPROVE_TRUSTED_CONTACT,
+);
+
+function* removeTrustedContactWorker({ payload }) {
+  const trustedContactsService: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  let { contactName } = payload;
+  contactName = contactName.toLowerCase().trim();
+  delete trustedContactsService.tc.trustedContacts[contactName];
+
+  let trustedContactsInfo: any = yield call(
+    AsyncStorage.getItem,
+    'TrustedContactsInfo',
+  );
+  if (trustedContactsInfo) {
+    trustedContactsInfo = JSON.parse(trustedContactsInfo);
+
+    for (let itr = 0; itr < trustedContactsInfo.length; itr++) {
+      const trustedContact = trustedContactsInfo[itr];
+      if (trustedContact) {
+        const presentContactName = `${trustedContact.firstName} ${
+          trustedContact.lastName ? trustedContact.lastName : ''
+        }`
+          .toLowerCase()
+          .trim();
+
+        if (presentContactName === contactName) {
+          if (itr < 3) trustedContactsInfo[itr] = null;
+          // Guardian nullified
+          else trustedContactsInfo.splice(itr, 1);
+          yield call(
+            AsyncStorage.setItem,
+            'TrustedContactsInfo',
+            JSON.stringify(trustedContactsInfo),
+          );
+          break;
+        }
+      }
+    }
+  }
+
+  const { SERVICES } = yield select((state) => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+  };
+  yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+}
+
+export const removeTrustedContactWatcher = createWatcher(
+  removeTrustedContactWorker,
+  REMOVE_TRUSTED_CONTACT,
 );
 
 function* updateEphemeralChannelWorker({ payload }) {
