@@ -336,6 +336,8 @@ export default class TrustedContacts {
       if (dataElements.shareTransferDetails) {
         this.trustedContacts[contactName].isGuardian = true;
       }
+      if (dataElements.DHInfo)
+        dataElements.DHInfo.address = ephemeralChannel.address;
 
       const { updatedEphemeralDataElements } = this.updateEphemeralChannelData(
         contactName,
@@ -355,7 +357,6 @@ export default class TrustedContacts {
       } else {
         let encryptedDataPacket: EncryptedEphemeralData;
         if (dataElements.DHInfo) {
-          dataElements.DHInfo.address = ephemeralChannel.address;
           encryptedDataPacket = {
             publicKey,
             encryptedData: null,
