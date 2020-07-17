@@ -80,6 +80,7 @@ import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
 import Receive from '../pages/Accounts/Receive';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
+import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -206,6 +207,7 @@ const HomeNavigator = createStackNavigator(
     ContactDetails,
     Receive,
     PairNewWallet,
+    ManageBackupKeeper,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
