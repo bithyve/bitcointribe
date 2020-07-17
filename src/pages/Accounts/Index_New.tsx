@@ -234,6 +234,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       
     this.getServiceType(serviceType);
     this.getBalance();
+    this.setAverageTransactionFees();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
       accounts[serviceType].loading.derivativeBalanceTx;
@@ -342,6 +343,45 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
+  setAverageTransactionFees = async() =>{
+    let { serviceType } = this.state;
+    let { accounts } = this.props;
+    const service = accounts[serviceType].service;
+    const storedAverageTxFees = JSON.parse(
+      await AsyncStorage.getItem('storedAverageTxFees'),
+    );
+    //console.log({ storedAverageTxFees });
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
+      if (Date.now() - lastFetched < 1800000) {
+        // maintaining a half an hour difference b/w fetches
+        this.setState({averageTxFees: averageTxFees});
+      } else {
+        const instance = service.hdWallet || service.secureHDWallet;
+        const averageTxFees = await instance.averageTransactionFee();
+
+        this.setState({averageTxFees: averageTxFees});
+        await AsyncStorage.setItem(
+          'storedAverageTxFees',
+          JSON.stringify({
+            ...storedAverageTxFees,
+            serviceType: { averageTxFees, lastFetched: Date.now() },
+          }),
+        );
+      }
+    } else {
+      const instance = service.hdWallet || service.secureHDWallet;
+      const averageTxFees = await instance.averageTransactionFee();
+      this.setState({averageTxFees: averageTxFees});
+      await AsyncStorage.setItem(
+        'storedAverageTxFees',
+        JSON.stringify({
+          serviceType: { averageTxFees, lastFetched: Date.now() },
+        }),
+      );
+    }
+  }
+
   setCurrencyCodeFromAsync = async () => {
     let currencyToggleValueTmp = this.props.currencyToggleValue;
     // await AsyncStorage.getItem(
@@ -379,6 +419,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       prevProps.accounts.exchangeRates !== this.props.accounts.exchangeRates
     ) {
       this.setState({ exchangeRates: this.props.accounts.exchangeRates });
+    }
+
+    if (
+      prevState.serviceType !== this.state.serviceType
+    ) {
+      this.setAverageTransactionFees();
     }
   };
 
