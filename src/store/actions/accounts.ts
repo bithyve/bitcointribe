@@ -31,7 +31,7 @@ export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore? },
+  options?: { loader?; fetchTransactionsSync?; restore?},
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -81,6 +81,7 @@ export const transferST3 = (serviceType, token) => {
 
 export const getTestcoins = (serviceType) => {
   // Test account specific
+  // console.log("Called getTestcoins", new Date())
   return { type: GET_TESTCOINS, payload: { serviceType } };
 };
 
@@ -197,6 +198,7 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 
 export const testcoinsReceived = (serviceType, service) => {
+  // console.log("Called testcoinsReceived", new Date())
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
 };
 
