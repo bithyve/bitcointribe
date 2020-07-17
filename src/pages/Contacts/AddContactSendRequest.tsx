@@ -50,7 +50,8 @@ export default function AddContactSendRequest(props) {
 
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
-  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
+  let trustedContactsInfo = useSelector((state) => state.trustedContacts.trustedContacts)
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
@@ -71,7 +72,6 @@ export default function AddContactSendRequest(props) {
   );
 
   const updateTrustedContactsInfo = async (contact) => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -101,11 +101,12 @@ export default function AddContactSendRequest(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact;
     }
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+
   };
 
   const dispatch = useDispatch();
@@ -297,9 +298,9 @@ export default function AddContactSendRequest(props) {
         contact={Contact}
         infoText={`Click here to accept contact request from ${
           WALLET_SETUP.walletName
-        } Hexa wallet - link will expire in ${
+          } Hexa wallet - link will expire in ${
           config.TC_REQUEST_EXPIRY / (60000 * 60)
-        } hours`}
+          } hours`}
         link={trustedLink}
         contactEmail={''}
         onPressBack={() => {

@@ -82,7 +82,7 @@ const TrustedContactHistory = (props) => {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
     React.createRef(),
   );
-  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
@@ -793,11 +793,12 @@ const TrustedContactHistory = (props) => {
         trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
-      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
       await AsyncStorage.setItem(
         'TrustedContactsInfo',
         JSON.stringify(trustedContactsInfo),
       );
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+
     },
     [index],
   );
@@ -995,9 +996,9 @@ const TrustedContactHistory = (props) => {
           contactEmail={''}
           infoText={`Click here to accept Keeper request for ${
             WALLET_SETUP.walletName
-          } Hexa wallet- link will expire in ${
+            } Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / (60000 * 60)
-          } hours`}
+            } hours`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)

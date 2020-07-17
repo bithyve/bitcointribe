@@ -102,7 +102,7 @@ export default function Receive(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
-  const fcmTokenValue =  useSelector((state) => idx(state, (_) => _.preferences.fcmTokenValue));
+  const fcmTokenValue = useSelector((state) => idx(state, (_) => _.preferences.fcmTokenValue));
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -307,11 +307,11 @@ export default function Receive(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
   };
 
   const createTrustedContact = useCallback(async () => {
@@ -323,7 +323,7 @@ export default function Receive(props) {
         }`
         .toLowerCase()
         .trim();
-        
+
       let info = '';
       if (selectedContact.phoneNumbers && selectedContact.phoneNumbers.length) {
         const phoneNumber = selectedContact.phoneNumbers[0].number;
@@ -384,7 +384,6 @@ export default function Receive(props) {
         (async () => {
           const walletID = await AsyncStorage.getItem('walletID');
           const FCM = fcmTokenValue;
-          console.log("FCM TOKEN in receive", fcmTokenValue, FCM); 
           //await AsyncStorage.getItem('fcmToken');
 
           const data: EphemeralDataElements = {
@@ -831,9 +830,9 @@ export default function Receive(props) {
             }
             infoText={`Click here to accept contact request from ${
               WALLET_SETUP.walletName
-            } Hexa wallet - link will expire in ${
+              } Hexa wallet - link will expire in ${
               config.TC_REQUEST_EXPIRY / (60000 * 60)
-             } hours`}
+              } hours`}
             amount={amount === '' ? null : amount}
             link={receiveLink}
             serviceType={serviceType}

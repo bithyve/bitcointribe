@@ -163,7 +163,7 @@ export default (state = initialState, action) => {
 
     case UPDATE_TRUSTED_CONTACT_INFO:
       return chain(state)
-        .setIn(['trustedContactInfo'], action.payload)
+        .setIn(['trustedContactsInfo'], action.payload)
         .value()
 
   }
