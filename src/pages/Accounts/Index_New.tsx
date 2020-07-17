@@ -49,7 +49,7 @@ import {
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
 } from '../../store/actions/accounts';
-import { setCurrencyToggleValue } from '../../store/actions/preferences';
+import { setCurrencyToggleValue, setTestAccountHelperDone, setTransactionHelper } from '../../store/actions/preferences';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
@@ -147,6 +147,10 @@ interface AccountsPropsTypes {
   currencyCode: any;
   currencyToggleValue: any;
   setCurrencyToggleValue: any;
+  setTestAccountHelperDone: any;
+  isTestHelperDoneValue: any;
+  setTransactionHelper: any;
+  isTransactionHelperDoneValue: any;
 }
 
 class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
@@ -408,11 +412,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   checkNShowHelperModal = async () => {
-    let isSendHelperDone = await AsyncStorage.getItem(
-      'isTransactionHelperDone',
-    );
-    if (!isSendHelperDone && this.state.serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isTransactionHelperDone', 'true');
+    let isTransactionHelperDone= this.props.isTransactionHelperDoneValue
+    // let isTransactionHelperDone = await AsyncStorage.getItem(
+    //   'isTransactionHelperDone',
+    // );
+    if (!isTransactionHelperDone && this.state.serviceType == TEST_ACCOUNT) {
+      this.props.setTransactionHelper(true);
+      //await AsyncStorage.setItem('isTransactionHelperDone', 'true');
       setTimeout(() => {
         this.setState({ isHelperDone: true });
       }, 10);
@@ -433,9 +439,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
 
-    let isTestAccountHelperDone = await AsyncStorage.getItem(
-      'isTestAccountHelperDone',
-    );
+    let isTestAccountHelperDone = this.props.isTestHelperDoneValue;
+    // let isTestAccountHelperDone = await AsyncStorage.getItem(
+    //   'isTestAccountHelperDone',
+    // );
 
     // if (isBuyHelperDone == 'true') {
     //   setBuyIsActive(false);
@@ -450,7 +457,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.navigation.state.params &&
       this.props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
-      await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+      this.props.setTestAccountHelperDone(true);
+     // await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
       setTimeout(() => {
         this.setState({ isTestHelperDone: true });
       }, 10);
@@ -1502,7 +1510,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   serviceType={serviceType}
                   getServiceType={this.getServiceType}
                   onPressKnowMore={() => {
-                    AsyncStorage.setItem('isTransactionHelperDone', 'true');
+                    this.props.setTransactionHelper(true);
+                    //AsyncStorage.setItem('isTransactionHelperDone', 'true');
                     (this.refs
                       .TransactionDetailsHelperBottomSheet as any).snapTo(
                       1,
@@ -1586,7 +1595,8 @@ const mapStateToProps = (state) => {
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-
+    isTestHelperDoneValue: idx(state, (_) => _.preferences.isTestHelperDoneValue),
+    isTransactionHelperDoneValue: idx(state, (_) => _.preferences.isTransactionHelperDoneValue),
     // service: idx(state, (_) => _.accounts)
   };
 };
@@ -1601,6 +1611,8 @@ export default withNavigationFocus(
     fetchDerivativeAccBalTx,
     fetchDerivativeAccAddress,
     setCurrencyToggleValue,
+    setTestAccountHelperDone,
+    setTransactionHelper
   })(Accounts),
 );
 

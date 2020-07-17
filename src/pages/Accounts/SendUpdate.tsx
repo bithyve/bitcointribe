@@ -57,6 +57,9 @@ import AccountsListSend from './AccountsListSend';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
+import {
+  setSendHelper, setTwoFASetup
+} from '../../store/actions/preferences';
 
 interface SendPropsTypes {
   navigation: any;
@@ -68,7 +71,11 @@ interface SendPropsTypes {
   service: any;
   transfer: any;
   accounts: any;
-  trustedContactsInfo: any
+  trustedContactsInfo: any,
+  isSendHelperDoneValue: any,
+  setSendHelper: any;
+  isTwoFASetupDone: any;
+  setTwoFASetup: any;
 }
 
 interface SendStateTypes {
@@ -241,9 +248,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   }
 
   checkNShowHelperModal = async () => {
-    let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
+    let isSendHelperDone = this.props.isSendHelperDoneValue;
+    //let isSendHelperDone = await AsyncStorage.getItem('isSendHelperDone');
     if (!isSendHelperDone && this.state.serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isSendHelperDone', 'true');
+      this.props.setSendHelper(true);
+      //await AsyncStorage.setItem('isSendHelperDone', 'true');
       setTimeout(() => {
         this.setState({ isSendHelperDone: true });
       }, 10);
@@ -420,14 +429,15 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   twoFASetupMethod = async () => {
-    const { service } = this.props;
-    if (!(await AsyncStorage.getItem('twoFASetup') &&
-      service[this.state.serviceType].service.secureHDWallet.twoFASetup)) {
+    const { service, isTwoFASetupDone } = this.props; //(await AsyncStorage.getItem('twoFASetup')
+    if (!isTwoFASetupDone &&
+      service[this.state.serviceType].service.secureHDWallet.twoFASetup) {
       this.props.navigation.navigate('TwoFASetup', {
         twoFASetup: service[this.state.serviceType].service.secureHDWallet.twoFASetup,
       });
       this.props.removeTwoFA();
-      await AsyncStorage.setItem('twoFASetup', 'true');
+      this.props.setSendHelper(true);
+      //await AsyncStorage.setItem('twoFASetup', 'true');
     }
   }
 
@@ -556,18 +566,10 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       balances,
       isEditable,
       accountData,
-      sweepSecure,
-      spendableBalance,
-      averageTxFees,
       getServiceType,
     } = this.state;
     const {
-      navigation,
-      addTransferDetails,
-      removeTwoFA,
       clearTransfer,
-      regularAccount,
-      trustedContactsService,
       service,
       transfer,
       accounts,
@@ -628,7 +630,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                   {serviceType == TEST_ACCOUNT ? (
                     <Text
                       onPress={() => {
-                        AsyncStorage.setItem('isSendHelperDone', 'true');
+                        this.props.setSendHelper(true);
+                      //  AsyncStorage.setItem('isSendHelperDone', 'true');
                         if (this.refs.SendHelperBottomSheet)
                           (this.refs.SendHelperBottomSheet as any).snapTo(1);
                       }}
@@ -872,7 +875,9 @@ const mapStateToProps = (state) => {
     accounts: state.accounts || [],
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
-    trustedContactsInfo
+    trustedContactsInfo,
+    isSendHelperDoneValue: idx(state, (_) => _.preferences.isSendHelperDoneValue),
+    isTwoFASetupDone: idx(state, (_) => _.preferences.isTwoFASetupDone),
   };
 };
 
@@ -881,9 +886,10 @@ export default withNavigationFocus(
     removeTwoFA,
     addTransferDetails,
     clearTransfer,
-
+    setSendHelper,
+    setTwoFASetup,
   })(Send),
-);
+  );
 
 const styles = StyleSheet.create({
   modalContentContainer: {
