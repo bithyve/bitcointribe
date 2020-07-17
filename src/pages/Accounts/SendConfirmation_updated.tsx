@@ -111,7 +111,7 @@ class SendConfirmation_updated extends Component<
       SelectedContactId: 0,
       transfer: {},
       loading: {},
-      isConfirmDisabled: true
+      isConfirmDisabled: false
     };
   }
 
@@ -160,6 +160,7 @@ class SendConfirmation_updated extends Component<
       prevProps.accounts[this.serviceType].loading.transfer !==
       this.props.accounts[this.serviceType].loading.transfer
     ) {
+      if(!this.props.accounts[this.serviceType].loading.transfer)
       this.setState({ isConfirmDisabled: false});
     }
   };
@@ -587,7 +588,7 @@ class SendConfirmation_updated extends Component<
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={this.onConfirm}
-              disabled={isConfirmDisabled || loading.transfer}
+              disabled={isConfirmDisabled}
               style={{
                 ...styles.confirmButtonView,
                 backgroundColor: isConfirmDisabled
@@ -599,8 +600,8 @@ class SendConfirmation_updated extends Component<
                 shadowOffset: { width: 15, height: 15 },
               }}
             >
-              {(!isConfirmDisabled && loading.transfer) ||
-              (isConfirmDisabled && loading.transfer) ? (
+              {(!isConfirmDisabled && this.props.accounts[this.serviceType].loading.transfer) ||
+              (isConfirmDisabled && this.props.accounts[this.serviceType].loading.transfer) ? (
                 <ActivityIndicator size="small" />
               ) : (
                 <Text style={styles.buttonText}>{'Confirm & Send'}</Text>

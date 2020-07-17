@@ -55,6 +55,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import Loader from '../../components/loader';
 import TwoFASetupWarningModal from './TwoFASetupWarningModal';
 import idx from 'idx';
+import { setReceiveHelper, setSavingWarning } from '../../store/actions/preferences';
 
 export default function Receive(props) {
   const [
@@ -103,6 +104,8 @@ export default function Receive(props) {
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
   const fcmTokenValue =  useSelector((state) => idx(state, (_) => _.preferences.fcmTokenValue));
+  const isReceiveHelperDoneValue =  useSelector((state) => idx(state, (_) => _.preferences.isReceiveHelperDoneValue));
+  const savingWarning =  useSelector((state) => idx(state, (_) => _.preferences.savingWarning));
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -455,11 +458,13 @@ export default function Receive(props) {
   ]);
 
   const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone1 = await AsyncStorage.getItem(
-      'isReceiveHelperDone',
-    );
+   let isReceiveHelperDone1 = isReceiveHelperDoneValue;
+    // let isReceiveHelperDone1 = await AsyncStorage.getItem(
+    //   'isReceiveHelperDone',
+    // );
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      dispatch(setReceiveHelper(true));
+      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
       }, 10);
@@ -476,16 +481,17 @@ export default function Receive(props) {
 
   useEffect(() => {
     checkNShowHelperModal();
-    (async () => {
+    //(async () => {
       if (serviceType === SECURE_ACCOUNT) {
-        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+        if (!savingWarning) {//await AsyncStorage.getItem('savingsWarning')
           // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
           if (SecureReceiveWarningBottomSheet.current)
             (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
-          await AsyncStorage.setItem('savingsWarning', 'true');
+          dispatch(setSavingWarning(true));
+          //await AsyncStorage.setItem('savingsWarning', 'true');
         }
       }
-    })();
+    //})();
   }, []);
 
   const onPressOkOf2FASetupWarning = () => {
@@ -506,7 +512,8 @@ export default function Receive(props) {
   }
 
   const onPressKnowMore = () => {
-    AsyncStorage.setItem('isReceiveHelperDone', 'true');
+    dispatch(setReceiveHelper(true));
+    //AsyncStorage.setItem('isReceiveHelperDone', 'true');
     if (ReceiveHelperBottomSheet.current)
       (ReceiveHelperBottomSheet as any).current.snapTo(1);
   }

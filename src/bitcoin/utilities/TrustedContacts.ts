@@ -6,6 +6,7 @@ import {
   TrustedDataElements,
   EphemeralData,
   EncryptedEphemeralData,
+  trustedChannelActions,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -640,8 +641,9 @@ export default class TrustedContacts {
 
   public fetchTrustedChannel = async (
     contactName: string,
+    contactsWalletName?: string,
   ): Promise<{
-    data: TrustedData;
+    data: TrustedDataElements;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
@@ -670,7 +672,16 @@ export default class TrustedContacts {
 
       let { data } = res.data;
       if (data) {
-        data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        data = this.processTrustedChannelData(contactName, data, symmetricKey)
+          .data;
+      }
+
+      if (contactsWalletName) {
+        this.trustedContacts[contactName] = {
+          ...this.trustedContacts[contactName],
+          contactsWalletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+          isWard: contactsWalletName ? true : false,
+        };
       }
 
       return {

@@ -2,6 +2,7 @@
 import {
   TrustedDataElements,
   EphemeralDataElements,
+  trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
 
 import { createAction } from 'redux-actions';
@@ -10,6 +11,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
+export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT';
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
@@ -43,6 +45,15 @@ export const approveTrustedContact = (
   };
 };
 
+export const removeTrustedContact = (contactName) => {
+  return {
+    type: REMOVE_TRUSTED_CONTACT,
+    payload: {
+      contactName,
+    },
+  };
+};
+
 export const updateEphemeralChannel = (
   contactInfo: { contactName: string; info: string },
   data: EphemeralDataElements,
@@ -68,20 +79,27 @@ export const fetchEphemeralChannel = (
 };
 
 export const updateTrustedChannel = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   data: TrustedDataElements,
   fetch?: Boolean,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactName, data, fetch },
+    payload: { contactInfo, data, fetch },
   };
 };
 
-export const fetchTrustedChannel = (contactName: string) => {
+export const fetchTrustedChannel = (
+  contactInfo: {
+    contactName: string;
+    info: string;
+  },
+  action: trustedChannelActions,
+  contactsWalletName?: string,
+) => {
   return {
     type: FETCH_TRUSTED_CHANNEL,
-    payload: { contactName },
+    payload: { contactInfo, action, contactsWalletName },
   };
 };
 

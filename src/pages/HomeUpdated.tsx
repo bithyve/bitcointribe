@@ -53,6 +53,7 @@ import { createRandomString } from '../common/CommonFunctions/timeFormatter';
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
+  fetchTrustedChannel,
   clearPaymentDetails,
 } from '../store/actions/trustedContacts';
 import {
@@ -93,7 +94,10 @@ import {
   addTransferDetails,
 } from '../store/actions/accounts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
-import { TrustedContactDerivativeAccount } from '../bitcoin/utilities/Interface';
+import {
+  TrustedContactDerivativeAccount,
+  trustedChannelActions,
+} from '../bitcoin/utilities/Interface';
 import moment from 'moment';
 import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
@@ -253,6 +257,7 @@ interface HomePropsTypes {
   updateFCMTokens: any;
   downloadMShare: any;
   approveTrustedContact: any;
+  fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
   s3Service: any;
@@ -443,6 +448,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         case 'trustedGuardian':
           const trustedGruardianRequest = {
             isGuardian: scannedData.isGuardian,
+            approvedTC: scannedData.approvedTC,
             requester: scannedData.requester,
             publicKey: scannedData.publicKey,
             info: scannedData.info,
@@ -1093,11 +1099,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           },
         );
       }
-    } else if (
-      splits[4] === 'tc' ||
-      splits[4] === 'tcg' ||
-      splits[4] === 'ptc'
-    ) {
+    } else if (['tc', 'tcg', 'atcg', 'ptc'].includes(splits[4])) {
       if (splits[3] !== config.APP_STAGE) {
         Alert.alert(
           'Invalid deeplink',
@@ -1112,7 +1114,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         }
 
         const trustedContactRequest = {
-          isGuardian: splits[4] === 'tcg' ? true : false,
+          isGuardian: ['tcg', 'atcg'].includes(splits[4]),
+          approvedTC: splits[4] === 'atcg' ? true : false,
           isPaymentRequest: splits[4] === 'ptc' ? true : false,
           requester: splits[5],
           encryptedKey: splits[6],
@@ -1759,6 +1762,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     let {
       requester,
       isGuardian,
+      approvedTC,
       encryptedKey,
       publicKey,
       info,
@@ -1773,6 +1777,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       navigation,
       approveTrustedContact,
       fetchEphemeralChannel,
+      fetchTrustedChannel,
       walletName,
       trustedContacts,
     } = this.props;
@@ -1817,51 +1822,74 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 'Invalid Number/Email',
                 'Decryption failed due to invalid input, try again.',
               );
+              return;
             }
           }
-          let pubExists = false;
+
+          let existingContact, existingContactName;
           Object.keys(trustedContacts.tc.trustedContacts).forEach(
             (contactName) => {
               const contact = trustedContacts.tc.trustedContacts[contactName];
               if (contact.contactsPubKey === publicKey) {
-                pubExists = true;
+                existingContactName = contactName;
+                existingContact = contact;
               }
             },
           );
-          if (pubExists) {
+          if (existingContactName && !approvedTC) {
             Toast('Contact already exists against this request');
             return;
           }
 
           if (publicKey && !rejected) {
-            navigation.navigate('ContactsListForAssociateContact', {
-              postAssociation: (contact) => {
-                const contactName = `${contact.firstName} ${
-                  contact.lastName ? contact.lastName : ''
-                }`.toLowerCase();
+            if (!approvedTC) {
+              navigation.navigate('ContactsListForAssociateContact', {
+                postAssociation: (contact) => {
+                  const contactName = `${contact.firstName} ${
+                    contact.lastName ? contact.lastName : ''
+                  }`.toLowerCase();
 
-                if (!semver.valid(version)) {
-                  // for 0.7, 0.9 and 1.0: info remains null
-                  info = null;
-                }
+                  if (!semver.valid(version)) {
+                    // for 0.7, 0.9 and 1.0: info remains null
+                    info = null;
+                  }
 
-                const contactInfo = {
-                  contactName,
-                  info,
-                };
-                if (isGuardian) {
-                  approveTrustedContact(
-                    contactInfo,
-                    publicKey,
-                    true,
-                    requester,
-                  );
-                } else {
-                  approveTrustedContact(contactInfo, publicKey, true);
-                }
-              },
-              isGuardian,
-            });
+                  const contactInfo = {
+                    contactName,
+                    info,
+                  };
+                  if (isGuardian) {
+                    approveTrustedContact(
+                      contactInfo,
+                      publicKey,
+                      true,
+                      requester,
+                    );
+                  } else {
+                    approveTrustedContact(contactInfo, publicKey, true);
+                  }
+                },
+                isGuardian,
+              });
+            } else {
+              if (!existingContactName) {
+                Alert.alert(
+                  'Invalid Link/QR',
+                  'You are not a valid trusted contact for approving this request',
+                );
+                return;
+              }
+              const contactInfo = {
+                contactName: existingContactName,
+                info,
+              };
+
+              fetchTrustedChannel(
+                contactInfo,
+                trustedChannelActions.downloadShare,
+                requester,
+              );
+            }
           } else if (publicKey && rejected) {
             // don't associate; only fetch the payment details from EC
             // fetchEphemeralChannel(null, null, publicKey);
@@ -3079,6 +3107,7 @@ export default withNavigationFocus(
     updateFCMTokens,
     downloadMShare,
     approveTrustedContact,
+    fetchTrustedChannel,
     uploadRequestedShare,
     initHealthCheck,
     fetchDerivativeAccBalTx,

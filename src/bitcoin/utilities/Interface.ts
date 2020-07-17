@@ -205,11 +205,19 @@ export interface EncryptedEphemeralData {
   };
 }
 
+export enum trustedChannelActions {
+  downloadShare = 'downloadShare',
+}
+
 export interface TrustedDataElements {
   xpub?: string;
   tpub?: string;
   walletID?: string;
   FCM?: string;
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
 }
 export interface TrustedData {
   publicKey: string;

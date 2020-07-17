@@ -16,6 +16,7 @@ import {
   TRUSTED_CHANNELS_SYNC,
   paymentDetailsFetched,
   switchTCLoading,
+  REMOVE_TRUSTED_CONTACT,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -29,6 +30,7 @@ import {
   INotification,
   notificationType,
   notificationTag,
+  trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
 import { downloadMShare, updateWalletImage } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -43,6 +45,7 @@ import { fetchNotificationsWorker } from './notifications';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
 import SSS from '../../bitcoin/utilities/sss/SSS';
+import Toast from '../../components/Toast';
 
 const sendNotification = (trustedContacts, contactName, walletName) => {
   const receivers = [];
@@ -141,6 +144,58 @@ function* approveTrustedContactWorker({ payload }) {
 export const approveTrustedContactWatcher = createWatcher(
   approveTrustedContactWorker,
   APPROVE_TRUSTED_CONTACT,
+);
+
+function* removeTrustedContactWorker({ payload }) {
+  const trustedContactsService: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  let { contactName } = payload;
+  contactName = contactName.toLowerCase().trim();
+  delete trustedContactsService.tc.trustedContacts[contactName];
+
+  let trustedContactsInfo: any = yield call(
+    AsyncStorage.getItem,
+    'TrustedContactsInfo',
+  );
+  if (trustedContactsInfo) {
+    trustedContactsInfo = JSON.parse(trustedContactsInfo);
+
+    for (let itr = 0; itr < trustedContactsInfo.length; itr++) {
+      const trustedContact = trustedContactsInfo[itr];
+      if (trustedContact) {
+        const presentContactName = `${trustedContact.firstName} ${
+          trustedContact.lastName ? trustedContact.lastName : ''
+        }`
+          .toLowerCase()
+          .trim();
+
+        if (presentContactName === contactName) {
+          if (itr < 3) trustedContactsInfo[itr] = null;
+          // Guardian nullified
+          else trustedContactsInfo.splice(itr, 1);
+          yield call(
+            AsyncStorage.setItem,
+            'TrustedContactsInfo',
+            JSON.stringify(trustedContactsInfo),
+          );
+          break;
+        }
+      }
+    }
+  }
+
+  const { SERVICES } = yield select((state) => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+  };
+  yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+}
+
+export const removeTrustedContactWatcher = createWatcher(
+  removeTrustedContactWorker,
+  REMOVE_TRUSTED_CONTACT,
 );
 
 function* updateEphemeralChannelWorker({ payload }) {
@@ -263,7 +318,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     const data: EphemeralDataElements = res.data.data;
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
-      yield delay(1000); // introducing delay in order to evade database insertion collision
+      // yield delay(1000); // introducing delay in order to evade database insertion collision
       yield put(downloadMShare(encryptedKey, otp));
     }
   } else {
@@ -330,17 +385,17 @@ function* updateTrustedChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, data, fetch } = payload;
+  const { contactInfo, data, fetch } = payload;
 
   const res = yield call(
     trustedContacts.updateTrustedChannel,
-    contactName,
+    contactInfo.contactName,
     data,
     fetch,
   );
   if (res.status === 200) {
     const { updated, data } = res.data;
-    yield put(trustedChannelUpdated(contactName, updated, data));
+    yield put(trustedChannelUpdated(contactInfo.contactName, updated, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -362,18 +417,33 @@ function* fetchTrustedChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName } = payload;
+  const { contactInfo, action, contactsWalletName } = payload;
 
-  const res = yield call(trustedContacts.fetchTrustedChannel, contactName);
+  const res = yield call(
+    trustedContacts.fetchTrustedChannel,
+    contactInfo.contactName,
+    contactsWalletName,
+  );
+
+  console.log({ res });
   if (res.status === 200) {
-    const { data } = res.data;
-    yield put(trustedChannelFetched(contactName, data));
+    const data: TrustedDataElements = res.data.data;
+    yield put(trustedChannelFetched(contactInfo.contactName, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    if (action === trustedChannelActions.downloadShare) {
+      if (data && data.shareTransferDetails) {
+        Toast('You have been successfully added as a Keeper');
+        const { otp, encryptedKey } = data.shareTransferDetails;
+        // yield delay(1000); // introducing delay in order to evade database insertion collision
+        yield put(downloadMShare(encryptedKey, otp));
+      }
+    }
   } else {
     console.log(res.err);
   }
