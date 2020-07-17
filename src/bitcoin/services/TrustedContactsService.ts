@@ -5,6 +5,7 @@ import {
   TrustedData,
   EphemeralDataElements,
   TrustedDataElements,
+  trustedChannelActions,
 } from '../utilities/Interface';
 
 export default class TrustedContactsService {
@@ -254,11 +255,12 @@ export default class TrustedContactsService {
 
   public fetchTrustedChannel = async (
     contactName: string,
+    contactsWalletName?: string,
   ): Promise<
     | {
         status: number;
         data: {
-          data: TrustedData;
+          data: TrustedDataElements;
         };
         err?: undefined;
         message?: undefined;
@@ -275,6 +277,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.fetchTrustedChannel(
           contactName.toLowerCase().trim(),
+          contactsWalletName,
         ),
       };
     } catch (err) {
