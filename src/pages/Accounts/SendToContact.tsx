@@ -812,14 +812,10 @@ export default function SendToContact(props) {
           if (transfer.details && transfer.details.length) {
             for (let i = 0; i < transfer.details.length; i++) {
               if (
-                transfer.details[i].selectedContact.id ==
-                selectedContact.id
+                transfer.details[i].selectedContact.id == selectedContact.id
               ) {
                 dispatch(
-                  removeTransferDetails(
-                    serviceType,
-                    transfer.details[i],
-                  ),
+                  removeTransferDetails(serviceType, transfer.details[i]),
                 );
                 break;
               }
@@ -840,10 +836,14 @@ export default function SendToContact(props) {
         }}
       />
     );
-  }, [spendableBalances, transfer, selectedContact,
+  }, [
+    spendableBalances,
+    transfer,
+    selectedContact,
     bitcoinAmount,
     currencyAmount,
-    note,]);
+    note,
+  ]);
 
   const renderAccountSelectionHeader = useCallback(() => {
     return (
@@ -856,7 +856,7 @@ export default function SendToContact(props) {
   }, []);
 
   const checkRecordsHavingPrice = () => {
-   if (transfer.details && transfer.details.length) {
+    if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
         if (
           !transfer.details[i].selectedContact.hasOwnProperty(
@@ -874,8 +874,10 @@ export default function SendToContact(props) {
   };
 
   const onConfirm = () => {
+    setTimeout(() => {
+      setIsConfirmDisabled(true);
+    }, 1);
     dispatch(clearTransfer(serviceType, 'stage1'));
-    setIsConfirmDisabled(false);
     if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
         if (transfer.details[i].selectedContact.id == selectedContact.id) {
@@ -895,6 +897,12 @@ export default function SendToContact(props) {
       handleTrasferST1();
     }, 10);
   };
+
+  useEffect(() => {
+    if (!loading.transfer) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading.transfer]);
 
   const getBalanceText = () => {
     let balance = spendableBalance;
@@ -1164,26 +1172,24 @@ export default function SendToContact(props) {
                 onPress={() => {
                   onConfirm();
                 }}
-                disabled={isConfirmDisabled || loading.transfer}
+                disabled={isConfirmDisabled}
                 style={{
                   ...styles.confirmButtonView,
-                  backgroundColor: Colors.blue,
+                  backgroundColor: isConfirmDisabled
+                    ? Colors.lightBlue
+                    : Colors.blue,
                   elevation: 10,
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
                   shadowOffset: { width: 15, height: 15 },
-                  opacity: isConfirmDisabled ? 0.5 : 1,
                 }}
               >
-                {/* {loading.transfer && !isInvalidBalance ? (
-                        <ActivityIndicator size="small" color={Colors.white} />
-                      ) : ( */}
-                {loading.transfer ? (
-                  <ActivityIndicator size="small" />
+                {(!isConfirmDisabled && loading.transfer) ||
+                (isConfirmDisabled && loading.transfer) ? (
+                  <ActivityIndicator size="small" color={Colors.white} />
                 ) : (
                   <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
                 )}
-                {/* )} */}
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -1192,7 +1198,7 @@ export default function SendToContact(props) {
                   width: wp('30%'),
                   marginLeft: 10,
                 }}
-                disabled={isConfirmDisabled || loading.transfer}
+                disabled={isConfirmDisabled}
                 onPress={() => {
                   // dispatch(clearTransfer(serviceType));
                   // if (getServiceType) {

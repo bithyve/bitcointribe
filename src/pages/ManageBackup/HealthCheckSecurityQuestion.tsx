@@ -36,6 +36,7 @@ export default function HealthCheckSecurityQuestion(props) {
   const [answer, setAnswer] = useState('');
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const setConfirm = () => {
     if (answer.length > 0 && answer != securityAnswer) {
@@ -87,6 +88,11 @@ export default function HealthCheckSecurityQuestion(props) {
     setDropdownBoxValue(value);
     setDropdownBoxOpenClose(false);
   };
+
+  useEffect(()=>{
+    if((!errorText && !answer && answer && dropdownBoxValue.id) || (dropdownBoxValue.id && answer)) setIsDisabled(false)
+    else setIsDisabled(true)
+  }, [answer, errorText, dropdownBoxValue.id])
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -248,7 +254,7 @@ export default function HealthCheckSecurityQuestion(props) {
             }}
           >
             <AppBottomSheetTouchableWrapper
-              disabled={errorText || !answer ? true : false}
+              disabled={isDisabled}
               onPress={() => {
                 setConfirm();
                 if (answer.trim() == securityAnswer.trim()) {
@@ -261,8 +267,9 @@ export default function HealthCheckSecurityQuestion(props) {
                 } else {
                   setErrorText('Answer is incorrect');
                 }
+                setIsDisabled(false);
               }}
-              style={styles.questionConfirmButton}
+              style={{...styles.questionConfirmButton, backgroundColor: isDisabled? Colors.lightBlue: Colors.blue}}
             >
               <Text style={styles.proceedButtonText}>
                 {!errorText ? 'Confirm' : 'Try Again'}
@@ -352,7 +359,6 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
   },
   inputBox: {
     borderWidth: 0.5,

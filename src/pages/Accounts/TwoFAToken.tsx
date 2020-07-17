@@ -53,6 +53,7 @@ export default function TwoFAToken(props) {
   const { transfer, loading } = useSelector(
     (state) => state.accounts[serviceType],
   );
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
 
   function onPressNumber(text) {
     let tmpToken = tokenArray;
@@ -197,6 +198,13 @@ export default function TwoFAToken(props) {
       props.navigation.state.params.onTransactionSuccess();
     props.navigation.goBack();
   }
+
+  useEffect(() => {
+    if (!loading.transfer) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading.transfer]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -389,12 +397,23 @@ export default function TwoFAToken(props) {
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
             <TouchableOpacity
+              disabled={isConfirmDisabled}
               onPress={() => {
+                setTimeout(() => {
+                  setIsConfirmDisabled(true);
+                }, 1);
                 dispatch(transferST3(serviceType, token));
               }}
-              style={{ ...styles.confirmModalButtonView, elevation: Elevation }}
+              style={{
+                ...styles.confirmModalButtonView,
+                elevation: Elevation,
+                backgroundColor: isConfirmDisabled
+                  ? Colors.lightBlue
+                  : Colors.blue,
+              }}
             >
-              {loading.transfer ? (
+              {(!isConfirmDisabled && loading.transfer) ||
+              (isConfirmDisabled && loading.transfer) ? (
                 <ActivityIndicator size="small" />
               ) : (
                 <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -445,11 +464,15 @@ export default function TwoFAToken(props) {
           onCloseStart={() => {
             SendUnSuccessBottomSheet.current.snapTo(0);
           }}
-          onCloseEnd={()=>setElevation(10)}
+          onCloseEnd={() => setElevation(10)}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('65%') : hp('70%')]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('70%'),
+          ]}
           renderContent={renderSendUnSuccessContents}
           renderHeader={renderSendUnSuccessHeader}
         />
