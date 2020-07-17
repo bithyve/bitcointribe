@@ -9,6 +9,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
+export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT';
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
@@ -38,6 +39,15 @@ export const approveTrustedContact = (
       contactsPublicKey,
       updateEphemeralChannel,
       contactsWalletName,
+    },
+  };
+};
+
+export const removeTrustedContact = (contactName) => {
+  return {
+    type: REMOVE_TRUSTED_CONTACT,
+    payload: {
+      contactName,
     },
   };
 };

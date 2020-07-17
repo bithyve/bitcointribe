@@ -95,6 +95,7 @@ import {
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
   trustedChannelsSyncWatcher,
+  removeTrustedContactWatcher,
 } from './sagas/trustedContacts';
 
 import { fromPrivateKey } from 'bip32';
@@ -191,6 +192,7 @@ const rootSaga = function* () {
     // Trusted Contacts
     initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
+    removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
