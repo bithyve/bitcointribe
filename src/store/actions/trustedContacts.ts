@@ -3,6 +3,7 @@
 import {
   TrustedDataElements,
   EphemeralDataElements,
+  trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
@@ -66,20 +67,27 @@ export const fetchEphemeralChannel = (
 };
 
 export const updateTrustedChannel = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   data: TrustedDataElements,
   fetch?: Boolean,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactName, data, fetch },
+    payload: { contactInfo, data, fetch },
   };
 };
 
-export const fetchTrustedChannel = (contactName: string) => {
+export const fetchTrustedChannel = (
+  contactInfo: {
+    contactName: string;
+    info: string;
+  },
+  action: trustedChannelActions,
+  contactsWalletName?: string,
+) => {
   return {
     type: FETCH_TRUSTED_CHANNEL,
-    payload: { contactName },
+    payload: { contactInfo, action, contactsWalletName },
   };
 };
 
