@@ -48,6 +48,7 @@ import {
   fetchDerivativeAccXpub,
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
+  setAverageTxFee
 } from '../../store/actions/accounts';
 import { setCurrencyToggleValue, setTestAccountHelperDone, setTransactionHelper } from '../../store/actions/preferences';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -151,6 +152,8 @@ interface AccountsPropsTypes {
   isTestHelperDoneValue: any;
   setTransactionHelper: any;
   isTransactionHelperDoneValue: any;
+  averageTxFees: any;
+  setAverageTxFee: any;
 }
 
 class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
@@ -345,12 +348,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   setAverageTransactionFees = async() =>{
     let { serviceType } = this.state;
-    let { accounts } = this.props;
+    let { accounts, averageTxFees } = this.props;
     const service = accounts[serviceType].service;
-    const storedAverageTxFees = JSON.parse(
-      await AsyncStorage.getItem('storedAverageTxFees'),
-    );
-    //console.log({ storedAverageTxFees });
+    const storedAverageTxFees = averageTxFees;
+    // const storedAverageTxFees = JSON.parse(
+    //   await AsyncStorage.getItem('storedAverageTxFees'),
+    // );
+    console.log({ storedAverageTxFees });
     if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
       const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
       if (Date.now() - lastFetched < 1800000) {
@@ -361,24 +365,31 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         const averageTxFees = await instance.averageTransactionFee();
 
         this.setState({averageTxFees: averageTxFees});
-        await AsyncStorage.setItem(
-          'storedAverageTxFees',
-          JSON.stringify({
-            ...storedAverageTxFees,
-            serviceType: { averageTxFees, lastFetched: Date.now() },
-          }),
-        );
+        this.props.setAverageTxFee({
+              ...storedAverageTxFees,
+              serviceType: { averageTxFees, lastFetched: Date.now() },
+            });
+        // await AsyncStorage.setItem(
+        //   'storedAverageTxFees',
+        //   JSON.stringify({
+        //     ...storedAverageTxFees,
+        //     serviceType: { averageTxFees, lastFetched: Date.now() },
+        //   }),
+        // );
       }
     } else {
       const instance = service.hdWallet || service.secureHDWallet;
       const averageTxFees = await instance.averageTransactionFee();
       this.setState({averageTxFees: averageTxFees});
-      await AsyncStorage.setItem(
-        'storedAverageTxFees',
-        JSON.stringify({
-          serviceType: { averageTxFees, lastFetched: Date.now() },
-        }),
-      );
+      this.props.setAverageTxFee({
+        serviceType: { averageTxFees, lastFetched: Date.now() },
+      });
+      // await AsyncStorage.setItem(
+      //   'storedAverageTxFees',
+      //   JSON.stringify({
+      //     serviceType: { averageTxFees, lastFetched: Date.now() },
+      //   }),
+      // );
     }
   }
 
@@ -1643,6 +1654,7 @@ const mapStateToProps = (state) => {
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     isTestHelperDoneValue: idx(state, (_) => _.preferences.isTestHelperDoneValue),
     isTransactionHelperDoneValue: idx(state, (_) => _.preferences.isTransactionHelperDoneValue),
+    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
     // service: idx(state, (_) => _.accounts)
   };
 };
@@ -1658,7 +1670,8 @@ export default withNavigationFocus(
     fetchDerivativeAccAddress,
     setCurrencyToggleValue,
     setTestAccountHelperDone,
-    setTransactionHelper
+    setTransactionHelper,
+    setAverageTxFee
   })(Accounts),
 );
 

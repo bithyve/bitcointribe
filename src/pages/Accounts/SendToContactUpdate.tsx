@@ -32,6 +32,7 @@ import {
   addTransferDetails,
   removeTransferDetails,
   clearTransfer,
+  setAverageTxFee
 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -87,6 +88,8 @@ interface SendToContactPropsTypes {
   currencyCode: any;
   currencyToggleValue: any;
   setCurrencyToggleValue: any;
+  averageTxFees: any;
+  setAverageTxFee: any;
 }
 
 interface SendToContactStateTypes {
@@ -232,9 +235,10 @@ class SendToContact extends Component<
     }
 
     if (
-      prevProps.accounts[serviceType].loading.transfer !==
-      this.props.accounts[serviceType].loading.transfer
+      prevProps.accounts[this.state.serviceType].loading.transfer !==
+      this.props.accounts[this.state.serviceType].loading.transfer
     ) {
+      if (!this.props.accounts[this.state.serviceType].loading.transfer.transfer) 
       this.setState({ isConfirmDisabled: false});
     }
 
@@ -399,9 +403,11 @@ class SendToContact extends Component<
   storeAverageTxFees = async () => {
     const { service } = this.props;
     const { serviceType } = this.state;
-    const storedAverageTxFees = await AsyncStorage.getItem(
-      'storedAverageTxFees',
-    );
+    const storedAverageTxFees = this.props.averageTxFees;
+    // const storedAverageTxFees = await AsyncStorage.getItem(
+    //   'storedAverageTxFees',
+    // );
+    console.log("storedAverageTxFees sendToContactUpdate", storedAverageTxFees);
     if (storedAverageTxFees) {
       const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
       if (Date.now() - lastFetched < 1800000) {
@@ -414,10 +420,11 @@ class SendToContact extends Component<
       service[serviceType].service.secureHDWallet;
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
-    await AsyncStorage.setItem(
-      'storedAverageTxFees',
-      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-    );
+    this.props.setAverageTxFee({ averageTxFees, lastFetched: Date.now()});
+    // await AsyncStorage.setItem(
+    //   'storedAverageTxFees',
+    //   JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+    // );
   };
 
   amountCalculation = () => {
@@ -1370,7 +1377,7 @@ const mapStateToProps = (state) => {
     accounts: state.accounts || [],
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-
+    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
   };
 };
 
@@ -1380,7 +1387,8 @@ export default withNavigationFocus(
     removeTransferDetails,
     clearTransfer,
     addTransferDetails,
-    setCurrencyToggleValue
+    setCurrencyToggleValue,
+    setAverageTxFee
   })(SendToContact),
 );
 

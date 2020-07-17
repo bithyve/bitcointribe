@@ -45,6 +45,7 @@ import {
   addTransferDetails,
   clearTransfer,
   removeTwoFA,
+  setAverageTxFee
 } from '../../store/actions/accounts';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendHelpContents from '../../components/Helper/SendHelpContents';
@@ -76,6 +77,8 @@ interface SendPropsTypes {
   setSendHelper: any;
   isTwoFASetupDone: any;
   setTwoFASetup: any;
+  averageTxFees: any;
+  setAverageTxFee: any;
 }
 
 interface SendStateTypes {
@@ -253,17 +256,13 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     if (!isSendHelperDone && this.state.serviceType == TEST_ACCOUNT) {
       this.props.setSendHelper(true);
       //await AsyncStorage.setItem('isSendHelperDone', 'true');
-      setTimeout(() => {
-        this.setState({ isSendHelperDone: true });
-      }, 10);
+      this.setState({ isSendHelperDone: true });
       setTimeout(() => {
         if (this.refs.SendHelperBottomSheet)
           (this.refs.SendHelperBottomSheet as any).snapTo(1);
       }, 1000);
     } else {
-      setTimeout(() => {
-        this.setState({ isSendHelperDone: false });
-      }, 10);
+      this.setState({ isSendHelperDone: false });
     }
   };
 
@@ -444,9 +443,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   storeAverageTxFees = async () => {
     const { service } = this.props;
     const { serviceType } = this.state;
-    const storedAverageTxFees = await AsyncStorage.getItem(
-      'storedAverageTxFees',
-    );
+    const storedAverageTxFees = this.props.averageTxFees;
+    // const storedAverageTxFees = await AsyncStorage.getItem(
+    //   'storedAverageTxFees',
+    // );
+    console.log("storedAverageTxFees", storedAverageTxFees);
     if (storedAverageTxFees) {
       const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
       if (Date.now() - lastFetched < 1800000) {
@@ -459,10 +460,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
-    await AsyncStorage.setItem(
-      'storedAverageTxFees',
-      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-    );
+    this.props.setAverageTxFee({ averageTxFees, lastFetched: Date.now()});
+    // await AsyncStorage.setItem(
+    //   'storedAverageTxFees',
+    //   JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+    // );
   };
 
   updateAddressBook = async () => {
@@ -878,6 +880,8 @@ const mapStateToProps = (state) => {
     trustedContactsInfo,
     isSendHelperDoneValue: idx(state, (_) => _.preferences.isSendHelperDoneValue),
     isTwoFASetupDone: idx(state, (_) => _.preferences.isTwoFASetupDone),
+    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
+
   };
 };
 
@@ -888,6 +892,7 @@ export default withNavigationFocus(
     clearTransfer,
     setSendHelper,
     setTwoFASetup,
+    setAverageTxFee
   })(Send),
   );
 
