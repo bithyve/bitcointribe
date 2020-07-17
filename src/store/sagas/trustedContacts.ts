@@ -97,7 +97,9 @@ function* approveTrustedContactWorker({ payload }) {
   );
 
   const { contactInfo, contactsPublicKey, contactsWalletName } = payload;
-  const encKey = SSS.strechKey(contactInfo.info);
+
+  let encKey;
+  if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
   const res = yield call(
     trustedContacts.finalizeContact,
     contactInfo.contactName,
@@ -158,12 +160,14 @@ function* updateEphemeralChannelWorker({ payload }) {
   const { contactInfo, data, fetch } = payload;
 
   let generatedKey = false;
-  if (!contactInfo.info) {
+  if (!contactInfo.info && contactInfo.contactName == 'Secondary Device') {
     // contact info = null, for secondary device (initially)
     contactInfo.info = SSS.generateKey(SSS.cipherSpec.keyLength);
     generatedKey = true;
   }
-  const encKey = SSS.strechKey(contactInfo.info);
+
+  let encKey;
+  if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
 
   const res = yield call(
     trustedContacts.updateEphemeralChannel,

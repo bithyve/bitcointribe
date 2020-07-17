@@ -341,35 +341,51 @@ export default class TrustedContacts {
         contactName,
         dataElements,
       );
-      let encryptedDataPacket: EncryptedEphemeralData;
-      if (dataElements.DHInfo) {
-        dataElements.DHInfo.address = ephemeralChannel.address;
-        encryptedDataPacket = {
-          publicKey,
-          encryptedData: null,
-          DHInfo: dataElements.DHInfo,
-        };
+
+      let res: AxiosResponse;
+      if (!encKey) {
+        // supporting versions prior to 1.1.0
+        res = await BH_AXIOS.post('updateEphemeralChannel', {
+          HEXA_ID,
+          address: ephemeralChannel.address,
+          data: dataElements,
+          fetch,
+          legacy: true,
+        });
       } else {
-        const ephemeralData: EphemeralData = {
-          publicKey,
-          data: updatedEphemeralDataElements,
-        };
+        let encryptedDataPacket: EncryptedEphemeralData;
+        if (dataElements.DHInfo) {
+          dataElements.DHInfo.address = ephemeralChannel.address;
+          encryptedDataPacket = {
+            publicKey,
+            encryptedData: null,
+            DHInfo: dataElements.DHInfo,
+          };
+        } else {
+          const ephemeralData: EphemeralData = {
+            publicKey,
+            data: updatedEphemeralDataElements,
+          };
 
-        const { encryptedData } = this.encryptData(encKey, ephemeralData.data);
+          const { encryptedData } = this.encryptData(
+            encKey,
+            ephemeralData.data,
+          );
 
-        encryptedDataPacket = {
-          publicKey,
-          encryptedData,
-          walletID: updatedEphemeralDataElements.walletID,
-        };
+          encryptedDataPacket = {
+            publicKey,
+            encryptedData,
+            walletID: updatedEphemeralDataElements.walletID,
+          };
+        }
+
+        res = await BH_AXIOS.post('updateEphemeralChannel', {
+          HEXA_ID,
+          address: ephemeralChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+        });
       }
-
-      const res = await BH_AXIOS.post('updateEphemeralChannel', {
-        HEXA_ID,
-        address: ephemeralChannel.address,
-        data: encryptedDataPacket,
-        fetch,
-      });
 
       let { updated, initiatedAt, data } = res.data;
       console.log({ updated, initiatedAt, data });
@@ -380,11 +396,16 @@ export default class TrustedContacts {
         ].ephemeralChannel.initiatedAt = initiatedAt;
 
       if (data && Object.keys(data).length) {
+        if (!encKey) {
+          this.updateEphemeralChannelData(contactName, data);
+        }
+
         return {
           updated,
           publicKey,
-          data: this.processEphemeralChannelData(contactName, data, encKey)
-            .data,
+          data: encKey
+            ? this.processEphemeralChannelData(contactName, data, encKey).data
+            : data,
         };
       }
 

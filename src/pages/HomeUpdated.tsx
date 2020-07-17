@@ -427,6 +427,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
           this.setState(
             {
@@ -465,6 +466,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             uploadedAt: scannedData.uploadedAt,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -502,6 +504,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -540,6 +543,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             info: scannedData.info,
             type: scannedData.type,
             isQR: true,
+            version: scannedData.ver,
           };
 
           this.setState(
@@ -1108,6 +1112,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           hintType: splits[7],
           hint: splits[8],
           uploadedAt: splits[9],
+          version,
         };
 
         this.setState(
@@ -1741,6 +1746,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       isQR,
       uploadedAt,
       isRecovery,
+      version,
     } = trustedContactRequest || recoveryRequest;
     const {
       UNDER_CUSTODY,
@@ -1751,8 +1757,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       walletName,
       trustedContacts,
     } = this.props;
-
-    console.log({ info });
 
     if (!isRecovery) {
       if (requester === walletName) {
@@ -1809,6 +1813,12 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 const contactName = `${contact.firstName} ${
                   contact.lastName ? contact.lastName : ''
                 }`.toLowerCase();
+
+                if (!semver.valid(version)) {
+                  // for 0.7, 0.9 and 1.0: info remains null
+                  info = null;
+                }
+
                 const contactInfo = {
                   contactName,
                   info,
