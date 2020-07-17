@@ -269,12 +269,14 @@ const TrustedContactHistory = (props) => {
         }}
         onPressContinue={async (selectedContacts, index) => {
           Keyboard.dismiss();
-          const isTrustedC = await isTrustedContact(selectedContacts[0]);
-          if (isTrustedC) {
-            Toast('Trusted Contact already exists');
-          } else {
-            getContacts(selectedContacts, index);
-          }
+          // const isTrustedC = await isTrustedContact(selectedContacts[0]);
+          // if (isTrustedC) {
+          //   Toast('Trusted Contact already exists');
+          // } else {
+          //   getContacts(selectedContacts, index);
+          // }
+
+          getContacts(selectedContacts, index);
         }}
         index={index}
       />
@@ -830,7 +832,9 @@ const TrustedContactHistory = (props) => {
       return;
     }
 
-    const publicKey = trustedContacts.tc.trustedContacts[contactName].publicKey;
+    const { publicKey, symmetricKey } = trustedContacts.tc.trustedContacts[
+      contactName
+    ];
     const requester = WALLET_SETUP.walletName;
     const appVersion = DeviceInfo.getVersion();
     if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
@@ -844,13 +848,20 @@ const TrustedContactHistory = (props) => {
         publicKey,
         number,
       ).encryptedPub;
+      const uploadedAt = symmetricKey
+        ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
+        : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+            .initiatedAt;
+
       const numberDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `https://hexawallet.io/${config.APP_STAGE}/${
+          symmetricKey ? 'atcg' : 'tcg'
+        }` +
         `/${requester}` +
         `/${numberEncPubKey}` +
         `/${numHintType}` +
         `/${numHint}` +
-        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
+        `/${uploadedAt}` +
         `/v${appVersion}`;
       console.log({ numberDL });
       setTrustedLink(numberDL);
@@ -863,13 +874,20 @@ const TrustedContactHistory = (props) => {
         email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
       const emailEncPubKey = TrustedContactsService.encryptPub(publicKey, email)
         .encryptedPub;
+      const uploadedAt = symmetricKey
+        ? SHARES_TRANSFER_DETAILS[index].UPLOADED_AT
+        : trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+            .initiatedAt;
+
       const emailDL =
-        `https://hexawallet.io/${config.APP_STAGE}/tcg` +
+        `https://hexawallet.io/${config.APP_STAGE}/${
+          symmetricKey ? 'atcg' : 'tcg'
+        }` +
         `/${requester}` +
         `/${emailEncPubKey}` +
         `/${emailHintType}` +
         `/${emailHint}` +
-        `/${trustedContacts.tc.trustedContacts[contactName].ephemeralChannel.initiatedAt}` +
+        `/${uploadedAt}` +
         `/v${appVersion}`;
       console.log({ emailDL });
       setTrustedLink(emailDL);
@@ -974,7 +992,8 @@ const TrustedContactHistory = (props) => {
         FCM,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
-
+      const hasTrustedChannel =
+        trustedContact && trustedContact.symmetricKey ? true : false;
       if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
         // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
         setTrustedLink('');
@@ -1021,7 +1040,8 @@ const TrustedContactHistory = (props) => {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY &&
+        !hasTrustedChannel
       ) {
         setTrustedLink('');
         setTrustedQR('');
@@ -1063,21 +1083,24 @@ const TrustedContactHistory = (props) => {
         info = chosenContact.emails[0].email;
       }
 
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
-      setTrustedQR(
-        JSON.stringify({
-          isGuardian: true,
-          requester: WALLET_SETUP.walletName,
-          publicKey,
-          info: info.trim(),
-          uploadedAt:
-            trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
-              .initiatedAt,
-          type: 'trustedGuardian',
-          ver: DeviceInfo.getVersion(),
-        }),
-      );
+      const { publicKey, symmetricKey } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
+      if (publicKey)
+        setTrustedQR(
+          JSON.stringify({
+            approvedTC: symmetricKey ? true : false,
+            isGuardian: true,
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            info: info.trim(),
+            uploadedAt:
+              trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+                .initiatedAt,
+            type: 'trustedGuardian',
+            ver: DeviceInfo.getVersion(),
+          }),
+        );
     }
   }, [
     SHARES_TRANSFER_DETAILS[index],
