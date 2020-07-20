@@ -587,8 +587,8 @@ export default function SendToContact(props) {
                 //     switchOn ? 0 : 2,
                 //   )} in order to conduct this transaction`
                 'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
-              : transfer.stage1.err
-            : 'Something went wrong'
+              : 'Something went wrong, please try again.'
+            : 'Something went wrong, please try again.'
         }
         userInfo={transfer.details}
         isFromContact={false}

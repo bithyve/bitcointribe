@@ -560,11 +560,15 @@ export default function Receive(props) {
         info={
           'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
         }
-        infoText={`Click here to accept contact request from ${
-          WALLET_SETUP.walletName
-        } Hexa wallet - link will expire in ${
-          config.TC_REQUEST_EXPIRY / (60000 * 60)
-        } hours`}
+        infoText={
+          receiveLink.includes('https://hexawallet.io')
+            ? `Click here to accept contact request from ${
+                WALLET_SETUP.walletName
+              } Hexa wallet - link will expire in ${
+                config.TC_REQUEST_EXPIRY / (60000 * 60)
+              } hours`
+            : null
+        }
         amount={amount === '' ? null : amount}
         link={receiveLink}
         serviceType={serviceType}
