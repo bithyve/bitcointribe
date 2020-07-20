@@ -75,7 +75,7 @@ export default function KeeperDeviceHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                If your Keeper Device is not accessible, it is{'\n'}possible to restore it using your primary device{'\n'}and a Guardian.
+                If your Keeper Device is not accessible, it is{'\n'}possible to restore it using your primary device{'\n'}and one of your Keepers.
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
