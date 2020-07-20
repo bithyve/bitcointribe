@@ -269,9 +269,9 @@ export default function AddressBookContents(props) {
             shareIndex: contact.shareIndex,
           });
         }}
-        onLongPress={() => {
-          dispatch(removeTrustedContact(contact.contactName));
-        }}
+        // onLongPress={() => {
+        //   dispatch(removeTrustedContact(contact.contactName));
+        // }}
         style={styles.selectedContactsView}
       >
         {getImageIcon(contact)}

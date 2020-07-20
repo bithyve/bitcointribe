@@ -448,7 +448,7 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={'Something went wrong, please try again'}
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
