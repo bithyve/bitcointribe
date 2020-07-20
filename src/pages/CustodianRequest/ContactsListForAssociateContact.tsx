@@ -19,8 +19,10 @@ const ContactsListForAssociateContact = (props) => {
     if (list.length > 0) setContacts([...list]);
   }
 
+  const trustedContactsState  = useSelector((state) => state.trustedContacts);
+
   const updateTrustedContactsInfo = async () => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
+    let { trustedContactsInfo } = trustedContactsState;
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
