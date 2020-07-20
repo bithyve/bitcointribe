@@ -267,8 +267,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   };
 
   setRecipientAddress = () => {
-     const { service } = this.props;
-     const { recipientAddress, serviceType, sweepSecure, spendableBalance, } = this.state;
+    const { service } = this.props;
+    const { recipientAddress, serviceType, sweepSecure, spendableBalance, } = this.state;
     // const instance = service[serviceType].service.hdWallet || service[serviceType].service.secureHDWallet;
     // // console.log("instance setRecipientAddress", instance);
     // let isAddressValid = instance.isValidAddress(recipientAddress);
@@ -306,8 +306,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           };
 
           this.props.addTransferDetails(serviceType, {
-              selectedContact: item,
-            })
+            selectedContact: item,
+          })
 
           this.props.navigation.navigate('SendToContact', {
             selectedContact: item,
@@ -366,8 +366,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               sweepSecure,
               spendableBalance,
               bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * 1e8)}`
-              : '',
+                ? `${Math.round(options.amount * 1e8)}`
+                : '',
             });
             break;
 
@@ -472,7 +472,6 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { serviceType } = this.state;
     let { trustedContactsInfo } = this.props
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
         const sendableTrustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {

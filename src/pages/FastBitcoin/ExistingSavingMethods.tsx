@@ -25,6 +25,7 @@ import {
 import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { useSelector } from 'react-redux';
+import Loader from '../../components/loader';
 
 export default function ExistingSavingMethods(props) {
   const FBTCAccountData = useSelector((state) => state.fbtc.FBTCAccountData);
@@ -109,271 +110,7 @@ export default function ExistingSavingMethods(props) {
           </View>
         </View>
       </View>
-      {loading ? (
-        <ScrollView style={{ flex: 1 }}>
-          {loading ? (
-            <View style={{ flex: 1 }}>
-              <View
-                style={{
-                  ...styles.cardOuterView,
-                  padding: wp('3%'),
-                  justifyContent: 'center',
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: wp('1.5%'),
-                    marginRight: wp('3%'),
-                  }}
-                >
-                  <View
-                    style={{
-                      width: wp('10%'),
-                      height: wp('10%'),
-                      borderRadius: wp('10%') / 2,
-                      backgroundColor: Colors.backgroundColor,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: wp('30%'),
-                      height: wp('7%'),
-                      backgroundColor: Colors.backgroundColor,
-                      borderRadius: 9,
-                      marginTop: 5,
-                      marginLeft: wp('3%'),
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: wp('15%'),
-                      height: wp('5%'),
-                      backgroundColor: Colors.backgroundColor,
-                      borderRadius: 7,
-                      marginLeft: 'auto',
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    height: 1,
-                    backgroundColor: Colors.borderColor,
-                    margin: wp('3%'),
-                    marginTop: wp('0.5%'),
-                  }}
-                />
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    margin: wp('3%'),
-                    marginTop: wp('1.5%'),
-                  }}
-                >
-                  <View
-                    style={{
-                      width: wp('40%'),
-                      height: wp('4%'),
-                      backgroundColor: Colors.backgroundColor,
-                      borderRadius: 6,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: wp('30%'),
-                      height: wp('5%'),
-                      backgroundColor: Colors.backgroundColor,
-                      borderRadius: 7,
-                      marginLeft: 'auto',
-                    }}
-                  />
-                </View>
-                <View style={styles.permissionView}>
-                  <View
-                    style={{
-                      width: wp('35%'),
-                      height: wp('5%'),
-                      backgroundColor: Colors.backgroundColor,
-                      borderRadius: 7,
-                      marginLeft: 'auto',
-                    }}
-                  />
-                  <View style={styles.permissionSeparationView} />
-                  <View
-                    style={{
-                      ...styles.permissionImage,
-                      backgroundColor: Colors.backgroundColor,
-                      marginLeft: 'auto',
-                      borderRadius: wp('5.5%') / 2,
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    ...styles.permissionView,
-                    marginTop: wp('0%'),
-                    marginBottom: wp('1.5%'),
-                  }}
-                >
-                  <View
-                    style={{
-                      width: wp('35%'),
-                      height: wp('5%'),
-                      backgroundColor: Colors.backgroundColor,
-                      borderRadius: 7,
-                    }}
-                  />
-                  <View style={styles.permissionSeparationView} />
-                  <View
-                    style={{
-                      ...styles.permissionImage,
-                      backgroundColor: Colors.backgroundColor,
-                      marginLeft: 'auto',
-                      borderRadius: wp('5.5%') / 2,
-                    }}
-                  />
-                </View>
-              </View>
-              <View style={{ flex: 1 }}>
-                {[1, 2, 3, 4].map(() => {
-                  return (
-                    <View style={{}}>
-                      <View
-                        style={{
-                          marginLeft: 20,
-                          marginRight: 20,
-                          marginTop: 5,
-                          marginBottom: 5,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          borderColor: Colors.borderColor,
-                          borderWidth: 1,
-                          borderRadius: 10,
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: wp('10%'),
-                            height: wp('10%'),
-                            borderRadius: wp('10%') / 2,
-                            backgroundColor: Colors.backgroundColor,
-                            marginLeft: wp('3%'),
-                          }}
-                        />
-                        <View
-                          style={{
-                            flex: 1,
-                            marginLeft: wp('3%'),
-                            marginRight: wp('3%'),
-                          }}
-                        >
-                          <View
-                            style={{
-                              padding: wp('3%'),
-                              paddingRight: wp('0%'),
-                              paddingLeft: wp('0%'),
-                            }}
-                          >
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                              }}
-                            >
-                              <View
-                                style={{
-                                  width: wp('40%'),
-                                  height: wp('5%'),
-                                  backgroundColor: Colors.backgroundColor,
-                                  borderRadius: 5,
-                                }}
-                              />
-                              <View
-                                style={{
-                                  width: wp('20%'),
-                                  height: wp('3%'),
-                                  backgroundColor: Colors.backgroundColor,
-                                  borderRadius: 5,
-                                  marginLeft: 'auto',
-                                }}
-                              />
-                            </View>
-                            <View
-                              style={{
-                                width: wp('30%'),
-                                height: wp('5%'),
-                                backgroundColor: Colors.backgroundColor,
-                                borderRadius: 5,
-                                marginTop: 5,
-                              }}
-                            />
-                          </View>
-                          <View
-                            style={{
-                              height: 1,
-                              backgroundColor: Colors.borderColor,
-                            }}
-                          />
-                          <View
-                            style={{
-                              padding: wp('3%'),
-                              paddingRight: wp('0%'),
-                              paddingLeft: wp('0%'),
-                            }}
-                          >
-                            <View style={{ flexDirection: 'row' }}>
-                              <View
-                                style={{
-                                  width: wp('25%'),
-                                  height: wp('3%'),
-                                  backgroundColor: Colors.backgroundColor,
-                                  borderRadius: 5,
-                                }}
-                              />
-                              <View
-                                style={{
-                                  width: wp('25%'),
-                                  height: wp('3%'),
-                                  backgroundColor: Colors.backgroundColor,
-                                  borderRadius: 5,
-                                  marginLeft: 'auto',
-                                }}
-                              />
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                              <View
-                                style={{
-                                  width: wp('30%'),
-                                  height: wp('5%'),
-                                  backgroundColor: Colors.backgroundColor,
-                                  borderRadius: 5,
-                                  marginTop: 5,
-                                }}
-                              />
-                              <View
-                                style={{
-                                  width: wp('20%'),
-                                  height: wp('5%'),
-                                  backgroundColor: Colors.backgroundColor,
-                                  borderRadius: 5,
-                                  marginTop: 5,
-                                  marginLeft: 'auto',
-                                }}
-                              />
-                            </View>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            </View>
-          ) : null}
-        </ScrollView>
-      ) : FBTCAccountInfo ? (
+      {FBTCAccountInfo ? (
         <ScrollView style={{ flex: 1 }}>
           <View
             style={{
@@ -462,8 +199,8 @@ export default function ExistingSavingMethods(props) {
                   style={styles.permissionImage}
                 />
               ) : (
-                <View style={styles.permissionImage} />
-              )}
+                  <View style={styles.permissionImage} />
+                )}
             </View>
             <View
               style={{
@@ -480,8 +217,8 @@ export default function ExistingSavingMethods(props) {
                   style={styles.permissionImage}
                 />
               ) : (
-                <View style={styles.permissionImage} />
-              )}
+                  <View style={styles.permissionImage} />
+                )}
             </View>
           </View>
           <View style={{ flex: 1 }}>
@@ -643,13 +380,16 @@ export default function ExistingSavingMethods(props) {
           </View>
         </ScrollView>
       ) : null}
-    <View style={{marginTop: 'auto'}}>
-      <BottomInfoBox
-        title={'Funding Sources'}
-        infoText={
-          'When you setup a service for getting bitcoin, it appears here'
-        }
-      />
+      {
+        loading ? <Loader /> : null
+      }
+      <View style={{ marginTop: 'auto' }}>
+        <BottomInfoBox
+          title={'Funding Sources'}
+          infoText={
+            'When you setup a service for getting bitcoin, it appears here'
+          }
+        />
       </View>
     </View>
   );

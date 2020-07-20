@@ -59,8 +59,8 @@ const SecondaryDeviceHistory = (props) => {
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
-  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
-  
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
+
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
   );
@@ -159,17 +159,18 @@ const SecondaryDeviceHistory = (props) => {
       trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
       trustedContactsInfo[0] = contact;
     }
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+
   }, []);
 
   const createGuardian = useCallback(
     async (reshare?: boolean) => {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = fcmTokenValue; 
+      const FCM = fcmTokenValue;
       //await AsyncStorage.getItem('fcmToken');
 
       const firstName = 'Secondary';
