@@ -641,6 +641,7 @@ class SendConfirmation_updated extends Component<
                 });
           }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'SendSuccessBottomSheet'}
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
@@ -687,11 +688,11 @@ class SendConfirmation_updated extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                if (this.refs.SendSuccessBottomSheet as any)
-                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-                navigation.navigate('Accounts');
-              }}
+              // onPressHeader={() => {
+              //   if (this.refs.SendSuccessBottomSheet as any)
+              //     (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+              //   navigation.navigate('Accounts');
+              // }}
             />
           )}
         />
@@ -701,12 +702,13 @@ class SendConfirmation_updated extends Component<
             (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
           }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'SendUnSuccessBottomSheet'}
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
             <SendConfirmationContent
               title={'Sent Unsuccessful'}
-              info={'There seems to be a problem'}
+              info={'Something went wrong, please try again'}
               userInfo={transfer.details ? transfer.details : []}
               isFromContact={false}
               okButtonText={'Try Again'}
@@ -727,10 +729,10 @@ class SendConfirmation_updated extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                if (this.refs.SendUnSuccessBottomSheet as any)
-                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   if (this.refs.SendUnSuccessBottomSheet as any)
+              //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              // }}
             />
           )}
         />
