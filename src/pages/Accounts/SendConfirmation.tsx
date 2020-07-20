@@ -426,20 +426,20 @@ export default function SendConfirmation(props) {
   const renderSendSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendSuccessBottomSheet.current)
-            SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts', {
-            serviceType,
-            index:
-              serviceType === TEST_ACCOUNT
-                ? 0
-                : serviceType === REGULAR_ACCOUNT
-                ? 1
-                : 2,
-            spendableBalance: spendableBalance - totalAmount,
-          });
-        }}
+        // onPressHeader={() => {
+        //   if (SendSuccessBottomSheet.current)
+        //     SendSuccessBottomSheet.current.snapTo(0);
+        //   props.navigation.navigate('Accounts', {
+        //     serviceType,
+        //     index:
+        //       serviceType === TEST_ACCOUNT
+        //         ? 0
+        //         : serviceType === REGULAR_ACCOUNT
+        //         ? 1
+        //         : 2,
+        //     spendableBalance: spendableBalance - totalAmount,
+        //   });
+        // }}
       />
     );
   };
@@ -448,7 +448,7 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={'Something went wrong, please try again'}
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
@@ -474,11 +474,11 @@ export default function SendConfirmation(props) {
   const renderSendUnSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
-          if (SendUnSuccessBottomSheet.current)
-            SendUnSuccessBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   //  dispatch(clearTransfer(serviceType));
+        //   if (SendUnSuccessBottomSheet.current)
+        //     SendUnSuccessBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   };
@@ -900,6 +900,7 @@ export default function SendConfirmation(props) {
       </ScrollView>
       <BottomSheet
         onCloseStart={() => onTransactionStage1Success()}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -911,6 +912,7 @@ export default function SendConfirmation(props) {
         onCloseStart={() => {
           SendUnSuccessBottomSheet.current.snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendUnSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}

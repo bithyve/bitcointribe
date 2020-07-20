@@ -82,8 +82,11 @@ const SecurityQuestionHistory = props => {
           Keyboard.dismiss();
           updateAutoHighlightFlags();
           saveConfirmationHistory();
-          SecurityQuestionBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            (SecurityQuestionBottomSheet as any).current.snapTo(0);
           (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+          }, 2);
+          
         }}
       />
     );
@@ -92,9 +95,9 @@ const SecurityQuestionHistory = props => {
   const renderSecurityQuestionHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (SecurityQuestionBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (SecurityQuestionBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -121,9 +124,9 @@ const SecurityQuestionHistory = props => {
   const renderHealthCheckSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -305,14 +308,16 @@ const SecurityQuestionHistory = props => {
         />
       </View>
       <BottomSheet
-        enabledInnerScrolling={true}
+         enabledGestureInteraction={false}
+         enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
       <BottomSheet
-        enabledInnerScrolling={true}
+         enabledGestureInteraction={false}
+         enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,

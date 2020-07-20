@@ -568,8 +568,8 @@ export default function SendToContact(props) {
                 //     switchOn ? 0 : 2,
                 //   )} in order to conduct this transaction`
                 'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
-              : transfer.stage1.err
-            : 'Something went wrong'
+              : 'Something went wrong, please try again.'
+            : 'Something went wrong, please try again.'
         }
         userInfo={transfer.details}
         isFromContact={false}
@@ -596,11 +596,11 @@ export default function SendToContact(props) {
   const renderSendUnSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
-          if (SendUnSuccessBottomSheet.current)
-            SendUnSuccessBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   //  dispatch(clearTransfer(serviceType));
+        //   if (SendUnSuccessBottomSheet.current)
+        //     SendUnSuccessBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   };
@@ -772,10 +772,10 @@ export default function SendToContact(props) {
     ) {
       return (
         <ModalHeader
-          onPressHeader={() => {
-            if (RemoveBottomSheet.current)
-              (RemoveBottomSheet as any).current.snapTo(0);
-          }}
+          // onPressHeader={() => {
+          //   if (RemoveBottomSheet.current)
+          //     (RemoveBottomSheet as any).current.snapTo(0);
+          // }}
         />
       );
     }
@@ -829,9 +829,9 @@ export default function SendToContact(props) {
   const renderAccountSelectionHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        onPressHeader={() => {
-          AccountSelectionBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   AccountSelectionBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1517,6 +1517,7 @@ export default function SendToContact(props) {
         </View>
       </KeyboardAvoidingView>
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={RemoveBottomSheet as any}
         snapPoints={[
@@ -1565,6 +1566,7 @@ export default function SendToContact(props) {
         onCloseStart={() => {
           SendUnSuccessBottomSheet.current.snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendUnSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -1618,6 +1620,7 @@ export default function SendToContact(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AccountSelectionBottomSheet}
         snapPoints={[
           -50,

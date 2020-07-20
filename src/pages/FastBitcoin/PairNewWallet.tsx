@@ -241,9 +241,9 @@ const PairNewWallet = (props) => {
   const renderRegistrationSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (RegistrationSuccessBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (RegistrationSuccessBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -288,9 +288,9 @@ const PairNewWallet = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorModalBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorModalBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -387,6 +387,7 @@ const PairNewWallet = (props) => {
         
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={RegistrationSuccessBottomSheet as any}
         snapPoints={[
           -50,
@@ -396,6 +397,7 @@ const PairNewWallet = (props) => {
         renderHeader={renderRegistrationSuccessModalHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorModalBottomSheet as any}
         snapPoints={[

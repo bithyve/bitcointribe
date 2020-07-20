@@ -311,9 +311,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             shareIndex: contact.shareIndex,
           });
         }}
-        onLongPress={() => {
-          this.props.removeTrustedContact(contact.contactName);
-        }}
+        // onLongPress={() => {
+        //   this.props.removeTrustedContact(contact.contactName);
+        // }}
         style={styles.selectedContactsView}
       >
         {getImageIcon(contact)}
@@ -392,9 +392,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -537,6 +537,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           </ScrollView>
         </View>
         <BottomSheet
+        enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.AddContactAddressBookBottomSheet as any}
           snapPoints={[
@@ -548,6 +549,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.HelpBottomSheet as any}
           snapPoints={[
             -50,

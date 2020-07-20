@@ -158,7 +158,11 @@ export default function TwoFAToken(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={
+          'There seems to be a problem' + '\n' + transfer.stage3.failed
+            ? 'Invalid 2FA token, please try again.'
+            : 'Something went wrong, please try again.'
+        }
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}

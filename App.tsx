@@ -92,7 +92,8 @@ class App extends Component {
           }}
         />
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -112,9 +113,9 @@ class App extends Component {
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
-              }}
+            // onPressHeader={() => {
+            //     (this.NoInternetBottomSheet as any).current.snapTo(0);
+            //   }}
             />
           )}
         />

@@ -309,9 +309,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -340,9 +340,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceMessageHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -660,6 +660,7 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceBottomSheet.current as any).snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet as any}
         snapPoints={[-30, hp('85%')]}
@@ -670,6 +671,7 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceMessageBottomSheet.current as any).snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceMessageBottomSheet as any}
         snapPoints={[
@@ -680,6 +682,7 @@ const SecondaryDeviceHistory = (props) => {
         renderHeader={renderSecondaryDeviceMessageHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
@@ -697,7 +700,8 @@ const SecondaryDeviceHistory = (props) => {
           setQrBottomSheetsFlag(false);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        onCloseStart={() => { }}
+        onCloseStart={() => {}}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={QrBottomSheet as any}
         snapPoints={[
