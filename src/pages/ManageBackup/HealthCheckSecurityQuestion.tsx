@@ -19,8 +19,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
+import { withNavigation } from 'react-navigation';
 
-export default function HealthCheckSecurityQuestion(props) {
+function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
@@ -44,6 +45,7 @@ export default function HealthCheckSecurityQuestion(props) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
         } else {
+          props.navigation.navigate('ReLogin');
           setAnswer(securityAnswer);
           setErrorText('');
           return;
@@ -280,6 +282,8 @@ export default function HealthCheckSecurityQuestion(props) {
     </View>
   );
 }
+
+export default withNavigation(HealthCheckSecurityQuestion);
 
 const styles = StyleSheet.create({
   modalContentContainer: {
