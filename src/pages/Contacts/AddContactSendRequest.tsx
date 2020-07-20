@@ -51,7 +51,7 @@ export default function AddContactSendRequest(props) {
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
   const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
-  let trustedContactsInfo = useSelector((state) => state.trustedContacts.trustedContacts)
+  let trustedContactsInfo = useSelector((state) => state.trustedContacts.trustedContactsInfo)
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
@@ -106,7 +106,6 @@ export default function AddContactSendRequest(props) {
       JSON.stringify(trustedContactsInfo),
     );
     dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
-
   };
 
   const dispatch = useDispatch();
