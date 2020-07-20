@@ -49,7 +49,10 @@ import {
   EphemeralDataElements,
   MetaShare,
 } from '../../bitcoin/utilities/Interface';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  removeTrustedContact,
+} from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
   const [isSendDisabled, setIsSendDisabled] = useState(false);
@@ -1283,6 +1286,19 @@ export default function ContactDetails(props) {
             ) : null}
           </View>
         )}
+        <TouchableOpacity
+          style={{
+            ...styles.bottomButton,
+          }}
+          onPress={() => {
+            dispatch(removeTrustedContact(contact.contactName));
+            props.navigation.goBack();
+          }}
+        >
+          <View>
+            <Text style={styles.buttonText}>Remove</Text>
+          </View>
+        </TouchableOpacity>
       </View>
       <BottomSheet
         enabledInnerScrolling={true}
