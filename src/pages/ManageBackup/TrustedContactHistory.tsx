@@ -474,9 +474,9 @@ const TrustedContactHistory = (props) => {
   const renderConfirmHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ConfirmBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ConfirmBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, [selectedContactMode]);
@@ -500,9 +500,9 @@ const TrustedContactHistory = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -619,9 +619,9 @@ const TrustedContactHistory = (props) => {
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ReshareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -658,9 +658,9 @@ const TrustedContactHistory = (props) => {
   const renderChangeHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ChangeBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ChangeBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1138,9 +1138,9 @@ const TrustedContactHistory = (props) => {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (shareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (shareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1175,10 +1175,10 @@ const TrustedContactHistory = (props) => {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaLinkBottomSheet.current)
+        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1210,10 +1210,10 @@ const TrustedContactHistory = (props) => {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaQRBottomSheet.current)
+        //     (SendViaQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1389,6 +1389,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderShareOtpWithTrustedContactHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ChangeBottomSheet as any}
         snapPoints={[
@@ -1399,6 +1400,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderChangeHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ReshareBottomSheet as any}
         snapPoints={[
@@ -1409,6 +1411,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderReshareHeader}
       />
       <BottomSheet
+      enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ConfirmBottomSheet as any}
         snapPoints={[
@@ -1432,6 +1435,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderTrustedContactQrHeader}
       /> */}
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
@@ -1442,6 +1446,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderErrorModalHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={shareBottomSheet as any}
         snapPoints={[
@@ -1452,6 +1457,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={SendModalFunction}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -1462,6 +1468,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderSendViaLinkHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[

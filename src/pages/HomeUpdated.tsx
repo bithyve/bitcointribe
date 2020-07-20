@@ -3017,6 +3017,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         />
         <BottomSheet
           onCloseEnd={() => {}}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
           snapPoints={[-50, hp('60%')]}
@@ -3032,9 +3033,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                (this.NoInternetBottomSheet as any).current.snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   (this.NoInternetBottomSheet as any).current.snapTo(0);
+              // }}
             />
           )}
         />

@@ -308,9 +308,9 @@ const PersonalCopyHistory = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -345,9 +345,9 @@ const PersonalCopyHistory = (props) => {
   const renderPersonalCopyShareModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -605,6 +605,7 @@ const PersonalCopyHistory = (props) => {
         />
       </View>
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={PersonalCopyShareBottomSheet as any}
         snapPoints={[-50, hp('85%')]}
@@ -612,6 +613,7 @@ const PersonalCopyHistory = (props) => {
         renderHeader={renderPersonalCopyShareModalHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
