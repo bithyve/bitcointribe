@@ -512,11 +512,10 @@ export default function Receive(props) {
 
   const renderAddContactAddressBookHeader = () => {
     return (
-      <SmallHeaderModal
-        backgroundColor={Colors.white}
-        onPressHeader={() => {
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
+      <ModalHeader
+        // onPressHeader={() => {
+        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -538,6 +537,9 @@ export default function Receive(props) {
           setSelectedContact(selectedContact);
         }}
         onPressBack={() => {
+          setTimeout(() => {
+            setAsTrustedContact(!AsTrustedContact);
+          }, 2);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}
       />
@@ -560,11 +562,15 @@ export default function Receive(props) {
         info={
           'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
         }
-        infoText={`Click here to accept contact request from ${
-          WALLET_SETUP.walletName
-        } Hexa wallet - link will expire in ${
-          config.TC_REQUEST_EXPIRY / (60000 * 60)
-        } hours`}
+        infoText={
+          receiveLink.includes('https://hexawallet.io')
+            ? `Click here to accept contact request from ${
+                WALLET_SETUP.walletName
+              } Hexa wallet - link will expire in ${
+                config.TC_REQUEST_EXPIRY / (60000 * 60)
+              } hours`
+            : null
+        }
         amount={amount === '' ? null : amount}
         link={receiveLink}
         serviceType={serviceType}
@@ -582,10 +588,10 @@ export default function Receive(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaLinkBottomSheet.current)
+        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -618,10 +624,10 @@ export default function Receive(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaQRBottomSheet.current)
+        //     (SendViaQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -755,10 +761,10 @@ export default function Receive(props) {
       <SmallHeaderModal
         borderColor={Colors.borderColor}
         backgroundColor={Colors.white}
-        onPressHeader={() => {
-          if (SecureReceiveWarningBottomSheet.current)
-            (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SecureReceiveWarningBottomSheet.current)
+        //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1148,6 +1154,7 @@ export default function Receive(props) {
         renderHeader={renderReceiveHelperHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={AddContactAddressBookBookBottomSheet as any}
         snapPoints={[
@@ -1158,6 +1165,7 @@ export default function Receive(props) {
         renderHeader={renderAddContactAddressBookHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -1168,6 +1176,7 @@ export default function Receive(props) {
         renderHeader={renderSendViaLinkHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
@@ -1178,6 +1187,7 @@ export default function Receive(props) {
         renderHeader={renderSendViaQRHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SecureReceiveWarningBottomSheet as any}
         snapPoints={[

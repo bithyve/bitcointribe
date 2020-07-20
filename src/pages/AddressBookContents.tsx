@@ -269,9 +269,9 @@ export default function AddressBookContents(props) {
             shareIndex: contact.shareIndex,
           });
         }}
-        onLongPress={() => {
-          dispatch(removeTrustedContact(contact.contactName));
-        }}
+        // onLongPress={() => {
+        //   dispatch(removeTrustedContact(contact.contactName));
+        // }}
         style={styles.selectedContactsView}
       >
         {getImageIcon(contact)}
@@ -416,9 +416,9 @@ export default function AddressBookContents(props) {
   const renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -571,6 +571,7 @@ export default function AddressBookContents(props) {
       </View>
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AddContactAddressBookBookBottomSheet as any}
         snapPoints={[
           -50,
