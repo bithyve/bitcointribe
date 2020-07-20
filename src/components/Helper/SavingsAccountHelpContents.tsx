@@ -59,7 +59,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Savings Account is designed as an account{'\n'}where you can store funds that you don’t plan{'\n'}to use in the short term. The Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}spending. The 2FA code must be retrieved{'\n'}from the Keeper App
+                The Savings Account is designed as an account{'\n'}where you can store funds that you don’t plan{'\n'}to use in the short term. The Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}spending. The 2FA code must be retrieved{'\n'}from the 2FA App
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -99,7 +99,7 @@ export default function SavingsAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Savings Account is a 2-of-3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on a Keeper App), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper App can be used to migrate from Hexa{'\n'}
+                The Savings Account is a 2-of-3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on your Keeper device), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper device can be used to migrate from Hexa{'\n'}
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
