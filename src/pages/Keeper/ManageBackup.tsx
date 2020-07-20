@@ -82,41 +82,44 @@ class ManageBackup extends Component<
           type: 'icloud',
           health: 0,
           title: 'Level 1',
-          info: 'Keepers need your attention',
-          manageText: 'Manage',
+          infoRed: 'Keepers need your attention',
+          infoGreen: 'All Keepers are accessible',
           isSetupDone: true,
-          id: 1
+          id: 1,
         },
         {
           type: 'keeper',
           health: 0,
           title: 'Level 2',
-          info: 'Improve security by adding Keepers',
-          manageText: 'Setup',
+          infoGray: 'Improve security by adding Keepers',
+          infoRed: 'Keepers need your attention',
+          infoGreen: 'All Keepers are accessible',
           isSetupDone: false,
-          id: 2
+          id: 2,
         },
         {
           type: 'keeper',
           health: 0,
           title: 'Level 3',
-          info: 'Improve security by adding Keepers',
+          infoGray: 'Improve security by adding Keepers',
+          infoRed: 'Keepers need your attention',
+          infoGreen: 'All Keepers are accessible',
           manageText: 'Setup',
           isSetupDone: false,
-          id: 3
+          id: 3,
         },
       ],
     };
   }
 
+  selectId = (value) => {
+    if(value!=this.state.selectedId) this.setState({ selectedId: value });
+    else this.setState({ selectedId: 0 });
+  }
+
   render() {
-    const {
-      levelData,
-      selectedId,
-    } = this.state;
-    const {
-      navigation
-    } = this.props;
+    const { levelData, selectedId } = this.state;
+    const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -159,181 +162,126 @@ class ManageBackup extends Component<
             </View>
           </View>
           <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
-            <View style={{borderRadius: 10, marginTop: wp('7%'), backgroundColor: Colors.blue,}}>
-              <View style={styles.cardView}>
-                <View style={{ flexDirection: 'row' }}>
-                  <View style={styles.cardHealthImageView}>
-                    <Image
-                      source={require('../../assets/images/icons/icon_error_yellow.png')}
-                      style={styles.cardHealthImage}
-                    />
-                  </View>
-                  <TouchableOpacity style={styles.cardButtonView}>
-                    <Text style={styles.cardButtonText}>iCloud</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
-                  <View style={{ justifyContent: 'center' }}>
-                    <Text
-                      style={{
-                        ...styles.levelText,
-                        color: Colors.white,
-                      }}
-                    >
-                      {'value.title'}
-                    </Text>
-                    <Text
-                      style={{
-                        ...styles.levelInfoText,
-                        color: Colors.white,
-                      }}
-                    >
-                      {'value.info'}
-                    </Text>
-                  </View>
-                  <TouchableOpacity onPress={()=>{if(!selectedId) {this.setState({selectedId: 1})} else this.setState({selectedId: 0})}} style={styles.manageButton}>
-                    <Text
-                      style={{
-                        ...styles.manageButtonText,
-                        color: Colors.white,
-                      }}
-                    >
-                      {'Manage'}
-                    </Text>
-                    <AntDesign name="arrowright" color={Colors.white} size={12} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {selectedId ? (<View>
-              <View style={{backgroundColor: Colors.white, height: 0.5}} />
-              <View style={styles.cardView}>
-                <View style={{ flexDirection: 'row' }}>
-                  <View style={styles.cardHealthImageView}>
-                    <Image
-                      source={require('../../assets/images/icons/icon_error_yellow.png')}
-                      style={styles.cardHealthImage}
-                    />
-                  </View>
-                  <TouchableOpacity style={styles.cardButtonView}>
-                    <Text style={styles.cardButtonText}>iCloud</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
-                  <View style={{ justifyContent: 'center' }}>
-                    <Text
-                      style={{
-                        ...styles.levelText,
-                        color: Colors.white,
-                      }}
-                    >
-                      {'value.title'}
-                    </Text>
-                    <Text
-                      style={{
-                        ...styles.levelInfoText,
-                        color: Colors.white,
-                      }}
-                    >
-                      {'value.info'}
-                    </Text>
-                  </View>
-                  <TouchableOpacity style={styles.manageButton}>
-                    <Text
-                      style={{
-                        ...styles.manageButtonText,
-                        color: Colors.white,
-                      }}
-                    >
-                      {'Manage'}
-                    </Text>
-                    <AntDesign name="arrowright" color={Colors.white} size={12} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              </View>) : null}
-            </View>
-            {/* {levelData.map((value) => {
+            {levelData.map((value) => {
               return (
                 <View
                   style={{
-                    ...styles.cardView,
+                    borderRadius: 10,
+                    marginTop: wp('7%'),
                     backgroundColor: value.isSetupDone
                       ? Colors.blue
                       : Colors.backgroundColor1,
                   }}
                 >
-                  <View style={{ flexDirection: 'row' }}>
-                    {value.isSetupDone ? (
-                      <View style={styles.cardHealthImageView}>
+                  <View style={styles.cardView}>
+                    <View style={{ flexDirection: 'row' }}>
+                      {value.isSetupDone ? (
+                        <View style={styles.cardHealthImageView}>
+                          <Image
+                            source={require('../../assets/images/icons/icon_error_yellow.png')}
+                            style={styles.cardHealthImage}
+                          />
+                        </View>
+                      ) : (
                         <Image
-                          source={require('../../assets/images/icons/icon_error_yellow.png')}
-                          style={styles.cardHealthImage}
+                          source={require('../../assets/images/icons/Spaner.png')}
+                          style={{
+                            borderRadius: wp('7%') / 2,
+                            width: wp('7%'),
+                            height: wp('7%'),
+                          }}
                         />
-                      </View>
-                    ) : (
-                      <Image
-                        source={require('../../assets/images/icons/Spaner.png')}
-                        style={{
-                          borderRadius: wp('7%') / 2,
-                          width: wp('7%'),
-                          height: wp('7%'),
-                        }}
-                      />
-                    )}
-
-                    {value.type == 'icloud' && (
-                      <TouchableOpacity style={styles.cardButtonView}>
-                        <Text style={styles.cardButtonText}>iCloud</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-
-                  <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
-                    <View style={{ justifyContent: 'center' }}>
-                      <Text
-                        style={{
-                          ...styles.levelText,
-                          color: value.isSetupDone
-                            ? Colors.white
-                            : Colors.babyGray,
-                        }}
-                      >
-                        {value.title}
-                      </Text>
-                      <Text
-                        style={{
-                          ...styles.levelInfoText,
-                          color: value.isSetupDone
-                            ? Colors.white
-                            : Colors.babyGray,
-                        }}
-                      >
-                        {value.info}
-                      </Text>
+                      )}
+                      {value.isSetupDone && <TouchableOpacity style={styles.cardButtonView}>
+                        <Text style={styles.cardButtonText}>Know More</Text>
+                      </TouchableOpacity>}
                     </View>
-                    <TouchableOpacity style={styles.manageButton}>
-                      <Text
-                        style={{
-                          ...styles.manageButtonText,
-                          color: value.isSetupDone
-                            ? Colors.white
-                            : Colors.black,
-                        }}
+
+                    <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
+                      <View style={{ justifyContent: 'center' }}>
+                        <Text
+                          style={{
+                            ...styles.levelText,
+                            color: value.isSetupDone
+                              ? Colors.white
+                              : Colors.babyGray,
+                          }}
+                        >
+                          {value.title}
+                        </Text>
+                        <Text
+                          style={{
+                            ...styles.levelInfoText,
+                            color: value.isSetupDone
+                              ? Colors.white
+                              : Colors.babyGray,
+                          }}
+                        >
+                          {value.isSetupDone ? value.health ? value.infoGreen : value.infoRed : value.infoGray}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        activeOpacity={10}
+                        onPress={() => this.selectId(value.id)}
+                        style={styles.manageButton}
                       >
-                        {value.manageText}
-                      </Text>
-                      <AntDesign
-                        name="arrowright"
-                        color={value.isSetupDone ? Colors.white : Colors.black}
-                        size={12}
-                      />
-                    </TouchableOpacity>
+                        <Text
+                          style={{
+                            ...styles.manageButtonText,
+                            color: value.isSetupDone
+                              ? Colors.white
+                              : Colors.black,
+                          }}
+                        >
+                          {value.isSetupDone ? 'Manage' : 'Setup'}
+                        </Text>
+                        <AntDesign
+                          name={selectedId ? 'arrowup' : 'arrowright'}
+                          color={value.isSetupDone ? Colors.white : Colors.black}
+                          size={12}
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
+                  {selectedId == value.id ? (
+                    <View>
+                      <View
+                        style={{ backgroundColor: Colors.white, height: 0.5 }}
+                      />
+                      <View style={styles.cardView}>
+                        <View style={{ width: wp('40%') }}>
+                          <Text
+                            numberOfLines={2}
+                            style={{
+                              color: Colors.white,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue(10),
+                            }}
+                          >
+                            Lorem ipsum dolor sit amet, consetetur
+                          </Text>
+                        </View>
+
+                        <TouchableOpacity style={styles.appBackupButton}>
+                          <Image
+                            source={require('../../assets/images/icons/reset.png')}
+                            style={styles.resetImage}
+                          />
+                          <Text
+                            style={{
+                              ...styles.cardButtonText,
+                              fontSize: RFValue(11),
+                            }}
+                          >
+                            App Backup
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : null}
                 </View>
               );
-            })} */}
+            })}
           </View>
         </View>
       </View>
@@ -470,5 +418,20 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
     marginRight: 3,
+  },
+  appBackupButton: {
+    flexDirection: 'row',
+    backgroundColor: Colors.deepBlue,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    borderRadius: 8,
+    width: wp('31%'),
+    height: wp('11'),
+    marginTop: 'auto',
+  },
+  resetImage: {
+    width: wp('4%'),
+    height: wp('4%'),
+    resizeMode: 'contain',
   },
 });
