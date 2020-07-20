@@ -317,10 +317,10 @@ export default function AddContactSendRequest(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaLinkBottomSheet.current)
+        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -360,10 +360,10 @@ export default function AddContactSendRequest(props) {
   const renderTimerModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (TimerModalBottomSheet.current)
-            (TimerModalBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (TimerModalBottomSheet.current)
+        //     (TimerModalBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -376,10 +376,10 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaQRBottomSheet.current)
+        //     (SendViaQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -638,6 +638,7 @@ export default function AddContactSendRequest(props) {
           </View>
         </View>
         <BottomSheet
+        enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaLinkBottomSheet as any}
           snapPoints={[
@@ -650,6 +651,7 @@ export default function AddContactSendRequest(props) {
           renderHeader={renderSendViaLinkHeader}
         />
         <BottomSheet
+        enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaQRBottomSheet as any}
           snapPoints={[
@@ -662,6 +664,7 @@ export default function AddContactSendRequest(props) {
           renderHeader={renderSendViaQRHeader}
         />
         <BottomSheet
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={TimerModalBottomSheet as any}
           snapPoints={[

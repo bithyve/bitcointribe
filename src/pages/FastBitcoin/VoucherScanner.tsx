@@ -655,9 +655,9 @@ const VoucherScanner = (props) => {
   const renderRegistrationSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (RegistrationSuccessBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (RegistrationSuccessBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -781,9 +781,9 @@ const VoucherScanner = (props) => {
   const renderQuoteModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (QuoteBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (QuoteBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -822,9 +822,9 @@ const VoucherScanner = (props) => {
   const renderVoucherRedeemSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (VoucherRedeemSuccessBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (VoucherRedeemSuccessBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -844,9 +844,9 @@ const VoucherScanner = (props) => {
   const renderAccountVerificationModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          AccountVerificationBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   AccountVerificationBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -924,9 +924,9 @@ const VoucherScanner = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorModalBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorModalBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1211,6 +1211,7 @@ const VoucherScanner = (props) => {
       </View>
       {showLoader ? <Loader /> : null}
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={RegistrationSuccessBottomSheet as any}
         snapPoints={[
@@ -1222,6 +1223,7 @@ const VoucherScanner = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={ErrorModalBottomSheet as any}
         snapPoints={[
           -50,
@@ -1233,6 +1235,7 @@ const VoucherScanner = (props) => {
       {QuoteDetails && (
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={QuoteBottomSheet as any}
           snapPoints={[
             -50,
@@ -1246,6 +1249,7 @@ const VoucherScanner = (props) => {
       )}
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={VoucherRedeemSuccessBottomSheet as any}
         snapPoints={[
           -50,
@@ -1256,6 +1260,7 @@ const VoucherScanner = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AccountVerificationBottomSheet as any}
         snapPoints={[
           -50,

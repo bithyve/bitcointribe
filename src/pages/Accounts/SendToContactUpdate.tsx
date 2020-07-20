@@ -1208,6 +1208,7 @@ class SendToContact extends Component<
         </KeyboardAvoidingView>
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'RemoveBottomSheet'}
           snapPoints={[
             -50,
@@ -1245,10 +1246,10 @@ class SendToContact extends Component<
             ) {
               return (
                 <ModalHeader
-                  onPressHeader={() => {
-                    if (this.refs.RemoveBottomSheet)
-                      (this.refs.RemoveBottomSheet as any).snapTo(0);
-                  }}
+                  // onPressHeader={() => {
+                  //   if (this.refs.RemoveBottomSheet)
+                  //     (this.refs.RemoveBottomSheet as any).snapTo(0);
+                  // }}
                 />
               );
             }
@@ -1259,6 +1260,7 @@ class SendToContact extends Component<
             (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
           }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'SendUnSuccessBottomSheet'}
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
@@ -1279,8 +1281,8 @@ class SendToContact extends Component<
                       //     switchOn ? 0 : 2,
                       //   )} in order to conduct this transaction`
                       'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
-                    : transfer[serviceType].transfer.stage1.err
-                  : 'Something went wrong'
+                    : 'Something went wrong, please try again'
+                  : 'Something went wrong, please try again'
               }
               userInfo={transfer[serviceType].transfer.details}
               isFromContact={false}
@@ -1304,16 +1306,17 @@ class SendToContact extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                //  dispatch(clearTransfer(serviceType));
-                if (this.refs.SendUnSuccessBottomSheet)
-                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   //  dispatch(clearTransfer(serviceType));
+              //   if (this.refs.SendUnSuccessBottomSheet)
+              //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              // }}
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'AccountSelectionBottomSheet'}
           snapPoints={[
             -50,
@@ -1358,9 +1361,9 @@ class SendToContact extends Component<
           )}
           renderHeader={() => (
             <SmallHeaderModal
-              onPressHeader={() => {
-                (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
+              // }}
             />
           )}
         />

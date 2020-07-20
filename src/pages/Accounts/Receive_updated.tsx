@@ -790,6 +790,7 @@ export default function Receive(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AddContactAddressBookBookBottomSheet as any}
         snapPoints={[
           -50,
@@ -803,18 +804,23 @@ export default function Receive(props) {
             proceedButtonText={'Confirm & Proceed'}
             onPressContinue={(selectedContacts) => onPressContinue(selectedContacts)}
             onSelectContact={(selectedContact) => setSelectedContact(selectedContact)}
-            onPressBack={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+            onPressBack={() => {
+              setTimeout(() => {
+                setAsTrustedContact(!AsTrustedContact);
+              }, 2);
+              (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}}
           />
         )}
         renderHeader={() => (
-          <SmallHeaderModal
+          <ModalHeader
             backgroundColor={Colors.white}
-            onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+            //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
           />
         )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
           -50,
@@ -835,11 +841,15 @@ export default function Receive(props) {
             info={
               'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
             }
-            infoText={`Click here to accept contact request from ${
-              WALLET_SETUP.walletName
-              } Hexa wallet - link will expire in ${
-              config.TC_REQUEST_EXPIRY / (60000 * 60)
-              } hours`}
+            infoText={
+              receiveLink.includes('https://hexawallet.io')
+                ? `Click here to accept contact request from ${
+                    WALLET_SETUP.walletName
+                  } Hexa wallet - link will expire in ${
+                    config.TC_REQUEST_EXPIRY / (60000 * 60)
+                  } hours`
+                : null
+            }
             amount={amount === '' ? null : amount}
             link={receiveLink}
             serviceType={serviceType}
@@ -852,15 +862,16 @@ export default function Receive(props) {
         )}
         renderHeader={() => (
           <ModalHeader
-            onPressHeader={() => {
-              if (SendViaLinkBottomSheet.current)
-                (SendViaLinkBottomSheet as any).current.snapTo(0);
-            }}
+            // onPressHeader={() => {
+            //   if (SendViaLinkBottomSheet.current)
+            //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
@@ -887,15 +898,16 @@ export default function Receive(props) {
         )}
         renderHeader={() => (
           <ModalHeader
-            onPressHeader={() => {
-              if (SendViaQRBottomSheet.current)
-                (SendViaQRBottomSheet as any).current.snapTo(0);
-            }}
+            // onPressHeader={() => {
+            //   if (SendViaQRBottomSheet.current)
+            //     (SendViaQRBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SecureReceiveWarningBottomSheet as any}
         snapPoints={[
           -50,
@@ -909,10 +921,10 @@ export default function Receive(props) {
           <SmallHeaderModal
             borderColor={Colors.borderColor}
             backgroundColor={Colors.white}
-            onPressHeader={() => {
-              if (SecureReceiveWarningBottomSheet.current)
-                (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-            }}
+            // onPressHeader={() => {
+            //   if (SecureReceiveWarningBottomSheet.current)
+            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />

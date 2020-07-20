@@ -47,8 +47,8 @@ import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendShareModal from '../ManageBackup/SendShareModal';
-import { EphemeralData, MetaShare } from '../../bitcoin/utilities/Interface';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import { EphemeralDataElements, MetaShare } from '../../bitcoin/utilities/Interface';
+import { updateEphemeralChannel, removeTrustedContact } from '../../store/actions/trustedContacts';
 
 const getImageIcon = (item) => {
   if (item) {
@@ -99,6 +99,7 @@ interface ContactDetailsPropTypes {
   uploadRequestedShare: any,
   uploadEncMShare: any,
   updateEphemeralChannel: any,
+  removeTrustedContact: any,
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean,
@@ -585,7 +586,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
       }`
         .toLowerCase()
         .trim();
-      let data: EphemeralData = {
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
@@ -746,9 +747,9 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   SendModalFunction = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (this.shareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (this.shareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -773,10 +774,10 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   renderSendViaLinkHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (this.SendViaLinkBottomSheet.current)
-            (this.SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (this.SendViaLinkBottomSheet.current)
+        //     (this.SendViaLinkBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -802,10 +803,10 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   renderSendViaQRHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (this.SendViaQRBottomSheet.current)
-            (this.SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (this.SendViaQRBottomSheet.current)
+        //     (this.SendViaQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -831,10 +832,10 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   renderExitKeyQRHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (this.ExitKeyQRBottomSheet.current)
-            (this.ExitKeyQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (this.ExitKeyQRBottomSheet.current)
+        //     (this.ExitKeyQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -856,9 +857,9 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   renderErrorModalHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (this.ErrorBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (this.ErrorBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -886,9 +887,9 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   renderReshareHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (this.ReshareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (this.ReshareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -1140,9 +1141,23 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
               ) : null}
             </View>
           )}
+          <TouchableOpacity
+          style={{
+            ...styles.bottomButton,
+          }}
+          onPress={() => {
+            this.props.removeTrustedContact(contact.contactName);
+            this.props.navigation.goBack();
+          }}
+        >
+          <View>
+            <Text style={styles.buttonText}>Remove</Text>
+          </View>
+        </TouchableOpacity>
         </View>
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.SendViaLinkBottomSheet as any}
           snapPoints={[
             -50,
@@ -1153,6 +1168,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.SendViaQRBottomSheet as any}
           snapPoints={[
             -50,
@@ -1163,6 +1179,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.ExitKeyQRBottomSheet as any}
           snapPoints={[
             -50,
@@ -1173,6 +1190,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.ReshareBottomSheet as any}
           snapPoints={[
             -50,
@@ -1183,6 +1201,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.ErrorBottomSheet as any}
           snapPoints={[
             -50,
@@ -1193,6 +1212,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.shareBottomSheet as any}
           snapPoints={[
             Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
@@ -1223,7 +1243,8 @@ export default connect(mapStateToProps, {
   UploadSuccessfully,
   uploadEncMShare,
   uploadRequestedShare,
-  ErrorSending
+  ErrorSending,
+  removeTrustedContact
 })(ContactDetailsNew);
 const styles = StyleSheet.create({
   modalContainer: {
