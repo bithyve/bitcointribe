@@ -24,7 +24,7 @@ import Styles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { trustedChannelsSync, updateAddressBookLocally } from '../store/actions/trustedContacts';
+import { trustedChannelsSync,removeTrustedContact, updateAddressBookLocally } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -52,7 +52,8 @@ interface AddressBookContentsPropTypes {
   trustedChannelsSyncing: any,
   updateAddressBookLocally: any,
   addressBookData: any,
-  trustedContactsInfo: any
+  trustedContactsInfo: any,
+  removeTrustedContact: any,
 }
 interface AddressBookContentsStateTypes {
   isLoadContacts: boolean,
@@ -154,7 +155,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   componentDidUpdate(prevProps) {
     const oldDerivativeAccounts = idx(prevProps, (_) => _.regularAccount.hdWallet.derivativeAccounts);
     const newDerivativeAccounts = idx(this.props, (_) => _.regularAccount.hdWallet.derivativeAccounts);
-    if (oldDerivativeAccounts !== newDerivativeAccounts) {
+    if (oldDerivativeAccounts !== newDerivativeAccounts || prevProps.trustedContactsService != this.props.trustedContactsService) {
       this.updateAddressBook();
     }
     if (this.state.trustedContact) {
@@ -309,6 +310,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             index,
             shareIndex: contact.shareIndex,
           });
+        }}
+        onLongPress={() => {
+          this.props.removeTrustedContact(contact.contactName);
         }}
         style={styles.selectedContactsView}
       >
@@ -568,7 +572,7 @@ const mapStateToProps = (state) => {
     trustedContactsInfo
   };
 };
-export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally })(AddressBookContents);
+export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally, removeTrustedContact })(AddressBookContents);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',

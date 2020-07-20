@@ -3,7 +3,13 @@ import {
     CURRENCY_TOGGLE_VALUE,
     FCM_TOKEN_VALUE,
     SECONDARY_DEVICE_ADDRESS_VALUE,
-    RELEASE_CASES_VALUE
+    RELEASE_CASES_VALUE,
+    TEST_ACCOUNT_HELPER_DONE,
+    TRANSACTION_HELPER_DONE,
+    RECEIVE_HELPER_DONE,
+    SEND_HELPER_DONE,
+    SAVING_WARNING,
+    TWO_FA_SETUP
   } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
 import { chain } from 'icepick';
@@ -15,6 +21,12 @@ const initialState = {
     fcmTokenValue: '',
     secondaryDeviceAddressValue: '',
     releaseCasesValue: null,
+    isTestHelperDoneValue: false,
+    isTransactionHelperDoneValue: false,
+    isReceiveHelperDoneValue: false,
+    savingWarning: false,
+    isSendHelperDoneValue: false,
+    isTwoFASetupDone: false,
 }
 
 export default (state = initialState, { type, payload }) => {
@@ -45,6 +57,31 @@ export default (state = initialState, { type, payload }) => {
               return {
                 ...state,
                 releaseCasesValue: payload.releaseCasesValue,
+              };
+              case TEST_ACCOUNT_HELPER_DONE:
+              return {
+                ...state,
+                isTestHelperDoneValue: payload.isTestHelperDoneValue,
+              };
+              case TRANSACTION_HELPER_DONE:
+              return {
+                ...state,
+                isTransactionHelperDoneValue: payload.isTransactionHelperDoneValue,
+              };
+              case RECEIVE_HELPER_DONE:
+              return {
+                ...state,
+                isReceiveHelperDoneValue: payload.isReceiveHelperDoneValue,
+              };
+              case SEND_HELPER_DONE:
+              return {
+                ...state,
+                isSendHelperDoneValue: payload.isSendHelperDoneValue,
+              };
+              case SAVING_WARNING:
+              return {
+                ...state,
+                savingWarning: payload.savingWarning,
               };
         default:
             return state
