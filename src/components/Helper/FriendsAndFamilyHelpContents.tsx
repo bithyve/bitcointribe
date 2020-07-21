@@ -48,7 +48,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can send two of your five Recovery Keys{'\n'}to your Friends and Family chosen using{'\n'}your Address Book. You can then either send{'\n'}them a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
+                You can send two of your five Recovery Keys{'\n'}to your Friends and Family chosen from{'\n'}your Address Book. You can then either share{'\n'}a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -64,7 +64,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Recovery Keys are sent through secure, encrypted{'\n'}channels, most frequently used in Internet{'\n'}communication. These channels are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information,{'\n'}and are called ECDH channels.
+                Recovery Keys are sent through secure, encrypted{'\n'}channels, most frequently used in Internet{'\n'}communications. These channels are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information,{'\n'}and are called ECDH channels.
                 {/* Recovery Keys are sent through ECDH channels,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt information */}
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
