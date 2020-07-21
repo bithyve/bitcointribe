@@ -345,9 +345,9 @@ const PersonalCopyHistory = (props) => {
   const renderPersonalCopyShareModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-        // }}
+        onPressHeader={() => {
+          (PersonalCopyShareBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -454,7 +454,11 @@ const PersonalCopyHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <PersonalCopyHelpContents />;
+    return <PersonalCopyHelpContents 
+    titleClicked={()=>{
+      if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+    }}/>;
   };
 
   const renderMailOptionsHeader = () => {
@@ -605,7 +609,6 @@ const PersonalCopyHistory = (props) => {
         />
       </View>
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={PersonalCopyShareBottomSheet as any}
         snapPoints={[-50, hp('85%')]}

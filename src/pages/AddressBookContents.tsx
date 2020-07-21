@@ -201,7 +201,11 @@ export default function AddressBookContents(props) {
   };
 
   const renderHelpContent = () => {
-    return <AddressBookHelpContents />;
+    return <AddressBookHelpContents 
+    titleClicked={()=>{
+      if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+    }}/>
   };
 
   const getImageIcon = (item) => {

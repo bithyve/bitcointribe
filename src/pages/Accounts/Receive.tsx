@@ -652,7 +652,11 @@ export default function Receive(props) {
       //     }
       //   }}
       // />
-      <ReceiveHelpContents />
+      <ReceiveHelpContents 
+      titleClicked={()=>{
+        if (ReceiveHelperBottomSheet.current)
+              (ReceiveHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   }, [serviceType]);
 

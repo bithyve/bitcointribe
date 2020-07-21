@@ -12,13 +12,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 export default function FriendsAndFamilyHelpContents(props) {
   return (
-    <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View
+      style={styles.modalContainer}>
+          <AppBottomSheetTouchableWrapper style={{ justifyContent: 'center', alignItems: 'center' }}
+             activeOpacity={10}
+             onPress={()=> props.titleClicked && props.titleClicked()}>
                 <Text
                     style={{
                         color: Colors.white,
@@ -30,7 +28,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 >
                     Recovery Key with Friends and Family
                 </Text>
-            </View>
+            </AppBottomSheetTouchableWrapper>
             <View
                 style={{
                 backgroundColor: Colors.homepageButtonColor,
@@ -40,6 +38,14 @@ export default function FriendsAndFamilyHelpContents(props) {
                 marginBottom: hp('1%'),
                 }}
             />
+      
+    <ScrollView
+        style={styles.modalContainer}
+        snapToInterval={hp('89%')}
+        decelerationRate='fast'
+    >
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
+            
             <Text
             style={{
                 textAlign: 'center',
@@ -109,6 +115,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             </Text>
         </View>
     </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
