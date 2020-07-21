@@ -162,7 +162,7 @@ export default function AddressBookContents(props) {
             imKeepers.push(element);
           }
           if (!element.isWard && !element.isGuardian) {
-            otherTrustedContact.push(element);
+            otherTrustedContact.push({ ...element, isRemovable: true });
           }
         }
         setMyKeeper(myKeepers);
@@ -420,9 +420,9 @@ export default function AddressBookContents(props) {
   const renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   };

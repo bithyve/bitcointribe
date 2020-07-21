@@ -123,6 +123,10 @@ const TrustedContactHistory = (props) => {
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
 
+  const updateTrustedChannelLoader = useSelector(
+    (state) => state.trustedContacts.loading.updateTrustedChannel,
+  );
+
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
@@ -474,9 +478,9 @@ const TrustedContactHistory = (props) => {
   const renderConfirmHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ConfirmBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ConfirmBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, [selectedContactMode]);
@@ -500,9 +504,9 @@ const TrustedContactHistory = (props) => {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -619,9 +623,9 @@ const TrustedContactHistory = (props) => {
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ReshareBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ReshareBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -658,9 +662,9 @@ const TrustedContactHistory = (props) => {
   const renderChangeHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ChangeBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ChangeBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -793,12 +797,6 @@ const TrustedContactHistory = (props) => {
   };
 
   const createDeepLink = useCallback(() => {
-    console.log(uploadMetaShare, updateEphemeralChannelLoader);
-    if (uploadMetaShare || updateEphemeralChannelLoader) {
-      if (trustedLink) setTrustedLink('');
-      if (trustedQR) setTrustedQR('');
-      return;
-    }
     if (!SHARES_TRANSFER_DETAILS[index]) {
       setTimeout(() => {
         setErrorMessageHeader('Failed to share');
@@ -898,13 +896,7 @@ const TrustedContactHistory = (props) => {
         'Cannot add a contact without phone-num/email as a trusted entity',
       );
     }
-  }, [
-    chosenContact,
-    trustedContacts,
-    SHARES_TRANSFER_DETAILS[index],
-    uploadMetaShare,
-    updateEphemeralChannelLoader,
-  ]);
+  }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
@@ -994,8 +986,7 @@ const TrustedContactHistory = (props) => {
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const hasTrustedChannel =
         trustedContact && trustedContact.symmetricKey ? true : false;
-      if (changeContact && !trustedContacts.tc.trustedContacts[contactName]) {
-        // !trustedContacts.tc.trustedContacts[contactName] ensures that TC actually changed
+      if (changeContact) {
         setTrustedLink('');
         setTrustedQR('');
         // remove the previous TC
@@ -1062,6 +1053,16 @@ const TrustedContactHistory = (props) => {
   }, [SHARES_TRANSFER_DETAILS[index], chosenContact, changeContact]);
 
   useEffect(() => {
+    if (
+      uploadMetaShare ||
+      updateEphemeralChannelLoader ||
+      updateTrustedChannelLoader
+    ) {
+      if (trustedLink) setTrustedLink('');
+      if (trustedQR) setTrustedQR('');
+      return;
+    }
+
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
@@ -1108,6 +1109,7 @@ const TrustedContactHistory = (props) => {
     trustedContacts,
     uploadMetaShare,
     updateEphemeralChannelLoader,
+    updateTrustedChannelLoader,
   ]);
 
   const SendShareModalFunction = useCallback(() => {
@@ -1138,9 +1140,9 @@ const TrustedContactHistory = (props) => {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (shareBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (shareBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -1175,10 +1177,10 @@ const TrustedContactHistory = (props) => {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaLinkBottomSheet.current)
-        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -1210,10 +1212,10 @@ const TrustedContactHistory = (props) => {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaQRBottomSheet.current)
-        //     (SendViaQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -1415,7 +1417,7 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderReshareHeader}
       />
       <BottomSheet
-      enabledGestureInteraction={false}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ConfirmBottomSheet as any}
         snapPoints={[
