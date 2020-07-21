@@ -649,6 +649,12 @@ export default function Accounts(props) {
     };
   };
 
+  const getAccountNameFromType = () =>{
+    if(serviceType==TEST_ACCOUNT) return "Test Account";
+    else if(serviceType==REGULAR_ACCOUNT) return "Checking Account";
+    else return "Savings Account";
+  }
+
   const renderTransactionsContent = () => {
     if (transactionLoading) {
       return (
@@ -926,7 +932,7 @@ export default function Accounts(props) {
                     fontFamily: Fonts.FiraSansRegular,
                   }}
                 >
-                  All recent transactions across your accounts appear here
+                  All your recent transactions for the {serviceType} will appear here.
                 </Text>
               </View>
             </View>
@@ -977,7 +983,7 @@ export default function Accounts(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                All recent transactions across your accounts appear here
+                All your recent transactions for the {getAccountNameFromType()} will appear here.
               </Text>
             </View>
           </View>
