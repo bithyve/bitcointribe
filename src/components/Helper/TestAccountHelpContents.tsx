@@ -74,7 +74,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                The Bitcoin Testnet is similar to Bitcoin Mainnet{'\n'}and has Test bitcoin for people to experiment{'\n'}with. Test bitcoin can not be sent to wallets{'\n'}that only support Bitcoin Mainnet
+                Use the Test Account to learn all {'\n'}the features of the Checking Account
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
