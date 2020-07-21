@@ -602,7 +602,7 @@ export default function Receive(props) {
       <SendViaQR
         isFromReceive={true}
         headerText={'QR'}
-        subHeaderText={'Scan bitcoin address'}
+        subHeaderText={'Scan QR for contact request'}
         contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
