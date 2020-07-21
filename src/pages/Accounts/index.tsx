@@ -1522,8 +1522,8 @@ export default function Accounts(props) {
             >
               <View>
               <View style={{ flexDirection: 'row', marginLeft: 30,
-                    marginRight: 20, }}>
-                <Text style={{ ...styles.cardAmountText, color: Colors.textColorGrey, fontSize: RFValue(13) }}>
+                    marginRight: 20, alignItems: 'flex-end' }}>
+                <Text style={{ fontFamily: Fonts.FiraSansItalic, color: Colors.blue, fontSize: RFValue(13) }}>
                   Available to spend:{' '}
                   {serviceType == TEST_ACCOUNT
                     ? UsNumberFormat(spendableBalance)
@@ -1536,11 +1536,11 @@ export default function Accounts(props) {
                       ).toFixed(2)
                     : null}
                 </Text>
-                <Text style={{...styles.cardAmountUnitText, color: Colors.textColorGrey}}>
+                <Text style={{fontFamily: Fonts.FiraSansMediumItalic, color: Colors.textColorGrey, fontSize: RFValue(10), marginBottom: 1}}>
                   {serviceType == TEST_ACCOUNT
-                    ? 't-sats'
+                    ? ' t-sats'
                     : switchOn
-                    ? 'sats'
+                    ? ' sats'
                     : CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
