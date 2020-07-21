@@ -11,16 +11,18 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import CountDown from 'react-native-countdown-component';
+import { config } from 'process';
+import Config from '../../bitcoin/HexaConfig';
 
 export default function TimerModalContents(props) {
   const [showMessage, setShowMessage] = useState(false);
 
-  const setDoNotShowTimer = async() =>{
-    if(showMessage){
-      await AsyncStorage.setItem("TCRequestTimer", JSON.stringify(true));
+  const setDoNotShowTimer = async () => {
+    if (showMessage) {
+      await AsyncStorage.setItem('TCRequestTimer', JSON.stringify(true));
     }
     props.onTimerFinish();
-  }
+  };
 
   return (
     <View style={styles.modalContainer}>
@@ -75,28 +77,28 @@ export default function TimerModalContents(props) {
         <View style={styles.bottomView}>
           <View style={styles.bottomInnerView}>
             <Ionicons color={Colors.blue} size={18} name={'md-time'} />
-            {props.renderTimer ?
-            <CountDown
-              size={15}
-              until={1200}
-              onFinish={() => props.onTimerFinish()}
-              digitStyle={{
-                backgroundColor: '#FFF',
-                borderWidth: 0,
-                borderColor: '#FFF',
-                margin: -10,
-              }}
-              digitTxtStyle={{
-                color: Colors.blue,
-                fontSize: RFValue(19),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-              separatorStyle={{ color: Colors.blue }}
-              timeToShow={['M', 'S']}
-              timeLabels={{ m: null, s: null }}
-              showSeparator
-            />
-            : null}
+            {props.renderTimer ? (
+              <CountDown
+                size={15}
+                until={Config.TC_REQUEST_EXPIRY}
+                onFinish={() => props.onTimerFinish()}
+                digitStyle={{
+                  backgroundColor: '#FFF',
+                  borderWidth: 0,
+                  borderColor: '#FFF',
+                  margin: -10,
+                }}
+                digitTxtStyle={{
+                  color: Colors.blue,
+                  fontSize: RFValue(19),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+                separatorStyle={{ color: Colors.blue }}
+                timeToShow={['H', 'M', 'S']}
+                timeLabels={{ h: null, m: null, s: null }}
+                showSeparator
+              />
+            ) : null}
           </View>
 
           <AppBottomSheetTouchableWrapper
@@ -141,7 +143,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     marginBottom: 15,
-    marginTop: 15
+    marginTop: 15,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
