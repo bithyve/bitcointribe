@@ -23,13 +23,11 @@ export default function AddressBookHelpContents(props) {
     }
 
   return (
-    <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <View style={styles.modalContainer}>
+        <AppBottomSheetTouchableWrapper style={{ justifyContent: 'center', alignItems: 'center' }}
+         activeOpacity={10}
+         onPress={()=> props.titleClicked && props.titleClicked()}
+         >
                 <Text
                     style={{
                         color: Colors.white,
@@ -41,7 +39,7 @@ export default function AddressBookHelpContents(props) {
                 >
                     Friends and Family
                 </Text>
-            </View>
+            </AppBottomSheetTouchableWrapper>
             <View
                 style={{
                 backgroundColor: Colors.homepageButtonColor,
@@ -51,6 +49,13 @@ export default function AddressBookHelpContents(props) {
                 marginBottom: hp('1%')
                 }}
             />
+    <ScrollView
+        style={styles.modalContainer}
+        snapToInterval={hp('89%')}
+        decelerationRate='fast'
+    >
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
+            
             <Text
             style={{
                 textAlign: 'center',
@@ -164,6 +169,7 @@ export default function AddressBookHelpContents(props) {
             </View>
         </View>
     </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({

@@ -364,7 +364,11 @@ export default function Send(props) {
       //       (SendHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <SendHelpContents />
+      <SendHelpContents 
+      titleClicked={()=>{
+        if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   };
   const renderSendHelperHeader = () => {

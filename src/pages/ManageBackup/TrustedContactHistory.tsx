@@ -1234,7 +1234,11 @@ const TrustedContactHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <FriendsAndFamilyHelpContents />;
+    return <FriendsAndFamilyHelpContents 
+    titleClicked={()=>{
+      if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+    }}/>;
   };
 
   return (
