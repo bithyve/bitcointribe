@@ -58,7 +58,7 @@ export default function TestAccountHelpContents(props) {
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-            The Test Account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying bitcoin. It comes preloaded{'\n'}with test bitcoin that you can send to other{'\n'}users on Bitcoin Testnet
+            The Test Account is designed as an account{'\n'}that enables people to experience Bitcoin{'\n'}without buying bitcoin. It comes preloaded{'\n'}with test bitcoin.
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
