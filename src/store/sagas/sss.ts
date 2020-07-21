@@ -186,15 +186,19 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    delete trustedContacts.tc.trustedContacts[payload.contactInfo.contactName]; // removing secondary device's TC
-    const accountNumber =
-      regularService.hdWallet.trustedContactToDA[
+    if (payload.contactInfo.contactName === 'Secondary Device') {
+      delete trustedContacts.tc.trustedContacts[
         payload.contactInfo.contactName
-      ];
-    if (accountNumber) {
-      delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
-        accountNumber
-      ].contactDetails; // removing previous SDs xpub
+      ]; // removing secondary device's TC
+      const accountNumber =
+        regularService.hdWallet.trustedContactToDA[
+          payload.contactInfo.contactName
+        ];
+      if (accountNumber) {
+        delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+          accountNumber
+        ].contactDetails; // removing previous SDs xpub
+      }
     }
 
     yield call(s3Service.reshareMetaShare, payload.shareIndex);
