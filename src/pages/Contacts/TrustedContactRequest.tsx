@@ -345,7 +345,7 @@ export default function TrustedContactRequest(props) {
                 // marginBottom: wp('8%'),
               }}
             >
-              we need your{' '}
+              Enter your{' '}
               <Text
                 style={{
                   ...styles.modalInfoText,
@@ -355,9 +355,9 @@ export default function TrustedContactRequest(props) {
                 }}
               >
                 {props.inputType === 'phone'
-                  ? 'mobile number linked to your wallet, '
+                  ? 'mobile number, '
                   : props.inputType === 'email'
-                  ? 'email address linked to your wallet, '
+                  ? 'email address, '
                   : null}
                   <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                     to accept the request
