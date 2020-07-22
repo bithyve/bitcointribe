@@ -535,6 +535,7 @@ export default function Receive(props) {
         onPressBack={() => {
           setTimeout(() => {
             setAsTrustedContact(!AsTrustedContact);
+            setSelectedContact({});
           }, 2);
           (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
         }}

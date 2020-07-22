@@ -81,6 +81,12 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
+export interface ShareUploadables {
+  encryptedMetaShare: string;
+  messageId: string;
+  encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+}
+
 export interface DerivativeAccountElements {
   xpub: string;
   xpriv: string;

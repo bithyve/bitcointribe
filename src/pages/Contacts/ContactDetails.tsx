@@ -953,9 +953,9 @@ export default function ContactDetails(props) {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-      // onPressHeader={() => {
-      //   (shareBottomSheet as any).current.snapTo(0);
-      // }}
+      onPressHeader={() => {
+        (shareBottomSheet as any).current.snapTo(0);
+      }}
       />
     );
   }, []);
@@ -1362,7 +1362,6 @@ export default function ContactDetails(props) {
         renderHeader={renderErrorModalHeader}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={shareBottomSheet as any}
         snapPoints={[

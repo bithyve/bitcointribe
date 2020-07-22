@@ -62,6 +62,7 @@ import {
   DerivativeAccount,
   TrustedDataElements,
   WalletImage,
+  ShareUploadables,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
@@ -236,15 +237,25 @@ function* uploadEncMetaShareWorker({ payload }) {
   // );
 
   const res = yield call(
-    s3Service.uploadShare,
+    s3Service.prepareShareUploadables,
     payload.shareIndex,
     payload.contactInfo.contactName,
   ); // contact injection (requires database insertion)
 
   if (res.status === 200) {
-    console.log('Uploaded share: ', payload.shareIndex);
-    const { otp, encryptedKey } = res.data;
+    const {
+      otp,
+      encryptedKey,
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    } = res.data;
 
+    const shareUploadables: ShareUploadables = {
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    };
     const updatedSERVICES = {
       ...SERVICES,
       REGULAR_ACCOUNT: JSON.stringify(regularService),
@@ -282,7 +293,9 @@ function* uploadEncMetaShareWorker({ payload }) {
           encryptedKey,
         },
       };
-      yield put(updateTrustedChannel(payload.contactInfo, data));
+      yield put(
+        updateTrustedChannel(payload.contactInfo, data, null, shareUploadables),
+      );
     } else {
       // adding transfer details to he ephemeral data
       const data: EphemeralDataElements = {
@@ -293,7 +306,16 @@ function* uploadEncMetaShareWorker({ payload }) {
         },
       };
 
-      yield put(updateEphemeralChannel(payload.contactInfo, data));
+      yield put(
+        updateEphemeralChannel(
+          payload.contactInfo,
+          data,
+          null,
+          null,
+          null,
+          shareUploadables,
+        ),
+      );
     }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
