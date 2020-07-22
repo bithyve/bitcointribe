@@ -30,6 +30,7 @@ export const ERROR_SENDING = 'ERROR_SENDING';
 export const ERROR_RECEIVING = 'ERROR_RECEIVING';
 
 export const initHealthCheck = () => {
+  // console.log("Called initHealthCheck", new Date())
   return { type: INIT_HEALTH_CHECK };
 };
 
@@ -167,6 +168,7 @@ export const mnemonicRecovered = (mnemonic) => {
 };
 
 export const switchS3Loader = (beingLoaded) => {
+  // console.log("Called s3 Loading", new Date())
   return { type: S3_LOADING, payload: { beingLoaded } };
 };
 
