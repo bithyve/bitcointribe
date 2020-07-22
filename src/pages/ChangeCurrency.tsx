@@ -33,6 +33,7 @@ export default function ChangeCurrency(props) {
     code: 'USD',
     symbol: '$',
   });
+  const [isDisabled, setIsDisabled] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -40,7 +41,7 @@ export default function ChangeCurrency(props) {
       //await AsyncStorage.getItem('currencyCode');
       setCurrency(
         currencyList[
-        currencyList.findIndex((value) => value.code == currencyCode)
+          currencyList.findIndex((value) => value.code == currencyCode)
         ],
       );
     })();
@@ -83,6 +84,7 @@ export default function ChangeCurrency(props) {
         <TouchableOpacity
           onPress={() => {
             setIsVisible(!isVisible);
+            setIsDisabled(false);
           }}
           style={{
             flexDirection: 'row',
@@ -148,7 +150,7 @@ export default function ChangeCurrency(props) {
             />
           </View>
         </TouchableOpacity>
-        <View style={{ position: 'relative', flex: 1, }}>
+        <View style={{ position: 'relative', flex: 1 }}>
           {isVisible && (
             <View
               style={{
@@ -159,7 +161,6 @@ export default function ChangeCurrency(props) {
                 overflow: 'hidden',
                 marginLeft: wp('10%'),
                 marginRight: wp('10%'),
-
               }}
             >
               <ScrollView>
@@ -220,7 +221,7 @@ export default function ChangeCurrency(props) {
             </View>
           )}
         </View>
-        <View >
+        <View>
           {/* <BottomInfoBox
             title={'Note'}
             infoText={
@@ -228,9 +229,10 @@ export default function ChangeCurrency(props) {
             }
           /> */}
           <TouchableOpacity
+            disabled={isDisabled}
             onPress={() => setNewCurrency()}
             style={{
-              backgroundColor: Colors.blue,
+              backgroundColor: isDisabled ? Colors.lightBlue : Colors.blue,
               width: wp('35%'),
               height: wp('13%'),
               borderRadius: 10,
@@ -238,7 +240,7 @@ export default function ChangeCurrency(props) {
               alignItems: 'center',
               marginLeft: 30,
               marginRight: 20,
-              marginBottom: hp('3%')
+              marginBottom: hp('3%'),
             }}
           >
             <Text
@@ -249,7 +251,7 @@ export default function ChangeCurrency(props) {
               }}
             >
               Save Changes
-          </Text>
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

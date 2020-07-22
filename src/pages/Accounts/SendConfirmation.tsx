@@ -84,7 +84,10 @@ export default function SendConfirmation(props) {
     React.createRef<BottomSheet>(),
   );
   const [SelectedContactId, setSelectedContactId] = useState(0);
-  const [KnowMoreBottomSheet, setKnowMoreBottomSheet] = useState(React.createRef<BottomSheet>())
+  const [KnowMoreBottomSheet, setKnowMoreBottomSheet] = useState(
+    React.createRef<BottomSheet>(),
+  );
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
   // const [amount, setAmount] = useState('');
 
   // useEffect(() => {
@@ -236,6 +239,9 @@ export default function SendConfirmation(props) {
   };
 
   const onConfirm = useCallback(() => {
+    setTimeout(() => {
+      setIsConfirmDisabled(true);
+    }, 1);
     dispatch(clearTransfer(serviceType, 'stage2'));
     const txPriority =
       sliderValueText === 'Low Fee'
@@ -381,57 +387,59 @@ export default function SendConfirmation(props) {
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
         isCancel={false}
-        onPressOk={() => {
-          if (SendSuccessBottomSheet.current)
-            SendSuccessBottomSheet.current.snapTo(0);
-
-          dispatch(clearTransfer(serviceType));
-          // dispatch(fetchTransactions(serviceType));
-          // dispatch(
-          //   fetchBalanceTx(serviceType, {
-          //     loader: true,
-          //     syncTrustedDerivative:
-          //       serviceType === REGULAR_ACCOUNT ||
-          //       serviceType === SECURE_ACCOUNT
-          //         ? true
-          //         : false,
-          //   }),
-          // );
-
-          props.navigation.navigate('Accounts', {
-            serviceType,
-            index:
-              serviceType === TEST_ACCOUNT
-                ? 0
-                : serviceType === REGULAR_ACCOUNT
-                ? 1
-                : 2,
-            spendableBalance: spendableBalance - totalAmount,
-          });
-        }}
+        onPressOk={() => onTransactionStage1Success()}
         isSuccess={true}
         serviceType={serviceType}
       />
     );
   };
 
+  const onTransactionStage1Success = () => {
+    if (SendSuccessBottomSheet.current)
+      SendSuccessBottomSheet.current.snapTo(0);
+
+    dispatch(clearTransfer(serviceType));
+    // dispatch(fetchTransactions(serviceType));
+    // dispatch(
+    //   fetchBalanceTx(serviceType, {
+    //     loader: true,
+    //     syncTrustedDerivative:
+    //       serviceType === REGULAR_ACCOUNT ||
+    //       serviceType === SECURE_ACCOUNT
+    //         ? true
+    //         : false,
+    //   }),
+    // );
+
+    props.navigation.navigate('Accounts', {
+      serviceType,
+      index:
+        serviceType === TEST_ACCOUNT
+          ? 0
+          : serviceType === REGULAR_ACCOUNT
+          ? 1
+          : 2,
+      spendableBalance: spendableBalance - totalAmount,
+    });
+  };
+
   const renderSendSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendSuccessBottomSheet.current)
-            SendSuccessBottomSheet.current.snapTo(0);
-          props.navigation.navigate('Accounts', {
-            serviceType,
-            index:
-              serviceType === TEST_ACCOUNT
-                ? 0
-                : serviceType === REGULAR_ACCOUNT
-                ? 1
-                : 2,
-            spendableBalance: spendableBalance - totalAmount,
-          });
-        }}
+        // onPressHeader={() => {
+        //   if (SendSuccessBottomSheet.current)
+        //     SendSuccessBottomSheet.current.snapTo(0);
+        //   props.navigation.navigate('Accounts', {
+        //     serviceType,
+        //     index:
+        //       serviceType === TEST_ACCOUNT
+        //         ? 0
+        //         : serviceType === REGULAR_ACCOUNT
+        //         ? 1
+        //         : 2,
+        //     spendableBalance: spendableBalance - totalAmount,
+        //   });
+        // }}
       />
     );
   };
@@ -440,7 +448,7 @@ export default function SendConfirmation(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={'Something went wrong, please try again'}
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
@@ -466,17 +474,17 @@ export default function SendConfirmation(props) {
   const renderSendUnSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
-          if (SendUnSuccessBottomSheet.current)
-            SendUnSuccessBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   //  dispatch(clearTransfer(serviceType));
+        //   if (SendUnSuccessBottomSheet.current)
+        //     SendUnSuccessBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   };
 
   const renderKnowMoreContents = () => {
-    return(
+    return (
       <TestAccountHelperModalContents
         topButtonText={'Note'}
         // image={require('../../assets/images/icons/regular.png')}
@@ -491,7 +499,7 @@ export default function SendConfirmation(props) {
         // }}
       />
     );
-  }
+  };
 
   const renderKnowMoreHeader = useCallback(() => {
     return (
@@ -504,6 +512,12 @@ export default function SendConfirmation(props) {
       />
     );
   }, []);
+
+  useEffect(() => {
+    if (!loading.transfer) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading.transfer]);
 
   return (
     <View
@@ -565,7 +579,12 @@ export default function SendConfirmation(props) {
                 : 'Savings Account'}
             </Text>
           </View>
-          <TouchableOpacity onPress={() => {KnowMoreBottomSheet.current.snapTo(1)}} style={{marginLeft: 'auto'}}>
+          <TouchableOpacity
+            onPress={() => {
+              KnowMoreBottomSheet.current.snapTo(1);
+            }}
+            style={{ marginLeft: 'auto' }}
+          >
             <Text
               style={{
                 color: Colors.textColorGrey,
@@ -844,18 +863,21 @@ export default function SendConfirmation(props) {
         >
           <TouchableOpacity
             onPress={onConfirm}
-            disabled={loading.transfer}
+            disabled={isConfirmDisabled || loading.transfer}
             style={{
               ...styles.confirmButtonView,
-              backgroundColor: Colors.blue,
+              backgroundColor: isConfirmDisabled
+                ? Colors.lightBlue
+                : Colors.blue,
               elevation: 10,
               shadowColor: Colors.shadowBlue,
               shadowOpacity: 1,
               shadowOffset: { width: 15, height: 15 },
             }}
           >
-            {loading.transfer ? (
-              <ActivityIndicator size="small" />
+            {(!isConfirmDisabled && loading.transfer) ||
+            (isConfirmDisabled && loading.transfer) ? (
+              <ActivityIndicator size="small" color={Colors.white} />
             ) : (
               <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
             )}
@@ -877,7 +899,8 @@ export default function SendConfirmation(props) {
         </View>
       </ScrollView>
       <BottomSheet
-        onCloseStart={() => {}}
+        onCloseStart={() => onTransactionStage1Success()}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -889,6 +912,7 @@ export default function SendConfirmation(props) {
         onCloseStart={() => {
           SendUnSuccessBottomSheet.current.snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendUnSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -901,10 +925,10 @@ export default function SendConfirmation(props) {
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('20%')
-          : Platform.OS == 'android'
-          ? hp('21%')
-          : hp('20%'),
+            ? hp('20%')
+            : Platform.OS == 'android'
+            ? hp('21%')
+            : hp('20%'),
         ]}
         renderContent={renderKnowMoreContents}
         renderHeader={renderKnowMoreHeader}

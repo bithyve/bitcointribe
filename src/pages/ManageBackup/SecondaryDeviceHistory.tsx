@@ -34,7 +34,7 @@ import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
@@ -44,6 +44,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
+import SSS from '../../bitcoin/utilities/sss/SSS';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -58,6 +59,7 @@ const SecondaryDeviceHistory = (props) => {
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -157,17 +159,19 @@ const SecondaryDeviceHistory = (props) => {
       trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
       trustedContactsInfo[0] = contact;
     }
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+
   }, []);
 
   const createGuardian = useCallback(
     async (reshare?: boolean) => {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
 
       const firstName = 'Secondary';
       const lastName = 'Device';
@@ -175,15 +179,25 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
-      let data: EphemeralData = {
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
+      let info = null;
+      if (trustedContact && trustedContact.secondaryKey) {
+        info = trustedContact.secondaryKey;
+      }
+
+      const contactInfo = {
+        contactName,
+        info,
+      };
+
       if (reshare) {
         setSecondaryQR('');
-        dispatch(uploadEncMShare(0, contactName, data, true));
+        dispatch(uploadEncMShare(0, contactInfo, data, true));
         updateTrustedContactsInfo({ firstName, lastName });
       } else {
         if (
@@ -192,7 +206,7 @@ const SecondaryDeviceHistory = (props) => {
           config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
-          dispatch(uploadEncMShare(0, contactName, data));
+          dispatch(uploadEncMShare(0, contactInfo, data));
           updateTrustedContactsInfo({ firstName, lastName });
         } else if (
           trustedContact &&
@@ -205,7 +219,7 @@ const SecondaryDeviceHistory = (props) => {
           setSecondaryQR('');
           dispatch(
             updateEphemeralChannel(
-              contactName,
+              contactInfo,
               trustedContact.ephemeralChannel.data[0],
             ),
           );
@@ -231,14 +245,16 @@ const SecondaryDeviceHistory = (props) => {
       trustedContacts.tc.trustedContacts[contactName] &&
       trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
     ) {
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
 
       setSecondaryQR(
         JSON.stringify({
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info: secondaryKey,
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,
@@ -293,9 +309,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -324,9 +340,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceMessageHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -644,6 +660,7 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceBottomSheet.current as any).snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet as any}
         snapPoints={[-30, hp('85%')]}
@@ -654,6 +671,7 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceMessageBottomSheet.current as any).snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceMessageBottomSheet as any}
         snapPoints={[
@@ -664,6 +682,7 @@ const SecondaryDeviceHistory = (props) => {
         renderHeader={renderSecondaryDeviceMessageHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
@@ -681,7 +700,8 @@ const SecondaryDeviceHistory = (props) => {
           setQrBottomSheetsFlag(false);
           (QrBottomSheet as any).current.snapTo(0);
         }}
-        onCloseStart={() => { }}
+        onCloseStart={() => {}}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={QrBottomSheet as any}
         snapPoints={[

@@ -165,8 +165,8 @@ export interface INotification {
 } // corresponds to the notification schema
 
 // TRUSTED CONTACTS
-export interface EphemeralData {
-  publicKey?: string; // pubKeys serves as the identifier as it can be public
+export interface EphemeralDataElements {
+  publicKey?: string;
   walletID?: string;
   FCM?: string;
   DHInfo?: {
@@ -189,11 +189,35 @@ export interface EphemeralData {
   };
 }
 
+export interface EphemeralData {
+  publicKey: string;
+  data: EphemeralDataElements;
+}
+
+export interface EncryptedEphemeralData {
+  publicKey: string;
+  encryptedData: string; // encrypted EphemeralData
+  // add ons for optimisation
+  walletID?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
+}
+
+export enum trustedChannelActions {
+  downloadShare = 'downloadShare',
+}
+
 export interface TrustedDataElements {
   xpub?: string;
   tpub?: string;
   walletID?: string;
   FCM?: string;
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
 }
 export interface TrustedData {
   publicKey: string;
@@ -209,7 +233,9 @@ export interface Contacts {
   [contactName: string]: {
     privateKey: string;
     publicKey: string;
+    encKey: string;
     symmetricKey?: string;
+    secondaryKey?: string;
     contactsPubKey?: string;
     contactsWalletName?: string;
     isWard?: Boolean;
@@ -219,7 +245,7 @@ export interface Contacts {
     ephemeralChannel?: {
       address: string;
       initiatedAt?: number;
-      data?: EphemeralData[];
+      data?: EphemeralDataElements[];
     };
     trustedChannel?: {
       address: string;

@@ -53,13 +53,8 @@ export default function Launch(props) {
     ) {
       // going to background
       // start the timer , if comes back in time cancel it
-      timer = setTimeout(() => {
-        props.navigation.navigate('ReLogin');
-      }, limit);
-    } else {
-      if (timer !== null) {
-        clearTimeout(timer)
-      }
+      // TODO -- check if camera and contact was open
+      props.navigation.navigate('ReLogin');
     }
   };
 

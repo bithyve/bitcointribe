@@ -45,8 +45,14 @@ import config from '../../bitcoin/HexaConfig';
 import SendViaQR from '../../components/SendViaQR';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import SendShareModal from '../ManageBackup/SendShareModal';
-import { EphemeralData, MetaShare } from '../../bitcoin/utilities/Interface';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import {
+  EphemeralDataElements,
+  MetaShare,
+} from '../../bitcoin/utilities/Interface';
+import {
+  updateEphemeralChannel,
+  removeTrustedContact,
+} from '../../store/actions/trustedContacts';
 
 export default function ContactDetails(props) {
   const [isSendDisabled, setIsSendDisabled] = useState(false);
@@ -117,6 +123,7 @@ export default function ContactDetails(props) {
   const uploading = useSelector(
     (state) => state.sss.loading.uploadRequestedShare,
   );
+  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
   const errorSending = useSelector((state) => state.sss.errorSending);
   const uploadSuccessfull = useSelector(
     (state) => state.sss.uploadSuccessfully,
@@ -545,10 +552,10 @@ export default function ContactDetails(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaLinkBottomSheet.current)
+        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -576,10 +583,10 @@ export default function ContactDetails(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaQRBottomSheet.current)
+        //     (SendViaQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -607,10 +614,10 @@ export default function ContactDetails(props) {
   const renderExitKeyQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (ExitKeyQRBottomSheet.current)
-            (ExitKeyQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (ExitKeyQRBottomSheet.current)
+        //     (ExitKeyQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -634,9 +641,9 @@ export default function ContactDetails(props) {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -666,9 +673,9 @@ export default function ContactDetails(props) {
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ReshareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -685,7 +692,8 @@ export default function ContactDetails(props) {
         (Contact.emails && Contact.emails.length))
     ) {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue; 
+      //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
       const contactName = `${Contact.firstName} ${
@@ -693,7 +701,23 @@ export default function ContactDetails(props) {
       }`
         .toLowerCase()
         .trim();
-      let data: EphemeralData = {
+
+      let info = '';
+      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+        const phoneNumber = Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (Contact.emails && Contact.emails.length) {
+        info = Contact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
+
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
       };
@@ -743,7 +767,7 @@ export default function ContactDetails(props) {
       ) {
         setTrustedLink('');
         setTrustedQR('');
-        dispatch(uploadEncMShare(index, contactName, data));
+        dispatch(uploadEncMShare(index, contactInfo, data));
       } else if (
         trustedContact &&
         !trustedContact.symmetricKey &&
@@ -756,7 +780,7 @@ export default function ContactDetails(props) {
         setTrustedQR('');
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -929,9 +953,9 @@ export default function ContactDetails(props) {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (shareBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (shareBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1264,8 +1288,22 @@ export default function ContactDetails(props) {
             ) : null}
           </View>
         )}
+        <TouchableOpacity
+          style={{
+            ...styles.bottomButton,
+          }}
+          onPress={() => {
+            dispatch(removeTrustedContact(contact.contactName));
+            props.navigation.goBack();
+          }}
+        >
+          <View>
+            <Text style={styles.buttonText}>Remove</Text>
+          </View>
+        </TouchableOpacity>
       </View>
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
@@ -1276,6 +1314,7 @@ export default function ContactDetails(props) {
         renderHeader={renderSendViaLinkHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
@@ -1286,6 +1325,7 @@ export default function ContactDetails(props) {
         renderHeader={renderSendViaQRHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ExitKeyQRBottomSheet as any}
         snapPoints={[
@@ -1296,6 +1336,7 @@ export default function ContactDetails(props) {
         renderHeader={renderExitKeyQRHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ReshareBottomSheet as any}
         snapPoints={[
@@ -1306,6 +1347,7 @@ export default function ContactDetails(props) {
         renderHeader={renderReshareHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
@@ -1316,6 +1358,7 @@ export default function ContactDetails(props) {
         renderHeader={renderErrorModalHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={shareBottomSheet as any}
         snapPoints={[

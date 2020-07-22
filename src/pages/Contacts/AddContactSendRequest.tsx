@@ -29,7 +29,7 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralData, EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
@@ -47,9 +47,11 @@ export default function AddContactSendRequest(props) {
     React.createRef(),
   );
   const [renderTimer, setRenderTimer] = useState(false);
-  
+
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
+  let trustedContactsInfo = useSelector((state) => state.trustedContacts.trustedContactsInfo)
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
@@ -70,7 +72,6 @@ export default function AddContactSendRequest(props) {
   );
 
   const updateTrustedContactsInfo = async (contact) => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -100,11 +101,11 @@ export default function AddContactSendRequest(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact;
     }
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
   };
 
   const dispatch = useDispatch();
@@ -116,18 +117,34 @@ export default function AddContactSendRequest(props) {
         }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+        const phoneNumber = Contact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (Contact.emails && Contact.emails.length) {
+        info = Contact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
 
-      const data: EphemeralData = {
+      const data: EphemeralDataElements = {
         walletID,
         FCM,
       };
 
       if (!trustedContact) {
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       } else if (
         !trustedContact.symmetricKey &&
         trustedContact.ephemeralChannel &&
@@ -138,7 +155,7 @@ export default function AddContactSendRequest(props) {
         // re-initiating expired EC
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -233,10 +250,21 @@ export default function AddContactSendRequest(props) {
       }
 
       if (!trustedQR) {
+        let info = '';
+        if (Contact.phoneNumbers && Contact.phoneNumbers.length) {
+          const phoneNumber = Contact.phoneNumbers[0].number;
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
+          info = number;
+        } else if (Contact.emails && Contact.emails.length) {
+          info = Contact.emails[0].email;
+        }
+
         setTrustedQR(
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            info: info.trim(),
             uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'trustedContactQR',
             ver: appVersion,
@@ -246,16 +274,18 @@ export default function AddContactSendRequest(props) {
     }
   }, [Contact, trustedContacts, updateEphemeralChannelLoader]);
 
-  const openTimer = async() => {
+  const openTimer = async () => {
     setTimeout(() => {
       setRenderTimer(true);
     }, 2);
-    let TCRequestTimer = JSON.parse(await AsyncStorage.getItem("TCRequestTimer"));
+    let TCRequestTimer = JSON.parse(
+      await AsyncStorage.getItem('TCRequestTimer'),
+    );
     (SendViaLinkBottomSheet as any).current.snapTo(0);
-    if(!TCRequestTimer){
+    if (!TCRequestTimer) {
       (TimerModalBottomSheet as any).current.snapTo(1);
     }
-  }
+  };
 
   const renderSendViaLinkContents = useCallback(() => {
     return (
@@ -267,16 +297,16 @@ export default function AddContactSendRequest(props) {
         contact={Contact}
         infoText={`Click here to accept contact request from ${
           WALLET_SETUP.walletName
-        } Hexa wallet - link will expire in ${
-          config.TC_REQUEST_EXPIRY / 60000
-        } minutes`}
+          } Hexa wallet - link will expire in ${
+          config.TC_REQUEST_EXPIRY / (60000 * 60)
+          } hours`}
         link={trustedLink}
         contactEmail={''}
         onPressBack={() => {
           if (SendViaLinkBottomSheet.current)
             (SendViaLinkBottomSheet as any).current.snapTo(0);
         }}
-        onPressDone={async() => {
+        onPressDone={async () => {
           (SendViaLinkBottomSheet as any).current.snapTo(0);
           openTimer();
         }}
@@ -287,10 +317,10 @@ export default function AddContactSendRequest(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaLinkBottomSheet.current)
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaLinkBottomSheet.current)
+        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -321,8 +351,8 @@ export default function AddContactSendRequest(props) {
     return (
       <TimerModalContents
         renderTimer={renderTimer}
-        onTimerFinish={()=>onContinueWithTimer()}
-        onPressContinue={()=>onContinueWithTimer()}
+        onTimerFinish={() => onContinueWithTimer()}
+        onPressContinue={() => onContinueWithTimer()}
       />
     );
   }, [renderTimer]);
@@ -330,26 +360,26 @@ export default function AddContactSendRequest(props) {
   const renderTimerModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (TimerModalBottomSheet.current)
-            (TimerModalBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (TimerModalBottomSheet.current)
+        //     (TimerModalBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
 
   const onContinueWithTimer = () => {
-    (TimerModalBottomSheet as any).current.snapTo(0); 
+    (TimerModalBottomSheet as any).current.snapTo(0);
     props.navigation.goBack();
-  }
+  };
 
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          if (SendViaQRBottomSheet.current)
-            (SendViaQRBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   if (SendViaQRBottomSheet.current)
+        //     (SendViaQRBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -608,6 +638,7 @@ export default function AddContactSendRequest(props) {
           </View>
         </View>
         <BottomSheet
+        enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaLinkBottomSheet as any}
           snapPoints={[
@@ -620,6 +651,7 @@ export default function AddContactSendRequest(props) {
           renderHeader={renderSendViaLinkHeader}
         />
         <BottomSheet
+        enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaQRBottomSheet as any}
           snapPoints={[
@@ -632,6 +664,7 @@ export default function AddContactSendRequest(props) {
           renderHeader={renderSendViaQRHeader}
         />
         <BottomSheet
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={TimerModalBottomSheet as any}
           snapPoints={[

@@ -24,7 +24,7 @@ export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
-
+export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
 // export const fetchAddress = (serviceType) => {
 //   return { type: FETCH_ADDR, payload: { serviceType } };
 // };
@@ -175,6 +175,13 @@ export const fetchDerivativeAccBalTx = (
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: { serviceType, accountType, accountNumber },
+  };
+};
+
+export const setAverageTxFee = (data) => {
+  return {
+    type: AVERAGE_TX_FEE,
+    payload: { averageTxFees: data },
   };
 };
 

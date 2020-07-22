@@ -1,6 +1,9 @@
 // types and action creators: dispatched by components and sagas
 
-import { EphemeralData, WalletImage } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralDataElements,
+  WalletImage,
+} from '../../bitcoin/utilities/Interface';
 
 export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
 export const PREPARE_MSHARES = 'PREPARE_MSHARES';
@@ -37,8 +40,8 @@ export const prepareMShares = () => {
 
 export const uploadEncMShare = (
   shareIndex: number,
-  contactName: string,
-  data: EphemeralData,
+  contactInfo: { contactName: string; info: string },
+  data: EphemeralDataElements,
   changingGuardian?: boolean,
   previousGuardianName?: string,
 ) => {
@@ -46,7 +49,7 @@ export const uploadEncMShare = (
     type: UPLOAD_ENC_MSHARE,
     payload: {
       shareIndex,
-      contactName,
+      contactInfo,
       data,
       changingGuardian,
       previousGuardianName,
@@ -75,7 +78,7 @@ export const generatePersonalCopy = (selectedPersonalCopy) => {
 export const sharePersonalCopy = (
   shareVia: string,
   selectedPersonalCopy: { type: string; title: string },
-  isEmailOtherOptions
+  isEmailOtherOptions,
 ) => {
   return {
     type: SHARE_PERSONAL_COPY,

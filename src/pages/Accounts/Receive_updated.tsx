@@ -45,7 +45,7 @@ import {
 import BackupStyles from '../ManageBackup/Styles';
 import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
 import {
-  EphemeralData,
+  EphemeralDataElements,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -55,6 +55,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import Loader from '../../components/loader';
 import TwoFASetupWarningModal from './TwoFASetupWarningModal';
 import idx from 'idx';
+import { setReceiveHelper, setSavingWarning } from '../../store/actions/preferences';
 
 export default function Receive(props) {
   const [
@@ -102,6 +103,9 @@ export default function Receive(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
+  const fcmTokenValue =  useSelector((state) => idx(state, (_) => _.preferences.fcmTokenValue));
+  const isReceiveHelperDoneValue =  useSelector((state) => idx(state, (_) => _.preferences.isReceiveHelperDoneValue));
+  const savingWarning =  useSelector((state) => idx(state, (_) => _.preferences.savingWarning));
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -245,10 +249,23 @@ export default function Receive(props) {
       }
 
       if (!receiveQR) {
+        let info = '';
+        if (
+          selectedContact.phoneNumbers &&
+          selectedContact.phoneNumbers.length
+        ) {
+          const phoneNumber = selectedContact.phoneNumbers[0].number;
+          let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+          number = number.slice(number.length - 10); // last 10 digits only
+          info = number;
+        } else if (selectedContact.emails && selectedContact.emails.length) {
+          info = selectedContact.emails[0].email;
+        }
         setReceiveQR(
           JSON.stringify({
             requester: WALLET_SETUP.walletName,
             publicKey,
+            info: info.trim(),
             uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
             type: 'paymentTrustedContactQR',
             ver: appVersion,
@@ -293,11 +310,11 @@ export default function Receive(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
     await AsyncStorage.setItem(
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
   };
 
   const createTrustedContact = useCallback(async () => {
@@ -309,6 +326,22 @@ export default function Receive(props) {
         }`
         .toLowerCase()
         .trim();
+
+      let info = '';
+      if (selectedContact.phoneNumbers && selectedContact.phoneNumbers.length) {
+        const phoneNumber = selectedContact.phoneNumbers[0].number;
+        let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        info = number;
+      } else if (selectedContact.emails && selectedContact.emails.length) {
+        info = selectedContact.emails[0].email;
+      }
+
+      const contactInfo = {
+        contactName,
+        info: info.trim(),
+      };
+
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const { receivingAddress } =
         serviceType === SECURE_ACCOUNT
@@ -353,9 +386,10 @@ export default function Receive(props) {
       if (!trustedContact) {
         (async () => {
           const walletID = await AsyncStorage.getItem('walletID');
-          const FCM = await AsyncStorage.getItem('fcmToken');
+          const FCM = fcmTokenValue;
+          //await AsyncStorage.getItem('fcmToken');
 
-          const data: EphemeralData = {
+          const data: EphemeralDataElements = {
             walletID,
             FCM,
             paymentDetails: {
@@ -369,7 +403,7 @@ export default function Receive(props) {
               },
             },
           };
-          dispatch(updateEphemeralChannel(contactName, data));
+          dispatch(updateEphemeralChannel(contactInfo, data));
         })();
       } else if (
         !trustedContact.symmetricKey &&
@@ -381,7 +415,7 @@ export default function Receive(props) {
         // re-initiating expired EC
         dispatch(
           updateEphemeralChannel(
-            contactName,
+            contactInfo,
             trustedContact.ephemeralChannel.data[0],
           ),
         );
@@ -398,7 +432,7 @@ export default function Receive(props) {
             .paymentURI === paymentURI
         )
           return;
-        const data: EphemeralData = {
+        const data: EphemeralDataElements = {
           paymentDetails: {
             trusted: {
               address: trustedReceivingAddress,
@@ -410,7 +444,7 @@ export default function Receive(props) {
             },
           },
         };
-        dispatch(updateEphemeralChannel(contactName, data));
+        dispatch(updateEphemeralChannel(contactInfo, data));
       }
     }
   }, [
@@ -423,11 +457,13 @@ export default function Receive(props) {
   ]);
 
   const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone1 = await AsyncStorage.getItem(
-      'isReceiveHelperDone',
-    );
+   let isReceiveHelperDone1 = isReceiveHelperDoneValue;
+    // let isReceiveHelperDone1 = await AsyncStorage.getItem(
+    //   'isReceiveHelperDone',
+    // );
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      dispatch(setReceiveHelper(true));
+      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
       }, 10);
@@ -444,16 +480,17 @@ export default function Receive(props) {
 
   useEffect(() => {
     checkNShowHelperModal();
-    (async () => {
+    //(async () => {
       if (serviceType === SECURE_ACCOUNT) {
-        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+        if (!savingWarning) {//await AsyncStorage.getItem('savingsWarning')
           // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
           if (SecureReceiveWarningBottomSheet.current)
             (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
-          await AsyncStorage.setItem('savingsWarning', 'true');
+          dispatch(setSavingWarning(true));
+          //await AsyncStorage.setItem('savingsWarning', 'true');
         }
       }
-    })();
+    //})();
   }, []);
 
   const onPressOkOf2FASetupWarning = () => {
@@ -474,7 +511,8 @@ export default function Receive(props) {
   }
 
   const onPressKnowMore = () => {
-    AsyncStorage.setItem('isReceiveHelperDone', 'true');
+    dispatch(setReceiveHelper(true));
+    //AsyncStorage.setItem('isReceiveHelperDone', 'true');
     if (ReceiveHelperBottomSheet.current)
       (ReceiveHelperBottomSheet as any).current.snapTo(1);
   }
@@ -752,6 +790,7 @@ export default function Receive(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AddContactAddressBookBookBottomSheet as any}
         snapPoints={[
           -50,
@@ -765,18 +804,23 @@ export default function Receive(props) {
             proceedButtonText={'Confirm & Proceed'}
             onPressContinue={(selectedContacts) => onPressContinue(selectedContacts)}
             onSelectContact={(selectedContact) => setSelectedContact(selectedContact)}
-            onPressBack={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+            onPressBack={() => {
+              setTimeout(() => {
+                setAsTrustedContact(!AsTrustedContact);
+              }, 2);
+              (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}}
           />
         )}
         renderHeader={() => (
-          <SmallHeaderModal
+          <ModalHeader
             backgroundColor={Colors.white}
-            onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
+            //onPressHeader={() => (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}
           />
         )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SendViaLinkBottomSheet as any}
         snapPoints={[
           -50,
@@ -797,6 +841,15 @@ export default function Receive(props) {
             info={
               'Send the link below with your contact. It will send your bitcoin address and a way for the person to accept your request.'
             }
+            infoText={
+              receiveLink.includes('https://hexawallet.io')
+                ? `Click here to accept contact request from ${
+                    WALLET_SETUP.walletName
+                  } Hexa wallet - link will expire in ${
+                    config.TC_REQUEST_EXPIRY / (60000 * 60)
+                  } hours`
+                : null
+            }
             amount={amount === '' ? null : amount}
             link={receiveLink}
             serviceType={serviceType}
@@ -809,15 +862,16 @@ export default function Receive(props) {
         )}
         renderHeader={() => (
           <ModalHeader
-            onPressHeader={() => {
-              if (SendViaLinkBottomSheet.current)
-                (SendViaLinkBottomSheet as any).current.snapTo(0);
-            }}
+            // onPressHeader={() => {
+            //   if (SendViaLinkBottomSheet.current)
+            //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SendViaQRBottomSheet as any}
         snapPoints={[
           -50,
@@ -844,15 +898,16 @@ export default function Receive(props) {
         )}
         renderHeader={() => (
           <ModalHeader
-            onPressHeader={() => {
-              if (SendViaQRBottomSheet.current)
-                (SendViaQRBottomSheet as any).current.snapTo(0);
-            }}
+            // onPressHeader={() => {
+            //   if (SendViaQRBottomSheet.current)
+            //     (SendViaQRBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={SecureReceiveWarningBottomSheet as any}
         snapPoints={[
           -50,
@@ -866,10 +921,10 @@ export default function Receive(props) {
           <SmallHeaderModal
             borderColor={Colors.borderColor}
             backgroundColor={Colors.white}
-            onPressHeader={() => {
-              if (SecureReceiveWarningBottomSheet.current)
-                (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-            }}
+            // onPressHeader={() => {
+            //   if (SecureReceiveWarningBottomSheet.current)
+            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+            // }}
           />
         )}
       />

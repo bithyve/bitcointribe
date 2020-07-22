@@ -32,6 +32,7 @@ import {
   addTransferDetails,
   removeTransferDetails,
   clearTransfer,
+  setAverageTxFee
 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -87,6 +88,8 @@ interface SendToContactPropsTypes {
   currencyCode: any;
   currencyToggleValue: any;
   setCurrencyToggleValue: any;
+  averageTxFees: any;
+  setAverageTxFee: any;
 }
 
 interface SendToContactStateTypes {
@@ -229,6 +232,14 @@ class SendToContact extends Component<
       this.setState({
         exchangeRates: this.props.accounts && this.props.accounts.exchangeRates,
       });
+    }
+
+    if (
+      prevProps.accounts[this.state.serviceType].loading.transfer !==
+      this.props.accounts[this.state.serviceType].loading.transfer
+    ) {
+      if (!this.props.accounts[this.state.serviceType].loading.transfer.transfer) 
+      this.setState({ isConfirmDisabled: false});
     }
 
     if (
@@ -392,9 +403,11 @@ class SendToContact extends Component<
   storeAverageTxFees = async () => {
     const { service } = this.props;
     const { serviceType } = this.state;
-    const storedAverageTxFees = await AsyncStorage.getItem(
-      'storedAverageTxFees',
-    );
+    const storedAverageTxFees = this.props.averageTxFees;
+    // const storedAverageTxFees = await AsyncStorage.getItem(
+    //   'storedAverageTxFees',
+    // );
+    console.log("storedAverageTxFees sendToContactUpdate", storedAverageTxFees);
     if (storedAverageTxFees) {
       const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
       if (Date.now() - lastFetched < 1800000) {
@@ -407,10 +420,11 @@ class SendToContact extends Component<
       service[serviceType].service.secureHDWallet;
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
-    await AsyncStorage.setItem(
-      'storedAverageTxFees',
-      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-    );
+    this.props.setAverageTxFee({ averageTxFees, lastFetched: Date.now()});
+    // await AsyncStorage.setItem(
+    //   'storedAverageTxFees',
+    //   JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+    // );
   };
 
   amountCalculation = () => {
@@ -551,6 +565,7 @@ class SendToContact extends Component<
     } = this.props;
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
+    this.setState({isConfirmDisabled: true});
     clearTransfer(serviceType, 'stage1');
     this.setState({ isConfirmDisabled: false });
     if (
@@ -1119,11 +1134,13 @@ class SendToContact extends Component<
                     this.onConfirm();
                   }}
                   disabled={
-                    isConfirmDisabled || loading[serviceType].loading.transfer
+                    isConfirmDisabled
                   }
                   style={{
                     ...styles.confirmButtonView,
-                    backgroundColor: Colors.blue,
+                    backgroundColor: isConfirmDisabled
+                    ? Colors.lightBlue
+                    : Colors.blue,
                     elevation: 10,
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
@@ -1134,7 +1151,8 @@ class SendToContact extends Component<
                   {/* {loading[serviceType].loading.transfer && !isInvalidBalance ? (
                         <ActivityIndicator size="small" color={Colors.white} />
                       ) : ( */}
-                  {loading[serviceType].loading.transfer ? (
+                  {(!isConfirmDisabled && loading[serviceType].loading.transfer) ||
+                  (isConfirmDisabled && loading[serviceType].loading.transfer) ? (
                     <ActivityIndicator size="small" />
                   ) : (
                     <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
@@ -1148,7 +1166,7 @@ class SendToContact extends Component<
                       marginLeft: 10,
                     }}
                     disabled={
-                      isConfirmDisabled || loading[serviceType].loading.transfer
+                      isConfirmDisabled
                     }
                     onPress={() => {
                       if (
@@ -1190,6 +1208,7 @@ class SendToContact extends Component<
         </KeyboardAvoidingView>
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'RemoveBottomSheet'}
           snapPoints={[
             -50,
@@ -1227,10 +1246,10 @@ class SendToContact extends Component<
             ) {
               return (
                 <ModalHeader
-                  onPressHeader={() => {
-                    if (this.refs.RemoveBottomSheet)
-                      (this.refs.RemoveBottomSheet as any).snapTo(0);
-                  }}
+                  // onPressHeader={() => {
+                  //   if (this.refs.RemoveBottomSheet)
+                  //     (this.refs.RemoveBottomSheet as any).snapTo(0);
+                  // }}
                 />
               );
             }
@@ -1241,6 +1260,7 @@ class SendToContact extends Component<
             (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
           }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'SendUnSuccessBottomSheet'}
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
@@ -1261,8 +1281,8 @@ class SendToContact extends Component<
                       //     switchOn ? 0 : 2,
                       //   )} in order to conduct this transaction`
                       'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
-                    : transfer[serviceType].transfer.stage1.err
-                  : 'Something went wrong'
+                    : 'Something went wrong, please try again'
+                  : 'Something went wrong, please try again'
               }
               userInfo={transfer[serviceType].transfer.details}
               isFromContact={false}
@@ -1286,16 +1306,17 @@ class SendToContact extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                //  dispatch(clearTransfer(serviceType));
-                if (this.refs.SendUnSuccessBottomSheet)
-                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   //  dispatch(clearTransfer(serviceType));
+              //   if (this.refs.SendUnSuccessBottomSheet)
+              //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              // }}
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'AccountSelectionBottomSheet'}
           snapPoints={[
             -50,
@@ -1340,9 +1361,9 @@ class SendToContact extends Component<
           )}
           renderHeader={() => (
             <SmallHeaderModal
-              onPressHeader={() => {
-                (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
+              // }}
             />
           )}
         />
@@ -1359,7 +1380,7 @@ const mapStateToProps = (state) => {
     accounts: state.accounts || [],
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-
+    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
   };
 };
 
@@ -1369,7 +1390,8 @@ export default withNavigationFocus(
     removeTransferDetails,
     clearTransfer,
     addTransferDetails,
-    setCurrencyToggleValue
+    setCurrencyToggleValue,
+    setAverageTxFee
   })(SendToContact),
 );
 

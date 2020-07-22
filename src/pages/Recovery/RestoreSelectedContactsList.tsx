@@ -433,9 +433,9 @@ export default function RestoreSelectedContactsList(props) {
   const renderErrorModalHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -459,9 +459,9 @@ export default function RestoreSelectedContactsList(props) {
   const renderErrorModalHeader1 = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (ErrorBottomSheet1 as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (ErrorBottomSheet1 as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -1258,6 +1258,7 @@ export default function RestoreSelectedContactsList(props) {
         onCloseEnd={() => {}}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
+        enabledGestureInteraction={false}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),
@@ -1294,6 +1295,7 @@ export default function RestoreSelectedContactsList(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={ErrorBottomSheet1 as any}
         snapPoints={[
           -50,

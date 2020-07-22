@@ -13,7 +13,7 @@ import {
   SWITCH_TC_LOADING,
 
 } from '../actions/trustedContacts';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralData, EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import { UPDATE_ADDRESS_BOOK_LOCALLY, UPDATE_TRUSTED_CONTACT_INFO } from '../constants';
 import { chain } from 'icepick'
 
@@ -27,7 +27,7 @@ const initialState: {
     };
   };
   ephemeralChannel: {
-    [contactName: string]: { updated: Boolean; data?: EphemeralData };
+    [contactName: string]: { updated: Boolean; data?: EphemeralDataElements };
   };
   trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
   paymentDetails: {
@@ -163,7 +163,7 @@ export default (state = initialState, action) => {
 
     case UPDATE_TRUSTED_CONTACT_INFO:
       return chain(state)
-        .setIn(['trustedContactInfo'], action.payload)
+        .setIn(['trustedContactsInfo'], action.payload)
         .value()
 
   }

@@ -1,7 +1,8 @@
 // types and action creators: dispatched by components and sagas
 import {
   TrustedDataElements,
-  EphemeralData,
+  EphemeralDataElements,
+  trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
 
 import { createAction } from 'redux-actions';
@@ -10,21 +11,25 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
+export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT';
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
 
-export const initializeTrustedContact = (contactName: string) => {
+export const initializeTrustedContact = (contactInfo: {
+  contactName: string;
+  info: string;
+}) => {
   return {
     type: INITIALIZE_TRUSTED_CONTACT,
-    payload: { contactName },
+    payload: { contactInfo },
   };
 };
 
 export const approveTrustedContact = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   contactsPublicKey: string,
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
@@ -32,7 +37,7 @@ export const approveTrustedContact = (
   return {
     type: APPROVE_TRUSTED_CONTACT,
     payload: {
-      contactName,
+      contactInfo,
       contactsPublicKey,
       updateEphemeralChannel,
       contactsWalletName,
@@ -40,45 +45,61 @@ export const approveTrustedContact = (
   };
 };
 
+export const removeTrustedContact = (contactName) => {
+  return {
+    type: REMOVE_TRUSTED_CONTACT,
+    payload: {
+      contactName,
+    },
+  };
+};
+
 export const updateEphemeralChannel = (
-  contactName: string,
-  data: EphemeralData,
+  contactInfo: { contactName: string; info: string },
+  data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch, trustedContacts, uploadXpub },
+    payload: { contactInfo, data, fetch, trustedContacts, uploadXpub },
   };
 };
 
 export const fetchEphemeralChannel = (
-  contactName?: string,
+  contactInfo: { contactName: string; info: string },
   approveTC?: Boolean,
   publicKey?: string,
 ) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payload: { contactName, approveTC, publicKey },
+    payload: { contactInfo, approveTC, publicKey },
   };
 };
 
 export const updateTrustedChannel = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   data: TrustedDataElements,
   fetch?: Boolean,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactName, data, fetch },
+    payload: { contactInfo, data, fetch },
   };
 };
 
-export const fetchTrustedChannel = (contactName: string) => {
+export const fetchTrustedChannel = (
+  contactInfo: {
+    contactName: string;
+    info: string;
+  },
+  action: trustedChannelActions,
+  contactsWalletName?: string,
+) => {
   return {
     type: FETCH_TRUSTED_CHANNEL,
-    payload: { contactName },
+    payload: { contactInfo, action, contactsWalletName },
   };
 };
 

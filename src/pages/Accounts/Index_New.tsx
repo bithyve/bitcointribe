@@ -48,8 +48,9 @@ import {
   fetchDerivativeAccXpub,
   fetchDerivativeAccBalTx,
   fetchDerivativeAccAddress,
+  setAverageTxFee
 } from '../../store/actions/accounts';
-import { setCurrencyToggleValue } from '../../store/actions/preferences';
+import { setCurrencyToggleValue, setTestAccountHelperDone, setTransactionHelper } from '../../store/actions/preferences';
 import { ScrollView } from 'react-native-gesture-handler';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
@@ -147,6 +148,12 @@ interface AccountsPropsTypes {
   currencyCode: any;
   currencyToggleValue: any;
   setCurrencyToggleValue: any;
+  setTestAccountHelperDone: any;
+  isTestHelperDoneValue: any;
+  setTransactionHelper: any;
+  isTransactionHelperDoneValue: any;
+  averageTxFees: any;
+  setAverageTxFee: any;
 }
 
 class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
@@ -230,6 +237,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       
     this.getServiceType(serviceType);
     this.getBalance();
+    this.setAverageTransactionFees();
     this.balanceTxLoading = accounts[serviceType].loading.balanceTx;
     this.derivativeBalanceTxLoading =
       accounts[serviceType].loading.derivativeBalanceTx;
@@ -338,6 +346,53 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
+  setAverageTransactionFees = async() =>{
+    let { serviceType } = this.state;
+    let { accounts, averageTxFees } = this.props;
+    const service = accounts[serviceType].service;
+    const storedAverageTxFees = averageTxFees;
+    // const storedAverageTxFees = JSON.parse(
+    //   await AsyncStorage.getItem('storedAverageTxFees'),
+    // );
+    console.log({ storedAverageTxFees });
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
+      if (Date.now() - lastFetched < 1800000) {
+        // maintaining a half an hour difference b/w fetches
+        this.setState({averageTxFees: averageTxFees});
+      } else {
+        const instance = service.hdWallet || service.secureHDWallet;
+        const averageTxFees = await instance.averageTransactionFee();
+
+        this.setState({averageTxFees: averageTxFees});
+        this.props.setAverageTxFee({
+              ...storedAverageTxFees,
+              serviceType: { averageTxFees, lastFetched: Date.now() },
+            });
+        // await AsyncStorage.setItem(
+        //   'storedAverageTxFees',
+        //   JSON.stringify({
+        //     ...storedAverageTxFees,
+        //     serviceType: { averageTxFees, lastFetched: Date.now() },
+        //   }),
+        // );
+      }
+    } else {
+      const instance = service.hdWallet || service.secureHDWallet;
+      const averageTxFees = await instance.averageTransactionFee();
+      this.setState({averageTxFees: averageTxFees});
+      this.props.setAverageTxFee({
+        serviceType: { averageTxFees, lastFetched: Date.now() },
+      });
+      // await AsyncStorage.setItem(
+      //   'storedAverageTxFees',
+      //   JSON.stringify({
+      //     serviceType: { averageTxFees, lastFetched: Date.now() },
+      //   }),
+      // );
+    }
+  }
+
   setCurrencyCodeFromAsync = async () => {
     let currencyToggleValueTmp = this.props.currencyToggleValue;
     // await AsyncStorage.getItem(
@@ -376,6 +431,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     ) {
       this.setState({ exchangeRates: this.props.accounts.exchangeRates });
     }
+
+    if (
+      prevState.serviceType !== this.state.serviceType
+    ) {
+      this.setAverageTransactionFees();
+    }
   };
 
   componentWillUnmount() {}
@@ -408,11 +469,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   checkNShowHelperModal = async () => {
-    let isSendHelperDone = await AsyncStorage.getItem(
-      'isTransactionHelperDone',
-    );
-    if (!isSendHelperDone && this.state.serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isTransactionHelperDone', 'true');
+    let isTransactionHelperDone= this.props.isTransactionHelperDoneValue
+    // let isTransactionHelperDone = await AsyncStorage.getItem(
+    //   'isTransactionHelperDone',
+    // );
+    if (!isTransactionHelperDone && this.state.serviceType == TEST_ACCOUNT) {
+      this.props.setTransactionHelper(true);
+      //await AsyncStorage.setItem('isTransactionHelperDone', 'true');
       setTimeout(() => {
         this.setState({ isHelperDone: true });
       }, 10);
@@ -433,9 +496,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
 
-    let isTestAccountHelperDone = await AsyncStorage.getItem(
-      'isTestAccountHelperDone',
-    );
+    let isTestAccountHelperDone = this.props.isTestHelperDoneValue;
+    // let isTestAccountHelperDone = await AsyncStorage.getItem(
+    //   'isTestAccountHelperDone',
+    // );
 
     // if (isBuyHelperDone == 'true') {
     //   setBuyIsActive(false);
@@ -450,7 +514,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.navigation.state.params &&
       this.props.navigation.getParam('serviceType') == TEST_ACCOUNT
     ) {
-      await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
+      this.props.setTestAccountHelperDone(true);
+     // await AsyncStorage.setItem('isTestAccountHelperDone', 'true');
       setTimeout(() => {
         this.setState({ isTestHelperDone: true });
       }, 10);
@@ -1502,7 +1567,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   serviceType={serviceType}
                   getServiceType={this.getServiceType}
                   onPressKnowMore={() => {
-                    AsyncStorage.setItem('isTransactionHelperDone', 'true');
+                    this.props.setTransactionHelper(true);
+                    //AsyncStorage.setItem('isTransactionHelperDone', 'true');
                     (this.refs
                       .TransactionDetailsHelperBottomSheet as any).snapTo(
                       1,
@@ -1586,7 +1652,9 @@ const mapStateToProps = (state) => {
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
-
+    isTestHelperDoneValue: idx(state, (_) => _.preferences.isTestHelperDoneValue),
+    isTransactionHelperDoneValue: idx(state, (_) => _.preferences.isTransactionHelperDoneValue),
+    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
     // service: idx(state, (_) => _.accounts)
   };
 };
@@ -1601,6 +1669,9 @@ export default withNavigationFocus(
     fetchDerivativeAccBalTx,
     fetchDerivativeAccAddress,
     setCurrencyToggleValue,
+    setTestAccountHelperDone,
+    setTransactionHelper,
+    setAverageTxFee
   })(Accounts),
 );
 

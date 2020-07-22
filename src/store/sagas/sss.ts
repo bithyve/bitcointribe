@@ -57,7 +57,7 @@ import {
 import {
   EncDynamicNonPMDD,
   MetaShare,
-  EphemeralData,
+  EphemeralDataElements,
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
@@ -66,7 +66,11 @@ import {
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
-import { updateEphemeralChannel } from '../actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  trustedContactApproved,
+  updateTrustedChannel,
+} from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import crypto from 'crypto';
@@ -170,7 +174,7 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
-  const trustedContacts = yield select(
+  const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
   const regularService: RegularAccount = yield select(
@@ -182,9 +186,11 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing secondary device's TC
+    delete trustedContacts.tc.trustedContacts[payload.contactInfo.contactName]; // removing secondary device's TC
     const accountNumber =
-      regularService.hdWallet.trustedContactToDA[payload.contactName];
+      regularService.hdWallet.trustedContactToDA[
+        payload.contactInfo.contactName
+      ];
     if (accountNumber) {
       delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
         accountNumber
@@ -228,22 +234,12 @@ function* uploadEncMetaShareWorker({ payload }) {
   const res = yield call(
     s3Service.uploadShare,
     payload.shareIndex,
-    payload.contactName,
+    payload.contactInfo.contactName,
   ); // contact injection (requires database insertion)
 
   if (res.status === 200) {
     console.log('Uploaded share: ', payload.shareIndex);
     const { otp, encryptedKey } = res.data;
-    console.log({ otp, encryptedKey });
-
-    // adding transfer details to he ephemeral data
-    const data: EphemeralData = {
-      ...payload.data,
-      shareTransferDetails: {
-        otp,
-        encryptedKey,
-      },
-    };
 
     const updatedSERVICES = {
       ...SERVICES,
@@ -271,7 +267,30 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     });
 
-    yield put(updateEphemeralChannel(payload.contactName, data));
+    const contact =
+      trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
+    if (contact && contact.symmetricKey) {
+      // has trusted channel
+      const data: TrustedDataElements = {
+        // won't include elements from payload.data
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+      yield put(updateTrustedChannel(payload.contactInfo, data));
+    } else {
+      // adding transfer details to he ephemeral data
+      const data: EphemeralDataElements = {
+        ...payload.data,
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+
+      yield put(updateEphemeralChannel(payload.contactInfo, data));
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
@@ -705,8 +724,7 @@ function* sharePersonalCopyWorker({ payload }) {
               }, 1000);
             },
           );
-        }
-        else {
+        } else {
           let shareOptions = {
             title: selectedPersonalCopy.title,
             message: `Please find attached the personal copy ${
@@ -714,13 +732,14 @@ function* sharePersonalCopyWorker({ payload }) {
             } share pdf, it is password protected by the answer to the security question.`,
             url:
               Platform.OS == 'android'
-                ? 'file://' + personalCopyDetails[selectedPersonalCopy.type].path
+                ? 'file://' +
+                  personalCopyDetails[selectedPersonalCopy.type].path
                 : personalCopyDetails[selectedPersonalCopy.type].path,
             type: 'application/pdf',
             showAppsToView: true,
             subject: selectedPersonalCopy.title,
           };
-  
+
           try {
             yield call(Share.open, shareOptions);
           } catch (err) {

@@ -568,8 +568,8 @@ export default function SendToContact(props) {
                 //     switchOn ? 0 : 2,
                 //   )} in order to conduct this transaction`
                 'Insufficient balance to complete the transaction plus fee.\nPlease reduce the amount and try again.'
-              : transfer.stage1.err
-            : 'Something went wrong'
+              : 'Something went wrong, please try again.'
+            : 'Something went wrong, please try again.'
         }
         userInfo={transfer.details}
         isFromContact={false}
@@ -596,11 +596,11 @@ export default function SendToContact(props) {
   const renderSendUnSuccessHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
-          if (SendUnSuccessBottomSheet.current)
-            SendUnSuccessBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   //  dispatch(clearTransfer(serviceType));
+        //   if (SendUnSuccessBottomSheet.current)
+        //     SendUnSuccessBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   };
@@ -772,10 +772,10 @@ export default function SendToContact(props) {
     ) {
       return (
         <ModalHeader
-          onPressHeader={() => {
-            if (RemoveBottomSheet.current)
-              (RemoveBottomSheet as any).current.snapTo(0);
-          }}
+          // onPressHeader={() => {
+          //   if (RemoveBottomSheet.current)
+          //     (RemoveBottomSheet as any).current.snapTo(0);
+          // }}
         />
       );
     }
@@ -793,14 +793,10 @@ export default function SendToContact(props) {
           if (transfer.details && transfer.details.length) {
             for (let i = 0; i < transfer.details.length; i++) {
               if (
-                transfer.details[i].selectedContact.id ==
-                selectedContact.id
+                transfer.details[i].selectedContact.id == selectedContact.id
               ) {
                 dispatch(
-                  removeTransferDetails(
-                    serviceType,
-                    transfer.details[i],
-                  ),
+                  removeTransferDetails(serviceType, transfer.details[i]),
                 );
                 break;
               }
@@ -821,23 +817,27 @@ export default function SendToContact(props) {
         }}
       />
     );
-  }, [spendableBalances, transfer, selectedContact,
+  }, [
+    spendableBalances,
+    transfer,
+    selectedContact,
     bitcoinAmount,
     currencyAmount,
-    note,]);
+    note,
+  ]);
 
   const renderAccountSelectionHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        onPressHeader={() => {
-          AccountSelectionBottomSheet.current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   AccountSelectionBottomSheet.current.snapTo(0);
+        // }}
       />
     );
   }, []);
 
   const checkRecordsHavingPrice = () => {
-   if (transfer.details && transfer.details.length) {
+    if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
         if (
           !transfer.details[i].selectedContact.hasOwnProperty(
@@ -855,8 +855,10 @@ export default function SendToContact(props) {
   };
 
   const onConfirm = () => {
+    setTimeout(() => {
+      setIsConfirmDisabled(true);
+    }, 1);
     dispatch(clearTransfer(serviceType, 'stage1'));
-    setIsConfirmDisabled(false);
     if (transfer.details && transfer.details.length) {
       for (let i = 0; i < transfer.details.length; i++) {
         if (transfer.details[i].selectedContact.id == selectedContact.id) {
@@ -876,6 +878,12 @@ export default function SendToContact(props) {
       handleTrasferST1();
     }, 10);
   };
+
+  useEffect(() => {
+    if (!loading.transfer) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading.transfer]);
 
   const getBalanceText = () => {
     let balance = spendableBalance;
@@ -1442,26 +1450,24 @@ export default function SendToContact(props) {
                 onPress={() => {
                   onConfirm();
                 }}
-                disabled={isConfirmDisabled || loading.transfer}
+                disabled={isConfirmDisabled}
                 style={{
                   ...styles.confirmButtonView,
-                  backgroundColor: Colors.blue,
+                  backgroundColor: isConfirmDisabled
+                    ? Colors.lightBlue
+                    : Colors.blue,
                   elevation: 10,
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
                   shadowOffset: { width: 15, height: 15 },
-                  opacity: isConfirmDisabled ? 0.5 : 1,
                 }}
               >
-                {/* {loading.transfer && !isInvalidBalance ? (
-                        <ActivityIndicator size="small" color={Colors.white} />
-                      ) : ( */}
-                {loading.transfer ? (
-                  <ActivityIndicator size="small" />
+                {(!isConfirmDisabled && loading.transfer) ||
+                (isConfirmDisabled && loading.transfer) ? (
+                  <ActivityIndicator size="small" color={Colors.white} />
                 ) : (
                   <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
                 )}
-                {/* )} */}
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -1470,7 +1476,7 @@ export default function SendToContact(props) {
                   width: wp('30%'),
                   marginLeft: 10,
                 }}
-                disabled={isConfirmDisabled || loading.transfer}
+                disabled={isConfirmDisabled}
                 onPress={() => {
                   // dispatch(clearTransfer(serviceType));
                   // if (getServiceType) {
@@ -1511,6 +1517,7 @@ export default function SendToContact(props) {
         </View>
       </KeyboardAvoidingView>
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={RemoveBottomSheet as any}
         snapPoints={[
@@ -1559,6 +1566,7 @@ export default function SendToContact(props) {
         onCloseStart={() => {
           SendUnSuccessBottomSheet.current.snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={SendUnSuccessBottomSheet}
         snapPoints={[-50, hp('65%')]}
@@ -1612,6 +1620,7 @@ export default function SendToContact(props) {
       />
       <BottomSheet
         enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
         ref={AccountSelectionBottomSheet}
         snapPoints={[
           -50,

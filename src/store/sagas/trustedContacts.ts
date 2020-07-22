@@ -16,11 +16,12 @@ import {
   TRUSTED_CHANNELS_SYNC,
   paymentDetailsFetched,
   switchTCLoading,
+  REMOVE_TRUSTED_CONTACT,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import {
-  EphemeralData,
+  EphemeralDataElements,
   DerivativeAccount,
   Contacts,
   TrustedData,
@@ -29,6 +30,7 @@ import {
   INotification,
   notificationType,
   notificationTag,
+  trustedChannelActions,
 } from '../../bitcoin/utilities/Interface';
 import { downloadMShare, updateWalletImage } from '../actions/sss';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -42,6 +44,8 @@ import { AsyncStorage } from 'react-native';
 import { fetchNotificationsWorker } from './notifications';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RelayServices from '../../bitcoin/services/RelayService';
+import SSS from '../../bitcoin/utilities/sss/SSS';
+import Toast from '../../components/Toast';
 
 const sendNotification = (trustedContacts, contactName, walletName) => {
   const receivers = [];
@@ -68,8 +72,8 @@ function* initializedTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName } = payload;
-  const res = yield call(service.initializeContact, contactName);
+  const { contactName, encKey } = payload;
+  const res = yield call(service.initializeContact, contactName, encKey);
   if (res.status === 200) {
     const { publicKey } = res.data;
     yield put(trustedContactInitialized(contactName, publicKey));
@@ -95,16 +99,19 @@ function* approveTrustedContactWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, contactsPublicKey, contactsWalletName } = payload;
+  const { contactInfo, contactsPublicKey, contactsWalletName } = payload;
 
+  let encKey;
+  if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
   const res = yield call(
     trustedContacts.finalizeContact,
-    contactName,
+    contactInfo.contactName,
     contactsPublicKey,
+    encKey,
     contactsWalletName,
   );
   if (res.status === 200) {
-    yield put(trustedContactApproved(contactName, true));
+    yield put(trustedContactApproved(contactInfo.contactName, true));
     if (payload.updateEphemeralChannel) {
       const uploadXpub = true;
       const data = {
@@ -114,7 +121,7 @@ function* approveTrustedContactWorker({ payload }) {
       };
       yield put(
         updateEphemeralChannel(
-          contactName,
+          contactInfo,
           data,
           true,
           trustedContacts,
@@ -139,6 +146,58 @@ export const approveTrustedContactWatcher = createWatcher(
   APPROVE_TRUSTED_CONTACT,
 );
 
+function* removeTrustedContactWorker({ payload }) {
+  const trustedContactsService: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+  let { contactName } = payload;
+  contactName = contactName.toLowerCase().trim();
+  delete trustedContactsService.tc.trustedContacts[contactName];
+
+  let trustedContactsInfo: any = yield call(
+    AsyncStorage.getItem,
+    'TrustedContactsInfo',
+  );
+  if (trustedContactsInfo) {
+    trustedContactsInfo = JSON.parse(trustedContactsInfo);
+
+    for (let itr = 0; itr < trustedContactsInfo.length; itr++) {
+      const trustedContact = trustedContactsInfo[itr];
+      if (trustedContact) {
+        const presentContactName = `${trustedContact.firstName} ${
+          trustedContact.lastName ? trustedContact.lastName : ''
+        }`
+          .toLowerCase()
+          .trim();
+
+        if (presentContactName === contactName) {
+          if (itr < 3) trustedContactsInfo[itr] = null;
+          // Guardian nullified
+          else trustedContactsInfo.splice(itr, 1);
+          yield call(
+            AsyncStorage.setItem,
+            'TrustedContactsInfo',
+            JSON.stringify(trustedContactsInfo),
+          );
+          break;
+        }
+      }
+    }
+  }
+
+  const { SERVICES } = yield select((state) => state.storage.database);
+  const updatedSERVICES = {
+    ...SERVICES,
+    TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+  };
+  yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+}
+
+export const removeTrustedContactWatcher = createWatcher(
+  removeTrustedContactWorker,
+  REMOVE_TRUSTED_CONTACT,
+);
+
 function* updateEphemeralChannelWorker({ payload }) {
   yield put(switchTCLoading('updateEphemeralChannel'));
 
@@ -153,17 +212,35 @@ function* updateEphemeralChannelWorker({ payload }) {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  const { contactName, data, fetch } = payload;
+  const { contactInfo, data, fetch } = payload;
+
+  let generatedKey = false;
+  if (!contactInfo.info && contactInfo.contactName == 'Secondary Device') {
+    // contact info = null, for secondary device (initially)
+    contactInfo.info = SSS.generateKey(SSS.cipherSpec.keyLength);
+    generatedKey = true;
+  }
+
+  let encKey;
+  if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
 
   const res = yield call(
     trustedContacts.updateEphemeralChannel,
-    contactName,
+    contactInfo.contactName,
     data,
+    encKey,
     fetch,
   );
+
+  if (generatedKey) {
+    trustedContacts.tc.trustedContacts[
+      contactInfo.contactName.toLowerCase().trim()
+    ].secondaryKey = contactInfo.info;
+  }
+
   console.log({ res });
   if (res.status === 200) {
-    const ephData: EphemeralData = res.data.data;
+    const ephData: EphemeralDataElements = res.data.data;
     if (ephData && ephData.paymentDetails) {
       // using trusted details on TC approval
       const { trusted } = ephData.paymentDetails;
@@ -171,16 +248,20 @@ function* updateEphemeralChannelWorker({ payload }) {
     }
 
     yield put(
-      ephemeralChannelUpdated(contactName, res.data.updated, res.data.data),
+      ephemeralChannelUpdated(
+        contactInfo.contactName,
+        res.data.updated,
+        res.data.data,
+      ),
     );
 
     if (payload.uploadXpub) {
-      console.log('Uploading xpub for: ', contactName);
+      console.log('Uploading xpub for: ', contactInfo.contactName);
       const res = yield call(
         regularService.getDerivativeAccXpub,
         TRUSTED_CONTACTS,
         null,
-        contactName,
+        contactInfo.contactName,
       );
 
       if (res.status === 200) {
@@ -197,12 +278,12 @@ function* updateEphemeralChannelWorker({ payload }) {
         };
         const updateRes = yield call(
           trustedContacts.updateTrustedChannel,
-          contactName,
+          contactInfo.contactName,
           data,
           true,
         );
         if (updateRes.status === 200) {
-          console.log('Xpub updated to TC for: ', contactName);
+          console.log('Xpub updated to TC for: ', contactInfo.contactName);
 
           // send acceptance notification
           const { walletName } = yield select(
@@ -210,12 +291,19 @@ function* updateEphemeralChannelWorker({ payload }) {
           );
           sendNotification(
             trustedContacts,
-            contactName.toLowerCase().trim(),
+            contactInfo.contactName.toLowerCase().trim(),
             walletName,
           );
-        } else console.log('Xpub updation to TC failed for: ', contactName);
+        } else
+          console.log(
+            'Xpub updation to TC failed for: ',
+            contactInfo.contactName,
+          );
       } else {
-        console.log('Derivative xpub generation failed for: ', contactName);
+        console.log(
+          'Derivative xpub generation failed for: ',
+          contactInfo.contactName,
+        );
       }
     }
 
@@ -227,10 +315,10 @@ function* updateEphemeralChannelWorker({ payload }) {
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
 
-    const data: EphemeralData = res.data.data;
+    const data: EphemeralDataElements = res.data.data;
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
-      yield delay(1000); // introducing delay in order to evade database insertion collision
+      // yield delay(1000); // introducing delay in order to evade database insertion collision
       yield put(downloadMShare(encryptedKey, otp));
     }
   } else {
@@ -249,15 +337,17 @@ function* fetchEphemeralChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
+  const { contactInfo, approveTC, publicKey } = payload; // if publicKey: fetching just the payment details
+  const encKey = SSS.strechKey(contactInfo.info);
   const res = yield call(
     trustedContacts.fetchEphemeralChannel,
-    contactName,
+    contactInfo.contactName,
+    encKey,
     approveTC,
     publicKey,
   );
   if (res.status === 200) {
-    const data: EphemeralData = res.data.data;
+    const data: EphemeralDataElements = res.data.data;
     if (publicKey) {
       if (data && data.paymentDetails) {
         // using alternate details on TC rejection
@@ -273,7 +363,7 @@ function* fetchEphemeralChannelWorker({ payload }) {
       downloadMShare(encryptedKey, otp);
     }
 
-    yield put(ephemeralChannelFetched(contactName, data));
+    yield put(ephemeralChannelFetched(contactInfo.contactName, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -295,17 +385,17 @@ function* updateTrustedChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName, data, fetch } = payload;
+  const { contactInfo, data, fetch } = payload;
 
   const res = yield call(
     trustedContacts.updateTrustedChannel,
-    contactName,
+    contactInfo.contactName,
     data,
     fetch,
   );
   if (res.status === 200) {
     const { updated, data } = res.data;
-    yield put(trustedChannelUpdated(contactName, updated, data));
+    yield put(trustedChannelUpdated(contactInfo.contactName, updated, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -327,18 +417,33 @@ function* fetchTrustedChannelWorker({ payload }) {
     (state) => state.trustedContacts.service,
   );
 
-  const { contactName } = payload;
+  const { contactInfo, action, contactsWalletName } = payload;
 
-  const res = yield call(trustedContacts.fetchTrustedChannel, contactName);
+  const res = yield call(
+    trustedContacts.fetchTrustedChannel,
+    contactInfo.contactName,
+    contactsWalletName,
+  );
+
+  console.log({ res });
   if (res.status === 200) {
-    const { data } = res.data;
-    yield put(trustedChannelFetched(contactName, data));
+    const data: TrustedDataElements = res.data.data;
+    yield put(trustedChannelFetched(contactInfo.contactName, data));
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    if (action === trustedChannelActions.downloadShare) {
+      if (data && data.shareTransferDetails) {
+        Toast('You have been successfully added as a Keeper');
+        const { otp, encryptedKey } = data.shareTransferDetails;
+        // yield delay(1000); // introducing delay in order to evade database insertion collision
+        yield put(downloadMShare(encryptedKey, otp));
+      }
+    }
   } else {
     console.log(res.err);
   }
@@ -375,7 +480,7 @@ export function* trustedChannelsSyncWorker() {
 
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   for (const contactName of Object.keys(contacts)) {
-    let { trustedChannel, ephemeralChannel } = contacts[contactName];
+    let { trustedChannel, ephemeralChannel, encKey } = contacts[contactName];
 
     if (!trustedChannel) {
       // trusted channel not setup; probably need to still get the counter party's pubKey
@@ -392,6 +497,7 @@ export function* trustedChannelsSyncWorker() {
           trustedContacts.finalizeContact,
           contactName,
           contactsPublicKey,
+          encKey,
         );
 
         if (res.status !== 200) {

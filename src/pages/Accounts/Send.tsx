@@ -240,7 +240,7 @@ export default function Send(props) {
   };
 
   const updateAddressBook = async () => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
+    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts)
     if (trustedContactsInfo) {
       if (trustedContactsInfo.length) {
         const sendableTrustedContacts = [];

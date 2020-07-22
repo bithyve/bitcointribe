@@ -37,6 +37,8 @@ import SmallHeaderModal from '../../components/SmallHeaderModal';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import QRCode from 'react-native-qrcode-svg';
+import { setReceiveHelper, setSavingWarning } from '../../store/actions/preferences';
+import idx from 'idx';
 
 const ReceivingAddress = (props) => {
   const [AsTrustedContact, setAsTrustedContact] = useState(false);
@@ -51,6 +53,7 @@ const ReceivingAddress = (props) => {
     SecureReceiveWarningBottomSheet,
     setSecureReceiveWarningBottomSheet,
   ] = useState(React.createRef());
+  const dispatch = useDispatch();
 
   const { loading, service } = useSelector(
     (state) => state.accounts[serviceType],
@@ -58,18 +61,22 @@ const ReceivingAddress = (props) => {
   const { receivingAddress } =
     serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet;
   const [isReceiveHelperDone, setIsReceiveHelperDone] = useState(true);
+  const isReceiveHelperDoneValue =  useSelector((state) => idx(state, (_) => _.preferences.isReceiveHelperDoneValue));
+  const savingWarning =  useSelector((state) => idx(state, (_) => _.preferences.savingWarning));
 
   const checkNShowHelperModal = async () => {
-    let isReceiveHelperDone1 = await AsyncStorage.getItem(
-      'isReceiveHelperDone',
-    );
+    let isReceiveHelperDone1 = isReceiveHelperDoneValue;
+    // let isReceiveHelperDone1 = await AsyncStorage.getItem(
+    //   'isReceiveHelperDone',
+    // );
     // console.log(
     //   'isReceiveHelperDone1',
     //   isReceiveHelperDone,
     //   isReceiveHelperDone1,
     // );
     if (!isReceiveHelperDone1 && serviceType == TEST_ACCOUNT) {
-      await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      dispatch(setReceiveHelper(true));
+      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout(() => {
         setIsReceiveHelperDone(true);
       }, 10);
@@ -86,16 +93,17 @@ const ReceivingAddress = (props) => {
 
   useEffect(() => {
     checkNShowHelperModal();
-    (async () => {
+   // (async () => {
       if (serviceType === SECURE_ACCOUNT) {
-        if (!(await AsyncStorage.getItem('savingsWarning'))) {
+        if (!savingWarning) { //(await AsyncStorage.getItem('savingsWarning'))
           // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
           if (SecureReceiveWarningBottomSheet.current)
             (SecureReceiveWarningBottomSheet.current as any).snapTo(1);
-          await AsyncStorage.setItem('savingsWarning', 'true');
+            dispatch(setSavingWarning(true));
+          //await AsyncStorage.setItem('savingsWarning', 'true');
         }
       }
-    })();
+  //  })();
   }, []);
   const renderReceiveHelperContents = useCallback(() => {
     return (
@@ -289,7 +297,8 @@ const ReceivingAddress = (props) => {
               {serviceType == TEST_ACCOUNT ? (
                 <Text
                   onPress={() => {
-                    AsyncStorage.setItem('isReceiveHelperDone', 'true');
+                    dispatch(setReceiveHelper(true));
+                    //AsyncStorage.setItem('isReceiveHelperDone', 'true');
                     if (ReceiveHelperBottomSheet.current)
                       (ReceiveHelperBottomSheet.current as any).snapTo(1);
                   }}

@@ -22,7 +22,6 @@ import ManageBackup from '../pages/ManageBackup';
 import CustodianRequestOTP from '../pages/CustodianRequest/CustodianRequestOTP';
 import CustodianRequestAccepted from '../pages/CustodianRequest/CustodianRequestAccepted';
 import SecondaryDevice from '../pages/ManageBackup/SecondaryDevice';
-import CommunicationMode from '../pages/ManageBackup/CommunicationMode';
 import TrustedContacts from '../pages/ManageBackup/TrustedContacts';
 import Cloud from '../pages/ManageBackup/Cloud';
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery';
@@ -78,6 +77,7 @@ import SendToContact from '../pages/Accounts/SendToContactUpdate';
 import SendConfirmation from '../pages/Accounts/SendConfirmation_updated';
 import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest';
 import ContactDetails from '../pages/Contacts/ContactDetails';
+import ContactDetailsNew from '../pages/Contacts/ContactDetailsNew';
 import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 
@@ -116,7 +116,6 @@ const SetupNavigator = createStackNavigator(
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
-  'CommunicationMode',
   'TrustedContacts',
   'Cloud',
   'CustodianRequestOTP',
@@ -143,7 +142,6 @@ const HomeNavigator = createStackNavigator(
     Accounts,
     ManageBackup,
     SecondaryDevice,
-    CommunicationMode,
     TrustedContacts,
     Cloud,
     CustodianRequestOTP,
@@ -204,6 +202,7 @@ const HomeNavigator = createStackNavigator(
     VoucherScanner,
     AddContactSendRequest,
     ContactDetails,
+    ContactDetailsNew,
     Receive,
     PairNewWallet,
     UpdateApp: {

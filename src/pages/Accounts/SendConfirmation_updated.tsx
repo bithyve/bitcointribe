@@ -64,6 +64,7 @@ interface SendConfirmationStateTypes {
   SelectedContactId: any;
   transfer: any;
   loading: any;
+  isConfirmDisabled: boolean;
 }
 
 interface SendConfirmationPropsTypes {
@@ -110,6 +111,7 @@ class SendConfirmation_updated extends Component<
       SelectedContactId: 0,
       transfer: {},
       loading: {},
+      isConfirmDisabled: false
     };
   }
 
@@ -152,6 +154,14 @@ class SendConfirmation_updated extends Component<
       this.props.accounts[this.serviceType].loading
     ) {
       this.setState({ loading: this.props.accounts[this.serviceType].loading });
+    }
+
+    if (
+      prevProps.accounts[this.serviceType].loading.transfer !==
+      this.props.accounts[this.serviceType].loading.transfer
+    ) {
+      if(!this.props.accounts[this.serviceType].loading.transfer)
+      this.setState({ isConfirmDisabled: false});
     }
   };
 
@@ -285,6 +295,9 @@ class SendConfirmation_updated extends Component<
 
   onConfirm = () => {
     let { sliderValueText } = this.state;
+    setTimeout(() => {
+      this.setState({isConfirmDisabled: true});
+    }, 1);
     this.props.clearTransfer(this.serviceType, 'stage2');
     const txPriority =
       sliderValueText === 'Low Fee'
@@ -337,7 +350,7 @@ class SendConfirmation_updated extends Component<
       CurrencyCode,
       totalAmount,
       sliderValue,
-      sliderValueText,
+      isConfirmDisabled,
       SelectedContactId,
       transfer,
       loading,
@@ -575,17 +588,20 @@ class SendConfirmation_updated extends Component<
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
               onPress={this.onConfirm}
-              disabled={loading.transfer}
+              disabled={isConfirmDisabled}
               style={{
                 ...styles.confirmButtonView,
-                backgroundColor: Colors.blue,
+                backgroundColor: isConfirmDisabled
+                ? Colors.lightBlue
+                : Colors.blue,
                 elevation: 10,
                 shadowColor: Colors.shadowBlue,
                 shadowOpacity: 1,
                 shadowOffset: { width: 15, height: 15 },
               }}
             >
-              {loading.transfer ? (
+              {(!isConfirmDisabled && this.props.accounts[this.serviceType].loading.transfer) ||
+              (isConfirmDisabled && this.props.accounts[this.serviceType].loading.transfer) ? (
                 <ActivityIndicator size="small" />
               ) : (
                 <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
@@ -608,8 +624,24 @@ class SendConfirmation_updated extends Component<
           </View>
         </ScrollView>
         <BottomSheet
-          onCloseStart={() => {}}
+          onCloseStart={() => {
+            if (this.refs.SendSuccessBottomSheet as any)
+                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+
+                this.props.clearTransfer(this.serviceType);
+                navigation.navigate('Accounts', {
+                  serviceType: this.serviceType,
+                  index:
+                    this.serviceType === TEST_ACCOUNT
+                      ? 0
+                      : this.serviceType === REGULAR_ACCOUNT
+                      ? 1
+                      : 2,
+                  spendableBalance: this.spendableBalance - totalAmount,
+                });
+          }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'SendSuccessBottomSheet'}
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
@@ -656,11 +688,11 @@ class SendConfirmation_updated extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                if (this.refs.SendSuccessBottomSheet as any)
-                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-                navigation.navigate('Accounts');
-              }}
+              // onPressHeader={() => {
+              //   if (this.refs.SendSuccessBottomSheet as any)
+              //     (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+              //   navigation.navigate('Accounts');
+              // }}
             />
           )}
         />
@@ -670,12 +702,13 @@ class SendConfirmation_updated extends Component<
             (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
           }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={'SendUnSuccessBottomSheet'}
           snapPoints={[-50, hp('65%')]}
           renderContent={() => (
             <SendConfirmationContent
               title={'Sent Unsuccessful'}
-              info={'There seems to be a problem'}
+              info={'Something went wrong, please try again'}
               userInfo={transfer.details ? transfer.details : []}
               isFromContact={false}
               okButtonText={'Try Again'}
@@ -696,10 +729,10 @@ class SendConfirmation_updated extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                if (this.refs.SendUnSuccessBottomSheet as any)
-                  (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              }}
+              // onPressHeader={() => {
+              //   if (this.refs.SendUnSuccessBottomSheet as any)
+              //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+              // }}
             />
           )}
         />

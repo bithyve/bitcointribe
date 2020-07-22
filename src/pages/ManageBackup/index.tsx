@@ -182,6 +182,7 @@ export default function ManageBackup(props) {
   ]);
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.sss.service);
+  let { trustedContactsInfo } = useSelector((state) => state.trustedContacts)
   // const { databaseSSS } = useSelector(state => state.storage);
   const [overallHealth, setOverallHealth] = useState(null);
   const health = useSelector((state) => state.sss.overallHealth);
@@ -269,7 +270,7 @@ export default function ManageBackup(props) {
             Health of the App
           </Text>
         </View>
-        <View style={styles.healthOfAppDivider}/>
+        <View style={styles.healthOfAppDivider} />
       </AppBottomSheetTouchableWrapper>
     );
   };
@@ -791,7 +792,6 @@ export default function ManageBackup(props) {
   };
 
   const setContactsFromAsync = async () => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setContacts(selectedContacts);
@@ -804,33 +804,6 @@ export default function ManageBackup(props) {
       }
       setPageData([...pageData]);
     }
-
-    // let contactList = JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-
-    // setContacts(contactList);
-    // if (contactList.length) {
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact1') !=
-    //     -1
-    //   ) {
-    //     pageData[1].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact1')
-    //       ];
-    //   }
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact2') !=
-    //     -1
-    //   ) {
-    //     pageData[2].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact2')
-    //       ];
-    //   }
-    // }
-    // setPageData([...pageData]);
   };
 
   const setAutoHighlightFlagsFromAsync = async () => {
@@ -1386,10 +1359,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
@@ -1399,10 +1372,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
@@ -1412,10 +1385,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
@@ -1425,10 +1398,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
@@ -1438,10 +1411,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
@@ -1451,10 +1424,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     return {

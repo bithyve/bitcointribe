@@ -24,7 +24,7 @@ import Styles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { trustedChannelsSync, updateAddressBookLocally } from '../store/actions/trustedContacts';
+import { trustedChannelsSync,removeTrustedContact, updateAddressBookLocally } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -52,7 +52,8 @@ interface AddressBookContentsPropTypes {
   trustedChannelsSyncing: any,
   updateAddressBookLocally: any,
   addressBookData: any,
-  trustedContactsInfo: any
+  trustedContactsInfo: any,
+  removeTrustedContact: any,
 }
 interface AddressBookContentsStateTypes {
   isLoadContacts: boolean,
@@ -154,7 +155,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   componentDidUpdate(prevProps) {
     const oldDerivativeAccounts = idx(prevProps, (_) => _.regularAccount.hdWallet.derivativeAccounts);
     const newDerivativeAccounts = idx(this.props, (_) => _.regularAccount.hdWallet.derivativeAccounts);
-    if (oldDerivativeAccounts !== newDerivativeAccounts) {
+    if (oldDerivativeAccounts !== newDerivativeAccounts || prevProps.trustedContactsService != this.props.trustedContactsService) {
       this.updateAddressBook();
     }
     if (this.state.trustedContact) {
@@ -297,34 +298,38 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
       <TouchableOpacity
         key={contact.id}
         onPress={() => {
-          navigation.navigate('ContactDetails', {
+          // navigation.navigate('ContactDetails', {
+          //   contactsType,
+          //   contact,
+          //   index,
+          //   shareIndex: contact.shareIndex,
+          // });
+          navigation.navigate('ContactDetailsNew', {
             contactsType,
             contact,
             index,
             shareIndex: contact.shareIndex,
           });
         }}
+        // onLongPress={() => {
+        //   this.props.removeTrustedContact(contact.contactName);
+        // }}
         style={styles.selectedContactsView}
       >
         {getImageIcon(contact)}
         <View>
           <Text style={styles.contactText}>
-            {contact.contactName &&
-              contact.contactName.split(' ')[0] &&
-              contact.contactName != 'Secondary Device'
-              ? contact.contactName.split(' ')[0]
-              : contact.contactName && contact.contactName == 'Secondary Device'
-                ? 'Keeper'
-                : ''}{' '}
+            {contact.firstName && contact.firstName != 'Secondary'
+              ? contact.firstName + ' '
+              : contact.firstName && contact.firstName == 'Secondary'
+              ? 'Keeper '
+              : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
-              {contact.contactName &&
-                contact.contactName.split(' ')[1] &&
-                contact.contactName != 'Secondary Device'
-                ? contact.contactName.split(' ')[1]
-                : contact.contactName &&
-                  contact.contactName == 'Secondary Device'
-                  ? 'Device'
-                  : ''}
+              {contact.lastName && contact.lastName != 'Device'
+                ? contact.lastName + ' '
+                : contact.lastName && contact.lastName == 'Device'
+                ? 'Device '
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -387,9 +392,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   };
@@ -532,6 +537,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           </ScrollView>
         </View>
         <BottomSheet
+        enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.AddContactAddressBookBottomSheet as any}
           snapPoints={[
@@ -543,6 +549,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.HelpBottomSheet as any}
           snapPoints={[
             -50,
@@ -567,7 +574,7 @@ const mapStateToProps = (state) => {
     trustedContactsInfo
   };
 };
-export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally })(AddressBookContents);
+export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally, removeTrustedContact })(AddressBookContents);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
