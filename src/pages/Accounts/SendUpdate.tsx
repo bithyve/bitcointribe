@@ -842,7 +842,11 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           hp('89%'),
           // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
-        renderContent={() => (<SendHelpContents />)}
+        renderContent={() => (<SendHelpContents 
+          titleClicked={()=>{
+            if (this.refs.SendHelperBottomSheet)
+                  (this.refs.SendHelperBottomSheet as any).snapTo(0);
+          }}/>)}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.blue}

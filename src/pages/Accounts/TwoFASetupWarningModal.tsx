@@ -49,7 +49,7 @@ export default function TwoFASetupWarningModal(props) {
                 Ok, I understand
               </Text>
             </AppBottomSheetTouchableWrapper>
-            <AppBottomSheetTouchableWrapper
+            {/* <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressManageBackup()}
               style={{
                 ...styles.confirmButtonView,
@@ -58,7 +58,7 @@ export default function TwoFASetupWarningModal(props) {
               }}
             >
               <Text style={styles.manageBackupButtonText}>Manage Backup</Text>
-            </AppBottomSheetTouchableWrapper>
+            </AppBottomSheetTouchableWrapper> */}
           </View>
         </View>
     </View>

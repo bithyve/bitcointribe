@@ -779,7 +779,13 @@ export default function Receive(props) {
           -50,
           hp('89%'),
         ]}
-        renderContent={() => <ReceiveHelpContents />}
+        renderContent={() =>
+          (<ReceiveHelpContents 
+      titleClicked={()=>{
+        if (ReceiveHelperBottomSheet.current)
+              (ReceiveHelperBottomSheet as any).current.snapTo(0);
+      }}/>)
+        }
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.blue}
@@ -807,6 +813,7 @@ export default function Receive(props) {
             onPressBack={() => {
               setTimeout(() => {
                 setAsTrustedContact(!AsTrustedContact);
+                setSelectedContact({});
               }, 2);
               (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}}
           />
@@ -881,7 +888,7 @@ export default function Receive(props) {
           <SendViaQR
             isFromReceive={true}
             headerText={'QR'}
-            subHeaderText={'Scan bitcoin address'}
+            subHeaderText={'Scan QR for contact request'}
             contactText={'Adding to Friends and Family:'}
             contact={!isEmpty(selectedContact) ? selectedContact : null}
             amount={amount === '' ? null : amount}
@@ -915,7 +922,7 @@ export default function Receive(props) {
         ]}
         renderContent={() => <TwoFASetupWarningModal
           onPressOk={() => onPressOkOf2FASetupWarning()}
-          onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+          //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
         />}
         renderHeader={() => (
           <SmallHeaderModal
@@ -1139,5 +1146,11 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-  }
+  },
+  TwoFAWarningView: {
+    height: '100%',
+    alignItems: 'center',
+    marginTop: hp('2%'),
+    flex: 1,
+  },
 });
