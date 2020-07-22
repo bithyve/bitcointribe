@@ -215,12 +215,14 @@ function* updateEphemeralChannelWorker({ payload }) {
   const { contactInfo, data, fetch } = payload;
 
   let generatedKey = false;
-  if (!contactInfo.info && contactInfo.contactName == 'Secondary Device') {
+  if (
+    !contactInfo.info &&
+    contactInfo.contactName == 'Secondary Device'.toLowerCase()
+  ) {
     // contact info = null, for secondary device (initially)
     contactInfo.info = SSS.generateKey(SSS.cipherSpec.keyLength);
     generatedKey = true;
   }
-
   let encKey;
   if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
 
@@ -230,6 +232,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     data,
     encKey,
     fetch,
+    payload.shareUploadables,
   );
 
   if (generatedKey) {
@@ -388,13 +391,14 @@ function* updateTrustedChannelWorker({ payload }) {
   );
 
   const { contactInfo, data, fetch } = payload;
-
   const res = yield call(
     trustedContacts.updateTrustedChannel,
     contactInfo.contactName,
     data,
     fetch,
+    payload.shareUploadables,
   );
+
   if (res.status === 200) {
     const { updated, data } = res.data;
     yield put(trustedChannelUpdated(contactInfo.contactName, updated, data));
