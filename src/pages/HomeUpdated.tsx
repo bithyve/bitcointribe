@@ -2319,6 +2319,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              infoBoxInfoText={''}
               isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}

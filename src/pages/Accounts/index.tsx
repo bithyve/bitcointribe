@@ -653,7 +653,9 @@ export default function Accounts(props) {
   }
 
   const renderTransactionsContent = () => {
+    const infoBoxInfoText = 'All your recent transactions for the '+getAccountNameFromType()+' will appear here.';
     return <TransactionsContent
+      infoBoxInfoText={infoBoxInfoText}
       isFromAccount={true}
       transactionLoading={transactionLoading}
       transactions={transactions}

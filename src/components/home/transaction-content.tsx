@@ -29,7 +29,8 @@ const TransactionsContent = ({
   setTransactionItem,
   setTabBarZIndex,
   transactionLoading,
-  isFromAccount
+  isFromAccount,
+  infoBoxInfoText
 }) => {
   if (transactionLoading) {
     return (
@@ -83,7 +84,7 @@ const TransactionsContent = ({
             <Text
               style={styles.textNote}
             >
-              All your recent transactions across the accounts appear here
+              {infoBoxInfoText ? infoBoxInfoText :'All your recent transactions across the accounts appear here'}
             </Text>
           </View>
         </View>
@@ -212,7 +213,7 @@ const TransactionsContent = ({
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                All your recent transactions across the accounts appear here
+                {infoBoxInfoText ? infoBoxInfoText :'All your recent transactions across the accounts appear here'}
               </Text>
             </View>
           )}
@@ -242,7 +243,7 @@ const TransactionsContent = ({
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
-              All your recent transactions across the accounts appear here
+              {infoBoxInfoText ? infoBoxInfoText :'All your recent transactions across the accounts appear here'}
             </Text>
           </View>
         </View>

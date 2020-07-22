@@ -828,6 +828,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     };
   };
 
+  getAccountNameFromType = () =>{
+    if(this.state.serviceType==TEST_ACCOUNT) return "Test Account";
+    else if(this.state.serviceType==REGULAR_ACCOUNT) return "Checking Account";
+    else return "Savings Account";
+  }
+
   render() {
     const {
       serviceType,
@@ -1375,8 +1381,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   : hp('60%'),
               ]}
               renderContent={() => {
+                const infoBoxInfoText = 'All your recent transactions for the '+this.getAccountNameFromType()+' will appear here.';
                 return (
                   <TransactionsContent
+                    infoBoxInfoText={infoBoxInfoText}
                     isFromAccount={true}
                     transactionLoading={transactionLoading}
                     transactions={transactions}
