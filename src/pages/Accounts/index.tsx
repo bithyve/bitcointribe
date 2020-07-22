@@ -646,8 +646,16 @@ export default function Accounts(props) {
     };
   };
 
+  const getAccountNameFromType = () =>{
+    if(serviceType==TEST_ACCOUNT) return "Test Account";
+    else if(serviceType==REGULAR_ACCOUNT) return "Checking Account";
+    else return "Savings Account";
+  }
+
   const renderTransactionsContent = () => {
+    const infoBoxInfoText = 'All your recent transactions for the '+getAccountNameFromType()+' will appear here.';
     return <TransactionsContent
+      infoBoxInfoText={infoBoxInfoText}
       isFromAccount={true}
       transactionLoading={transactionLoading}
       transactions={transactions}
@@ -711,7 +719,11 @@ export default function Accounts(props) {
       //       (TestAccountHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <TestAccountHelpContents />
+      <TestAccountHelpContents 
+      titleClicked={()=>{
+        if (TestAccountHelperBottomSheet.current)
+              (TestAccountHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   };
   const renderTestAccountsHelperHeader = () => {
@@ -751,7 +763,11 @@ export default function Accounts(props) {
       //       (SecureAccountHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <SavingsAccountHelpContents />
+      <SavingsAccountHelpContents 
+      titleClicked={()=>{
+        if (SecureAccountHelperBottomSheet.current)
+              (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   }, []);
 
@@ -791,7 +807,11 @@ export default function Accounts(props) {
       //       (RegularAccountHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <CheckingAccountHelpContents />
+      <CheckingAccountHelpContents 
+      titleClicked={()=>{
+        if (RegularAccountHelperBottomSheet.current)
+              (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   }, []);
 
@@ -852,7 +872,11 @@ export default function Accounts(props) {
       //     (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <TransactionHelperModalContents />
+      <TransactionHelperModalContents 
+      titleClicked={()=>{
+        if (TransactionDetailsHelperBottomSheet.current)
+        (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   };
   const renderHelperHeader = () => {
@@ -1190,8 +1214,8 @@ export default function Accounts(props) {
             >
               <View>
               <View style={{ flexDirection: 'row', marginLeft: 30,
-                    marginRight: 20, }}>
-                <Text style={{ ...styles.cardAmountText, color: Colors.textColorGrey, fontSize: RFValue(13) }}>
+                    marginRight: 20, alignItems: 'flex-end' }}>
+                <Text style={{ fontFamily: Fonts.FiraSansItalic, color: Colors.blue, fontSize: RFValue(13) }}>
                   Available to spend:{' '}
                   {serviceType == TEST_ACCOUNT
                     ? UsNumberFormat(spendableBalance)
@@ -1204,11 +1228,11 @@ export default function Accounts(props) {
                       ).toFixed(2)
                     : null}
                 </Text>
-                <Text style={{...styles.cardAmountUnitText, color: Colors.textColorGrey}}>
+                <Text style={{fontFamily: Fonts.FiraSansMediumItalic, color: Colors.textColorGrey, fontSize: RFValue(10), marginBottom: 1}}>
                   {serviceType == TEST_ACCOUNT
-                    ? 't-sats'
+                    ? ' t-sats'
                     : switchOn
-                    ? 'sats'
+                    ? ' sats'
                     : CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>

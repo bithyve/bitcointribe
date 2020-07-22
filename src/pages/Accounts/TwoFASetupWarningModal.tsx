@@ -2,24 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
-  Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  SafeAreaView,
-  StatusBar,
-  AsyncStorage,
-  ImageBackground,
-  FlatList,
-  CheckBox,
-  ActivityIndicator,
-  Alert,
-  InteractionManager,
 } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import {
@@ -28,39 +12,8 @@ import {
 } from 'react-native-responsive-screen';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
-import BottomSheet from 'reanimated-bottom-sheet';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import BottomInfoBox from '../../components/BottomInfoBox';
-import ModalHeader from '../../components/ModalHeader';
-import AddContactAddressBook from '../Contacts/AddContactAddressBook';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import DeviceInfo from 'react-native-device-info';
-import { nameToInitials } from '../../common/CommonFunctions';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import SendViaQR from '../../components/SendViaQR';
-import SendViaLink from '../../components/SendViaLink';
-import Entypo from 'react-native-vector-icons/Entypo';
-import {
-  TEST_ACCOUNT,
-  SECURE_ACCOUNT,
-  REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes';
-import BackupStyles from '../ManageBackup/Styles';
-import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { fetchAddress } from '../../store/actions/accounts';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
-import {
-  EphemeralData,
-  TrustedContactDerivativeAccount,
-  TrustedContactDerivativeAccountElements,
-} from '../../bitcoin/utilities/Interface';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import config from '../../bitcoin/HexaConfig';
-import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import Loader from '../../components/loader';
 
 export default function TwoFASetupWarningModal(props) {
   return (
@@ -96,7 +49,7 @@ export default function TwoFASetupWarningModal(props) {
                 Ok, I understand
               </Text>
             </AppBottomSheetTouchableWrapper>
-            <AppBottomSheetTouchableWrapper
+            {/* <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressManageBackup()}
               style={{
                 ...styles.confirmButtonView,
@@ -105,7 +58,7 @@ export default function TwoFASetupWarningModal(props) {
               }}
             >
               <Text style={styles.manageBackupButtonText}>Manage Backup</Text>
-            </AppBottomSheetTouchableWrapper>
+            </AppBottomSheetTouchableWrapper> */}
           </View>
         </View>
     </View>

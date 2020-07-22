@@ -2319,6 +2319,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              infoBoxInfoText={''}
               isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}
@@ -3048,7 +3049,21 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+           onOpenEnd={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onOpenStart={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onCloseStart={() => {
+            this.setState({
+              tabBarIndex: 999,
+            });
+          }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}

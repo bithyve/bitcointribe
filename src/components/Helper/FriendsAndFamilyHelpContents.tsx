@@ -12,13 +12,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 export default function FriendsAndFamilyHelpContents(props) {
   return (
-    <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View
+      style={styles.modalContainer}>
+          <AppBottomSheetTouchableWrapper style={{ justifyContent: 'center', alignItems: 'center' }}
+             activeOpacity={10}
+             onPress={()=> props.titleClicked && props.titleClicked()}>
                 <Text
                     style={{
                         color: Colors.white,
@@ -30,7 +28,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 >
                     Recovery Key with Friends and Family
                 </Text>
-            </View>
+            </AppBottomSheetTouchableWrapper>
             <View
                 style={{
                 backgroundColor: Colors.homepageButtonColor,
@@ -40,15 +38,23 @@ export default function FriendsAndFamilyHelpContents(props) {
                 marginBottom: hp('1%'),
                 }}
             />
+      
+    <ScrollView
+        style={styles.modalContainer}
+        snapToInterval={hp('89%')}
+        decelerationRate='fast'
+    >
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
+            
             <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                You can send two of your five Recovery Keys{'\n'}to your Friends and Family chosen using{'\n'}your Address Book. You can then either send{'\n'}them a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
+                You can send two of your five Recovery Keys{'\n'}to your Friends and Family chosen from{'\n'}your Address Book. You can then either share{'\n'}a QR code or a link so they can open{'\n'}Hexa and act as your Keeper
             </Text>
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
@@ -60,11 +66,11 @@ export default function FriendsAndFamilyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                Recovery Keys are sent through secure, encrypted{'\n'}channels, most frequently used in Internet{'\n'}communication. These channels are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information,{'\n'}and are called ECDH channels.
+                Recovery Keys are sent through secure, encrypted{'\n'}channels, most frequently used in Internet{'\n'}communications. These channels are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information,{'\n'}and are called ECDH channels.
                 {/* Recovery Keys are sent through ECDH channels,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt information */}
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -85,7 +91,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -101,7 +107,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -109,6 +115,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             </Text>
         </View>
     </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -117,7 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
+    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,

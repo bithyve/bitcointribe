@@ -3,6 +3,7 @@ import {
   TrustedDataElements,
   EphemeralDataElements,
   trustedChannelActions,
+  ShareUploadables,
 } from '../../bitcoin/utilities/Interface';
 
 import { createAction } from 'redux-actions';
@@ -60,10 +61,18 @@ export const updateEphemeralChannel = (
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
+  shareUploadables?: ShareUploadables,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactInfo, data, fetch, trustedContacts, uploadXpub },
+    payload: {
+      contactInfo,
+      data,
+      fetch,
+      trustedContacts,
+      uploadXpub,
+      shareUploadables,
+    },
   };
 };
 
@@ -82,10 +91,11 @@ export const updateTrustedChannel = (
   contactInfo: { contactName: string; info: string },
   data: TrustedDataElements,
   fetch?: Boolean,
+  shareUploadables?: ShareUploadables,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactInfo, data, fetch },
+    payload: { contactInfo, data, fetch, shareUploadables },
   };
 };
 

@@ -84,9 +84,8 @@ const SecurityQuestionHistory = props => {
           saveConfirmationHistory();
           setTimeout(() => {
             (SecurityQuestionBottomSheet as any).current.snapTo(0);
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
           }, 2);
-          
+          (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
     );
@@ -95,9 +94,9 @@ const SecurityQuestionHistory = props => {
   const renderSecurityQuestionHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (SecurityQuestionBottomSheet as any).current.snapTo(0);
-        // }}
+        onPressHeader={() => {
+          (SecurityQuestionBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -208,7 +207,11 @@ const SecurityQuestionHistory = props => {
 
   const renderHelpContent = () => {
     return(
-      <SecurityQuestionHelpContents />
+      <SecurityQuestionHelpContents 
+      titleClicked={()=>{
+        if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   }
 
@@ -308,7 +311,6 @@ const SecurityQuestionHistory = props => {
         />
       </View>
       <BottomSheet
-         enabledGestureInteraction={false}
          enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}

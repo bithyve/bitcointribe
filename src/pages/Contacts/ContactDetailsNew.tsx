@@ -747,9 +747,9 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
   SendModalFunction = () => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (this.shareBottomSheet as any).current.snapTo(0);
-        // }}
+        onPressHeader={() => {
+          (this.shareBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   };
@@ -1141,6 +1141,9 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
               ) : null}
             </View>
           )}
+          {this.Contact.isRemovable &&
+          Date.now() - this.Contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+          !this.Contact.hasTrustedChannel ? (
           <TouchableOpacity
           style={{
             ...styles.bottomButton,
@@ -1154,6 +1157,7 @@ class ContactDetailsNew extends PureComponent<ContactDetailsPropTypes, ContactDe
             <Text style={styles.buttonText}>Remove</Text>
           </View>
         </TouchableOpacity>
+        ) : null}
         </View>
         <BottomSheet
           enabledInnerScrolling={true}

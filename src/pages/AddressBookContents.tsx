@@ -255,7 +255,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             imKeepers.push(element);
           }
           if (!element.isWard && !element.isGuardian) {
-            otherTrustedContact.push(element);
+            otherTrustedContact.push({ ...element, isRemovable: true });
           }
         }
         this.setState({
@@ -287,10 +287,65 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   };
 
   renderHelpContent = () => {
-    return (
-      <AddressBookHelpContents />
-    );
-  }
+    return <AddressBookHelpContents 
+    titleClicked={()=>{
+      if (this.HelpBottomSheet.current)
+            (this.HelpBottomSheet as any).current.snapTo(0);
+    }}/>
+  };
+
+  getImageIcon = (item) => {
+    if (item) {
+      if (item.image && item.image.uri) {
+        return (
+          <Image
+            source={item.image}
+            style={{
+              width: wp('12%'),
+              height: wp('12%'),
+              borderRadius: wp('12%') / 2,
+              resizeMode: 'contain',
+            }}
+          />
+        );
+      } else {
+        return (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: Colors.shadowBlue,
+              width: wp('12%'),
+              height: wp('12%'),
+              borderRadius: wp('12%') / 2,
+            }}
+          >
+            <Text
+              style={{
+                textAlign: 'center',
+                fontSize: 13,
+                lineHeight: 13,
+              }}
+            >
+              {item
+                ? nameToInitials(
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
+                      ? item.firstName + ' ' + item.lastName
+                      : item.firstName && !item.lastName
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
+                : ''}
+            </Text>
+          </View>
+        );
+      }
+    }
+  };
 
   getElement = (contact, index, contactsType) => {
     const { navigation } = this.props;
@@ -392,9 +447,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   };

@@ -7,6 +7,7 @@ import {
   EphemeralData,
   EncryptedEphemeralData,
   trustedChannelActions,
+  ShareUploadables,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -314,6 +315,7 @@ export default class TrustedContacts {
     dataElements: EphemeralDataElements,
     encKey: string,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         updated: any;
@@ -381,12 +383,26 @@ export default class TrustedContacts {
           };
         }
 
-        res = await BH_AXIOS.post('updateEphemeralChannel', {
-          HEXA_ID,
-          address: ephemeralChannel.address,
-          data: encryptedDataPacket,
-          fetch,
-        });
+        if (shareUploadables && Object.keys(shareUploadables).length) {
+          res = await BH_AXIOS.post('updateShareAndEC', {
+            // EC update params
+            HEXA_ID,
+            address: ephemeralChannel.address,
+            data: encryptedDataPacket,
+            fetch,
+            // upload share params
+            share: shareUploadables.encryptedMetaShare,
+            messageId: shareUploadables.messageId,
+            encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+          });
+        } else {
+          res = await BH_AXIOS.post('updateEphemeralChannel', {
+            HEXA_ID,
+            address: ephemeralChannel.address,
+            data: encryptedDataPacket,
+            fetch,
+          });
+        }
       }
 
       let { updated, initiatedAt, data } = res.data;
@@ -567,6 +583,7 @@ export default class TrustedContacts {
     contactName: string,
     dataElements: TrustedDataElements,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         updated: any;
@@ -599,7 +616,6 @@ export default class TrustedContacts {
         publicKey,
         data: dataElements,
       };
-
       const {
         updatedTrustedData,
         overallTrustedData,
@@ -615,12 +631,28 @@ export default class TrustedContacts {
         encryptedData,
       };
 
-      const res = await BH_AXIOS.post('updateTrustedChannel', {
-        HEXA_ID,
-        address: trustedChannel.address,
-        data: encryptedDataPacket,
-        fetch,
-      });
+      let res: AxiosResponse;
+      if (shareUploadables && Object.keys(shareUploadables).length) {
+        res = await BH_AXIOS.post('updateShareAndTC', {
+          // EC update params
+          HEXA_ID,
+          address: trustedChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+          // upload share params
+          share: shareUploadables.encryptedMetaShare,
+          messageId: shareUploadables.messageId,
+          encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+        });
+      } else {
+        res = await BH_AXIOS.post('updateTrustedChannel', {
+          HEXA_ID,
+          address: trustedChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+        });
+      }
+
       let { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
       this.trustedContacts[

@@ -23,13 +23,11 @@ export default function KeeperDeviceHelpContents(props) {
     }
 
   return (
-    <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <View
+    style={styles.modalContainer}>
+         <AppBottomSheetTouchableWrapper style={{ justifyContent: 'center', alignItems: 'center' }}
+            activeOpacity={10}
+            onPress={()=> props.titleClicked && props.titleClicked()}>
                 <Text
                     style={{
                         color: Colors.white,
@@ -41,7 +39,7 @@ export default function KeeperDeviceHelpContents(props) {
                 >
                     Recovery Keys on a Keeper Device
                 </Text>
-            </View>
+            </AppBottomSheetTouchableWrapper>
             <View
                 style={{
                 backgroundColor: Colors.homepageButtonColor,
@@ -51,11 +49,18 @@ export default function KeeperDeviceHelpContents(props) {
                 marginBottom: hp('1%'),
                 }}
             />
+    <ScrollView
+        style={styles.modalContainer}
+        snapToInterval={hp('89%')}
+        decelerationRate='fast'
+    >
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
+           
             <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -71,11 +76,11 @@ export default function KeeperDeviceHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
-                If your Keeper Device is not accessible, it is{'\n'}possible to restore it from your primary device{'\n'}and another keeper.
+                If your Keeper Device is not accessible, it is{'\n'}possible to restore it using your primary device{'\n'}and one of your Keepers.
             </Text>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View
@@ -95,7 +100,7 @@ export default function KeeperDeviceHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -111,7 +116,7 @@ export default function KeeperDeviceHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -123,7 +128,7 @@ export default function KeeperDeviceHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -140,7 +145,7 @@ export default function KeeperDeviceHelpContents(props) {
                     style={{
                         color: Colors.white,
                         // textAlign: 'center',
-                        fontSize: RFValue(12),
+                        fontSize: RFValue(13),
                         fontFamily: Fonts.FiraSansRegular,
                     }}
                 >
@@ -150,7 +155,7 @@ export default function KeeperDeviceHelpContents(props) {
                     <Text
                         style={{
                             color: Colors.white,
-                            fontSize: RFValue(12),
+                            fontSize: RFValue(13),
                             fontFamily: Fonts.FiraSansRegular,
                             textDecorationLine: 'underline',
                             textAlign: 'center',
@@ -162,6 +167,7 @@ export default function KeeperDeviceHelpContents(props) {
             </View>
         </View>
     </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -170,7 +176,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
+    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
