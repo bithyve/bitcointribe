@@ -552,10 +552,10 @@ export default function ContactDetails(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaLinkBottomSheet.current)
-        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -583,10 +583,10 @@ export default function ContactDetails(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaQRBottomSheet.current)
-        //     (SendViaQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -614,10 +614,10 @@ export default function ContactDetails(props) {
   const renderExitKeyQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (ExitKeyQRBottomSheet.current)
-        //     (ExitKeyQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (ExitKeyQRBottomSheet.current)
+      //     (ExitKeyQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -641,9 +641,9 @@ export default function ContactDetails(props) {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -673,9 +673,9 @@ export default function ContactDetails(props) {
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ReshareBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ReshareBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -953,9 +953,9 @@ export default function ContactDetails(props) {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (shareBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (shareBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -1288,19 +1288,23 @@ export default function ContactDetails(props) {
             ) : null}
           </View>
         )}
-        <TouchableOpacity
-          style={{
-            ...styles.bottomButton,
-          }}
-          onPress={() => {
-            dispatch(removeTrustedContact(contact.contactName));
-            props.navigation.goBack();
-          }}
-        >
-          <View>
-            <Text style={styles.buttonText}>Remove</Text>
-          </View>
-        </TouchableOpacity>
+        {Contact.isRemovable &&
+        Date.now() - Contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+        !Contact.hasTrustedChannel ? (
+          <TouchableOpacity
+            style={{
+              ...styles.bottomButton,
+            }}
+            onPress={() => {
+              dispatch(removeTrustedContact(contact.contactName));
+              props.navigation.goBack();
+            }}
+          >
+            <View>
+              <Text style={styles.buttonText}>Remove</Text>
+            </View>
+          </TouchableOpacity>
+        ) : null}
       </View>
       <BottomSheet
         enabledGestureInteraction={false}

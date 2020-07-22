@@ -309,9 +309,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        // }}
+        onPressHeader={() => {
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -526,7 +526,11 @@ const SecondaryDeviceHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <KeeperDeviceHelpContents />;
+    return <KeeperDeviceHelpContents
+    titleClicked={()=> {
+      if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+    }}/>;
   };
 
   if (isErrorSendingFailed) {
@@ -660,7 +664,6 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceBottomSheet.current as any).snapTo(0);
         }}
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet as any}
         snapPoints={[-30, hp('85%')]}

@@ -348,6 +348,46 @@ export default function Send(props) {
     }
   };
 
+  const renderSendHelperContents = () => {
+    return (
+      // <TestAccountHelperModalContents
+      //   topButtonText={`Sending Bitcoins`}
+      //   image={require('../../assets/images/icons/send.png')}
+      //   helperInfo={`When you want to send bitcoins or sats, you need the recipient’s bitcoin address\n\nYou can scan this address as a QR code or copy it from the recipient`}
+      //   continueButtonText={'Ok, got it'}
+      //   onPressContinue={() => {
+      //     if (SendHelperBottomSheet.current)
+      //       (SendHelperBottomSheet as any).current.snapTo(0);
+      //   }}
+      // />
+      <SendHelpContents 
+      titleClicked={()=>{
+        if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(0);
+      }}/>
+    );
+  };
+  const renderSendHelperHeader = () => {
+    return (
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          if (isSendHelperDone) {
+            if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(1);
+            setTimeout(() => {
+              setIsSendHelperDone(false);
+            }, 10);
+          } else {
+            if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(0);
+          }
+        }}
+      />
+    );
+  };
+
   useEffect(() => {
     const { type } = service.addressDiff(recipientAddress.trim());
     if (type) {
@@ -866,7 +906,13 @@ export default function Send(props) {
           hp('89%'),
           // Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
-        renderContent={() => <SendHelpContents />}
+        renderContent={() => {
+          <SendHelpContents 
+      titleClicked={()=>{
+        if (SendHelperBottomSheet.current)
+              (SendHelperBottomSheet as any).current.snapTo(0);
+      }}/>
+        }}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.blue}

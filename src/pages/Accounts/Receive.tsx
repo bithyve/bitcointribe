@@ -598,7 +598,7 @@ export default function Receive(props) {
       <SendViaQR
         isFromReceive={true}
         headerText={'QR'}
-        subHeaderText={'Scan bitcoin address'}
+        subHeaderText={'Scan QR for contact request'}
         contactText={'Adding to Friends and Family:'}
         contact={!isEmpty(selectedContact) ? selectedContact : null}
         amount={amount === '' ? null : amount}
@@ -648,7 +648,11 @@ export default function Receive(props) {
       //     }
       //   }}
       // />
-      <ReceiveHelpContents />
+      <ReceiveHelpContents 
+      titleClicked={()=>{
+        if (ReceiveHelperBottomSheet.current)
+              (ReceiveHelperBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   }, [serviceType]);
 
@@ -1263,11 +1267,36 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
-  confirmButtonView: {
+  TwoFAWarningButtonView: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    flexDirection: 'row',
+    marginTop: hp('1%'),
+    marginBottom: hp('2%'),
+    marginLeft: hp('2%'),
+  },
+  TwoFAWarningButton: {
     width: wp('40%'),
     height: wp('13%'),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
+    backgroundColor: Colors.blue,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    marginRight: 5,
+    shadowOffset: { width: 15, height: 15 },
+  },
+  TwoFAWarningButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  TwoFAWarningView: {
+    height: '100%',
+    alignItems: 'center',
+    marginTop: hp('2%'),
+    flex: 1,
   },
 });

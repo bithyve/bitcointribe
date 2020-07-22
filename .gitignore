@@ -64,3 +64,4 @@ buck-out/
 .env*
 env*
 !.env.example
+ios/Podfile.lock

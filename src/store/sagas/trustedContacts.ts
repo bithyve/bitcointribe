@@ -381,6 +381,8 @@ export const fetchEphemeralChannelWatcher = createWatcher(
 );
 
 function* updateTrustedChannelWorker({ payload }) {
+  yield put(switchTCLoading('updateTrustedChannel'));
+
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
@@ -405,6 +407,7 @@ function* updateTrustedChannelWorker({ payload }) {
   } else {
     console.log(res.err);
   }
+  yield put(switchTCLoading('updateTrustedChannel'));
 }
 
 export const updateTrustedChannelWatcher = createWatcher(
