@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   View,
@@ -44,8 +44,13 @@ import config from '../bitcoin/HexaConfig';
 import KnowMoreButton from '../components/KnowMoreButton';
 import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddressBookHelpContents from '../components/Helper/AddressBookHelpContents';
+// import CountDown from 'react-native-countdown-component';
+import CountDown from '../components/CountDown';
+import Config from '../bitcoin/HexaConfig';
 
 export default function AddressBookContents(props) {
+  const TC_REQUEST_EXPIRY = Config.TC_REQUEST_EXPIRY/1000;
+  const [updateList, setUpdateList] = useState(false);
   const [onRefresh, setOnRefresh] = useState(false);
   const [
     AddContactAddressBookBookBottomSheet,
@@ -261,7 +266,8 @@ export default function AddressBookContents(props) {
     }
   };
 
-  const getElement = (contact, index, contactsType) => {
+  const getElement = useCallback((contact, index, contactsType) => {
+    var minute = TC_REQUEST_EXPIRY-((Date.now() - contact.initiatedAt)/1000);
     return (
       <TouchableOpacity
         key={contact.id}
@@ -307,7 +313,9 @@ export default function AddressBookContents(props) {
           }}
         >
           {!contact.hasXpub && (
-            <View
+            Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+              !contact.hasTrustedChannel ? 
+              (<View
               style={{
                 width: wp('15%'),
                 height: wp('6%'),
@@ -325,12 +333,28 @@ export default function AddressBookContents(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                {Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                !contact.hasTrustedChannel
-                  ? 'Expired'
-                  : 'Pending'}
+                Expired
               </Text>
-            </View>
+            </View>)
+            :
+            <CountDown
+              onFinish={()=>setUpdateList(!updateList)}
+              id={index}
+              size={12}
+              until={minute}
+              digitStyle={{
+                backgroundColor: '#FFF',
+                borderWidth: 0,
+                borderColor: '#FFF',
+                margin: -10,
+              }}
+              digitTxtStyle={{ color: Colors.textColorGrey, fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular, }}
+              separatorStyle={{ color: Colors.textColorGrey, }}
+              timeToShow={['H', 'M', 'S']}
+              timeLabels={{ h: null, m: null, s: null }}
+              showSeparator
+            />
           )}
           <View
             style={{
@@ -354,7 +378,7 @@ export default function AddressBookContents(props) {
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [updateList, MyKeeper, IMKeeper, OtherTrustedContact]);
 
   const getWaterMark = () => {
     return (
@@ -644,19 +668,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-  },
-  shareButtonView: {
-    height: wp('7%'),
-    width: wp('18%'),
-    backgroundColor: Colors.backgroundColor,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 5,
-    marginLeft: 'auto',
-    marginRight: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
   },
   pageTitle: {
     marginLeft: 30,
