@@ -44,7 +44,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -60,7 +60,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -70,7 +70,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -94,7 +94,7 @@ export default function FriendsAndFamilyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -110,7 +110,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -120,7 +120,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -130,7 +130,7 @@ export default function FriendsAndFamilyHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
+    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
