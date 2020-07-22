@@ -73,7 +73,7 @@ export default function SavingsAccountHelpContents(props) {
             style={{
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(12),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
@@ -96,7 +96,7 @@ export default function SavingsAccountHelpContents(props) {
             style={{
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(12),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
@@ -129,7 +129,7 @@ export default function SavingsAccountHelpContents(props) {
             style={{
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(12),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -145,7 +145,7 @@ export default function SavingsAccountHelpContents(props) {
             style={{
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(12),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
@@ -166,7 +166,7 @@ export default function SavingsAccountHelpContents(props) {
             style={{
               textAlign: 'center',
               color: Colors.white,
-              fontSize: RFValue(12),
+              fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -182,7 +182,7 @@ export default function SavingsAccountHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -202,7 +202,7 @@ export default function SavingsAccountHelpContents(props) {
               style={{
                 color: Colors.white,
                 // textAlign: 'center',
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
@@ -217,7 +217,7 @@ export default function SavingsAccountHelpContents(props) {
               <Text
                 style={{
                   color: Colors.white,
-                  fontSize: RFValue(12),
+                  fontSize: RFValue(13),
                   fontFamily: Fonts.FiraSansRegular,
                   textDecorationLine: 'underline',
                   textAlign: 'center',
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
+    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,

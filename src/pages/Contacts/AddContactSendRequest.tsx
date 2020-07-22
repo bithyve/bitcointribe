@@ -67,7 +67,9 @@ export default function AddContactSendRequest(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
-
+  function isEmpty(obj) {
+    return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+  }
   const updateTrustedContactsInfo = async (contact) => {
     let trustedContactsInfo: any = await AsyncStorage.getItem(
       'TrustedContactsInfo',
@@ -291,13 +293,14 @@ export default function AddContactSendRequest(props) {
   };
 
   const renderSendViaLinkContents = useCallback(() => {
+    if (!isEmpty(Contact)) {
     return (
       <SendViaLink
         isFromReceive={true}
         headerText={'Share'}
         subHeaderText={'Send to your contact'}
         contactText={'Adding to Friends and Family:'}
-        contact={Contact}
+        contact={Contact ? Contact : null}
         infoText={`Click here to accept contact request from ${
           WALLET_SETUP.walletName
         } Hexa wallet - link will expire in ${
@@ -314,7 +317,8 @@ export default function AddContactSendRequest(props) {
           openTimer();
         }}
       />
-    );
+    )
+      }
   }, [Contact, trustedLink]);
 
   const renderSendViaLinkHeader = useCallback(() => {

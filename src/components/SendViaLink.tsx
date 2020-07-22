@@ -31,6 +31,7 @@ export default function SendViaLink(props) {
 
   const [shareLink, setShareLink] = useState('');
   const [infoText, setInfoText] = useState('');
+  const [stateUpdate, setStateUpdate] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
   const [dropdownBoxList, setDropdownBoxList] = useState([
     {
@@ -108,10 +109,13 @@ export default function SendViaLink(props) {
         if (shareApps[i].url) {
           let supported = await Linking.canOpenURL(shareApps[i].url);
           shareApps[i].isAvailable = supported;
-          ////console.log("supported", supported);
+         //// console.log("supported", supported,shareApps);
         }
       }
+      setTimeout(() => {  
       setShareApps(shareApps);
+      }, 2);
+      setStateUpdate(!stateUpdate);
     })();
   }, [contact]);
 

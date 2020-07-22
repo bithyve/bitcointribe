@@ -69,6 +69,7 @@ class App extends Component {
             );  
             if (
               currentScreen != 'Login' &&
+              currentScreen != 'Home' &&
               currentScreen != 'Launch' &&
               currentScreen != 'ReLogin' && !isInternetModalCome
             ) {

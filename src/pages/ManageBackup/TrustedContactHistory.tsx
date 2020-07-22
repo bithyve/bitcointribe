@@ -1140,9 +1140,9 @@ const TrustedContactHistory = (props) => {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-      // onPressHeader={() => {
-      //   (shareBottomSheet as any).current.snapTo(0);
-      // }}
+      onPressHeader={() => {
+        (shareBottomSheet as any).current.snapTo(0);
+      }}
       />
     );
   }, []);
@@ -1452,7 +1452,6 @@ const TrustedContactHistory = (props) => {
         renderHeader={renderErrorModalHeader}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={shareBottomSheet as any}
         snapPoints={[
