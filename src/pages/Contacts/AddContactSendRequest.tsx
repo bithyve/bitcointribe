@@ -358,7 +358,6 @@ export default function AddContactSendRequest(props) {
     return (
       <TimerModalContents
         renderTimer={renderTimer}
-        onTimerFinish={() => onContinueWithTimer()}
         onPressContinue={() => onContinueWithTimer()}
       />
     );
@@ -677,8 +676,8 @@ export default function AddContactSendRequest(props) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('46%')
-              : hp('46%'),
+              ? hp('30%')
+              : hp('35%'),
           ]}
           renderContent={renderTimerModalContents}
           renderHeader={renderTimerModalHeader}
