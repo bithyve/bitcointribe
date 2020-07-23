@@ -264,18 +264,22 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(12),
               }}
             >
-              To Address
+              {txDetails.recipientAddresses.length > 1
+                ? 'To Addresses'
+                : 'To Address'}
             </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {txDetails.recipientAddresses[0]}
-            </Text>
+            {txDetails.recipientAddresses.map((address) => (
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginTop: hp('0.5%'),
+                }}
+              >
+                {address}
+              </Text>
+            ))}
           </View>
         ) : null}
         {txDetails.senderAddresses ? (
@@ -287,18 +291,22 @@ export default function TransactionDetails(props) {
                 fontSize: RFValue(12),
               }}
             >
-              From Address
+              {txDetails.senderAddresses.length > 1
+                ? 'From Addresses'
+                : 'From Address'}
             </Text>
-            <Text
-              style={{
-                color: Colors.textColorGrey,
-                fontFamily: Fonts.FiraSansRegular,
-                fontSize: RFValue(12),
-                marginTop: hp('0.5%'),
-              }}
-            >
-              {txDetails.senderAddresses[0]}
-            </Text>
+            {txDetails.senderAddresses.map((address) => (
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                  fontSize: RFValue(12),
+                  marginTop: hp('0.5%'),
+                }}
+              >
+                {address}
+              </Text>
+            ))}
           </View>
         ) : null}
         <View style={styles.infoCardView}>

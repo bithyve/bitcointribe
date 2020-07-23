@@ -64,7 +64,7 @@ export default function SavingsAccountHelpContents(props) {
         <View
           style={{
             height: hp('89%'),
-            justifyContent: 'space-between',
+            
             paddingBottom: hp('6%'),
             marginTop: hp('1%'),
           }}
@@ -82,12 +82,12 @@ export default function SavingsAccountHelpContents(props) {
             Savings Account{'\n'}requires 2FA confirmation to authorise{'\n'}
             spending. The 2FA code must be retrieved{'\n'}from the Keeper App
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center',  marginTop: hp('5%'), marginBottom: hp('5%') }}>
             <Image
               source={require('../../assets/images/icons/savings_account_info_1.png')}
               style={{
                 width: wp('90%'),
-                height: wp('90%'),
+                height: wp('70%'),
                 resizeMode: 'contain',
               }}
             />
@@ -104,7 +104,7 @@ export default function SavingsAccountHelpContents(props) {
             the Checking Account.{'\n'}This is in part, due to the requirement
             of {'\n'}2FA confirmation to confirm spending
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center',marginTop: hp('7%') }}>
             <View
               style={{
                 borderStyle: 'dotted',
@@ -120,7 +120,7 @@ export default function SavingsAccountHelpContents(props) {
         <View
           style={{
             height: hp('89%'),
-            justifyContent: 'space-between',
+            
             paddingTop: hp('2%'),
             paddingBottom: hp('6%'),
           }}
@@ -138,7 +138,7 @@ export default function SavingsAccountHelpContents(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/savings_account_info_1.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('90%'), height: wp('70%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -156,10 +156,7 @@ export default function SavingsAccountHelpContents(props) {
         </View>
         <View
           style={{
-            height: hp('89%'),
-            justifyContent: 'space-between',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
+            height: hp('89%'),paddingTop: hp('2%'),
           }}
         >
           <Text
@@ -172,10 +169,10 @@ export default function SavingsAccountHelpContents(props) {
             >
                 The Savings Account is a 2-of-3 multi signature{'\n'}account where you hold two keys (one on this{'\n'}device, the other on your Keeper device), and{'\n'}BitHyve holds one key. The key held on the{'\n'}Keeper device can be used to migrate from Hexa{'\n'}
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('5%'), marginBottom: hp('5%') }}>
                 <Image
                     source={require('../../assets/images/icons/savings_account_info_2.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('90%'), height: wp('70%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -188,7 +185,7 @@ export default function SavingsAccountHelpContents(props) {
             >
                   A multi signature account requires signatures from {'\n'}multiple keys. Hexa requires signatures{'\n'}from 2-of-3 keys, of which{'\n'}one key belongs to BitHyve signing server
             </Text>
-        </View>
+        
         <View
             style={{
               flexDirection: 'row',
@@ -196,6 +193,7 @@ export default function SavingsAccountHelpContents(props) {
               marginRight: wp('10%'),
               justifyContent: 'center',
               flexWrap: 'wrap',
+              marginTop: hp('3%'),
             }}
           >
             <Text
@@ -208,7 +206,7 @@ export default function SavingsAccountHelpContents(props) {
             >
               To read more,
             </Text>
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               style={{ marginLeft: 5 }}
               onPress={() =>
                 openLink('https://en.bitcoin.it/wiki/Multisignature')
@@ -225,7 +223,8 @@ export default function SavingsAccountHelpContents(props) {
               >
                 click here
               </Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
+          </View>
           </View>
       </ScrollView>
     </View>
@@ -237,7 +236,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
+    paddingBottom: hp('3%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,

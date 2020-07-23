@@ -35,39 +35,22 @@ export default function TransactionHelperModalContents(props) {
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text
-          style={{
-            color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
-            fontSize: RFValue(20),
-            marginTop: hp('1%'),
-            marginBottom: hp('1%'),
-          }}
-        >
-          Transaction
-        </Text>
+        <Text style={styles.headerText}>Transaction</Text>
       </AppBottomSheetTouchableWrapper>
-      <View
-        style={{
-          backgroundColor: Colors.homepageButtonColor,
-          height: 1,
-          marginLeft: wp('5%'),
-          marginRight: wp('5%'),
-          marginTop: 10,
-          marginBottom: hp('1%'),
-        }}
-      />
+      <View style={styles.headerSeparator} />
       <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
+        style={{
+          flex: 1,
+          backgroundColor: Colors.blue,
+          marginBottom: wp('5%'),
+        }}
+        snapToInterval={hp('75%')}
         decelerationRate="fast"
       >
         <View
           style={{
-            height: hp('89%'),
+            height: hp('75%'),
             justifyContent: 'space-between',
-            paddingBottom: hp('6%'),
-            marginTop: hp('1%'),
           }}
         >
           <Text
@@ -76,18 +59,21 @@ export default function TransactionHelperModalContents(props) {
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
+              marginTop: wp('10%'),
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
           >
-            A transaction is identified by an alphanumeric{'\n'}string called
-            the transaction ID, which acts as a{'\n'}permanent reference to your
-            payment on the{'\n'}Bitcoin blockchain
+            A transaction is identified by an alphanumeric string called the
+            transaction ID, which acts as a permanent reference to your payment
+            on the Bitcoin blockchain
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
               style={{
-                width: wp('90%'),
-                height: wp('90%'),
+                width: wp('80%'),
+                height: wp('65%'),
                 resizeMode: 'contain',
               }}
             />
@@ -98,31 +84,31 @@ export default function TransactionHelperModalContents(props) {
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
           >
-            You can search for your transaction on Bitcoin{'\n'}using blockchain
-            explorers, which provide{'\n'}detailed information on the status and
-            {'\n'}information associated with your transaction
+            You can search for your transaction on Bitcoin using blockchain
+            explorers, which provide detailed information on the status and
+            information associated with your transaction
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View
-              style={{
-                borderStyle: 'dotted',
-                borderWidth: 1,
-                borderRadius: 1,
-                borderColor: Colors.white,
-                width: wp('70%'),
-                height: 0,
-              }}
-            />
-          </View>
+          <View
+            style={{
+              borderStyle: 'dotted',
+              borderWidth: 1,
+              borderRadius: 1,
+              borderColor: Colors.white,
+              width: wp('70%'),
+              height: 0,
+              alignSelf: 'center',
+              marginBottom: wp('1%'),
+            }}
+          />
         </View>
         <View
           style={{
-            height: hp('89%'),
+            height: hp('75%'),
             justifyContent: 'space-between',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
           }}
         >
           <Text
@@ -131,20 +117,23 @@ export default function TransactionHelperModalContents(props) {
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
+              marginTop: wp('10%'),
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
           >
-            A transaction requires some time to confirm,{'\n'}and this delay is
-            called the confirmation time.{'\n'}The confirmation time depends on
-            the fees{'\n'}paid for the transaction, and on the structure{'\n'}of
-            the transaction. For most transactions, six{'\n'}confirmations is
-            taken as reference
+            A transaction requires some time to confirm, and this delay is
+            called the confirmation time. The confirmation time depends on the
+            fees paid for the transaction, and on the structure of the
+            transaction. For most transactions, six confirmations is taken as
+            reference
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/confirmation_time.png')}
               style={{
-                width: wp('90%'),
-                height: wp('90%'),
+                width: wp('80%'),
+                height: wp('65%'),
                 resizeMode: 'contain',
               }}
             />
@@ -155,12 +144,14 @@ export default function TransactionHelperModalContents(props) {
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
           >
-            The fee paid for a transaction depends only on{'\n'}the transaction
-            size, not on the transaction{'\n'}amount. This fee increases as the
-            complexity{'\n'}of the transaction increases, which is why the{'\n'}
-            Checking Account has lower fees compared to{'\n'}the Savings Account
+            The fee paid for a transaction depends only on the transaction size,
+            not on the transaction amount. This fee increases as the complexity
+            of the transaction increases, which is why the Checking Account has
+            lower fees compared to the Savings Account
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
@@ -171,16 +162,15 @@ export default function TransactionHelperModalContents(props) {
                 borderColor: Colors.white,
                 width: wp('70%'),
                 height: 0,
+                marginBottom: wp('1%'),
               }}
             />
           </View>
         </View>
         <View
           style={{
-            height: hp('89%'),
+            height: hp('75%'),
             justifyContent: 'space-between',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
           }}
         >
           <Text
@@ -189,20 +179,21 @@ export default function TransactionHelperModalContents(props) {
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
+              marginTop: wp('10%'),
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
           >
-            A transaction that is not confirmed stays in the{'\n'}pool of
-            unconfirmed transactions, called the{'\n'}mempool. The mempool is
-            used by bitcoin{'\n'}miners to include transactions in blocks, and
-            {'\n'}get mining fees
-            {/* How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it */}
+            A transaction that is not confirmed stays in the pool of unconfirmed
+            transactions, called the mempool. The mempool is used by bitcoin
+            miners to include transactions in blocks, and get mining fees
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/transaction_confirmation.png')}
               style={{
-                width: wp('90%'),
-                height: wp('90%'),
+                width: wp('80%'),
+                height: wp('65%'),
                 resizeMode: 'contain',
               }}
             />
@@ -213,24 +204,22 @@ export default function TransactionHelperModalContents(props) {
               color: Colors.white,
               fontSize: RFValue(13),
               fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
           >
-            On average, the mempool is cleared every{'\n'}three to six hours.
-            This means the maximum{'\n'}amount of time you need to wait for a
-            {'\n'}transaction to be confirmed is six hours on most{'\n'}days
-            {/* How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it */}
+            On average, the mempool is cleared every three to six hours. This
+            means the maximum amount of time you need to wait for a transaction
+            to be confirmed is six hours on most days
           </Text>
-          {/* <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                If the transaction takes time to confirm, you{'\n'}may increase the fee paid by RBF or Replace-{'\n'}By-Fee. This provides additional incentive for{'\n'}the miner to mine your transaction
-                {How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it}
-            </Text> */}
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                width: wp('70%'),
+                height: 0,
+              }}
+            />
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -242,10 +231,25 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
+    // paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
+  },
+  headerText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  headerSeparator: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginTop: 10,
+    marginBottom: hp('1%'),
   },
 });

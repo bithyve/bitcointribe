@@ -46,7 +46,6 @@ export default function SecurityQuestionHelpContents(props) {
         <View
           style={{
             height: hp('89%'),
-            justifyContent: 'space-between',
             paddingBottom: hp('6%'),
           }}
         >
@@ -98,7 +97,7 @@ export default function SecurityQuestionHelpContents(props) {
             However, it is recommended{'\n'} that you keep the answer safe to
             provide{'\n'} for an extra layer of security
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%') }}>
             <View
               style={{
                 borderStyle: 'dotted',
@@ -121,7 +120,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
