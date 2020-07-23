@@ -789,11 +789,11 @@ export default class S3Service {
     }
   };
 
-  public prepareShareUploadables = async (
+  public prepareShareUploadables = (
     shareIndex: number,
     contactName: string,
     dynamicNonPMDD?: MetaShare[],
-  ): Promise<
+  ):
     | {
         status: number;
         data: {
@@ -811,12 +811,11 @@ export default class S3Service {
         err: string;
         message: string;
         data?: undefined;
-      }
-  > => {
+      } => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.sss.prepareShareUploadables(
+        data: this.sss.prepareShareUploadables(
           shareIndex,
           contactName,
           dynamicNonPMDD,

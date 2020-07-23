@@ -60,6 +60,7 @@ export const updateEphemeralChannel = (
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
   shareUploadables?: ShareUploadables,
+  updatedDB?: any,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
@@ -70,6 +71,7 @@ export const updateEphemeralChannel = (
       trustedContacts,
       uploadXpub,
       shareUploadables,
+      updatedDB,
     },
   };
 };
@@ -90,10 +92,11 @@ export const updateTrustedChannel = (
   data: TrustedDataElements,
   fetch?: Boolean,
   shareUploadables?: ShareUploadables,
+  updatedDB?: any,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactInfo, data, fetch, shareUploadables },
+    payload: { contactInfo, data, fetch, shareUploadables, updatedDB },
   };
 };
 
