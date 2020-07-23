@@ -91,9 +91,9 @@ export default function AddressBookHelpContents(props) {
               marginTop: wp('10%'),
             }}
           >
-            Secure, encrypted channels are used to{'\n'}communicate your
-            extended public key. An{'\n'}extended public key can be used by a
-            peer to{'\n'}generate new addresses on your behalf.
+            Secure, encrypted channels are used to communicate your
+            extended public key. An extended public key can be used by a
+            peer to generate new addresses on your behalf.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -109,7 +109,7 @@ export default function AddressBookHelpContents(props) {
             </Text>
             <View style={{...styles.linkView, marginTop: wp('7%')}}>
               <Text style={styles.toKnowMoreText}>To know more,</Text>
-              <TouchableOpacity
+              <AppBottomSheetTouchableWrapper
                 style={{ marginLeft: 5 }}
                 onPress={() =>
                   openLink(
@@ -118,7 +118,7 @@ export default function AddressBookHelpContents(props) {
                 }
               >
                 <Text style={styles.clickHereText}>click here</Text>
-              </TouchableOpacity>
+              </AppBottomSheetTouchableWrapper>
             </View>
           </View>
           <View style={styles.separatorView} />
