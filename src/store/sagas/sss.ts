@@ -275,12 +275,17 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     };
 
-    yield call(insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup,
-        SERVICES: updatedSERVICES,
-      },
-    });
+    // yield call(insertDBWorker, {
+    //   payload: {
+    //     DECENTRALIZED_BACKUP: updatedBackup,
+    //     SERVICES: updatedSERVICES,
+    //   },
+    // });
+
+    const updatedDB = {
+      DECENTRALIZED_BACKUP: updatedBackup,
+      SERVICES: updatedSERVICES,
+    };
 
     const contact =
       trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
@@ -294,7 +299,13 @@ function* uploadEncMetaShareWorker({ payload }) {
         },
       };
       yield put(
-        updateTrustedChannel(payload.contactInfo, data, null, shareUploadables),
+        updateTrustedChannel(
+          payload.contactInfo,
+          data,
+          null,
+          shareUploadables,
+          updatedDB,
+        ),
       );
     } else {
       // adding transfer details to he ephemeral data
@@ -314,6 +325,7 @@ function* uploadEncMetaShareWorker({ payload }) {
           null,
           null,
           shareUploadables,
+          updatedDB,
         ),
       );
     }

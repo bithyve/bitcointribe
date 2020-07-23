@@ -316,7 +316,17 @@ function* updateEphemeralChannelWorker({ payload }) {
       REGULAR_ACCOUNT: JSON.stringify(regularService),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    if (payload.updatedDB) {
+      yield call(insertDBWorker, {
+        payload: {
+          ...payload.updatedDB,
+          SERVICES: { ...payload.updatedDB.SERVICES, ...updatedSERVICES },
+        },
+      });
+    } else {
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
 
     const data: EphemeralDataElements = res.data.data;
     if (data && data.shareTransferDetails) {
@@ -407,7 +417,17 @@ function* updateTrustedChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    if (payload.updatedDB) {
+      yield call(insertDBWorker, {
+        payload: {
+          ...payload.updatedDB,
+          SERVICES: { ...payload.updatedDB.SERVICES, ...updatedSERVICES },
+        },
+      });
+    } else {
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
   } else {
     console.log(res.err);
   }

@@ -620,17 +620,17 @@ export default class SSS {
   //   return { otp, encryptedKey: otpEncryptedData };
   // };
 
-  public prepareShareUploadables = async (
+  public prepareShareUploadables = (
     shareIndex: number,
     contactName: string,
     dynamicNonPMDD?: MetaShare[],
-  ): Promise<{
+  ): {
     otp: string;
     encryptedKey: string;
     encryptedMetaShare: string;
     messageId: string;
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-  }> => {
+  } => {
     if (!this.metaShares.length) {
       throw new Error('Generate MetaShares prior uploading');
     }
