@@ -57,15 +57,23 @@ export default function AddressBookHelpContents(props) {
         }}
       />
       <ScrollView
-        style={styles.modalContainer}
+        style={{
+          height: '100%',
+          backgroundColor: Colors.blue,
+          alignSelf: 'center',
+          width: '100%',
+          elevation: 10,
+          shadowColor: Colors.borderColor,
+          shadowOpacity: 10,
+          shadowOffset: { width: 0, height: 2 },
+        }}
         snapToInterval={hp('89%')}
         decelerationRate="fast"
       >
         <View
           style={{
             height: hp('89%'),
-            justifyContent: 'space-between',
-            paddingBottom: hp('6%'),
+            justifyContent: 'space-evenly',
           }}
         >
           <Text
@@ -86,7 +94,7 @@ export default function AddressBookHelpContents(props) {
               source={require('../../assets/images/icons/FnF_recovery_key_2.png')}
               style={{
                 width: wp('80%'),
-                height: wp('80%'),
+                height: wp('65%'),
                 resizeMode: 'contain',
               }}
             />
@@ -130,9 +138,7 @@ export default function AddressBookHelpContents(props) {
         <View
           style={{
             height: hp('89%'),
-            justifyContent: 'space-between',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
+            justifyContent: 'space-evenly',
           }}
         >
           <Text
@@ -152,24 +158,25 @@ export default function AddressBookHelpContents(props) {
               source={require('../../assets/images/icons/test_account_info_2.png')}
               style={{
                 width: wp('80%'),
-                height: wp('80%'),
+                height: wp('65%'),
                 resizeMode: 'contain',
               }}
             />
           </View>
-          <Text
-            style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            Possessing an extended public key does not{'\n'}allow one to gain
-            possession of funds. This is{'\n'}because the contact does not
-            possess your private{'\n'}key which affirms ownership of funds
-          </Text>
-          {/* <Text
+          <View style={{ paddingBottom: hp('4%') }}>
+            <Text
+              style={{
+                textAlign: 'center',
+                color: Colors.white,
+                fontSize: RFValue(13),
+                fontFamily: Fonts.FiraSansRegular,
+              }}
+            >
+              Possessing an extended public key does not{'\n'}allow one to gain
+              possession of funds. This is{'\n'}because the contact does not
+              possess your private{'\n'}key which affirms ownership of funds
+            </Text>
+            {/* <Text
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
@@ -179,45 +186,46 @@ export default function AddressBookHelpContents(props) {
             >
                 Creation of ECDH channels is facilitated by the{'\n'}BitHyve Relay Server. After creation however,{'\n'}the Relay Server (and others on the internet) is{'\n'}blind to all communications between the{'\n'}two parties
             </Text> */}
-          <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: wp('10%'),
-              marginRight: wp('10%'),
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Text
+            <View
               style={{
-                color: Colors.white,
-                // textAlign: 'center',
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
+                flexDirection: 'row',
+                marginLeft: wp('10%'),
+                marginRight: wp('10%'),
+                justifyContent: 'center',
+                flexWrap: 'wrap',
               }}
-            >
-              To know more,
-            </Text>
-            <TouchableOpacity
-              style={{ marginLeft: 5 }}
-              onPress={() =>
-                openLink(
-                  'https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman',
-                )
-              }
             >
               <Text
                 style={{
                   color: Colors.white,
+                  // textAlign: 'center',
                   fontSize: RFValue(13),
                   fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                  textAlign: 'center',
                 }}
               >
-                click here
+                To know more,
               </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{ marginLeft: 5 }}
+                onPress={() =>
+                  openLink(
+                    'https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman',
+                  )
+                }
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue(13),
+                    fontFamily: Fonts.FiraSansRegular,
+                    textDecorationLine: 'underline',
+                    textAlign: 'center',
+                  }}
+                >
+                  click here
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -230,7 +238,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
