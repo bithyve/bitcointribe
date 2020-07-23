@@ -435,7 +435,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         </View>
       </TouchableOpacity>
     );
-  }, [updateList, MyKeeper, IMKeeper, OtherTrustedContact]);
+  }
 
   renderAddContactAddressBookContents = () => {
     const { navigation } = this.props;
