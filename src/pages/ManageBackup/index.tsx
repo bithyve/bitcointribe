@@ -256,21 +256,14 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryHeader = () => {
     return (
-      <AppBottomSheetTouchableWrapper
-        activeOpacity={10}
-        style={styles.modalHeaderContainer}
-        onPress={() => (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0)}
-      >
-        <View style={{ height: 20 }}>
-          <View style={styles.modalHeaderHandle} />
-        </View>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={styles.healthOfAppText}>
-            Health of the App
-          </Text>
-        </View>
-        <View style={styles.healthOfAppDivider}/>
-      </AppBottomSheetTouchableWrapper>
+      <SmallHeaderModal
+        borderColor={Colors.blue}
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          if (WalletBackupAndRecoveryBottomSheet.current)
+            (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   };
 
