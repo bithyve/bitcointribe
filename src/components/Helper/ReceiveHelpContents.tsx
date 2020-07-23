@@ -199,7 +199,7 @@ export default function ReceiveHelpContents(props) {
             >
               To know more,
             </Text>
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               style={{ marginLeft: 5 }}
               onPress={() =>
                 openLink(
@@ -218,7 +218,7 @@ export default function ReceiveHelpContents(props) {
               >
                 click here
               </Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           </View>
         </View>
       </ScrollView>
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
