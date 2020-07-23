@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { PureComponent } from 'react';
 import {
   View,
   Text,
@@ -7,7 +6,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Image,
   ScrollView,
   Platform,
@@ -17,16 +15,15 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
+import { connect } from 'react-redux';
+import idx from 'idx';
 import Colors from '../common/Colors';
 import Fonts from '../common/Fonts';
+import Styles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import {
-  trustedChannelsSync,
-  removeTrustedContact,
-} from '../store/actions/trustedContacts';
+import { trustedChannelsSync, removeTrustedContact, updateAddressBookLocally } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -48,51 +45,124 @@ import AddressBookHelpContents from '../components/Helper/AddressBookHelpContent
 import CountDown from '../components/CountDown';
 import Config from '../bitcoin/HexaConfig';
 
-export default function AddressBookContents(props) {
-  const TC_REQUEST_EXPIRY = Config.TC_REQUEST_EXPIRY/1000;
-  const [updateList, setUpdateList] = useState(false);
-  const [onRefresh, setOnRefresh] = useState(false);
-  const [
-    AddContactAddressBookBookBottomSheet,
-    setAddContactAddressBookBottomSheet,
-  ] = useState(React.createRef<BottomSheet>());
-  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
-  const [isLoadContacts, setIsLoadContacts] = useState(false);
-  const [SelectedContact, setSelectedContact] = useState([]);
-  const [Loading, setLoading] = useState(true);
-  const [trustedContact, setTrustedContact] = useState([]);
-  let [MyKeeper, setMyKeeper] = useState([]);
-  let [IMKeeper, setIMKeeper] = useState([]);
-  let [OtherTrustedContact, setOtherTrustedContact] = useState([]);
-  const regularAccount: RegularAccount = useSelector(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  const trustedContactsService: TrustedContactsService = useSelector(
-    (state) => state.trustedContacts.service,
-  );
+interface AddressBookContentsPropTypes {
+  navigation: any;
+  isFocused: boolean;
+  regularAccount: RegularAccount,
+  trustedContactsService: TrustedContactsService,
+  trustedChannelsSync: any,
+  trustedChannelsSyncing: any,
+  updateAddressBookLocally: any,
+  addressBookData: any,
+  trustedContactsInfo: any,
+  removeTrustedContact: any,
+}
+interface AddressBookContentsStateTypes {
+  isLoadContacts: boolean,
+  selectedContact: any[],
+  loading: boolean,
+  MyKeeper: any[],
+  IMKeeper: any[],
+  trustedContact: any[],
+  OtherTrustedContact: any[],
+  onRefresh: boolean,
+  updateList: boolean
+}
 
-  const trustedChannelsSyncing = useSelector(
-    (state) => state.trustedContacts.loading.trustedChannelsSync,
-  );
-  useEffect(() => {
-    setOnRefresh(trustedChannelsSyncing);
-  }, [trustedChannelsSyncing]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, [trustedContact]);
+const getImageIcon = (item) => {
+  if (item) {
+    if (item.image && item.image.uri) {
+      return (
+        <Image
+          source={item.image}
+          style={styles.imageIconStyle}
+        />
+      );
+    } else {
+      return (
+        <View style={styles.imageIconViewStyle}>
+          <Text style={styles.imageIconText}>
+            {item
+              ? nameToInitials(
+                item.firstName == 'Secondary' && item.lastName == 'Device'
+                  ? 'Keeper Device'
+                  : item.firstName && item.lastName
+                    ? item.firstName + ' ' + item.lastName
+                    : item.firstName && !item.lastName
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                        ? item.lastName
+                        : '',
+              )
+              : ''}
+          </Text>
+        </View>
+      );
+    }
+  }
+};
 
-  const updateAddressBook = async () => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
+class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, AddressBookContentsStateTypes> {
+  AddContactAddressBookBottomSheet: any;
+  HelpBottomSheet: any;
+  focusListener: any;
+
+  constructor(props) {
+    super(props);
+    this.focusListener = null;
+    this.AddContactAddressBookBottomSheet = React.createRef();
+    this.HelpBottomSheet = React.createRef();
+    this.state = {
+      onRefresh: false,
+      isLoadContacts: false,
+      selectedContact: [],
+      loading: true,
+      trustedContact: idx(props, _ => _.addressBookData.trustedContact) || [],
+      MyKeeper: idx(props, _ => _.addressBookData.MyKeeper) || [],
+      IMKeeper: idx(props, _ => _.addressBookData.IMKeeper) || [],
+      OtherTrustedContact: idx(props, _ => _.addressBookData.OtherTrustedContact) || [],
+      updateList: false
+    }
+  }
+
+
+  componentDidMount() {
+    this.focusListener = this.props.navigation.addListener('didFocus', () => {
+      this.props.trustedChannelsSync();
+      this.updateAddressBook()
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    const oldDerivativeAccounts = idx(prevProps, (_) => _.regularAccount.hdWallet.derivativeAccounts);
+    const newDerivativeAccounts = idx(this.props, (_) => _.regularAccount.hdWallet.derivativeAccounts);
+    if (oldDerivativeAccounts !== newDerivativeAccounts || prevProps.trustedContactsService != this.props.trustedContactsService) {
+      this.updateAddressBook();
+    }
+    if (this.state.trustedContact) {
+      this.setState({
+        loading: false,
+      });
+    }
+    if (prevProps.trustedChannelsSyncing !== this.props.trustedChannelsSyncing) {
+      this.setState({
+        loading: this.props.trustedChannelsSyncing
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    this.focusListener.remove();
+  }
+
+  updateAddressBook = async () => {
+    const { regularAccount, trustedContactsService } = this.props;
+    const { trustedContactsInfo } = this.props
     let myKeepers = [];
     let imKeepers = [];
     let otherTrustedContact = [];
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       if (trustedContactsInfo.length) {
         const trustedContacts = [];
         for (let index = 0; index < trustedContactsInfo.length; index++) {
@@ -100,7 +170,7 @@ export default function AddressBookContents(props) {
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
+            }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -170,50 +240,43 @@ export default function AddressBookContents(props) {
             otherTrustedContact.push({ ...element, isRemovable: true });
           }
         }
-        setMyKeeper(myKeepers);
-        setIMKeeper(imKeepers);
-        setOtherTrustedContact(otherTrustedContact);
-        setTrustedContact(trustedContacts);
+        this.setState({
+          MyKeeper: myKeepers,
+          IMKeeper: imKeepers,
+          OtherTrustedContact: otherTrustedContact,
+          trustedContact: trustedContacts,
+        }, () => this.props.updateAddressBookLocally({
+          MyKeeper: myKeepers,
+          IMKeeper: imKeepers,
+          OtherTrustedContact: otherTrustedContact,
+          trustedContact: trustedContacts,
+        }));
       }
     }
   };
 
-  useEffect(() => {
-    updateAddressBook();
-  }, [regularAccount.hdWallet.derivativeAccounts, trustedContactsService]);
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    let focusListener = props.navigation.addListener('didFocus', () => {
-      dispatch(trustedChannelsSync());
-    });
-    return () => {
-      focusListener.remove();
-    };
-  }, []);
-
-  const renderHelpHeader = () => {
+  renderHelpHeader = () => {
     return (
       <SmallHeaderModal
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          if (HelpBottomSheet.current)
-            (HelpBottomSheet as any).current.snapTo(0);
+          if (this.HelpBottomSheet.current)
+            (this.HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
-  const renderHelpContent = () => {
-    return <AddressBookHelpContents 
-    titleClicked={()=>{
-      if (HelpBottomSheet.current)
-            (HelpBottomSheet as any).current.snapTo(0);
-    }}/>
+  renderHelpContent = () => {
+    return <AddressBookHelpContents
+      titleClicked={() => {
+        if (this.HelpBottomSheet.current)
+          (this.HelpBottomSheet as any).current.snapTo(0);
+      }} />
   };
 
-  const getImageIcon = (item) => {
+  getImageIcon = (item) => {
     if (item) {
       if (item.image && item.image.uri) {
         return (
@@ -248,16 +311,16 @@ export default function AddressBookContents(props) {
             >
               {item
                 ? nameToInitials(
-                    item.firstName == 'Secondary' && item.lastName == 'Device'
-                      ? 'Keeper Device'
-                      : item.firstName && item.lastName
+                  item.firstName == 'Secondary' && item.lastName == 'Device'
+                    ? 'Keeper Device'
+                    : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                          ? item.lastName
+                          : '',
+                )
                 : ''}
             </Text>
           </View>
@@ -266,13 +329,20 @@ export default function AddressBookContents(props) {
     }
   };
 
-  const getElement = useCallback((contact, index, contactsType) => {
-    var minute = TC_REQUEST_EXPIRY-((Date.now() - contact.initiatedAt)/1000);
+  getElement = (contact, index, contactsType) => {
+    const { navigation } = this.props;
+    var minute = (config.TC_REQUEST_EXPIRY / 1000) - ((Date.now() - contact.initiatedAt) / 1000);
     return (
       <TouchableOpacity
         key={contact.id}
         onPress={() => {
-          props.navigation.navigate('ContactDetails', {
+          // navigation.navigate('ContactDetails', {
+          //   contactsType,
+          //   contact,
+          //   index,
+          //   shareIndex: contact.shareIndex,
+          // });
+          navigation.navigate('ContactDetailsNew', {
             contactsType,
             contact,
             index,
@@ -280,7 +350,7 @@ export default function AddressBookContents(props) {
           });
         }}
         // onLongPress={() => {
-        //   dispatch(removeTrustedContact(contact.contactName));
+        //   this.props.removeTrustedContact(contact.contactName);
         // }}
         style={styles.selectedContactsView}
       >
@@ -290,81 +360,68 @@ export default function AddressBookContents(props) {
             {contact.firstName && contact.firstName != 'Secondary'
               ? contact.firstName + ' '
               : contact.firstName && contact.firstName == 'Secondary'
-              ? 'Keeper '
-              : ''}
+                ? 'Keeper '
+                : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.lastName && contact.lastName != 'Device'
                 ? contact.lastName + ' '
                 : contact.lastName && contact.lastName == 'Device'
-                ? 'Device '
-                : ''}
+                  ? 'Device '
+                  : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
             <Text style={styles.phoneText}>{contact.connectedVia}</Text>
           ) : null}
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginLeft: 'auto',
-          }}
-        >
+        <View style={styles.getImageView}>
           {!contact.hasXpub && (
             Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-              !contact.hasTrustedChannel ? 
+              !contact.hasTrustedChannel ?
               (<View
-              style={{
-                width: wp('15%'),
-                height: wp('6%'),
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: Colors.borderColor,
-                marginRight: 10,
-                borderRadius: 5,
-              }}
-            >
-              <Text
                 style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(10),
-                  fontFamily: Fonts.FiraSansRegular,
+                  width: wp('15%'),
+                  height: wp('6%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.borderColor,
+                  marginRight: 10,
+                  borderRadius: 5,
                 }}
               >
-                Expired
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(10),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Expired
               </Text>
-            </View>)
-            :
-            <CountDown
-              onFinish={()=>setUpdateList(!updateList)}
-              id={index}
-              size={12}
-              until={minute}
-              digitStyle={{
-                backgroundColor: '#FFF',
-                borderWidth: 0,
-                borderColor: '#FFF',
-                margin: -10,
-              }}
-              digitTxtStyle={{ color: Colors.textColorGrey, fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular, }}
-              separatorStyle={{ color: Colors.textColorGrey, }}
-              timeToShow={['H', 'M', 'S']}
-              timeLabels={{ h: null, m: null, s: null }}
-              showSeparator
-            />
+              </View>)
+              :
+              <CountDown
+                onFinish={() => this.setState({ updateList: !this.state.updateList })}
+                id={index}
+                size={12}
+                until={minute}
+                digitStyle={{
+                  backgroundColor: '#FFF',
+                  borderWidth: 0,
+                  borderColor: '#FFF',
+                  margin: -10,
+                }}
+                digitTxtStyle={{
+                  color: Colors.textColorGrey, fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+                separatorStyle={{ color: Colors.textColorGrey, }}
+                timeToShow={['H', 'M', 'S']}
+                timeLabels={{ h: null, m: null, s: null }}
+                showSeparator
+              />
           )}
-          <View
-            style={{
-              width: 10,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginLeft: 'auto',
-              marginRight: 10,
-            }}
-          >
+          <View style={styles.xpubIconView}>
             <Ionicons
               name="ios-arrow-forward"
               color={Colors.borderColor}
@@ -380,68 +437,33 @@ export default function AddressBookContents(props) {
     );
   }, [updateList, MyKeeper, IMKeeper, OtherTrustedContact]);
 
-  const getWaterMark = () => {
-    return (
-      <View
-        style={{
-          marginBottom: 15,
-          marginLeft: wp('5%'),
-          marginRight: wp('5%'),
-        }}
-      >
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', padding: 15 }}
-        >
-          <View>
-            <View style={styles.watermarkViewBigText} />
-            <View style={styles.watermarkViewSmallText} />
-          </View>
-          <View style={styles.watermarkViewButton} />
-          <View style={styles.watermarkViewArrow} />
-        </View>
-        <View
-          style={{
-            borderTopWidth: 1,
-            borderTopColor: Colors.borderColor,
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 15,
-          }}
-        >
-          <View>
-            <View style={styles.watermarkViewBigText} />
-            <View style={styles.watermarkViewSmallText} />
-          </View>
-          <View style={styles.watermarkViewButton} />
-          <View style={styles.watermarkViewArrow} />
-        </View>
-      </View>
-    );
-  };
-
-  const renderAddContactAddressBookContents = () => {
+  renderAddContactAddressBookContents = () => {
+    const { navigation } = this.props;
+    const { isLoadContacts, selectedContact } = this.state;
     return (
       <AddContactAddressBook
         isLoadContacts={isLoadContacts}
-        modalRef={AddContactAddressBookBookBottomSheet}
+        modalRef={this.AddContactAddressBookBottomSheet}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          props.navigation.navigate('AddContactSendRequest', {
-            SelectedContact: SelectedContact,
+          navigation.navigate('AddContactSendRequest', {
+            SelectedContact: selectedContact,
           });
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
-        onSelectContact={(selectedContact) => {
-          setSelectedContact(selectedContact);
+        onSelectContact={(selectedData) => {
+          this.setState({
+            selectedContact: selectedData
+          });
         }}
         onPressBack={() => {
-          (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+          (this.AddContactAddressBookBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
-  const renderAddContactAddressBookHeader = () => {
+  renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
       // onPressHeader={() => {
@@ -451,114 +473,110 @@ export default function AddressBookContents(props) {
     );
   };
 
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <SafeAreaView style={{ flex: 0 }} />
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={styles.modalContainer}>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity
-              onPress={() => props.navigation.goBack()}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>
-              {'Friends and Family'}
-            </Text>
-          </View>
-          <KnowMoreButton
-            onpress={() => {
-              (HelpBottomSheet as any).current.snapTo(1);
-            }}
-            containerStyle={{
-              marginTop: 'auto',
-              marginBottom: 'auto',
-              marginRight: 10,
-            }}
-            textStyle={{}}
-          />
-        </View>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={onRefresh}
-              onRefresh={() => {
-                dispatch(trustedChannelsSync());
+  render() {
+    const { navigation, trustedChannelsSync } = this.props;
+    const { MyKeeper, IMKeeper, OtherTrustedContact, onRefresh } = this.state;
+    return (
+      <View style={Styles.rootView}>
+        <SafeAreaView style={Styles.statusBarStyle} />
+        <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeaderTitleView}>
+            <View style={Styles.backIconRootContainer}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={Styles.backIconTouchContainer}
+              >
+                <FontAwesome
+                  name="long-arrow-left"
+                  color={Colors.blue}
+                  size={17}
+                />
+              </TouchableOpacity>
+              <Text style={styles.modalHeaderTitleText}>
+                {'Friends and Family'}
+              </Text>
+            </View>
+            <KnowMoreButton
+              onpress={() => {
+                (this.HelpBottomSheet as any).current.snapTo(1);
               }}
+              containerStyle={{
+                marginTop: 'auto',
+                marginBottom: 'auto',
+                marginRight: 10,
+              }}
+              textStyle={{}}
             />
-          }
-          style={{ flex: 1 }}
-        >
-          <View style={{ marginTop: wp('2%') }}>
-            <Text style={styles.pageTitle}>My Keepers</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who can help me restore my wallet
-            </Text>
-            {!Loading ? (
+          </View>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={onRefresh}
+                onRefresh={() => {
+                  trustedChannelsSync();
+                }}
+              />
+            }
+            style={{ flex: 1 }}
+          >
+            <View style={{ marginTop: wp('2%') }}>
+              <Text style={styles.pageTitle}>My Keepers</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who can help me restore my wallet
+              </Text>
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {MyKeeper.length > 0 ? (
                     MyKeeper.map((item, index) => {
-                      return getElement(item, index, 'My Keepers');
+                      return this.getElement(item, index, 'My Keepers');
                     })
                   ) : (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                 </View>
               </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>I am the Keeper of</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who I can help restore their wallets
-            </Text>
-
-            {!Loading ? (
+            </View>
+            <View style={{ marginTop: wp('5%') }}>
+              <Text style={styles.pageTitle}>I am the Keeper of</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who I can help restore their wallets
+              </Text>
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {IMKeeper.length > 0 ? (
                     IMKeeper.map((item, index) => {
-                      return getElement(item, index, "I'm Keeper of");
+                      return this.getElement(item, index, "I'm Keeper of");
                     })
                   ) : (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                 </View>
               </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          <View style={{ marginTop: wp('5%') }}>
-            <Text style={styles.pageTitle}>Other Contacts</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who I can pay directly
-            </Text>
-            {!Loading ? (
+            </View>
+            <View style={{ marginTop: wp('5%') }}>
+              <Text style={styles.pageTitle}>Other Contacts</Text>
+              <Text style={styles.pageInfoText}>
+                Contacts who I can pay directly
+              </Text>
+
               <View style={{ marginBottom: 15 }}>
                 <View style={{ height: 'auto' }}>
                   {OtherTrustedContact.length > 0 ? (
                     OtherTrustedContact.map((item, index) => {
-                      return getElement(item, index, 'Other Contacts');
+                      return this.getElement(item, index, 'Other Contacts');
                     })
                   ) : (
-                    <View style={{ height: wp('22%') + 30 }} />
-                  )}
+                      <View style={{ height: wp('22%') + 30 }} />
+                    )}
                   <TouchableOpacity
                     onPress={() => {
                       setTimeout(() => {
-                        setIsLoadContacts(true);
+                        this.setState({
+                          isLoadContacts: true
+                        });
                       }, 2);
-                      AddContactAddressBookBookBottomSheet.current.snapTo(1);
+                      this.AddContactAddressBookBottomSheet.current.snapTo(1);
                     }}
                     style={{
                       ...styles.selectedContactsView,
@@ -568,59 +586,69 @@ export default function AddressBookContents(props) {
                     }}
                   >
                     <Image
-                      style={{
-                        width: wp('10%'),
-                        height: wp('10%'),
-                        marginLeft: 5,
-                      }}
+                      style={styles.addGrayImage}
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>Add Contact</Text>
+                      <Text style={styles.contactText}>
+                        Add Contact
+                        </Text>
                     </View>
                   </TouchableOpacity>
                 </View>
               </View>
-            ) : (
-              getWaterMark()
-            )}
-          </View>
-          {OtherTrustedContact.length == 0 &&
-            IMKeeper.length == 0 &&
-            MyKeeper.length == 0 && (
-              <BottomInfoBox
-                title={'Note'}
-                infoText={
-                  'All your contacts appear here when added to Hexa wallet'
-                }
-              />
-            )}
-        </ScrollView>
+            </View>
+            {OtherTrustedContact.length == 0 &&
+              IMKeeper.length == 0 &&
+              MyKeeper.length == 0 && (
+                <BottomInfoBox
+                  title={'Note'}
+                  infoText={
+                    'All your contacts appear here when added to Hexa wallet'
+                  }
+                />
+              )}
+          </ScrollView>
+        </View>
+        <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={this.AddContactAddressBookBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+          ]}
+          renderContent={this.renderAddContactAddressBookContents}
+          renderHeader={this.renderAddContactAddressBookHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
+          ref={this.HelpBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+          ]}
+          renderContent={this.renderHelpContent}
+          renderHeader={this.renderHelpHeader}
+        />
       </View>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        enabledGestureInteraction={false}
-        ref={AddContactAddressBookBookBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
-        ]}
-        renderContent={renderAddContactAddressBookContents}
-        renderHeader={renderAddContactAddressBookHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={HelpBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
-        ]}
-        renderContent={renderHelpContent}
-        renderHeader={renderHelpHeader}
-      />
-    </View>
-  );
+    );
+  }
 }
+
+const mapStateToProps = (state) => {
+  let addressBookData = idx(state, _ => _.trustedContacts.addressBook)
+  let trustedContactsInfo = idx(state, _ => _.trustedContacts.trustedContactsInfo)
+  return {
+    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
+    trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+    trustedChannelsSyncing: idx(state, (_) => _.trustedContacts.loading.trustedChannelsSync),
+    addressBookData,
+    trustedContactsInfo
+  };
+};
+export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally, removeTrustedContact })(AddressBookContents);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
@@ -709,4 +737,72 @@ const styles = StyleSheet.create({
     width: wp('3%'),
     borderRadius: wp('3%') / 2,
   },
+  imageIconStyle: {
+    width: wp('12%'),
+    height: wp('12%'),
+    borderRadius: wp('12%') / 2,
+    resizeMode: 'contain',
+  },
+  imageIconViewStyle: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.shadowBlue,
+    width: wp('12%'),
+    height: wp('12%'),
+    borderRadius: wp('12%') / 2,
+  },
+  imageIconText: {
+    textAlign: 'center',
+    fontSize: 13,
+    lineHeight: 13,
+  },
+  getImageView: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 'auto',
+  },
+  xpubViewStyle: {
+    width: wp('15%'),
+    height: wp('6%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.borderColor,
+    marginRight: 10,
+    borderRadius: 5,
+  },
+  xpubTextStyle: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  xpubIconView: {
+    width: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 'auto',
+    marginRight: 10,
+  },
+  waterMarkView: {
+    marginBottom: 15,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+  },
+  waterMarkInnerView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15
+  },
+  waterMarkBigView: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderColor,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+  },
+  addGrayImage: {
+    width: wp('10%'),
+    height: wp('10%'),
+    marginLeft: 5,
+  }
 });

@@ -5,14 +5,8 @@ import {
   StatusBar,
   Text,
   TouchableOpacity,
-  Platform,
   SafeAreaView,
-  TextInput,
-  Keyboard,
   ScrollView,
-  Linking,
-  AsyncStorage,
-  ActivityIndicator,
   Image,
 } from 'react-native';
 import Colors from '../../common/Colors';
@@ -22,19 +16,12 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
-import DeviceInfo from 'react-native-device-info';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Feather from 'react-native-vector-icons/Feather';
-import { useDispatch, useSelector } from 'react-redux';
+
 import {
   REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
-import { FlatList } from 'react-native-gesture-handler';
 import moment from 'moment';
-import { UsNumberFormat } from '../../common/utilities';
 
 export default function ExistingSavingMethodDetails(props) {
   const FBTCAccount = props.navigation.state.params.getBittrAccount
