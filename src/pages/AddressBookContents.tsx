@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Image,
   ScrollView,
   Platform,
@@ -24,7 +23,7 @@ import Styles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { trustedChannelsSync,removeTrustedContact, updateAddressBookLocally } from '../store/actions/trustedContacts';
+import { trustedChannelsSync, removeTrustedContact, updateAddressBookLocally } from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -42,6 +41,9 @@ import config from '../bitcoin/HexaConfig';
 import KnowMoreButton from '../components/KnowMoreButton';
 import SmallHeaderModal from '../components/SmallHeaderModal';
 import AddressBookHelpContents from '../components/Helper/AddressBookHelpContents';
+// import CountDown from 'react-native-countdown-component';
+import CountDown from '../components/CountDown';
+import Config from '../bitcoin/HexaConfig';
 
 interface AddressBookContentsPropTypes {
   navigation: any;
@@ -63,31 +65,10 @@ interface AddressBookContentsStateTypes {
   IMKeeper: any[],
   trustedContact: any[],
   OtherTrustedContact: any[],
-  onRefresh: boolean
+  onRefresh: boolean,
+  updateList: boolean
 }
 
-const WaterMark = () => {
-  return (
-    <View style={styles.waterMarkView}>
-      <View style={styles.waterMarkInnerView}>
-        <View>
-          <View style={styles.watermarkViewBigText} />
-          <View style={styles.watermarkViewSmallText} />
-        </View>
-        <View style={styles.watermarkViewButton} />
-        <View style={styles.watermarkViewArrow} />
-      </View>
-      <View style={styles.waterMarkBigView}>
-        <View>
-          <View style={styles.watermarkViewBigText} />
-          <View style={styles.watermarkViewSmallText} />
-        </View>
-        <View style={styles.watermarkViewButton} />
-        <View style={styles.watermarkViewArrow} />
-      </View>
-    </View>
-  );
-};
 
 const getImageIcon = (item) => {
   if (item) {
@@ -141,6 +122,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
       MyKeeper: idx(props, _ => _.addressBookData.MyKeeper) || [],
       IMKeeper: idx(props, _ => _.addressBookData.IMKeeper) || [],
       OtherTrustedContact: idx(props, _ => _.addressBookData.OtherTrustedContact) || [],
+      updateList: false
     }
   }
 
@@ -287,11 +269,11 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   };
 
   renderHelpContent = () => {
-    return <AddressBookHelpContents 
-    titleClicked={()=>{
-      if (this.HelpBottomSheet.current)
-            (this.HelpBottomSheet as any).current.snapTo(0);
-    }}/>
+    return <AddressBookHelpContents
+      titleClicked={() => {
+        if (this.HelpBottomSheet.current)
+          (this.HelpBottomSheet as any).current.snapTo(0);
+      }} />
   };
 
   getImageIcon = (item) => {
@@ -329,16 +311,16 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             >
               {item
                 ? nameToInitials(
-                    item.firstName == 'Secondary' && item.lastName == 'Device'
-                      ? 'Keeper Device'
-                      : item.firstName && item.lastName
+                  item.firstName == 'Secondary' && item.lastName == 'Device'
+                    ? 'Keeper Device'
+                    : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                      ? item.lastName
-                      : '',
-                  )
+                        ? item.firstName
+                        : !item.firstName && item.lastName
+                          ? item.lastName
+                          : '',
+                )
                 : ''}
             </Text>
           </View>
@@ -349,6 +331,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
 
   getElement = (contact, index, contactsType) => {
     const { navigation } = this.props;
+    var minute = (config.TC_REQUEST_EXPIRY / 1000) - ((Date.now() - contact.initiatedAt) / 1000);
     return (
       <TouchableOpacity
         key={contact.id}
@@ -377,14 +360,14 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             {contact.firstName && contact.firstName != 'Secondary'
               ? contact.firstName + ' '
               : contact.firstName && contact.firstName == 'Secondary'
-              ? 'Keeper '
-              : ''}
+                ? 'Keeper '
+                : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.lastName && contact.lastName != 'Device'
                 ? contact.lastName + ' '
                 : contact.lastName && contact.lastName == 'Device'
-                ? 'Device '
-                : ''}
+                  ? 'Device '
+                  : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -393,14 +376,50 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         </View>
         <View style={styles.getImageView}>
           {!contact.hasXpub && (
-            <View style={styles.xpubViewStyle}>
-              <Text style={styles.xpubTextStyle}>
-                {Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                  !contact.hasTrustedChannel
-                  ? 'Expired'
-                  : 'Pending'}
+            Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+              !contact.hasTrustedChannel ?
+              (<View
+                style={{
+                  width: wp('15%'),
+                  height: wp('6%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.borderColor,
+                  marginRight: 10,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(10),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Expired
               </Text>
-            </View>
+              </View>)
+              :
+              <CountDown
+                onFinish={() => this.setState({ updateList: !this.state.updateList })}
+                id={index}
+                size={12}
+                until={minute}
+                digitStyle={{
+                  backgroundColor: '#FFF',
+                  borderWidth: 0,
+                  borderColor: '#FFF',
+                  margin: -10,
+                }}
+                digitTxtStyle={{
+                  color: Colors.textColorGrey, fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+                separatorStyle={{ color: Colors.textColorGrey, }}
+                timeToShow={['H', 'M', 'S']}
+                timeLabels={{ h: null, m: null, s: null }}
+                showSeparator
+              />
           )}
           <View style={styles.xpubIconView}>
             <Ionicons
@@ -416,7 +435,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         </View>
       </TouchableOpacity>
     );
-  };
+  }, [updateList, MyKeeper, IMKeeper, OtherTrustedContact]);
 
   renderAddContactAddressBookContents = () => {
     const { navigation } = this.props;
@@ -592,7 +611,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           </ScrollView>
         </View>
         <BottomSheet
-        enabledGestureInteraction={false}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.AddContactAddressBookBottomSheet as any}
           snapPoints={[
@@ -677,19 +696,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-  },
-  shareButtonView: {
-    height: wp('7%'),
-    width: wp('18%'),
-    backgroundColor: Colors.backgroundColor,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    borderRadius: 5,
-    marginLeft: 'auto',
-    marginRight: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
   },
   pageTitle: {
     marginLeft: 30,
