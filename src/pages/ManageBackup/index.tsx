@@ -182,6 +182,7 @@ export default function ManageBackup(props) {
   ]);
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.sss.service);
+  let { trustedContactsInfo } = useSelector((state) => state.trustedContacts)
   // const { databaseSSS } = useSelector(state => state.storage);
   const [overallHealth, setOverallHealth] = useState(null);
   const health = useSelector((state) => state.sss.overallHealth);
@@ -256,14 +257,21 @@ export default function ManageBackup(props) {
 
   const renderWalletBackupAndRecoveryHeader = () => {
     return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          if (WalletBackupAndRecoveryBottomSheet.current)
-            (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0);
-        }}
-      />
+      <AppBottomSheetTouchableWrapper
+        activeOpacity={10}
+        style={styles.modalHeaderContainer}
+        onPress={() => (WalletBackupAndRecoveryBottomSheet as any).current.snapTo(0)}
+      >
+        <View style={{ height: 20 }}>
+          <View style={styles.modalHeaderHandle} />
+        </View>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={styles.healthOfAppText}>
+            Health of the App
+          </Text>
+        </View>
+        <View style={styles.healthOfAppDivider} />
+      </AppBottomSheetTouchableWrapper>
     );
   };
 
@@ -629,7 +637,7 @@ export default function ManageBackup(props) {
           }, 2);
           (PersonalCopyQRScannerBottomSheet as any).current.snapTo(0);
         }}
-        onPressProceed={() => {}}
+        onPressProceed={() => { }}
         onPressIgnore={() => {
           setTimeout(() => {
             setLoadCamera(false);
@@ -677,9 +685,6 @@ export default function ManageBackup(props) {
       personalCopy2,
       securityAns,
     } = autoHighlightFlags;
-
-    console.log('@AutoHighlight');
-    console.log({ autoHighlightFlags });
 
     if (!overallHealth) {
       if (!secondaryDevice) {
@@ -787,12 +792,7 @@ export default function ManageBackup(props) {
   };
 
   const setContactsFromAsync = async () => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-
     if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setContacts(selectedContacts);
 
@@ -804,33 +804,6 @@ export default function ManageBackup(props) {
       }
       setPageData([...pageData]);
     }
-
-    // let contactList = JSON.parse(
-    //   await AsyncStorage.getItem('SelectedContacts'),
-    // );
-
-    // setContacts(contactList);
-    // if (contactList.length) {
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact1') !=
-    //     -1
-    //   ) {
-    //     pageData[1].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact1')
-    //       ];
-    //   }
-    //   if (
-    //     contactList.findIndex((value) => value && value.type == 'contact2') !=
-    //     -1
-    //   ) {
-    //     pageData[2].personalInfo =
-    //       contactList[
-    //         contactList.findIndex((value) => value && value.type == 'contact2')
-    //       ];
-    //   }
-    // }
-    // setPageData([...pageData]);
   };
 
   const setAutoHighlightFlagsFromAsync = async () => {
@@ -911,7 +884,7 @@ export default function ManageBackup(props) {
         JSON.stringify(autoHighlightFlags)
       ) {
         setAutoHighlightFlags(updatedAutoHighlightFlags);
-
+        // TODO -- replace this
         AsyncStorage.setItem(
           'AutoHighlightFlags',
           JSON.stringify(updatedAutoHighlightFlags),
@@ -1334,7 +1307,7 @@ export default function ManageBackup(props) {
       ) {
         pageData[1].personalInfo =
           contacts[
-            contacts.findIndex((value) => value && value.type == 'contact1')
+          contacts.findIndex((value) => value && value.type == 'contact1')
           ];
       }
       if (
@@ -1342,7 +1315,7 @@ export default function ManageBackup(props) {
       ) {
         pageData[2].personalInfo =
           contacts[
-            contacts.findIndex((value) => value && value.type == 'contact2')
+          contacts.findIndex((value) => value && value.type == 'contact2')
           ];
       }
     }
@@ -1367,6 +1340,7 @@ export default function ManageBackup(props) {
           );
           if (!intialHealthSync) {
             dispatch(checkMSharesHealth());
+            // TODO -- replace this
             AsyncStorage.setItem('initalHealthSync', 'true');
           }
         })();
@@ -1385,10 +1359,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact1' && autoHighlightFlags.trustedContact1) {
@@ -1398,10 +1372,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'contact2' && autoHighlightFlags.trustedContact2) {
@@ -1411,10 +1385,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy1' && autoHighlightFlags.personalCopy1) {
@@ -1424,10 +1398,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'copy2' && autoHighlightFlags.personalCopy2) {
@@ -1437,10 +1411,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     if (item.type == 'security' && autoHighlightFlags.securityAns) {
@@ -1450,10 +1424,10 @@ export default function ManageBackup(props) {
           item.status == 'Ugly'
             ? Colors.red
             : item.status == 'Bad'
-            ? Colors.yellow
-            : item.status == 'Good'
-            ? Colors.green
-            : Colors.textColorGrey,
+              ? Colors.yellow
+              : item.status == 'Good'
+                ? Colors.green
+                : Colors.textColorGrey,
       };
     }
     return {
@@ -1498,18 +1472,18 @@ export default function ManageBackup(props) {
               >
                 {item.personalInfo
                   ? nameToInitials(
-                      item.personalInfo.firstName && item.personalInfo.lastName
-                        ? item.personalInfo.firstName +
-                            ' ' +
-                            item.personalInfo.lastName
-                        : item.personalInfo.firstName &&
-                          !item.personalInfo.lastName
+                    item.personalInfo.firstName && item.personalInfo.lastName
+                      ? item.personalInfo.firstName +
+                      ' ' +
+                      item.personalInfo.lastName
+                      : item.personalInfo.firstName &&
+                        !item.personalInfo.lastName
                         ? item.personalInfo.firstName
                         : !item.personalInfo.firstName &&
                           item.personalInfo.lastName
-                        ? item.personalInfo.lastName
-                        : '',
-                    )
+                          ? item.personalInfo.lastName
+                          : '',
+                  )
                   : ''}
               </Text>
             </View>
@@ -1670,12 +1644,12 @@ export default function ManageBackup(props) {
                       shieldStatus={overallHealth.overallStatus}
                     />
                   ) : (
-                    <HomePageShield
-                      circleShadowColor={Colors.borderColor}
-                      shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                      shieldStatus={0}
-                    />
-                  )}
+                      <HomePageShield
+                        circleShadowColor={Colors.borderColor}
+                        shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                        shieldStatus={0}
+                      />
+                    )}
                 </View>
               </View>
               <View style={{ marginBottom: 10 }}>
@@ -1793,16 +1767,16 @@ export default function ManageBackup(props) {
                             {(item.type === 'security' ||
                               (item.type === 'secondaryDevice' &&
                                 item.status !== 'Ugly')) && (
-                              <Text
-                                style={{
-                                  fontFamily: Fonts.FiraSansMediumItalic,
-                                  fontWeight: 'bold',
-                                  fontStyle: 'italic',
-                                }}
-                              >
-                                {getTime(item.time)}
-                              </Text>
-                            )}
+                                <Text
+                                  style={{
+                                    fontFamily: Fonts.FiraSansMediumItalic,
+                                    fontWeight: 'bold',
+                                    fontStyle: 'italic',
+                                  }}
+                                >
+                                  {getTime(item.time)}
+                                </Text>
+                              )}
                           </Text>
                         </View>
                         <Image
@@ -1925,24 +1899,24 @@ export default function ManageBackup(props) {
                 }}
               >
                 {autoHighlightFlags.secondaryDevice &&
-                autoHighlightFlags.trustedContact1 &&
-                autoHighlightFlags.trustedContact2 &&
-                autoHighlightFlags.personalCopy1 &&
-                autoHighlightFlags.personalCopy2 &&
-                autoHighlightFlags.securityAns
+                  autoHighlightFlags.trustedContact1 &&
+                  autoHighlightFlags.trustedContact2 &&
+                  autoHighlightFlags.personalCopy1 &&
+                  autoHighlightFlags.personalCopy2 &&
+                  autoHighlightFlags.securityAns
                   ? 'Confirm Shares'
                   : 'Complete Setup'}
               </Text>
             </TouchableOpacity>
           </View>
         ) : (
-          <ScrollView
-            contentContainerStyle={{
-              backgroundColor: Colors.backgroundColor,
-            }}
-            refreshControl={<RefreshControl refreshing={!is_initiated} />}
-          />
-        )}
+            <ScrollView
+              contentContainerStyle={{
+                backgroundColor: Colors.backgroundColor,
+              }}
+              refreshControl={<RefreshControl refreshing={!is_initiated} />}
+            />
+          )}
       </View>
     </View>
   );

@@ -123,6 +123,7 @@ export default function ContactDetails(props) {
   const uploading = useSelector(
     (state) => state.sss.loading.uploadRequestedShare,
   );
+  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
   const errorSending = useSelector((state) => state.sss.errorSending);
   const uploadSuccessfull = useSelector(
     (state) => state.sss.uploadSuccessfully,
@@ -691,7 +692,8 @@ export default function ContactDetails(props) {
         (Contact.emails && Contact.emails.length))
     ) {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue; 
+      //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
       const contactName = `${Contact.firstName} ${
