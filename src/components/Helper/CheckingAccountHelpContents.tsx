@@ -36,150 +36,91 @@ export default function CheckingAccountHelpContents(props) {
         onPress={() => props.titleClicked && props.titleClicked()}
       >
         <Text
-          style={{
-            color: Colors.white,
-            fontFamily: Fonts.FiraSansMedium,
-            fontSize: RFValue(20),
-            marginTop: hp('1%'),
-            marginBottom: hp('1%'),
-          }}
+          style={styles.headerText}
         >
           Checking Account
         </Text>
       </AppBottomSheetTouchableWrapper>
-      <View
-        style={{
-          backgroundColor: Colors.homepageButtonColor,
-          height: 1,
-          marginLeft: wp('5%'),
-          marginRight: wp('5%'),
-          marginBottom: hp('1%'),
-        }}
-      />
+      <View style={styles.headerSeparator} />
       <ScrollView
-        style={styles.modalContainer}
+         style={{
+          flex: 1,
+          backgroundColor: Colors.blue,
+        }}
         snapToInterval={hp('89%')}
         decelerationRate="fast"
       >
-        <View
-          style={{
-            height: hp('89%'),
-            justifyContent: 'space-between',
-            paddingBottom: hp('6%'),
-            marginTop: hp('1%'),
-          }}
-        >
+         <View style={styles.ElementView}>
           <Text
             style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginTop: wp('5%'),
             }}
           >
-            The Checking Account is designed as an account{'\n'}that you plan to
-            use in the short term. Funds in{'\n'}the Checking Account can be
-            spent immediately{'\n'}without 2FA confirmation, and carries lower
-            fees{'\n'}compared to the Savings Account
+            The Checking Account is designed as an account that you plan to
+            use in the short term. Funds in the Checking Account can be
+            spent immediately without 2FA confirmation, and carries lower
+            fees compared to the Savings Account
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/checking_account_info_1.png')}
-              style={{
-                width: wp('90%'),
-                height: wp('90%'),
-                resizeMode: 'contain',
-              }}
+              style={styles.helperImage}
             />
           </View>
           <Text
             style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginBottom: wp('5%'),
             }}
           >
-            Since the Checking Account does not require{'\n'}2FA confirmation
-            for spending, a person using your{'\n'}phone and knowing your
-            passcode will {'\n'}be able to spend your bitcoin. Hence, for {'\n'}
-            storing more funds or for spending infrequently, {'\n'}please store
+            Since the Checking Account does not require 2FA confirmation
+            for spending, a person using your phone and knowing your
+            passcode will be able to spend your bitcoin. Hence, for
+            storing more funds or for spending infrequently, please store
             your bitcoin in the Savings Account
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <View
-              style={{
-                borderStyle: 'dotted',
-                borderWidth: 1,
-                borderRadius: 1,
-                borderColor: Colors.white,
-                width: wp('70%'),
-                height: 0,
-              }}
-            />
+          <View
+            style={{
+              borderStyle: 'dotted',
+              borderWidth: 1,
+              borderRadius: 1,
+              borderColor: Colors.white,
+              ...styles.separatorView,
+            }}
+          />
           </View>
         </View>
-        <View
-          style={{
-            height: hp('89%'),
-            justifyContent: 'space-between',
-            paddingTop: hp('2%'),
-            paddingBottom: hp('6%'),
-          }}
-        >
+        <View style={styles.ElementView}>
           <Text
             style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginTop: wp('5%'),
             }}
           >
-            The Checking Account is a single signature{'\n'}account as compared
-            to the multi signature{'\n'}Savings Account, and does not require
-            2FA confirmation {'\n'}for spending. This smaller requirement
-            results in{'\n'}a lesser fee compared to the Savings Account
+            The Checking Account is a single signature account as compared
+            to the multi signature Savings Account, and does not require
+            2FA confirmation for spending. This smaller requirement
+            results in a lesser fee compared to the Savings Account
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={require('../../assets/images/icons/test_account_info_2.png')}
-              style={{
-                width: wp('90%'),
-                height: wp('90%'),
-                resizeMode: 'contain',
-              }}
+              style={styles.helperImage}
             />
           </View>
-          <Text
-            style={{
-              textAlign: 'center',
-              color: Colors.white,
-              fontSize: RFValue(13),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            Use this account to store small{'\n'}amounts for daily use
+          <View style={styles.bottomLinkView}>
+            <Text style={{...styles.infoText, marginLeft: 0, marginRight: 0,}}>
+            Use this account to store small amounts for daily use
           </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: wp('10%'),
-              marginRight: wp('10%'),
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-            }}
-          >
+          <View style={{...styles.linkView, marginTop: wp('7%')}}>
             <Text
-              style={{
-                color: Colors.white,
-                // textAlign: 'center',
-                fontSize: RFValue(13),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
+              style={styles.toKnowMoreText}
             >
               To read more,
             </Text>
-            <TouchableOpacity
+            <AppBottomSheetTouchableWrapper
               style={{ marginLeft: 5 }}
               onPress={() =>
                 openLink(
@@ -188,18 +129,12 @@ export default function CheckingAccountHelpContents(props) {
               }
             >
               <Text
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                  textAlign: 'center',
-                }}
-              >
+                style={styles.clickHereText}>
                 click here
               </Text>
-            </TouchableOpacity>
+            </AppBottomSheetTouchableWrapper>
           </View>
+        </View>
         </View>
       </ScrollView>
     </View>
@@ -211,10 +146,70 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
+  },
+  headerText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  headerSeparator: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginBottom: hp('1%'),
+  },
+  infoText: {
+    textAlign: 'center',
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: wp('8%'),
+    marginRight: wp('8%'),
+  },
+  clickHereText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  toKnowMoreText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  linkView: {
+    flexDirection: 'row',
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  ElementView: {
+    height: hp('89%'),
+    justifyContent: 'space-between',
+  },
+  separatorView: {
+    width: wp('70%'),
+    height: 0,
+    alignSelf: 'center',
+    marginBottom: wp('1%'),
+  },
+  helperImage: {
+    width: wp('80%'),
+    height: wp('60%'),
+    resizeMode: 'contain',
+  },
+  bottomLinkView: {
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+    marginBottom: wp('15%'),
   },
 });

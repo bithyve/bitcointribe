@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
