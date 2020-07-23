@@ -28,7 +28,7 @@ export default function ManageBackupHelpContents(props) {
         snapToInterval={hp('89%')}
         decelerationRate='fast'
     >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-evenly'}}>
             <Text
             style={{
                 textAlign: 'center',
@@ -42,7 +42,7 @@ export default function ManageBackupHelpContents(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/manage_backup_info_1.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('80%'), height: wp('68%'), resizeMode: 'contain' }}
                 />
             </View>
             <Text
@@ -68,7 +68,7 @@ export default function ManageBackupHelpContents(props) {
                 />
             </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
+        <View style={{height: hp('89%'), justifyContent: 'space-evenly', paddingBottom: hp('4%')}}>
             <Text
             style={{
                 textAlign: 'center',
@@ -82,9 +82,10 @@ export default function ManageBackupHelpContents(props) {
             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/images/icons/FnF_recovery_key.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
+                    style={{ width: wp('80%'), height: wp('68%'), resizeMode: 'contain' }}
                 />
             </View>
+            <View>
             <Text
                 style={{
                     textAlign: 'center',
@@ -95,7 +96,7 @@ export default function ManageBackupHelpContents(props) {
             >
                 Recovery Keys need to be available at all times{'\n'}to enable recovery. If your keys are not available,{'\n'}you will not be able to recover your Wallet
             </Text>
-            <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
+            <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), marginTop: hp('1%'), justifyContent: 'center', flexWrap: 'wrap'}}>
                 <Text
                     style={{
                         color: Colors.white,
@@ -106,7 +107,7 @@ export default function ManageBackupHelpContents(props) {
                 >
                     To know more,
                 </Text>
-                <TouchableOpacity style={{marginLeft: 5}} onPress={() => openLink("https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing")}> 
+                <AppBottomSheetTouchableWrapper style={{marginLeft: 5}} onPress={() => openLink("https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing")}> 
                     <Text
                         style={{
                             color: Colors.white,
@@ -118,7 +119,8 @@ export default function ManageBackupHelpContents(props) {
                     >
                         click here
                     </Text>
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
+            </View>
             </View>
         </View>
     </ScrollView>
