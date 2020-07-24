@@ -34,7 +34,10 @@ import { nameToInitials } from '../../common/CommonFunctions';
 import Entypo from 'react-native-vector-icons/Entypo';
 import _ from 'underscore';
 import moment from 'moment';
-import { addTransferDetails } from '../../store/actions/accounts';
+import {
+  addTransferDetails,
+  clearTransfer,
+} from '../../store/actions/accounts';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import BottomSheet from 'reanimated-bottom-sheet';
 import SendViaLink from '../../components/SendViaLink';
@@ -106,6 +109,7 @@ interface ContactDetailsPropTypes {
   uploadMetaShare: any;
   updateEphemeralChannelLoader: any;
   ErrorSending: any;
+  clearTransfer: any;
   addTransferDetails: any;
   UploadSuccessfully: any;
   uploadRequestedShare: any;
@@ -323,6 +327,8 @@ class ContactDetailsNew extends PureComponent<
   // ]);
 
   onPressSend = () => {
+    this.props.clearTransfer(REGULAR_ACCOUNT);
+
     if (this.contactsType == 'My Keepers') {
       this.saveInTransitHistory('isSent');
     }
@@ -1310,6 +1316,7 @@ const mapStateToProps = (state) => {
 };
 export default connect(mapStateToProps, {
   addTransferDetails,
+  clearTransfer,
   UploadSuccessfully,
   uploadEncMShare,
   uploadRequestedShare,
