@@ -327,6 +327,11 @@ export default function UpdateApp(props) {
                 }}
               >
                 <Text
+                onPress={() => {
+                  if(isOpenFromNotificationList) props.navigation.goBack();
+                  else
+                  onClick(false, true);
+                }}
                   style={{ ...styles.proceedButtonText, color: Colors.blue }}
                 >
                   Remind me Later

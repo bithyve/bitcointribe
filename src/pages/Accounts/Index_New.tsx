@@ -448,19 +448,19 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     if (this.carousel.current) {
       if (serviceType == TEST_ACCOUNT) {
         if (this.carousel.current as any)
-          setTimeout(() => {
-            (this.carousel.current as any).snapToItem(0, true, false);
-          }, 1000);
+          //setTimeout(() => {
+          (this.carousel.current as any).snapToItem(0, true, false);
+        //}, 1100);
       } else if (serviceType == REGULAR_ACCOUNT) {
         if (this.carousel.current as any)
-          setTimeout(() => {
-            (this.carousel.current as any).snapToItem(1, true, false);
-          }, 1000);
+          // setTimeout(() => {
+          (this.carousel.current as any).snapToItem(1, true, false);
+        //}, 1100);
       } else if (serviceType == SECURE_ACCOUNT) {
         if (this.carousel.current as any)
-          setTimeout(() => {
-            (this.carousel.current as any).snapToItem(2, true, false);
-          }, 1000);
+          // setTimeout(() => {
+          (this.carousel.current as any).snapToItem(2, true, false);
+        // }, 1100);
       }
     }
     this.setState({ serviceType: serviceType });
@@ -828,11 +828,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     };
   };
 
-  getAccountNameFromType = () =>{
-    if(this.state.serviceType==TEST_ACCOUNT) return "Test Account";
-    else if(this.state.serviceType==REGULAR_ACCOUNT) return "Checking Account";
-    else return "Savings Account";
-  }
+  getAccountNameFromType = () => {
+    if (this.state.serviceType == TEST_ACCOUNT) return 'Test Account';
+    else if (this.state.serviceType == REGULAR_ACCOUNT)
+      return 'Checking Account';
+    else return 'Savings Account';
+  };
 
   render() {
     const {
@@ -1225,16 +1226,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   </View>
                 </View>
               </TouchableWithoutFeedback>
-              {/* <TouchableWithoutFeedback
-                onPress={() => {
-                  if ((this.refs.TestAccountHelperBottomSheet as any).current)
-                    (this.refs.TestAccountHelperBottomSheet as any).current.snapTo(0);
-                  if ((this.refs.RegularAccountHelperBottomSheet as any).current)
-                    (this.refs.RegularAccountHelperBottomSheet as any).current.snapTo(0);
-                  if ((this.refs.SecureAccountHelperBottomSheet as any).current)
-                    (this.refs.SecureAccountHelperBottomSheet as any).current.snapTo(0);
-                }}
-              > */}
+
               <View style={{ marginTop: hp('2%') }}>
                 <View style={styles.bottomButtonView}>
                   <TouchableOpacity
@@ -1281,10 +1273,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     </View>
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Receive</Text>
-                      {/* <Text style={styles.bottomCardInfoText}>
-                          Tran Fee : {averageTxFees['high']} (
-                          {serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
-                        </Text> */}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -1295,334 +1283,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     marginRight: 10,
                   }}
                 >
-                  {/* TODO: Currently we removed BUY UI. */}
-                  {/* <TouchableOpacity
-                    onPress={() => {
-                      props.navigation.navigate('Buy', {
-                        serviceType,
-                        getServiceType: getServiceType,
-                      });
-                    }}
-                    style={{
-                      ...styles.bottomCardView,
-                      opacity: 0.3,
-                      backgroundColor: Colors.borderColor,
-                    }}
-                    disabled={true}
-                  >
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 10,
-                      }}
-                    >
-                      <Image
-                        source={require('../../assets/images/icons/icon_buy.png')}
-                        style={styles.bottomCardImage}
-                      />
-                    </View>
-                    <View style={{ flex: 3, marginLeft: wp('3%') }}>
-                      <Text style={styles.bottomCardTitleText}>Buy</Text>
-                      <Text style={styles.bottomCardInfoText}>
-                        Ex Rate : {exchangeRates ? exchangeRates[CurrencyCode].last : 0}{' '}
-                        (usd)
-                      </Text>
-                    </View>
-                  </TouchableOpacity> */}
-
-                  {/* TODO: Currently we removed Sell UI. */}
-                  {/* <TouchableOpacity
-                    style={{...styles.bottomCardView, opacity: 0.3,
-                      backgroundColor: Colors.borderColor,}}
-                      disabled={ true }
-                    onPress={() => {
-                      props.navigation.navigate('Sell', {
-                        serviceType,
-                        getServiceType: getServiceType,
-                      });
-                    }}
-                  >
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginLeft: 10,
-                      }}
-                    >
-                      <Image
-                        source={require('../../assets/images/icons/icon_sell.png')}
-                        style={styles.bottomCardImage}
-                      />
-                    </View>
-                    <View style={{ flex: 3, marginLeft: wp('3%') }}>
-                      <Text style={styles.bottomCardTitleText}>Sell</Text>
-                      <Text style={styles.bottomCardInfoText}>
-                        Ex Rate : {exchangeRates ? exchangeRates[CurrencyCode].last : 0}{' '}
-                        (usd)
-                      </Text>
-                    </View>
-                  </TouchableOpacity> */}
                 </View>
               </View>
-              {/* </TouchableWithoutFeedback> */}
             </ScrollView>
             {showLoader ? <Loader /> : null}
-
-            <BottomSheet
-              enabledInnerScrolling={true}
-              ref={'bottomSheet'}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('60%')
-                  : hp('60%'),
-              ]}
-              renderContent={() => {
-                const infoBoxInfoText = 'All your recent transactions for the '+this.getAccountNameFromType()+' will appear here.';
-                return (
-                  <TransactionsContent
-                    infoBoxInfoText={infoBoxInfoText}
-                    isFromAccount={true}
-                    transactionLoading={transactionLoading}
-                    transactions={transactions}
-                    AtCloseEnd={false}
-                    setTransactionItem={(item) =>
-                      this.setState({ selectedTransactionItem: item })
-                    }
-                    setTabBarZIndex={(index) =>
-                      this.setState({ tabBarIndex: index })
-                    }
-                    TransactionDetailsBottomSheet={
-                      this.refs.TransactionDetailsBottomSheet as any
-                    }
-                  />
-                );
-              }}
-              renderHeader={() => (
-                <TouchableOpacity
-                  activeOpacity={10}
-                  onPress={() => {
-                    if (this.refs.bottomSheet as any)
-                      (this.refs.bottomSheet as any).snapTo(0);
-                  }}
-                  style={styles.transactionModalHeaderContainer}
-                >
-                  <View style={styles.transactionModalHeaderHandle} />
-                  <Text style={styles.transactionModalHeaderTitleText}>
-                    {'Transactions'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-
-            {/* helper modals */}
-            {/* <BottomSheet
-            enabledInnerScrolling={true}
-            ref={BuyHelperBottomSheet}
-            snapPoints={[
-              -50,
-              hp('90%'),
-              Platform.OS == 'android' ? hp('50%') : hp('90%'),
-            ]}
-            renderContent={renderBuyHelperContents}
-            renderHeader={renderBuyHelperHeader}
-          /> */}
-            <BottomSheet
-              onCloseStart={async () => {
-                // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
-                // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
-              }}
-              enabledInnerScrolling={true}
-              ref={'TestAccountHelperBottomSheet'}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('87%')
-                  : hp('89%'),
-                // Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                //   ? hp('35%')
-                //   : hp('40%'),
-                //Platform.OS == 'android' ? hp('50%') : hp('90%'),
-              ]}
-              renderContent={() => (
-                <TestAccountHelpContents 
-      titleClicked={()=>{
-        if (this.refs.TestAccountHelperBottomSheet as any)
-        (this.refs.TestAccountHelperBottomSheet as any).snapTo(0)
-      }}/>
-              )}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.blue}
-                  backgroundColor={Colors.blue}
-                  onPressHeader={() => {
-                    if (isTestHelperDone) {
-                      if (this.refs.TestAccountHelperBottomSheet as any)
-                        (this.refs.TestAccountHelperBottomSheet as any).snapTo(
-                          1,
-                        );
-                      setTimeout(() => {
-                        this.setState({ isTestHelperDone: false });
-                      }, 10);
-                    } else {
-                      if (this.refs.TestAccountHelperBottomSheet as any)
-                        (this.refs.TestAccountHelperBottomSheet as any).snapTo(
-                          0,
-                        );
-                    }
-                  }}
-                />
-              )}
-            />
-            <BottomSheet
-              enabledInnerScrolling={true}
-              ref={'SecureAccountHelperBottomSheet'}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('87%')
-                  : hp('89%'),
-              ]}
-              renderContent={() => (
-                <SavingsAccountHelpContents 
-      titleClicked={()=>{
-        if (this.refs.SecureAccountHelperBottomSheet as any)
-                        (this.refs
-                          .SecureAccountHelperBottomSheet as any).snapTo(0);
-      }}/>
-              )}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.blue}
-                  backgroundColor={Colors.blue}
-                  onPressHeader={() => {
-                    if (isSecureAccountHelperDone) {
-                      if (this.refs.SecureAccountHelperBottomSheet as any)
-                        (this.refs
-                          .SecureAccountHelperBottomSheet as any).snapTo(1);
-                      setTimeout(() => {
-                        this.setState({ isSecureAccountHelperDone: false });
-                      }, 10);
-                    } else {
-                      if (this.refs.SecureAccountHelperBottomSheet as any)
-                        (this.refs
-                          .SecureAccountHelperBottomSheet as any).snapTo(0);
-                    }
-                  }}
-                />
-              )}
-            />
-            <BottomSheet
-              enabledInnerScrolling={true}
-              ref={'RegularAccountHelperBottomSheet'}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('87%')
-                  : hp('89%'),
-              ]}
-              renderContent={() => (<CheckingAccountHelpContents 
-                titleClicked={()=>{
-                  if (this.refs.RegularAccountHelperBottomSheet as any)
-                        (this.refs
-                          .RegularAccountHelperBottomSheet as any).snapTo(0);
-                }}/>)}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.blue}
-                  backgroundColor={Colors.blue}
-                  onPressHeader={() => {
-                    if (isRegularAccountHelperDone) {
-                      if (this.refs.RegularAccountHelperBottomSheet as any)
-                        (this.refs
-                          .RegularAccountHelperBottomSheet as any).snapTo(1);
-                      setTimeout(() => {
-                        this.setState({ isRegularAccountHelperDone: false });
-                      }, 10);
-                    } else {
-                      if (this.refs.RegularAccountHelperBottomSheet as any)
-                        (this.refs
-                          .RegularAccountHelperBottomSheet as any).snapTo(0);
-                    }
-                  }}
-                />
-              )}
-            />
-            <BottomSheet
-              enabledInnerScrolling={true}
-              ref={'TransactionDetailsBottomSheet'}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp('88%')
-                  : hp('88%'),
-              ]}
-              renderContent={() => (
-                <TransactionDetails
-                  item={transactionItem}
-                  serviceType={serviceType}
-                  getServiceType={this.getServiceType}
-                  onPressKnowMore={() => {
-                    this.props.setTransactionHelper(true);
-                    //AsyncStorage.setItem('isTransactionHelperDone', 'true');
-                    (this.refs
-                      .TransactionDetailsHelperBottomSheet as any).snapTo(1);
-                  }}
-                />
-              )}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.white}
-                  backgroundColor={Colors.white}
-                  onPressHeader={() => {
-                    if (this.refs.TransactionDetailsBottomSheet as any)
-                      (this.refs.TransactionDetailsBottomSheet as any).snapTo(
-                        0,
-                      );
-                  }}
-                />
-              )}
-            />
-
-            <BottomSheet
-              enabledInnerScrolling={true}
-              ref={'TransactionDetailsHelperBottomSheet'}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && deviceInfoModule.hasNotch()
-                  ? hp('87%')
-                  : hp('89%'),
-                // Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                //   ? hp('35%')
-                //   : hp('40%'),
-              ]}
-              renderContent={() => (<TransactionHelperModalContents 
-                titleClicked={()=>{
-                  (this.refs
-                    .TransactionDetailsHelperBottomSheet as any).snapTo(0);
-                }}/>)}
-              renderHeader={() => (
-                <SmallHeaderModal
-                  borderColor={Colors.blue}
-                  backgroundColor={Colors.blue}
-                  onPressHeader={() => {
-                    if (isHelperDone) {
-                      (this.refs
-                        .TransactionDetailsHelperBottomSheet as any).snapTo(1);
-                      setTimeout(() => {
-                        this.setState({ isHelperDone: false });
-                      }, 10);
-                    } else {
-                      (this.refs
-                        .TransactionDetailsHelperBottomSheet as any).snapTo(0);
-                    }
-                  }}
-                />
-              )}
-            />
           </View>
         ) : (
           <ScrollView
@@ -1634,6 +1298,256 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             }
           />
         )}
+        {this.state.is_initiated ? (<BottomSheet
+          enabledInnerScrolling={true}
+          ref={'bottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('60%'),
+          ]}
+          renderContent={() => {
+            const infoBoxInfoText =
+              'All your recent transactions for the ' +
+              this.getAccountNameFromType() +
+              ' will appear here.';
+            return (
+              <TransactionsContent
+                infoBoxInfoText={infoBoxInfoText}
+                isFromAccount={true}
+                transactionLoading={transactionLoading}
+                transactions={transactions}
+                AtCloseEnd={false}
+                setTransactionItem={(item) =>
+                  this.setState({ selectedTransactionItem: item })
+                }
+                setTabBarZIndex={(index) =>
+                  this.setState({ tabBarIndex: index })
+                }
+                TransactionDetailsBottomSheet={
+                  this.refs.TransactionDetailsBottomSheet as any
+                }
+              />
+            );
+          }}
+          renderHeader={() => (
+            <TouchableOpacity
+              activeOpacity={10}
+              onPress={() => {
+                if (this.refs.bottomSheet as any)
+                  (this.refs.bottomSheet as any).snapTo(0);
+              }}
+              style={styles.transactionModalHeaderContainer}
+            >
+              <View style={styles.transactionModalHeaderHandle} />
+              <Text style={styles.transactionModalHeaderTitleText}>
+                {'Transactions'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />) : null}
+
+{this.state.is_initiated ? (<BottomSheet
+          onCloseStart={async () => {
+            // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
+            // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
+          }}
+          enabledInnerScrolling={true}
+          ref={'TestAccountHelperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('87%')
+              : hp('89%'),
+            // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            //   ? hp('35%')
+            //   : hp('40%'),
+            //Platform.OS == 'android' ? hp('50%') : hp('90%'),
+          ]}
+          renderContent={() => (
+            <TestAccountHelpContents
+              titleClicked={() => {
+                if (this.refs.TestAccountHelperBottomSheet as any)
+                  (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.blue}
+              backgroundColor={Colors.blue}
+              onPressHeader={() => {
+                if (isTestHelperDone) {
+                  if (this.refs.TestAccountHelperBottomSheet as any)
+                    (this.refs.TestAccountHelperBottomSheet as any).snapTo(1);
+                  setTimeout(() => {
+                    this.setState({ isTestHelperDone: false });
+                  }, 10);
+                } else {
+                  if (this.refs.TestAccountHelperBottomSheet as any)
+                    (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
+                }
+              }}
+            />
+          )}
+        />) : null}
+
+       {this.state.is_initiated ? ( <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'SecureAccountHelperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('87%')
+              : hp('89%'),
+          ]}
+          renderContent={() => (
+            <SavingsAccountHelpContents
+              titleClicked={() => {
+                if (this.refs.SecureAccountHelperBottomSheet as any)
+                  (this.refs.SecureAccountHelperBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.blue}
+              backgroundColor={Colors.blue}
+              onPressHeader={() => {
+                if (isSecureAccountHelperDone) {
+                  if (this.refs.SecureAccountHelperBottomSheet as any)
+                    (this.refs.SecureAccountHelperBottomSheet as any).snapTo(1);
+                  setTimeout(() => {
+                    this.setState({ isSecureAccountHelperDone: false });
+                  }, 10);
+                } else {
+                  if (this.refs.SecureAccountHelperBottomSheet as any)
+                    (this.refs.SecureAccountHelperBottomSheet as any).snapTo(0);
+                }
+              }}
+            />
+          )}
+        />) : null}
+
+        {this.state.is_initiated ? (<BottomSheet
+          enabledInnerScrolling={true}
+          ref={'RegularAccountHelperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('87%')
+              : hp('89%'),
+          ]}
+          renderContent={() => (
+            <CheckingAccountHelpContents
+              titleClicked={() => {
+                if (this.refs.RegularAccountHelperBottomSheet as any)
+                  (this.refs.RegularAccountHelperBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.blue}
+              backgroundColor={Colors.blue}
+              onPressHeader={() => {
+                if (isRegularAccountHelperDone) {
+                  if (this.refs.RegularAccountHelperBottomSheet as any)
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                      1,
+                    );
+                  setTimeout(() => {
+                    this.setState({ isRegularAccountHelperDone: false });
+                  }, 10);
+                } else {
+                  if (this.refs.RegularAccountHelperBottomSheet as any)
+                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                      0,
+                    );
+                }
+              }}
+            />
+          )}
+        />) : null}
+
+       {this.state.is_initiated ? ( <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'TransactionDetailsBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('88%')
+              : hp('88%'),
+          ]}
+          renderContent={() => (
+            <TransactionDetails
+              item={transactionItem}
+              serviceType={serviceType}
+              getServiceType={this.getServiceType}
+              onPressKnowMore={() => {
+                this.props.setTransactionHelper(true);
+                //AsyncStorage.setItem('isTransactionHelperDone', 'true');
+                (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
+                  1,
+                );
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.white}
+              backgroundColor={Colors.white}
+              onPressHeader={() => {
+                if (this.refs.TransactionDetailsBottomSheet as any)
+                  (this.refs.TransactionDetailsBottomSheet as any).snapTo(0);
+              }}
+            />
+          )}
+        />): null}
+
+{this.state.is_initiated ? (<BottomSheet
+          enabledInnerScrolling={true}
+          ref={'TransactionDetailsHelperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && deviceInfoModule.hasNotch()
+              ? hp('87%')
+              : hp('89%'),
+            // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+            //   ? hp('35%')
+            //   : hp('40%'),
+          ]}
+          renderContent={() => (
+            <TransactionHelperModalContents
+              titleClicked={() => {
+                (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
+                  0,
+                );
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              borderColor={Colors.blue}
+              backgroundColor={Colors.blue}
+              onPressHeader={() => {
+                if (isHelperDone) {
+                  (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
+                    1,
+                  );
+                  setTimeout(() => {
+                    this.setState({ isHelperDone: false });
+                  }, 10);
+                } else {
+                  (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
+                    0,
+                  );
+                }
+              }}
+            />
+          )}
+        /> ) : null}
       </View>
     );
   }
