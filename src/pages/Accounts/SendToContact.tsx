@@ -221,23 +221,39 @@ export default function SendToContact(props) {
   }, [spendableBalances, serviceType]);
 
   const storeAverageTxFees = async () => {
-    const storedAverageTxFees = await AsyncStorage.getItem(
-      'storedAverageTxFees',
+    const storedAverageTxFees = JSON.parse(
+      await AsyncStorage.getItem('storedAverageTxFees'),
     );
-    if (storedAverageTxFees) {
-      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+    //console.log({ storedAverageTxFees });
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
       if (Date.now() - lastFetched < 1800000) {
+        // maintaining a half an hour difference b/w fetches
         setAverageTxFees(averageTxFees);
-        return;
-      } // maintaining a half an hour difference b/w fetches
+      } else {
+        const instance = service.hdWallet || service.secureHDWallet;
+        const averageTxFees = await instance.averageTransactionFee();
+
+        setAverageTxFees(averageTxFees);
+        await AsyncStorage.setItem(
+          'storedAverageTxFees',
+          JSON.stringify({
+            ...storedAverageTxFees,
+            [serviceType]: { averageTxFees, lastFetched: Date.now() },
+          }),
+        );
+      }
+    } else {
+      const instance = service.hdWallet || service.secureHDWallet;
+      const averageTxFees = await instance.averageTransactionFee();
+      setAverageTxFees(averageTxFees);
+      await AsyncStorage.setItem(
+        'storedAverageTxFees',
+        JSON.stringify({
+          [serviceType]: { averageTxFees, lastFetched: Date.now() },
+        }),
+      );
     }
-    const instance = service.hdWallet || service.secureHDWallet;
-    const averageTxFees = await instance.averageTransactionFee();
-    setAverageTxFees(averageTxFees);
-    await AsyncStorage.setItem(
-      'storedAverageTxFees',
-      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-    );
   };
 
   useEffect(() => {
@@ -596,11 +612,11 @@ export default function SendToContact(props) {
   const renderSendUnSuccessHeader = () => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   //  dispatch(clearTransfer(serviceType));
-        //   if (SendUnSuccessBottomSheet.current)
-        //     SendUnSuccessBottomSheet.current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   //  dispatch(clearTransfer(serviceType));
+      //   if (SendUnSuccessBottomSheet.current)
+      //     SendUnSuccessBottomSheet.current.snapTo(0);
+      // }}
       />
     );
   };
@@ -772,10 +788,10 @@ export default function SendToContact(props) {
     ) {
       return (
         <ModalHeader
-          // onPressHeader={() => {
-          //   if (RemoveBottomSheet.current)
-          //     (RemoveBottomSheet as any).current.snapTo(0);
-          // }}
+        // onPressHeader={() => {
+        //   if (RemoveBottomSheet.current)
+        //     (RemoveBottomSheet as any).current.snapTo(0);
+        // }}
         />
       );
     }
@@ -829,9 +845,9 @@ export default function SendToContact(props) {
   const renderAccountSelectionHeader = useCallback(() => {
     return (
       <SmallHeaderModal
-        // onPressHeader={() => {
-        //   AccountSelectionBottomSheet.current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   AccountSelectionBottomSheet.current.snapTo(0);
+      // }}
       />
     );
   }, []);

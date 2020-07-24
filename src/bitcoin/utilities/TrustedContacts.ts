@@ -282,6 +282,10 @@ export default class TrustedContacts {
           this.trustedContacts[contactName].FCMs
             ? this.trustedContacts[contactName].FCMs.push(data.FCM)
             : (this.trustedContacts[contactName].FCMs = [data.FCM]);
+
+        this.trustedContacts[contactName].trustedAddress = data.trustedAddress;
+        this.trustedContacts[contactName].trustedTestAddress =
+          data.trustedTestAddress;
       }
     } else {
       ephemeralData = [data];

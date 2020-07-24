@@ -364,29 +364,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       if (Date.now() - lastFetched < 1800000) {
         // maintaining a half an hour difference b/w fetches
         this.setState({ averageTxFees: averageTxFees });
-      } else {
-        const instance = service.hdWallet || service.secureHDWallet;
-        const averageTxFees = await instance.averageTransactionFee();
-
-        this.setState({ averageTxFees: averageTxFees });
-        this.props.setAverageTxFee({
-          ...storedAverageTxFees,
-          serviceType: { averageTxFees, lastFetched: Date.now() },
-        });
-        // await AsyncStorage.setItem(
-        //   'storedAverageTxFees',
-        //   JSON.stringify({
-        //     ...storedAverageTxFees,
-        //     serviceType: { averageTxFees, lastFetched: Date.now() },
-        //   }),
-        // );
       }
     } else {
       const instance = service.hdWallet || service.secureHDWallet;
       const averageTxFees = await instance.averageTransactionFee();
       this.setState({ averageTxFees: averageTxFees });
       this.props.setAverageTxFee({
-        serviceType: { averageTxFees, lastFetched: Date.now() },
+        ...storedAverageTxFees,
+        [serviceType]: { averageTxFees, lastFetched: Date.now() },
       });
       // await AsyncStorage.setItem(
       //   'storedAverageTxFees',
@@ -429,6 +414,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.accounts[this.state.serviceType].service
     ) {
       this.getBalance();
+      this.balanceTxLoading = this.props.accounts[
+        this.state.serviceType
+      ].loading.balanceTx;
+      this.derivativeBalanceTxLoading = this.props.accounts[
+        this.state.serviceType
+      ].loading.derivativeBalanceTx;
     }
     if (
       prevProps.accounts.exchangeRates !== this.props.accounts.exchangeRates
@@ -1505,6 +1496,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             />
           )}
         />): null}
+
 
 {this.state.is_initiated ? (<BottomSheet
           enabledInnerScrolling={true}

@@ -123,7 +123,7 @@ export default function ContactDetails(props) {
   const uploading = useSelector(
     (state) => state.sss.loading.uploadRequestedShare,
   );
-  const fcmTokenValue =  useSelector((state) => state.preferences.fcmTokenValue);
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
   const errorSending = useSelector((state) => state.sss.errorSending);
   const uploadSuccessfull = useSelector(
     (state) => state.sss.uploadSuccessfully,
@@ -692,7 +692,7 @@ export default function ContactDetails(props) {
         (Contact.emails && Contact.emails.length))
     ) {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = fcmTokenValue; 
+      const FCM = fcmTokenValue;
       //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
@@ -953,9 +953,9 @@ export default function ContactDetails(props) {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-      onPressHeader={() => {
-        (shareBottomSheet as any).current.snapTo(0);
-      }}
+        onPressHeader={() => {
+          (shareBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -1001,13 +1001,15 @@ export default function ContactDetails(props) {
               ) : null}
             </View>
             {Contact.hasTrustedChannel &&
-            !Contact.hasXpub ? null : Contact.contactName ===
-                'Secondary Device' && !Contact.hasXpub ? null : (
+            !(
+              Contact.hasXpub || Contact.hasTrustedAddress
+            ) ? null : Contact.contactName === 'Secondary Device' &&
+              !(Contact.hasXpub || Contact.hasTrustedAddress) ? null : (
               <TouchableOpacity
                 disabled={isSendDisabled}
                 onPress={() => {
                   setIsSendDisabled(true);
-                  Contact.hasXpub
+                  Contact.hasXpub || Contact.hasTrustedAddress
                     ? onPressSend()
                     : Contact.contactName != 'Secondary Device'
                     ? onPressResendRequest()
@@ -1027,7 +1029,7 @@ export default function ContactDetails(props) {
                   paddingRight: wp('1.5%'),
                 }}
               >
-                {Contact.hasXpub && (
+                {(Contact.hasXpub || Contact.hasTrustedAddress) && (
                   <Image
                     source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                     style={{
@@ -1045,7 +1047,7 @@ export default function ContactDetails(props) {
                     marginLeft: 2,
                   }}
                 >
-                  {Contact.hasXpub
+                  {Contact.hasXpub || Contact.hasTrustedAddress
                     ? 'Send'
                     : index < 3
                     ? 'Reshare'

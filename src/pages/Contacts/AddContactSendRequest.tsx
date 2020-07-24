@@ -28,13 +28,26 @@ import SendViaLink from '../../components/SendViaLink';
 import { nameToInitials } from '../../common/CommonFunctions';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
-import { EphemeralData, EphemeralDataElements } from '../../bitcoin/utilities/Interface';
+import {
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
+import {
+  EphemeralData,
+  EphemeralDataElements,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import ModalHeader from '../../components/ModalHeader';
 import Toast from '../../components/Toast';
 import TimerModalContents from './TimerModalContents';
-
+import {
+  TRUSTED_CONTACTS,
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
@@ -51,7 +64,9 @@ export default function AddContactSendRequest(props) {
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
   const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
-  let trustedContactsInfo = useSelector((state) => state.trustedContacts.trustedContactsInfo)
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
 
   const SelectedContact = props.navigation.getParam('SelectedContact')
     ? props.navigation.getParam('SelectedContact')
@@ -67,6 +82,15 @@ export default function AddContactSendRequest(props) {
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
+
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
+
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
@@ -81,13 +105,13 @@ export default function AddContactSendRequest(props) {
 
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
 
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
 
@@ -103,11 +127,11 @@ export default function AddContactSendRequest(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact;
     }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+    // await AsyncStorage.setItem(
+    //   'TrustedContactsInfo',
+    //   JSON.stringify(trustedContactsInfo),
+    // );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 
   const dispatch = useDispatch();
@@ -116,7 +140,7 @@ export default function AddContactSendRequest(props) {
     if (Contact && Contact.firstName) {
       const contactName = `${Contact.firstName} ${
         Contact.lastName ? Contact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -140,9 +164,34 @@ export default function AddContactSendRequest(props) {
       const FCM = fcmTokenValue;
       //await AsyncStorage.getItem('fcmToken');
 
+      let accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[contactName];
+      if (!accountNumber) {
+        // initialize a trusted derivative account against the following account
+        const res = regularAccount.getDerivativeAccXpub(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        if (res.status !== 200) {
+          console.log('Err occurred while generating derivative account');
+        } else {
+          // refresh the account number
+          accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[contactName];
+        }
+      }
+
+      const trustedReceivingAddress = (regularAccount.hdWallet
+        .derivativeAccounts[TRUSTED_CONTACTS][
+        accountNumber
+      ] as TrustedContactDerivativeAccountElements).receivingAddress;
+
       const data: EphemeralDataElements = {
         walletID,
         FCM,
+        trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
 
       if (!trustedContact) {
@@ -152,7 +201,7 @@ export default function AddContactSendRequest(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -179,7 +228,7 @@ export default function AddContactSendRequest(props) {
 
     const contactName = `${Contact.firstName} ${
       Contact.lastName ? Contact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -291,40 +340,40 @@ export default function AddContactSendRequest(props) {
 
   const renderSendViaLinkContents = useCallback(() => {
     if (!isEmpty(Contact)) {
-    return (
-      <SendViaLink
-        isFromReceive={true}
-        headerText={'Share'}
-        subHeaderText={'Send to your contact'}
-        contactText={'Adding to Friends and Family:'}
-        contact={Contact ? Contact : null}
-        infoText={`Click here to accept contact request from ${
-          WALLET_SETUP.walletName
+      return (
+        <SendViaLink
+          isFromReceive={true}
+          headerText={'Share'}
+          subHeaderText={'Send to your contact'}
+          contactText={'Adding to Friends and Family:'}
+          contact={Contact ? Contact : null}
+          infoText={`Click here to accept contact request from ${
+            WALLET_SETUP.walletName
           } Hexa wallet - link will expire in ${
-          config.TC_REQUEST_EXPIRY / (60000 * 60)
+            config.TC_REQUEST_EXPIRY / (60000 * 60)
           } hours`}
-        link={trustedLink}
-        contactEmail={''}
-        onPressBack={() => {
-          if (SendViaLinkBottomSheet.current)
+          link={trustedLink}
+          contactEmail={''}
+          onPressBack={() => {
+            if (SendViaLinkBottomSheet.current)
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+          }}
+          onPressDone={async () => {
             (SendViaLinkBottomSheet as any).current.snapTo(0);
-        }}
-        onPressDone={async () => {
-          (SendViaLinkBottomSheet as any).current.snapTo(0);
-          openTimer();
-        }}
-      />
-    )
-      }
+            openTimer();
+          }}
+        />
+      );
+    }
   }, [Contact, trustedLink]);
 
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaLinkBottomSheet.current)
-        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -363,10 +412,10 @@ export default function AddContactSendRequest(props) {
   const renderTimerModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (TimerModalBottomSheet.current)
-        //     (TimerModalBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (TimerModalBottomSheet.current)
+      //     (TimerModalBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -379,10 +428,10 @@ export default function AddContactSendRequest(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaQRBottomSheet.current)
-        //     (SendViaQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -494,10 +543,10 @@ export default function AddContactSendRequest(props) {
                   {Contact.firstName && Contact.lastName
                     ? Contact.firstName + ' ' + Contact.lastName
                     : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                        ? Contact.lastName
-                        : ''}
+                    ? Contact.firstName
+                    : !Contact.firstName && Contact.lastName
+                    ? Contact.lastName
+                    : ''}
                 </Text>
                 {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
                   <Text
@@ -545,41 +594,41 @@ export default function AddContactSendRequest(props) {
                 />
               </View>
             ) : (
-                <View
+              <View
+                style={{
+                  position: 'absolute',
+                  marginLeft: 15,
+                  marginRight: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: Colors.backgroundColor,
+                  width: 70,
+                  height: 70,
+                  borderRadius: 70 / 2,
+                  shadowColor: Colors.shadowBlue,
+                  shadowOpacity: 1,
+                  shadowOffset: { width: 2, height: 2 },
+                }}
+              >
+                <Text
                   style={{
-                    position: 'absolute',
-                    marginLeft: 15,
-                    marginRight: 15,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: Colors.backgroundColor,
-                    width: 70,
-                    height: 70,
-                    borderRadius: 70 / 2,
-                    shadowColor: Colors.shadowBlue,
-                    shadowOpacity: 1,
-                    shadowOffset: { width: 2, height: 2 },
+                    textAlign: 'center',
+                    fontSize: RFValue(20),
+                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
                   }}
                 >
-                  <Text
-                    style={{
-                      textAlign: 'center',
-                      fontSize: RFValue(20),
-                      lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                    }}
-                  >
-                    {nameToInitials(
-                      Contact.firstName && Contact.lastName
-                        ? Contact.firstName + ' ' + Contact.lastName
-                        : Contact.firstName && !Contact.lastName
-                          ? Contact.firstName
-                          : !Contact.firstName && Contact.lastName
-                            ? Contact.lastName
-                            : '',
-                    )}
-                  </Text>
-                </View>
-              )}
+                  {nameToInitials(
+                    Contact.firstName && Contact.lastName
+                      ? Contact.firstName + ' ' + Contact.lastName
+                      : Contact.firstName && !Contact.lastName
+                      ? Contact.firstName
+                      : !Contact.firstName && Contact.lastName
+                      ? Contact.lastName
+                      : '',
+                  )}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
         <View style={{ marginTop: 'auto' }}>
@@ -641,7 +690,7 @@ export default function AddContactSendRequest(props) {
           </View>
         </View>
         <BottomSheet
-        enabledGestureInteraction={false}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaLinkBottomSheet as any}
           snapPoints={[
@@ -654,7 +703,7 @@ export default function AddContactSendRequest(props) {
           renderHeader={renderSendViaLinkHeader}
         />
         <BottomSheet
-        enabledGestureInteraction={false}
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaQRBottomSheet as any}
           snapPoints={[

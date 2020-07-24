@@ -58,6 +58,7 @@ import { trustedChannelsSyncWorker } from './trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 // function* fetchAddrWorker({ payload }) {
 //   yield put(switchLoader(payload.serviceType, 'receivingAddress'));
@@ -449,6 +450,10 @@ function* processRecipients(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
 
+  const trustedContactsServices: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
   for (const recipient of recipients) {
     if (recipient.address) addressedRecipients.push(recipient);
     // recipient: explicit address
@@ -456,8 +461,6 @@ function* processRecipients(
       if (!recipient.id) throw new Error('Invalid recipient');
       if (recipient.id === REGULAR_ACCOUNT || recipient.id === SECURE_ACCOUNT) {
         // recipient: sibling account
-        const instance =
-          recipient.id === REGULAR_ACCOUNT ? regularAccount : secureAccount;
         const subInstance =
           recipient.id === REGULAR_ACCOUNT
             ? regularAccount.hdWallet
@@ -475,38 +478,58 @@ function* processRecipients(
         const contactName = recipient.id;
         let res;
 
-        if (serviceType !== TEST_ACCOUNT) {
-          res = yield call(
-            regularAccount.getDerivativeAccAddress,
-            TRUSTED_CONTACTS,
-            null,
-            contactName,
-          );
-        } else {
-          console.log(regularAccount.hdWallet.trustedContactToDA);
-          const accountNumber =
-            regularAccount.hdWallet.trustedContactToDA[
-              contactName.toLowerCase().trim()
-            ];
-          if (accountNumber) {
-            const { contactDetails } = regularAccount.hdWallet
-              .derivativeAccounts[TRUSTED_CONTACTS][
-              accountNumber
-            ] as TrustedContactDerivativeAccountElements;
+        const accountNumber =
+          regularAccount.hdWallet.trustedContactToDA[
+            contactName.toLowerCase().trim()
+          ];
+        if (accountNumber) {
+          const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ][accountNumber] as TrustedContactDerivativeAccountElements;
 
+          if (serviceType !== TEST_ACCOUNT) {
+            if (contactDetails && contactDetails.xpub) {
+              res = yield call(
+                regularAccount.getDerivativeAccAddress,
+                TRUSTED_CONTACTS,
+                null,
+                contactName,
+              );
+            } else {
+              const {
+                trustedAddress,
+              } = trustedContactsServices.tc.trustedContacts[
+                contactName.toLowerCase().trim()
+              ];
+              if (trustedAddress)
+                res = { status: 200, data: { address: trustedAddress } };
+              else
+                throw new Error('Failed fetch contact address, xpub missing');
+            }
+          } else {
             if (contactDetails && contactDetails.tpub) {
               res = yield call(
                 testAccount.deriveReceivingAddress,
                 contactDetails.tpub,
               );
             } else {
-              throw new Error('Failed fetch testnet address, tpub missing');
+              const {
+                trustedTestAddress,
+              } = trustedContactsServices.tc.trustedContacts[
+                contactName.toLowerCase().trim()
+              ];
+              if (trustedTestAddress)
+                res = { status: 200, data: { address: trustedTestAddress } };
+              else
+                throw new Error(
+                  'Failed fetch contact testnet address, tpub missing',
+                );
             }
-          } else {
-            throw new Error(
-              'Failed fetch testnet address, accountNumber missing',
-            );
           }
+        } else {
+          throw new Error(
+            'Failed fetch testnet address, accountNumber missing',
+          );
         }
 
         console.log({ res });

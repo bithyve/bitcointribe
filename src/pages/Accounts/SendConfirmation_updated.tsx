@@ -111,7 +111,7 @@ class SendConfirmation_updated extends Component<
       SelectedContactId: 0,
       transfer: {},
       loading: {},
-      isConfirmDisabled: false
+      isConfirmDisabled: false,
     };
   }
 
@@ -129,7 +129,6 @@ class SendConfirmation_updated extends Component<
       loading: accounts[this.serviceType].loading,
     });
     this.onChangeInTransfer();
-    
   };
 
   componentDidUpdate = (prevProps) => {
@@ -142,10 +141,10 @@ class SendConfirmation_updated extends Component<
       this.props.accounts[this.serviceType].transfer
     ) {
       this.setState({
-          transfer: this.props.accounts[this.serviceType].transfer,
-        });
+        transfer: this.props.accounts[this.serviceType].transfer,
+      });
       setTimeout(() => {
-      this.onChangeInTransfer();
+        this.onChangeInTransfer();
       }, 10);
     }
 
@@ -160,8 +159,8 @@ class SendConfirmation_updated extends Component<
       prevProps.accounts[this.serviceType].loading.transfer !==
       this.props.accounts[this.serviceType].loading.transfer
     ) {
-      if(!this.props.accounts[this.serviceType].loading.transfer)
-      this.setState({ isConfirmDisabled: false});
+      if (!this.props.accounts[this.serviceType].loading.transfer)
+        this.setState({ isConfirmDisabled: false });
     }
   };
 
@@ -296,7 +295,7 @@ class SendConfirmation_updated extends Component<
   onConfirm = () => {
     let { sliderValueText } = this.state;
     setTimeout(() => {
-      this.setState({isConfirmDisabled: true});
+      this.setState({ isConfirmDisabled: true });
     }, 1);
     this.props.clearTransfer(this.serviceType, 'stage2');
     const txPriority =
@@ -592,16 +591,18 @@ class SendConfirmation_updated extends Component<
               style={{
                 ...styles.confirmButtonView,
                 backgroundColor: isConfirmDisabled
-                ? Colors.lightBlue
-                : Colors.blue,
+                  ? Colors.lightBlue
+                  : Colors.blue,
                 elevation: 10,
                 shadowColor: Colors.shadowBlue,
                 shadowOpacity: 1,
                 shadowOffset: { width: 15, height: 15 },
               }}
             >
-              {(!isConfirmDisabled && this.props.accounts[this.serviceType].loading.transfer) ||
-              (isConfirmDisabled && this.props.accounts[this.serviceType].loading.transfer) ? (
+              {(!isConfirmDisabled &&
+                this.props.accounts[this.serviceType].loading.transfer) ||
+              (isConfirmDisabled &&
+                this.props.accounts[this.serviceType].loading.transfer) ? (
                 <ActivityIndicator size="small" />
               ) : (
                 <Text style={styles.buttonText}>{'Confirm & Send'}</Text>
@@ -626,19 +627,19 @@ class SendConfirmation_updated extends Component<
         <BottomSheet
           onCloseStart={() => {
             if (this.refs.SendSuccessBottomSheet as any)
-                  (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+              (this.refs.SendSuccessBottomSheet as any).snapTo(0);
 
-                this.props.clearTransfer(this.serviceType);
-                navigation.navigate('Accounts', {
-                  serviceType: this.serviceType,
-                  index:
-                    this.serviceType === TEST_ACCOUNT
-                      ? 0
-                      : this.serviceType === REGULAR_ACCOUNT
-                      ? 1
-                      : 2,
-                  spendableBalance: this.spendableBalance - totalAmount,
-                });
+            this.props.clearTransfer(this.serviceType);
+            navigation.navigate('Accounts', {
+              serviceType: this.serviceType,
+              index:
+                this.serviceType === TEST_ACCOUNT
+                  ? 0
+                  : this.serviceType === REGULAR_ACCOUNT
+                  ? 1
+                  : 2,
+              spendableBalance: this.spendableBalance - totalAmount,
+            });
           }}
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -688,11 +689,11 @@ class SendConfirmation_updated extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              // onPressHeader={() => {
-              //   if (this.refs.SendSuccessBottomSheet as any)
-              //     (this.refs.SendSuccessBottomSheet as any).snapTo(0);
-              //   navigation.navigate('Accounts');
-              // }}
+            // onPressHeader={() => {
+            //   if (this.refs.SendSuccessBottomSheet as any)
+            //     (this.refs.SendSuccessBottomSheet as any).snapTo(0);
+            //   navigation.navigate('Accounts');
+            // }}
             />
           )}
         />
@@ -729,10 +730,10 @@ class SendConfirmation_updated extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              // onPressHeader={() => {
-              //   if (this.refs.SendUnSuccessBottomSheet as any)
-              //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              // }}
+            // onPressHeader={() => {
+            //   if (this.refs.SendUnSuccessBottomSheet as any)
+            //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+            // }}
             />
           )}
         />
@@ -786,8 +787,7 @@ const mapStateToProps = (state) => {
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
     accounts: idx(state, (_) => _.accounts) || [],
-    WALLET_SETUP:
-      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || '',
+    WALLET_SETUP: idx(state, (_) => _.storage.database.WALLET_SETUP) || '',
   };
 };
 

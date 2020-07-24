@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, AsyncStorage, TouchableOpacity, Text, SafeAreaView, StatusBar } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  AsyncStorage,
+  TouchableOpacity,
+  Text,
+  SafeAreaView,
+  StatusBar,
+} from 'react-native';
 import ContactList from '../../components/ContactList';
 import Toast from '../../components/Toast';
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import Colors from '../../common/Colors';
+import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
@@ -13,16 +21,17 @@ const ContactsListForAssociateContact = (props) => {
   const [contacts, setContacts] = useState([]);
   const postAssociation = props.navigation.getParam('postAssociation');
   const isGuardian = props.navigation.getParam('isGuardian');
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   function selectedContactsList(list) {
     if (list.length > 0) setContacts([...list]);
   }
 
-  const trustedContactsState  = useSelector((state) => state.trustedContacts);
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
 
   const updateTrustedContactsInfo = async () => {
-    let { trustedContactsInfo } = trustedContactsState;
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -30,13 +39,13 @@ const ContactsListForAssociateContact = (props) => {
 
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
 
           const selectedContactName = `${contacts[0].firstName} ${
             contacts[0].lastName ? contacts[0].lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
 
@@ -47,9 +56,9 @@ const ContactsListForAssociateContact = (props) => {
         Toast(
           // `Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`,
           `${
-          isGuardian
-            ? 'You have been successfully added as a Keeper'
-            : 'Contact successfully added to Friends and Family'
+            isGuardian
+              ? 'You have been successfully added as a Keeper'
+              : 'Contact successfully added to Friends and Family'
           }`,
         );
         postAssociation(contacts[0]);
@@ -64,20 +73,19 @@ const ContactsListForAssociateContact = (props) => {
       // Toast(`Trusted Contact${isGuardian ? '(Ward)' : ''} added successfully`);
       Toast(
         `${
-        isGuardian
-          ? 'You have been successfully added as a Keeper'
-          : 'Contact successfully added to Friends and Family'
+          isGuardian
+            ? 'You have been successfully added as a Keeper'
+            : 'Contact successfully added to Friends and Family'
         }`,
       );
       postAssociation(contacts[0]);
       props.navigation.navigate('Home');
     }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
-
+    // await AsyncStorage.setItem(
+    //   'TrustedContactsInfo',
+    //   JSON.stringify(trustedContactsInfo),
+    // );
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 
   // const continueNProceed = async () => {
@@ -113,11 +121,7 @@ const ContactsListForAssociateContact = (props) => {
             onPress={() => props.navigation.goBack()}
             style={{ height: 30, width: 30, justifyContent: 'center' }}
           >
-            <FontAwesome
-              name="long-arrow-left"
-              color={Colors.blue}
-              size={17}
-            />
+            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </TouchableOpacity>
           <View>
             <Text style={styles.modalHeaderTitleText}>
@@ -127,8 +131,9 @@ const ContactsListForAssociateContact = (props) => {
         </View>
       </View>
       <Text style={styles.modalSubheaderText}>
-        Associate a contact from your address book. This will help you remember who the request was from
-        </Text>
+        Associate a contact from your address book. This will help you remember
+        who the request was from
+      </Text>
       <ContactList
         isTrustedContact={true}
         style={{}}
