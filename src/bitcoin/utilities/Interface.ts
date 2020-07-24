@@ -193,6 +193,7 @@ export interface EphemeralDataElements {
       paymentURI?: string;
     };
   };
+  trustedAddress?: string;
 }
 
 export interface EphemeralData {

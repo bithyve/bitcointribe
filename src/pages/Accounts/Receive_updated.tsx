@@ -43,7 +43,10 @@ import {
   TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes';
 import BackupStyles from '../ManageBackup/Styles';
-import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
 import {
   EphemeralDataElements,
   TrustedContactDerivativeAccountElements,
@@ -55,7 +58,10 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import Loader from '../../components/loader';
 import TwoFASetupWarningModal from './TwoFASetupWarningModal';
 import idx from 'idx';
-import { setReceiveHelper, setSavingWarning } from '../../store/actions/preferences';
+import {
+  setReceiveHelper,
+  setSavingWarning,
+} from '../../store/actions/preferences';
 
 export default function Receive(props) {
   const [
@@ -103,9 +109,15 @@ export default function Receive(props) {
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
-  const fcmTokenValue =  useSelector((state) => idx(state, (_) => _.preferences.fcmTokenValue));
-  const isReceiveHelperDoneValue =  useSelector((state) => idx(state, (_) => _.preferences.isReceiveHelperDoneValue));
-  const savingWarning =  useSelector((state) => idx(state, (_) => _.preferences.savingWarning));
+  const fcmTokenValue = useSelector((state) =>
+    idx(state, (_) => _.preferences.fcmTokenValue),
+  );
+  const isReceiveHelperDoneValue = useSelector((state) =>
+    idx(state, (_) => _.preferences.isReceiveHelperDoneValue),
+  );
+  const savingWarning = useSelector((state) =>
+    idx(state, (_) => _.preferences.savingWarning),
+  );
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
@@ -172,7 +184,7 @@ export default function Receive(props) {
     }
     const contactName = `${selectedContact.firstName} ${
       selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -283,19 +295,21 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
+    let { trustedContactsInfo } = useSelector(
+      (state) => state.trustedContacts.trustedContacts,
+    );
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
           if (!trustedContact) return false;
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
           return presentContactName == selectedContactName;
@@ -314,7 +328,7 @@ export default function Receive(props) {
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 
   const createTrustedContact = useCallback(async () => {
@@ -323,7 +337,7 @@ export default function Receive(props) {
     if (selectedContact && selectedContact.firstName) {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -357,13 +371,13 @@ export default function Receive(props) {
         regularAccount.hdWallet.trustedContactToDA[contactName];
       if (!accountNumber) {
         // initialize a trusted derivative account against the following account
-        const res = await regularAccount.getDerivativeAccXpub(
+        const res = regularAccount.getDerivativeAccXpub(
           TRUSTED_CONTACTS,
           null,
           contactName,
         );
         if (res.status !== 200) {
-          // console.log('Err occurred while generating derivative account');
+          console.log('Err occurred while generating derivative account');
         } else {
           // refresh the account number
           accountNumber =
@@ -402,6 +416,7 @@ export default function Receive(props) {
                 paymentURI,
               },
             },
+            trustedAddress: trustedReceivingAddress,
           };
           dispatch(updateEphemeralChannel(contactInfo, data));
         })();
@@ -410,7 +425,7 @@ export default function Receive(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
         dispatch(
@@ -457,7 +472,7 @@ export default function Receive(props) {
   ]);
 
   const checkNShowHelperModal = async () => {
-   let isReceiveHelperDone1 = isReceiveHelperDoneValue;
+    let isReceiveHelperDone1 = isReceiveHelperDoneValue;
     // let isReceiveHelperDone1 = await AsyncStorage.getItem(
     //   'isReceiveHelperDone',
     // );
@@ -481,41 +496,42 @@ export default function Receive(props) {
   useEffect(() => {
     checkNShowHelperModal();
     //(async () => {
-      if (serviceType === SECURE_ACCOUNT) {
-        if (!savingWarning) {//await AsyncStorage.getItem('savingsWarning')
-          // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
-          if (SecureReceiveWarningBottomSheet.current)
-            (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
-          dispatch(setSavingWarning(true));
-          //await AsyncStorage.setItem('savingsWarning', 'true');
-        }
+    if (serviceType === SECURE_ACCOUNT) {
+      if (!savingWarning) {
+        //await AsyncStorage.getItem('savingsWarning')
+        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        if (SecureReceiveWarningBottomSheet.current)
+          (SecureReceiveWarningBottomSheet as any).current.snapTo(1);
+        dispatch(setSavingWarning(true));
+        //await AsyncStorage.setItem('savingsWarning', 'true');
       }
+    }
     //})();
   }, []);
 
   const onPressOkOf2FASetupWarning = () => {
     if (SecureReceiveWarningBottomSheet.current)
       (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
-  }
+  };
 
   const onPressTouchableWrapper = () => {
     if (ReceiveHelperBottomSheet.current)
       (ReceiveHelperBottomSheet as any).current.snapTo(0);
-  }
+  };
 
   const onPressBack = () => {
     if (getServiceType) {
       getServiceType(serviceType);
     }
     props.navigation.goBack();
-  }
+  };
 
   const onPressKnowMore = () => {
     dispatch(setReceiveHelper(true));
     //AsyncStorage.setItem('isReceiveHelperDone', 'true');
     if (ReceiveHelperBottomSheet.current)
       (ReceiveHelperBottomSheet as any).current.snapTo(1);
-  }
+  };
 
   const onPressShare = () => {
     if (AsTrustedContact) {
@@ -523,7 +539,7 @@ export default function Receive(props) {
     }
     if (SendViaLinkBottomSheet.current)
       (SendViaLinkBottomSheet as any).current.snapTo(1);
-  }
+  };
 
   const onPressQr = () => {
     if (AsTrustedContact) {
@@ -531,7 +547,7 @@ export default function Receive(props) {
     }
     if (SendViaQRBottomSheet.current)
       (SendViaQRBottomSheet as any).current.snapTo(1);
-  }
+  };
 
   const onPressReceiveHelperHeader = () => {
     if (isReceiveHelperDone) {
@@ -544,14 +560,14 @@ export default function Receive(props) {
       if (ReceiveHelperBottomSheet.current)
         (ReceiveHelperBottomSheet as any).current.snapTo(0);
     }
-  }
+  };
 
   const onPressContinue = (selectedContacts) => {
     setTimeout(() => {
       setSelectedContact(selectedContacts[0]);
     }, 2);
     (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-  }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -583,8 +599,8 @@ export default function Receive(props) {
                     serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
-                        ? require('../../assets/images/icons/icon_regular.png')
-                        : require('../../assets/images/icons/icon_secureaccount.png')
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
                   }
                   style={{ width: wp('10%'), height: wp('10%') }}
                 />
@@ -600,8 +616,8 @@ export default function Receive(props) {
                     {serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
-                        ? 'Checking Account'
-                        : 'Savings Account'}
+                      ? 'Checking Account'
+                      : 'Savings Account'}
                   </Text>
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
@@ -658,7 +674,9 @@ export default function Receive(props) {
                 </TouchableOpacity>
                 {!isEmpty(selectedContact) && (
                   <View style={styles.contactProfileView}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View
+                      style={{ flexDirection: 'row', alignItems: 'center' }}
+                    >
                       <View style={styles.selectedContactView}>
                         {selectedContact && selectedContact.imageAvailable ? (
                           <View style={styles.selectedContactImageView}>
@@ -668,62 +686,63 @@ export default function Receive(props) {
                             />
                           </View>
                         ) : (
-                            <View style={styles.selectedContactInitialsView}>
-                              <Text style={styles.selectedContactInitialsText}>
-                                {nameToInitials(
-                                  selectedContact &&
+                          <View style={styles.selectedContactInitialsView}>
+                            <Text style={styles.selectedContactInitialsText}>
+                              {nameToInitials(
+                                selectedContact &&
+                                  selectedContact.firstName &&
+                                  selectedContact.lastName
+                                  ? selectedContact.firstName +
+                                      ' ' +
+                                      selectedContact.lastName
+                                  : selectedContact &&
                                     selectedContact.firstName &&
+                                    !selectedContact.lastName
+                                  ? selectedContact.firstName
+                                  : selectedContact &&
+                                    !selectedContact.firstName &&
                                     selectedContact.lastName
-                                    ? selectedContact.firstName +
-                                    ' ' +
-                                    selectedContact.lastName
-                                    : selectedContact &&
-                                      selectedContact.firstName &&
-                                      !selectedContact.lastName
-                                      ? selectedContact.firstName
-                                      : selectedContact &&
-                                        !selectedContact.firstName &&
-                                        selectedContact.lastName
-                                        ? selectedContact.lastName
-                                        : '',
-                                )}
-                              </Text>
-                            </View>
-                          )}
+                                  ? selectedContact.lastName
+                                  : '',
+                              )}
+                            </Text>
+                          </View>
+                        )}
                         <View>
                           <Text style={styles.addingAsContactText}>
                             Adding as a Contact:
                           </Text>
                           <Text style={styles.contactNameText}>
                             {selectedContact &&
-                              selectedContact.firstName &&
-                              selectedContact.lastName
+                            selectedContact.firstName &&
+                            selectedContact.lastName
                               ? selectedContact.firstName +
-                              ' ' +
-                              selectedContact.lastName
+                                ' ' +
+                                selectedContact.lastName
                               : selectedContact &&
                                 selectedContact.firstName &&
                                 !selectedContact.lastName
-                                ? selectedContact.firstName
-                                : selectedContact &&
-                                  !selectedContact.firstName &&
-                                  selectedContact.lastName
-                                  ? selectedContact.lastName
-                                  : ''}
+                              ? selectedContact.firstName
+                              : selectedContact &&
+                                !selectedContact.firstName &&
+                                selectedContact.lastName
+                              ? selectedContact.lastName
+                              : ''}
                           </Text>
                           {selectedContact &&
-                            selectedContact.phoneNumbers &&
-                            selectedContact.phoneNumbers.length ? (
-                              <Text style={styles.selectedContactPhoneNumber}>
-                                {selectedContact.phoneNumbers[0].digits}
-                              </Text>
-                            ) : selectedContact &&
-                              selectedContact.emails &&
-                              selectedContact.emails.length ? (
-                                <Text style={styles.selectedContactEmail}>
-                                  {selectedContact && selectedContact.emails[0].email}
-                                </Text>
-                              ) : null}
+                          selectedContact.phoneNumbers &&
+                          selectedContact.phoneNumbers.length ? (
+                            <Text style={styles.selectedContactPhoneNumber}>
+                              {selectedContact.phoneNumbers[0].digits}
+                            </Text>
+                          ) : selectedContact &&
+                            selectedContact.emails &&
+                            selectedContact.emails.length ? (
+                            <Text style={styles.selectedContactEmail}>
+                              {selectedContact &&
+                                selectedContact.emails[0].email}
+                            </Text>
+                          ) : null}
                         </View>
                       </View>
                     </View>
@@ -775,17 +794,15 @@ export default function Receive(props) {
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ReceiveHelperBottomSheet as any}
-        snapPoints={[
-          -50,
-          hp('89%'),
-        ]}
-        renderContent={() =>
-          (<ReceiveHelpContents 
-      titleClicked={()=>{
-        if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(0);
-      }}/>)
-        }
+        snapPoints={[-50, hp('89%')]}
+        renderContent={() => (
+          <ReceiveHelpContents
+            titleClicked={() => {
+              if (ReceiveHelperBottomSheet.current)
+                (ReceiveHelperBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.blue}
@@ -808,14 +825,19 @@ export default function Receive(props) {
             modalTitle="Select a Contact"
             modalRef={AddContactAddressBookBookBottomSheet}
             proceedButtonText={'Confirm & Proceed'}
-            onPressContinue={(selectedContacts) => onPressContinue(selectedContacts)}
-            onSelectContact={(selectedContact) => setSelectedContact(selectedContact)}
+            onPressContinue={(selectedContacts) =>
+              onPressContinue(selectedContacts)
+            }
+            onSelectContact={(selectedContact) =>
+              setSelectedContact(selectedContact)
+            }
             onPressBack={() => {
               setTimeout(() => {
                 setAsTrustedContact(!AsTrustedContact);
                 setSelectedContact({});
               }, 2);
-              (AddContactAddressBookBookBottomSheet as any).current.snapTo(0)}}
+              (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+            }}
           />
         )}
         renderHeader={() => (
@@ -864,15 +886,17 @@ export default function Receive(props) {
               if (SendViaLinkBottomSheet.current)
                 (SendViaLinkBottomSheet as any).current.snapTo(0);
             }}
-            onPressDone={() => (SendViaLinkBottomSheet as any).current.snapTo(0)}
+            onPressDone={() =>
+              (SendViaLinkBottomSheet as any).current.snapTo(0)
+            }
           />
         )}
         renderHeader={() => (
           <ModalHeader
-            // onPressHeader={() => {
-            //   if (SendViaLinkBottomSheet.current)
-            //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-            // }}
+          // onPressHeader={() => {
+          //   if (SendViaLinkBottomSheet.current)
+          //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+          // }}
           />
         )}
       />
@@ -905,10 +929,10 @@ export default function Receive(props) {
         )}
         renderHeader={() => (
           <ModalHeader
-            // onPressHeader={() => {
-            //   if (SendViaQRBottomSheet.current)
-            //     (SendViaQRBottomSheet as any).current.snapTo(0);
-            // }}
+          // onPressHeader={() => {
+          //   if (SendViaQRBottomSheet.current)
+          //     (SendViaQRBottomSheet as any).current.snapTo(0);
+          // }}
           />
         )}
       />
@@ -920,10 +944,12 @@ export default function Receive(props) {
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
         ]}
-        renderContent={() => <TwoFASetupWarningModal
-          onPressOk={() => onPressOkOf2FASetupWarning()}
-          //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
-        />}
+        renderContent={() => (
+          <TwoFASetupWarningModal
+            onPressOk={() => onPressOkOf2FASetupWarning()}
+            //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+          />
+        )}
         renderHeader={() => (
           <SmallHeaderModal
             borderColor={Colors.borderColor}
