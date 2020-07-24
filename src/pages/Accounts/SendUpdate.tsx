@@ -141,6 +141,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
   }
 
   componentDidMount = () => {
+    this.props.clearTransfer(this.state.serviceType);
     this.getBalances();
     if (this.state.serviceType === SECURE_ACCOUNT) this.twoFASetupMethod();
     this.checkNShowHelperModal();

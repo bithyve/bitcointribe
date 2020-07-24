@@ -132,7 +132,7 @@ class SendToContact extends Component<
         ? this.props.navigation.getParam('isFromAddressBook')
         : null,
       isOpen: false,
-      exchangeRates: [],
+      exchangeRates: null,
       selectedContact: this.props.navigation.getParam('selectedContact'),
       serviceType: this.props.navigation.getParam('serviceType'),
       averageTxFees: this.props.navigation.getParam('averageTxFees'),
@@ -173,10 +173,11 @@ class SendToContact extends Component<
     BackHandler.addEventListener('hardwareBackPress', () => {
       this.checkRecordsHavingPrice();
     });
-    this.setState({ exchangeRates: accounts && accounts.exchangeRates });
+    this.setState({ exchangeRates: accounts && accounts.exchangeRates }, () => {
+      if (bitcoinAmount) this.convertBitCoinToCurrency(bitcoinAmount);
+    });
     this.getBalances();
     this.setCurrencyCodeFromAsync();
-    if (bitcoinAmount) this.convertBitCoinToCurrency(bitcoinAmount);
     if (!averageTxFees) this.storeAverageTxFees();
 
     if (serviceType == REGULAR_ACCOUNT) {
