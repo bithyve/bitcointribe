@@ -127,10 +127,10 @@ export default function AddContactSendRequest(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact;
     }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
+    // await AsyncStorage.setItem(
+    //   'TrustedContactsInfo',
+    //   JSON.stringify(trustedContactsInfo),
+    // );
     dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 

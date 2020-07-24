@@ -120,6 +120,10 @@ export default function Receive(props) {
     idx(state, (_) => _.preferences.savingWarning),
   );
 
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
+
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
   );
@@ -299,9 +303,6 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let { trustedContactsInfo } = useSelector(
-      (state) => state.trustedContacts.trustedContacts,
-    );
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -328,10 +329,10 @@ export default function Receive(props) {
       trustedContactsInfo[2] = null;
       trustedContactsInfo[3] = contact; // initial 3 reserved for Guardians
     }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
+    // await AsyncStorage.setItem(
+    //   'TrustedContactsInfo',
+    //   JSON.stringify(trustedContactsInfo),
+    // );
     dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 

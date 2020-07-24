@@ -133,6 +133,9 @@ const TrustedContactHistory = (props) => {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
@@ -207,7 +210,7 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[1]);
       }
     }
-  }, [selectedTitle]);
+  }, [selectedTitle, trustedContactsInfo]);
 
   const getContacts = useCallback(
     async (selectedContacts, index) => {
@@ -791,9 +794,6 @@ const TrustedContactHistory = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      let { trustedContactsInfo } = useSelector(
-        (state) => state.trustedContacts.trustedContacts,
-      );
       if (trustedContactsInfo) {
         if (trustedContactsInfo[index]) {
           let found = false;
@@ -828,10 +828,10 @@ const TrustedContactHistory = (props) => {
         trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
-      await AsyncStorage.setItem(
-        'TrustedContactsInfo',
-        JSON.stringify(trustedContactsInfo),
-      );
+      // await AsyncStorage.setItem(
+      //   'TrustedContactsInfo',
+      //   JSON.stringify(trustedContactsInfo),
+      // );
       dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
     [index],

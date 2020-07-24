@@ -78,6 +78,10 @@ const SecondaryDeviceHistory = (props) => {
     (state) => state.storage.database.WALLET_SETUP,
   );
 
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
+
   const dispatch = useDispatch();
   const [secondaryQR, setSecondaryQR] = useState('');
   const s3Service: S3Service = useSelector((state) => state.sss.service);
@@ -170,23 +174,23 @@ const SecondaryDeviceHistory = (props) => {
     }
   };
 
-  const updateTrustedContactsInfo = useCallback(async (contact) => {
-    let { trustedContactsInfo } = useSelector(
-      (state) => state.trustedContacts.trustedContacts,
-    );
-    if (trustedContactsInfo) {
-      trustedContactsInfo[0] = contact;
-    } else {
-      trustedContactsInfo = [];
-      trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
-      trustedContactsInfo[0] = contact;
-    }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
-  }, []);
+  const updateTrustedContactsInfo = useCallback(
+    async (contact) => {
+      if (trustedContactsInfo) {
+        trustedContactsInfo[0] = contact;
+      } else {
+        trustedContactsInfo = [];
+        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+        trustedContactsInfo[0] = contact;
+      }
+      // await AsyncStorage.setItem(
+      //   'TrustedContactsInfo',
+      //   JSON.stringify(trustedContactsInfo),
+      // );
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+    },
+    [trustedContactsInfo],
+  );
 
   const createGuardian = useCallback(
     async (reshare?: boolean) => {
