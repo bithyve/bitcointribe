@@ -6,10 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Image,
   ScrollView,
-  Platform,
   RefreshControl,
   ImageBackground,
 } from 'react-native';
@@ -85,6 +83,10 @@ class ManageBackup extends Component<
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
           isSetupDone: true,
+          keeper1Done: false,
+          keeper1Name: '',
+          keeper2Done: false,
+          keeper2Name: '',
           id: 1,
         },
         {
@@ -94,7 +96,11 @@ class ManageBackup extends Component<
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
-          isSetupDone: false,
+          isSetupDone: true,
+          keeper1Done: true,
+          keeper1Name: 'iPad Pro',
+          keeper2Done: false,
+          keeper2Name: '',
           id: 2,
         },
         {
@@ -106,6 +112,10 @@ class ManageBackup extends Component<
           infoGreen: 'All Keepers are accessible',
           manageText: 'Setup',
           isSetupDone: false,
+          keeper1Done: false,
+          keeper1Name: '',
+          keeper2Done: false,
+          keeper2Name: '',
           id: 3,
         },
       ],
@@ -113,9 +123,9 @@ class ManageBackup extends Component<
   }
 
   selectId = (value) => {
-    if(value!=this.state.selectedId) this.setState({ selectedId: value });
+    if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
-  }
+  };
 
   render() {
     const { levelData, selectedId } = this.state;
@@ -147,7 +157,7 @@ class ManageBackup extends Component<
             />
           </TouchableOpacity>
         </View>
-        <View style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1 }}>
           <View style={styles.topHealthView}>
             <ImageBackground
               source={require('../../assets/images/icons/shield_blue.png')}
@@ -170,7 +180,7 @@ class ManageBackup extends Component<
                     marginTop: wp('7%'),
                     backgroundColor: value.isSetupDone
                       ? Colors.blue
-                      : Colors.backgroundColor1,
+                      : Colors.backgroundColor,
                   }}
                 >
                   <View style={styles.cardView}>
@@ -192,9 +202,25 @@ class ManageBackup extends Component<
                           }}
                         />
                       )}
-                      {value.isSetupDone && <TouchableOpacity style={styles.cardButtonView}>
-                        <Text style={styles.cardButtonText}>Know More</Text>
-                      </TouchableOpacity>}
+                      <TouchableOpacity
+                        style={{
+                          ...styles.cardButtonView,
+                          backgroundColor: value.isSetupDone
+                            ? Colors.deepBlue
+                            : Colors.white,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            ...styles.cardButtonText,
+                            color: value.isSetupDone
+                              ? Colors.white
+                              : Colors.textColorGrey,
+                          }}
+                        >
+                          Know More
+                        </Text>
+                      </TouchableOpacity>
                     </View>
 
                     <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
@@ -204,7 +230,7 @@ class ManageBackup extends Component<
                             ...styles.levelText,
                             color: value.isSetupDone
                               ? Colors.white
-                              : Colors.babyGray,
+                              : Colors.textColorGrey,
                           }}
                         >
                           {value.title}
@@ -214,10 +240,14 @@ class ManageBackup extends Component<
                             ...styles.levelInfoText,
                             color: value.isSetupDone
                               ? Colors.white
-                              : Colors.babyGray,
+                              : Colors.textColorGrey,
                           }}
                         >
-                          {value.isSetupDone ? value.health ? value.infoGreen : value.infoRed : value.infoGray}
+                          {value.isSetupDone
+                            ? value.health
+                              ? value.infoGreen
+                              : value.infoRed
+                            : value.infoGray}
                         </Text>
                       </View>
                       <TouchableOpacity
@@ -236,8 +266,14 @@ class ManageBackup extends Component<
                           {value.isSetupDone ? 'Manage' : 'Setup'}
                         </Text>
                         <AntDesign
-                          name={selectedId ? 'arrowup' : 'arrowright'}
-                          color={value.isSetupDone ? Colors.white : Colors.black}
+                          name={
+                            selectedId && selectedId == value.id
+                              ? 'arrowup'
+                              : 'arrowright'
+                          }
+                          color={
+                            value.isSetupDone ? Colors.white : Colors.black
+                          }
                           size={12}
                         />
                       </TouchableOpacity>
@@ -253,7 +289,9 @@ class ManageBackup extends Component<
                           <Text
                             numberOfLines={2}
                             style={{
-                              color: Colors.white,
+                              color: value.isSetupDone
+                                ? Colors.white
+                                : Colors.textColorGrey,
                               fontFamily: Fonts.FiraSansRegular,
                               fontSize: RFValue(10),
                             }}
@@ -261,21 +299,128 @@ class ManageBackup extends Component<
                             Lorem ipsum dolor sit amet, consetetur
                           </Text>
                         </View>
-
-                        <TouchableOpacity style={styles.appBackupButton}>
-                          <Image
-                            source={require('../../assets/images/icons/reset.png')}
-                            style={styles.resetImage}
-                          />
-                          <Text
-                            style={{
-                              ...styles.cardButtonText,
-                              fontSize: RFValue(11),
-                            }}
+                        {value.id == 1 ? (
+                          <View
+                            style={{ flexDirection: 'row', marginTop: 'auto' }}
                           >
-                            App Backup
-                          </Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={styles.appBackupButton}>
+                              <Image
+                                source={require('../../assets/images/icons/reset.png')}
+                                style={styles.resetImage}
+                              />
+                              <Text
+                                style={{
+                                  ...styles.cardButtonText,
+                                  fontSize: RFValue(11),
+                                }}
+                              >
+                                App Backup
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{
+                                ...styles.appBackupButton,
+                                width: wp('41%'),
+                                borderColor: Colors.red,
+                                borderWidth: 0.5,
+                                marginLeft: 'auto',
+                              }}
+                            >
+                              <ImageBackground
+                                source={require('../../assets/images/icons/questionMark.png')}
+                                style={{
+                                  ...styles.resetImage,
+                                  position: 'relative',
+                                }}
+                              >
+                                <View
+                                  style={{
+                                    backgroundColor: Colors.red,
+                                    width: wp('1%'),
+                                    height: wp('1%'),
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 0,
+                                  }}
+                                />
+                              </ImageBackground>
+                              <Text
+                                style={{
+                                  ...styles.cardButtonText,
+                                  fontSize: RFValue(11),
+                                }}
+                              >
+                                Security Question
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        ) : (
+                          <View
+                            style={{ flexDirection: 'row', marginTop: 'auto' }}
+                          >
+                            <TouchableOpacity
+                              style={{
+                                ...styles.appBackupButton,
+                                backgroundColor: value.isSetupDone && value.keeper1Done ? Colors.deepBlue : Colors.white,
+                                width: 'auto',
+                                paddingLeft: wp('3%'),
+                                paddingRight: wp('3%'),
+                                borderColor: Colors.red,
+                                borderWidth: 0.5,
+                              }}
+                            >
+                              <View
+                                style={{
+                                  backgroundColor: Colors.red,
+                                  width: wp('2%'),
+                                  height: wp('2%'),
+                                  borderRadius: wp('2%')/2,
+                                }}
+                              />
+                              <Text
+                                style={{
+                                  ...styles.cardButtonText,
+                                  color: value.isSetupDone && value.keeper1Done ? Colors.white : Colors.textColorGrey,
+                                  fontSize: RFValue(11),
+                                  marginLeft: wp('3%')
+                                }}
+                              >
+                                {value.isSetupDone && value.keeper1Done ? value.keeper1Name :'App Keeper'}
+                              </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={{
+                                ...styles.appBackupButton,
+                                backgroundColor: value.isSetupDone && value.keeper2Done ? Colors.deepBlue : Colors.white,
+                                width: 'auto',
+                                paddingLeft: wp('3%'),
+                                paddingRight: wp('3%'),
+                                borderColor: Colors.red,
+                                borderWidth: 0.5,
+                                marginLeft: wp('4%')
+                              }}
+                            >
+                              <View
+                                style={{
+                                  backgroundColor: Colors.red,
+                                  width: wp('2%'),
+                                  height: wp('2%'),
+                                  borderRadius: wp('2%')/2,
+                                }}
+                              />
+                              <Text
+                                style={{
+                                  ...styles.cardButtonText,
+                                  fontSize: RFValue(11),
+                                  color: value.isSetupDone && value.keeper2Done ? Colors.white : Colors.textColorGrey,
+                                  marginLeft: wp('3%')
+                                }}
+                              >
+                                {value.isSetupDone && value.keeper2Done ? value.keeper2Name :'App Keeper'}
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
                       </View>
                     </View>
                   ) : null}
@@ -283,7 +428,7 @@ class ManageBackup extends Component<
               );
             })}
           </View>
-        </View>
+        </ScrollView>
       </View>
     );
   }
@@ -384,8 +529,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   cardButtonView: {
-    backgroundColor: Colors.deepBlue,
-    width: wp('20%'),
+    width: wp('21%'),
     height: wp('8'),
     justifyContent: 'center',
     alignItems: 'center',
@@ -426,8 +570,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     width: wp('31%'),
-    height: wp('11'),
-    marginTop: 'auto',
+    height: wp('11%'),
   },
   resetImage: {
     width: wp('4%'),
