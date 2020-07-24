@@ -23,7 +23,11 @@ import Styles from '../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { trustedChannelsSync, removeTrustedContact, updateAddressBookLocally } from '../store/actions/trustedContacts';
+import {
+  trustedChannelsSync,
+  removeTrustedContact,
+  updateAddressBookLocally,
+} from '../store/actions/trustedContacts';
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount';
 import {
   REGULAR_ACCOUNT,
@@ -48,53 +52,47 @@ import Config from '../bitcoin/HexaConfig';
 interface AddressBookContentsPropTypes {
   navigation: any;
   isFocused: boolean;
-  regularAccount: RegularAccount,
-  trustedContactsService: TrustedContactsService,
-  trustedChannelsSync: any,
-  trustedChannelsSyncing: any,
-  updateAddressBookLocally: any,
-  addressBookData: any,
-  trustedContactsInfo: any,
-  removeTrustedContact: any,
+  regularAccount: RegularAccount;
+  trustedContactsService: TrustedContactsService;
+  trustedChannelsSync: any;
+  trustedChannelsSyncing: any;
+  updateAddressBookLocally: any;
+  addressBookData: any;
+  trustedContactsInfo: any;
+  removeTrustedContact: any;
 }
 interface AddressBookContentsStateTypes {
-  isLoadContacts: boolean,
-  selectedContact: any[],
-  loading: boolean,
-  MyKeeper: any[],
-  IMKeeper: any[],
-  trustedContact: any[],
-  OtherTrustedContact: any[],
-  onRefresh: boolean,
-  updateList: boolean
+  isLoadContacts: boolean;
+  selectedContact: any[];
+  loading: boolean;
+  MyKeeper: any[];
+  IMKeeper: any[];
+  trustedContact: any[];
+  OtherTrustedContact: any[];
+  onRefresh: boolean;
+  updateList: boolean;
 }
-
 
 const getImageIcon = (item) => {
   if (item) {
     if (item.image && item.image.uri) {
-      return (
-        <Image
-          source={item.image}
-          style={styles.imageIconStyle}
-        />
-      );
+      return <Image source={item.image} style={styles.imageIconStyle} />;
     } else {
       return (
         <View style={styles.imageIconViewStyle}>
           <Text style={styles.imageIconText}>
             {item
               ? nameToInitials(
-                item.firstName == 'Secondary' && item.lastName == 'Device'
-                  ? 'Keeper Device'
-                  : item.firstName && item.lastName
+                  item.firstName == 'Secondary' && item.lastName == 'Device'
+                    ? 'Keeper Device'
+                    : item.firstName && item.lastName
                     ? item.firstName + ' ' + item.lastName
                     : item.firstName && !item.lastName
-                      ? item.firstName
-                      : !item.firstName && item.lastName
-                        ? item.lastName
-                        : '',
-              )
+                    ? item.firstName
+                    : !item.firstName && item.lastName
+                    ? item.lastName
+                    : '',
+                )
               : ''}
           </Text>
         </View>
@@ -103,7 +101,10 @@ const getImageIcon = (item) => {
   }
 };
 
-class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, AddressBookContentsStateTypes> {
+class AddressBookContents extends PureComponent<
+  AddressBookContentsPropTypes,
+  AddressBookContentsStateTypes
+> {
   AddContactAddressBookBottomSheet: any;
   HelpBottomSheet: any;
   focusListener: any;
@@ -118,26 +119,35 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
       isLoadContacts: false,
       selectedContact: [],
       loading: true,
-      trustedContact: idx(props, _ => _.addressBookData.trustedContact) || [],
-      MyKeeper: idx(props, _ => _.addressBookData.MyKeeper) || [],
-      IMKeeper: idx(props, _ => _.addressBookData.IMKeeper) || [],
-      OtherTrustedContact: idx(props, _ => _.addressBookData.OtherTrustedContact) || [],
-      updateList: false
-    }
+      trustedContact: idx(props, (_) => _.addressBookData.trustedContact) || [],
+      MyKeeper: idx(props, (_) => _.addressBookData.MyKeeper) || [],
+      IMKeeper: idx(props, (_) => _.addressBookData.IMKeeper) || [],
+      OtherTrustedContact:
+        idx(props, (_) => _.addressBookData.OtherTrustedContact) || [],
+      updateList: false,
+    };
   }
-
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener('didFocus', () => {
       this.props.trustedChannelsSync();
-      this.updateAddressBook()
+      this.updateAddressBook();
     });
   }
 
   componentDidUpdate(prevProps) {
-    const oldDerivativeAccounts = idx(prevProps, (_) => _.regularAccount.hdWallet.derivativeAccounts);
-    const newDerivativeAccounts = idx(this.props, (_) => _.regularAccount.hdWallet.derivativeAccounts);
-    if (oldDerivativeAccounts !== newDerivativeAccounts || prevProps.trustedContactsService != this.props.trustedContactsService) {
+    const oldDerivativeAccounts = idx(
+      prevProps,
+      (_) => _.regularAccount.hdWallet.derivativeAccounts,
+    );
+    const newDerivativeAccounts = idx(
+      this.props,
+      (_) => _.regularAccount.hdWallet.derivativeAccounts,
+    );
+    if (
+      oldDerivativeAccounts !== newDerivativeAccounts ||
+      prevProps.trustedContactsService != this.props.trustedContactsService
+    ) {
       this.updateAddressBook();
     }
     if (this.state.trustedContact) {
@@ -145,9 +155,11 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         loading: false,
       });
     }
-    if (prevProps.trustedChannelsSyncing !== this.props.trustedChannelsSyncing) {
+    if (
+      prevProps.trustedChannelsSyncing !== this.props.trustedChannelsSyncing
+    ) {
       this.setState({
-        loading: this.props.trustedChannelsSyncing
+        loading: this.props.trustedChannelsSyncing,
       });
     }
   }
@@ -158,7 +170,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
 
   updateAddressBook = async () => {
     const { regularAccount, trustedContactsService } = this.props;
-    const { trustedContactsInfo } = this.props
+    const { trustedContactsInfo } = this.props;
     let myKeepers = [];
     let imKeepers = [];
     let otherTrustedContact = [];
@@ -170,7 +182,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           if (!contactInfo) continue;
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
+          }`;
           let connectedVia;
           if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
             connectedVia = contactInfo.phoneNumbers[0].number;
@@ -196,10 +208,14 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             }
           }
 
-          const isWard =
-            trustedContactsService.tc.trustedContacts[
-              contactName.toLowerCase().trim()
-            ].isWard;
+          const {
+            isWard,
+            trustedAddress,
+          } = trustedContactsService.tc.trustedContacts[
+            contactName.toLowerCase().trim()
+          ];
+
+          const hasTrustedAddress = !!trustedAddress;
 
           const isGuardian = index < 3 ? true : false;
           let shareIndex;
@@ -222,6 +238,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             contactName,
             connectedVia,
             hasXpub,
+            hasTrustedAddress,
             isGuardian,
             isWard,
             initiatedAt,
@@ -240,17 +257,21 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             otherTrustedContact.push({ ...element, isRemovable: true });
           }
         }
-        this.setState({
-          MyKeeper: myKeepers,
-          IMKeeper: imKeepers,
-          OtherTrustedContact: otherTrustedContact,
-          trustedContact: trustedContacts,
-        }, () => this.props.updateAddressBookLocally({
-          MyKeeper: myKeepers,
-          IMKeeper: imKeepers,
-          OtherTrustedContact: otherTrustedContact,
-          trustedContact: trustedContacts,
-        }));
+        this.setState(
+          {
+            MyKeeper: myKeepers,
+            IMKeeper: imKeepers,
+            OtherTrustedContact: otherTrustedContact,
+            trustedContact: trustedContacts,
+          },
+          () =>
+            this.props.updateAddressBookLocally({
+              MyKeeper: myKeepers,
+              IMKeeper: imKeepers,
+              OtherTrustedContact: otherTrustedContact,
+              trustedContact: trustedContacts,
+            }),
+        );
       }
     }
   };
@@ -269,11 +290,14 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
   };
 
   renderHelpContent = () => {
-    return <AddressBookHelpContents
-      titleClicked={() => {
-        if (this.HelpBottomSheet.current)
-          (this.HelpBottomSheet as any).current.snapTo(0);
-      }} />
+    return (
+      <AddressBookHelpContents
+        titleClicked={() => {
+          if (this.HelpBottomSheet.current)
+            (this.HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   };
 
   getImageIcon = (item) => {
@@ -311,16 +335,16 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             >
               {item
                 ? nameToInitials(
-                  item.firstName == 'Secondary' && item.lastName == 'Device'
-                    ? 'Keeper Device'
-                    : item.firstName && item.lastName
+                    item.firstName == 'Secondary' && item.lastName == 'Device'
+                      ? 'Keeper Device'
+                      : item.firstName && item.lastName
                       ? item.firstName + ' ' + item.lastName
                       : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                          ? item.lastName
-                          : '',
-                )
+                      ? item.firstName
+                      : !item.firstName && item.lastName
+                      ? item.lastName
+                      : '',
+                  )
                 : ''}
             </Text>
           </View>
@@ -331,7 +355,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
 
   getElement = (contact, index, contactsType) => {
     const { navigation } = this.props;
-    var minute = (config.TC_REQUEST_EXPIRY / 1000) - ((Date.now() - contact.initiatedAt) / 1000);
+    var minute =
+      config.TC_REQUEST_EXPIRY / 1000 -
+      (Date.now() - contact.initiatedAt) / 1000;
     return (
       <TouchableOpacity
         key={contact.id}
@@ -360,14 +386,14 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
             {contact.firstName && contact.firstName != 'Secondary'
               ? contact.firstName + ' '
               : contact.firstName && contact.firstName == 'Secondary'
-                ? 'Keeper '
-                : ''}
+              ? 'Keeper '
+              : ''}
             <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
               {contact.lastName && contact.lastName != 'Device'
                 ? contact.lastName + ' '
                 : contact.lastName && contact.lastName == 'Device'
-                  ? 'Device '
-                  : ''}
+                ? 'Device '
+                : ''}
             </Text>
           </Text>
           {contact.connectedVia ? (
@@ -375,10 +401,10 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           ) : null}
         </View>
         <View style={styles.getImageView}>
-          {!contact.hasXpub && (
-            Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-              !contact.hasTrustedChannel ?
-              (<View
+          {!(contact.hasXpub || contact.hasTrustedAddress) &&
+            (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+            !contact.hasTrustedChannel ? (
+              <View
                 style={{
                   width: wp('15%'),
                   height: wp('6%'),
@@ -397,11 +423,13 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
                   }}
                 >
                   Expired
-              </Text>
-              </View>)
-              :
+                </Text>
+              </View>
+            ) : (
               <CountDown
-                onFinish={() => this.setState({ updateList: !this.state.updateList })}
+                onFinish={() =>
+                  this.setState({ updateList: !this.state.updateList })
+                }
                 id={index}
                 size={12}
                 until={minute}
@@ -412,15 +440,16 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
                   margin: -10,
                 }}
                 digitTxtStyle={{
-                  color: Colors.textColorGrey, fontSize: RFValue(12),
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
-                separatorStyle={{ color: Colors.textColorGrey, }}
+                separatorStyle={{ color: Colors.textColorGrey }}
                 timeToShow={['H', 'M', 'S']}
                 timeLabels={{ h: null, m: null, s: null }}
                 showSeparator
               />
-          )}
+            ))}
           <View style={styles.xpubIconView}>
             <Ionicons
               name="ios-arrow-forward"
@@ -435,7 +464,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         </View>
       </TouchableOpacity>
     );
-  }
+  };
 
   renderAddContactAddressBookContents = () => {
     const { navigation } = this.props;
@@ -453,7 +482,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
         }}
         onSelectContact={(selectedData) => {
           this.setState({
-            selectedContact: selectedData
+            selectedContact: selectedData,
           });
         }}
         onPressBack={() => {
@@ -532,8 +561,8 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
                       return this.getElement(item, index, 'My Keepers');
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             </View>
@@ -549,8 +578,8 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
                       return this.getElement(item, index, "I'm Keeper of");
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                 </View>
               </View>
             </View>
@@ -567,13 +596,13 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
                       return this.getElement(item, index, 'Other Contacts');
                     })
                   ) : (
-                      <View style={{ height: wp('22%') + 30 }} />
-                    )}
+                    <View style={{ height: wp('22%') + 30 }} />
+                  )}
                   <TouchableOpacity
                     onPress={() => {
                       setTimeout(() => {
                         this.setState({
-                          isLoadContacts: true
+                          isLoadContacts: true,
                         });
                       }, 2);
                       this.AddContactAddressBookBottomSheet.current.snapTo(1);
@@ -590,9 +619,7 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
                       source={require('../assets/images/icons/icon_add_grey.png')}
                     />
                     <View>
-                      <Text style={styles.contactText}>
-                        Add Contact
-                        </Text>
+                      <Text style={styles.contactText}>Add Contact</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -616,7 +643,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           ref={this.AddContactAddressBookBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('82%') : hp('82%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('82%')
+              : hp('82%'),
           ]}
           renderContent={this.renderAddContactAddressBookContents}
           renderHeader={this.renderAddContactAddressBookHeader}
@@ -627,7 +656,9 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
           ref={this.HelpBottomSheet as any}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('87%') : hp('89%'),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('87%')
+              : hp('89%'),
           ]}
           renderContent={this.renderHelpContent}
           renderHeader={this.renderHelpHeader}
@@ -638,17 +669,27 @@ class AddressBookContents extends PureComponent<AddressBookContentsPropTypes, Ad
 }
 
 const mapStateToProps = (state) => {
-  let addressBookData = idx(state, _ => _.trustedContacts.addressBook)
-  let trustedContactsInfo = idx(state, _ => _.trustedContacts.trustedContactsInfo)
+  let addressBookData = idx(state, (_) => _.trustedContacts.addressBook);
+  let trustedContactsInfo = idx(
+    state,
+    (_) => _.trustedContacts.trustedContactsInfo,
+  );
   return {
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     trustedContactsService: idx(state, (_) => _.trustedContacts.service),
-    trustedChannelsSyncing: idx(state, (_) => _.trustedContacts.loading.trustedChannelsSync),
+    trustedChannelsSyncing: idx(
+      state,
+      (_) => _.trustedContacts.loading.trustedChannelsSync,
+    ),
     addressBookData,
-    trustedContactsInfo
+    trustedContactsInfo,
   };
 };
-export default connect(mapStateToProps, { trustedChannelsSync, updateAddressBookLocally, removeTrustedContact })(AddressBookContents);
+export default connect(mapStateToProps, {
+  trustedChannelsSync,
+  updateAddressBookLocally,
+  removeTrustedContact,
+})(AddressBookContents);
 const styles = StyleSheet.create({
   modalContainer: {
     height: '100%',
@@ -791,7 +832,7 @@ const styles = StyleSheet.create({
   waterMarkInnerView: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15
+    padding: 15,
   },
   waterMarkBigView: {
     borderTopWidth: 1,
@@ -804,5 +845,5 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     marginLeft: 5,
-  }
+  },
 });

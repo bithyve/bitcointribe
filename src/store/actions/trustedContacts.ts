@@ -7,7 +7,7 @@ import {
 } from '../../bitcoin/utilities/Interface';
 
 import { createAction } from 'redux-actions';
-import { UPDATE_ADDRESS_BOOK_LOCALLY, UPDATE_TRUSTED_CONTACT_INFO } from '../constants'
+import { UPDATE_ADDRESS_BOOK_LOCALLY } from '../constants';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
@@ -18,6 +18,7 @@ export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
+export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
 
 export const initializeTrustedContact = (contactInfo: {
   contactName: string;
@@ -122,6 +123,13 @@ export const trustedChannelsSync = () => {
   };
 };
 
+export const updateTrustedContactInfoLocally = (trustedContactInfo) => {
+  return {
+    type: UPDATE_TRUSTED_CONTACT_INFO,
+    payload: { trustedContactInfo },
+  };
+};
+
 // types and action creators: dispatched by sagas
 export const TRUSTED_CONTACT_INITIALIZED = 'TRUSTED_CONTACT_INITIALIZED';
 export const TRUSTED_CONTACT_APPROVED = 'TRUSTED_CONTACT_APPROVED';
@@ -209,10 +217,8 @@ export const switchTCLoading = (beingLoaded) => {
   };
 };
 
-
-
-const updateAddressBookLocallyRequest = createAction(UPDATE_ADDRESS_BOOK_LOCALLY);
-export const updateAddressBookLocally = (payload) => dispatch => dispatch(updateAddressBookLocallyRequest(payload))
-
-const updateTrustedContactInfoRequest = createAction(UPDATE_TRUSTED_CONTACT_INFO);
-export const updateTrustedContactInfoLocally = (payload) => dispatch => dispatch(updateTrustedContactInfoRequest(payload))
+const updateAddressBookLocallyRequest = createAction(
+  UPDATE_ADDRESS_BOOK_LOCALLY,
+);
+export const updateAddressBookLocally = (payload) => (dispatch) =>
+  dispatch(updateAddressBookLocallyRequest(payload));

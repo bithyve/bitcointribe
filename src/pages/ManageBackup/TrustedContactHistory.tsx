@@ -46,14 +46,27 @@ import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralDataElements,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import config from '../../bitcoin/HexaConfig';
 import Toast from '../../components/Toast';
 import KnowMoreButton from '../../components/KnowMoreButton';
-import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents';
 import idx from 'idx';
+import {
+  TRUSTED_CONTACTS,
+  REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
+} from '../../common/constants/serviceTypes';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -112,6 +125,17 @@ const TrustedContactHistory = (props) => {
     (state) => state.trustedContacts.service,
   );
 
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
+
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
@@ -173,7 +197,9 @@ const TrustedContactHistory = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let trustedContactsInfo: any = useSelector(state => idx(state, _ => _.trustedContacts.trustedContactInfo))
+    let trustedContactsInfo: any = useSelector((state) =>
+      idx(state, (_) => _.trustedContacts.trustedContactInfo),
+    );
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setSelectedContacts(selectedContacts);
@@ -184,7 +210,7 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[1]);
       }
     }
-  }, [selectedTitle]);
+  }, [selectedTitle, trustedContactsInfo]);
 
   const getContacts = useCallback(
     async (selectedContacts, index) => {
@@ -211,7 +237,7 @@ const TrustedContactHistory = (props) => {
     (selectedContact) => {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -636,14 +662,14 @@ const TrustedContactHistory = (props) => {
             >
               {chosenContact && chosenContact.name
                 ? nameToInitials(
-                  chosenContact.firstName && chosenContact.lastName
-                    ? chosenContact.firstName + ' ' + chosenContact.lastName
-                    : chosenContact.firstName && !chosenContact.lastName
+                    chosenContact.firstName && chosenContact.lastName
+                      ? chosenContact.firstName + ' ' + chosenContact.lastName
+                      : chosenContact.firstName && !chosenContact.lastName
                       ? chosenContact.firstName
                       : !chosenContact.firstName && chosenContact.lastName
-                        ? chosenContact.lastName
-                        : '',
-                )
+                      ? chosenContact.lastName
+                      : '',
+                  )
                 : ''}
             </Text>
           </View>
@@ -683,7 +709,7 @@ const TrustedContactHistory = (props) => {
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
 
@@ -768,7 +794,6 @@ const TrustedContactHistory = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
-      let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
       if (trustedContactsInfo) {
         if (trustedContactsInfo[index]) {
           let found = false;
@@ -803,12 +828,11 @@ const TrustedContactHistory = (props) => {
         trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
-      await AsyncStorage.setItem(
-        'TrustedContactsInfo',
-        JSON.stringify(trustedContactsInfo),
-      );
-      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
-
+      // await AsyncStorage.setItem(
+      //   'TrustedContactsInfo',
+      //   JSON.stringify(trustedContactsInfo),
+      // );
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
     [index],
   );
@@ -827,7 +851,7 @@ const TrustedContactHistory = (props) => {
 
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -845,9 +869,35 @@ const TrustedContactHistory = (props) => {
         contactName,
         info: info.trim(),
       };
+
+      let accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[contactName];
+      if (!accountNumber) {
+        // initialize a trusted derivative account against the following account
+        const res = regularAccount.getDerivativeAccXpub(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        if (res.status !== 200) {
+          console.log('Err occurred while generating derivative account');
+        } else {
+          // refresh the account number
+          accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[contactName];
+        }
+      }
+
+      const trustedReceivingAddress = (regularAccount.hdWallet
+        .derivativeAccounts[TRUSTED_CONTACTS][
+        accountNumber
+      ] as TrustedContactDerivativeAccountElements).receivingAddress;
+
       let data: EphemeralDataElements = {
         walletID,
         FCM,
+        trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const hasTrustedChannel =
@@ -856,7 +906,9 @@ const TrustedContactHistory = (props) => {
         setTrustedLink('');
         setTrustedQR('');
         // remove the previous TC
-        let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
+        let { trustedContactsInfo } = useSelector(
+          (state) => state.trustedContacts.trustedContacts,
+        );
         let previousGuardianName;
         if (trustedContactsInfo) {
           trustedContactsInfo = JSON.parse(trustedContactsInfo);
@@ -864,7 +916,7 @@ const TrustedContactHistory = (props) => {
           if (previousGuardian) {
             previousGuardianName = `${previousGuardian.firstName} ${
               previousGuardian.lastName ? previousGuardian.lastName : ''
-              }`
+            }`
               .toLowerCase()
               .trim();
           } else {
@@ -881,7 +933,7 @@ const TrustedContactHistory = (props) => {
       } else if (
         !SHARES_TRANSFER_DETAILS[index] ||
         Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         setTrustedLink('');
         setTrustedQR('');
@@ -894,7 +946,7 @@ const TrustedContactHistory = (props) => {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY &&
+          config.TC_REQUEST_EXPIRY &&
         !hasTrustedChannel
       ) {
         setTrustedLink('');
@@ -929,7 +981,7 @@ const TrustedContactHistory = (props) => {
     if (chosenContact.firstName && SHARES_TRANSFER_DETAILS[index]) {
       const contactName = `${chosenContact.firstName} ${
         chosenContact.lastName ? chosenContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
       console.log({ contactName });
@@ -1003,9 +1055,9 @@ const TrustedContactHistory = (props) => {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-      onPressHeader={() => {
-        (shareBottomSheet as any).current.snapTo(0);
-      }}
+        onPressHeader={() => {
+          (shareBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -1021,9 +1073,9 @@ const TrustedContactHistory = (props) => {
           contactEmail={''}
           infoText={`Click here to accept Keeper request for ${
             WALLET_SETUP.walletName
-            } Hexa wallet- link will expire in ${
+          } Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / (60000 * 60)
-            } hours`}
+          } hours`}
           link={trustedLink}
           onPressBack={() => {
             if (SendViaLinkBottomSheet.current)
@@ -1097,11 +1149,14 @@ const TrustedContactHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <FriendsAndFamilyHelpContents 
-    titleClicked={()=>{
-      if (HelpBottomSheet.current)
+    return (
+      <FriendsAndFamilyHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
             (HelpBottomSheet as any).current.snapTo(0);
-    }}/>;
+        }}
+      />
+    );
   };
 
   return (
@@ -1140,10 +1195,10 @@ const TrustedContactHistory = (props) => {
                 {chosenContact.firstName && chosenContact.lastName
                   ? chosenContact.firstName + ' ' + chosenContact.lastName
                   : chosenContact.firstName && !chosenContact.lastName
-                    ? chosenContact.firstName
-                    : !chosenContact.firstName && chosenContact.lastName
-                      ? chosenContact.lastName
-                      : 'Friends and Family'}
+                  ? chosenContact.firstName
+                  : !chosenContact.firstName && chosenContact.lastName
+                  ? chosenContact.lastName
+                  : 'Friends and Family'}
               </Text>
               <Text style={BackupStyles.modalHeaderInfoText}>
                 Last backup{' '}
@@ -1180,8 +1235,8 @@ const TrustedContactHistory = (props) => {
               source={
                 shared || activateReshare
                   ? getIconByStatus(
-                    props.navigation.state.params.selectedStatus,
-                  )
+                      props.navigation.state.params.selectedStatus,
+                    )
                   : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
