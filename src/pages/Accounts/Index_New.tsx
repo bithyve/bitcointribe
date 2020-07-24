@@ -920,7 +920,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               refreshControl={
                 <RefreshControl
                   refreshing={
-                    this.balanceTxLoading || this.derivativeBalanceTxLoading
+                    accounts[serviceType].loading.balanceTx || accounts[serviceType].loading.derivativeBalanceTx
                   }
                   onRefresh={() => {
                     // this.props.fetchTransactions(serviceType);
