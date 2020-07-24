@@ -32,7 +32,7 @@ import {
   addTransferDetails,
   removeTransferDetails,
   clearTransfer,
-  setAverageTxFee
+  setAverageTxFee,
 } from '../../store/actions/accounts';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { UsNumberFormat } from '../../common/utilities';
@@ -61,7 +61,7 @@ import config from '../../bitcoin/HexaConfig';
 import { connect } from 'react-redux';
 import { withNavigationFocus } from 'react-navigation';
 import idx from 'idx';
-import {setCurrencyToggleValue} from '../../store/actions/preferences';
+import { setCurrencyToggleValue } from '../../store/actions/preferences';
 
 const currencyCode = [
   'BRL',
@@ -238,8 +238,10 @@ class SendToContact extends Component<
       prevProps.accounts[this.state.serviceType].loading.transfer !==
       this.props.accounts[this.state.serviceType].loading.transfer
     ) {
-      if (!this.props.accounts[this.state.serviceType].loading.transfer.transfer) 
-      this.setState({ isConfirmDisabled: false});
+      if (
+        !this.props.accounts[this.state.serviceType].loading.transfer.transfer
+      )
+        this.setState({ isConfirmDisabled: false });
     }
 
     if (
@@ -340,7 +342,7 @@ class SendToContact extends Component<
     // await AsyncStorage.getItem(
     //   'currencyToggleValue',
     // );
-    let currencyCodeTmp = this.props.currencyCode; 
+    let currencyCodeTmp = this.props.currencyCode;
     //await AsyncStorage.getItem('currencyCode');
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
@@ -407,9 +409,8 @@ class SendToContact extends Component<
     // const storedAverageTxFees = await AsyncStorage.getItem(
     //   'storedAverageTxFees',
     // );
-    console.log("storedAverageTxFees sendToContactUpdate", storedAverageTxFees);
-    if (storedAverageTxFees) {
-      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
       if (Date.now() - lastFetched < 1800000) {
         this.setState({ averageTxFees: averageTxFees });
         return;
@@ -420,11 +421,13 @@ class SendToContact extends Component<
       service[serviceType].service.secureHDWallet;
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
-    this.props.setAverageTxFee({ averageTxFees, lastFetched: Date.now()});
-    // await AsyncStorage.setItem(
-    //   'storedAverageTxFees',
-    //   JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-    // );
+    this.props.setAverageTxFee({
+      ...storedAverageTxFees,
+      [serviceType]: {
+        averageTxFees,
+        lastFetched: Date.now(),
+      },
+    });
   };
 
   amountCalculation = () => {
@@ -452,7 +455,8 @@ class SendToContact extends Component<
       });
       if (spendableBalance - amountStacked < Number(bitcoinAmount)) {
         this.setState({ isInvalidBalance: true, isConfirmDisabled: true });
-      } else this.setState({ isConfirmDisabled: false, isInvalidBalance: false });
+      } else
+        this.setState({ isConfirmDisabled: false, isInvalidBalance: false });
     } else {
       this.setState({ isConfirmDisabled: true });
       if (!transfer[serviceType].transfer.details.length) {
@@ -474,8 +478,8 @@ class SendToContact extends Component<
     if (transfer[serviceType].transfer.stage1.failed) {
       this.setState({ isConfirmDisabled: false });
       setTimeout(() => {
-      (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
-      }, 2)
+        (this.refs.SendUnSuccessBottomSheet as any).snapTo(1);
+      }, 2);
     } else if (transfer[serviceType].transfer.executed === 'ST1') {
       if (transfer[serviceType].transfer.details.length) {
         this.props.navigation.navigate('SendConfirmation', {
@@ -498,6 +502,7 @@ class SendToContact extends Component<
       serviceType,
       averageTxFees,
     } = this.state;
+    console.log({ state: this.state, averageTxFees });
     const { transfer, service, transferST1 } = this.props;
 
     const recipients = [];
@@ -565,7 +570,7 @@ class SendToContact extends Component<
     } = this.props;
     const { bitcoinAmount, currencyAmount, note } = this.state;
     const { serviceType, selectedContact } = this.state;
-    this.setState({isConfirmDisabled: true});
+    this.setState({ isConfirmDisabled: true });
     clearTransfer(serviceType, 'stage1');
     this.setState({ isConfirmDisabled: false });
     if (
@@ -665,9 +670,7 @@ class SendToContact extends Component<
         <SafeAreaView style={{ flex: 0 }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
-          <View
-            style={styles.view}
-          >
+          <View style={styles.view}>
             <TouchableOpacity
               onPress={() => {
                 this.checkRecordsHavingPrice();
@@ -693,9 +696,7 @@ class SendToContact extends Component<
             />
             <View style={{ marginLeft: wp('2.5%') }}>
               <Text style={styles.modalHeaderTitleText}>{'Send'}</Text>
-              <Text
-                style={styles.sendText}
-              >
+              <Text style={styles.sendText}>
                 {serviceType == TEST_ACCOUNT
                   ? 'Test Account'
                   : serviceType == REGULAR_ACCOUNT
@@ -705,9 +706,7 @@ class SendToContact extends Component<
             </View>
           </View>
         </View>
-        <View
-          style={styles.availableToSpendView}
-        >
+        <View style={styles.availableToSpendView}>
           <TouchableOpacity
             activeOpacity={10}
             onPress={() => {
@@ -733,18 +732,10 @@ class SendToContact extends Component<
                 ? 'S3 Service'
                 : ''}
             </Text>
-            <Text
-              style={styles.availableToSpendText}
-            >
+            <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
-              <Text
-                style={styles.balanceText}
-              >
-                {this.getBalanceText()}
-              </Text>
-              <Text
-                style={styles.textTsats}
-              >
+              <Text style={styles.balanceText}>{this.getBalanceText()}</Text>
+              <Text style={styles.textTsats}>
                 {serviceType == TEST_ACCOUNT
                   ? ' t-sats )'
                   : switchOn
@@ -769,9 +760,7 @@ class SendToContact extends Component<
               {transfer[serviceType].transfer.details.map((item) => {
                 //console.log('ITEM in list', item);
                 return (
-                  <View
-                    style={styles.view1}
-                  >
+                  <View style={styles.view1}>
                     <View style={{ flexDirection: 'row' }}>
                       {item.selectedContact &&
                       item.selectedContact.account_name ? (
@@ -867,23 +856,26 @@ class SendToContact extends Component<
                         />
                       </TouchableOpacity>
                     </View>
-                    <Text
-                      style={styles.name}
-                      numberOfLines={1}
-                    >
+                    <Text style={styles.name} numberOfLines={1}>
                       {item.selectedContact.name ||
                         item.selectedContact.account_name ||
                         item.selectedContact.id}
                     </Text>
-                    <Text
-                      style={styles.amountText}
-                    >
-                     {switchOn
-            ? `${item.bitcoinAmount ? item.bitcoinAmount : bitcoinAmount}` +
-              `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
-            : CurrencySymbol +
-              ' ' +
-              `${item.currencyAmount ? item.currencyAmount : currencyAmount}`}
+                    <Text style={styles.amountText}>
+                      {switchOn
+                        ? `${
+                            item.bitcoinAmount
+                              ? item.bitcoinAmount
+                              : bitcoinAmount
+                          }` +
+                          `${serviceType == TEST_ACCOUNT ? 't-sats' : 'sats'}`
+                        : CurrencySymbol +
+                          ' ' +
+                          `${
+                            item.currencyAmount
+                              ? item.currencyAmount
+                              : currencyAmount
+                          }`}
                     </Text>
                   </View>
                 );
@@ -892,17 +884,13 @@ class SendToContact extends Component<
             </ScrollView>
           ) : null}
         </View>
-        <View
-          style={styles.dividerView}
-        />
+        <View style={styles.dividerView} />
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <View
-            style={styles.parentView}
-          >
+          <View style={styles.parentView}>
             <ScrollView>
               <View style={{ flex: 1, flexDirection: 'row' }}>
                 <View style={{ flex: 1, flexDirection: 'column' }}>
@@ -922,9 +910,7 @@ class SendToContact extends Component<
                   >
                     <View style={styles.amountInputImage}>
                       {currencyCode.includes(CurrencyCode) ? (
-                        <View
-                          style={styles.currencyImageView}
-                        >
+                        <View style={styles.currencyImageView}>
                           <MaterialCommunityIcons
                             name={getCurrencyImageName(CurrencyCode)}
                             color={Colors.currencyGray}
@@ -947,9 +933,7 @@ class SendToContact extends Component<
             source={require('../../assets/images/icons/dollar_grey.png')}
           /> */}
                     </View>
-                    <View
-                      style={styles.convertText}
-                    />
+                    <View style={styles.convertText} />
                     <TextInput
                       style={{
                         ...styles.textBox,
@@ -1013,9 +997,7 @@ class SendToContact extends Component<
                         source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
                       />
                     </View>
-                    <View
-                      style={styles.enterAmountView}
-                    />
+                    <View style={styles.enterAmountView} />
                     <TextInput
                       style={{
                         ...styles.textBox,
@@ -1026,12 +1008,12 @@ class SendToContact extends Component<
                       }}
                       placeholder={
                         switchOn
-                        ? serviceType == TEST_ACCOUNT
-                          ? 'Enter amount in t-sats'
-                          : 'Enter amount in sats'
-                        : serviceType == TEST_ACCOUNT
-                        ? 'Converted amount in t-sats'
-                        : 'Converted amount in sats'
+                          ? serviceType == TEST_ACCOUNT
+                            ? 'Enter amount in t-sats'
+                            : 'Enter amount in sats'
+                          : serviceType == TEST_ACCOUNT
+                          ? 'Converted amount in t-sats'
+                          : 'Converted amount in sats'
                       }
                       editable={switchOn}
                       value={bitcoinAmount}
@@ -1059,9 +1041,7 @@ class SendToContact extends Component<
                   </TouchableOpacity>
                   {/* {renderBitCoinInputText()} */}
                 </View>
-                <View
-                  style={styles.toggleSwitchView}
-                >
+                <View style={styles.toggleSwitchView}>
                   <ToggleSwitch
                     currencyCodeValue={CurrencyCode}
                     onpress={async () => {
@@ -1077,9 +1057,7 @@ class SendToContact extends Component<
                 </View>
               </View>
               {serviceType == TEST_ACCOUNT ? (
-                <View
-                  style={styles.bottomInfoView}
-                >
+                <View style={styles.bottomInfoView}>
                   <BottomInfoBox
                     title={'Value of your test-sats'}
                     infoText={
@@ -1126,21 +1104,17 @@ class SendToContact extends Component<
                   }}
                 />
               </View>
-              <View
-                style={styles.confirmView}
-              >
+              <View style={styles.confirmView}>
                 <TouchableOpacity
                   onPress={() => {
                     this.onConfirm();
                   }}
-                  disabled={
-                    isConfirmDisabled
-                  }
+                  disabled={isConfirmDisabled}
                   style={{
                     ...styles.confirmButtonView,
                     backgroundColor: isConfirmDisabled
-                    ? Colors.lightBlue
-                    : Colors.blue,
+                      ? Colors.lightBlue
+                      : Colors.blue,
                     elevation: 10,
                     shadowColor: Colors.shadowBlue,
                     shadowOpacity: 1,
@@ -1151,8 +1125,10 @@ class SendToContact extends Component<
                   {/* {loading[serviceType].loading.transfer && !isInvalidBalance ? (
                         <ActivityIndicator size="small" color={Colors.white} />
                       ) : ( */}
-                  {(!isConfirmDisabled && loading[serviceType].loading.transfer) ||
-                  (isConfirmDisabled && loading[serviceType].loading.transfer) ? (
+                  {(!isConfirmDisabled &&
+                    loading[serviceType].loading.transfer) ||
+                  (isConfirmDisabled &&
+                    loading[serviceType].loading.transfer) ? (
                     <ActivityIndicator size="small" />
                   ) : (
                     <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
@@ -1160,48 +1136,46 @@ class SendToContact extends Component<
                   {/* )} */}
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={{
-                      ...styles.confirmButtonView,
-                      width: wp('30%'),
-                      marginLeft: 10,
-                    }}
-                    disabled={
-                      isConfirmDisabled
-                    }
-                    onPress={() => {
-                      if (
-                        transfer[serviceType].transfer.details &&
-                        transfer[serviceType].transfer.details.length
+                  style={{
+                    ...styles.confirmButtonView,
+                    width: wp('30%'),
+                    marginLeft: 10,
+                  }}
+                  disabled={isConfirmDisabled}
+                  onPress={() => {
+                    if (
+                      transfer[serviceType].transfer.details &&
+                      transfer[serviceType].transfer.details.length
+                    ) {
+                      for (
+                        let i = 0;
+                        i < transfer[serviceType].transfer.details.length;
+                        i++
                       ) {
-                        for (
-                          let i = 0;
-                          i < transfer[serviceType].transfer.details.length;
-                          i++
+                        if (
+                          transfer[serviceType].transfer.details[i]
+                            .selectedContact.id == selectedContact.id
                         ) {
-                          if (
-                            transfer[serviceType].transfer.details[i]
-                              .selectedContact.id == selectedContact.id
-                          ) {
-                            removeTransferDetails(
-                              serviceType,
-                              transfer[serviceType].transfer.details[i],
-                            );
-                          }
+                          removeTransferDetails(
+                            serviceType,
+                            transfer[serviceType].transfer.details[i],
+                          );
                         }
-                        addTransferDetails(serviceType, {
-                          selectedContact,
-                          bitcoinAmount,
-                          currencyAmount,
-                          note,
-                        });
-                        this.props.navigation.goBack();
                       }
-                    }}
-                  >
-                    <Text style={{ ...styles.buttonText, color: Colors.blue }}>
-                      Add Recipient
-                    </Text>
-                  </TouchableOpacity>
+                      addTransferDetails(serviceType, {
+                        selectedContact,
+                        bitcoinAmount,
+                        currencyAmount,
+                        note,
+                      });
+                      this.props.navigation.goBack();
+                    }
+                  }}
+                >
+                  <Text style={{ ...styles.buttonText, color: Colors.blue }}>
+                    Add Recipient
+                  </Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
@@ -1246,10 +1220,10 @@ class SendToContact extends Component<
             ) {
               return (
                 <ModalHeader
-                  // onPressHeader={() => {
-                  //   if (this.refs.RemoveBottomSheet)
-                  //     (this.refs.RemoveBottomSheet as any).snapTo(0);
-                  // }}
+                // onPressHeader={() => {
+                //   if (this.refs.RemoveBottomSheet)
+                //     (this.refs.RemoveBottomSheet as any).snapTo(0);
+                // }}
                 />
               );
             }
@@ -1306,11 +1280,11 @@ class SendToContact extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              // onPressHeader={() => {
-              //   //  dispatch(clearTransfer(serviceType));
-              //   if (this.refs.SendUnSuccessBottomSheet)
-              //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
-              // }}
+            // onPressHeader={() => {
+            //   //  dispatch(clearTransfer(serviceType));
+            //   if (this.refs.SendUnSuccessBottomSheet)
+            //     (this.refs.SendUnSuccessBottomSheet as any).snapTo(0);
+            // }}
             />
           )}
         />
@@ -1339,18 +1313,18 @@ class SendToContact extends Component<
                       selectedContact.id
                     ) {
                       this.props.removeTransferDetails(
-                          serviceType,
-                          transfer.details[i],
-                        )
+                        serviceType,
+                        transfer.details[i],
+                      );
                       break;
                     }
                   }
                   this.props.addTransferDetails(type, {
-                      selectedContact,
-                      bitcoinAmount,
-                      currencyAmount,
-                      note,
-                    })
+                    selectedContact,
+                    bitcoinAmount,
+                    currencyAmount,
+                    note,
+                  });
                 }
                 (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
                 setTimeout(() => {
@@ -1361,9 +1335,9 @@ class SendToContact extends Component<
           )}
           renderHeader={() => (
             <SmallHeaderModal
-              // onPressHeader={() => {
-              //   (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
-              // }}
+            // onPressHeader={() => {
+            //   (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
+            // }}
             />
           )}
         />
@@ -1391,7 +1365,7 @@ export default withNavigationFocus(
     clearTransfer,
     addTransferDetails,
     setCurrencyToggleValue,
-    setAverageTxFee
+    setAverageTxFee,
   })(SendToContact),
 );
 
@@ -1401,18 +1375,18 @@ const styles = StyleSheet.create({
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
   },
-  view:{
+  view: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  view1:{
+  view1: {
     marginRight: 20,
     justifyContent: 'center',
     alignItems: 'center',
     width: wp('15%'),
   },
-  name:{
+  name: {
     color: Colors.textColorGrey,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
@@ -1420,12 +1394,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     width: wp('15%'),
   },
-  amountText:{
+  amountText: {
     color: Colors.blue,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
   },
-  dividerView:{
+  dividerView: {
     alignSelf: 'center',
     width: wp('90%'),
     borderBottomWidth: 1,
@@ -1433,29 +1407,29 @@ const styles = StyleSheet.create({
     marginBottom: hp('1%'),
     marginTop: hp('2%'),
   },
-  parentView:{ paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') },
-  backArrow:{
+  parentView: { paddingLeft: 20, paddingRight: 20, paddingTop: wp('5%') },
+  backArrow: {
     height: 30,
     width: 30,
     justifyContent: 'center',
   },
-  sendText:{
+  sendText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(12),
   },
-  confirmView:{
+  confirmView: {
     flexDirection: 'row',
     marginTop: hp('3%'),
     marginBottom: hp('5%'),
   },
-  currencyImageView:{
+  currencyImageView: {
     width: wp('6%'),
     height: wp('6%'),
     justifyContent: 'center',
     alignItems: 'center',
   },
-  convertText:{
+  convertText: {
     width: 2,
     height: '60%',
     backgroundColor: Colors.borderColor,
@@ -1463,7 +1437,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     alignSelf: 'center',
   },
-  enterAmountView:{
+  enterAmountView: {
     width: 2,
     height: '60%',
     backgroundColor: Colors.borderColor,
@@ -1471,19 +1445,19 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     alignSelf: 'center',
   },
-  toggleSwitchView:{
+  toggleSwitchView: {
     marginLeft: 'auto',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  bottomInfoView:{
+  bottomInfoView: {
     marginTop: wp('1.5%'),
     marginBottom: -25,
     padding: -20,
     marginLeft: -20,
     marginRight: -20,
   },
-  availableToSpendView:{
+  availableToSpendView: {
     alignSelf: 'center',
     width: wp('90%'),
     marginBottom: hp('2%'),
@@ -1492,23 +1466,23 @@ const styles = StyleSheet.create({
     paddingBottom: hp('1.5%'),
     paddingTop: hp('1%'),
   },
-  availableToSpendText:{
+  availableToSpendText: {
     color: Colors.blue,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansItalic,
     lineHeight: 15,
     textAlign: 'center',
   },
-  balanceText:{
+  balanceText: {
     color: Colors.blue,
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansItalic,
   },
-  textTsats:{
-  color: Colors.textColorGrey,
-  fontSize: RFValue(7),
-  fontFamily: Fonts.FiraSansMediumItalic,
-},
+  textTsats: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue(7),
+    fontFamily: Fonts.FiraSansMediumItalic,
+  },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,

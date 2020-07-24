@@ -473,12 +473,8 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const { service } = this.props;
     const { serviceType } = this.state;
     const storedAverageTxFees = this.props.averageTxFees;
-    // const storedAverageTxFees = await AsyncStorage.getItem(
-    //   'storedAverageTxFees',
-    // );
-    console.log('storedAverageTxFees', storedAverageTxFees);
-    if (storedAverageTxFees) {
-      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
       if (Date.now() - lastFetched < 1800000) {
         this.setState({ averageTxFees: averageTxFees });
         return;
@@ -487,15 +483,15 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
     const instance =
       service[serviceType].service.hdWallet ||
       service[serviceType].service.secureHDWallet;
-    // console.log("instance storeAverageTxFees", instance, service[serviceType].service.hdWallet);
-
     const averageTxFees = await instance.averageTransactionFee();
     this.setState({ averageTxFees: averageTxFees });
-    this.props.setAverageTxFee({ averageTxFees, lastFetched: Date.now() });
-    // await AsyncStorage.setItem(
-    //   'storedAverageTxFees',
-    //   JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
-    // );
+    this.props.setAverageTxFee({
+      ...storedAverageTxFees,
+      [serviceType]: {
+        averageTxFees,
+        lastFetched: Date.now(),
+      },
+    });
   };
 
   updateAddressBook = async () => {

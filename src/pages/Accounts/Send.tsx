@@ -220,11 +220,12 @@ export default function Send(props) {
   };
 
   const storeAverageTxFees = async () => {
-    const storedAverageTxFees = await AsyncStorage.getItem(
-      'storedAverageTxFees',
+    const storedAverageTxFees = JSON.parse(
+      await AsyncStorage.getItem('storedAverageTxFees'),
     );
-    if (storedAverageTxFees) {
-      const { averageTxFees, lastFetched } = JSON.parse(storedAverageTxFees);
+    if (storedAverageTxFees && storedAverageTxFees[serviceType]) {
+      const { averageTxFees, lastFetched } = storedAverageTxFees[serviceType];
+
       if (Date.now() - lastFetched < 1800000) {
         setAverageTxFees(averageTxFees);
         return;
@@ -235,7 +236,10 @@ export default function Send(props) {
     setAverageTxFees(averageTxFees);
     await AsyncStorage.setItem(
       'storedAverageTxFees',
-      JSON.stringify({ averageTxFees, lastFetched: Date.now() }),
+      JSON.stringify({
+        ...storedAverageTxFees,
+        [serviceType]: { averageTxFees, lastFetched: Date.now() },
+      }),
     );
   };
 

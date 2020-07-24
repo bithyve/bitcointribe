@@ -364,29 +364,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       if (Date.now() - lastFetched < 1800000) {
         // maintaining a half an hour difference b/w fetches
         this.setState({ averageTxFees: averageTxFees });
-      } else {
-        const instance = service.hdWallet || service.secureHDWallet;
-        const averageTxFees = await instance.averageTransactionFee();
-
-        this.setState({ averageTxFees: averageTxFees });
-        this.props.setAverageTxFee({
-          ...storedAverageTxFees,
-          serviceType: { averageTxFees, lastFetched: Date.now() },
-        });
-        // await AsyncStorage.setItem(
-        //   'storedAverageTxFees',
-        //   JSON.stringify({
-        //     ...storedAverageTxFees,
-        //     serviceType: { averageTxFees, lastFetched: Date.now() },
-        //   }),
-        // );
       }
     } else {
       const instance = service.hdWallet || service.secureHDWallet;
       const averageTxFees = await instance.averageTransactionFee();
       this.setState({ averageTxFees: averageTxFees });
       this.props.setAverageTxFee({
-        serviceType: { averageTxFees, lastFetched: Date.now() },
+        ...storedAverageTxFees,
+        [serviceType]: { averageTxFees, lastFetched: Date.now() },
       });
       // await AsyncStorage.setItem(
       //   'storedAverageTxFees',
@@ -429,6 +414,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       this.props.accounts[this.state.serviceType].service
     ) {
       this.getBalance();
+      this.balanceTxLoading = this.props.accounts[
+        this.state.serviceType
+      ].loading.balanceTx;
+      this.derivativeBalanceTxLoading = this.props.accounts[
+        this.state.serviceType
+      ].loading.derivativeBalanceTx;
     }
     if (
       prevProps.accounts.exchangeRates !== this.props.accounts.exchangeRates
@@ -828,11 +819,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     };
   };
 
-  getAccountNameFromType = () =>{
-    if(this.state.serviceType==TEST_ACCOUNT) return "Test Account";
-    else if(this.state.serviceType==REGULAR_ACCOUNT) return "Checking Account";
-    else return "Savings Account";
-  }
+  getAccountNameFromType = () => {
+    if (this.state.serviceType == TEST_ACCOUNT) return 'Test Account';
+    else if (this.state.serviceType == REGULAR_ACCOUNT)
+      return 'Checking Account';
+    else return 'Savings Account';
+  };
 
   render() {
     const {
@@ -1381,7 +1373,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   : hp('60%'),
               ]}
               renderContent={() => {
-                const infoBoxInfoText = 'All your recent transactions for the '+this.getAccountNameFromType()+' will appear here.';
+                const infoBoxInfoText =
+                  'All your recent transactions for the ' +
+                  this.getAccountNameFromType() +
+                  ' will appear here.';
                 return (
                   <TransactionsContent
                     infoBoxInfoText={infoBoxInfoText}
@@ -1448,11 +1443,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 //Platform.OS == 'android' ? hp('50%') : hp('90%'),
               ]}
               renderContent={() => (
-                <TestAccountHelpContents 
-      titleClicked={()=>{
-        if (this.refs.TestAccountHelperBottomSheet as any)
-        (this.refs.TestAccountHelperBottomSheet as any).snapTo(0)
-      }}/>
+                <TestAccountHelpContents
+                  titleClicked={() => {
+                    if (this.refs.TestAccountHelperBottomSheet as any)
+                      (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
+                  }}
+                />
               )}
               renderHeader={() => (
                 <SmallHeaderModal
@@ -1487,12 +1483,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   : hp('89%'),
               ]}
               renderContent={() => (
-                <SavingsAccountHelpContents 
-      titleClicked={()=>{
-        if (this.refs.SecureAccountHelperBottomSheet as any)
-                        (this.refs
-                          .SecureAccountHelperBottomSheet as any).snapTo(0);
-      }}/>
+                <SavingsAccountHelpContents
+                  titleClicked={() => {
+                    if (this.refs.SecureAccountHelperBottomSheet as any)
+                      (this.refs.SecureAccountHelperBottomSheet as any).snapTo(
+                        0,
+                      );
+                  }}
+                />
               )}
               renderHeader={() => (
                 <SmallHeaderModal
@@ -1524,12 +1522,16 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                   ? hp('87%')
                   : hp('89%'),
               ]}
-              renderContent={() => (<CheckingAccountHelpContents 
-                titleClicked={()=>{
-                  if (this.refs.RegularAccountHelperBottomSheet as any)
-                        (this.refs
-                          .RegularAccountHelperBottomSheet as any).snapTo(0);
-                }}/>)}
+              renderContent={() => (
+                <CheckingAccountHelpContents
+                  titleClicked={() => {
+                    if (this.refs.RegularAccountHelperBottomSheet as any)
+                      (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                        0,
+                      );
+                  }}
+                />
+              )}
               renderHeader={() => (
                 <SmallHeaderModal
                   borderColor={Colors.blue}
@@ -1599,11 +1601,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 //   ? hp('35%')
                 //   : hp('40%'),
               ]}
-              renderContent={() => (<TransactionHelperModalContents 
-                titleClicked={()=>{
-                  (this.refs
-                    .TransactionDetailsHelperBottomSheet as any).snapTo(0);
-                }}/>)}
+              renderContent={() => (
+                <TransactionHelperModalContents
+                  titleClicked={() => {
+                    (this.refs
+                      .TransactionDetailsHelperBottomSheet as any).snapTo(0);
+                  }}
+                />
+              )}
               renderHeader={() => (
                 <SmallHeaderModal
                   borderColor={Colors.blue}
