@@ -25,15 +25,15 @@ import {
 } from 'react-native-responsive-screen';
 import config from '../bitcoin/HexaConfig';
 import { isCompatible } from './Home';
+import { useSelector } from 'react-redux'
+import { updatePreference } from '../store/actions/preferences';
+
+
 
 export default function Launch(props) {
   const dispatch = useDispatch();
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [lastActiveTime, setLastActiveTime] = useState(moment().toString())
-
-
-  let timer = null
-
+  const preferences = useSelector((state) => state.preferences)
   useEffect(() => {
     dispatch(initializeDB());
   }, []);
@@ -44,17 +44,38 @@ export default function Launch(props) {
   }, []);
 
 
+
+  let isNavigate = false;
+  let isContactOpen = false;
+  let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {
-    let limit = 15000;
+    AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
+      (response) => {
+        isContactOpen = JSON.parse(response[0][1]);
+        isCameraOpen = JSON.parse(response[1][1]);
+      },
+    );
+    let keyArray = [
+      ['isCameraOpen', JSON.stringify(true)],
+      ['isContactOpen', JSON.stringify(true)],
+    ];
+    if (isCameraOpen) keyArray[0][1] = JSON.stringify(false);
+    if (isContactOpen) keyArray[1][1] = JSON.stringify(false);
+    if (isContactOpen || isContactOpen) {
+      AsyncStorage.multiSet(keyArray, () => { });
+      return;
+    }
+    if (isNavigate) {
+      props.navigation.navigate('ReLogin');
+    }
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      // going to background
-      // start the timer , if comes back in time cancel it
-      // TODO -- check if camera and contact was open
-      props.navigation.navigate('ReLogin');
+      isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
+    } else {
+      isNavigate = false;
     }
   };
 

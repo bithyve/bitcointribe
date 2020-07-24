@@ -104,6 +104,7 @@ import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
 import { updatePreference, setFCMToken, setSecondaryDeviceAddress } from '../store/actions/preferences'
+import * as Permissions from 'expo-permissions';
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -725,10 +726,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
               key: 'isInternetModalCome',
               value: false
             })
-            await AsyncStorage.setItem(
-              'isInternetModalCome',
-              JSON.stringify(false),
-            );
+            // TODO -- fix this part
+            // await AsyncStorage.setItem(
+            //   'isInternetModalCome',
+            //   JSON.stringify(false),
+            // );
           }
         },
       );
@@ -785,7 +787,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
-    const {notificationListNew} = this.props;
+    const { notificationListNew } = this.props;
     let newTransactions = [];
     const { accounts, fetchDerivativeAccBalTx } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
@@ -804,7 +806,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       newTransactions.push(...newTransactionsSecure);
 
     if (newTransactions.length) {
-     // let asyncNotification = notificationListNew;
+      // let asyncNotification = notificationListNew;
       let asyncNotification = JSON.parse(
         await AsyncStorage.getItem('notificationList'),
       );
@@ -1208,9 +1210,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   checkFastBitcoin = async () => {
-    const {FBTCAccountData} = this.props;
+    const { FBTCAccountData } = this.props;
     let getFBTCAccount = FBTCAccountData || {};
-     // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+    // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
     this.setState({ fbBTCAccount: getFBTCAccount });
     return;
   };
@@ -1383,8 +1385,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
-    const {notificationListNew} = this.props;
-   // let asyncNotificationList = notificationListNew;
+    const { notificationListNew } = this.props;
+    // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1393,7 +1395,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
     let readStatus = true;
     if (content.notificationType == 'release') {
-      let releaseCases = this.props.releaseCasesValue; 
+      let releaseCases = this.props.releaseCasesValue;
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
         readStatus = true;
@@ -1414,7 +1416,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationId: content.notificationId,
     };
     asyncNotificationList.push(obj);
-   // this.props.notificationsUpdated(asyncNotificationList);
+    // this.props.notificationsUpdated(asyncNotificationList);
 
     await AsyncStorage.setItem(
       'notificationList',
@@ -1607,7 +1609,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
       });
     } else if (type == 'ChangeCurrency') {
-      let currency = currencyCode; 
+      let currency = currencyCode;
       //await AsyncStorage.getItem('currencyCode');
       navigation.navigate('ChangeCurrency');
       this.setState({
@@ -1630,8 +1632,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationListOpen = async () => {
-    const {notificationListNew} = this.props;
-   // let asyncNotificationList = notificationListNew;
+    const { notificationListNew } = this.props;
+    // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1644,7 +1646,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           );
         }
       }
-     // this.props.notificationsUpdated(asyncNotificationList);
+      // this.props.notificationsUpdated(asyncNotificationList);
 
       await AsyncStorage.setItem(
         'notificationList',
@@ -1847,7 +1849,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 postAssociation: (contact) => {
                   const contactName = `${contact.firstName} ${
                     contact.lastName ? contact.lastName : ''
-                  }`.toLowerCase();
+                    }`.toLowerCase();
 
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
@@ -1968,7 +1970,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async (value) => {
-    const {notificationListNew} = this.props;
+    const { notificationListNew } = this.props;
     //let asyncNotifications = notificationListNew;
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
@@ -1995,7 +1997,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         tempNotificationData[i].read = true;
       }
     }
-   // this.props.notificationsUpdated(asyncNotifications);
+    // this.props.notificationsUpdated(asyncNotifications);
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotifications),
@@ -2061,8 +2063,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
-    const {notificationListNew} = this.props;
-   // let asyncNotification = notificationListNew;
+    const { notificationListNew } = this.props;
+    // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -3049,7 +3051,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-           onOpenEnd={() => {
+          onOpenEnd={() => {
             this.setState({
               tabBarIndex: 0,
             });
@@ -3080,9 +3082,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
           renderHeader={() => (
             <ModalHeader
-              // onPressHeader={() => {
-              //   (this.NoInternetBottomSheet as any).current.snapTo(0);
-              // }}
+            // onPressHeader={() => {
+            //   (this.NoInternetBottomSheet as any).current.snapTo(0);
+            // }}
             />
           )}
         />
