@@ -65,17 +65,14 @@ export default function Launch(props) {
       AsyncStorage.multiSet(keyArray, () => { });
       return;
     }
-    var blockApp = setTimeout(() => {
-      if (isNavigate) {
-        props.navigation.navigate('ReLogin');
-      }
-    }, 1000);
+    if (isNavigate) {
+      props.navigation.navigate('ReLogin');
+    }
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      clearTimeout(blockApp);
       isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
     } else {
       isNavigate = false;
