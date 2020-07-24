@@ -44,8 +44,10 @@ import TimerModalContents from './TimerModalContents';
 import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
@@ -83,6 +85,10 @@ export default function AddContactSendRequest(props) {
 
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
   const updateEphemeralChannelLoader = useSelector(
@@ -185,6 +191,7 @@ export default function AddContactSendRequest(props) {
         walletID,
         FCM,
         trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
 
       if (!trustedContact) {

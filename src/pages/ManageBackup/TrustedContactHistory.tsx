@@ -63,8 +63,10 @@ import idx from 'idx';
 import {
   TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -125,6 +127,10 @@ const TrustedContactHistory = (props) => {
 
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
   const [trustedLink, setTrustedLink] = useState('');
@@ -891,6 +897,7 @@ const TrustedContactHistory = (props) => {
         walletID,
         FCM,
         trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const hasTrustedChannel =

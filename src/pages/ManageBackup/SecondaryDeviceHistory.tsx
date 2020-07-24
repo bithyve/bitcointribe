@@ -51,11 +51,13 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
 import SSS from '../../bitcoin/utilities/sss/SSS';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -88,6 +90,9 @@ const SecondaryDeviceHistory = (props) => {
   );
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
@@ -222,6 +227,7 @@ const SecondaryDeviceHistory = (props) => {
         walletID,
         FCM,
         trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 

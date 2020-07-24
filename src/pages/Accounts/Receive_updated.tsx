@@ -62,6 +62,7 @@ import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 export default function Receive(props) {
   const [
@@ -127,6 +128,9 @@ export default function Receive(props) {
   );
   const regularAccount: RegularAccount = useSelector(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
   useEffect(() => {
@@ -417,6 +421,7 @@ export default function Receive(props) {
               },
             },
             trustedAddress: trustedReceivingAddress,
+            trustedTestAddress: testAccount.hdWallet.receivingAddress,
           };
           dispatch(updateEphemeralChannel(contactInfo, data));
         })();

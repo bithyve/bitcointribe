@@ -194,6 +194,7 @@ export interface EphemeralDataElements {
     };
   };
   trustedAddress?: string;
+  trustedTestAddress?: string;
 }
 
 export interface EphemeralData {
@@ -258,6 +259,8 @@ export interface Contacts {
       address: string;
       data?: TrustedData[];
     };
+    trustedAddress?: string;
+    trustedTestAddress?: string;
   };
 }
 
