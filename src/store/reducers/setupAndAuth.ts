@@ -1,3 +1,4 @@
+import { chain } from 'icepick'
 import {
   CREDS_STORED,
   CREDS_AUTHENTICATED,
@@ -40,82 +41,65 @@ const initialState: {
 export default (state = initialState, action) => {
   switch (action.type) {
     case SETUP_INITIALIZED:
-      return {
-        ...state,
-        isInitialized: true,
-        loading: {
-          ...state.loading,
-          initializing: false,
-        },
-      };
+      return chain(state)
+        .setIn(['isInitialized'], true)
+        .setIn(['loading', 'initializing'], false)
+        .value()
+
 
     case CREDS_STORED:
-      return {
-        ...state,
-        hasCreds: true,
-        loading: {
-          ...state.loading,
-          storingCreds: false,
-        },
-      };
+      return chain(state)
+        .setIn(['hasCreds'], true)
+        .setIn(['loading', 'storingCreds'], false)
+        .value()
 
     case CREDS_AUTHENTICATED:
-      return {
-        ...state,
-        isAuthenticated: action.payload.isAuthenticated,
-        authenticationFailed: !action.payload.isAuthenticated,
-        loading: {
-          ...state.loading,
-          authenticating: false,
-        },
-      };
+
+      return chain(state)
+        .setIn(['isAuthenticated'], action.payload.isAuthenticated)
+        .setIn(['authenticationFailed'], !action.payload.isAuthenticated)
+        .setIn(['loading', 'authenticating'], false)
+        .value()
+
 
     case SETUP_LOADING:
-      return {
-        ...state,
-        authenticationFailed:
-          action.payload.beingLoaded === 'authenticating' &&
-          !state.loading[action.payload.beingLoaded] === true
-            ? false
-            : state.authenticationFailed,
-        loading: {
-          ...state.loading,
-          [action.payload.beingLoaded]: !state.loading[
-            action.payload.beingLoaded
-          ],
-        },
-      };
+      let authenticationFailed = action.payload.beingLoaded === 'authenticating' &&
+        !state.loading[action.payload.beingLoaded] === true
+        ? false
+        : state.authenticationFailed
+
+      return chain(state)
+        .setIn(['authenticationFailed'], authenticationFailed)
+        .setIn(['loading', action.payload.beingLoaded], !state.loading[
+          action.payload.beingLoaded
+        ])
+        .value()
+
+
 
     case RE_LOGIN:
-      return {
-        ...state,
-        reLogin: action.payload.loggedIn,
-        authenticationFailed: action.payload.reset
+
+      return chain(state)
+        .setIn(['reLogin'], action.payload.loggedIn)
+        .setIn(['authenticationFailed'], action.payload.reset
           ? false
-          : !action.payload.loggedIn,
-        loading: {
-          ...state.loading,
-          authenticating: false,
-        },
-      };
+          : !action.payload.loggedIn)
+        .setIn(['loading', 'authenticating'], false)
+        .value()
+
+
 
     case AUTH_CRED_CHANGED:
-      return {
-        ...state,
-        credsChanged: action.payload.changed,
-      };
+      return chain(state)
+        .setIn(['credsChanged'], action.payload.changed).value()
+
+
 
     case SWITCH_CREDS_CHANGED:
-      return {
-        ...state,
-        credsChanged: '',
-      };
+      return chain(state).setIn(['credsChanged'], '').value()
 
-      case PIN_CHANGED_FAILED:
-      return {
-        ...state,
-        pinChangedFailed: action.payload.isFailed,
-      };
+    case PIN_CHANGED_FAILED:
+      return chain(state).setIn(['pinChangedFailed'], action.payload.isFailed).value()
   }
 
   return state;

@@ -58,8 +58,15 @@ import {
 } from '../store/actions/trustedContacts';
 import {
   updateFCMTokens,
-  fetchNotifications,
+  fetchNotifications, notificationsUpdated
 } from '../store/actions/notifications';
+import {
+  storeFbtcData
+} from '../store/actions/fbtc';
+import {
+  setCurrencyCode,
+  setCurrencyToggleValue
+} from '../store/actions/preferences';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
 import ErrorModalContents from '../components/ErrorModalContents';
@@ -96,6 +103,7 @@ import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
+import { updatePreference, setFCMToken, setSecondaryDeviceAddress } from '../store/actions/preferences'
 
 function isEmpty(obj) {
   return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
@@ -261,6 +269,20 @@ interface HomePropsTypes {
   clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
+  notificationListNew: any;
+  notificationsUpdated: any;
+  FBTCAccountData: any;
+  storeFbtcData: any;
+  setCurrencyCode: any;
+  currencyCode: any;
+  setCurrencyToggleValue: any;
+  currencyToggleValue: any;
+  updatePreference: any;
+  fcmTokenValue: any;
+  setFCMToken: any;
+  setSecondaryDeviceAddress: any;
+  secondaryDeviceAddressValue: any;
+  releaseCasesValue: any;
 }
 
 class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
@@ -674,9 +696,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => {})
+      .then(() => { })
       .catch(
-        (err) => {}, //console.log('err', err)
+        (err) => { }, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -687,7 +709,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onAppStateChange = async (nextAppState) => {
-    this.handleAppStateChange(nextAppState);
     const { appState } = this.state;
     try {
       if (appState === nextAppState) return;
@@ -700,6 +721,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             this.scheduleNotification();
           }
           if (nextAppState === 'inactive' || nextAppState == 'background') {
+            this.props.updatePreference({
+              key: 'isInternetModalCome',
+              value: false
+            })
             await AsyncStorage.setItem(
               'isInternetModalCome',
               JSON.stringify(false),
@@ -707,7 +732,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) {}
+    } catch (error) { }
   };
 
   componentDidMount = () => {
@@ -760,6 +785,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
+    const {notificationListNew} = this.props;
     let newTransactions = [];
     const { accounts, fetchDerivativeAccBalTx } = this.props;
     const regularAccount = accounts[REGULAR_ACCOUNT].service.hdWallet;
@@ -778,6 +804,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       newTransactions.push(...newTransactionsSecure);
 
     if (newTransactions.length) {
+     // let asyncNotification = notificationListNew;
       let asyncNotification = JSON.parse(
         await AsyncStorage.getItem('notificationList'),
       );
@@ -819,7 +846,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         };
         this.localNotification(notificationDetails);
       }
-
+      //this.props.notificationsUpdated(asyncNotificationList);
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -856,22 +883,30 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => {})
-      .catch((err) => {});
+      .then(() => { })
+      .catch((err) => { });
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => {});
+      .then((notifications) => { });
   };
 
   componentDidUpdate = (prevProps) => {
-    if (prevProps.notificationList !== this.props.notificationList) {
+    if ((prevProps.notificationList !== this.props.notificationList) || (prevProps.releaseCasesValue !== this.props.releaseCasesValue)) {
       this.setupNotificationList();
     }
 
     if (prevProps.accounts !== this.props.accounts) {
       this.getBalances();
       this.getNewTransactionNotifications();
+    }
+
+    if (prevProps.fcmTokenValue !== this.props.fcmTokenValue) {
+      this.storeFCMToken();
+    }
+
+    if (prevProps.secondaryDeviceAddressValue !== this.props.secondaryDeviceAddressValue) {
+      this.setSecondaryDeviceAddresses();
     }
 
     if (this.props.paymentDetails !== null && this.props.paymentDetails) {
@@ -1003,35 +1038,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-  handleAppStateChange = async (nextAppState) => {
-    let limit = 15;
-    const { isContactOpen, isCameraOpen } = this.state;
-    if (
-      Platform.OS == 'android'
-        ? nextAppState == 'active'
-        : nextAppState == 'inactive' || nextAppState == 'background'
-    ) {
-      this.setState({ lastActiveTime: moment().toISOString() });
-    } else {
-      let { lastActiveTime } = this.state;
-      let diff = moment().diff(moment(lastActiveTime), 'seconds');
-      if (diff >= limit) {
-        this.setState(
-          {
-            lastActiveTime: moment().toISOString(),
-          },
-          () => {
-            this.props.navigation.navigate('ReLogin');
-          },
-        );
-      } else {
-        this.setState({
-          lastActiveTime: moment().toISOString(),
-        });
-        return;
-      }
-    }
-  };
+
 
   handleDeepLink = async (event) => {
     const { navigation, isFocused } = this.props;
@@ -1097,7 +1104,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[3]
+          splits[3]
           }`,
         );
       } else {
@@ -1201,16 +1208,18 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   checkFastBitcoin = async () => {
-    let getFBTCAccount =
-      JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
+    const {FBTCAccountData} = this.props;
+    let getFBTCAccount = FBTCAccountData || {};
+     // JSON.parse(await AsyncStorage.getItem('FBTCAccount')) || {};
     this.setState({ fbBTCAccount: getFBTCAccount });
     return;
   };
 
   setSecondaryDeviceAddresses = async () => {
-    let secondaryDeviceOtpTemp = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
+    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue;
+    // JSON.parse(
+    //   await AsyncStorage.getItem('secondaryDeviceAddress'),
+    // );
     if (!secondaryDeviceOtpTemp) {
       secondaryDeviceOtpTemp = [];
     }
@@ -1220,36 +1229,30 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push(this.state.secondaryDeviceOtp);
-      await AsyncStorage.setItem(
-        'secondaryDeviceAddress',
-        JSON.stringify(secondaryDeviceOtpTemp),
-      );
+      this.props.setSecondaryDeviceAddress(secondaryDeviceOtpTemp);
+      // await AsyncStorage.setItem(
+      //   'secondaryDeviceAddress',
+      //   JSON.stringify(secondaryDeviceOtpTemp),
+      // );
     }
   };
 
   getAssociatedContact = async () => {
-    let SelectedContacts = JSON.parse(
-      await AsyncStorage.getItem('SelectedContacts'),
-    );
-
     // TODO -- need to check this
     let AssociatedContact = JSON.parse(
       await AsyncStorage.getItem('AssociatedContacts'),
     );
     // setAssociatedContact(AssociatedContact);
-    let SecondaryDeviceAddress = JSON.parse(
-      await AsyncStorage.getItem('secondaryDeviceAddress'),
-    );
     this.setSecondaryDeviceAddresses();
-    this.setState({
-      selectedContact: SelectedContacts,
-    });
   };
 
   setCurrencyCodeFromAsync = async () => {
-    let currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    const { currencyCode, currencyToggleValue } = this.props;
+    let currencyCodeTmp = currencyCode;
+    //await AsyncStorage.getItem('currencyCode');
     if (!currencyCodeTmp) {
-      await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
+      this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
+      //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
       this.setState({
         currencyCode: RNLocalize.getCurrencies()[0],
       });
@@ -1258,9 +1261,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         currencyCode: currencyCodeTmp,
       });
     }
-    let currencyToggleValueTmp = await AsyncStorage.getItem(
-      'currencyToggleValue',
-    );
+    let currencyToggleValueTmp = currencyToggleValue;
+    // await AsyncStorage.getItem(
+    //   'currencyToggleValue',
+    // );
 
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
@@ -1296,11 +1300,16 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   storeFCMToken = async () => {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
-    let fcmTokenFromAsync = await AsyncStorage.getItem('fcmToken');
-    if (fcmTokenFromAsync != fcmToken && fcmTokenFromAsync) {
+    let fcmTokenFromAsync = this.props.fcmTokenValue;
+    //await AsyncStorage.getItem('fcmToken');
+    if (fcmTokenFromAsync && fcmTokenFromAsync != fcmToken) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem 
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     } else if (!fcmTokenFromAsync) {
+      this.props.setFCMToken(fcmToken);
+      //TODO: Remove setItem 
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     }
@@ -1374,6 +1383,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async (item) => {
     let content = JSON.parse(item._data.content);
+    const {notificationListNew} = this.props;
+   // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1382,7 +1393,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
     let readStatus = true;
     if (content.notificationType == 'release') {
-      let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+      let releaseCases = this.props.releaseCasesValue; 
+      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
         readStatus = true;
       } else if (releaseCases.remindMeLaterClick) {
@@ -1402,6 +1414,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       notificationId: content.notificationId,
     };
     asyncNotificationList.push(obj);
+   // this.props.notificationsUpdated(asyncNotificationList);
+
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotificationList),
@@ -1421,7 +1435,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1430,19 +1444,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1481,13 +1495,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1496,7 +1510,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-          dAccountType
+        dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1587,13 +1601,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressSettingsElements = async (type, currencycode) => {
-    const { navigation } = this.props;
+    const { navigation, currencyCode } = this.props;
     if (type == 'ManagePin') {
       return navigation.navigate('SettingManagePin', {
         managePinSuccessProceed: (pin) => this.managePinSuccessProceed(pin),
       });
     } else if (type == 'ChangeCurrency') {
-      let currency = await AsyncStorage.getItem('currencyCode');
+      let currency = currencyCode; 
+      //await AsyncStorage.getItem('currencyCode');
       navigation.navigate('ChangeCurrency');
       this.setState({
         currencyCode: currency,
@@ -1615,6 +1630,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationListOpen = async () => {
+    const {notificationListNew} = this.props;
+   // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1627,6 +1644,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           );
         }
       }
+     // this.props.notificationsUpdated(asyncNotificationList);
+
       await AsyncStorage.setItem(
         'notificationList',
         JSON.stringify(asyncNotificationList),
@@ -1673,7 +1692,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => {};
+  onPhoneNumberChange = () => { };
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -1949,6 +1968,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async (value) => {
+    const {notificationListNew} = this.props;
+    //let asyncNotifications = notificationListNew;
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -1974,6 +1995,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         tempNotificationData[i].read = true;
       }
     }
+   // this.props.notificationsUpdated(asyncNotifications);
     await AsyncStorage.setItem(
       'notificationList',
       JSON.stringify(asyncNotifications),
@@ -1995,8 +2017,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                  return el.build === value.info.split(' ')[1];
-                })
+                return el.build === value.info.split(' ')[1];
+              })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -2039,6 +2061,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
+    const {notificationListNew} = this.props;
+   // let asyncNotification = notificationListNew;
     let asyncNotification = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
@@ -2056,9 +2080,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         const element = notificationList['notifications'][i];
         let readStatus = false;
         if (element.notificationType == 'release') {
-          let releaseCases = JSON.parse(
-            await AsyncStorage.getItem('releaseCases'),
-          );
+          let releaseCases = this.props.releaseCasesValue;
+          // JSON.parse(
+          //   await AsyncStorage.getItem('releaseCases'),
+          // );
           if (element.body.split(' ')[1] == releaseCases.build) {
             if (releaseCases.remindMeLaterClick) {
               readStatus = false;
@@ -2077,9 +2102,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-              asyncNotificationList.findIndex(
-                (value) => value.notificationId == element.notificationId,
-              )
+            asyncNotificationList.findIndex(
+              (value) => value.notificationId == element.notificationId,
+            )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2121,6 +2146,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           tmpList.push(obj);
         }
       }
+      //this.props.notificationsUpdated(tmpList);
       await AsyncStorage.setItem('notificationList', JSON.stringify(tmpList));
       tmpList.sort(function (left, right) {
         return moment.utc(right.date).unix() - moment.utc(left.date).unix();
@@ -2132,6 +2158,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }
   };
+
+  setCurrencyToggleValue = (temp) => {
+    this.props.setCurrencyToggleValue(temp);
+  }
 
   render() {
     const {
@@ -2204,6 +2234,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             navigation={this.props.navigation}
             overallHealth={overallHealth}
             onSwitchToggle={this.onSwitchToggle}
+            setCurrencyToggleValue={this.setCurrencyToggleValue}
           />
         </View>
 
@@ -2277,8 +2308,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2288,6 +2319,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           ]}
           renderContent={() => (
             <TransactionsContent
+              infoBoxInfoText={''}
+              isFromAccount={false}
               transactionLoading={transactionsLoading}
               transactions={transactions}
               AtCloseEnd={atCloseEnd}
@@ -2327,8 +2360,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2396,8 +2429,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('82%')
               : hp('82%'),
@@ -2451,8 +2484,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-              ? hp('19%')
-              : hp('18%'),
+                ? hp('19%')
+                : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -3016,7 +3049,21 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           )}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+           onOpenEnd={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onOpenStart={() => {
+            this.setState({
+              tabBarIndex: 0,
+            });
+          }}
+          onCloseStart={() => {
+            this.setState({
+              tabBarIndex: 999,
+            });
+          }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.NoInternetBottomSheet}
@@ -3059,6 +3106,13 @@ const mapStateToProps = (state) => {
     overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
+    notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
+    FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
+    fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
+    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue),
+    releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
   };
 };
 
@@ -3075,6 +3129,13 @@ export default withNavigationFocus(
     fetchDerivativeAccBalTx,
     addTransferDetails,
     clearPaymentDetails,
+    notificationsUpdated,
+    storeFbtcData,
+    setCurrencyCode,
+    setCurrencyToggleValue,
+    updatePreference,
+    setFCMToken,
+    setSecondaryDeviceAddress
   })(HomeUpdated),
 );
 
@@ -3149,8 +3210,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

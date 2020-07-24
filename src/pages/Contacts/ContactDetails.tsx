@@ -123,6 +123,7 @@ export default function ContactDetails(props) {
   const uploading = useSelector(
     (state) => state.sss.loading.uploadRequestedShare,
   );
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
   const errorSending = useSelector((state) => state.sss.errorSending);
   const uploadSuccessfull = useSelector(
     (state) => state.sss.uploadSuccessfully,
@@ -551,10 +552,10 @@ export default function ContactDetails(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaLinkBottomSheet.current)
-        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -582,10 +583,10 @@ export default function ContactDetails(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaQRBottomSheet.current)
-        //     (SendViaQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -613,10 +614,10 @@ export default function ContactDetails(props) {
   const renderExitKeyQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (ExitKeyQRBottomSheet.current)
-        //     (ExitKeyQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (ExitKeyQRBottomSheet.current)
+      //     (ExitKeyQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -640,9 +641,9 @@ export default function ContactDetails(props) {
   const renderErrorModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -672,9 +673,9 @@ export default function ContactDetails(props) {
   const renderReshareHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ReshareBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ReshareBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -691,7 +692,8 @@ export default function ContactDetails(props) {
         (Contact.emails && Contact.emails.length))
     ) {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
       console.log({ walletID, FCM });
 
       const contactName = `${Contact.firstName} ${
@@ -951,9 +953,9 @@ export default function ContactDetails(props) {
   const SendModalFunction = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (shareBottomSheet as any).current.snapTo(0);
-        // }}
+        onPressHeader={() => {
+          (shareBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -999,13 +1001,15 @@ export default function ContactDetails(props) {
               ) : null}
             </View>
             {Contact.hasTrustedChannel &&
-            !Contact.hasXpub ? null : Contact.contactName ===
-                'Secondary Device' && !Contact.hasXpub ? null : (
+            !(
+              Contact.hasXpub || Contact.hasTrustedAddress
+            ) ? null : Contact.contactName === 'Secondary Device' &&
+              !(Contact.hasXpub || Contact.hasTrustedAddress) ? null : (
               <TouchableOpacity
                 disabled={isSendDisabled}
                 onPress={() => {
                   setIsSendDisabled(true);
-                  Contact.hasXpub
+                  Contact.hasXpub || Contact.hasTrustedAddress
                     ? onPressSend()
                     : Contact.contactName != 'Secondary Device'
                     ? onPressResendRequest()
@@ -1025,7 +1029,7 @@ export default function ContactDetails(props) {
                   paddingRight: wp('1.5%'),
                 }}
               >
-                {Contact.hasXpub && (
+                {(Contact.hasXpub || Contact.hasTrustedAddress) && (
                   <Image
                     source={require('../../assets/images/icons/icon_bitcoin_light.png')}
                     style={{
@@ -1043,7 +1047,7 @@ export default function ContactDetails(props) {
                     marginLeft: 2,
                   }}
                 >
-                  {Contact.hasXpub
+                  {Contact.hasXpub || Contact.hasTrustedAddress
                     ? 'Send'
                     : index < 3
                     ? 'Reshare'
@@ -1286,19 +1290,23 @@ export default function ContactDetails(props) {
             ) : null}
           </View>
         )}
-        <TouchableOpacity
-          style={{
-            ...styles.bottomButton,
-          }}
-          onPress={() => {
-            dispatch(removeTrustedContact(contact.contactName));
-            props.navigation.goBack();
-          }}
-        >
-          <View>
-            <Text style={styles.buttonText}>Remove</Text>
-          </View>
-        </TouchableOpacity>
+        {Contact.isRemovable &&
+        Date.now() - Contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+        !Contact.hasTrustedChannel ? (
+          <TouchableOpacity
+            style={{
+              ...styles.bottomButton,
+            }}
+            onPress={() => {
+              dispatch(removeTrustedContact(contact.contactName));
+              props.navigation.goBack();
+            }}
+          >
+            <View>
+              <Text style={styles.buttonText}>Remove</Text>
+            </View>
+          </TouchableOpacity>
+        ) : null}
       </View>
       <BottomSheet
         enabledGestureInteraction={false}
@@ -1356,7 +1364,6 @@ export default function ContactDetails(props) {
         renderHeader={renderErrorModalHeader}
       />
       <BottomSheet
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={shareBottomSheet as any}
         snapPoints={[

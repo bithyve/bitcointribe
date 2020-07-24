@@ -11,17 +11,11 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import CountDown from 'react-native-countdown-component';
+import { config } from 'process';
+import Config from '../../bitcoin/HexaConfig';
 
 export default function TimerModalContents(props) {
-  const [showMessage, setShowMessage] = useState(false);
-
-  const setDoNotShowTimer = async() =>{
-    if(showMessage){
-      await AsyncStorage.setItem("TCRequestTimer", JSON.stringify(true));
-    }
-    props.onTimerFinish();
-  }
-
+  const TC_REQUEST_EXPIRY = Config.TC_REQUEST_EXPIRY/1000;
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -34,73 +28,35 @@ export default function TimerModalContents(props) {
         </View>
       </View>
       <View style={{ flex: 1, marginLeft: 20, marginRight: 20 }}>
-        <AppBottomSheetTouchableWrapper
-          activeOpacity={10}
-          onPress={() => setShowMessage(!showMessage)}
-          style={{
-            flexDirection: 'row',
-            borderRadius: 8,
-            backgroundColor: Colors.backgroundColor,
-            alignItems: 'center',
-            padding: 20,
-          }}
-        >
-          <Text
-            style={{
-              color: Colors.textColorGrey,
-              fontSize: RFValue(12),
-              fontFamily: Fonts.FiraSansRegular,
-            }}
-          >
-            Never show this message again
-          </Text>
-          <View
-            style={{
-              width: wp('7%'),
-              height: wp('7%'),
-              borderRadius: 7,
-              backgroundColor: Colors.white,
-              borderColor: Colors.borderColor,
-              borderWidth: 1,
-              marginLeft: 'auto',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {showMessage && (
-              <Entypo name="check" size={RFValue(17)} color={Colors.green} />
-            )}
-          </View>
-        </AppBottomSheetTouchableWrapper>
         <View style={styles.bottomView}>
           <View style={styles.bottomInnerView}>
             <Ionicons color={Colors.blue} size={18} name={'md-time'} />
-            {props.renderTimer ?
-            <CountDown
-              size={15}
-              until={1200}
-              onFinish={() => props.onTimerFinish()}
-              digitStyle={{
-                backgroundColor: '#FFF',
-                borderWidth: 0,
-                borderColor: '#FFF',
-                margin: -10,
-              }}
-              digitTxtStyle={{
-                color: Colors.blue,
-                fontSize: RFValue(19),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-              separatorStyle={{ color: Colors.blue }}
-              timeToShow={['M', 'S']}
-              timeLabels={{ m: null, s: null }}
-              showSeparator
-            />
-            : null}
+            {props.renderTimer ? (
+              <CountDown
+                size={15}
+                until={TC_REQUEST_EXPIRY}
+                onFinish={() => props.onPressContinue()}
+                digitStyle={{
+                  backgroundColor: '#FFF',
+                  borderWidth: 0,
+                  borderColor: '#FFF',
+                  margin: -10,
+                }}
+                digitTxtStyle={{
+                  color: Colors.blue,
+                  fontSize: RFValue(19),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+                separatorStyle={{ color: Colors.blue }}
+                timeToShow={['H', 'M', 'S']}
+                timeLabels={{ h: null, m: null, s: null }}
+                showSeparator
+              />
+            ) : null}
           </View>
 
           <AppBottomSheetTouchableWrapper
-            onPress={() => setDoNotShowTimer()}
+            onPress={() => props.onPressContinue()}
             style={{
               backgroundColor: Colors.blue,
               borderRadius: 10,
@@ -141,7 +97,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     marginBottom: 15,
-    marginTop: 15
+    marginTop: 15,
   },
   modalHeaderTitleText: {
     color: Colors.blue,

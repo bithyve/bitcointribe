@@ -36,6 +36,11 @@ export const getCurrencyImageName = (currencyCodeValue) => {
   }
 };
 
+
+export const isEmpty = (obj) => {
+  return Object.keys(obj).every((k) => !Object.keys(obj[k]).length);
+}
+
 export const getCurrencyImageByRegion = (currencyCode, type) => {
   const dollarCurrency = ['USD', 'AUD', 'BBD', 'BSD', 'BZD', 'BMD', 'BND', 'KHR', 'CAD', 'KYD', 'XCD', 'FJD', 'GYD', 'HKD', 'JMD', 'LRD', 'NAD', 'NZD', 'SGD', 'SBD', 'SRD', 'TWD', 'TTD', 'TVD', 'ZWD']
   const poundCurrency = ['EGP', 'FKP', 'GIP', 'GGP', 'IMP', 'JEP', 'SHP', 'SYP', 'GBP']

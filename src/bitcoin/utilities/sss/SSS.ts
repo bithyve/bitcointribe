@@ -570,19 +570,72 @@ export default class SSS {
     return { shares };
   };
 
-  public uploadShare = async (
+  // public uploadShare = async (
+  //   shareIndex: number,
+  //   contactName: string,
+  //   dynamicNonPMDD?: MetaShare[],
+  // ): Promise<{
+  //   otp: string;
+  //   encryptedKey: string;
+  // }> => {
+  //   if (!this.metaShares.length) {
+  //     throw new Error('Generate MetaShares prior uploading');
+  //   }
+
+  //   let res: AxiosResponse;
+  //   this.metaShares[
+  //     shareIndex
+  //   ].meta.guardian = contactName.toLowerCase().trim();
+  //   const metaShare: MetaShare = this.metaShares[shareIndex];
+  //   const { encryptedMetaShare, key, messageId } = SSS.encryptMetaShare(
+  //     metaShare,
+  //   );
+
+  //   let encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  //   if (dynamicNonPMDD) {
+  //     encryptedDynamicNonPMDD = {
+  //       encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+  //         .encryptedDynamicNonPMDD,
+  //       updatedAt: Date.now(),
+  //     };
+  //   }
+
+  //   try {
+  //     res = await BH_AXIOS.post('uploadShare', {
+  //       HEXA_ID,
+  //       share: encryptedMetaShare,
+  //       messageId,
+  //       encryptedDynamicNonPMDD,
+  //     });
+  //   } catch (err) {
+  //     if (err.response) throw new Error(err.response.data.err);
+  //     if (err.code) throw new Error(err.code);
+  //   }
+
+  //   const { success } = res.data;
+  //   if (!success) {
+  //     throw new Error('Unable to upload share');
+  //   }
+  //   const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
+  //   return { otp, encryptedKey: otpEncryptedData };
+  // };
+
+  public prepareShareUploadables = (
     shareIndex: number,
     contactName: string,
     dynamicNonPMDD?: MetaShare[],
-  ): Promise<{
+  ): {
     otp: string;
     encryptedKey: string;
-  }> => {
+    encryptedMetaShare: string;
+    messageId: string;
+    encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  } => {
     if (!this.metaShares.length) {
       throw new Error('Generate MetaShares prior uploading');
     }
 
-    let res: AxiosResponse;
+    // let res: AxiosResponse;
     this.metaShares[
       shareIndex
     ].meta.guardian = contactName.toLowerCase().trim();
@@ -600,24 +653,30 @@ export default class SSS {
       };
     }
 
-    try {
-      res = await BH_AXIOS.post('uploadShare', {
-        HEXA_ID,
-        share: encryptedMetaShare,
-        messageId,
-        encryptedDynamicNonPMDD,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
-    }
+    // try {
+    //   res = await BH_AXIOS.post('uploadShare', {
+    //     HEXA_ID,
+    //     share: encryptedMetaShare,
+    //     messageId,
+    //     encryptedDynamicNonPMDD,
+    //   });
+    // } catch (err) {
+    //   if (err.response) throw new Error(err.response.data.err);
+    //   if (err.code) throw new Error(err.code);
+    // }
 
-    const { success } = res.data;
-    if (!success) {
-      throw new Error('Unable to upload share');
-    }
+    // const { success } = res.data;
+    // if (!success) {
+    //   throw new Error('Unable to upload share');
+    // }
     const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
-    return { otp, encryptedKey: otpEncryptedData };
+    return {
+      otp,
+      encryptedKey: otpEncryptedData,
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    };
   };
 
   public initializeHealthcheck = async (): Promise<{

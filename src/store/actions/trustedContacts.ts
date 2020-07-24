@@ -1,10 +1,13 @@
 // types and action creators: dispatched by components and sagas
-
 import {
   TrustedDataElements,
   EphemeralDataElements,
   trustedChannelActions,
+  ShareUploadables,
 } from '../../bitcoin/utilities/Interface';
+
+import { createAction } from 'redux-actions';
+import { UPDATE_ADDRESS_BOOK_LOCALLY } from '../constants';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
@@ -15,6 +18,7 @@ export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
+export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
 
 export const initializeTrustedContact = (contactInfo: {
   contactName: string;
@@ -58,10 +62,20 @@ export const updateEphemeralChannel = (
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
+  shareUploadables?: ShareUploadables,
+  updatedDB?: any,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactInfo, data, fetch, trustedContacts, uploadXpub },
+    payload: {
+      contactInfo,
+      data,
+      fetch,
+      trustedContacts,
+      uploadXpub,
+      shareUploadables,
+      updatedDB,
+    },
   };
 };
 
@@ -80,10 +94,12 @@ export const updateTrustedChannel = (
   contactInfo: { contactName: string; info: string },
   data: TrustedDataElements,
   fetch?: Boolean,
+  shareUploadables?: ShareUploadables,
+  updatedDB?: any,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactInfo, data, fetch },
+    payload: { contactInfo, data, fetch, shareUploadables, updatedDB },
   };
 };
 
@@ -104,6 +120,13 @@ export const fetchTrustedChannel = (
 export const trustedChannelsSync = () => {
   return {
     type: TRUSTED_CHANNELS_SYNC,
+  };
+};
+
+export const updateTrustedContactInfoLocally = (trustedContactInfo) => {
+  return {
+    type: UPDATE_TRUSTED_CONTACT_INFO,
+    payload: { trustedContactInfo },
   };
 };
 
@@ -193,3 +216,9 @@ export const switchTCLoading = (beingLoaded) => {
     payload: { beingLoaded },
   };
 };
+
+const updateAddressBookLocallyRequest = createAction(
+  UPDATE_ADDRESS_BOOK_LOCALLY,
+);
+export const updateAddressBookLocally = (payload) => (dispatch) =>
+  dispatch(updateAddressBookLocallyRequest(payload));

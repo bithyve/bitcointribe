@@ -18,6 +18,7 @@ import {
   TWO_FA_RESETTED,
   ADD_TRANSFER_DETAILS,
   REMOVE_TRANSFER_DETAILS,
+  AVERAGE_TX_FEE,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -54,6 +55,7 @@ const ACCOUNT_VARS: {
     transfer: Boolean;
     testcoins: Boolean;
   };
+  averageTxFees: any;
 } = {
   service: null,
   receivingAddress: '',
@@ -79,6 +81,7 @@ const ACCOUNT_VARS: {
     transfer: false,
     testcoins: false,
   },
+  averageTxFees: null,
 };
 
 const initialState: {
@@ -435,6 +438,12 @@ export default (state = initialState, action) => {
             twoFAResetted: action.payload.resetted,
           },
         },
+      };
+
+    case AVERAGE_TX_FEE:
+      return {
+        ...state,
+        averageTxFees: action.payload.averageTxFees,
       };
   }
   return state;

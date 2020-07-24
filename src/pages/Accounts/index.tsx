@@ -57,10 +57,6 @@ import moment from 'moment';
 import config from '../../bitcoin/HexaConfig';
 import { UsNumberFormat } from '../../common/utilities';
 import TransactionDetails from './TransactionDetails';
-import {
-  TrustedContactDerivativeAccount,
-  Transactions,
-} from '../../bitcoin/utilities/Interface';
 import TransactionHelperModalContents from '../../components/Helper/TransactionHelperModalContents';
 import TestAccountHelpContents from '../../components/Helper/TestAccountHelpContents';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -69,6 +65,7 @@ import CheckingAccountHelpContents from '../../components/Helper/CheckingAccount
 import deviceInfoModule from 'react-native-device-info';
 import SavingsAccountHelpContents from '../../components/Helper/SavingsAccountHelpContents';
 import Loader from '../../components/loader';
+import TransactionsContent from '../../components/home/transaction-content';
 
 export default function Accounts(props) {
   const [FBTCAccount, setFBTCAccount] = useState({});
@@ -313,7 +310,7 @@ export default function Accounts(props) {
             'storedAverageTxFees',
             JSON.stringify({
               ...storedAverageTxFees,
-              serviceType: { averageTxFees, lastFetched: Date.now() },
+              [serviceType]: { averageTxFees, lastFetched: Date.now() },
             }),
           );
         }
@@ -324,7 +321,7 @@ export default function Accounts(props) {
         await AsyncStorage.setItem(
           'storedAverageTxFees',
           JSON.stringify({
-            serviceType: { averageTxFees, lastFetched: Date.now() },
+            [serviceType]: { averageTxFees, lastFetched: Date.now() },
           }),
         );
       }
@@ -348,21 +345,20 @@ export default function Accounts(props) {
     setServiceType(serviceType);
     //console.log('Service type', serviceType);
     if (carousel.current) {
-        if (serviceType == TEST_ACCOUNT) {
-          setTimeout(() => {
-           (carousel.current as any).snapToItem(0, true, false);
-          }, 1000);
-          
-        } else if (serviceType == REGULAR_ACCOUNT) {
-          setTimeout(() => {
-           (carousel.current as any).snapToItem(1, true, false);
-          }, 1000);
-        } else if (serviceType == SECURE_ACCOUNT) {
-          setTimeout(() => {
+      if (serviceType == TEST_ACCOUNT) {
+        setTimeout(() => {
+          (carousel.current as any).snapToItem(0, true, false);
+        }, 1000);
+      } else if (serviceType == REGULAR_ACCOUNT) {
+        setTimeout(() => {
+          (carousel.current as any).snapToItem(1, true, false);
+        }, 1000);
+      } else if (serviceType == SECURE_ACCOUNT) {
+        setTimeout(() => {
           (carousel.current as any).snapToItem(2, true, false);
-          }, 1000);
-        }
+        }, 1000);
       }
+    }
 
     if (serviceType == TEST_ACCOUNT) checkNHighlight();
   };
@@ -649,341 +645,31 @@ export default function Accounts(props) {
     };
   };
 
+  const getAccountNameFromType = () => {
+    if (serviceType == TEST_ACCOUNT) return 'Test Account';
+    else if (serviceType == REGULAR_ACCOUNT) return 'Checking Account';
+    else return 'Savings Account';
+  };
+
   const renderTransactionsContent = () => {
-    if (transactionLoading) {
-      return (
-        <View style={styles.modalContentContainer}>
-          <View
-            style={{
-              flex: 1,
-            }}
-          >
-            <View style={{ marginLeft: 20, marginTop: 20 }}>
-              <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-            </View>
-            {[1, 2, 3, 4, 5].map((value) => {
-              return (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingTop: wp('5%'),
-                    paddingBottom: wp('5%'),
-                    borderBottomWidth: 0.5,
-                    borderColor: Colors.borderColor,
-                  }}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('5%'),
-                        borderRadius: wp('5%') / 2,
-                        marginLeft: 10,
-                        marginRight: 10,
-                      }}
-                    />
-                    <View>
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp('5%'),
-                          width: wp('25%'),
-                          borderRadius: 10,
-                        }}
-                      />
-                      <View
-                        style={{
-                          backgroundColor: Colors.backgroundColor,
-                          height: wp('5%'),
-                          width: wp('35%'),
-                          marginTop: 5,
-                          borderRadius: 10,
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('7%'),
-                        width: wp('20%'),
-                        borderRadius: 10,
-                      }}
-                    />
-                    <View
-                      style={{
-                        backgroundColor: Colors.backgroundColor,
-                        height: wp('5%'),
-                        width: wp('5%'),
-                        borderRadius: wp('5%') / 2,
-                        marginLeft: 10,
-                        marginRight: 10,
-                      }}
-                    />
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-      );
-    } else {
-      return transactions.length ? (
-        <View style={styles.modalContentContainer}>
-          <View style={{ marginLeft: 20, marginTop: 20 }}>
-            <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <View style={{ height: 'auto' }}>
-              <FlatList
-                data={transactions}
-                ItemSeparatorComponent={() => (
-                  <View style={{ backgroundColor: Colors.white }}>
-                    <View style={styles.separatorView} />
-                  </View>
-                )}
-                renderItem={({ item }) => {
-                  return (
-                    <AppBottomSheetTouchableWrapper
-                      onPress={
-                        () => {
-                          (TransactionDetailsBottomSheet as any).current.snapTo(
-                            1,
-                          );
-                          checkNShowHelperModal();
-                          setTimeout(() => {
-                            setTransactionItem(item);
-                          }, 10);
-                        }
-                        // props.navigation.navigate('TransactionDetails', {
-                        //   item,
-                        //   serviceType,
-                        //   getServiceType: getServiceType,
-                        // })
-                      }
-                      style={{
-                        ...styles.transactionModalElementView,
-                        backgroundColor: Colors.white,
-                      }}
-                    >
-                      <View style={styles.modalElementInfoView}>
-                        <View style={{ justifyContent: 'center' }}>
-                          <FontAwesome
-                            name={
-                              item.transactionType == 'Received'
-                                ? 'long-arrow-down'
-                                : 'long-arrow-up'
-                            }
-                            size={15}
-                            color={
-                              item.transactionType == 'Received'
-                                ? Colors.green
-                                : Colors.red
-                            }
-                          />
-                        </View>
-                        <View
-                          style={{ justifyContent: 'center', marginLeft: 10 }}
-                        >
-                          <Text style={styles.transactionModalTitleText}>
-                            {item.accountType}{' '}
-                          </Text>
-                          <Text style={styles.transactionModalDateText}>
-                            {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
-                            {/* <Entypo
-                      size={10}
-                      name={"dot-single"}
-                      color={Colors.textColorGrey}
-                    />
-                    {item.time} */}
-                          </Text>
-                        </View>
-                      </View>
-                      <View style={styles.transactionModalAmountView}>
-                        <Image
-                          source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
-                          style={{
-                            width: 12,
-                            height: 12,
-                            resizeMode: 'contain',
-                            alignSelf: 'center',
-                          }}
-                        />
-                        <View
-                          style={{
-                            marginLeft: 5,
-                            alignSelf: 'center',
-                            marginRight: 5,
-                            flexDirection: 'row',
-                          }}
-                        >
-                          <Text
-                            style={{
-                              ...styles.transactionModalAmountText,
-                              color:
-                                item.transactionType == 'Received'
-                                  ? Colors.green
-                                  : Colors.red,
-                              alignSelf: 'center',
-                            }}
-                          >
-                            {/* {switchOn
-                      ? item.amount
-                      : (
-                          (item.amount / 1e8) *
-                          exchangeRates[CurrencyCode].last
-                        ).toFixed(2)} */}
-                            {/* {item.amount} */}
-                            {item.accountType == 'Test Account'
-                              ? UsNumberFormat(item.amount)
-                              : switchOn
-                              ? UsNumberFormat(item.amount)
-                              : exchangeRates
-                              ? (
-                                  (item.amount / 1e8) *
-                                  exchangeRates[CurrencyCode].last
-                                ).toFixed(2)
-                              : null}
-                          </Text>
-                          <Text
-                            style={{
-                              alignSelf: 'center',
-                              fontSize: RFValue(13),
-                              fontFamily: Fonts.OpenSans,
-                              color: Colors.textColorGrey,
-                              lineHeight: 19,
-                            }}
-                          >
-                            {item.accountType == 'Test Account'
-                              ? 't-sats'
-                              : switchOn
-                              ? 'sats'
-                              : CurrencyCode.toLocaleLowerCase()}
-                          </Text>
-                        </View>
-                        <Text
-                          style={{
-                            ...styles.transactionModalAmountUnitText,
-                            alignSelf: 'center',
-                          }}
-                        >
-                          {item.confirmations < 6 ? item.confirmations : '6+'}
-                        </Text>
-                        <Ionicons
-                          name="ios-arrow-forward"
-                          color={Colors.textColorGrey}
-                          size={12}
-                          style={{ marginLeft: 20, alignSelf: 'center' }}
-                        />
-                      </View>
-                    </AppBottomSheetTouchableWrapper>
-                  );
-                }}
-              />
-            </View>
-          </View>
-          {transactions.length <= 1 ? (
-            <View
-              style={{
-                backgroundColor: Colors.white,
-                marginBottom:
-                  Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                    ? wp('0%')
-                    : wp('5%'),
-              }}
-            >
-              <View
-                style={{
-                  margin: 15,
-                  backgroundColor: Colors.backgroundColor,
-                  padding: 10,
-                  paddingTop: 20,
-                  paddingBottom: 20,
-                  marginBottom:
-                    Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                      ? wp('0%')
-                      : wp('5%'),
-                  borderRadius: 7,
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.black,
-                    fontSize: RFValue(13),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  View your transactions
-                </Text>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  All recent transactions across your accounts appear here
-                </Text>
-              </View>
-            </View>
-          ) : null}
-        </View>
-      ) : (
-        <View style={styles.modalContentContainer}>
-          <View style={{ marginLeft: 20, marginTop: 20 }}>
-            <Text style={styles.modalHeaderTitleText}>{'Transactions'}</Text>
-          </View>
-          <View style={{ flex: 1 }}></View>
-          <View
-            style={{
-              backgroundColor: Colors.white,
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? wp('0%')
-                  : wp('5%'),
-            }}
-          >
-            <View
-              style={{
-                margin: 15,
-                backgroundColor: Colors.backgroundColor,
-                padding: 10,
-                paddingTop: 20,
-                paddingBottom: 20,
-                marginBottom:
-                  Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                    ? wp('0%')
-                    : wp('5%'),
-                borderRadius: 7,
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.black,
-                  fontSize: RFValue(13),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                View your transactions
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue(12),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                All recent transactions across your accounts appear here
-              </Text>
-            </View>
-          </View>
-        </View>
-      );
-    }
+    const infoBoxInfoText =
+      'All your recent transactions for the ' +
+      getAccountNameFromType() +
+      ' will appear here.';
+    return (
+      <TransactionsContent
+        infoBoxInfoText={infoBoxInfoText}
+        isFromAccount={true}
+        transactionLoading={transactionLoading}
+        transactions={transactions}
+        AtCloseEnd={false}
+        setTransactionItem={(item) =>
+          this.setState({ selectedTransactionItem: item })
+        }
+        setTabBarZIndex={(index) => this.setState({ tabBarIndex: index })}
+        TransactionDetailsBottomSheet={this.transactionDetailsBottomSheet}
+      />
+    );
   };
 
   const renderTransactionsHeader = () => {
@@ -1037,7 +723,12 @@ export default function Accounts(props) {
       //       (TestAccountHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <TestAccountHelpContents />
+      <TestAccountHelpContents
+        titleClicked={() => {
+          if (TestAccountHelperBottomSheet.current)
+            (TestAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   };
   const renderTestAccountsHelperHeader = () => {
@@ -1077,7 +768,12 @@ export default function Accounts(props) {
       //       (SecureAccountHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <SavingsAccountHelpContents />
+      <SavingsAccountHelpContents
+        titleClicked={() => {
+          if (SecureAccountHelperBottomSheet.current)
+            (SecureAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   }, []);
 
@@ -1117,7 +813,12 @@ export default function Accounts(props) {
       //       (RegularAccountHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <CheckingAccountHelpContents />
+      <CheckingAccountHelpContents
+        titleClicked={() => {
+          if (RegularAccountHelperBottomSheet.current)
+            (RegularAccountHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   }, []);
 
@@ -1178,7 +879,12 @@ export default function Accounts(props) {
       //     (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
       //   }}
       // />
-      <TransactionHelperModalContents />
+      <TransactionHelperModalContents
+        titleClicked={() => {
+          if (TransactionDetailsHelperBottomSheet.current)
+            (TransactionDetailsHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   };
   const renderHelperHeader = () => {
@@ -1490,7 +1196,7 @@ export default function Accounts(props) {
                 sliderWidth={sliderWidth}
                 itemWidth={sliderWidth * 0.95}
                 onSnapToItem={(index) => {
-                  console.log('onSnapToItem', index, carouselInitIndex);
+                  //console.log('onSnapToItem', index, carouselInitIndex);
                   index === 0
                     ? getServiceType(TEST_ACCOUNT)
                     : index === 1
@@ -1515,29 +1221,48 @@ export default function Accounts(props) {
               }}
             >
               <View>
-              <View style={{ flexDirection: 'row', marginLeft: 30,
-                    marginRight: 20, }}>
-                <Text style={{ ...styles.cardAmountText, color: Colors.textColorGrey, fontSize: RFValue(13) }}>
-                  Available to spend:{' '}
-                  {serviceType == TEST_ACCOUNT
-                    ? UsNumberFormat(spendableBalance)
-                    : switchOn
-                    ? UsNumberFormat(spendableBalance)
-                    : exchangeRates
-                    ? (
-                        (spendableBalance / 1e8) *
-                        exchangeRates[CurrencyCode].last
-                      ).toFixed(2)
-                    : null}
-                </Text>
-                <Text style={{...styles.cardAmountUnitText, color: Colors.textColorGrey}}>
-                  {serviceType == TEST_ACCOUNT
-                    ? 't-sats'
-                    : switchOn
-                    ? 'sats'
-                    : CurrencyCode.toLocaleLowerCase()}
-                </Text>
-              </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    marginLeft: 30,
+                    marginRight: 20,
+                    alignItems: 'flex-end',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: Fonts.FiraSansItalic,
+                      color: Colors.blue,
+                      fontSize: RFValue(13),
+                    }}
+                  >
+                    Available to spend:{' '}
+                    {serviceType == TEST_ACCOUNT
+                      ? UsNumberFormat(spendableBalance)
+                      : switchOn
+                      ? UsNumberFormat(spendableBalance)
+                      : exchangeRates
+                      ? (
+                          (spendableBalance / 1e8) *
+                          exchangeRates[CurrencyCode].last
+                        ).toFixed(2)
+                      : null}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: Fonts.FiraSansMediumItalic,
+                      color: Colors.textColorGrey,
+                      fontSize: RFValue(10),
+                      marginBottom: 1,
+                    }}
+                  >
+                    {serviceType == TEST_ACCOUNT
+                      ? ' t-sats'
+                      : switchOn
+                      ? ' sats'
+                      : CurrencyCode.toLocaleLowerCase()}
+                  </Text>
+                </View>
                 <View
                   style={{
                     backgroundColor: Colors.backgroundColor,
@@ -2342,11 +2067,3 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 });
-const circleSvgPath = ({ position, canvasSize }): string =>
-  `M0,0H${canvasSize.x}V${canvasSize.y}H0V0ZM${position.x._value},${position.y._value}Za50 50 0 1 0 100 0 50 50 0 1 0-100 0`;
-
-const StepNumber = ({ currentStepNumber }) => (
-  <View>
-    <Text>{''}</Text>
-  </View>
-);

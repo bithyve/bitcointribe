@@ -81,6 +81,12 @@ export interface BuddyStaticNonPMDD {
   shareIDs: string[];
 }
 
+export interface ShareUploadables {
+  encryptedMetaShare: string;
+  messageId: string;
+  encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+}
+
 export interface DerivativeAccountElements {
   xpub: string;
   xpriv: string;
@@ -187,6 +193,8 @@ export interface EphemeralDataElements {
       paymentURI?: string;
     };
   };
+  trustedAddress?: string;
+  trustedTestAddress?: string;
 }
 
 export interface EphemeralData {
@@ -251,6 +259,8 @@ export interface Contacts {
       address: string;
       data?: TrustedData[];
     };
+    trustedAddress?: string;
+    trustedTestAddress?: string;
   };
 }
 

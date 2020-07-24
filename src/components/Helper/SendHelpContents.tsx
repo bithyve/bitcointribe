@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Image, Text, StyleSheet, Linking, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,149 +18,102 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function SendHelpContents(props) {
-    
-    const openLink = (url) => {
-        Linking.canOpenURL(url).then(supported => {
-          if (supported) {
-            Linking.openURL(url);
-          } else {
-            console.log("Don't know how to open URI: " + url);
-          }
-        })
-    }
-
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
 
   return (
-    <ScrollView
-        style={styles.modalContainer}
+    <View style={styles.modalContainer}>
+      <AppBottomSheetTouchableWrapper
+        style={{ justifyContent: 'center', alignItems: 'center' }}
+        activeOpacity={10}
+        onPress={() => props.titleClicked && props.titleClicked()}
+      >
+        <Text style={styles.headerText}>Sending bitcoin</Text>
+      </AppBottomSheetTouchableWrapper>
+      <View style={styles.headerSeparator} />
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: Colors.blue,
+        }}
         snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text
-                    style={{
-                        color: Colors.white,
-                        fontFamily: Fonts.FiraSansMedium,
-                        fontSize: RFValue(20),
-                        marginTop: hp('1%'),
-                        marginBottom: hp('1%'),
-                    }}
-                >
-                    Sending bitcoin
-                </Text>
-            </View>
-            <View
-                style={{
-                backgroundColor: Colors.homepageButtonColor,
-                height: 1,
-                marginLeft: wp('5%'),
-                marginRight: wp('5%'),
-                marginBottom: hp('1%'),
-                }}
+        decelerationRate="fast"
+      >
+        <View style={styles.ElementView}>
+          <Text
+            style={{
+              ...styles.infoText,
+              marginTop: wp('10%'),
+            }}
+          >
+            When you want to send bitcoin, you need a destination, which is denoted by the recipient’s address. This address is an alphanumeric string beginning with “1”, “3” or “bc1” for Bitcoin Mainnet, and “2” for  Bitcoin Testnet
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/bitcoin_send_info_1.png')}
+              style={styles.helperImage}
             />
-            <Text
+          </View>
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginBottom: wp('15%'),
             }}
-            >
-                When you want to send bitcoin, you need a{'\n'}destination, which is denoted by the{'\n'}recipient’s address. This address is an{'\n'}alphanumeric string beginning with “1”, “3” or{'\n'}“bc1” for Bitcoin Mainnet, and “2” for {'\n'}Bitcoin Testnet
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/bitcoin_send_info_1.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+          >
+            Bitcoin transactions can not be reversed or cancelled. For this reason, it is recommended that you scan a QR code instead of keying in characters
+          </Text>
+          <View
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              borderStyle: 'dotted',
+              borderWidth: 1,
+              borderRadius: 1,
+              borderColor: Colors.white,
+              ...styles.separatorView,
             }}
-            >
-                Bitcoin transactions can not be reversed or cancelled.{'\n'}For this reason, it is recommended that you scan a QR{'\n'}code instead of keying in characters
-            </Text>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
+          />
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
-            {/* <Text
+        <View style={styles.ElementView}>
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              ...styles.infoText,
+              marginTop: wp('10%'),
             }}
-            >
-                A transaction that is not confirmed stays in the{'\n'}pool of unconfirmed transactions, called the{'\n'}mempool. The mempool is routinely cleared by{'\n'}miners every three to six hours
-            </Text> */}
-            <Text
-            style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
-            }}
-            >
-                Once you press “Send” on Hexa, the transaction{'\n'}is relayed to a bitcoin full node. This full node{'\n'}then announces the transactions to other full{'\n'}nodes, including those of miners
+          >
+            Once you press “Send” on Hexa, the transaction is relayed to a bitcoin full node. This full node then announces the transactions to other full nodes, including those of miners
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+              style={styles.helperImage}
+            />
+          </View>
+          <View style={styles.bottomLinkView}>
+            <Text style={{...styles.infoText, marginLeft: 0, marginRight: 0,}}>
+            A miner includes a transaction within their block only if the fee associated is sufficiently high. This is why Hexa requests for a fee when sending a transaction
             </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
+            <View style={{...styles.linkView, marginTop: wp('7%')}}>
+              <Text style={styles.toKnowMoreText}>To know more,</Text>
+              <AppBottomSheetTouchableWrapper
+                style={{ marginLeft: 5 }}
+                onPress={() =>
+                  openLink('https://en.bitcoin.it/wiki/Miner_fees')
+                }
+              >
+                <Text style={styles.clickHereText}>click here</Text>
+              </AppBottomSheetTouchableWrapper>
             </View>
-            <Text
-                style={{
-                    textAlign: 'center',
-                    color: Colors.white,
-                    fontSize: RFValue(12),
-                    fontFamily: Fonts.FiraSansRegular,
-                }}
-            >
-                A miner includes a transaction within their{'\n'}block only if the fee associated is{'\n'}sufficiently high. This is why Hexa requests for{'\n'}a fee when sending a transaction
-            </Text>
-            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                <Text
-                    style={{
-                        textAlign: 'center',
-                        color: Colors.white,
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                    }}
-                >
-                    To read more,
-                </Text>
-                <TouchableOpacity style={{marginLeft: 5}} onPress={() => openLink("https://en.bitcoin.it/wiki/Miner_fees")}> 
-                    <Text
-                        style={{
-                            color: Colors.white,
-                            fontSize: RFValue(12),
-                            fontFamily: Fonts.FiraSansRegular,
-                            textDecorationLine: 'underline',
-                        }}
-                    >
-                        click here
-                    </Text>
-                </TouchableOpacity>
-            </View>
+          </View>
+          <View style={styles.separatorView} />
         </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -162,10 +122,70 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
+  },
+  headerText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  headerSeparator: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginBottom: hp('1%'),
+  },
+  infoText: {
+    textAlign: 'center',
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+  },
+  clickHereText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
+  toKnowMoreText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  linkView: {
+    flexDirection: 'row',
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  ElementView: {
+    height: hp('89%'),
+    justifyContent: 'space-between',
+  },
+  separatorView: {
+    width: wp('70%'),
+    height: 0,
+    alignSelf: 'center',
+    marginBottom: wp('1%'),
+  },
+  helperImage: {
+    width: wp('80%'),
+    height: wp('65%'),
+    resizeMode: 'contain',
+  },
+  bottomLinkView: {
+    marginLeft: wp('10%'),
+    marginRight: wp('10%'),
+    marginBottom: wp('15%'),
   },
 });

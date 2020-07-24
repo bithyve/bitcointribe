@@ -96,7 +96,9 @@ export default function TrustedContactRequest(props) {
             autoCapitalize={'none'}
             keyboardType={'email-address'}
             placeholderTextColor={Colors.borderColor}
-            placeholder={'Enter email'}
+            placeholder={`${props.hint.charAt(0)}XXXX@XXX${props.hint.substring(
+              1,
+            )}.com`}
             onChangeText={(text) => {
               setEmailId(text);
             }}
@@ -138,7 +140,7 @@ export default function TrustedContactRequest(props) {
           <TextInput
             keyboardType={'numeric'}
             placeholderTextColor={Colors.borderColor}
-            placeholder={'Enter Phone Number'}
+            placeholder={`${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`}
             onChangeText={(text) => {
               setPhoneNumber(text);
               if (text.length === 10) checkForValidation(text);
@@ -281,52 +283,59 @@ export default function TrustedContactRequest(props) {
         }}
       >
         <View>
-          <View style={styles.successModalHeaderView}>
-            {!props.isRecovery ? (
-              props.isPayment ? (
-                <Text style={styles.modalTitleText}>
-                  {'Friends and Family\nRequest'}
-                </Text>
+          <View style={{flexDirection: 'row', flex: 1}}>
+            <View style={styles.successModalHeaderView}>
+              {!props.isRecovery ? (
+                props.isPayment ? (
+                  <Text style={styles.modalTitleText}>
+                    {'Friends and Family Request'}
+                  </Text>
+                ) : (
+                  <Text style={styles.modalTitleText}>
+                    {props.isGuardian
+                      ? 'Friends and Family Request'
+                      : 'Keeper Request'}
+                  </Text>
+                )
               ) : (
-                <Text style={styles.modalTitleText}>
-                  {props.isGuardian
-                    ? 'Friends and Family\nRequest'
-                    : 'Keeper Request'}
-                </Text>
-              )
-            ) : (
-              <Text style={styles.modalTitleText}>Recovery Key Request</Text>
-            )}
-            <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
-              {props.inputType
-                ? 'Accept the request to add your contact to Friends and Family'
-                : 'Your contact below wants you to be their Keeper, so that you can help them restore their wallet'}
-            </Text>
-          </View>
-          <View style={styles.box}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: hp('2%'),
-              }}
-            >
-              <Image
-                style={styles.successModalAmountImage}
-                source={require('../../assets/images/icons/icon_wallet.png')}
-              />
-              <Text
-                style={{
-                  fontSize: RFValue(25),
-                  fontFamily: Fonts.FiraSansRegular,
-                  color: Colors.black1,
-                }}
-              >
-                {props.trustedContactName}
+                <Text style={styles.modalTitleText}>Recovery Key Request</Text>
+              )}
+              <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
+                {props.inputType
+                  ? 'Accept the request to add your contact to Friends and Family'
+                  : 'Looks like someone wants to be your Keeper'}
               </Text>
             </View>
+            <View style={styles.box}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  style={styles.successModalAmountImage}
+                  source={require('../../assets/images/icons/icon_wallet.png')}
+                />
+                <Text
+                  style={{
+                    fontSize: RFValue(18),
+                    fontFamily: Fonts.FiraSansRegular,
+                    color: Colors.blue,
+                  }}
+                >
+                  {props.trustedContactName}
+                </Text>
+              </View>
+            </View>
           </View>
-
+          <View style={{width: '100%', height: 0.5, backgroundColor: Colors.borderColor, marginBottom: hp('3%')}}/>
+          {!props.isQR ? (<Text style={{...styles.modalTitleText, marginLeft: wp('8%'),
+                marginRight: wp('8%'),}}>{props.inputType === 'phone'
+                  ? 'Confirm your mobile number'
+                  : props.inputType === 'email'
+                  ? 'Confirm your email address'
+                  : null}</Text>) : null}
           {!props.isQR ? (
             <Text
               style={{
@@ -336,10 +345,7 @@ export default function TrustedContactRequest(props) {
                 // marginBottom: wp('8%'),
               }}
             >
-              Enter{' '}
-              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-                your{' '}
-              </Text>
+              Enter your{' '}
               <Text
                 style={{
                   ...styles.modalInfoText,
@@ -349,12 +355,15 @@ export default function TrustedContactRequest(props) {
                 }}
               >
                 {props.inputType === 'phone'
-                  ? '10 digit phone number  '
+                  ? 'mobile number, '
                   : props.inputType === 'email'
-                  ? 'email ID  '
+                  ? 'email address, '
                   : null}
+                  <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                    to accept the request
+                  </Text>
               </Text>
-              <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+              {/* <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                 {props.inputType === 'phone'
                   ? `${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`
                   : props.inputType === 'email'
@@ -362,7 +371,7 @@ export default function TrustedContactRequest(props) {
                       1,
                     )}.com`
                   : null}
-              </Text>
+              </Text> */}
             </Text>
           ) : null}
 
@@ -441,18 +450,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   box: {
-    backgroundColor: Colors.backgroundColor1,
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    padding: hp('2%'),
-    marginBottom: hp('3%'),
-    borderRadius: 10,
+    flex: 1,
+    height: 60,
+    backgroundColor: Colors.shadowBlue,
+    marginTop: hp('3%'),
+    marginLeft: wp('4%'),
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
     justifyContent: 'center',
   },
   successModalHeaderView: {
+    flex: 1,
     marginTop: hp('3%'),
     marginBottom: hp('3%'),
-    marginRight: wp('8%'),
     marginLeft: wp('8%'),
   },
   modalTitleText: {
@@ -484,11 +494,11 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansMedium,
   },
   successModalAmountImage: {
-    width: wp('15%'),
-    height: wp('15%'),
-    marginRight: 15,
+    width: wp('10%'),
+    height: wp('10%'),
+    marginRight: 10,
     marginLeft: 10,
-    marginBottom: wp('1%'),
+    // marginBottom: wp('1%'),
     resizeMode: 'contain',
   },
   phoneNumberInfoText: {

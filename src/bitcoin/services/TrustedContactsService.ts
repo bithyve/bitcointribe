@@ -6,6 +6,7 @@ import {
   EphemeralDataElements,
   TrustedDataElements,
   trustedChannelActions,
+  ShareUploadables,
 } from '../utilities/Interface';
 
 export default class TrustedContactsService {
@@ -126,6 +127,7 @@ export default class TrustedContactsService {
     dataElements: EphemeralDataElements,
     encKey: string,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         status: number;
@@ -158,6 +160,7 @@ export default class TrustedContactsService {
           dataElements,
           encKey,
           fetch,
+          shareUploadables,
         ),
       };
     } catch (err) {
@@ -213,6 +216,7 @@ export default class TrustedContactsService {
     contactName: string,
     dataElements: TrustedDataElements,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         status: number;
@@ -242,6 +246,7 @@ export default class TrustedContactsService {
           contactName.toLowerCase().trim(),
           dataElements,
           fetch,
+          shareUploadables,
         ),
       };
     } catch (err) {

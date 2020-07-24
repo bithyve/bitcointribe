@@ -54,6 +54,9 @@ export default function Login(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
+  const releaseCasesValue = useSelector(
+    (state) => state.preferences.releaseCasesValue,
+  );
   const [isDisabledProceed, setIsDisabledProceed] = useState(false);
   // const releases =[
   //       {
@@ -119,8 +122,8 @@ export default function Login(props) {
     [passcode],
   );
 
-  useEffect(()=>{
-    if(passcode.length==4){
+  useEffect(() => {
+    if (passcode.length == 4) {
       setIsDisabledProceed(false);
     }
   }, [passcode])
@@ -237,9 +240,10 @@ export default function Login(props) {
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
         console.log('Release note', res.data.releases);
-        let releaseCases = JSON.parse(
-          await AsyncStorage.getItem('releaseCases'),
-        );
+        let releaseCases = releaseCasesValue;
+        // JSON.parse(
+        //   await AsyncStorage.getItem('releaseCases'),
+        // );
         if (
           res.data.releases.length &&
           res.data.releases[0].build != DeviceInfo.getBuildNumber()
@@ -449,8 +453,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -478,8 +482,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -507,8 +511,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -536,8 +540,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -563,14 +567,14 @@ export default function Login(props) {
                     setSubTextMessage2(
                       'Best place to start if you are new to Bitcoin',
                     );
+                    dispatch(credsAuth(passcode));
                   }, 3000);
-                  dispatch(credsAuth(passcode));
                 }}
                 style={{
                   ...styles.proceedButtonView,
                   elevation: Elevation,
                   backgroundColor:
-                  isDisabledProceed ? Colors.lightBlue : Colors.blue,
+                    isDisabledProceed ? Colors.lightBlue : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>
@@ -714,7 +718,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

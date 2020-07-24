@@ -34,17 +34,30 @@ import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
-import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralDataElements,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  SECURE_ACCOUNT,
+  REGULAR_ACCOUNT,
+  TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
 import SSS from '../../bitcoin/utilities/sss/SSS';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -59,9 +72,14 @@ const SecondaryDeviceHistory = (props) => {
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
   );
 
   const dispatch = useDispatch();
@@ -74,6 +92,13 @@ const SecondaryDeviceHistory = (props) => {
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
+
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -149,30 +174,29 @@ const SecondaryDeviceHistory = (props) => {
     }
   };
 
-  const updateTrustedContactsInfo = useCallback(async (contact) => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-    console.log({ trustedContactsInfo });
-
-    if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
-      trustedContactsInfo[0] = contact;
-    } else {
-      trustedContactsInfo = [];
-      trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
-      trustedContactsInfo[0] = contact;
-    }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-  }, []);
+  const updateTrustedContactsInfo = useCallback(
+    async (contact) => {
+      if (trustedContactsInfo) {
+        trustedContactsInfo[0] = contact;
+      } else {
+        trustedContactsInfo = [];
+        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+        trustedContactsInfo[0] = contact;
+      }
+      // await AsyncStorage.setItem(
+      //   'TrustedContactsInfo',
+      //   JSON.stringify(trustedContactsInfo),
+      // );
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+    },
+    [trustedContactsInfo],
+  );
 
   const createGuardian = useCallback(
     async (reshare?: boolean) => {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
 
       const firstName = 'Secondary';
       const lastName = 'Device';
@@ -180,9 +204,34 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
+      let accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[contactName];
+      if (!accountNumber) {
+        // initialize a trusted derivative account against the following account
+        const res = regularAccount.getDerivativeAccXpub(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        if (res.status !== 200) {
+          console.log('Err occurred while generating derivative account');
+        } else {
+          // refresh the account number
+          accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[contactName];
+        }
+      }
+
+      const trustedReceivingAddress = (regularAccount.hdWallet
+        .derivativeAccounts[TRUSTED_CONTACTS][
+        accountNumber
+      ] as TrustedContactDerivativeAccountElements).receivingAddress;
+
       let data: EphemeralDataElements = {
         walletID,
         FCM,
+        trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
@@ -310,9 +359,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (secondaryDeviceBottomSheet as any).current.snapTo(0);
-        // }}
+        onPressHeader={() => {
+          (secondaryDeviceBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, []);
@@ -341,9 +390,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceMessageHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -442,6 +491,9 @@ const SecondaryDeviceHistory = (props) => {
         infoText={
           'For re-sharing the Recovery Key for the Keeper Device, you will have to scan the Exit Key from the Personal Copies (pdfs). Please scan it here to proceed'
         }
+        onBackPress={() => {
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
         // }
@@ -524,7 +576,14 @@ const SecondaryDeviceHistory = (props) => {
   };
 
   const renderHelpContent = () => {
-    return <KeeperDeviceHelpContents />;
+    return (
+      <KeeperDeviceHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   };
 
   if (isErrorSendingFailed) {
@@ -658,7 +717,6 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceBottomSheet.current as any).snapTo(0);
         }}
-        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceBottomSheet as any}
         snapPoints={[-30, hp('85%')]}

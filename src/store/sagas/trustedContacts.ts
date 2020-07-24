@@ -17,6 +17,7 @@ import {
   paymentDetailsFetched,
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
+  updateTrustedContactInfoLocally,
 } from '../actions/trustedContacts';
 import { createWatcher } from '../utils/utilities';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
@@ -150,17 +151,14 @@ function* removeTrustedContactWorker({ payload }) {
   const trustedContactsService: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
+  let trustedContactsInfo = yield select(
+    (state) => state.trustedContacts.trustedContactsInfo,
+  );
   let { contactName } = payload;
   contactName = contactName.toLowerCase().trim();
   delete trustedContactsService.tc.trustedContacts[contactName];
 
-  let trustedContactsInfo: any = yield call(
-    AsyncStorage.getItem,
-    'TrustedContactsInfo',
-  );
   if (trustedContactsInfo) {
-    trustedContactsInfo = JSON.parse(trustedContactsInfo);
-
     for (let itr = 0; itr < trustedContactsInfo.length; itr++) {
       const trustedContact = trustedContactsInfo[itr];
       if (trustedContact) {
@@ -174,11 +172,12 @@ function* removeTrustedContactWorker({ payload }) {
           if (itr < 3) trustedContactsInfo[itr] = null;
           // Guardian nullified
           else trustedContactsInfo.splice(itr, 1);
-          yield call(
-            AsyncStorage.setItem,
-            'TrustedContactsInfo',
-            JSON.stringify(trustedContactsInfo),
-          );
+          // yield call(
+          //   AsyncStorage.setItem,
+          //   'TrustedContactsInfo',
+          //   JSON.stringify(trustedContactsInfo),
+          // );
+          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
           break;
         }
       }
@@ -215,12 +214,14 @@ function* updateEphemeralChannelWorker({ payload }) {
   const { contactInfo, data, fetch } = payload;
 
   let generatedKey = false;
-  if (!contactInfo.info && contactInfo.contactName == 'Secondary Device') {
+  if (
+    !contactInfo.info &&
+    contactInfo.contactName == 'Secondary Device'.toLowerCase()
+  ) {
     // contact info = null, for secondary device (initially)
     contactInfo.info = SSS.generateKey(SSS.cipherSpec.keyLength);
     generatedKey = true;
   }
-
   let encKey;
   if (contactInfo.info) encKey = SSS.strechKey(contactInfo.info);
 
@@ -230,6 +231,7 @@ function* updateEphemeralChannelWorker({ payload }) {
     data,
     encKey,
     fetch,
+    payload.shareUploadables,
   );
 
   if (generatedKey) {
@@ -313,7 +315,17 @@ function* updateEphemeralChannelWorker({ payload }) {
       REGULAR_ACCOUNT: JSON.stringify(regularService),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    if (payload.updatedDB) {
+      yield call(insertDBWorker, {
+        payload: {
+          ...payload.updatedDB,
+          SERVICES: { ...payload.updatedDB.SERVICES, ...updatedSERVICES },
+        },
+      });
+    } else {
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
 
     const data: EphemeralDataElements = res.data.data;
     if (data && data.shareTransferDetails) {
@@ -381,18 +393,21 @@ export const fetchEphemeralChannelWatcher = createWatcher(
 );
 
 function* updateTrustedChannelWorker({ payload }) {
+  yield put(switchTCLoading('updateTrustedChannel'));
+
   const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
   );
 
   const { contactInfo, data, fetch } = payload;
-
   const res = yield call(
     trustedContacts.updateTrustedChannel,
     contactInfo.contactName,
     data,
     fetch,
+    payload.shareUploadables,
   );
+
   if (res.status === 200) {
     const { updated, data } = res.data;
     yield put(trustedChannelUpdated(contactInfo.contactName, updated, data));
@@ -401,10 +416,21 @@ function* updateTrustedChannelWorker({ payload }) {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
-    yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    if (payload.updatedDB) {
+      yield call(insertDBWorker, {
+        payload: {
+          ...payload.updatedDB,
+          SERVICES: { ...payload.updatedDB.SERVICES, ...updatedSERVICES },
+        },
+      });
+    } else {
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    }
   } else {
     console.log(res.err);
   }
+  yield put(switchTCLoading('updateTrustedChannel'));
 }
 
 export const updateTrustedChannelWatcher = createWatcher(
