@@ -55,6 +55,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import RecipientSendConfirmation from './RecipientSendConfirmation';
+import RadioButton from '../../components/RadioButton';
 
 export default function SendConfirmation(props) {
   const dispatch = useDispatch();
@@ -520,6 +521,10 @@ export default function SendConfirmation(props) {
     }
   }, [loading.transfer]);
 
+  const onPrioritySelect = (priority) => {
+    setSliderValueText(priority);
+  }
+
   return (
     <View
       style={{
@@ -718,7 +723,7 @@ export default function SendConfirmation(props) {
           <Text
             style={{
               color: Colors.blue,
-              fontSize: RFValue(13),
+              fontSize: RFValue(18),
               fontFamily: Fonts.FiraSansRegular,
               marginLeft: 5,
             }}
@@ -743,12 +748,19 @@ export default function SendConfirmation(props) {
               <Text style={styles.tableHeadingText}>Arrival Time</Text>
             </View>
             <View style={styles.priorityDataContainer}>
-              <Text style={styles.tableHeadingText}>Fee</Text>
+              <Text style={{...styles.tableHeadingText, textAlign: 'center'}}>Fee</Text>
             </View>
           </View>
           <View style={styles.priorityTableContainer}>
-            <View style={styles.priorityDataContainer}>
-              <Text style={styles.priorityTableText}>High</Text>
+            <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+              <RadioButton
+                size={20}
+                color={Colors.lightBlue}
+                borderColor={Colors.borderColor}
+                isChecked={sliderValueText.includes('High')}
+                onpress={() => onPrioritySelect('High Fee')}
+              />
+              <Text style={{...styles.priorityTableText, marginLeft: 10}}>High</Text>
             </View>
             <View style={styles.priorityDataContainer}>
               <Text style={styles.priorityTableText}>10 - 20 minutes</Text>
@@ -762,8 +774,15 @@ export default function SendConfirmation(props) {
             </View>
           </View>
           <View style={styles.priorityTableContainer}>
-            <View style={styles.priorityDataContainer}>
-              <Text style={styles.priorityTableText}>Medium</Text>
+            <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+              <RadioButton
+                size={20}
+                color={Colors.lightBlue}
+                borderColor={Colors.borderColor}
+                isChecked={sliderValueText.includes('Medium')}
+                onpress={() => onPrioritySelect('Medium Fee')}
+              />
+              <Text style={{...styles.priorityTableText, marginLeft: 10}}>Medium</Text>
             </View>
             <View style={styles.priorityDataContainer}>
               <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
@@ -777,8 +796,15 @@ export default function SendConfirmation(props) {
             </View>
           </View>
           <View style={{...styles.priorityTableContainer, borderBottomWidth: 0}}>
-            <View style={styles.priorityDataContainer}>
-              <Text style={styles.priorityTableText}>Low</Text>
+            <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+              <RadioButton
+                size={20}
+                color={Colors.lightBlue}
+                borderColor={Colors.borderColor}
+                isChecked={sliderValueText.includes('Low')}
+                onpress={() => onPrioritySelect('Low Fee')}
+              />
+              <Text style={{...styles.priorityTableText, marginLeft: 10}}>Low</Text>
             </View>
             <View style={styles.priorityDataContainer}>
               <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
@@ -990,7 +1016,8 @@ const styles = StyleSheet.create({
   priorityTableText: {
     fontSize: RFValue(12),
     lineHeight: RFValue(12),
-    color: Colors.greyTextColor
+    color: Colors.greyTextColor,
+    textAlign: 'center',
   },
   priorityTableHeadingContainer: {
     flex: 1,
@@ -1012,6 +1039,8 @@ const styles = StyleSheet.create({
   },
   priorityDataContainer: {
     flex: 1,
-    alignItems: 'center'
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 });
