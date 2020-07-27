@@ -402,7 +402,7 @@ class AddressBookContents extends PureComponent<
           ) : null}
         </View>
         <View style={styles.getImageView}>
-        {contactsType !== "I'm Keeper of" ? <View>
+        {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? <View>
           {!(contact.hasXpub || contact.hasTrustedAddress) &&
             (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
             !contact.hasTrustedChannel ? (
