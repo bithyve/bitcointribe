@@ -133,7 +133,7 @@ const TrustedContactHistory = (props) => {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  const trustedContactsInfo = useSelector(
+  let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
 
@@ -797,42 +797,48 @@ const TrustedContactHistory = (props) => {
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
   const updateTrustedContactsInfo = useCallback(
-    (contact) => {
+    async (contact) => {
       if (trustedContactsInfo) {
-        const tcInfo = trustedContactsInfo;
-        if (tcInfo[index]) {
+        if (trustedContactsInfo[index]) {
           let found = false;
-          for (let i = 3; i < tcInfo.length; i++) {
+          for (let i = 3; i < trustedContactsInfo.length; i++) {
             // push if not present in TC list
-            if (tcInfo[i] && tcInfo[i].name == tcInfo[index].name) {
+            if (
+              trustedContactsInfo[i] &&
+              trustedContactsInfo[i].name == trustedContactsInfo[index].name
+            ) {
               found = true;
               break;
             }
           }
-          if (!found) tcInfo.push(tcInfo[index]);
+
+          if (!found) trustedContactsInfo.push(trustedContactsInfo[index]);
         }
 
-        for (let i = 0; i < tcInfo.length; i++) {
-          if (tcInfo[i] && tcInfo[i].name == contact.name) {
-            tcInfo.splice(i, 1);
+        for (let i = 0; i < trustedContactsInfo.length; i++) {
+          if (
+            trustedContactsInfo[i] &&
+            trustedContactsInfo[i].name == contact.name
+          ) {
+            trustedContactsInfo.splice(i, 1);
             break;
           }
         }
 
-        tcInfo[index] = contact;
-        dispatch(updateTrustedContactInfoLocally(tcInfo));
+        trustedContactsInfo[index] = contact;
       } else {
-        const tcInfo = [];
-        tcInfo[0] = null; // securing initial 3 positions for Guardians
-        tcInfo[1] = null;
-        tcInfo[2] = null;
-        tcInfo[index] = contact;
-        dispatch(updateTrustedContactInfoLocally(tcInfo));
+        trustedContactsInfo = [];
+        trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
+        trustedContactsInfo[1] = null;
+        trustedContactsInfo[2] = null;
+        trustedContactsInfo[index] = contact;
       }
-      // await AsyncStorage.setItem(
-      //   'TrustedContactsInfo',
-      //   JSON.stringify(trustedContactsInfo),
-      // );
+      await AsyncStorage.setItem(
+        'TrustedContactsInfo',
+        JSON.stringify(trustedContactsInfo),
+      );
+
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
     [index, trustedContactsInfo],
   );
