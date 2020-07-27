@@ -133,7 +133,7 @@ const TrustedContactHistory = (props) => {
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
 
-  let trustedContactsInfo = useSelector(
+  const trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
 
@@ -797,53 +797,42 @@ const TrustedContactHistory = (props) => {
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
   const updateTrustedContactsInfo = useCallback(
-    async (contact) => {
+    (contact) => {
       if (trustedContactsInfo) {
-        console.log({ trustedContactsInfo });
-        if (trustedContactsInfo[index]) {
+        const tcInfo = trustedContactsInfo;
+        if (tcInfo[index]) {
           let found = false;
-          for (let i = 3; i < trustedContactsInfo.length; i++) {
+          for (let i = 3; i < tcInfo.length; i++) {
             // push if not present in TC list
-            if (
-              trustedContactsInfo[i] &&
-              trustedContactsInfo[i].name == trustedContactsInfo[index].name
-            ) {
+            if (tcInfo[i] && tcInfo[i].name == tcInfo[index].name) {
               found = true;
               break;
             }
           }
-
-          if (!found) trustedContactsInfo.push(trustedContactsInfo[index]);
+          if (!found) tcInfo.push(tcInfo[index]);
         }
 
-        console.log({ trustedContactsInfo });
-
-        for (let i = 0; i < trustedContactsInfo.length; i++) {
-          if (
-            trustedContactsInfo[i] &&
-            trustedContactsInfo[i].name == contact.name
-          ) {
-            trustedContactsInfo.splice(i, 1);
+        for (let i = 0; i < tcInfo.length; i++) {
+          if (tcInfo[i] && tcInfo[i].name == contact.name) {
+            tcInfo.splice(i, 1);
             break;
           }
         }
-        console.log({ trustedContactsInfo });
 
-        trustedContactsInfo[index] = contact;
+        tcInfo[index] = contact;
+        dispatch(updateTrustedContactInfoLocally(tcInfo));
       } else {
-        trustedContactsInfo = [];
-        trustedContactsInfo[0] = null; // securing initial 3 positions for Guardians
-        trustedContactsInfo[1] = null;
-        trustedContactsInfo[2] = null;
-        trustedContactsInfo[index] = contact;
+        const tcInfo = [];
+        tcInfo[0] = null; // securing initial 3 positions for Guardians
+        tcInfo[1] = null;
+        tcInfo[2] = null;
+        tcInfo[index] = contact;
+        dispatch(updateTrustedContactInfoLocally(tcInfo));
       }
       // await AsyncStorage.setItem(
       //   'TrustedContactsInfo',
       //   JSON.stringify(trustedContactsInfo),
       // );
-      console.log({ trustedContactsInfo });
-
-      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
     [index, trustedContactsInfo],
   );

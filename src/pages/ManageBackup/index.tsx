@@ -791,7 +791,7 @@ export default function ManageBackup(props) {
     }
   };
 
-  useEffect(() => {
+  const setContactsFromAsync = useCallback(() => {
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setContacts(selectedContacts);
@@ -806,6 +806,10 @@ export default function ManageBackup(props) {
     }
   }, [trustedContactsInfo]);
 
+  useEffect(() => {
+    setContactsFromAsync();
+  }, [trustedContactsInfo]);
+
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem('AutoHighlightFlags');
     if (highlightFlags) {
@@ -817,13 +821,13 @@ export default function ManageBackup(props) {
     InteractionManager.runAfterInteractions(() => {
       setIs_initiated(true);
     });
-    // let focusListener = props.navigation.addListener('didFocus', () => {
-    //   setContactsFromAsync();
-    //   // setAutoHighlightFlagsFromAsync();
-    // });
-    // return () => {
-    //   focusListener.remove();
-    // };
+    let focusListener = props.navigation.addListener('didFocus', () => {
+      setContactsFromAsync();
+      // setAutoHighlightFlagsFromAsync();
+    });
+    return () => {
+      focusListener.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -892,9 +896,9 @@ export default function ManageBackup(props) {
     }
   }, [overallHealth]);
 
-  useEffect(() => {
-    autoHighlight();
-  }, [autoHighlightFlags]);
+  // useEffect(() => {
+  //   autoHighlight();
+  // }, [autoHighlightFlags]);
 
   useEffect(() => {
     // dispatch(fetchSSSFromDB());

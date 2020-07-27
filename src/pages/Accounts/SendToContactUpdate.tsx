@@ -174,7 +174,18 @@ class SendToContact extends Component<
       this.checkRecordsHavingPrice();
     });
     this.setState({ exchangeRates: accounts && accounts.exchangeRates }, () => {
-      if (bitcoinAmount) this.convertBitCoinToCurrency(bitcoinAmount);
+      if (bitcoinAmount) {
+        const currency = this.state.exchangeRates
+          ? (
+              (parseInt(bitcoinAmount) / 1e8) *
+              this.state.exchangeRates[this.state.CurrencyCode].last
+            ).toFixed(2)
+          : 0;
+
+        this.setState({
+          currencyAmount: currency.toString(),
+        });
+      }
     });
     this.getBalances();
     this.setCurrencyCodeFromAsync();
