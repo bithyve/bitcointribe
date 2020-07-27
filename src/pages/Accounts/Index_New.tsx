@@ -297,7 +297,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           if (serviceType === REGULAR_ACCOUNT) {
             derivativeAccount =
               accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-                dAccountType
+              dAccountType
               ];
           } else if (serviceType === SECURE_ACCOUNT) {
             if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -432,7 +432,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-  componentWillUnmount() {}
 
   getServiceType = (serviceType) => {
     if (!serviceType) return;
@@ -463,9 +462,11 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
 
   checkNShowHelperModal = async () => {
     let isTransactionHelperDone = this.props.isTransactionHelperDoneValue;
-    // let isTransactionHelperDone = await AsyncStorage.getItem(
-    //   'isTransactionHelperDone',
-    // );
+    if (!isTransactionHelperDone) {
+      isTransactionHelperDone = await AsyncStorage.getItem(
+        'isTransactionHelperDone',
+      );
+    }
     if (!isTransactionHelperDone && this.state.serviceType == TEST_ACCOUNT) {
       this.props.setTransactionHelper(true);
       //await AsyncStorage.setItem('isTransactionHelperDone', 'true');
@@ -488,9 +489,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
 
     let isTestAccountHelperDone = this.props.isTestHelperDoneValue;
-    // let isTestAccountHelperDone = await AsyncStorage.getItem(
-    //   'isTestAccountHelperDone',
-    // );
+    if (!isTestAccountHelperDone) {
+      isTestAccountHelperDone = await AsyncStorage.getItem(
+        'isTestAccountHelperDone',
+      );
+    }
+
 
     // if (isBuyHelperDone == 'true') {
     //   setBuyIsActive(false);
@@ -579,10 +583,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             index == 0
               ? Colors.blue
               : index == 1
-              ? Colors.yellow
-              : index == 2
-              ? Colors.green
-              : Colors.borderColor,
+                ? Colors.yellow
+                : index == 2
+                  ? Colors.green
+                  : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -752,32 +756,32 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 )}
               </View>
             ) : (
-              <Image
-                style={styles.cardBitCoinImage}
-                source={getCurrencyImageByRegion(
-                  this.state.CurrencyCode,
-                  'light',
+                  <Image
+                    style={styles.cardBitCoinImage}
+                    source={getCurrencyImageByRegion(
+                      this.state.CurrencyCode,
+                      'light',
+                    )}
+                  />
                 )}
-              />
-            )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(this.state.netBalance)
                 : this.state.switchOn
-                ? UsNumberFormat(this.state.netBalance)
-                : this.state.exchangeRates
-                ? (
-                    (this.state.netBalance / 1e8) *
-                    this.state.exchangeRates[this.state.CurrencyCode].last
-                  ).toFixed(2)
-                : null}
+                  ? UsNumberFormat(this.state.netBalance)
+                  : this.state.exchangeRates
+                    ? (
+                      (this.state.netBalance / 1e8) *
+                      this.state.exchangeRates[this.state.CurrencyCode].last
+                    ).toFixed(2)
+                    : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : this.state.switchOn
-                ? 'sats'
-                : this.state.CurrencyCode.toLocaleLowerCase()}
+                  ? 'sats'
+                  : this.state.CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -870,7 +874,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           <Text style={styles.headerText}>Accounts</Text>
           <TouchableOpacity
             style={{ height: 54, justifyContent: 'center' }}
-            onPress={() => {}}
+            onPress={() => { }}
           >
             <View
               style={{
@@ -885,17 +889,17 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 activeOffImage={
                   this.currencyCode.includes(CurrencyCode)
                     ? this.setCurrencyCodeToImage(
-                        getCurrencyImageName(CurrencyCode),
-                        'light',
-                      )
+                      getCurrencyImageName(CurrencyCode),
+                      'light',
+                    )
                     : getCurrencyImageByRegion(CurrencyCode, 'light')
                 }
                 inactiveOffImage={
                   this.currencyCode.includes(CurrencyCode)
                     ? this.setCurrencyCodeToImage(
-                        getCurrencyImageName(CurrencyCode),
-                        'dark',
-                      )
+                      getCurrencyImageName(CurrencyCode),
+                      'dark',
+                    )
                     : getCurrencyImageByRegion(CurrencyCode, 'dark')
                 }
                 toggleColor={Colors.lightBlue}
@@ -928,7 +932,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       loader: true,
                       syncTrustedDerivative:
                         serviceType === REGULAR_ACCOUNT ||
-                        serviceType === SECURE_ACCOUNT
+                          serviceType === SECURE_ACCOUNT
                           ? true
                           : false,
                     });
@@ -957,8 +961,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     index === 0
                       ? this.getServiceType(TEST_ACCOUNT)
                       : index === 1
-                      ? this.getServiceType(REGULAR_ACCOUNT)
-                      : this.getServiceType(SECURE_ACCOUNT);
+                        ? this.getServiceType(REGULAR_ACCOUNT)
+                        : this.getServiceType(SECURE_ACCOUNT);
                   }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
@@ -999,13 +1003,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? UsNumberFormat(spendableBalance)
                         : switchOn
-                        ? UsNumberFormat(spendableBalance)
-                        : exchangeRates
-                        ? (
-                            (spendableBalance / 1e8) *
-                            exchangeRates[CurrencyCode].last
-                          ).toFixed(2)
-                        : null}
+                          ? UsNumberFormat(spendableBalance)
+                          : exchangeRates
+                            ? (
+                              (spendableBalance / 1e8) *
+                              exchangeRates[CurrencyCode].last
+                            ).toFixed(2)
+                            : null}
                     </Text>
                     <Text
                       style={{
@@ -1018,8 +1022,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? 't-sats'
                         : switchOn
-                        ? 'sats'
-                        : CurrencyCode.toLocaleLowerCase()}
+                          ? 'sats'
+                          : CurrencyCode.toLocaleLowerCase()}
                     </Text>
                   </View>
                   <View style={styles.transactionTitle}>
@@ -1050,8 +1054,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                             () => {
                               (this.refs
                                 .TransactionDetailsBottomSheet as any).snapTo(
-                                1,
-                              );
+                                  1,
+                                );
                               this.checkNShowHelperModal();
                               setTimeout(() => {
                                 this.setState({ transactionItem: item });
@@ -1105,45 +1109,45 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               </View>
                             </View>
                           ) : (
-                            <View style={styles.modalElementInfoView}>
-                              <View style={{ justifyContent: 'center' }}>
-                                <FontAwesome
-                                  name={
-                                    item.transactionType == 'Received'
-                                      ? 'long-arrow-down'
-                                      : 'long-arrow-up'
-                                  }
-                                  size={15}
-                                  color={
-                                    item.transactionType == 'Received'
-                                      ? Colors.green
-                                      : Colors.red
-                                  }
-                                />
-                              </View>
-                              <View
-                                style={{
-                                  justifyContent: 'center',
-                                  marginLeft: 10,
-                                }}
-                              >
-                                <Text style={styles.transactionModalTitleText}>
-                                  {item.accountType}{' '}
-                                </Text>
-                                <Text style={styles.transactionModalDateText}>
-                                  {moment(item.date)
-                                    .utc()
-                                    .format('DD MMMM YYYY')}{' '}
-                                  {/* <Entypo
+                              <View style={styles.modalElementInfoView}>
+                                <View style={{ justifyContent: 'center' }}>
+                                  <FontAwesome
+                                    name={
+                                      item.transactionType == 'Received'
+                                        ? 'long-arrow-down'
+                                        : 'long-arrow-up'
+                                    }
+                                    size={15}
+                                    color={
+                                      item.transactionType == 'Received'
+                                        ? Colors.green
+                                        : Colors.red
+                                    }
+                                  />
+                                </View>
+                                <View
+                                  style={{
+                                    justifyContent: 'center',
+                                    marginLeft: 10,
+                                  }}
+                                >
+                                  <Text style={styles.transactionModalTitleText}>
+                                    {item.accountType}{' '}
+                                  </Text>
+                                  <Text style={styles.transactionModalDateText}>
+                                    {moment(item.date)
+                                      .utc()
+                                      .format('DD MMMM YYYY')}{' '}
+                                    {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                  {/* {item.time} */}
-                                </Text>
+                                    {/* {item.time} */}
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
-                          )}
+                            )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1163,13 +1167,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                  ? UsNumberFormat(item.amount)
-                                  : exchangeRates
-                                  ? (
-                                      (item.amount / 1e8) *
-                                      exchangeRates[CurrencyCode].last
-                                    ).toFixed(2)
-                                  : null}
+                                    ? UsNumberFormat(item.amount)
+                                    : exchangeRates
+                                      ? (
+                                        (item.amount / 1e8) *
+                                        exchangeRates[CurrencyCode].last
+                                      ).toFixed(2)
+                                      : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1179,8 +1183,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                  ? 'sats'
-                                  : CurrencyCode.toLocaleLowerCase()}
+                                    ? 'sats'
+                                    : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1202,14 +1206,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 />
                               </View>
                             ) : (
-                              <View style={styles.forwardIconView}>
-                                <Ionicons
-                                  name="ios-arrow-forward"
-                                  color={Colors.textColorGrey}
-                                  size={12}
-                                />
-                              </View>
-                            )}
+                                <View style={styles.forwardIconView}>
+                                  <Ionicons
+                                    name="ios-arrow-forward"
+                                    color={Colors.textColorGrey}
+                                    size={12}
+                                  />
+                                </View>
+                              )}
                           </View>
                         </TouchableOpacity>
                       )}
@@ -1242,7 +1246,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       <Text style={styles.bottomCardInfoText}>
                         Tran Fee :
                         {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
-                        ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
+                        {/* ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'}) */}
+                        ({serviceType == TEST_ACCOUNT
+                          ? 't-sats'
+                          : switchOn
+                            ? 'sats'
+                            : CurrencyCode.toLocaleLowerCase()})
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -1280,15 +1289,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             {showLoader ? <Loader /> : null}
           </View>
         ) : (
-          <ScrollView
-            contentContainerStyle={{
-              backgroundColor: Colors.backgroundColor,
-            }}
-            refreshControl={
-              <RefreshControl refreshing={!this.state.is_initiated} />
-            }
-          />
-        )}
+            <ScrollView
+              contentContainerStyle={{
+                backgroundColor: Colors.backgroundColor,
+              }}
+              refreshControl={
+                <RefreshControl refreshing={!this.state.is_initiated} />
+              }
+            />
+          )}
         {this.state.is_initiated ? (<BottomSheet
           enabledInnerScrolling={true}
           ref={'bottomSheet'}
@@ -1339,7 +1348,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           )}
         />) : null}
 
-{this.state.is_initiated ? (<BottomSheet
+        {this.state.is_initiated ? (<BottomSheet
           onCloseStart={async () => {
             // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
             // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
@@ -1384,7 +1393,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           )}
         />) : null}
 
-       {this.state.is_initiated ? ( <BottomSheet
+        {this.state.is_initiated ? (<BottomSheet
           enabledInnerScrolling={true}
           ref={'SecureAccountHelperBottomSheet'}
           snapPoints={[
@@ -1462,7 +1471,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           )}
         />) : null}
 
-       {this.state.is_initiated ? ( <BottomSheet
+        {this.state.is_initiated ? (<BottomSheet
           enabledInnerScrolling={true}
           ref={'TransactionDetailsBottomSheet'}
           snapPoints={[
@@ -1495,10 +1504,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               }}
             />
           )}
-        />): null}
+        />) : null}
 
 
-{this.state.is_initiated ? (<BottomSheet
+        {this.state.is_initiated ? (<BottomSheet
           enabledInnerScrolling={true}
           ref={'TransactionDetailsHelperBottomSheet'}
           snapPoints={[
@@ -1539,7 +1548,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               }}
             />
           )}
-        /> ) : null}
+        />) : null}
       </View>
     );
   }
@@ -1691,8 +1700,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-        ? 43
-        : 40,
+          ? 43
+          : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,
