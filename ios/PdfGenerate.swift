@@ -379,7 +379,7 @@ import QRCoder
     txtTitle.sizeToFit()
     v5.addSubview(txtTitle)
 
-    txtPart.text = "Use this key to reset the 2FA if you have lost your authenticator app or for exiting your funds from Savings account if the BitHyve server is not responding"
+    txtPart.text = "Use this key to reset the 2FA if you have lost your authenticator app or for withdrawing your funds from Savings account if the BitHyve server is not responding"
     txtPart.lineBreakMode = .byWordWrapping
     txtPart.numberOfLines = 0
     txtPart.frame = CGRect(x:10,y:txtTitle.frame.height + txtTitle.font.ascender + 2,width:v5.bounds.size.width - 10, height:v5.bounds.size.height)
