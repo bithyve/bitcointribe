@@ -951,6 +951,8 @@ function* checkMSharesHealthWorker() {
   const res = yield call(s3Service.checkHealth);
   const postFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
 
+  yield put(calculateOverallHealth(s3Service));
+
   if (res.status === 200) {
     if (preFetchHealth !== postFetchHealth) {
       const { SERVICES } = yield select((state) => state.storage.database);
@@ -960,8 +962,6 @@ function* checkMSharesHealthWorker() {
       };
       console.log('Health Check updated');
       yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-
-      yield put(calculateOverallHealth(s3Service));
     }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
