@@ -136,6 +136,7 @@ const TrustedContactHistory = (props) => {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
@@ -197,20 +198,23 @@ const TrustedContactHistory = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let trustedContactsInfo: any = useSelector((state) =>
-      idx(state, (_) => _.trustedContacts.trustedContactInfo),
-    );
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setSelectedContacts(selectedContacts);
+      // if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
+      //   setChosenContact(selectedContacts[0]);
+      // } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
+      //   setChosenContact(selectedContacts[1]);
+      // }
 
-      if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
+      if (index == 1 && selectedContacts[0]) {
         setChosenContact(selectedContacts[0]);
-      } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
+      }
+      if (index == 2 && selectedContacts[1]) {
         setChosenContact(selectedContacts[1]);
       }
     }
-  }, [selectedTitle, trustedContactsInfo]);
+  }, [index, trustedContactsInfo]);
 
   const getContacts = useCallback(
     async (selectedContacts, index) => {
@@ -820,6 +824,7 @@ const TrustedContactHistory = (props) => {
             break;
           }
         }
+
         trustedContactsInfo[index] = contact;
       } else {
         trustedContactsInfo = [];
@@ -828,13 +833,14 @@ const TrustedContactHistory = (props) => {
         trustedContactsInfo[2] = null;
         trustedContactsInfo[index] = contact;
       }
-      // await AsyncStorage.setItem(
-      //   'TrustedContactsInfo',
-      //   JSON.stringify(trustedContactsInfo),
-      // );
+      await AsyncStorage.setItem(
+        'TrustedContactsInfo',
+        JSON.stringify(trustedContactsInfo),
+      );
+
       dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
-    [index],
+    [index, trustedContactsInfo],
   );
 
   const createGuardian = useCallback(async () => {
@@ -906,12 +912,9 @@ const TrustedContactHistory = (props) => {
         setTrustedLink('');
         setTrustedQR('');
         // remove the previous TC
-        let { trustedContactsInfo } = useSelector(
-          (state) => state.trustedContacts.trustedContacts,
-        );
+
         let previousGuardianName;
         if (trustedContactsInfo) {
-          trustedContactsInfo = JSON.parse(trustedContactsInfo);
           const previousGuardian = trustedContactsInfo[index];
           if (previousGuardian) {
             previousGuardianName = `${previousGuardian.firstName} ${

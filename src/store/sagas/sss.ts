@@ -71,6 +71,7 @@ import {
   updateEphemeralChannel,
   trustedContactApproved,
   updateTrustedChannel,
+  updateTrustedContactInfoLocally,
 } from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
@@ -946,84 +947,22 @@ export const updateMSharesHealthWatcher = createWatcher(
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  // const preInstance = JSON.stringify(s3Service);
+  const preFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
   const res = yield call(s3Service.checkHealth);
-  // const postInstance = JSON.stringify(s3Service);
-  yield put(calculateOverallHealth(s3Service));
+  const postFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
+
   if (res.status === 200) {
-    // const { shareGuardianMapping } = res.data;
-    // const trustedContacts: TrustedContactsService = yield select(
-    //   (state) => state.trustedContacts.service,
-    // );
-    // let approvedAny = false;
-    // for (const index of Object.keys(shareGuardianMapping)) {
-    //   const { updatedAt, guardian } = shareGuardianMapping[index];
-    //   console.log({ updatedAt, guardian });
-    //   if (updatedAt > 0 && guardian) {
-    //     if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
-    //       const approveTC = true;
-    //       const res = yield call(
-    //         trustedContacts.fetchEphemeralChannel,
-    //         guardian,
-    //         approveTC,
-    //       );
-    //       if (res.status === 200) {
-    //         console.log('Trusted Channel create: ', guardian);
-    //         // generate a corresponding derivative acc and assign xpub
-    //         const res = yield call(
-    //           regularService.getDerivativeAccXpub,
-    //           TRUSTED_CONTACTS,
-    //           null,
-    //           guardian,
-    //         );
-    //         if (res.status === 200) {
-    //           const xpub = res.data;
-    //           // update the trusted channel with the xpub
-    //           const data: TrustedDataElements = {
-    //             xpub,
-    //           };
-    //           const updateRes = yield call(
-    //             trustedContacts.updateTrustedChannel,
-    //             guardian,
-    //             data,
-    //             true,
-    //           );
-    //           if (updateRes.status === 200) {
-    //             console.log('Xpub updated to trusted channel for: ', guardian);
-    //           } else {
-    //             console.log(
-    //               `Failed to update xpub to trusted channel for ${guardian}`,
-    //             );
-    //           }
-    //         } else {
-    //           console.log(`Failed to generate xpub for ${guardian}`);
-    //         }
-    //         approvedAny = true;
-    //       }
-    //     }
-    //   }
-    // }
-    // if (approvedAny) {
-    //   // yield delay(1000);
-    //   const { SERVICES } = yield select((state) => state.storage.database);
-    //   const updatedSERVICES = {
-    //     ...SERVICES,
-    //     REGULAR_ACCOUNT: JSON.stringify(regularService),
-    //     TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-    //   };
-    //   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-    // }
-    // if (preInstance !== postInstance) {
-    //   const { SERVICES } = yield select(state => state.storage.database);
-    //   const updatedSERVICES = {
-    //     ...SERVICES,
-    //     S3_SERVICE: JSON.stringify(s3Service),
-    //   };
-    //   yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    // }
+    if (preFetchHealth !== postFetchHealth) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify(s3Service),
+      };
+      console.log('Health Check updated');
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+      yield put(calculateOverallHealth(s3Service));
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -1197,7 +1136,7 @@ function* overallHealthWorker({ payload }) {
   }
   shareStatus[3] = storedPDFHealth[3];
   shareStatus[4] = storedPDFHealth[4];
-
+  console.log({ shareStatus });
   const healthStatus = new HealthStatus();
   const overallHealth = yield call(
     healthStatus.appHealthStatus,
@@ -1205,6 +1144,7 @@ function* overallHealthWorker({ payload }) {
     shareStatus,
   );
 
+  console.log({ overallHealth });
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
@@ -1713,6 +1653,11 @@ function* fetchWalletImageWorker({ payload }) {
       for (const key of Object.keys(ASYNC_DATA)) {
         console.log('restoring to async: ', key);
         yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+
+        if (key === 'TrustedContactsInfo' && ASYNC_DATA[key]) {
+          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
+          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+        }
       }
     }
 

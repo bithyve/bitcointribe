@@ -407,29 +407,29 @@ class AddressBookContents extends PureComponent<
           ) : null}
         </View>
         <View style={styles.getImageView}>
-          {contactsType !== "I'm Keeper of" ? <View>
-            {!(contact.hasXpub || contact.hasTrustedAddress) &&
-              (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-                !contact.hasTrustedChannel ? (
-                  <View
-                    style={{
-                      width: wp('15%'),
-                      height: wp('6%'),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: Colors.borderColor,
-                      marginRight: 10,
-                      borderRadius: 5,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
-                        fontFamily: Fonts.FiraSansRegular,
-                      }}
-                    >
-                      Expired
+        {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? <View>
+          {!(contact.hasXpub || contact.hasTrustedAddress) &&
+            (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+            !contact.hasTrustedChannel ? (
+              <View
+                style={{
+                  width: wp('15%'),
+                  height: wp('6%'),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: Colors.borderColor,
+                  marginRight: 10,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue(10),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                  Expired
                 </Text>
                   </View>
                 ) : (
