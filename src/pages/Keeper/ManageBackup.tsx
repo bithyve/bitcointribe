@@ -10,6 +10,7 @@ import {
   ScrollView,
   RefreshControl,
   ImageBackground,
+  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -47,6 +48,7 @@ import {
   clearPaymentDetails,
 } from '../../store/actions/trustedContacts';
 import idx from 'idx';
+import KeeperTypeModalContents from './KeeperTypeModalContent';
 interface ManageBackupStateTypes {
   levelData: any;
   selectedId: any;
@@ -79,6 +81,7 @@ class ManageBackup extends Component<
         {
           type: 'icloud',
           health: 0,
+          status: 'good',
           title: 'Level 1',
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
@@ -92,6 +95,7 @@ class ManageBackup extends Component<
         {
           type: 'keeper',
           health: 0,
+          status: 'ugly',
           title: 'Level 2',
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
@@ -106,6 +110,7 @@ class ManageBackup extends Component<
         {
           type: 'keeper',
           health: 0,
+          status: 'ugly',
           title: 'Level 3',
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
@@ -121,6 +126,10 @@ class ManageBackup extends Component<
       ],
     };
   }
+
+  componentDidMount = () => {
+    (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+  };
 
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
@@ -161,9 +170,23 @@ class ManageBackup extends Component<
           <View style={styles.topHealthView}>
             <ImageBackground
               source={require('../../assets/images/icons/shield_blue.png')}
-              style={styles.healthShieldImage}
+              style={{ ...styles.healthShieldImage, position: 'relative' }}
               resizeMode={'contain'}
-            ></ImageBackground>
+            >
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp('3%'),
+                  width: wp('3%'),
+                  borderRadius: wp('3%') / 2,
+                  position: 'absolute',
+                  top: wp('3%'),
+                  right: 0,
+                  borderWidth: 2,
+                  borderColor: Colors.white,
+                }}
+              />
+            </ImageBackground>
             <View style={styles.headerSeparator} />
             <View>
               <Text style={styles.backupText}>Backup</Text>
@@ -181,16 +204,43 @@ class ManageBackup extends Component<
                     backgroundColor: value.isSetupDone
                       ? Colors.blue
                       : Colors.backgroundColor,
+                    shadowRadius: selectedId && selectedId == value.id ? 10 : 0,
+                    shadowColor: Colors.borderColor,
+                    shadowOpacity:
+                      selectedId && selectedId == value.id ? 0.7 : 0,
+                    shadowOffset: { width: 2, height: 2 },
+                    elevation: selectedId && selectedId == value.id ? 10 : 0,
+                    opacity: selectedId && selectedId == value.id ? 10 : 5,
                   }}
                 >
                   <View style={styles.cardView}>
                     <View style={{ flexDirection: 'row' }}>
                       {value.isSetupDone ? (
-                        <View style={styles.cardHealthImageView}>
-                          <Image
-                            source={require('../../assets/images/icons/icon_error_yellow.png')}
-                            style={styles.cardHealthImage}
-                          />
+                        <View
+                          style={{
+                            ...styles.cardHealthImageView,
+                            backgroundColor:
+                              value.status == 'ugly'
+                                ? Colors.red
+                                : value.status == 'good'
+                                ? Colors.green
+                                : Colors.yellow,
+                          }}
+                        >
+                          {value.status == 'good' ? (
+                            <Image
+                              source={require('../../assets/images/icons/check_white.png')}
+                              style={{
+                                ...styles.cardHealthImage,
+                                width: wp('4%'),
+                              }}
+                            />
+                          ) : (
+                            <Image
+                              source={require('../../assets/images/icons/icon_error_white.png')}
+                              style={styles.cardHealthImage}
+                            />
+                          )}
                         </View>
                       ) : (
                         <Image
@@ -361,7 +411,9 @@ class ManageBackup extends Component<
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                backgroundColor: value.isSetupDone && value.keeper1Done ? Colors.deepBlue : Colors.white,
+                                backgroundColor: value.isSetupDone
+                                  ? Colors.deepBlue
+                                  : Colors.white,
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
@@ -374,30 +426,36 @@ class ManageBackup extends Component<
                                   backgroundColor: Colors.red,
                                   width: wp('2%'),
                                   height: wp('2%'),
-                                  borderRadius: wp('2%')/2,
+                                  borderRadius: wp('2%') / 2,
                                 }}
                               />
                               <Text
                                 style={{
                                   ...styles.cardButtonText,
-                                  color: value.isSetupDone && value.keeper1Done ? Colors.white : Colors.textColorGrey,
+                                  color: value.isSetupDone
+                                    ? Colors.white
+                                    : Colors.textColorGrey,
                                   fontSize: RFValue(11),
-                                  marginLeft: wp('3%')
+                                  marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.isSetupDone && value.keeper1Done ? value.keeper1Name :'App Keeper'}
+                                {value.isSetupDone
+                                  ? value.keeper1Name
+                                  : 'App Keeper'}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={{
                                 ...styles.appBackupButton,
-                                backgroundColor: value.isSetupDone && value.keeper2Done ? Colors.deepBlue : Colors.white,
+                                backgroundColor: value.isSetupDone
+                                  ? Colors.deepBlue
+                                  : Colors.white,
                                 width: 'auto',
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
                                 borderColor: Colors.red,
                                 borderWidth: 0.5,
-                                marginLeft: wp('4%')
+                                marginLeft: wp('4%'),
                               }}
                             >
                               <View
@@ -405,18 +463,22 @@ class ManageBackup extends Component<
                                   backgroundColor: Colors.red,
                                   width: wp('2%'),
                                   height: wp('2%'),
-                                  borderRadius: wp('2%')/2,
+                                  borderRadius: wp('2%') / 2,
                                 }}
                               />
                               <Text
                                 style={{
                                   ...styles.cardButtonText,
                                   fontSize: RFValue(11),
-                                  color: value.isSetupDone && value.keeper2Done ? Colors.white : Colors.textColorGrey,
-                                  marginLeft: wp('3%')
+                                  color: value.isSetupDone
+                                    ? Colors.white
+                                    : Colors.textColorGrey,
+                                  marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.isSetupDone && value.keeper2Done ? value.keeper2Name :'App Keeper'}
+                                {value.isSetupDone && value.keeper2Done
+                                  ? value.keeper2Name
+                                  : 'App Keeper'}
                               </Text>
                             </TouchableOpacity>
                           </View>
@@ -429,6 +491,33 @@ class ManageBackup extends Component<
             })}
           </View>
         </ScrollView>
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'keeperTypeBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('60%')
+              : hp('70%'),
+          ]}
+          renderContent={() => (
+            <KeeperTypeModalContents
+              onPressSetup={() =>
+                (this.refs.keeperTypeBottomSheet as any).snapTo(0)
+              }
+              onPressBack={() =>
+                (this.refs.keeperTypeBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              onPressHeader={() =>
+                (this.refs.keeperTypeBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+        />
       </View>
     );
   }
@@ -455,7 +544,7 @@ const styles = StyleSheet.create({
   modalHeaderTitleView: {
     alignItems: 'center',
     flexDirection: 'row',
-    paddingRight: 10,
+    paddingRight: 5,
     paddingBottom: 5,
     paddingTop: 10,
     marginLeft: 20,
