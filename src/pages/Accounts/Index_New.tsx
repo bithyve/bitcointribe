@@ -1242,7 +1242,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       <Text style={styles.bottomCardInfoText}>
                         Tran Fee :
                         {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
-                        ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'})
+                        {/* ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'}) */}
+                        ({serviceType == TEST_ACCOUNT
+                        ? 't-sats'
+                        : switchOn
+                        ? 'sats'
+                        : CurrencyCode.toLocaleLowerCase()})
                       </Text>
                     </View>
                   </TouchableOpacity>
