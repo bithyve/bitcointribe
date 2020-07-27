@@ -12,13 +12,11 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 export default function PersonalCopyHelpContents(props) {
   return (
-    <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+    <View
+    style={styles.modalContainer}>
+         <AppBottomSheetTouchableWrapper style={{ justifyContent: 'center', alignItems: 'center' }}
+          activeOpacity={10}
+          onPress={()=> props.titleClicked && props.titleClicked()}>
                 <Text
                     style={{
                         color: Colors.white,
@@ -30,7 +28,7 @@ export default function PersonalCopyHelpContents(props) {
                 >
                     Personal Recovery Key
                 </Text>
-            </View>
+            </AppBottomSheetTouchableWrapper>
             <View
                 style={{
                 backgroundColor: Colors.homepageButtonColor,
@@ -40,11 +38,18 @@ export default function PersonalCopyHelpContents(props) {
                 marginBottom: hp('1%'),
                 }}
             />
+    <ScrollView
+        style={styles.modalContainer}
+        snapToInterval={hp('89%')}
+        decelerationRate='fast'
+    >
+        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('6%')}}>
+           
             <Text
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -60,7 +65,7 @@ export default function PersonalCopyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -84,7 +89,7 @@ export default function PersonalCopyHelpContents(props) {
             style={{
                 textAlign: 'center',
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue(13),
                 fontFamily: Fonts.FiraSansRegular,
             }}
             >
@@ -100,7 +105,7 @@ export default function PersonalCopyHelpContents(props) {
                 style={{
                     textAlign: 'center',
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue(13),
                     fontFamily: Fonts.FiraSansRegular,
                 }}
             >
@@ -108,6 +113,7 @@ export default function PersonalCopyHelpContents(props) {
             </Text>
         </View>
     </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -116,7 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,

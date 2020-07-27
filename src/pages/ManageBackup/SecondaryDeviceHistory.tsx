@@ -34,16 +34,30 @@ import DeviceInfo from 'react-native-device-info';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { uploadEncMShare } from '../../store/actions/sss';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralDataElements,
+  TrustedContactDerivativeAccountElements,
+} from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { updateEphemeralChannel } from '../../store/actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
 import config from '../../bitcoin/HexaConfig';
 import QRModal from '../Accounts/QRModal';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import {
+  SECURE_ACCOUNT,
+  REGULAR_ACCOUNT,
+  TRUSTED_CONTACTS,
+  TEST_ACCOUNT,
+} from '../../common/constants/serviceTypes';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents';
+import SSS from '../../bitcoin/utilities/sss/SSS';
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 
 const SecondaryDeviceHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -53,13 +67,19 @@ const SecondaryDeviceHistory = (props) => {
   const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
+  const [blockReshare, setBlockReshare] = useState('');
   const SHARES_TRANSFER_DETAILS = useSelector(
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   );
+  const fcmTokenValue = useSelector((state) => state.preferences.fcmTokenValue);
 
   const WALLET_SETUP = useSelector(
     (state) => state.storage.database.WALLET_SETUP,
+  );
+
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo,
   );
 
   const dispatch = useDispatch();
@@ -72,6 +92,13 @@ const SecondaryDeviceHistory = (props) => {
   const trustedContacts: TrustedContactsService = useSelector(
     (state) => state.trustedContacts.service,
   );
+  const regularAccount: RegularAccount = useSelector(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
+  );
+  const testAccount: TestAccount = useSelector(
+    (state) => state.accounts[TEST_ACCOUNT].service,
+  );
+
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -147,30 +174,29 @@ const SecondaryDeviceHistory = (props) => {
     }
   };
 
-  const updateTrustedContactsInfo = useCallback(async (contact) => {
-    let trustedContactsInfo: any = await AsyncStorage.getItem(
-      'TrustedContactsInfo',
-    );
-    console.log({ trustedContactsInfo });
-
-    if (trustedContactsInfo) {
-      trustedContactsInfo = JSON.parse(trustedContactsInfo);
-      trustedContactsInfo[0] = contact;
-    } else {
-      trustedContactsInfo = [];
-      trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
-      trustedContactsInfo[0] = contact;
-    }
-    await AsyncStorage.setItem(
-      'TrustedContactsInfo',
-      JSON.stringify(trustedContactsInfo),
-    );
-  }, []);
+  const updateTrustedContactsInfo = useCallback(
+    async (contact) => {
+      if (trustedContactsInfo) {
+        trustedContactsInfo[0] = contact;
+      } else {
+        trustedContactsInfo = [];
+        trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
+        trustedContactsInfo[0] = contact;
+      }
+      await AsyncStorage.setItem(
+        'TrustedContactsInfo',
+        JSON.stringify(trustedContactsInfo),
+      );
+      dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
+    },
+    [trustedContactsInfo],
+  );
 
   const createGuardian = useCallback(
     async (reshare?: boolean) => {
       const walletID = await AsyncStorage.getItem('walletID');
-      const FCM = await AsyncStorage.getItem('fcmToken');
+      const FCM = fcmTokenValue;
+      //await AsyncStorage.getItem('fcmToken');
 
       const firstName = 'Secondary';
       const lastName = 'Device';
@@ -178,15 +204,50 @@ const SecondaryDeviceHistory = (props) => {
         .toLowerCase()
         .trim();
 
-      let data: EphemeralData = {
+      let accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[contactName];
+      if (!accountNumber) {
+        // initialize a trusted derivative account against the following account
+        const res = regularAccount.getDerivativeAccXpub(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        );
+        if (res.status !== 200) {
+          console.log('Err occurred while generating derivative account');
+        } else {
+          // refresh the account number
+          accountNumber =
+            regularAccount.hdWallet.trustedContactToDA[contactName];
+        }
+      }
+
+      const trustedReceivingAddress = (regularAccount.hdWallet
+        .derivativeAccounts[TRUSTED_CONTACTS][
+        accountNumber
+      ] as TrustedContactDerivativeAccountElements).receivingAddress;
+
+      let data: EphemeralDataElements = {
         walletID,
         FCM,
+        trustedAddress: trustedReceivingAddress,
+        trustedTestAddress: testAccount.hdWallet.receivingAddress,
       };
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
 
+      let info = null;
+      if (trustedContact && trustedContact.secondaryKey) {
+        info = trustedContact.secondaryKey;
+      }
+
+      const contactInfo = {
+        contactName,
+        info,
+      };
+
       if (reshare) {
         setSecondaryQR('');
-        dispatch(uploadEncMShare(0, contactName, data, true));
+        dispatch(uploadEncMShare(0, contactInfo, data, true));
         updateTrustedContactsInfo({ firstName, lastName });
       } else {
         if (
@@ -195,7 +256,7 @@ const SecondaryDeviceHistory = (props) => {
             config.TC_REQUEST_EXPIRY
         ) {
           setSecondaryQR('');
-          dispatch(uploadEncMShare(0, contactName, data));
+          dispatch(uploadEncMShare(0, contactInfo, data));
           updateTrustedContactsInfo({ firstName, lastName });
         } else if (
           trustedContact &&
@@ -208,7 +269,7 @@ const SecondaryDeviceHistory = (props) => {
           setSecondaryQR('');
           dispatch(
             updateEphemeralChannel(
-              contactName,
+              contactInfo,
               trustedContact.ephemeralChannel.data[0],
             ),
           );
@@ -234,14 +295,16 @@ const SecondaryDeviceHistory = (props) => {
       trustedContacts.tc.trustedContacts[contactName] &&
       trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
     ) {
-      const publicKey =
-        trustedContacts.tc.trustedContacts[contactName].publicKey;
+      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
+        contactName
+      ];
 
       setSecondaryQR(
         JSON.stringify({
           isGuardian: true,
           requester: WALLET_SETUP.walletName,
           publicKey,
+          info: secondaryKey,
           uploadedAt:
             trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
               .initiatedAt,
@@ -256,6 +319,19 @@ const SecondaryDeviceHistory = (props) => {
     uploadMetaShare,
     updateEphemeralChannelLoader,
   ]);
+
+  useEffect(() => {
+    (async () => {
+      // blocking keeper reshare till 100% health
+      const blockPCShare = await AsyncStorage.getItem('blockPCShare');
+      if (blockPCShare) {
+        setBlockReshare(blockPCShare);
+      } else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
+        AsyncStorage.setItem('blockPCShare', 'true');
+        setBlockReshare(blockPCShare);
+      }
+    })();
+  }, []);
 
   const renderSecondaryDeviceContents = useCallback(() => {
     return (
@@ -314,9 +390,9 @@ const SecondaryDeviceHistory = (props) => {
   const renderSecondaryDeviceMessageHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
-        }}
+      // onPressHeader={() => {
+      //   (secondaryDeviceMessageBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -413,8 +489,11 @@ const SecondaryDeviceHistory = (props) => {
         QRModalHeader={'Keeper Reshare'}
         title={'Scan the Exit Key'}
         infoText={
-          'Open your PDF copy which is password protected with your Secret Question\'s answer'
+          'For re-sharing the Recovery Key for the Keeper Device, you will have to scan the Exit Key from the Personal Copies (pdfs). Please scan it here to proceed'
         }
+        onBackPress={() => {
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
         // noteText={
         //   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna'
         // }
@@ -461,6 +540,12 @@ const SecondaryDeviceHistory = (props) => {
             (QrBottomSheet.current as any).snapTo(0);
           }, 2);
         }}
+        onBackPress={() => {
+          setTimeout(() => {
+            setQrBottomSheetsFlag(false);
+          }, 2);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
       />
     );
   }, [QrBottomSheetsFlag]);
@@ -483,18 +568,23 @@ const SecondaryDeviceHistory = (props) => {
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-            if (HelpBottomSheet.current)
-              (HelpBottomSheet as any).current.snapTo(0);
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
         }}
       />
     );
   };
 
   const renderHelpContent = () => {
-    return(
-      <KeeperDeviceHelpContents />
+    return (
+      <KeeperDeviceHelpContents
+        titleClicked={() => {
+          if (HelpBottomSheet.current)
+            (HelpBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
-  }
+  };
 
   if (isErrorSendingFailed) {
     setTimeout(() => {
@@ -587,7 +677,7 @@ const SecondaryDeviceHistory = (props) => {
                   ? getIconByStatus(
                       props.navigation.state.params.selectedStatus,
                     )
-                  : require('../../assets/images/icons/settings.png')
+                  : require('../../assets/images/icons/icon_error_gray.png')
               }
             />
           </View>
@@ -607,8 +697,12 @@ const SecondaryDeviceHistory = (props) => {
             // setTimeout(() => {
             //   setQRModalHeader('Reshare Personal Copy');
             // }, 2);
-
-            (QrBottomSheet.current as any).snapTo(1);
+            if (blockReshare) {
+              (QrBottomSheet.current as any).snapTo(1);
+            } else {
+              createGuardian();
+              (secondaryDeviceBottomSheet as any).current.snapTo(1);
+            }
           }}
           onPressConfirm={() => {
             (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
@@ -633,6 +727,7 @@ const SecondaryDeviceHistory = (props) => {
         onCloseStart={() => {
           (secondaryDeviceMessageBottomSheet.current as any).snapTo(0);
         }}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={secondaryDeviceMessageBottomSheet as any}
         snapPoints={[
@@ -643,6 +738,7 @@ const SecondaryDeviceHistory = (props) => {
         renderHeader={renderSecondaryDeviceMessageHeader}
       />
       <BottomSheet
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ErrorBottomSheet as any}
         snapPoints={[
@@ -661,6 +757,7 @@ const SecondaryDeviceHistory = (props) => {
           (QrBottomSheet as any).current.snapTo(0);
         }}
         onCloseStart={() => {}}
+        enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={QrBottomSheet as any}
         snapPoints={[
@@ -670,7 +767,7 @@ const SecondaryDeviceHistory = (props) => {
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
       />
-      <BottomSheet 
+      <BottomSheet
         enabledInnerScrolling={true}
         ref={HelpBottomSheet as any}
         snapPoints={[

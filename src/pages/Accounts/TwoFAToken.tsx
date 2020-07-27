@@ -42,6 +42,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 
 export default function TwoFAToken(props) {
+  const [Elevation, setElevation] = useState(10);
   const [token, setToken] = useState('');
   const [tokenArray, setTokenArray] = useState(['']);
   const serviceType = props.navigation.getParam('serviceType');
@@ -52,6 +53,7 @@ export default function TwoFAToken(props) {
   const { transfer, loading } = useSelector(
     (state) => state.accounts[serviceType],
   );
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);
 
   function onPressNumber(text) {
     let tmpToken = tokenArray;
@@ -141,6 +143,9 @@ export default function TwoFAToken(props) {
   useEffect(() => {
     if (!transfer.txid && transfer.stage3.failed) {
       setTimeout(() => {
+        setElevation(0);
+      }, 4);
+      setTimeout(() => {
         SendUnSuccessBottomSheet.current.snapTo(1);
       }, 2);
     }
@@ -153,7 +158,11 @@ export default function TwoFAToken(props) {
     return (
       <SendConfirmationContent
         title={'Sent Unsuccessful'}
-        info={'There seems to be a problem'}
+        info={
+          'There seems to be a problem' + '\n' + transfer.stage3.failed
+            ? 'Invalid 2FA token, please try again.'
+            : 'Something went wrong, please try again.'
+        }
         userInfo={transfer.details}
         isFromContact={false}
         okButtonText={'Try Again'}
@@ -193,6 +202,13 @@ export default function TwoFAToken(props) {
       props.navigation.state.params.onTransactionSuccess();
     props.navigation.goBack();
   }
+
+  useEffect(() => {
+    if (!loading.transfer) {
+      setIsConfirmDisabled(false);
+    }
+  }, [loading.transfer]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
@@ -385,12 +401,23 @@ export default function TwoFAToken(props) {
           </View>
           <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
             <TouchableOpacity
+              disabled={isConfirmDisabled}
               onPress={() => {
+                setTimeout(() => {
+                  setIsConfirmDisabled(true);
+                }, 1);
                 dispatch(transferST3(serviceType, token));
               }}
-              style={{ ...styles.confirmModalButtonView }}
+              style={{
+                ...styles.confirmModalButtonView,
+                elevation: Elevation,
+                backgroundColor: isConfirmDisabled
+                  ? Colors.lightBlue
+                  : Colors.blue,
+              }}
             >
-              {loading.transfer ? (
+              {(!isConfirmDisabled && loading.transfer) ||
+              (isConfirmDisabled && loading.transfer) ? (
                 <ActivityIndicator size="small" />
               ) : (
                 <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -441,10 +468,15 @@ export default function TwoFAToken(props) {
           onCloseStart={() => {
             SendUnSuccessBottomSheet.current.snapTo(0);
           }}
+          onCloseEnd={() => setElevation(10)}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
-          snapPoints={[-50, Platform.OS == 'ios' && DeviceInfo.hasNotch()
-          ? hp('65%') : hp('70%')]}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('65%')
+              : hp('70%'),
+          ]}
           renderContent={renderSendUnSuccessContents}
           renderHeader={renderSendUnSuccessHeader}
         />
@@ -529,7 +561,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },

@@ -11,9 +11,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
 import { ScrollView } from 'react-native-gesture-handler';
 import DeviceInfo from 'react-native-device-info';
+import Loader from './loader';
 
 export default function NotificationListContent(props) {
-
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
@@ -29,91 +29,74 @@ export default function NotificationListContent(props) {
           </View>
         </View>
       </View>
-      <ScrollView style={{ height: 'auto'}}>
+      <ScrollView style={{ height: 'auto' }}>
         <View style={{ flex: 1 }}>
           {props.notificationLoading
-            ? [1, 2, 3, 4, 5].map((value) => {
-                return (
-                  <View key={value} style={styles.EmptyListLoaderView}>
-                    <View
-                      style={{ flexDirection: 'row', alignItems: 'center' }}
-                    >
-                      <View style={styles.EmptyListLoaderCircle} />
-                      <View>
-                        <View style={styles.EmptyListLoaderSmallText} />
-                        <View style={styles.EmptyListLoaderLargeText} />
-                      </View>
-                    </View>
-                    <View
-                      style={{ flexDirection: 'row', alignItems: 'center' }}
-                    >
-                      <View style={styles.EmptyListLoaderInfoText} />
-                      <View style={styles.EmptyListLoaderLargeCircle} />
-                    </View>
-                  </View>
-                );
-              })
+            ? null
             : props.NotificationData.map((value, index) => {
-                return (
-                  <AppBottomSheetTouchableWrapper
-                    key={index}
-                    onPress={() => props.onNotificationClicked(value)}
-                    style={{
-                      ...styles.notificationElement,
-                      backgroundColor: value.read
-                        ? Colors.white
-                        : Colors.shadowBlue,
-                    }}
+              return (
+                <AppBottomSheetTouchableWrapper
+                  key={index}
+                  onPress={() => props.onNotificationClicked(value)}
+                  style={{
+                    ...styles.notificationElement,
+                    backgroundColor: value.read
+                      ? Colors.white
+                      : Colors.shadowBlue,
+                  }}
+                >
+                  <View
+                    style={{ flexDirection: 'row', alignItems: 'center' }}
                   >
-                      <View
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                      >
-                        <Image
-                          source={
-                            value.type == 'release'
-                              ? require('../assets/images/icons/icon_hexa.png')
-                              : require('../assets/images/icons/icon_receive.png')
-                          }
-                          style={styles.notificationElementImage}
-                        />
-                        <View style={{flex:1, justifyContent:'center'}}>
-                        <Text numberOfLines={1} style={styles.notificationElementTitle}>
-                          {value.title}
-                        </Text>
-                        </View>
-                        <Text style={styles.notificationElementTimeText}>
-                          {value.time}
-                        </Text>
-                        {value.isMandatory ? (
-                          <FontAwesome
-                            name="star"
-                            color={Colors.yellow}
-                            size={17}
-                          />
-                        ) : (
-                          <View style={{ width: 17 }} />
-                        )}
+                    <Image
+                      source={
+                        value.type == 'release'
+                          ? require('../assets/images/icons/icon_hexa.png')
+                          : require('../assets/images/icons/icon_receive.png')
+                      }
+                      style={styles.notificationElementImage}
+                    />
+                    <View style={{ flex: 1, justifyContent: 'center' }}>
+                      <Text numberOfLines={1} style={styles.notificationElementTitle}>
+                        {value.title}
+                      </Text>
                     </View>
-                    <Text style={styles.notificationElementInfoText}>
-                      {value.info}
+                    <Text style={styles.notificationElementTimeText}>
+                      {value.time}
                     </Text>
-                  </AppBottomSheetTouchableWrapper>
-                );
-              })}
+                    {value.isMandatory ? (
+                      <FontAwesome
+                        name="star"
+                        color={Colors.yellow}
+                        size={17}
+                      />
+                    ) : (
+                        <View style={{ width: 17 }} />
+                      )}
+                  </View>
+                  <Text style={styles.notificationElementInfoText}>
+                    {value.info}
+                  </Text>
+                </AppBottomSheetTouchableWrapper>
+              );
+            })}
         </View>
       </ScrollView>
+      {
+        props.notificationLoading ? <Loader /> : null
+      }
       {!props.NotificationData.length ? (
-            <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
-              <View style={styles.waterMarkInfoBoxView}>
-                <Text style={styles.waterMarkInfoBoxTitle}>
-                  No notification yet
+        <View style={{ backgroundColor: Colors.white, marginTop: 'auto' }}>
+          <View style={styles.waterMarkInfoBoxView}>
+            <Text style={styles.waterMarkInfoBoxTitle}>
+              No notification yet
                 </Text>
-                <Text style={styles.waterMarkInfoBoxInfo}>
-                  All your recent notifications will be visible here
+            <Text style={styles.waterMarkInfoBoxInfo}>
+              All your recent notifications will be visible here
                 </Text>
-              </View>
-            </View>
-          ) : null}
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -163,7 +146,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
     marginRight: wp('2%'),
     width: 'auto',
-    marginLeft:'auto'
+    marginLeft: 'auto'
   },
   notificationElementInfoText: {
     color: Colors.textColorGrey,

@@ -1,28 +1,37 @@
 // types and action creators: dispatched by components and sagas
-
 import {
   TrustedDataElements,
-  EphemeralData,
+  EphemeralDataElements,
+  trustedChannelActions,
+  ShareUploadables,
 } from '../../bitcoin/utilities/Interface';
+
+import { createAction } from 'redux-actions';
+import { UPDATE_ADDRESS_BOOK_LOCALLY } from '../constants';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
+export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT';
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
 export const TRUSTED_CHANNELS_SYNC = 'TRUSTED_CHANNELS_SYNC';
+export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
 
-export const initializeTrustedContact = (contactName: string) => {
+export const initializeTrustedContact = (contactInfo: {
+  contactName: string;
+  info: string;
+}) => {
   return {
     type: INITIALIZE_TRUSTED_CONTACT,
-    payload: { contactName },
+    payload: { contactInfo },
   };
 };
 
 export const approveTrustedContact = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   contactsPublicKey: string,
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
@@ -30,7 +39,7 @@ export const approveTrustedContact = (
   return {
     type: APPROVE_TRUSTED_CONTACT,
     payload: {
-      contactName,
+      contactInfo,
       contactsPublicKey,
       updateEphemeralChannel,
       contactsWalletName,
@@ -38,51 +47,86 @@ export const approveTrustedContact = (
   };
 };
 
+export const removeTrustedContact = (contactName) => {
+  return {
+    type: REMOVE_TRUSTED_CONTACT,
+    payload: {
+      contactName,
+    },
+  };
+};
+
 export const updateEphemeralChannel = (
-  contactName: string,
-  data: EphemeralData,
+  contactInfo: { contactName: string; info: string },
+  data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
+  shareUploadables?: ShareUploadables,
+  updatedDB?: any,
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
-    payload: { contactName, data, fetch, trustedContacts, uploadXpub },
+    payload: {
+      contactInfo,
+      data,
+      fetch,
+      trustedContacts,
+      uploadXpub,
+      shareUploadables,
+      updatedDB,
+    },
   };
 };
 
 export const fetchEphemeralChannel = (
-  contactName?: string,
+  contactInfo: { contactName: string; info: string },
   approveTC?: Boolean,
   publicKey?: string,
 ) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payload: { contactName, approveTC, publicKey },
+    payload: { contactInfo, approveTC, publicKey },
   };
 };
 
 export const updateTrustedChannel = (
-  contactName: string,
+  contactInfo: { contactName: string; info: string },
   data: TrustedDataElements,
   fetch?: Boolean,
+  shareUploadables?: ShareUploadables,
+  updatedDB?: any,
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactName, data, fetch },
+    payload: { contactInfo, data, fetch, shareUploadables, updatedDB },
   };
 };
 
-export const fetchTrustedChannel = (contactName: string) => {
+export const fetchTrustedChannel = (
+  contactInfo: {
+    contactName: string;
+    info: string;
+  },
+  action: trustedChannelActions,
+  contactsWalletName?: string,
+) => {
   return {
     type: FETCH_TRUSTED_CHANNEL,
-    payload: { contactName },
+    payload: { contactInfo, action, contactsWalletName },
   };
 };
 
 export const trustedChannelsSync = () => {
   return {
     type: TRUSTED_CHANNELS_SYNC,
+  };
+};
+
+export const updateTrustedContactInfoLocally = (trustedContactInfo) => {
+  return {
+    type: UPDATE_TRUSTED_CONTACT_INFO,
+    payload: { trustedContactInfo },
   };
 };
 
@@ -172,3 +216,9 @@ export const switchTCLoading = (beingLoaded) => {
     payload: { beingLoaded },
   };
 };
+
+const updateAddressBookLocallyRequest = createAction(
+  UPDATE_ADDRESS_BOOK_LOCALLY,
+);
+export const updateAddressBookLocally = (payload) => (dispatch) =>
+  dispatch(updateAddressBookLocallyRequest(payload));

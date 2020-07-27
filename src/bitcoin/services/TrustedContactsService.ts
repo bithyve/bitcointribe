@@ -3,8 +3,10 @@ import config from '../HexaConfig';
 import {
   Contacts,
   TrustedData,
-  EphemeralData,
+  EphemeralDataElements,
   TrustedDataElements,
+  trustedChannelActions,
+  ShareUploadables,
 } from '../utilities/Interface';
 
 export default class TrustedContactsService {
@@ -46,6 +48,7 @@ export default class TrustedContactsService {
 
   public initializeContact = (
     contactName: string,
+    encKey: string,
   ):
     | {
         status: number;
@@ -64,7 +67,10 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.tc.initializeContact(contactName.toLowerCase().trim()),
+        data: this.tc.initializeContact(
+          contactName.toLowerCase().trim(),
+          encKey,
+        ),
       };
     } catch (err) {
       return {
@@ -78,6 +84,7 @@ export default class TrustedContactsService {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
+    encKey: string,
     contactsWalletName?: string,
   ):
     | {
@@ -102,6 +109,7 @@ export default class TrustedContactsService {
         data: this.tc.finalizeContact(
           contactName.toLowerCase().trim(),
           encodedPublicKey,
+          encKey,
           contactsWalletName,
         ),
       };
@@ -116,8 +124,10 @@ export default class TrustedContactsService {
 
   public updateEphemeralChannel = async (
     contactName: string,
-    dataElements: EphemeralData,
+    dataElements: EphemeralDataElements,
+    encKey: string,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         status: number;
@@ -125,7 +135,7 @@ export default class TrustedContactsService {
           | {
               updated: any;
               publicKey: string;
-              data: EphemeralData;
+              data: EphemeralDataElements;
             }
           | {
               updated: any;
@@ -148,7 +158,9 @@ export default class TrustedContactsService {
         data: await this.tc.updateEphemeralChannel(
           contactName.toLowerCase().trim(),
           dataElements,
+          encKey,
           fetch,
+          shareUploadables,
         ),
       };
     } catch (err) {
@@ -162,13 +174,14 @@ export default class TrustedContactsService {
 
   public fetchEphemeralChannel = async (
     contactName: string,
+    encKey: string,
     approveTC?: Boolean,
     publicKey?: string,
   ): Promise<
     | {
         status: number;
         data: {
-          data: EphemeralData;
+          data: EphemeralDataElements;
         };
         err?: undefined;
         message?: undefined;
@@ -185,6 +198,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.fetchEphemeralChannel(
           contactName ? contactName.toLowerCase().trim() : contactName,
+          encKey,
           approveTC,
           publicKey,
         ),
@@ -202,6 +216,7 @@ export default class TrustedContactsService {
     contactName: string,
     dataElements: TrustedDataElements,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         status: number;
@@ -231,6 +246,7 @@ export default class TrustedContactsService {
           contactName.toLowerCase().trim(),
           dataElements,
           fetch,
+          shareUploadables,
         ),
       };
     } catch (err) {
@@ -244,11 +260,12 @@ export default class TrustedContactsService {
 
   public fetchTrustedChannel = async (
     contactName: string,
+    contactsWalletName?: string,
   ): Promise<
     | {
         status: number;
         data: {
-          data: TrustedData;
+          data: TrustedDataElements;
         };
         err?: undefined;
         message?: undefined;
@@ -265,6 +282,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.fetchTrustedChannel(
           contactName.toLowerCase().trim(),
+          contactsWalletName,
         ),
       };
     } catch (err) {

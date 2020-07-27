@@ -37,14 +37,6 @@ import SecurityQuestionHelpContents from '../../components/Helper/SecurityQuesti
 
 const SecurityQuestionHistory = props => {
   const [SelectedOption, setSelectedOption] = useState(0);
-  const SelectOption = Id => {
-    if (Id == SelectedOption) {
-      setSelectedOption(0);
-    } else {
-      setSelectedOption(Id);
-    }
-  };
-
   const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
@@ -90,7 +82,9 @@ const SecurityQuestionHistory = props => {
           Keyboard.dismiss();
           updateAutoHighlightFlags();
           saveConfirmationHistory();
-          SecurityQuestionBottomSheet.current.snapTo(0);
+          setTimeout(() => {
+            (SecurityQuestionBottomSheet as any).current.snapTo(0);
+          }, 2);
           (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
         }}
       />
@@ -112,8 +106,8 @@ const SecurityQuestionHistory = props => {
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
-        info={'Questions Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answers'}
+        info={'Question Successfully Backed Up'}
+        note={'Hexa will remind you to help\nremember the answer'}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
         onPressProceed={() => {
@@ -129,9 +123,9 @@ const SecurityQuestionHistory = props => {
   const renderHealthCheckSuccessModalHeader = useCallback(() => {
     return (
       <ModalHeader
-        onPressHeader={() => {
-          (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-        }}
+        // onPressHeader={() => {
+        //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
+        // }}
       />
     );
   }, []);
@@ -213,7 +207,11 @@ const SecurityQuestionHistory = props => {
 
   const renderHelpContent = () => {
     return(
-      <SecurityQuestionHelpContents />
+      <SecurityQuestionHelpContents 
+      titleClicked={()=>{
+        if (HelpBottomSheet.current)
+              (HelpBottomSheet as any).current.snapTo(0);
+      }}/>
     );
   }
 
@@ -313,15 +311,16 @@ const SecurityQuestionHistory = props => {
         />
       </View>
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SecurityQuestionBottomSheet}
+         enabledInnerScrolling={true}
+        ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
       <BottomSheet
-        enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet}
+         enabledGestureInteraction={false}
+         enabledInnerScrolling={true}
+        ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('37%') : hp('45%'),

@@ -19,8 +19,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import { useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
+import { withNavigation } from 'react-navigation';
 
-export default function HealthCheckSecurityQuestion(props) {
+function HealthCheckSecurityQuestion(props) {
   const { security } = useSelector(
     state => state.storage.database.WALLET_SETUP,
   );
@@ -36,6 +37,7 @@ export default function HealthCheckSecurityQuestion(props) {
   const [answer, setAnswer] = useState('');
   const [dropdownBoxList, setDropdownBoxList] = useState(QuestionList);
   const [errorText, setErrorText] = useState('');
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const setConfirm = () => {
     if (answer.length > 0 && answer != securityAnswer) {
@@ -43,6 +45,7 @@ export default function HealthCheckSecurityQuestion(props) {
           AnswerCounter++;
           setAnswerCounter(AnswerCounter);
         } else {
+          props.navigation.navigate('ReLogin');
           setAnswer(securityAnswer);
           setErrorText('');
           return;
@@ -87,6 +90,11 @@ export default function HealthCheckSecurityQuestion(props) {
     setDropdownBoxValue(value);
     setDropdownBoxOpenClose(false);
   };
+
+  useEffect(()=>{
+    if((!errorText && !answer && answer && dropdownBoxValue.id) || (dropdownBoxValue.id && answer)) setIsDisabled(false)
+    else setIsDisabled(true)
+  }, [answer, errorText, dropdownBoxValue.id])
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -248,7 +256,7 @@ export default function HealthCheckSecurityQuestion(props) {
             }}
           >
             <AppBottomSheetTouchableWrapper
-              disabled={errorText || !answer ? true : false}
+              disabled={isDisabled}
               onPress={() => {
                 setConfirm();
                 if (answer.trim() == securityAnswer.trim()) {
@@ -261,11 +269,12 @@ export default function HealthCheckSecurityQuestion(props) {
                 } else {
                   setErrorText('Answer is incorrect');
                 }
+                setIsDisabled(false);
               }}
-              style={styles.questionConfirmButton}
+              style={{...styles.questionConfirmButton, backgroundColor: isDisabled? Colors.lightBlue: Colors.blue}}
             >
               <Text style={styles.proceedButtonText}>
-                {errorText || !answer ? 'Try Again' : 'Confirm'}
+                {!errorText ? 'Confirm' : 'Try Again'}
               </Text>
             </AppBottomSheetTouchableWrapper>
           </View>
@@ -273,6 +282,8 @@ export default function HealthCheckSecurityQuestion(props) {
     </View>
   );
 }
+
+export default withNavigation(HealthCheckSecurityQuestion);
 
 const styles = StyleSheet.create({
   modalContentContainer: {
@@ -352,7 +363,6 @@ const styles = StyleSheet.create({
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 15, height: 15 },
-    backgroundColor: Colors.blue,
   },
   inputBox: {
     borderWidth: 0.5,

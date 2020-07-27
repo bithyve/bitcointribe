@@ -6,8 +6,6 @@ import {
   KeyboardAvoidingView,
   TextInput,
   Platform,
-  AsyncStorage,
-  ImageBackground,
   TouchableWithoutFeedback,
   Image,
   Keyboard,
@@ -22,9 +20,7 @@ import {
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { RNCamera } from 'react-native-camera';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -46,39 +42,16 @@ export default function TwoFASweepFunds(props) {
   const [netBalance, setNetBalance] = useState(
     wallet.balances.balance + wallet.balances.unconfirmedBalance,
   );
-  const [
-    ServerNotRespondingBottomSheet,
-    setServerNotRespondingBottomSheet,
-  ] = useState(React.createRef());
-  const [NewTwoFASecretBottomSheet, setNewTwoFASecretBottomSheet] = useState(
-    React.createRef(),
-  );
-  const [
-    ResetTwoFASuccessBottomSheet,
-    setResetTwoFASuccessBottomSheet,
-  ] = useState(React.createRef());
-  const [successMessage, setSuccessMessage] = useState('');
-  const [successMessageHeader, setSuccessMessageHeader] = useState('');
-  const [QRModalHeader, setQRModalHeader] = useState('');
-  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
-  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const [bottomSheet, setBottomSheet] = useState(React.createRef());
   const [recipientAddress, setRecipientAddress] = useState('');
   const [amount, setAmount] = useState('');
-  const [token, setToken] = useState('');
   const [description, setDescription] = useState('');
   const [sliderValue, setSliderValue] = useState(0);
   const [sliderValueText, setSliderValueText] = useState('Low Fee');
-  const [isSendHelperDone, setIsSendHelperDone] = useState(true);
   const [isInvalidBalance, setIsInvalidBalance] = useState(false);
   const [isInvalidAddress, setIsInvalidAddress] = useState(true);
   // const [SendSuccessBottomSheet, setSendSuccessBottomSheet] = useState(
   //   React.createRef(),
   // );
-  const [SendHelperBottomSheet, setSendHelperBottomSheet] = useState(
-    React.createRef(),
-  );
-
   const [isEditable, setIsEditable] = useState(true);
   const viewRef = useRef(null);
   const tapSliderHandler = (evt) => {
@@ -218,7 +191,7 @@ export default function TwoFASweepFunds(props) {
                           editable={sweepSecure ? false : isEditable}
                           // ref={refs => setTextAmountRef(refs)}
                           style={{ ...styles.textBox, paddingLeft: 10 }}
-                          placeholder={'Enter Amount in sats'}
+                          placeholder={'Enter amount in sats'}
                           value={amount}
                           returnKeyLabel="Done"
                           returnKeyType="done"

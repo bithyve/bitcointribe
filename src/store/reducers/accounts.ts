@@ -18,6 +18,7 @@ import {
   TWO_FA_RESETTED,
   ADD_TRANSFER_DETAILS,
   REMOVE_TRANSFER_DETAILS,
+  AVERAGE_TX_FEE,
 } from '../actions/accounts';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
@@ -54,6 +55,7 @@ const ACCOUNT_VARS: {
     transfer: Boolean;
     testcoins: Boolean;
   };
+  averageTxFees: any;
 } = {
   service: null,
   receivingAddress: '',
@@ -79,6 +81,7 @@ const ACCOUNT_VARS: {
     transfer: false,
     testcoins: false,
   },
+  averageTxFees: null,
 };
 
 const initialState: {
@@ -177,7 +180,11 @@ export default (state = initialState, action) => {
           ...state[account],
           transfer: {
             ...state[account].transfer,
-            stage1: { ...state[account].transfer.stage1, failed: true },
+            stage1: {
+              ...state[account].transfer.stage1,
+              failed: true,
+              ...action.payload.errorDetails,
+            },
           },
           loading: {
             ...state[account].loading,
@@ -216,15 +223,55 @@ export default (state = initialState, action) => {
       };
 
     case CLEAR_TRANSFER:
-      return {
-        ...state,
-        [account]: {
-          ...state[account],
-          transfer: {
-            ...initialState[account].transfer,
+      if (!action.payload.stage)
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...initialState[account].transfer,
+            },
           },
-        },
-      };
+        };
+      else if (action.payload.stage === 'stage1')
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...state[account].transfer,
+              stage1: {},
+              stage2: {},
+              stage3: {},
+              executed: '',
+            },
+          },
+        };
+      else if (action.payload.stage === 'stage2')
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...state[account].transfer,
+              stage2: {},
+              stage3: {},
+              executed: 'ST1',
+            },
+          },
+        };
+      else if (action.payload.stage === 'stage3')
+        return {
+          ...state,
+          [account]: {
+            ...state[account],
+            transfer: {
+              ...state[account].transfer,
+              stage3: {},
+              executed: 'ST2',
+            },
+          },
+        };
 
     case TRANSFER_ST2_EXECUTED:
       switch (action.payload.serviceType) {
@@ -391,6 +438,12 @@ export default (state = initialState, action) => {
             twoFAResetted: action.payload.resetted,
           },
         },
+      };
+
+    case AVERAGE_TX_FEE:
+      return {
+        ...state,
+        averageTxFees: action.payload.averageTxFees,
       };
   }
   return state;

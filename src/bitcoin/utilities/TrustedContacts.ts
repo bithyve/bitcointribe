@@ -1,9 +1,13 @@
 import {
   Contacts,
-  EphemeralData,
+  EphemeralDataElements,
   TrustedData,
   EncryptedTrustedData,
   TrustedDataElements,
+  EphemeralData,
+  EncryptedEphemeralData,
+  trustedChannelActions,
+  ShareUploadables,
 } from './Interface';
 import crypto from 'crypto';
 import config from '../HexaConfig';
@@ -158,6 +162,7 @@ export default class TrustedContacts {
 
   public initializeContact = (
     contactName: string,
+    encKey: string,
   ): { publicKey: string; ephemeralAddress: string } => {
     if (this.trustedContacts[contactName]) {
       throw new Error(
@@ -177,6 +182,7 @@ export default class TrustedContacts {
     this.trustedContacts[contactName] = {
       privateKey,
       publicKey,
+      encKey,
       ephemeralChannel: { address: ephemeralAddress },
     };
 
@@ -186,6 +192,7 @@ export default class TrustedContacts {
   public finalizeContact = (
     contactName: string,
     encodedPublicKey: string,
+    encKey: string,
     contactsWalletName?: string,
   ): {
     channelAddress: string;
@@ -193,7 +200,7 @@ export default class TrustedContacts {
     publicKey: string;
   } => {
     if (!this.trustedContacts[contactName]) {
-      this.initializeContact(contactName); // case: trusted contact setup has been requested
+      this.initializeContact(contactName, encKey); // case: trusted contact setup has been requested
     }
 
     if (
@@ -242,11 +249,12 @@ export default class TrustedContacts {
     };
   };
 
-  public processEphemeralChannelData = (
+  public updateEphemeralChannelData = (
     contactName: string,
-    data: EphemeralData,
-  ) => {
+    data: EphemeralDataElements,
+  ): { updatedEphemeralDataElements: EphemeralDataElements } => {
     let ephemeralData = this.trustedContacts[contactName].ephemeralChannel.data;
+    let updatedEphemeralDataElements: EphemeralDataElements;
     if (ephemeralData) {
       let updated = false;
       for (let index = 0; index < ephemeralData.length; index++) {
@@ -255,6 +263,7 @@ export default class TrustedContacts {
             ...ephemeralData[index],
             ...data,
           };
+          updatedEphemeralDataElements = ephemeralData[index];
           updated = true;
           break;
         }
@@ -263,6 +272,7 @@ export default class TrustedContacts {
       if (!updated) {
         // counterparty's data reception for the first time
         ephemeralData.push(data);
+        updatedEphemeralDataElements = data;
         // update counterparty's walletId and FCM
         data.walletID
           ? (this.trustedContacts[contactName].walletID = data.walletID)
@@ -272,23 +282,49 @@ export default class TrustedContacts {
           this.trustedContacts[contactName].FCMs
             ? this.trustedContacts[contactName].FCMs.push(data.FCM)
             : (this.trustedContacts[contactName].FCMs = [data.FCM]);
+
+        this.trustedContacts[contactName].trustedAddress = data.trustedAddress;
+        this.trustedContacts[contactName].trustedTestAddress =
+          data.trustedTestAddress;
       }
     } else {
       ephemeralData = [data];
+      updatedEphemeralDataElements = data;
     }
 
     this.trustedContacts[contactName].ephemeralChannel.data = ephemeralData;
+    return { updatedEphemeralDataElements };
+  };
+
+  public processEphemeralChannelData = (
+    contactName: string,
+    encryptedData: EncryptedEphemeralData,
+    key: string,
+  ): EphemeralData => {
+    const data: TrustedDataElements = this.decryptData(
+      key,
+      encryptedData.encryptedData,
+    ).data;
+
+    const decryptedEphemeralData: EphemeralData = {
+      publicKey: encryptedData.publicKey,
+      data,
+    };
+    this.updateEphemeralChannelData(contactName, decryptedEphemeralData.data);
+    return decryptedEphemeralData;
   };
 
   public updateEphemeralChannel = async (
     contactName: string,
-    dataElements: EphemeralData,
+    dataElements: EphemeralDataElements,
+    encKey: string,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         updated: any;
         publicKey: string;
-        data: EphemeralData;
+        data: EphemeralDataElements;
       }
     | {
         updated: any;
@@ -298,7 +334,7 @@ export default class TrustedContacts {
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
-        this.initializeContact(contactName);
+        this.initializeContact(contactName, encKey);
       }
 
       const { ephemeralChannel, publicKey } = this.trustedContacts[contactName];
@@ -307,19 +343,73 @@ export default class TrustedContacts {
       if (dataElements.shareTransferDetails) {
         this.trustedContacts[contactName].isGuardian = true;
       }
-
-      if (dataElements.DHInfo) {
+      if (dataElements.DHInfo)
         dataElements.DHInfo.address = ephemeralChannel.address;
+
+      const { updatedEphemeralDataElements } = this.updateEphemeralChannelData(
+        contactName,
+        dataElements,
+      );
+
+      let res: AxiosResponse;
+      if (!encKey) {
+        // supporting versions prior to 1.1.0
+        res = await BH_AXIOS.post('updateEphemeralChannel', {
+          HEXA_ID,
+          address: ephemeralChannel.address,
+          data: dataElements,
+          fetch,
+          legacy: true,
+        });
+      } else {
+        let encryptedDataPacket: EncryptedEphemeralData;
+        if (dataElements.DHInfo) {
+          encryptedDataPacket = {
+            publicKey,
+            encryptedData: null,
+            DHInfo: dataElements.DHInfo,
+          };
+        } else {
+          const ephemeralData: EphemeralData = {
+            publicKey,
+            data: updatedEphemeralDataElements,
+          };
+
+          const { encryptedData } = this.encryptData(
+            encKey,
+            ephemeralData.data,
+          );
+
+          encryptedDataPacket = {
+            publicKey,
+            encryptedData,
+            walletID: updatedEphemeralDataElements.walletID,
+          };
+        }
+
+        if (shareUploadables && Object.keys(shareUploadables).length) {
+          res = await BH_AXIOS.post('updateShareAndEC', {
+            // EC update params
+            HEXA_ID,
+            address: ephemeralChannel.address,
+            data: encryptedDataPacket,
+            fetch,
+            // upload share params
+            share: shareUploadables.encryptedMetaShare,
+            messageId: shareUploadables.messageId,
+            encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+          });
+        } else {
+          res = await BH_AXIOS.post('updateEphemeralChannel', {
+            HEXA_ID,
+            address: ephemeralChannel.address,
+            data: encryptedDataPacket,
+            fetch,
+          });
+        }
       }
 
-      const res = await BH_AXIOS.post('updateEphemeralChannel', {
-        HEXA_ID,
-        address: ephemeralChannel.address,
-        data: dataElements,
-        fetch,
-      });
-
-      const { updated, initiatedAt, data } = res.data;
+      let { updated, initiatedAt, data } = res.data;
       console.log({ updated, initiatedAt, data });
       if (!updated) throw new Error('Failed to update ephemeral space');
       if (initiatedAt)
@@ -327,10 +417,18 @@ export default class TrustedContacts {
           contactName
         ].ephemeralChannel.initiatedAt = initiatedAt;
 
-      this.processEphemeralChannelData(contactName, dataElements);
       if (data && Object.keys(data).length) {
-        this.processEphemeralChannelData(contactName, data);
-        return { updated, publicKey, data };
+        if (!encKey) {
+          this.updateEphemeralChannelData(contactName, data);
+        }
+
+        return {
+          updated,
+          publicKey,
+          data: encKey
+            ? this.processEphemeralChannelData(contactName, data, encKey).data
+            : data,
+        };
       }
 
       return { updated, publicKey };
@@ -343,18 +441,18 @@ export default class TrustedContacts {
 
   public fetchEphemeralChannel = async (
     contactName: string,
+    encKey: string,
     approveTC?: Boolean,
     publicKey?: string,
   ): Promise<{
-    data: EphemeralData;
+    data: EphemeralDataElements;
   }> => {
     try {
       let res: AxiosResponse;
+
       if (!publicKey) {
         if (!this.trustedContacts[contactName]) {
-          throw new Error(
-            `No contact exist with contact name: ${contactName}`,
-          );
+          throw new Error(`No contact exist with contact name: ${contactName}`);
         }
 
         const { ephemeralChannel } = this.trustedContacts[contactName];
@@ -376,16 +474,16 @@ export default class TrustedContacts {
           identifier: `!${publicKey}`, // anti-counterparty's pub
         });
       }
-      const { data } = res.data;
+      let { data } = res.data;
 
       if (!publicKey && data && Object.keys(data).length) {
-        this.processEphemeralChannelData(contactName, data);
+        data = this.processEphemeralChannelData(contactName, data, encKey);
       }
 
       if (!publicKey && approveTC) {
         let contactsPublicKey;
         this.trustedContacts[contactName].ephemeralChannel.data.forEach(
-          (element: EphemeralData) => {
+          (element: EphemeralDataElements) => {
             if (
               element.publicKey !== this.trustedContacts[contactName].publicKey
             ) {
@@ -401,7 +499,7 @@ export default class TrustedContacts {
           );
         }
 
-        this.finalizeContact(contactName, contactsPublicKey);
+        this.finalizeContact(contactName, contactsPublicKey, encKey);
       }
 
       return { data };
@@ -489,6 +587,7 @@ export default class TrustedContacts {
     contactName: string,
     dataElements: TrustedDataElements,
     fetch?: Boolean,
+    shareUploadables?: ShareUploadables,
   ): Promise<
     | {
         updated: any;
@@ -501,9 +600,7 @@ export default class TrustedContacts {
   > => {
     try {
       if (!this.trustedContacts[contactName]) {
-        throw new Error(
-          `No contact exist with contact name: ${contactName}`,
-        );
+        throw new Error(`No contact exist with contact name: ${contactName}`);
       }
 
       if (
@@ -523,7 +620,6 @@ export default class TrustedContacts {
         publicKey,
         data: dataElements,
       };
-
       const {
         updatedTrustedData,
         overallTrustedData,
@@ -539,12 +635,28 @@ export default class TrustedContacts {
         encryptedData,
       };
 
-      const res = await BH_AXIOS.post('updateTrustedChannel', {
-        HEXA_ID,
-        address: trustedChannel.address,
-        data: encryptedDataPacket,
-        fetch,
-      });
+      let res: AxiosResponse;
+      if (shareUploadables && Object.keys(shareUploadables).length) {
+        res = await BH_AXIOS.post('updateShareAndTC', {
+          // EC update params
+          HEXA_ID,
+          address: trustedChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+          // upload share params
+          share: shareUploadables.encryptedMetaShare,
+          messageId: shareUploadables.messageId,
+          encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+        });
+      } else {
+        res = await BH_AXIOS.post('updateTrustedChannel', {
+          HEXA_ID,
+          address: trustedChannel.address,
+          data: encryptedDataPacket,
+          fetch,
+        });
+      }
+
       let { updated, data } = res.data;
       if (!updated) throw new Error('Failed to update ephemeral space');
       this.trustedContacts[
@@ -565,14 +677,13 @@ export default class TrustedContacts {
 
   public fetchTrustedChannel = async (
     contactName: string,
+    contactsWalletName?: string,
   ): Promise<{
-    data: TrustedData;
+    data: TrustedDataElements;
   }> => {
     try {
       if (!this.trustedContacts[contactName]) {
-        throw new Error(
-          `No contact exist with contact name: ${contactName}`,
-        );
+        throw new Error(`No contact exist with contact name: ${contactName}`);
       }
 
       if (
@@ -597,7 +708,16 @@ export default class TrustedContacts {
 
       let { data } = res.data;
       if (data) {
-        data = this.processTrustedChannelData(contactName, data, symmetricKey);
+        data = this.processTrustedChannelData(contactName, data, symmetricKey)
+          .data;
+      }
+
+      if (contactsWalletName) {
+        this.trustedContacts[contactName] = {
+          ...this.trustedContacts[contactName],
+          contactsWalletName, // would help with contact name to wallet name mapping to aid recovery share provisioning
+          isWard: contactsWalletName ? true : false,
+        };
       }
 
       return {

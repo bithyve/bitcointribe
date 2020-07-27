@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet, Linking } from 'react-native';
+import {
+  View,
+  Image,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Linking,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -11,188 +18,211 @@ import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrappe
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TransactionHelperModalContents(props) {
-
-    const openLink = (url) => {
-        Linking.canOpenURL(url).then(supported => {
-          if (supported) {
-            Linking.openURL(url);
-          } else {
-            console.log("Don't know how to open URI: " + url);
-          }
-        })
-    }
+  const openLink = (url) => {
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
 
   return (
-    <ScrollView
-        style={styles.modalContainer}
-        snapToInterval={hp('89%')}
-        decelerationRate='fast'
-    >
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingBottom: hp('4%')}}>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Text
-                    style={{
-                        color: Colors.white,
-                        fontFamily: Fonts.FiraSansMedium,
-                        fontSize: RFValue(20),
-                        marginTop: hp('1%'),
-                        marginBottom: hp('1%'),
-                    }}
-                >
-                    Transaction
-                </Text>
-            </View>
-            <View
-                style={{
-                backgroundColor: Colors.homepageButtonColor,
-                height: 1,
-                marginLeft: wp('5%'),
-                marginRight: wp('5%'),
-                marginTop: 10,
-                marginBottom: hp('1%'),
-                }}
+    <View style={styles.modalContainer}>
+      <AppBottomSheetTouchableWrapper
+        style={{ justifyContent: 'center', alignItems: 'center' }}
+        activeOpacity={10}
+        onPress={() => props.titleClicked && props.titleClicked()}
+      >
+        <Text style={styles.headerText}>Transaction</Text>
+      </AppBottomSheetTouchableWrapper>
+      <View style={styles.headerSeparator} />
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: Colors.blue,
+          marginBottom: wp('5%'),
+        }}
+        snapToInterval={hp('75%')}
+        decelerationRate="fast"
+      >
+        <View
+          style={{
+            height: hp('75%'),
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text
+            style={{
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginTop: wp('10%'),
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
+            }}
+          >
+            A transaction is identified by an alphanumeric string called the
+            transaction ID, which acts as a permanent reference to your payment
+            on the Bitcoin blockchain
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
+              style={{
+                width: wp('80%'),
+                height: wp('65%'),
+                resizeMode: 'contain',
+              }}
             />
-            <Text
+          </View>
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
-            >
-            A transction is identified by an alphanumeric{'\n'}string called the transaction ID, which acts as a{'\n'}permanent reference to your payment on the{'\n'}Bitcoin blockchain
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/bitcoin_transaction_id.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+          >
+            You can search for your transaction on Bitcoin using blockchain
+            explorers, which provide detailed information on the status and
+            information associated with your transaction
+          </Text>
+          <View
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              borderStyle: 'dotted',
+              borderWidth: 1,
+              borderRadius: 1,
+              borderColor: Colors.white,
+              width: wp('70%'),
+              height: 0,
+              alignSelf: 'center',
+              marginBottom: wp('1%'),
             }}
-            >
-                You can independently verify your transaction{'\n'}by looking up the transaction ID on a block{'\n'}explorer like blockstream.info
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                source={require('../../assets/images/icons/rabbit.png')}
-                style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
+          />
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('4%')}}>
-            <Text
+        <View
+          style={{
+            height: hp('75%'),
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginTop: wp('10%'),
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
-            >
-            A transaction requires some time to confirm,{'\n'}and this delay is called the confirmation time.{'\n'}The confirmation time depends on the fees{'\n'}paid by the transaction, and on the structure{'\n'}of the transaction.
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/confirmation_time.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <Text
+          >
+            A transaction requires some time to confirm, and this delay is
+            called the confirmation time. The confirmation time depends on the
+            fees paid for the transaction, and on the structure of the
+            transaction. For most transactions, six confirmations is taken as
+            reference
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/confirmation_time.png')}
+              style={{
+                width: wp('80%'),
+                height: wp('65%'),
+                resizeMode: 'contain',
+              }}
+            />
+          </View>
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
-            >
-                For most transactions, six confirmations is taken{'\n'}as reference.You can see the number of {'\n'}confirmations against the transaction within Hexa
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                <View
-                    style={{
-                        borderStyle: 'dotted',
-                        borderWidth: 1,
-                        borderRadius: 1,
-                        borderColor: Colors.white,
-                        width: wp('70%'),
-                        height: 0,
-                    }}
-                />
-            </View>
+          >
+            The fee paid for a transaction depends only on the transaction size,
+            not on the transaction amount. This fee increases as the complexity
+            of the transaction increases, which is why the Checking Account has
+            lower fees compared to the Savings Account
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                borderStyle: 'dotted',
+                borderWidth: 1,
+                borderRadius: 1,
+                borderColor: Colors.white,
+                width: wp('70%'),
+                height: 0,
+                marginBottom: wp('1%'),
+              }}
+            />
+          </View>
         </View>
-        <View style={{height: hp('89%'), justifyContent: 'space-between', paddingTop:hp('2%'), paddingBottom: hp('6%')}}>
-            <Text
+        <View
+          style={{
+            height: hp('75%'),
+            justifyContent: 'space-between',
+          }}
+        >
+          <Text
             style={{
-                textAlign: 'center',
-                color: Colors.white,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginTop: wp('10%'),
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
             }}
-            >
-                How quickly the miners pick up your{'\n'}transaction from the mempool depends on the{'\n'}fee associated with it
-            </Text>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/transaction_confirmation.png')}
-                    style={{ width: wp('90%'), height: wp('90%'), resizeMode: 'contain' }}
-                />
-            </View>
-            <View style={{flexDirection: 'row', marginLeft: wp('10%'), marginRight: wp('10%'), justifyContent: 'center', flexWrap: 'wrap'}}>
-                <Text
-                    style={{
-                        color: Colors.white,
-                        // textAlign: 'center',
-                        fontSize: RFValue(12),
-                        fontFamily: Fonts.FiraSansRegular,
-                    }}
-                >
-                    To know more,
-                </Text>
-                <TouchableOpacity style={{marginLeft: 5}} onPress={() => openLink("https://www.blockchain.com/charts/mempool-size")}> 
-                    <Text
-                        style={{
-                            color: Colors.white,
-                            fontSize: RFValue(12),
-                            fontFamily: Fonts.FiraSansRegular,
-                            textDecorationLine: 'underline',
-                            textAlign: 'center',
-                        }}
-                    >
-                        click here
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                <Image
-                    source={require('../../assets/images/icons/rabbit.png')}
-                    style={{ width: wp('25%'), height: wp('25%'), resizeMode: 'contain' }}
-                />
-            </View>
+          >
+            A transaction that is not confirmed stays in the pool of unconfirmed
+            transactions, called the mempool. The mempool is used by bitcoin
+            miners to include transactions in blocks, and get mining fees
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <Image
+              source={require('../../assets/images/icons/transaction_confirmation.png')}
+              style={{
+                width: wp('80%'),
+                height: wp('65%'),
+                resizeMode: 'contain',
+              }}
+            />
+          </View>
+          <Text
+            style={{
+              textAlign: 'center',
+              color: Colors.white,
+              fontSize: RFValue(13),
+              fontFamily: Fonts.FiraSansRegular,
+              marginLeft: wp('7%'),
+              marginRight: wp('7%'),
+            }}
+          >
+            On average, the mempool is cleared every three to six hours. This
+            means the maximum amount of time you need to wait for a transaction
+            to be confirmed is six hours on most days
+          </Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+            <View
+              style={{
+                width: wp('70%'),
+                height: 0,
+              }}
+            />
+          </View>
         </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 const styles = StyleSheet.create({
@@ -201,10 +231,25 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    paddingBottom: hp('5%'),
+    // paddingBottom: hp('4%'),
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: { width: 0, height: 2 },
+  },
+  headerText: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(20),
+    marginTop: hp('1%'),
+    marginBottom: hp('1%'),
+  },
+  headerSeparator: {
+    backgroundColor: Colors.homepageButtonColor,
+    height: 1,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginTop: 10,
+    marginBottom: hp('1%'),
   },
 });

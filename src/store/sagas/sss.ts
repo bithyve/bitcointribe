@@ -57,16 +57,22 @@ import {
 import {
   EncDynamicNonPMDD,
   MetaShare,
-  EphemeralData,
+  EphemeralDataElements,
   DerivativeAccounts,
   DerivativeAccount,
   TrustedDataElements,
   WalletImage,
+  ShareUploadables,
 } from '../../bitcoin/utilities/Interface';
 import generatePDF from '../utils/generatePDF';
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus';
 import { AsyncStorage, Platform, NativeModules, Alert } from 'react-native';
-import { updateEphemeralChannel } from '../actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  trustedContactApproved,
+  updateTrustedChannel,
+  updateTrustedContactInfoLocally,
+} from '../actions/trustedContacts';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import crypto from 'crypto';
@@ -170,8 +176,11 @@ function* uploadEncMetaShareWorker({ payload }) {
 
   const s3Service: S3Service = yield select((state) => state.sss.service);
   if (!s3Service.sss.metaShares.length) return;
-  const trustedContacts = yield select(
+  const trustedContacts: TrustedContactsService = yield select(
     (state) => state.trustedContacts.service,
+  );
+  const regularService: RegularAccount = yield select(
+    (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
 
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
@@ -179,7 +188,21 @@ function* uploadEncMetaShareWorker({ payload }) {
   );
 
   if (payload.changingGuardian) {
-    delete trustedContacts.tc.trustedContacts[payload.contactName]; // removing SD
+    if (payload.contactInfo.contactName === 'Secondary Device') {
+      delete trustedContacts.tc.trustedContacts[
+        payload.contactInfo.contactName
+      ]; // removing secondary device's TC
+      const accountNumber =
+        regularService.hdWallet.trustedContactToDA[
+          payload.contactInfo.contactName
+        ];
+      if (accountNumber) {
+        delete regularService.hdWallet.derivativeAccounts[TRUSTED_CONTACTS][
+          accountNumber
+        ].contactDetails; // removing previous SDs xpub
+      }
+    }
+
     yield call(s3Service.reshareMetaShare, payload.shareIndex);
     if (payload.previousGuardianName) {
       trustedContacts.tc.trustedContacts[
@@ -215,27 +238,28 @@ function* uploadEncMetaShareWorker({ payload }) {
   // );
 
   const res = yield call(
-    s3Service.uploadShare,
+    s3Service.prepareShareUploadables,
     payload.shareIndex,
-    payload.contactName,
+    payload.contactInfo.contactName,
   ); // contact injection (requires database insertion)
 
   if (res.status === 200) {
-    console.log('Uploaded share: ', payload.shareIndex);
-    const { otp, encryptedKey } = res.data;
-    console.log({ otp, encryptedKey });
+    const {
+      otp,
+      encryptedKey,
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
+    } = res.data;
 
-    // adding transfer details to he ephemeral data
-    const data: EphemeralData = {
-      ...payload.data,
-      shareTransferDetails: {
-        otp,
-        encryptedKey,
-      },
+    const shareUploadables: ShareUploadables = {
+      encryptedMetaShare,
+      messageId,
+      encryptedDynamicNonPMDD,
     };
-
     const updatedSERVICES = {
       ...SERVICES,
+      REGULAR_ACCOUNT: JSON.stringify(regularService),
       S3_SERVICE: JSON.stringify(s3Service),
       TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
     };
@@ -252,14 +276,60 @@ function* uploadEncMetaShareWorker({ payload }) {
       },
     };
 
-    yield call(insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup,
-        SERVICES: updatedSERVICES,
-      },
-    });
+    // yield call(insertDBWorker, {
+    //   payload: {
+    //     DECENTRALIZED_BACKUP: updatedBackup,
+    //     SERVICES: updatedSERVICES,
+    //   },
+    // });
 
-    yield put(updateEphemeralChannel(payload.contactName, data));
+    const updatedDB = {
+      DECENTRALIZED_BACKUP: updatedBackup,
+      SERVICES: updatedSERVICES,
+    };
+
+    const contact =
+      trustedContacts.tc.trustedContacts[payload.contactInfo.contactName];
+    if (contact && contact.symmetricKey) {
+      // has trusted channel
+      const data: TrustedDataElements = {
+        // won't include elements from payload.data
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+      yield put(
+        updateTrustedChannel(
+          payload.contactInfo,
+          data,
+          null,
+          shareUploadables,
+          updatedDB,
+        ),
+      );
+    } else {
+      // adding transfer details to he ephemeral data
+      const data: EphemeralDataElements = {
+        ...payload.data,
+        shareTransferDetails: {
+          otp,
+          encryptedKey,
+        },
+      };
+
+      yield put(
+        updateEphemeralChannel(
+          payload.contactInfo,
+          data,
+          null,
+          null,
+          null,
+          shareUploadables,
+          updatedDB,
+        ),
+      );
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(ErrorSending(true));
@@ -612,6 +682,17 @@ function* generatePersonalCopyWorker({ payload }) {
     //   if (!removed) console.log('Failed to remove sec-mne');
     // }
 
+    // remove secondary mnemonic (if the secondary menmonic has been removed and re-injected)
+    const blockPCShare = yield call(AsyncStorage.getItem, 'blockPCShare');
+    if (blockPCShare) {
+      if (secureAccount.secureHDWallet.secondaryMnemonic) {
+        const { removed } = secureAccount.removeSecondaryMnemonic();
+        if (!removed) {
+          console.log('Failed to remove the secondary mnemonic');
+        }
+      }
+    }
+
     const { SERVICES } = yield select((state) => state.storage.database);
     const updatedSERVICES = {
       ...SERVICES,
@@ -633,7 +714,7 @@ export const generatePersonalCopyWatcher = createWatcher(
 );
 
 function* sharePersonalCopyWorker({ payload }) {
-  const { shareVia, selectedPersonalCopy } = payload;
+  const { shareVia, selectedPersonalCopy, isEmailOtherOptions } = payload;
 
   try {
     let personalCopyDetails = yield call(
@@ -652,35 +733,59 @@ function* sharePersonalCopyWorker({ payload }) {
 
     switch (shareVia) {
       case 'Email':
-        yield call(
-          Mailer.mail,
-          {
-            subject: selectedPersonalCopy.title,
-            body: `<b>Please find attached the personal copy ${
-              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
-            } share pdf, it is password protected by the answer to the security question.</b>`,
-            isHTML: true,
-            attachment: {
-              path:
-                Platform.OS == 'android'
-                  ? 'file://' +
-                    personalCopyDetails[selectedPersonalCopy.type].path
-                  : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
-              type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-              name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+        if (!isEmailOtherOptions) {
+          yield call(
+            Mailer.mail,
+            {
+              subject: selectedPersonalCopy.title,
+              body: `<b>Please find attached the personal copy ${
+                selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+              } share pdf, it is password protected by the answer to the security question.</b>`,
+              isHTML: true,
+              attachment: {
+                path:
+                  Platform.OS == 'android'
+                    ? 'file://' +
+                      personalCopyDetails[selectedPersonalCopy.type].path
+                    : personalCopyDetails[selectedPersonalCopy.type].path, // The absolute path of the file from which to read data.
+                type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
+                name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
+              },
             },
-          },
-          (err, event) => {
-            console.log({ event, err });
-            // on delayed error (rollback the changes that happened post switch case)
-            setTimeout(() => {
-              AsyncStorage.setItem(
-                'personalCopyDetails',
-                JSON.stringify(personalCopyDetails),
-              );
-            }, 1000);
-          },
-        );
+            (err, event) => {
+              console.log({ event, err });
+              // on delayed error (rollback the changes that happened post switch case)
+              setTimeout(() => {
+                AsyncStorage.setItem(
+                  'personalCopyDetails',
+                  JSON.stringify(personalCopyDetails),
+                );
+              }, 1000);
+            },
+          );
+        } else {
+          let shareOptions = {
+            title: selectedPersonalCopy.title,
+            message: `Please find attached the personal copy ${
+              selectedPersonalCopy.type === 'copy1' ? '1' : '2'
+            } share pdf, it is password protected by the answer to the security question.`,
+            url:
+              Platform.OS == 'android'
+                ? 'file://' +
+                  personalCopyDetails[selectedPersonalCopy.type].path
+                : personalCopyDetails[selectedPersonalCopy.type].path,
+            type: 'application/pdf',
+            showAppsToView: true,
+            subject: selectedPersonalCopy.title,
+          };
+
+          try {
+            yield call(Share.open, shareOptions);
+          } catch (err) {
+            console.log({ err });
+            throw new Error(`Share failed: ${err}`);
+          }
+        }
         break;
 
       case 'Print':
@@ -842,84 +947,22 @@ export const updateMSharesHealthWatcher = createWatcher(
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  const regularService: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  // const preInstance = JSON.stringify(s3Service);
+  const preFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
   const res = yield call(s3Service.checkHealth);
-  // const postInstance = JSON.stringify(s3Service);
-  yield put(calculateOverallHealth(s3Service));
+  const postFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
+
   if (res.status === 200) {
-    // const { shareGuardianMapping } = res.data;
-    // const trustedContacts: TrustedContactsService = yield select(
-    //   (state) => state.trustedContacts.service,
-    // );
-    // let approvedAny = false;
-    // for (const index of Object.keys(shareGuardianMapping)) {
-    //   const { updatedAt, guardian } = shareGuardianMapping[index];
-    //   console.log({ updatedAt, guardian });
-    //   if (updatedAt > 0 && guardian) {
-    //     if (!trustedContacts.tc.trustedContacts[guardian].trustedChannel) {
-    //       const approveTC = true;
-    //       const res = yield call(
-    //         trustedContacts.fetchEphemeralChannel,
-    //         guardian,
-    //         approveTC,
-    //       );
-    //       if (res.status === 200) {
-    //         console.log('Trusted Channel create: ', guardian);
-    //         // generate a corresponding derivative acc and assign xpub
-    //         const res = yield call(
-    //           regularService.getDerivativeAccXpub,
-    //           TRUSTED_CONTACTS,
-    //           null,
-    //           guardian,
-    //         );
-    //         if (res.status === 200) {
-    //           const xpub = res.data;
-    //           // update the trusted channel with the xpub
-    //           const data: TrustedDataElements = {
-    //             xpub,
-    //           };
-    //           const updateRes = yield call(
-    //             trustedContacts.updateTrustedChannel,
-    //             guardian,
-    //             data,
-    //             true,
-    //           );
-    //           if (updateRes.status === 200) {
-    //             console.log('Xpub updated to trusted channel for: ', guardian);
-    //           } else {
-    //             console.log(
-    //               `Failed to update xpub to trusted channel for ${guardian}`,
-    //             );
-    //           }
-    //         } else {
-    //           console.log(`Failed to generate xpub for ${guardian}`);
-    //         }
-    //         approvedAny = true;
-    //       }
-    //     }
-    //   }
-    // }
-    // if (approvedAny) {
-    //   // yield delay(1000);
-    //   const { SERVICES } = yield select((state) => state.storage.database);
-    //   const updatedSERVICES = {
-    //     ...SERVICES,
-    //     REGULAR_ACCOUNT: JSON.stringify(regularService),
-    //     TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-    //   };
-    //   yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
-    // }
-    // if (preInstance !== postInstance) {
-    //   const { SERVICES } = yield select(state => state.storage.database);
-    //   const updatedSERVICES = {
-    //     ...SERVICES,
-    //     S3_SERVICE: JSON.stringify(s3Service),
-    //   };
-    //   yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-    // }
+    if (preFetchHealth !== postFetchHealth) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify(s3Service),
+      };
+      console.log('Health Check updated');
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+      yield put(calculateOverallHealth(s3Service));
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -1093,7 +1136,7 @@ function* overallHealthWorker({ payload }) {
   }
   shareStatus[3] = storedPDFHealth[3];
   shareStatus[4] = storedPDFHealth[4];
-
+  console.log({ shareStatus });
   const healthStatus = new HealthStatus();
   const overallHealth = yield call(
     healthStatus.appHealthStatus,
@@ -1101,6 +1144,7 @@ function* overallHealthWorker({ payload }) {
     shareStatus,
   );
 
+  console.log({ overallHealth });
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
@@ -1369,7 +1413,7 @@ function* recoverWalletWorker({ payload }) {
     });
 
     console.log({ mappedMetaShares });
-    let restorationShares = [];
+    let restorationShares: MetaShare[] = [];
     Object.keys(mappedMetaShares).forEach((walletId) => {
       if (mappedMetaShares[walletId].length >= 3)
         restorationShares = mappedMetaShares[walletId];
@@ -1442,6 +1486,7 @@ function* recoverWalletWorker({ payload }) {
       yield delay(2000); // seconds delay prior to Wallet Image check
       yield put(fetchWalletImage());
 
+      yield call(AsyncStorage.setItem, 'walletID', s3Service.sss.walletId);
       const current = Date.now();
       AsyncStorage.setItem('SecurityAnsTimestamp', JSON.stringify(current));
       const securityQuestionHistory = {
@@ -1451,6 +1496,23 @@ function* recoverWalletWorker({ payload }) {
         'securityQuestionHistory',
         JSON.stringify(securityQuestionHistory),
       );
+
+      // personal copy health restoration
+      let updatedPDFHealth = {};
+      for (const share of restorationShares) {
+        if (share.meta.index > 2) {
+          updatedPDFHealth[share.meta.index] = {
+            shareId: `placeHolderID${share.meta.index}`,
+            updatedAt: Date.now(),
+          };
+        }
+      }
+      if (Object.keys(updatedPDFHealth).length)
+        yield call(
+          AsyncStorage.setItem,
+          'PDF Health',
+          JSON.stringify(updatedPDFHealth),
+        );
     } else {
       throw new Error(res.err);
     }
@@ -1471,6 +1533,30 @@ export const recoverWalletWatcher = createWatcher(
 const sha256 = crypto.createHash('sha256');
 const hash = (element) => {
   return sha256.update(JSON.stringify(element)).digest('hex');
+};
+
+const asyncDataToBackup = async () => {
+  // ASYNC DATA to backup
+  // const FBTCAccount = select(
+  //   (state) => state.fbtc.FBTCAccountData,
+  // );
+  const [
+    [, TrustedContactsInfo],
+    [, personalCopyDetails],
+    [, FBTCAccount],
+  ] = await AsyncStorage.multiGet([
+    'TrustedContactsInfo',
+    'personalCopyDetails',
+    'FBTCAccount',
+  ]);
+  const ASYNC_DATA = {};
+  if (TrustedContactsInfo)
+    ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
+  if (personalCopyDetails)
+    ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
+  if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+
+  return ASYNC_DATA;
 };
 
 function* updateWalletImageWorker({ payload }) {
@@ -1500,12 +1586,8 @@ function* updateWalletImageWorker({ payload }) {
       hashesWI.SERVICES = currentSHash;
     }
 
-    const TrustedContactsInfo = yield call(
-      AsyncStorage.getItem,
-      'TrustedContactsInfo',
-    ); // use multiGet while fetching multiple items
-    if (TrustedContactsInfo) {
-      const ASYNC_DATA = { TrustedContactsInfo };
+    const ASYNC_DATA = yield call(asyncDataToBackup);
+    if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
         walletImage['ASYNC_DATA'] = ASYNC_DATA;
@@ -1523,13 +1605,8 @@ function* updateWalletImageWorker({ payload }) {
       SERVICES: hash(SERVICES),
     };
 
-    // ASYNC DATA to backup
-    const TrustedContactsInfo = yield call(
-      AsyncStorage.getItem,
-      'TrustedContactsInfo',
-    ); // use multiGet while fetching multiple items
-    if (TrustedContactsInfo) {
-      const ASYNC_DATA = { TrustedContactsInfo };
+    const ASYNC_DATA = yield call(asyncDataToBackup);
+    if (Object.keys(ASYNC_DATA).length) {
       walletImage['ASYNC_DATA'] = ASYNC_DATA;
       hashesWI['ASYNC_DATA'] = hash(ASYNC_DATA);
     }
@@ -1576,6 +1653,11 @@ function* fetchWalletImageWorker({ payload }) {
       for (const key of Object.keys(ASYNC_DATA)) {
         console.log('restoring to async: ', key);
         yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+
+        if (key === 'TrustedContactsInfo' && ASYNC_DATA[key]) {
+          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
+          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+        }
       }
     }
 

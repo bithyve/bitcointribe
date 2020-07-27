@@ -24,8 +24,11 @@ import Config from "react-native-config";
 import Octicons from 'react-native-vector-icons/Octicons';
 import DeviceInfo from 'react-native-device-info';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { useDispatch, useSelector } from 'react-redux';
+import { setReleaseCases } from '../store/actions/preferences';
 
 export default function UpdateApp(props) {
+  const dispatch = useDispatch();
 
   const releaseDataObj = props.navigation.state.params.releaseData
     ? props.navigation.state.params.releaseData
@@ -42,7 +45,9 @@ export default function UpdateApp(props) {
   const [isUpdateMandotary, setIsUpdateMandotary] = useState(false);
   const [releaseData, setReleaseData] = useState({});
   const [isUpdateInValid, setIsUpdateInValid] = useState(false);
-
+  const releaseCasesValue = useSelector(
+    (state) => state.preferences.releaseCasesValue,
+  );
   useEffect(() => {
     /**
      * Following if condition is for when this page is open from Home page Notification list
@@ -67,11 +72,13 @@ export default function UpdateApp(props) {
      */
     (async () => {
       if (!isOpenFromNotificationList) {
+        dispatch(setReleaseCases(null))
         await AsyncStorage.setItem('releaseCases', '');
         let releaseData;
-        let releaseDataOld = JSON.parse(
-          await AsyncStorage.getItem('releaseData'),
-        );
+        let releaseDataOld = releaseCasesValue; 
+        // JSON.parse(
+        //   await AsyncStorage.getItem('releaseData'),
+        // );
         console.log('releaseDataOld', releaseDataOld);
         if (releaseDataObj[0] && releaseDataObj[0].reminderLimit > 0) {
           if (!releaseDataOld) {
@@ -156,13 +163,15 @@ export default function UpdateApp(props) {
 
   const onClick = async (_ignoreClick, _remindMeLaterClick) => {
     let releaseCasesData;
-    let releaseCases = JSON.parse(await AsyncStorage.getItem('releaseCases'));
+    let releaseCases = releaseCasesValue;
+    //JSON.parse(await AsyncStorage.getItem('releaseCases'));
     console.log('releaseCases', releaseCases);
     releaseCasesData = {
         ...releaseData,
         ignoreClick: _ignoreClick,
         remindMeLaterClick: _remindMeLaterClick,
       };
+     dispatch(setReleaseCases(releaseCasesData)); 
     await AsyncStorage.setItem(
       'releaseCases',
       JSON.stringify(releaseCasesData),
@@ -318,6 +327,11 @@ export default function UpdateApp(props) {
                 }}
               >
                 <Text
+                onPress={() => {
+                  if(isOpenFromNotificationList) props.navigation.goBack();
+                  else
+                  onClick(false, true);
+                }}
                   style={{ ...styles.proceedButtonText, color: Colors.blue }}
                 >
                   Remind me Later

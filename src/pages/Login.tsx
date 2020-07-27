@@ -54,6 +54,10 @@ export default function Login(props) {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(
     React.createRef<BottomSheet>(),
   );
+  const releaseCasesValue = useSelector(
+    (state) => state.preferences.releaseCasesValue,
+  );
+  const [isDisabledProceed, setIsDisabledProceed] = useState(false);
   // const releases =[
   //       {
   //           "build": "40",
@@ -117,6 +121,12 @@ export default function Login(props) {
     },
     [passcode],
   );
+
+  useEffect(() => {
+    if (passcode.length == 4) {
+      setIsDisabledProceed(false);
+    }
+  }, [passcode]);
 
   const DECENTRALIZED_BACKUP = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
@@ -182,7 +192,7 @@ export default function Login(props) {
   const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     // HC init and down-streaming
-    if (s3Service) {
+    if (s3Service && s3Service.checkHealth) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
@@ -230,9 +240,10 @@ export default function Login(props) {
     RelayServices.fetchReleases(DeviceInfo.getBuildNumber())
       .then(async (res) => {
         console.log('Release note', res.data.releases);
-        let releaseCases = JSON.parse(
-          await AsyncStorage.getItem('releaseCases'),
-        );
+        let releaseCases = releaseCasesValue;
+        // JSON.parse(
+        //   await AsyncStorage.getItem('releaseCases'),
+        // );
         if (
           res.data.releases.length &&
           res.data.releases[0].build != DeviceInfo.getBuildNumber()
@@ -541,8 +552,12 @@ export default function Login(props) {
           {passcode.length == 4 ? (
             <View>
               <TouchableOpacity
-                disabled={passcode.length == 4 ? false : true}
+                disabled={isDisabledProceed}
                 onPress={() => {
+                  setTimeout(() => {
+                    setIsDisabledProceed(true);
+                    setElevation(0);
+                  }, 2);
                   loaderBottomSheet.current.snapTo(1);
                   setTimeout(() => {
                     setMessage('Hexa Test Account');
@@ -552,17 +567,15 @@ export default function Login(props) {
                     setSubTextMessage2(
                       'Best place to start if you are new to Bitcoin',
                     );
+                    dispatch(credsAuth(passcode));
                   }, 3000);
-                  setTimeout(() => {
-                    setElevation(0);
-                  }, 2);
-                  dispatch(credsAuth(passcode));
                 }}
                 style={{
                   ...styles.proceedButtonView,
                   elevation: Elevation,
-                  backgroundColor:
-                    passcode.length == 4 ? Colors.blue : Colors.lightBlue,
+                  backgroundColor: isDisabledProceed
+                    ? Colors.lightBlue
+                    : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>

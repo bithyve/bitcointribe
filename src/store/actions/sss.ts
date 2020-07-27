@@ -1,6 +1,9 @@
 // types and action creators: dispatched by components and sagas
 
-import { EphemeralData, WalletImage } from '../../bitcoin/utilities/Interface';
+import {
+  EphemeralDataElements,
+  WalletImage,
+} from '../../bitcoin/utilities/Interface';
 
 export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
 export const PREPARE_MSHARES = 'PREPARE_MSHARES';
@@ -27,6 +30,7 @@ export const ERROR_SENDING = 'ERROR_SENDING';
 export const ERROR_RECEIVING = 'ERROR_RECEIVING';
 
 export const initHealthCheck = () => {
+  // console.log("Called initHealthCheck", new Date())
   return { type: INIT_HEALTH_CHECK };
 };
 
@@ -36,8 +40,8 @@ export const prepareMShares = () => {
 
 export const uploadEncMShare = (
   shareIndex: number,
-  contactName: string,
-  data: EphemeralData,
+  contactInfo: { contactName: string; info: string },
+  data: EphemeralDataElements,
   changingGuardian?: boolean,
   previousGuardianName?: string,
 ) => {
@@ -45,7 +49,7 @@ export const uploadEncMShare = (
     type: UPLOAD_ENC_MSHARE,
     payload: {
       shareIndex,
-      contactName,
+      contactInfo,
       data,
       changingGuardian,
       previousGuardianName,
@@ -74,10 +78,11 @@ export const generatePersonalCopy = (selectedPersonalCopy) => {
 export const sharePersonalCopy = (
   shareVia: string,
   selectedPersonalCopy: { type: string; title: string },
+  isEmailOtherOptions,
 ) => {
   return {
     type: SHARE_PERSONAL_COPY,
-    payload: { shareVia, selectedPersonalCopy },
+    payload: { shareVia, selectedPersonalCopy, isEmailOtherOptions },
   };
 };
 
@@ -163,6 +168,7 @@ export const mnemonicRecovered = (mnemonic) => {
 };
 
 export const switchS3Loader = (beingLoaded) => {
+  // console.log("Called s3 Loading", new Date())
   return { type: S3_LOADING, payload: { beingLoaded } };
 };
 

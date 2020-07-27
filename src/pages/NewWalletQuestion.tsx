@@ -92,16 +92,16 @@ export default function NewWalletQuestion(props) {
   useEffect(() => {
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
     const secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
+      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+        .unconfirmedBalance
       : 0;
     const accumulativeBalance = regularBalance + secureBalance;
 
@@ -110,12 +110,12 @@ export default function NewWalletQuestion(props) {
       : [];
     const regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
+        .transactionDetails
       : [];
     const accumulativeTransactions = [
       ...testTransactions,
@@ -221,13 +221,13 @@ export default function NewWalletQuestion(props) {
 
   useEffect(() => {
     if (
-      isInitialized &&
-      exchangeRates &&
-      balances.testBalance &&
-      transactions.length > 0
+      isInitialized
+      // exchangeRates &&
+      // balances.testBalance &&
+      // transactions.length > 0
     ) {
       (loaderBottomSheet as any).current.snapTo(0);
-      dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
+      // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
       props.navigation.navigate('HomeNav');
     }
   }, [isInitialized, exchangeRates, balances, transactions]);
@@ -383,7 +383,7 @@ export default function NewWalletQuestion(props) {
                 firstLineTitle={'New Hexa Wallet'}
                 secondLineTitle={''}
                 infoTextNormal={'Setup '}
-                infoTextBold={'Security Question and answer'}
+                infoTextBold={'Security Question and Answer'}
                 infoTextNormal1={'\n(you need to remember this)'}
               />
 
@@ -493,7 +493,6 @@ export default function NewWalletQuestion(props) {
                         text = text.replace(/[^a-z]/g, '');
                         setAnswer(text);
                         setAnswerMasked(text);
-                        
                       }}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
@@ -501,7 +500,6 @@ export default function NewWalletQuestion(props) {
                         if (answer.length > 0) {
                           setAnswer('');
                           setAnswerMasked('');
-                          
                         }
                       }}
                       onBlur={() => {
@@ -534,20 +532,20 @@ export default function NewWalletQuestion(props) {
                         }
                       }}
                     />
-                    {answer ? 
-                    <TouchableWithoutFeedback
-                      onPress={() => {
-                        setHdeShowAnswer(!hideShowAnswer);
-                      }}
-                    >
-                      <Feather
-                        style={{ marginLeft: 'auto', padding: 10 }}
-                        size={15}
-                        color={Colors.blue}
-                        name={hideShowAnswer ? 'eye-off' : 'eye'}
-                      />
-                    </TouchableWithoutFeedback> 
-                     : null}
+                    {answer ?
+                      <TouchableWithoutFeedback
+                        onPress={() => {
+                          setHdeShowAnswer(!hideShowAnswer);
+                        }}
+                      >
+                        <Feather
+                          style={{ marginLeft: 'auto', padding: 10 }}
+                          size={15}
+                          color={Colors.blue}
+                          name={hideShowAnswer ? 'eye-off' : 'eye'}
+                        />
+                      </TouchableWithoutFeedback>
+                      : null}
                   </View>
                   <View
                     style={{
@@ -610,26 +608,26 @@ export default function NewWalletQuestion(props) {
                         setConfirm();
                       }}
                     />
-                    {confirmAnswer ? 
-                    <TouchableWithoutFeedback
-                      onPress={() => {
-                        setHideShowConfirmAnswer(!hideShowConfirmAnswer);
-                        setDropdownBoxOpenClose(false);
-                      }}
-                    >
-                      <Feather
-                        style={{ marginLeft: 'auto', padding: 10 }}
-                        size={15}
-                        color={Colors.blue}
-                        name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
-                      />
-                    </TouchableWithoutFeedback>
-                     : null }
+                    {confirmAnswer ?
+                      <TouchableWithoutFeedback
+                        onPress={() => {
+                          setHideShowConfirmAnswer(!hideShowConfirmAnswer);
+                          setDropdownBoxOpenClose(false);
+                        }}
+                      >
+                        <Feather
+                          style={{ marginLeft: 'auto', padding: 10 }}
+                          size={15}
+                          color={Colors.blue}
+                          name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
+                        />
+                      </TouchableWithoutFeedback>
+                      : null}
                   </View>
                 </View>
               ) : (
-                <View style={{ marginTop: 15 }} />
-              )}
+                  <View style={{ marginTop: 15 }} />
+                )}
               <View
                 style={{
                   marginLeft: 20,
@@ -653,13 +651,13 @@ export default function NewWalletQuestion(props) {
         </ScrollView>
         <View style={{ ...styles.bottomButtonView }}>
           {answer.trim() == confirmAnswer.trim() &&
-          confirmAnswer.trim() &&
-          answer.trim()
+            confirmAnswer.trim() &&
+            answer.trim()
             ? setButtonVisible()
             : null}
           <View style={styles.statusIndicatorView}>
-          <View style={styles.statusIndicatorInactiveView} />
-          <View style={styles.statusIndicatorActiveView} />
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorActiveView} />
           </View>
         </View>
         {!visibleButton ? (
@@ -677,7 +675,7 @@ export default function NewWalletQuestion(props) {
           </View>
         ) : null}
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

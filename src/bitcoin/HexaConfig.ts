@@ -32,6 +32,10 @@ class HexaConfig {
     keyLength: parseInt(Config.BIT_CIPHER_KEYLENGTH.trim(), 10),
     iv: Buffer.alloc(16, 0),
   };
+  public KEY_STRECH_ITERATIONS = parseInt(
+    Config.BIT_KEY_STRECH_ITERATIONS.trim(),
+    10,
+  );
   public BH_SERVERS = {
     RELAY: Config.BIT_API_URLS_RELAY.trim(),
     SIGNING_SERVER: Config.BIT_API_URLS_SIGNING_SERVER.trim(),
@@ -87,6 +91,10 @@ class HexaConfig {
     },
   };
 
+  public LEGACY_TC_REQUEST_EXPIRY = parseInt(
+    Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(),
+    10,
+  );
   public TC_REQUEST_EXPIRY = parseInt(Config.BIT_TC_REQUEST_EXPIRY.trim(), 10);
 
   public ESPLORA_API_ENDPOINTS = {
@@ -95,6 +103,7 @@ class HexaConfig {
       MULTIUTXO: Config.BIT_ESPLORA_TESTNET_MULTIUTXO.trim(),
       MULTITXN: Config.BIT_ESPLORA_TESTNET_MULTITXN.trim(),
       MULTIBALANCETXN: Config.BIT_ESPLORA_TESTNET_MULTIBALANCETXN.trim(),
+      MULTIUTXOTXN: Config.BIT_ESPLORA_TESTNET_MULTIUTXOTXN.trim(),
       TXN_FEE: Config.BIT_ESPLORA_TESTNET_TXNFEE.trim(),
       TXNDETAILS: Config.BIT_ESPLORA_TESTNET_TXNDETAILS.trim(),
       BROADCAST_TX: Config.BIT_ESPLORA_TESTNET_BROADCAST_TX.trim(),
@@ -104,6 +113,7 @@ class HexaConfig {
       MULTIUTXO: Config.BIT_ESPLORA_MAINNET_MULTIUTXO.trim(),
       MULTITXN: Config.BIT_ESPLORA_MAINNET_MULTITXN.trim(),
       MULTIBALANCETXN: Config.BIT_ESPLORA_MAINNET_MULTIBALANCETXN.trim(),
+      MULTIUTXOTXN: Config.BIT_ESPLORA_MAINNET_MULTIUTXOTXN.trim(),
       TXN_FEE: Config.BIT_ESPLORA_MAINNET_TXNFEE.trim(),
       TXNDETAILS: Config.BIT_ESPLORA_MAINNET_TXNDETAILS.trim(),
       BROADCAST_TX: Config.BIT_ESPLORA_MAINNET_BROADCAST_TX.trim(),

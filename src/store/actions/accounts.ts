@@ -1,5 +1,5 @@
 // types and action creators: dispatched by components and sagas
-export const FETCH_ADDR = 'FETCH_ADDR';
+// export const FETCH_ADDR = 'FETCH_ADDR';
 export const FETCH_BALANCE = 'FETCH_BALANCE';
 export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS';
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX';
@@ -23,14 +23,15 @@ export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB';
 export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS';
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX';
-
-export const fetchAddress = (serviceType) => {
-  return { type: FETCH_ADDR, payload: { serviceType } };
-};
+export const REMOVE_TWO_FA = 'REMOVE_TWO_FA';
+export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE';
+// export const fetchAddress = (serviceType) => {
+//   return { type: FETCH_ADDR, payload: { serviceType } };
+// };
 
 export const fetchBalance = (
   serviceType,
-  options?: { loader?; fetchTransactionsSync?; restore? },
+  options?: { loader?; fetchTransactionsSync?; restore?},
 ) => {
   return { type: FETCH_BALANCE, payload: { serviceType, options } };
 };
@@ -80,6 +81,7 @@ export const transferST3 = (serviceType, token) => {
 
 export const getTestcoins = (serviceType) => {
   // Test account specific
+  // console.log("Called getTestcoins", new Date())
   return { type: GET_TESTCOINS, payload: { serviceType } };
 };
 
@@ -97,8 +99,8 @@ export const removeTransferDetails = (serviceType, recipientData) => {
   };
 };
 
-export const clearTransfer = (serviceType) => {
-  return { type: CLEAR_TRANSFER, payload: { serviceType } };
+export const clearTransfer = (serviceType, stage?) => {
+  return { type: CLEAR_TRANSFER, payload: { serviceType, stage } };
 };
 
 export const accumulativeBalAndTx = () => {
@@ -120,6 +122,11 @@ export const syncDerivativeAccounts = (serviceTypes: string[]) => {
   };
 };
 
+export const removeTwoFA = () => {
+  return {
+    type: REMOVE_TWO_FA,
+  };
+};
 export const calculateExchangeRate = () => {
   return { type: EXCHANGE_RATE };
 };
@@ -171,6 +178,13 @@ export const fetchDerivativeAccBalTx = (
   };
 };
 
+export const setAverageTxFee = (data) => {
+  return {
+    type: AVERAGE_TX_FEE,
+    payload: { averageTxFees: data },
+  };
+};
+
 // types and action creators (saga): dispatched by saga workers
 export const ADDR_FETCHED = 'ADDR_FETCHED';
 export const BALANCE_FETCHED = 'BALANCE_FETCHED';
@@ -191,6 +205,7 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED';
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED';
 
 export const testcoinsReceived = (serviceType, service) => {
+  // console.log("Called testcoinsReceived", new Date())
   return { type: TESTCOINS_RECEIVED, payload: { serviceType, service } };
 };
 
@@ -210,8 +225,8 @@ export const executedST1 = (serviceType, result) => {
   return { type: TRANSFER_ST1_EXECUTED, payload: { serviceType, result } };
 };
 
-export const failedST1 = (serviceType) => {
-  return { type: TRANSFER_ST1_FAILED, payload: { serviceType } };
+export const failedST1 = (serviceType, errorDetails) => {
+  return { type: TRANSFER_ST1_FAILED, payload: { serviceType, errorDetails } };
 };
 
 export const executedST2 = (serviceType, result) => {

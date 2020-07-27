@@ -19,7 +19,7 @@ import {
 } from 'react-native-responsive-screen';
 import { nameToInitials } from '../../common/CommonFunctions';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { EphemeralData } from '../../bitcoin/utilities/Interface';
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
 import config from '../../bitcoin/HexaConfig';
 import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
@@ -47,11 +47,11 @@ export default function SendShareModal(props) {
       <View style={{ height: '100%' }}>
         <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
           <Text style={styles.commModeModalHeaderText}>
-            Send Recovery Key{'\n'}with contact
+            Send Recovery Key{'\n'}to contact
           </Text>
           <Text style={styles.commModeModalInfoText}>
-            Send Key to Keeper, you can change your Keeper,
-            or their primary mode of contact
+            Send Key to Keeper, you can change your Keeper, or their primary
+            mode of contact
           </Text>
         </View>
         <View style={styles.contactProfileView}>
@@ -212,7 +212,7 @@ export default function SendShareModal(props) {
                 style={styles.buttonImage}
               />
             )}
-            <Text style={styles.buttonText}>Via Link</Text>
+            <Text style={styles.buttonText}>Share</Text>
           </AppBottomSheetTouchableWrapper>
           <View
             style={{ width: 1, height: 30, backgroundColor: Colors.white }}
@@ -231,7 +231,7 @@ export default function SendShareModal(props) {
               />
             )}
 
-            <Text style={styles.buttonText}>Via QR</Text>
+            <Text style={styles.buttonText}>QR</Text>
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
