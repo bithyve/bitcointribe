@@ -830,10 +830,15 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     else return 'Savings Account';
   };
 
+  getAverageTxFees = () => {
+    const averageTxFees = idx(this.props.averageTxFees, (_) => _[this.state.serviceType].averageTxFees);
+    return averageTxFees;
+  }
+
   render() {
     const {
       serviceType,
-      averageTxFees,
+      // averageTxFees,
       netBalance,
       carouselInitIndex,
       showLoader,
@@ -849,6 +854,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       spendableBalance,
     } = this.state;
     const { navigation, exchangeRates, accounts } = this.props;
+    const averageTxFees = this.getAverageTxFees();
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
         <SafeAreaView style={{ flex: 0 }} />
@@ -1244,14 +1250,30 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
-                        Tran Fee :
-                        {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
-                        {/* ({serviceType === TEST_ACCOUNT ? 't-sats' : 'sats'}) */}
+                        Tran Fee :{' '}
+                        ({switchOn || serviceType === TEST_ACCOUNT
+                          ? (averageTxFees
+                              ? averageTxFees['medium'].averageTxFee
+                              : 0) +
+                            ' ' +
+                            (serviceType === TEST_ACCOUNT ? 't-sats' : 'sats')
+                          : exchangeRates
+                          ? (
+                              ((averageTxFees
+                                ? averageTxFees['medium'].averageTxFee
+                                : 0) /
+                                1e8) *
+                              exchangeRates[CurrencyCode].last
+                            ).toFixed(2) +
+                            ' ' +
+                            CurrencyCode.toLocaleLowerCase()
+                          : null})
+                        {/* {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
                         ({serviceType == TEST_ACCOUNT
                           ? 't-sats'
                           : switchOn
                             ? 'sats'
-                            : CurrencyCode.toLocaleLowerCase()})
+                            : CurrencyCode.toLocaleLowerCase()}) */}
                       </Text>
                     </View>
                   </TouchableOpacity>
