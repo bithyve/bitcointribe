@@ -49,6 +49,7 @@ import {
   uploadRequestedShare,
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
+import { updateAddressBookLocally } from '../store/actions/trustedContacts'
 
 import {
   approveTrustedContact,
@@ -785,6 +786,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }, 2000);
   };
+
+
+
+  
 
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
@@ -3137,7 +3142,8 @@ export default withNavigationFocus(
     setCurrencyToggleValue,
     updatePreference,
     setFCMToken,
-    setSecondaryDeviceAddress
+    setSecondaryDeviceAddress,
+    updateAddressBookLocally
   })(HomeUpdated),
 );
 
