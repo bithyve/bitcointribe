@@ -81,10 +81,10 @@ const ContactsListForAssociateContact = (props) => {
       postAssociation(contacts[0]);
       props.navigation.navigate('Home');
     }
-    // await AsyncStorage.setItem(
-    //   'TrustedContactsInfo',
-    //   JSON.stringify(trustedContactsInfo),
-    // );
+    await AsyncStorage.setItem(
+      'TrustedContactsInfo',
+      JSON.stringify(trustedContactsInfo),
+    );
     dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 

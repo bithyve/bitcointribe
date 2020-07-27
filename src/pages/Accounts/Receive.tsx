@@ -49,7 +49,10 @@ import {
 import BackupStyles from '../ManageBackup/Styles';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { updateEphemeralChannel, updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts';
+import {
+  updateEphemeralChannel,
+  updateTrustedContactInfoLocally,
+} from '../../store/actions/trustedContacts';
 import {
   EphemeralDataElements,
   TrustedContactDerivativeAccount,
@@ -177,7 +180,7 @@ export default function Receive(props) {
     }
     const contactName = `${selectedContact.firstName} ${
       selectedContact.lastName ? selectedContact.lastName : ''
-      }`
+    }`
       .toLowerCase()
       .trim();
     const trustedContact = trustedContacts.tc.trustedContacts[contactName];
@@ -289,7 +292,9 @@ export default function Receive(props) {
   ]);
 
   const updateTrustedContactsInfo = async (contact) => {
-    let { trustedContactsInfo } = useSelector((state) => state.trustedContacts.trustedContacts)
+    let { trustedContactsInfo } = useSelector(
+      (state) => state.trustedContacts.trustedContacts,
+    );
     if (trustedContactsInfo) {
       if (
         trustedContactsInfo.findIndex((trustedContact) => {
@@ -297,13 +302,13 @@ export default function Receive(props) {
 
           const presentContactName = `${trustedContact.firstName} ${
             trustedContact.lastName ? trustedContact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
 
           const selectedContactName = `${contact.firstName} ${
             contact.lastName ? contact.lastName : ''
-            }`
+          }`
             .toLowerCase()
             .trim();
 
@@ -323,7 +328,7 @@ export default function Receive(props) {
       'TrustedContactsInfo',
       JSON.stringify(trustedContactsInfo),
     );
-    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo))
+    dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
   };
 
   const createTrustedContact = useCallback(async () => {
@@ -332,7 +337,7 @@ export default function Receive(props) {
     if (selectedContact && selectedContact.firstName) {
       const contactName = `${selectedContact.firstName} ${
         selectedContact.lastName ? selectedContact.lastName : ''
-        }`
+      }`
         .toLowerCase()
         .trim();
 
@@ -420,7 +425,7 @@ export default function Receive(props) {
         trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
+          config.TC_REQUEST_EXPIRY
       ) {
         // re-initiating expired EC
 
@@ -509,9 +514,9 @@ export default function Receive(props) {
   const renderAddContactAddressBookHeader = () => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (AddContactAddressBookBookBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   };
@@ -585,10 +590,10 @@ export default function Receive(props) {
   const renderSendViaLinkHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaLinkBottomSheet.current)
-        //     (SendViaLinkBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaLinkBottomSheet.current)
+      //     (SendViaLinkBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -621,10 +626,10 @@ export default function Receive(props) {
   const renderSendViaQRHeader = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   if (SendViaQRBottomSheet.current)
-        //     (SendViaQRBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -649,11 +654,12 @@ export default function Receive(props) {
       //     }
       //   }}
       // />
-      <ReceiveHelpContents 
-      titleClicked={()=>{
-        if (ReceiveHelperBottomSheet.current)
-              (ReceiveHelperBottomSheet as any).current.snapTo(0);
-      }}/>
+      <ReceiveHelpContents
+        titleClicked={() => {
+          if (ReceiveHelperBottomSheet.current)
+            (ReceiveHelperBottomSheet as any).current.snapTo(0);
+        }}
+      />
     );
   }, [serviceType]);
 
@@ -744,8 +750,8 @@ export default function Receive(props) {
                     serviceType == TEST_ACCOUNT
                       ? require('../../assets/images/icons/icon_test.png')
                       : serviceType == REGULAR_ACCOUNT
-                        ? require('../../assets/images/icons/icon_regular.png')
-                        : require('../../assets/images/icons/icon_secureaccount.png')
+                      ? require('../../assets/images/icons/icon_regular.png')
+                      : require('../../assets/images/icons/icon_secureaccount.png')
                   }
                   style={{ width: wp('10%'), height: wp('10%') }}
                 />
@@ -761,8 +767,8 @@ export default function Receive(props) {
                     {serviceType == TEST_ACCOUNT
                       ? 'Test Account'
                       : serviceType == REGULAR_ACCOUNT
-                        ? 'Checking Account'
-                        : 'Savings Account'}
+                      ? 'Checking Account'
+                      : 'Savings Account'}
                   </Text>
                 </View>
                 {serviceType == TEST_ACCOUNT ? (
@@ -894,48 +900,48 @@ export default function Receive(props) {
                             />
                           </View>
                         ) : (
-                            <View
+                          <View
+                            style={{
+                              marginLeft: 15,
+                              marginRight: 15,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: Colors.backgroundColor,
+                              width: 70,
+                              height: 70,
+                              borderRadius: 70 / 2,
+                              shadowColor: Colors.shadowBlue,
+                              shadowOpacity: 1,
+                              shadowOffset: { width: 2, height: 2 },
+                            }}
+                          >
+                            <Text
                               style={{
-                                marginLeft: 15,
-                                marginRight: 15,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: Colors.backgroundColor,
-                                width: 70,
-                                height: 70,
-                                borderRadius: 70 / 2,
-                                shadowColor: Colors.shadowBlue,
-                                shadowOpacity: 1,
-                                shadowOffset: { width: 2, height: 2 },
+                                textAlign: 'center',
+                                fontSize: RFValue(20),
+                                lineHeight: RFValue(20), //... One for top and one for bottom alignment
                               }}
                             >
-                              <Text
-                                style={{
-                                  textAlign: 'center',
-                                  fontSize: RFValue(20),
-                                  lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                                }}
-                              >
-                                {nameToInitials(
-                                  selectedContact &&
+                              {nameToInitials(
+                                selectedContact &&
+                                  selectedContact.firstName &&
+                                  selectedContact.lastName
+                                  ? selectedContact.firstName +
+                                      ' ' +
+                                      selectedContact.lastName
+                                  : selectedContact &&
                                     selectedContact.firstName &&
+                                    !selectedContact.lastName
+                                  ? selectedContact.firstName
+                                  : selectedContact &&
+                                    !selectedContact.firstName &&
                                     selectedContact.lastName
-                                    ? selectedContact.firstName +
-                                    ' ' +
-                                    selectedContact.lastName
-                                    : selectedContact &&
-                                      selectedContact.firstName &&
-                                      !selectedContact.lastName
-                                      ? selectedContact.firstName
-                                      : selectedContact &&
-                                        !selectedContact.firstName &&
-                                        selectedContact.lastName
-                                        ? selectedContact.lastName
-                                        : '',
-                                )}
-                              </Text>
-                            </View>
-                          )}
+                                  ? selectedContact.lastName
+                                  : '',
+                              )}
+                            </Text>
+                          </View>
+                        )}
                         <View>
                           <Text
                             style={{
@@ -951,52 +957,52 @@ export default function Receive(props) {
                           </Text>
                           <Text style={styles.contactNameText}>
                             {selectedContact &&
-                              selectedContact.firstName &&
-                              selectedContact.lastName
+                            selectedContact.firstName &&
+                            selectedContact.lastName
                               ? selectedContact.firstName +
-                              ' ' +
-                              selectedContact.lastName
+                                ' ' +
+                                selectedContact.lastName
                               : selectedContact &&
                                 selectedContact.firstName &&
                                 !selectedContact.lastName
-                                ? selectedContact.firstName
-                                : selectedContact &&
-                                  !selectedContact.firstName &&
-                                  selectedContact.lastName
-                                  ? selectedContact.lastName
-                                  : ''}
+                              ? selectedContact.firstName
+                              : selectedContact &&
+                                !selectedContact.firstName &&
+                                selectedContact.lastName
+                              ? selectedContact.lastName
+                              : ''}
                           </Text>
                           {selectedContact &&
-                            selectedContact.phoneNumbers &&
-                            selectedContact.phoneNumbers.length ? (
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue(10),
-                                  marginLeft: 5,
-                                  paddingTop: 3,
-                                }}
-                              >
-                                {selectedContact.phoneNumbers[0].digits}
-                              </Text>
-                            ) : selectedContact &&
-                              selectedContact.emails &&
-                              selectedContact.emails.length ? (
-                                <Text
-                                  style={{
-                                    color: Colors.textColorGrey,
-                                    fontFamily: Fonts.FiraSansRegular,
-                                    fontSize: RFValue(10),
-                                    marginLeft: 5,
-                                    paddingTop: 3,
-                                    paddingBottom: 5,
-                                  }}
-                                >
-                                  {selectedContact &&
-                                    selectedContact.emails[0].email}
-                                </Text>
-                              ) : null}
+                          selectedContact.phoneNumbers &&
+                          selectedContact.phoneNumbers.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 5,
+                                paddingTop: 3,
+                              }}
+                            >
+                              {selectedContact.phoneNumbers[0].digits}
+                            </Text>
+                          ) : selectedContact &&
+                            selectedContact.emails &&
+                            selectedContact.emails.length ? (
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue(10),
+                                marginLeft: 5,
+                                paddingTop: 3,
+                                paddingBottom: 5,
+                              }}
+                            >
+                              {selectedContact &&
+                                selectedContact.emails[0].email}
+                            </Text>
+                          ) : null}
                         </View>
                       </View>
                     </View>

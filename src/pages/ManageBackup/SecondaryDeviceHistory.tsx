@@ -183,10 +183,10 @@ const SecondaryDeviceHistory = (props) => {
         trustedContactsInfo[2] = undefined; // securing initial 3 positions for Guardians
         trustedContactsInfo[0] = contact;
       }
-      // await AsyncStorage.setItem(
-      //   'TrustedContactsInfo',
-      //   JSON.stringify(trustedContactsInfo),
-      // );
+      await AsyncStorage.setItem(
+        'TrustedContactsInfo',
+        JSON.stringify(trustedContactsInfo),
+      );
       dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
     [trustedContactsInfo],
