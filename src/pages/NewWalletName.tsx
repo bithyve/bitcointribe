@@ -70,7 +70,7 @@ export default function NewWalletName(props) {
               keyboardType={
                 Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
               }
-              maxLength={20}
+              maxLength={10}
               onChangeText={(text) => {
                 text = text.replace(/[^A-Za-z]/g, '');
                 setWalletName(text);

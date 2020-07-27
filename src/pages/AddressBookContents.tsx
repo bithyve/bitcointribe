@@ -48,6 +48,7 @@ import AddressBookHelpContents from '../components/Helper/AddressBookHelpContent
 // import CountDown from 'react-native-countdown-component';
 import CountDown from '../components/CountDown';
 import Config from '../bitcoin/HexaConfig';
+import { ContactTypes } from 'expo-contacts';
 
 interface AddressBookContentsPropTypes {
   navigation: any;
@@ -401,6 +402,7 @@ class AddressBookContents extends PureComponent<
           ) : null}
         </View>
         <View style={styles.getImageView}>
+        {contactsType !== "I'm Keeper of" ? <View>
           {!(contact.hasXpub || contact.hasTrustedAddress) &&
             (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
             !contact.hasTrustedChannel ? (
@@ -450,7 +452,9 @@ class AddressBookContents extends PureComponent<
                 showSeparator
               />
             ))}
-          <View style={styles.xpubIconView}>
+          
+        </View> : null}
+        <View style={styles.xpubIconView}>
             <Ionicons
               name="ios-arrow-forward"
               color={Colors.borderColor}
@@ -461,7 +465,7 @@ class AddressBookContents extends PureComponent<
               }}
             />
           </View>
-        </View>
+          </View>
       </TouchableOpacity>
     );
   };
