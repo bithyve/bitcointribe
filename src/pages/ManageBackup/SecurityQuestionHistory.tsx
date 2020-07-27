@@ -107,7 +107,7 @@ const SecurityQuestionHistory = props => {
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
         info={'Question Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answer'}
+        note={'If need be, Hexa will help you\nremember the answer'}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
         onPressProceed={() => {
@@ -115,6 +115,7 @@ const SecurityQuestionHistory = props => {
           dispatch(checkMSharesHealth());
           props.navigation.goBack();
         }}
+        bottomImage={require('../../assets/images/icons/sendSuccess.png')}
         isBottomImage={true}
       />
     );
