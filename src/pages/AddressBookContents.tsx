@@ -173,7 +173,7 @@ class AddressBookContents extends PureComponent<
   updateAddressBook = async () => {
     const { regularAccount, trustedContactsService } = this.props;
     let { trustedContactsInfo } = this.props;
-    if (trustedContactsInfo) {
+    if (!trustedContactsInfo) {
       let TrustedContactsInfo = await AsyncStorage.getItem("TrustedContactsInfo")
       trustedContactsInfo = JSON.stringify(JSON.parse(TrustedContactsInfo))
     }

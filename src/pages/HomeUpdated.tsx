@@ -789,7 +789,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
 
 
-  
+
 
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
@@ -1256,7 +1256,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode, currencyToggleValue } = this.props;
     let currencyCodeTmp = currencyCode;
-    //await AsyncStorage.getItem('currencyCode');
+    if (!currencyCodeTmp) {
+      currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    }
     if (!currencyCodeTmp) {
       this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
       //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
@@ -1269,10 +1271,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }
     let currencyToggleValueTmp = currencyToggleValue;
-    // await AsyncStorage.getItem(
-    //   'currencyToggleValue',
-    // );
-
+    if (!currencyToggleValueTmp) {
+      currencyToggleValueTmp = await AsyncStorage.getItem(
+        'currencyToggleValue',
+      );
+    }
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
     });
@@ -1308,7 +1311,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
     let fcmTokenFromAsync = this.props.fcmTokenValue;
-    //await AsyncStorage.getItem('fcmToken');
     if (fcmTokenFromAsync && fcmTokenFromAsync != fcmToken) {
       this.props.setFCMToken(fcmToken);
       //TODO: Remove setItem 
