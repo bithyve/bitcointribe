@@ -49,6 +49,9 @@ import {
 } from '../../store/actions/trustedContacts';
 import idx from 'idx';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
+import moment from 'moment';
+
 interface ManageBackupStateTypes {
   levelData: any;
   selectedId: any;
@@ -128,12 +131,19 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = () => {
-    (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+    
   };
 
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
+  };
+
+  getTime = (item) => {
+    return (item.toString() && item.toString() == '0') ||
+      item.toString() == 'never'
+      ? 'never'
+      : timeFormatter(moment(new Date()), item);
   };
 
   render() {
@@ -364,7 +374,7 @@ class ManageBackup extends Component<
                                   fontSize: RFValue(11),
                                 }}
                               >
-                                App Backup
+                                Add Backup
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -375,6 +385,10 @@ class ManageBackup extends Component<
                                 borderWidth: 0.5,
                                 marginLeft: 'auto',
                               }}
+                              onPress={()=> navigation.navigate('SecurityQuestionHistoryKeeper',{
+                                selectedTime: this.getTime(new Date()),
+                                selectedStatus: 'Ugly',
+                              })}
                             >
                               <ImageBackground
                                 source={require('../../assets/images/icons/questionMark.png')}
@@ -420,6 +434,9 @@ class ManageBackup extends Component<
                                 borderColor: Colors.red,
                                 borderWidth: 0.5,
                               }}
+                              onPress={()=>{
+                                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                              }}
                             >
                               <View
                                 style={{
@@ -441,7 +458,7 @@ class ManageBackup extends Component<
                               >
                                 {value.isSetupDone
                                   ? value.keeper1Name
-                                  : 'App Keeper'}
+                                  : 'Add Keeper'}
                               </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -456,6 +473,9 @@ class ManageBackup extends Component<
                                 borderColor: Colors.red,
                                 borderWidth: 0.5,
                                 marginLeft: wp('4%'),
+                              }}
+                              onPress={()=>{
+                                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
                               }}
                             >
                               <View
@@ -478,7 +498,7 @@ class ManageBackup extends Component<
                               >
                                 {value.isSetupDone && value.keeper2Done
                                   ? value.keeper2Name
-                                  : 'App Keeper'}
+                                  : 'Add Keeper'}
                               </Text>
                             </TouchableOpacity>
                           </View>
