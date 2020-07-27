@@ -209,7 +209,8 @@ const TrustedContactHistory = (props) => {
 
       if (index == 1 && selectedContacts[0]) {
         setChosenContact(selectedContacts[0]);
-      } else if (index == 2 && selectedContacts[1]) {
+      }
+      if (index == 2 && selectedContacts[1]) {
         setChosenContact(selectedContacts[1]);
       }
     }
@@ -798,6 +799,7 @@ const TrustedContactHistory = (props) => {
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
       if (trustedContactsInfo) {
+        console.log({ trustedContactsInfo });
         if (trustedContactsInfo[index]) {
           let found = false;
           for (let i = 3; i < trustedContactsInfo.length; i++) {
@@ -814,6 +816,8 @@ const TrustedContactHistory = (props) => {
           if (!found) trustedContactsInfo.push(trustedContactsInfo[index]);
         }
 
+        console.log({ trustedContactsInfo });
+
         for (let i = 0; i < trustedContactsInfo.length; i++) {
           if (
             trustedContactsInfo[i] &&
@@ -823,6 +827,8 @@ const TrustedContactHistory = (props) => {
             break;
           }
         }
+        console.log({ trustedContactsInfo });
+
         trustedContactsInfo[index] = contact;
       } else {
         trustedContactsInfo = [];
@@ -835,9 +841,11 @@ const TrustedContactHistory = (props) => {
       //   'TrustedContactsInfo',
       //   JSON.stringify(trustedContactsInfo),
       // );
+      console.log({ trustedContactsInfo });
+
       dispatch(updateTrustedContactInfoLocally(trustedContactsInfo));
     },
-    [index],
+    [index, trustedContactsInfo],
   );
 
   const createGuardian = useCallback(async () => {
@@ -909,12 +917,9 @@ const TrustedContactHistory = (props) => {
         setTrustedLink('');
         setTrustedQR('');
         // remove the previous TC
-        let { trustedContactsInfo } = useSelector(
-          (state) => state.trustedContacts.trustedContacts,
-        );
+
         let previousGuardianName;
         if (trustedContactsInfo) {
-          trustedContactsInfo = JSON.parse(trustedContactsInfo);
           const previousGuardian = trustedContactsInfo[index];
           if (previousGuardian) {
             previousGuardianName = `${previousGuardian.firstName} ${
