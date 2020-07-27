@@ -136,6 +136,7 @@ const TrustedContactHistory = (props) => {
   let trustedContactsInfo = useSelector(
     (state) => state.trustedContacts.trustedContactsInfo,
   );
+
   const [trustedLink, setTrustedLink] = useState('');
   const [trustedQR, setTrustedQR] = useState('');
 
@@ -197,20 +198,22 @@ const TrustedContactHistory = (props) => {
   }, []);
 
   const setContactInfo = useCallback(async () => {
-    let trustedContactsInfo: any = useSelector((state) =>
-      idx(state, (_) => _.trustedContacts.trustedContactInfo),
-    );
     if (trustedContactsInfo) {
       const selectedContacts = trustedContactsInfo.slice(1, 3);
       setSelectedContacts(selectedContacts);
+      // if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
+      //   setChosenContact(selectedContacts[0]);
+      // } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
+      //   setChosenContact(selectedContacts[1]);
+      // }
 
-      if (selectedTitle == 'Trusted Contact 1' && selectedContacts[0]) {
+      if (index == 1 && selectedContacts[0]) {
         setChosenContact(selectedContacts[0]);
-      } else if (selectedTitle == 'Trusted Contact 2' && selectedContacts[1]) {
+      } else if (index == 2 && selectedContacts[1]) {
         setChosenContact(selectedContacts[1]);
       }
     }
-  }, [selectedTitle, trustedContactsInfo]);
+  }, [index, trustedContactsInfo]);
 
   const getContacts = useCallback(
     async (selectedContacts, index) => {
