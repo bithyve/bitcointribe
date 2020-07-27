@@ -946,11 +946,22 @@ export const updateMSharesHealthWatcher = createWatcher(
 function* checkMSharesHealthWorker() {
   yield put(switchS3Loader('checkMSharesHealth'));
   const s3Service: S3Service = yield select((state) => state.sss.service);
-  // const preInstance = JSON.stringify(s3Service);
+  const preFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
   const res = yield call(s3Service.checkHealth);
-  // const postInstance = JSON.stringify(s3Service);
-  yield put(calculateOverallHealth(s3Service));
+  const postFetchHealth = JSON.stringify(s3Service.sss.healthCheckStatus);
+
   if (res.status === 200) {
+    if (preFetchHealth !== postFetchHealth) {
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify(s3Service),
+      };
+      console.log('Health Check updated');
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+      yield put(calculateOverallHealth(s3Service));
+    }
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     console.log({ err: res.err });
@@ -1124,7 +1135,7 @@ function* overallHealthWorker({ payload }) {
   }
   shareStatus[3] = storedPDFHealth[3];
   shareStatus[4] = storedPDFHealth[4];
-
+  console.log({ shareStatus });
   const healthStatus = new HealthStatus();
   const overallHealth = yield call(
     healthStatus.appHealthStatus,
@@ -1132,6 +1143,7 @@ function* overallHealthWorker({ payload }) {
     shareStatus,
   );
 
+  console.log({ overallHealth });
   if (overallHealth) {
     // overallHealth.overallStatus = parseInt(overallHealth.overallStatus) * 20; // Conversion: stages to percentage
     overallHealth.overallStatus = parseInt(overallHealth.overallStatus); // Conversion: stages to percentage
