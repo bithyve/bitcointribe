@@ -82,6 +82,7 @@ import Receive from '../pages/Accounts/Receive_updated';
 import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
 import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
+import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
 
 const SetupNavigator = createStackNavigator(
   {
@@ -209,6 +210,7 @@ const HomeNavigator = createStackNavigator(
     PairNewWallet,
     ManageBackupKeeper,
     SecurityQuestionHistoryKeeper,
+    KeeperFeatures,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
