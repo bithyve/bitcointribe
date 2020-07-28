@@ -8,6 +8,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import BottomInfoBox from '../../components/BottomInfoBox';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function ApproveSetup(props) {
   return (
@@ -29,7 +31,7 @@ export default function ApproveSetup(props) {
             nonumy eirmod
           </Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <ScrollView style={{ flex: 1 }}>
           <View style={styles.grayBox}>
             <View style={styles.grayBoxImageView}>
               <Image
@@ -56,7 +58,26 @@ export default function ApproveSetup(props) {
             Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam
             nonumy eirmod
           </Text>
-        </View>
+          <View style={styles.bottomButtonView}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressContinue()}
+              style={{
+                ...styles.successModalButtonView,
+                shadowColor: Colors.shadowBlue,
+                backgroundColor: Colors.blue,
+              }}
+            >
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: Colors.white,
+                }}
+              >
+                Continue
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>
+        </ScrollView>
         <BottomInfoBox
           backgroundColor={Colors.white}
           title={'Note'}
@@ -122,5 +143,28 @@ const styles = StyleSheet.create({
     width: wp('10%'),
     height: wp('10%'),
     resizeMode: 'contain',
+  },
+  successModalButtonView: {
+    height: wp('13%'),
+    width: wp('35%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    marginLeft: wp('8%'),
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  bottomButtonView: {
+    height: 'auto',
+    paddingBottom: wp('8%'),
+    marginTop: wp('5%')
   },
 });

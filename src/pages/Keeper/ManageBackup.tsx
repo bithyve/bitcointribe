@@ -39,7 +39,6 @@ import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import SetupPrimaryKeeper from './SetupPrimaryKeeper';
-import ApproveSetup from './ApproveSetup';
 
 interface ManageBackupStateTypes {
   levelData: any;

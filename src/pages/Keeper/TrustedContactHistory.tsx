@@ -1398,8 +1398,8 @@ const TrustedContactHistory = (props) => {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('55%')
-              : hp('67%'),
+              ? hp('65%')
+              : hp('75%'),
           ]}
           renderContent={() => (
             <ApproveSetup
