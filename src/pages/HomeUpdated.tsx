@@ -84,7 +84,7 @@ import config from '../bitcoin/HexaConfig';
 import TrustedContactsService from '../bitcoin/services/TrustedContactsService';
 import TransactionsContent from '../components/home/transaction-content';
 import HomeList from '../components/home/home-list';
-import HomeHeader from '../components/home/home-header';
+import HomeHeader from '../components/home/home-header_update';
 import idx from 'idx';
 import CustomBottomTabs from '../components/home/custom-bottom-tabs';
 import { initialCardData } from '../stubs/initialCardData';
@@ -3217,7 +3217,7 @@ const styles = StyleSheet.create({
   cardViewContainer: {
     height: '100%',
     backgroundColor: Colors.backgroundColor,
-    marginTop: hp('4%'),
+    marginTop: hp('1%'),
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
