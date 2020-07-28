@@ -9,10 +9,12 @@ import {
   RECEIVE_HELPER_DONE,
   SEND_HELPER_DONE,
   SAVING_WARNING,
+  INIT_ASYNC_MIGRATION_SUCCESS,
 
 } from '../actions/preferences';
 import { UPDATE_APP_PREFERENCE } from "../constants";
 import { chain } from 'icepick';
+
 
 
 
@@ -29,7 +31,8 @@ const initialState = {
   savingWarning: false,
   isSendHelperDoneValue: false,
   isTwoFASetupDone: false,
-  isContactOpen: false
+  isContactOpen: false,
+  isMigrated: false
 }
 
 export default (state = initialState, { type, payload }) => {
@@ -85,6 +88,13 @@ export default (state = initialState, { type, payload }) => {
       return {
         ...state,
         savingWarning: payload.savingWarning,
+      };
+
+
+    case INIT_ASYNC_MIGRATION_SUCCESS:
+      return {
+        ...state,
+        isMigrated: true,
       };
 
     default:

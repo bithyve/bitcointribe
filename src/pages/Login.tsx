@@ -33,6 +33,7 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
+import { initMigration } from '../store/actions/preferences';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Satoshis or Sats');
@@ -296,9 +297,14 @@ export default function Login(props) {
     'trustedContactRequest',
   );
   const userKey = props.navigation.getParam('userKey');
+  const isMigrated = useSelector(state => state.preferences.isMigrated)
 
   useEffect(() => {
     if (isAuthenticated) {
+      // migrate async keys
+      if (!isMigrated) {
+        dispatch(initMigration())
+      }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
@@ -453,8 +459,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -482,8 +488,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -511,8 +517,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -540,8 +546,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -719,7 +725,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
