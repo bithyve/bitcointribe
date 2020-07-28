@@ -940,6 +940,14 @@ export default function Accounts(props) {
       let spendableBalance = wallet.balances.balance;
       let currentTransactions = wallet.transactions.transactionDetails;
 
+      if (serviceType === TEST_ACCOUNT) {
+        // hardcoding t-balance (till t-faucet saga syncs)
+        if (!currentTransactions.lenght) {
+          currentBalance = 10000;
+          spendableBalance = 10000;
+        }
+      }
+
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
         for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
           let derivativeAccount;

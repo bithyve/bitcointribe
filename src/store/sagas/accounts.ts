@@ -727,6 +727,8 @@ function* testcoinsWorker({ payload }) {
       [payload.serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    yield put(accountsSynched(true)); // initial sync: test-acc only (turns the amount text to black)
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to get testcoins');

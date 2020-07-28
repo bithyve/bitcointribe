@@ -49,7 +49,7 @@ import {
   uploadRequestedShare,
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
-import { updateAddressBookLocally } from '../store/actions/trustedContacts'
+import { updateAddressBookLocally } from '../store/actions/trustedContacts';
 
 import {
   approveTrustedContact,
@@ -790,10 +790,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }, 2000);
   };
 
-
-
-
-
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
     let newTransactions = [];
@@ -1449,7 +1445,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   getBalances = () => {
     const { accounts } = this.props;
 
-    const testBalance = accounts[TEST_ACCOUNT].service
+    let testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
         accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
@@ -1457,6 +1453,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     const testTransactions = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
       : [];
+
+    if (!testTransactions.length) testBalance = 10000; // hardcoding t-balance (till t-faucet saga syncs)
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
@@ -3161,7 +3159,7 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    updateAddressBookLocally
+    updateAddressBookLocally,
   })(HomeUpdated),
 );
 
