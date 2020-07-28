@@ -942,7 +942,7 @@ export default function Accounts(props) {
 
       if (serviceType === TEST_ACCOUNT) {
         // hardcoding t-balance (till t-faucet saga syncs)
-        if (!currentTransactions.lenght) {
+        if (!currentTransactions.length) {
           currentBalance = 10000;
           spendableBalance = 10000;
         }
@@ -1478,7 +1478,13 @@ export default function Accounts(props) {
                                 alignSelf: 'center',
                               }}
                             >
-                              {item.confirmations < 6
+                              {item.accountType === 'Test Account'
+                                ? item.confirmations < 6
+                                  ? item.confirmations
+                                  : item.confirmations === '-' // for testnet faucet tx
+                                  ? item.confirmations
+                                  : '6+'
+                                : item.confirmations < 6
                                 ? item.confirmations
                                 : '6+'}
                             </Text>

@@ -1819,8 +1819,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       } else {
         if (isGuardian && UNDER_CUSTODY[requester]) {
           Alert.alert(
-            'Failed to store',
-            'You cannot custody multiple shares of the same user.',
+            'Failed to accept',
+            `You already custody a share against the wallet name: ${requester}`,
           );
           this.setState({
             loading: false,

@@ -889,6 +889,10 @@ export default class HDSegwitWallet extends Bitcoin {
         'Test Account',
       );
       this.nextFreeAddressIndex = nextFreeAddressIndex;
+      this.receivingAddress = this.getExternalAddressByIndex(
+        this.nextFreeAddressIndex,
+      );
+
       this.balances = balances;
       this.transactions = transactions;
     }
