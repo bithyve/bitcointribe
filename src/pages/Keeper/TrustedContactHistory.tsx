@@ -28,20 +28,18 @@ import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from '../../components/HistoryPageComponent';
-import TrustedContacts from '../ManageBackup/TrustedContacts';
-import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact';
+import TrustedContacts from './TrustedContacts';
+import ShareOtpWithTrustedContact from './ShareOtpWithTrustedContact';
 import moment from 'moment';
 import _ from 'underscore';
-import TrustedContactQr from '../ManageBackup/TrustedContactQr';
 import { nameToInitials } from '../../common/CommonFunctions';
-import { textWithoutEncoding, email } from 'react-native-communications';
 import {
   uploadEncMShare,
   checkMSharesHealth,
   ErrorSending,
 } from '../../store/actions/sss';
 import { useDispatch } from 'react-redux';
-import SendShareModal from '../ManageBackup/SendShareModal';
+import SendShareModal from './SendShareModal';
 import TransparentHeaderModal from '../../components/TransparentHeaderModal';
 import SendViaLink from '../../components/SendViaLink';
 import SendViaQR from '../../components/SendViaQR';
@@ -67,6 +65,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ApproveSetup from './ApproveSetup';
 
 const TrustedContactHistory = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -99,6 +98,7 @@ const TrustedContactHistory = (props) => {
   const [SendViaQRBottomSheet, setSendViaQRBottomSheet] = useState(
     React.createRef(),
   );
+  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(React.createRef());
   const [shareBottomSheet, setshareBottomSheet] = useState(React.createRef());
   const [
     shareOtpWithTrustedContactBottomSheet,
@@ -228,7 +228,8 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[0]);
       }, 2);
       (trustedContactsBottomSheet as any).current.snapTo(0);
-      (shareBottomSheet as any).current.snapTo(1);
+      (ApproveSetupBottomSheet as any).current.snapTo(1);
+      
     },
     [SelectedContacts, chosenContact],
   );
@@ -1338,19 +1339,6 @@ const TrustedContactHistory = (props) => {
         renderContent={renderConfirmContent}
         renderHeader={renderConfirmHeader}
       />
-      {/* <BottomSheet
-        onCloseEnd={() => {
-          if (Object.keys(chosenContact).length > 0) {
-            onOTPShare(index);
-          }
-        }}
-        onCloseStart={() => {}}
-        enabledInnerScrolling={true}
-        ref={trustedContactQrBottomSheet as any}
-        snapPoints={[-30, hp('85%')]}
-        renderContent={renderTrustedContactQrContents}
-        renderHeader={renderTrustedContactQrHeader}
-      /> */}
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
@@ -1404,6 +1392,34 @@ const TrustedContactHistory = (props) => {
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
       />
+      <BottomSheet
+          enabledInnerScrolling={true}
+          ref={ApproveSetupBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('55%')
+              : hp('67%'),
+          ]}
+          renderContent={() => (
+            <ApproveSetup
+              onPressContinue={() =>{
+                (shareBottomSheet as any).current.snapTo(1);
+                if(ApproveSetupBottomSheet as any)
+                (ApproveSetupBottomSheet as any).current.snapTo(0)}
+              }
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              backgroundColor={Colors.backgroundColor1}
+              onPressHeader={() =>
+                {if(ApproveSetupBottomSheet as any)
+                (ApproveSetupBottomSheet as any).current.snapTo(0)}
+              }
+            />
+          )}
+        />
     </View>
   );
 };

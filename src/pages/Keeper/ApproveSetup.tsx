@@ -72,7 +72,7 @@ export default function ApproveSetup(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
   },
   successModalHeaderView: {
     marginRight: wp('8%'),

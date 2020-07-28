@@ -120,7 +120,7 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = () => {
-    (this.refs.ApproveSetupBottomSheet as any).snapTo(1)
+    
   };
 
   selectId = (value) => {
@@ -561,31 +561,7 @@ class ManageBackup extends Component<
             />
           )}
         />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={'ApproveSetupBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('55%')
-              : hp('67%'),
-          ]}
-          renderContent={() => (
-            <ApproveSetup
-              onPressContinue={() =>
-                (this.refs.ApproveSetupBottomSheet as any).snapTo(0)
-              }
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              backgroundColor={Colors.backgroundColor}
-              onPressHeader={() =>
-                (this.refs.ApproveSetupBottomSheet as any).snapTo(0)
-              }
-            />
-          )}
-        />
+        
       </View>
     );
   }
