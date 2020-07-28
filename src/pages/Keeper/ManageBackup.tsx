@@ -22,22 +22,9 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { trustedChannelsSync } from '../../store/actions/trustedContacts';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import {
-  REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes';
-import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
-import { nameToInitials } from '../../common/CommonFunctions';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import BottomInfoBox from '../../components/BottomInfoBox';
 import AddContactAddressBook from '../Contacts/AddContactAddressBook';
 import BottomSheet from 'reanimated-bottom-sheet';
 import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../../components/ModalHeader';
-import config from '../../bitcoin/HexaConfig';
-import KnowMoreButton from '../../components/KnowMoreButton';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
 import { withNavigationFocus } from 'react-navigation';
@@ -147,7 +134,7 @@ class ManageBackup extends Component<
   };
 
   render() {
-    const { levelData, selectedId } = this.state;
+    const { levelData, selectedId,} = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -318,10 +305,12 @@ class ManageBackup extends Component<
                         <Text
                           style={{
                             ...styles.manageButtonText,
+                            padding: 10,
                             color: value.isSetupDone
                               ? Colors.white
                               : Colors.black,
                           }}
+                          onPress={() => this.selectId(value.id)}
                         >
                           {value.isSetupDone ? 'Manage' : 'Setup'}
                         </Text>
@@ -522,8 +511,15 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <KeeperTypeModalContents
-              onPressSetup={() =>
+              onPressSetup={(type, name) =>{
+                if(type === 'contact'){
+                  navigation.navigate("TrustedContactHistoryKeeper", {
+                    selectedTime: this.getTime(new Date()),
+                    selectedStatus: 'Ugly',
+                    selectedTitle: name} );
+                }
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
+              }
               }
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
@@ -538,6 +534,7 @@ class ManageBackup extends Component<
             />
           )}
         />
+
       </View>
     );
   }

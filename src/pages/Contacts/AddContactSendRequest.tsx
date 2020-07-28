@@ -48,6 +48,7 @@ import {
 } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import TestAccount from '../../bitcoin/services/accounts/TestAccount';
+import ShareContactRequest from '../../components/ShareContactRequest';
 
 export default function AddContactSendRequest(props) {
   const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
@@ -440,7 +441,26 @@ export default function AddContactSendRequest(props) {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={BackupStyles.modalContainer}>
-        <View
+        <ShareContactRequest
+        SelectedContact={Contact ? Contact : {}}
+        navigation={props.navigation}
+        headerText={'Add Contact'}
+        headerSubText={'Send a Friends and Family request'}
+        isDoneButton={true}
+        contactHeader={'Adding to Friends and Family:'}
+        noteHeader={'Friends and Family request'}
+        note={'Your contact will have to accept your request for you to add them'}
+        createTrustedContact={()=>createTrustedContact()}
+        sendViaQr={()=>{
+          if (SendViaQRBottomSheet.current)
+                (SendViaQRBottomSheet as any).current.snapTo(1);
+        }}
+        sendViaLink={()=>{
+          if (SendViaLinkBottomSheet.current)
+                (SendViaLinkBottomSheet as any).current.snapTo(1);
+        }}
+        />
+        {/* <View
           style={{
             alignItems: 'center',
             flexDirection: 'row',
@@ -688,7 +708,7 @@ export default function AddContactSendRequest(props) {
               <Text style={styles.buttonText}>QR</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
         <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}

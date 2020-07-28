@@ -222,12 +222,42 @@ const HistoryPageComponent = (props) => {
 
       <View
         style={{
+          alignItems:'center',
           justifyContent: 'center',
           height: hp('20%'),
           backgroundColor: Colors.white,
         }}
       >
-        <View style={styles.bottomButtonInnerView}>
+        <TouchableOpacity
+            onPress={() => {
+              props.onPressConfirm();
+            }}
+            style={{
+              backgroundColor: Colors.blue,
+              height: wp('13%'),
+              width: wp('40%'),
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 10,
+              marginTop: hp('3%'),
+              marginBottom: hp('3%'),
+              elevation: 10,
+              shadowColor: Colors.shadowBlue,
+              shadowOpacity: 1,
+              shadowOffset: { width: 15, height: 15 },
+            }}
+          >
+            <Text
+              style={{
+                color: Colors.white,
+                fontSize: RFValue(10),
+                fontFamily: Fonts.FiraSansMedium,
+              }}
+            >
+              Confirm Question
+            </Text>
+            </TouchableOpacity>
+        {/* <View style={styles.bottomButtonInnerView}>
           <TouchableOpacity onPress={() => {}} style={styles.buttonInnerView}>
             <Text style={styles.buttonText}>Confirm Question</Text>
           </TouchableOpacity>
@@ -241,7 +271,7 @@ const HistoryPageComponent = (props) => {
           <TouchableOpacity style={styles.buttonInnerView} onPress={() => {}}>
             <Text style={styles.buttonText}>Change Question</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </View>
   );

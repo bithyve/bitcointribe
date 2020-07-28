@@ -14,7 +14,7 @@ export default function KeeperTypeModalContents(props) {
   const [keeperTypesData, setKeeperTypesData] = useState([
     {
       type: 'contact',
-      name: 'Keeper Contact',
+      name: 'Friends and Family',
       info: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
     },
     {
@@ -99,7 +99,7 @@ export default function KeeperTypeModalContents(props) {
         </View>
         <View style={styles.bottomButtonView}>
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressSetup()}
+            onPress={() => props.onPressSetup(SelectedKeeperType.type, SelectedKeeperType.name)}
             style={{
               ...styles.successModalButtonView,
               shadowColor: Colors.shadowBlue,

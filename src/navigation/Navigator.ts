@@ -83,6 +83,7 @@ import PairNewWallet from '../pages/FastBitcoin/PairNewWallet';
 import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
 import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
 import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
+import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistory';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -211,6 +212,7 @@ const HomeNavigator = createStackNavigator(
     ManageBackupKeeper,
     SecurityQuestionHistoryKeeper,
     KeeperFeatures,
+    TrustedContactHistoryKeeper,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
