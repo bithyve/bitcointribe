@@ -38,6 +38,7 @@ import idx from 'idx';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
+import SetupPrimaryKeeper from './SetupPrimaryKeeper';
 
 interface ManageBackupStateTypes {
   levelData: any;
@@ -118,7 +119,7 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = () => {
-    
+    (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1)
   };
 
   selectId = (value) => {
@@ -534,7 +535,30 @@ class ManageBackup extends Component<
             />
           )}
         />
-
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'SetupPrimaryKeeperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('50%')
+              : hp('60%'),
+          ]}
+          renderContent={() => (
+            <SetupPrimaryKeeper
+              onPressContinue={() =>
+                (this.refs.keeperTypeBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              onPressHeader={() =>
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+        />
       </View>
     );
   }
