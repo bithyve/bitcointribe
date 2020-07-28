@@ -15,17 +15,20 @@ export default function KeeperTypeModalContents(props) {
     {
       type: 'contact',
       name: 'Friends and Family',
-      info: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
+      info: 'Lorem ipsum dolor sit amet, consectetur',
+      image: require('../../assets/images/icons/icon_contact.png'),
     },
     {
       type: 'device',
       name: 'Keeper Device',
-      info: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
+      info: 'Lorem ipsum dolor sit amet, consectetur',
+      image: require('../../assets/images/icons/icon_secondarydevice.png'),
     },
     {
       type: 'pdf',
       name: 'Pdf Keeper',
-      info: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,',
+      info: 'Lorem ipsum dolor sit amet, consectetur',
+      image: require('../../assets/images/icons/files-and-folders-2.png'),
     },
   ]);
   const [SelectedKeeperType, setSelectedKeeperType] = useState({
@@ -51,7 +54,8 @@ export default function KeeperTypeModalContents(props) {
               color: Colors.lightTextColor,
             }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore.
           </Text>
         </View>
         <View
@@ -76,6 +80,16 @@ export default function KeeperTypeModalContents(props) {
                     onpress={() => onKeeperSelect(value)}
                   />
                 </View>
+                <Image
+                  style={{
+                    width: wp('9%'),
+                    height: wp('9%'),
+                    resizeMode: 'contain',
+                    alignSelf: 'center',
+                    marginRight: wp('5%'),
+                  }}
+                  source={value.image}
+                />
                 <View>
                   <Text style={styles.keeperTypeTitle}>{value.name}</Text>
                   <Text numberOfLines={1} style={styles.keeperTypeInfo}>
@@ -94,12 +108,18 @@ export default function KeeperTypeModalContents(props) {
               marginTop: 'auto',
             }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore.
           </Text>
         </View>
         <View style={styles.bottomButtonView}>
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressSetup(SelectedKeeperType.type, SelectedKeeperType.name)}
+            onPress={() =>
+              props.onPressSetup(
+                SelectedKeeperType.type,
+                SelectedKeeperType.name,
+              )
+            }
             style={{
               ...styles.successModalButtonView,
               shadowColor: Colors.shadowBlue,
@@ -211,5 +231,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: wp('5%'),
     marginBottom: wp('5%'),
-  }
+  },
 });

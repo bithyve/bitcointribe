@@ -225,6 +225,18 @@ class KeeperFeatures extends Component<
             }}
           />
           <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
+            <Text
+              numberOfLines={2}
+              style={{
+                ...styles.modalHeaderInfoText,
+                marginTop: hp('1.5%'),
+                marginLeft: wp('10%'),
+                marginRight: wp('10%')
+              }}
+            >
+              Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit amet,
+              consetetur Lorem ipsum dolor sit amet, consetetur
+            </Text>
             {levelData.map((value) => {
               return (
                 <TouchableOpacity
@@ -256,16 +268,18 @@ class KeeperFeatures extends Component<
             })}
           </View>
         </ScrollView>
-        <BottomInfoBox
+        {/* <BottomInfoBox
             backgroundColor={Colors.white}
             title={'Note'}
             infoText={
               'Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit amet, consetetur'
             }
-          />
+          /> */}
         <View style={styles.bottomButtonView}>
           <TouchableOpacity
-            onPress={() => {}}
+            onPress={() => {
+              navigation.goBack();
+            }}
             style={{
               ...styles.successModalButtonView,
               shadowColor: Colors.shadowBlue,
@@ -337,6 +351,7 @@ const styles = StyleSheet.create({
     fontSize: RFValue(11),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: hp('0.7%'),
+    marginBottom: hp('0.7%'),
   },
   headerBackArrowView: {
     height: 30,

@@ -94,7 +94,7 @@ class ManageBackup extends Component<
           infoGreen: 'All Keepers are accessible',
           isSetupDone: true,
           keeper1Done: true,
-          keeper1Name: 'iPad Pro',
+          keeper1Name: 'Add Primary Keeper',
           keeper2Done: false,
           keeper2Name: '',
           id: 2,
@@ -168,7 +168,7 @@ class ManageBackup extends Component<
         <ScrollView style={{ flex: 1 }}>
           <View style={styles.topHealthView}>
             <ImageBackground
-              source={require('../../assets/images/icons/shield_blue.png')}
+              source={require('../../assets/images/icons/keeper_sheild.png')}
               style={{ ...styles.healthShieldImage, position: 'relative' }}
               resizeMode={'contain'}
             >
@@ -426,7 +426,7 @@ class ManageBackup extends Component<
                                 borderWidth: 0.5,
                               }}
                               onPress={()=>{
-                                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1)
                               }}
                             >
                               <View
@@ -508,8 +508,8 @@ class ManageBackup extends Component<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('70%'),
+              ? hp('75%')
+              : hp('75%'),
           ]}
           renderContent={() => (
             <KeeperTypeModalContents
@@ -542,13 +542,14 @@ class ManageBackup extends Component<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('50%')
-              : hp('60%'),
+              ? hp('40%')
+              : hp('50%'),
           ]}
           renderContent={() => (
             <SetupPrimaryKeeper
-              onPressContinue={() =>
-                (this.refs.keeperTypeBottomSheet as any).snapTo(0)
+            onPressContinue={() =>
+              {navigation.navigate('KeeperFeatures');
+                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)}
               }
             />
           )}
