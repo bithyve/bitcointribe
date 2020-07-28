@@ -178,7 +178,7 @@ class ManageBackup extends Component<
                   width: wp('3%'),
                   borderRadius: wp('3%') / 2,
                   position: 'absolute',
-                  top: wp('3%'),
+                  top: wp('5%'),
                   right: 0,
                   borderWidth: 2,
                   borderColor: Colors.white,
