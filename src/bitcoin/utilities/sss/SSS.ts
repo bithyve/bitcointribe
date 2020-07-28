@@ -705,6 +705,13 @@ export default class SSS {
     }
     if (res.data.initSuccessful) {
       this.healthCheckInitialized = true;
+
+      for (let index = 0; index <= shareIDs.length; index++) {
+        this.healthCheckStatus[index] = {
+          shareId: shareIDs[index],
+          updatedAt: 0,
+        };
+      }
     }
     return {
       success: res.data.initSuccessful,

@@ -49,6 +49,7 @@ import {
   uploadRequestedShare,
 } from '../store/actions/sss';
 import { createRandomString } from '../common/CommonFunctions/timeFormatter';
+import { updateAddressBookLocally } from '../store/actions/trustedContacts'
 
 import {
   approveTrustedContact,
@@ -58,14 +59,13 @@ import {
 } from '../store/actions/trustedContacts';
 import {
   updateFCMTokens,
-  fetchNotifications, notificationsUpdated
+  fetchNotifications,
+  notificationsUpdated,
 } from '../store/actions/notifications';
-import {
-  storeFbtcData
-} from '../store/actions/fbtc';
+import { storeFbtcData } from '../store/actions/fbtc';
 import {
   setCurrencyCode,
-  setCurrencyToggleValue
+  setCurrencyToggleValue,
 } from '../store/actions/preferences';
 import { UsNumberFormat } from '../common/utilities';
 import { getCurrencyImageByRegion } from '../common/CommonFunctions/index';
@@ -103,7 +103,11 @@ import { withNavigationFocus } from 'react-navigation';
 import Loader from '../components/loader';
 import CustodianRequestModalContents from '../components/CustodianRequestModalContents';
 import semver from 'semver';
-import { updatePreference, setFCMToken, setSecondaryDeviceAddress } from '../store/actions/preferences'
+import {
+  updatePreference,
+  setFCMToken,
+  setSecondaryDeviceAddress,
+} from '../store/actions/preferences';
 import * as Permissions from 'expo-permissions';
 
 function isEmpty(obj) {
@@ -697,9 +701,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         fireDate: date.getTime(),
         //repeatInterval: 'hour',
       })
-      .then(() => { })
+      .then(() => {})
       .catch(
-        (err) => { }, //console.log('err', err)
+        (err) => {}, //console.log('err', err)
       );
     firebase
       .notifications()
@@ -724,8 +728,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (nextAppState === 'inactive' || nextAppState == 'background') {
             this.props.updatePreference({
               key: 'isInternetModalCome',
-              value: false
-            })
+              value: false,
+            });
             // TODO -- fix this part
             // await AsyncStorage.setItem(
             //   'isInternetModalCome',
@@ -734,7 +738,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           }
         },
       );
-    } catch (error) { }
+    } catch (error) {}
   };
 
   componentDidMount = () => {
@@ -785,6 +789,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }, 2000);
   };
+
+
+
+
 
   getNewTransactionNotifications = async () => {
     const { notificationListNew } = this.props;
@@ -885,16 +893,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       .scheduleNotification(notification, {
         fireDate: date.getTime(),
       })
-      .then(() => { })
-      .catch((err) => { });
+      .then(() => {})
+      .catch((err) => {});
     firebase
       .notifications()
       .getScheduledNotifications()
-      .then((notifications) => { });
+      .then((notifications) => {});
   };
 
   componentDidUpdate = (prevProps) => {
-    if ((prevProps.notificationList !== this.props.notificationList) || (prevProps.releaseCasesValue !== this.props.releaseCasesValue)) {
+    if (
+      prevProps.notificationList !== this.props.notificationList ||
+      prevProps.releaseCasesValue !== this.props.releaseCasesValue
+    ) {
       this.setupNotificationList();
     }
 
@@ -907,7 +918,10 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       this.storeFCMToken();
     }
 
-    if (prevProps.secondaryDeviceAddressValue !== this.props.secondaryDeviceAddressValue) {
+    if (
+      prevProps.secondaryDeviceAddressValue !==
+      this.props.secondaryDeviceAddressValue
+    ) {
       this.setSecondaryDeviceAddresses();
     }
 
@@ -1040,8 +1054,6 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-
-
   handleDeepLink = async (event) => {
     const { navigation, isFocused } = this.props;
     // if user is in any other screen before opening
@@ -1106,7 +1118,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         Alert.alert(
           'Invalid deeplink',
           `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-          splits[3]
+            splits[3]
           }`,
         );
       } else {
@@ -1251,7 +1263,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode, currencyToggleValue } = this.props;
     let currencyCodeTmp = currencyCode;
-    //await AsyncStorage.getItem('currencyCode');
+    if (!currencyCodeTmp) {
+      currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
+    }
     if (!currencyCodeTmp) {
       this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
       //await AsyncStorage.setItem('currencyCode', RNLocalize.getCurrencies()[0]);
@@ -1264,10 +1278,11 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       });
     }
     let currencyToggleValueTmp = currencyToggleValue;
-    // await AsyncStorage.getItem(
-    //   'currencyToggleValue',
-    // );
-
+    if (!currencyToggleValueTmp) {
+      currencyToggleValueTmp = await AsyncStorage.getItem(
+        'currencyToggleValue',
+      );
+    }
     this.setState({
       switchOn: currencyToggleValueTmp ? true : false,
     });
@@ -1303,15 +1318,14 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     const fcmToken = await firebase.messaging().getToken();
     let fcmArray = [fcmToken];
     let fcmTokenFromAsync = this.props.fcmTokenValue;
-    //await AsyncStorage.getItem('fcmToken');
     if (fcmTokenFromAsync && fcmTokenFromAsync != fcmToken) {
       this.props.setFCMToken(fcmToken);
-      //TODO: Remove setItem 
+      //TODO: Remove setItem
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     } else if (!fcmTokenFromAsync) {
       this.props.setFCMToken(fcmToken);
-      //TODO: Remove setItem 
+      //TODO: Remove setItem
       await AsyncStorage.setItem('fcmToken', fcmToken);
       this.props.updateFCMTokens(fcmArray);
     }
@@ -1437,7 +1451,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     const testBalance = accounts[TEST_ACCOUNT].service
       ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     const testTransactions = accounts[TEST_ACCOUNT].service
@@ -1446,19 +1460,19 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let regularBalance = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
       : 0;
 
     let regularTransactions = accounts[REGULAR_ACCOUNT].service
       ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
+          .transactionDetails
       : [];
 
     // regular derivative accounts
     for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
       const derivativeAccount =
         accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1497,13 +1511,13 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
     let secureBalance = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
+        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+          .unconfirmedBalance
       : 0;
 
     const secureTransactions = accounts[SECURE_ACCOUNT].service
       ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
+          .transactionDetails
       : [];
 
     // secure derivative accounts
@@ -1512,7 +1526,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
       const derivativeAccount =
         accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
-        dAccountType
+          dAccountType
         ];
       if (derivativeAccount.instance.using) {
         for (
@@ -1694,7 +1708,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
     // this.processDLRequest(key, true);
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   selectTab = (tabTitle) => {
     if (tabTitle == 'More') {
@@ -1849,7 +1863,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
                 postAssociation: (contact) => {
                   const contactName = `${contact.firstName} ${
                     contact.lastName ? contact.lastName : ''
-                    }`.toLowerCase();
+                  }`.toLowerCase();
 
                   if (!semver.valid(version)) {
                     // for 0.7, 0.9 and 1.0: info remains null
@@ -1905,11 +1919,17 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
       }
 
       if (!UNDER_CUSTODY[requester]) {
-        Alert.alert('Failed to send!', 'You do not host any key for this user');
-
-        this.setState({
-          loading: false,
-        });
+        this.setState(
+          {
+            loading: false,
+            errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
+            errorMessage: `Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore`,
+            buttonText: 'Okay',
+          },
+          () => {
+            (this.refs.errorBottomSheet as any).snapTo(1);
+          },
+        );
       } else {
         if (!publicKey) {
           try {
@@ -2019,8 +2039,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
           if (res.data.releases.length) {
             let releaseNotes = res.data.releases.length
               ? res.data.releases.find((el) => {
-                return el.build === value.info.split(' ')[1];
-              })
+                  return el.build === value.info.split(' ')[1];
+                })
               : '';
             navigation.navigate('UpdateApp', {
               releaseData: [releaseNotes],
@@ -2104,9 +2124,9 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
         ) {
           let temp =
             asyncNotificationList[
-            asyncNotificationList.findIndex(
-              (value) => value.notificationId == element.notificationId,
-            )
+              asyncNotificationList.findIndex(
+                (value) => value.notificationId == element.notificationId,
+              )
             ];
           if (element.notificationType == 'release') {
             readStatus = readStatus;
@@ -2163,7 +2183,7 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
 
   setCurrencyToggleValue = (temp) => {
     this.props.setCurrencyToggleValue(temp);
-  }
+  };
 
   render() {
     const {
@@ -2310,8 +2330,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2362,8 +2382,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -2431,8 +2451,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('82%')
               : hp('82%'),
@@ -2486,8 +2506,8 @@ class HomeUpdated extends Component<HomePropsTypes, HomeStateTypes> {
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('18%')
               : Platform.OS == 'android'
-                ? hp('19%')
-                : hp('18%'),
+              ? hp('19%')
+              : hp('18%'),
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp('65%')
               : hp('64%'),
@@ -3113,7 +3133,10 @@ const mapStateToProps = (state) => {
     currencyCode: idx(state, (_) => _.preferences.currencyCode),
     currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
-    secondaryDeviceAddressValue: idx(state, (_) => _.preferences.secondaryDeviceAddressValue),
+    secondaryDeviceAddressValue: idx(
+      state,
+      (_) => _.preferences.secondaryDeviceAddressValue,
+    ),
     releaseCasesValue: idx(state, (_) => _.preferences.releaseCasesValue),
   };
 };
@@ -3137,7 +3160,8 @@ export default withNavigationFocus(
     setCurrencyToggleValue,
     updatePreference,
     setFCMToken,
-    setSecondaryDeviceAddress
+    setSecondaryDeviceAddress,
+    updateAddressBookLocally
   })(HomeUpdated),
 );
 
@@ -3212,8 +3236,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-          ? 43
-          : 40,
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

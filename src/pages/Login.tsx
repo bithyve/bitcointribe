@@ -126,7 +126,7 @@ export default function Login(props) {
     if (passcode.length == 4) {
       setIsDisabledProceed(false);
     }
-  }, [passcode])
+  }, [passcode]);
 
   const DECENTRALIZED_BACKUP = useSelector(
     (state) => state.storage.database.DECENTRALIZED_BACKUP,
@@ -192,7 +192,7 @@ export default function Login(props) {
   const s3Service = useSelector((state) => state.sss.service);
   useEffect(() => {
     // HC init and down-streaming
-    if (s3Service) {
+    if (s3Service && s3Service.checkHealth) {
       const { healthCheckInitialized } = s3Service.sss;
       if (healthCheckInitialized) {
         dispatch(checkMSharesHealth());
@@ -453,8 +453,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -482,8 +482,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -511,8 +511,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
                 <View
@@ -540,8 +540,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                          ''
-                        )}
+                      ''
+                    )}
                   </Text>
                 </View>
               </View>
@@ -573,8 +573,9 @@ export default function Login(props) {
                 style={{
                   ...styles.proceedButtonView,
                   elevation: Elevation,
-                  backgroundColor:
-                    isDisabledProceed ? Colors.lightBlue : Colors.blue,
+                  backgroundColor: isDisabledProceed
+                    ? Colors.lightBlue
+                    : Colors.blue,
                 }}
               >
                 <Text style={styles.proceedButtonText}>Proceed</Text>
@@ -718,7 +719,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}
