@@ -196,9 +196,7 @@ const TransactionsContent = ({
                 ...styles.viewTransaction,
               }}
             >
-              <Text
-                style={{ ...styles.viewTransactionText, color: Colors.blue }}
-              >
+              <Text style={styles.viewTransactionText}>
                 View your transactions here
               </Text>
               <Text
@@ -316,7 +314,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.FiraSansRegular,
   },
   viewTransactionText: {
-    color: Colors.black,
+    color: Colors.blue,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
