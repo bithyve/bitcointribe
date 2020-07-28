@@ -39,6 +39,7 @@ import KeeperTypeModalContents from './KeeperTypeModalContent';
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import SetupPrimaryKeeper from './SetupPrimaryKeeper';
+import ApproveSetup from './ApproveSetup';
 
 interface ManageBackupStateTypes {
   levelData: any;
@@ -119,7 +120,7 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = () => {
-    (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1)
+    (this.refs.ApproveSetupBottomSheet as any).snapTo(1)
   };
 
   selectId = (value) => {
@@ -555,6 +556,31 @@ class ManageBackup extends Component<
             <SmallHeaderModal
               onPressHeader={() =>
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'ApproveSetupBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp('55%')
+              : hp('67%'),
+          ]}
+          renderContent={() => (
+            <ApproveSetup
+              onPressContinue={() =>
+                (this.refs.ApproveSetupBottomSheet as any).snapTo(0)
+              }
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              backgroundColor={Colors.backgroundColor}
+              onPressHeader={() =>
+                (this.refs.ApproveSetupBottomSheet as any).snapTo(0)
               }
             />
           )}
