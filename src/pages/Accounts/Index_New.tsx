@@ -1021,13 +1021,18 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                         : switchOn
                         ? UsNumberFormat(spendableBalance)
                         : exchangeRates
-                        ? (
+                          ? (
                             (spendableBalance / 1e8) *
                             exchangeRates[CurrencyCode].last
                           ).toFixed(2)
-                        : null}
+                          : null}{' '}
+                      {serviceType == TEST_ACCOUNT
+                        ? 't-sats'
+                        : switchOn
+                          ? 'sats'
+                          : CurrencyCode.toLocaleLowerCase()}
                     </Text>
-                    <Text
+                    {/* <Text
                       style={{
                         fontFamily: Fonts.FiraSansMediumItalic,
                         color: Colors.textColorGrey,
@@ -1038,9 +1043,9 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? 't-sats'
                         : switchOn
-                        ? 'sats'
-                        : CurrencyCode.toLocaleLowerCase()}
-                    </Text>
+                          ? 'sats'
+                          : CurrencyCode.toLocaleLowerCase()}
+                    </Text> */}
                   </View>
                   <View style={styles.transactionTitle}>
                     <Text style={styles.transactionTitleDateText}>Today</Text>
