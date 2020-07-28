@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -35,12 +35,19 @@ export default function KeeperTypeModalContents(props) {
     type: '',
     name: '',
   });
-
+console.log("isLevel2", props.isLevel2)
+  const [isLevel2, setIsLevel2] = useState(props.isLevel2 ? props.isLevel2 : false)
   const onKeeperSelect = (value) => {
     if (value.type != SelectedKeeperType.type) {
       setSelectedKeeperType(value);
     }
   };
+  useEffect(() => {
+    if(props.isLevel2){
+      console.log("props.isLevel2", props.isLevel2)
+      setIsLevel2(props.isLevel2)
+    }
+  }, [props.isLevel2]);
 
   return (
     <View style={{ ...styles.modalContentContainer, height: '100%' }}>
@@ -65,6 +72,7 @@ export default function KeeperTypeModalContents(props) {
           }}
         >
           {keeperTypesData.map((value) => {
+            if(isLevel2 && value.type === 'pdf'){return;}
             return (
               <AppBottomSheetTouchableWrapper
                 activeOpacity={10}
@@ -98,6 +106,7 @@ export default function KeeperTypeModalContents(props) {
                 </View>
               </AppBottomSheetTouchableWrapper>
             );
+            
           })}
         </View>
         <View style={styles.successModalAmountView}>

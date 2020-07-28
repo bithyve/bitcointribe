@@ -43,6 +43,7 @@ import SetupPrimaryKeeper from './SetupPrimaryKeeper';
 interface ManageBackupStateTypes {
   levelData: any;
   selectedId: any;
+  isLevel2: boolean;
 }
 
 interface ManageBackupPropsTypes {
@@ -101,7 +102,7 @@ class ManageBackup extends Component<
         {
           type: 'keeper',
           health: 0,
-          status: 'ugly',
+          status: '',
           title: 'Level 3',
           infoGray: 'Improve security by adding Keepers',
           infoRed: 'Keepers need your attention',
@@ -115,16 +116,40 @@ class ManageBackup extends Component<
           id: 3,
         },
       ],
+      isLevel2: false
     };
+    
+  }
+
+  setSelectedCards = () => {
+    const { levelData } = this.state;
+    for(let a= 0; a < levelData.length; a++){
+      console.log("levelData.status", levelData[a].status);
+      if(levelData[a].status == 'ugly')
+        this.setState({ selectedId: levelData[a].id });
+    }
   }
 
   componentDidMount = () => {
-    
+    this.setSelectedCards();
   };
 
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
+    if(value.id === 2){
+      console.log("inside if1")
+      setTimeout(() => {
+        this.setState({isLevel2: true});  
+      }, 2);
+      
+    } else{
+      console.log("inside else1")
+      setTimeout(() => {
+        this.setState({isLevel2: false});  
+      }, 2);
+      
+    }
   };
 
   getTime = (item) => {
@@ -135,7 +160,7 @@ class ManageBackup extends Component<
   };
 
   render() {
-    const { levelData, selectedId,} = this.state;
+    const { levelData, selectedId,isLevel2} = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -205,10 +230,10 @@ class ManageBackup extends Component<
                     shadowRadius: selectedId && selectedId == value.id ? 10 : 0,
                     shadowColor: Colors.borderColor,
                     shadowOpacity:
-                      selectedId && selectedId == value.id ? 0.7 : 0,
-                    shadowOffset: { width: 2, height: 2 },
+                      selectedId && selectedId == value.id ? 10 : 0,
+                    shadowOffset: { width: 5, height: 5 },
                     elevation: selectedId && selectedId == value.id ? 10 : 0,
-                    opacity: selectedId && selectedId == value.id ? 10 : 5,
+                    opacity: selectedId && selectedId == value.id ? 1 : 0.3,
                   }}
                 >
                   <View style={styles.cardView}>
@@ -425,7 +450,11 @@ class ManageBackup extends Component<
                                 borderWidth: 0.5,
                               }}
                               onPress={()=>{
+                                if(value.id === 2){
                                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1)
+                                } else{
+                                  (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                }
                               }}
                             >
                               <View
@@ -465,7 +494,16 @@ class ManageBackup extends Component<
                                 marginLeft: wp('4%'),
                               }}
                               onPress={()=>{
+                                if(value.id === 2){
+                                  console.log("inside if")
+                                  this.setState({isLevel2: true});
+                                } else{
+                                  console.log("inside else")
+                                  this.setState({isLevel2: false});
+                                }
+                                setTimeout(() => {
                                 (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                }, 10);
                               }}
                             >
                               <View
@@ -525,6 +563,7 @@ class ManageBackup extends Component<
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
               }
+              isLevel2={isLevel2}
             />
           )}
           renderHeader={() => (
