@@ -876,11 +876,24 @@ export default class HDSegwitWallet extends Bitcoin {
     // ]);
     if (txid) {
       this.usedAddresses = [recipientAddress];
-      this.balances = { balance: 0, unconfirmedBalance: amount * 1e8 }; // assumption: we don't call testFaucet twice
-      const { transactions } = await this.fetchTransactionsByAddresses(
+      // this.balances = { balance: amount * 1e8, unconfirmedBalance: 0 }; // assumption: we don't call testFaucet twice (spendable exception: 1st receive test-utxo)
+      const {
+        balances,
+        transactions,
+        nextFreeAddressIndex,
+      } = await this.fetchBalanceTransactionsByAddresses(
         this.usedAddresses,
+        [],
+        this.usedAddresses,
+        this.nextFreeAddressIndex - 1,
         'Test Account',
       );
+      this.nextFreeAddressIndex = nextFreeAddressIndex;
+      this.receivingAddress = this.getExternalAddressByIndex(
+        this.nextFreeAddressIndex,
+      );
+
+      this.balances = balances;
       this.transactions = transactions;
     }
     return {
@@ -1646,6 +1659,14 @@ export default class HDSegwitWallet extends Bitcoin {
       const confirmedUTXOs = [];
       for (const utxo of UTXOs) {
         if (utxo.status) {
+          if (
+            this.isTest &&
+            utxo.address === this.getExternalAddressByIndex(0)
+          ) {
+            confirmedUTXOs.push(utxo); // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            continue;
+          }
+
           if (utxo.status.confirmed) confirmedUTXOs.push(utxo);
           else {
             if (changeAddresses.includes(utxo.address)) {

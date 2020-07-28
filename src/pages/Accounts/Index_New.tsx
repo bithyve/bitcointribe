@@ -290,6 +290,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
       let spendableBalance = wallet.balances.balance;
       let currentTransactions = wallet.transactions.transactionDetails;
 
+      if (serviceType === TEST_ACCOUNT) {
+        // hardcoding t-balance (till t-faucet saga syncs)
+        if (!currentTransactions.length) {
+          currentBalance = 10000;
+          spendableBalance = 10000;
+        }
+      }
+
       if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
         for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
           let derivativeAccount;
@@ -297,7 +305,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           if (serviceType === REGULAR_ACCOUNT) {
             derivativeAccount =
               accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-              dAccountType
+                dAccountType
               ];
           } else if (serviceType === SECURE_ACCOUNT) {
             if (dAccountType === TRUSTED_CONTACTS) continue;
@@ -432,7 +440,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
     }
   };
 
-
   getServiceType = (serviceType) => {
     if (!serviceType) return;
     if (this.carousel.current) {
@@ -494,7 +501,6 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
         'isTestAccountHelperDone',
       );
     }
-
 
     // if (isBuyHelperDone == 'true') {
     //   setBuyIsActive(false);
@@ -583,10 +589,10 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
             index == 0
               ? Colors.blue
               : index == 1
-                ? Colors.yellow
-                : index == 2
-                  ? Colors.green
-                  : Colors.borderColor,
+              ? Colors.yellow
+              : index == 2
+              ? Colors.green
+              : Colors.borderColor,
           shadowOpacity: 0.2,
           shadowOffset: { width: 0, height: 7 },
           flexDirection: 'row',
@@ -756,32 +762,32 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 )}
               </View>
             ) : (
-                  <Image
-                    style={styles.cardBitCoinImage}
-                    source={getCurrencyImageByRegion(
-                      this.state.CurrencyCode,
-                      'light',
-                    )}
-                  />
+              <Image
+                style={styles.cardBitCoinImage}
+                source={getCurrencyImageByRegion(
+                  this.state.CurrencyCode,
+                  'light',
                 )}
+              />
+            )}
             <Text style={styles.cardAmountText}>
               {item.accountType == 'Test Account'
                 ? UsNumberFormat(this.state.netBalance)
                 : this.state.switchOn
-                  ? UsNumberFormat(this.state.netBalance)
-                  : this.state.exchangeRates
-                    ? (
-                      (this.state.netBalance / 1e8) *
-                      this.state.exchangeRates[this.state.CurrencyCode].last
-                    ).toFixed(2)
-                    : null}
+                ? UsNumberFormat(this.state.netBalance)
+                : this.state.exchangeRates
+                ? (
+                    (this.state.netBalance / 1e8) *
+                    this.state.exchangeRates[this.state.CurrencyCode].last
+                  ).toFixed(2)
+                : null}
             </Text>
             <Text style={styles.cardAmountUnitText}>
               {item.accountType == 'Test Account'
                 ? 't-sats'
                 : this.state.switchOn
-                  ? 'sats'
-                  : this.state.CurrencyCode.toLocaleLowerCase()}
+                ? 'sats'
+                : this.state.CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
@@ -831,9 +837,12 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
   };
 
   getAverageTxFees = () => {
-    const averageTxFees = idx(this.props.averageTxFees, (_) => _[this.state.serviceType].averageTxFees);
+    const averageTxFees = idx(
+      this.props.averageTxFees,
+      (_) => _[this.state.serviceType].averageTxFees,
+    );
     return averageTxFees;
-  }
+  };
 
   render() {
     const {
@@ -880,7 +889,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
           <Text style={styles.headerText}>Accounts</Text>
           <TouchableOpacity
             style={{ height: 54, justifyContent: 'center' }}
-            onPress={() => { }}
+            onPress={() => {}}
           >
             <View
               style={{
@@ -895,17 +904,17 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                 activeOffImage={
                   this.currencyCode.includes(CurrencyCode)
                     ? this.setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'light',
-                    )
+                        getCurrencyImageName(CurrencyCode),
+                        'light',
+                      )
                     : getCurrencyImageByRegion(CurrencyCode, 'light')
                 }
                 inactiveOffImage={
                   this.currencyCode.includes(CurrencyCode)
                     ? this.setCurrencyCodeToImage(
-                      getCurrencyImageName(CurrencyCode),
-                      'dark',
-                    )
+                        getCurrencyImageName(CurrencyCode),
+                        'dark',
+                      )
                     : getCurrencyImageByRegion(CurrencyCode, 'dark')
                 }
                 toggleColor={Colors.lightBlue}
@@ -930,7 +939,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
               refreshControl={
                 <RefreshControl
                   refreshing={
-                    accounts[serviceType].loading.balanceTx || accounts[serviceType].loading.derivativeBalanceTx
+                    accounts[serviceType].loading.balanceTx ||
+                    accounts[serviceType].loading.derivativeBalanceTx
                   }
                   onRefresh={() => {
                     // this.props.fetchTransactions(serviceType);
@@ -938,7 +948,7 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       loader: true,
                       syncTrustedDerivative:
                         serviceType === REGULAR_ACCOUNT ||
-                          serviceType === SECURE_ACCOUNT
+                        serviceType === SECURE_ACCOUNT
                           ? true
                           : false,
                     });
@@ -967,8 +977,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     index === 0
                       ? this.getServiceType(TEST_ACCOUNT)
                       : index === 1
-                        ? this.getServiceType(REGULAR_ACCOUNT)
-                        : this.getServiceType(SECURE_ACCOUNT);
+                      ? this.getServiceType(REGULAR_ACCOUNT)
+                      : this.getServiceType(SECURE_ACCOUNT);
                   }}
                   style={{ activeSlideAlignment: 'center' }}
                   scrollInterpolator={this.scrollInterpolator}
@@ -1009,13 +1019,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? UsNumberFormat(spendableBalance)
                         : switchOn
-                          ? UsNumberFormat(spendableBalance)
-                          : exchangeRates
-                            ? (
-                              (spendableBalance / 1e8) *
-                              exchangeRates[CurrencyCode].last
-                            ).toFixed(2)
-                            : null}
+                        ? UsNumberFormat(spendableBalance)
+                        : exchangeRates
+                        ? (
+                            (spendableBalance / 1e8) *
+                            exchangeRates[CurrencyCode].last
+                          ).toFixed(2)
+                        : null}
                     </Text>
                     <Text
                       style={{
@@ -1028,8 +1038,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                       {serviceType == TEST_ACCOUNT
                         ? 't-sats'
                         : switchOn
-                          ? 'sats'
-                          : CurrencyCode.toLocaleLowerCase()}
+                        ? 'sats'
+                        : CurrencyCode.toLocaleLowerCase()}
                     </Text>
                   </View>
                   <View style={styles.transactionTitle}>
@@ -1060,8 +1070,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                             () => {
                               (this.refs
                                 .TransactionDetailsBottomSheet as any).snapTo(
-                                  1,
-                                );
+                                1,
+                              );
                               this.checkNShowHelperModal();
                               setTimeout(() => {
                                 this.setState({ transactionItem: item });
@@ -1115,45 +1125,45 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                               </View>
                             </View>
                           ) : (
-                              <View style={styles.modalElementInfoView}>
-                                <View style={{ justifyContent: 'center' }}>
-                                  <FontAwesome
-                                    name={
-                                      item.transactionType == 'Received'
-                                        ? 'long-arrow-down'
-                                        : 'long-arrow-up'
-                                    }
-                                    size={15}
-                                    color={
-                                      item.transactionType == 'Received'
-                                        ? Colors.green
-                                        : Colors.red
-                                    }
-                                  />
-                                </View>
-                                <View
-                                  style={{
-                                    justifyContent: 'center',
-                                    marginLeft: 10,
-                                  }}
-                                >
-                                  <Text style={styles.transactionModalTitleText}>
-                                    {item.accountType}{' '}
-                                  </Text>
-                                  <Text style={styles.transactionModalDateText}>
-                                    {moment(item.date)
-                                      .utc()
-                                      .format('DD MMMM YYYY')}{' '}
-                                    {/* <Entypo
+                            <View style={styles.modalElementInfoView}>
+                              <View style={{ justifyContent: 'center' }}>
+                                <FontAwesome
+                                  name={
+                                    item.transactionType == 'Received'
+                                      ? 'long-arrow-down'
+                                      : 'long-arrow-up'
+                                  }
+                                  size={15}
+                                  color={
+                                    item.transactionType == 'Received'
+                                      ? Colors.green
+                                      : Colors.red
+                                  }
+                                />
+                              </View>
+                              <View
+                                style={{
+                                  justifyContent: 'center',
+                                  marginLeft: 10,
+                                }}
+                              >
+                                <Text style={styles.transactionModalTitleText}>
+                                  {item.accountType}{' '}
+                                </Text>
+                                <Text style={styles.transactionModalDateText}>
+                                  {moment(item.date)
+                                    .utc()
+                                    .format('DD MMMM YYYY')}{' '}
+                                  {/* <Entypo
                             size={10}
                             name={"dot-single"}
                             color={Colors.textColorGrey}
                           /> */}
-                                    {/* {item.time} */}
-                                  </Text>
-                                </View>
+                                  {/* {item.time} */}
+                                </Text>
                               </View>
-                            )}
+                            </View>
+                          )}
                           <View style={styles.transactionModalAmountView}>
                             <Image
                               source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
@@ -1173,13 +1183,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 {item.accountType == 'Test Account'
                                   ? UsNumberFormat(item.amount)
                                   : switchOn
-                                    ? UsNumberFormat(item.amount)
-                                    : exchangeRates
-                                      ? (
-                                        (item.amount / 1e8) *
-                                        exchangeRates[CurrencyCode].last
-                                      ).toFixed(2)
-                                      : null}
+                                  ? UsNumberFormat(item.amount)
+                                  : exchangeRates
+                                  ? (
+                                      (item.amount / 1e8) *
+                                      exchangeRates[CurrencyCode].last
+                                    ).toFixed(2)
+                                  : null}
 
                                 {/* {UsNumberFormat(item.amount)} */}
                               </Text>
@@ -1189,8 +1199,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 {item.accountType == 'Test Account'
                                   ? 't-sats'
                                   : switchOn
-                                    ? 'sats'
-                                    : CurrencyCode.toLocaleLowerCase()}
+                                  ? 'sats'
+                                  : CurrencyCode.toLocaleLowerCase()}
                               </Text>
                             </View>
                             <Text
@@ -1199,7 +1209,13 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 alignSelf: 'center',
                               }}
                             >
-                              {item.confirmations < 6
+                              {item.accountType === 'Test Account'
+                                ? item.confirmations < 6
+                                  ? item.confirmations
+                                  : item.confirmations === '-' // for testnet faucet tx
+                                  ? item.confirmations
+                                  : '6+'
+                                : item.confirmations < 6
                                 ? item.confirmations
                                 : '6+'}
                             </Text>
@@ -1212,14 +1228,14 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                                 />
                               </View>
                             ) : (
-                                <View style={styles.forwardIconView}>
-                                  <Ionicons
-                                    name="ios-arrow-forward"
-                                    color={Colors.textColorGrey}
-                                    size={12}
-                                  />
-                                </View>
-                              )}
+                              <View style={styles.forwardIconView}>
+                                <Ionicons
+                                  name="ios-arrow-forward"
+                                  color={Colors.textColorGrey}
+                                  size={12}
+                                />
+                              </View>
+                            )}
                           </View>
                         </TouchableOpacity>
                       )}
@@ -1250,8 +1266,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     <View style={{ flex: 3, marginLeft: wp('3%') }}>
                       <Text style={styles.bottomCardTitleText}>Send</Text>
                       <Text style={styles.bottomCardInfoText}>
-                        Tran Fee :{' '}
-                        ({switchOn || serviceType === TEST_ACCOUNT
+                        Tran Fee : (
+                        {switchOn || serviceType === TEST_ACCOUNT
                           ? (averageTxFees
                               ? averageTxFees['medium'].averageTxFee
                               : 0) +
@@ -1267,7 +1283,8 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                             ).toFixed(2) +
                             ' ' +
                             CurrencyCode.toLocaleLowerCase()
-                          : null})
+                          : null}
+                        )
                         {/* {averageTxFees ? averageTxFees['low'].averageTxFee : 0}{' '}
                         ({serviceType == TEST_ACCOUNT
                           ? 't-sats'
@@ -1304,273 +1321,287 @@ class Accounts extends Component<AccountsPropsTypes, AccountsStateTypes> {
                     marginLeft: 10,
                     marginRight: 10,
                   }}
-                >
-                </View>
+                ></View>
               </View>
             </ScrollView>
             {showLoader ? <Loader /> : null}
           </View>
         ) : (
-            <ScrollView
-              contentContainerStyle={{
-                backgroundColor: Colors.backgroundColor,
-              }}
-              refreshControl={
-                <RefreshControl refreshing={!this.state.is_initiated} />
-              }
-            />
-          )}
-        {this.state.is_initiated ? (<BottomSheet
-          enabledInnerScrolling={true}
-          ref={'bottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('60%')
-              : hp('60%'),
-          ]}
-          renderContent={() => {
-            const infoBoxInfoText =
-              'All your recent transactions for the ' +
-              this.getAccountNameFromType() +
-              ' will appear here.';
-            return (
-              <TransactionsContent
-                infoBoxInfoText={infoBoxInfoText}
-                isFromAccount={true}
-                transactionLoading={transactionLoading}
-                transactions={transactions}
-                AtCloseEnd={false}
-                setTransactionItem={(item) =>
-                  this.setState({ selectedTransactionItem: item })
-                }
-                setTabBarZIndex={(index) =>
-                  this.setState({ tabBarIndex: index })
-                }
-                TransactionDetailsBottomSheet={
-                  this.refs.TransactionDetailsBottomSheet as any
-                }
-              />
-            );
-          }}
-          renderHeader={() => (
-            <TouchableOpacity
-              activeOpacity={10}
-              onPress={() => {
-                if (this.refs.bottomSheet as any)
-                  (this.refs.bottomSheet as any).snapTo(0);
-              }}
-              style={styles.transactionModalHeaderContainer}
-            >
-              <View style={styles.transactionModalHeaderHandle} />
-              <Text style={styles.transactionModalHeaderTitleText}>
-                {'Transactions'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />) : null}
+          <ScrollView
+            contentContainerStyle={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+            refreshControl={
+              <RefreshControl refreshing={!this.state.is_initiated} />
+            }
+          />
+        )}
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'bottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('60%')
+                : hp('60%'),
+            ]}
+            renderContent={() => {
+              const infoBoxInfoText =
+                'All your recent transactions for the ' +
+                this.getAccountNameFromType() +
+                ' will appear here.';
+              return (
+                <TransactionsContent
+                  infoBoxInfoText={infoBoxInfoText}
+                  isFromAccount={true}
+                  transactionLoading={transactionLoading}
+                  transactions={transactions}
+                  AtCloseEnd={false}
+                  setTransactionItem={(item) =>
+                    this.setState({ selectedTransactionItem: item })
+                  }
+                  setTabBarZIndex={(index) =>
+                    this.setState({ tabBarIndex: index })
+                  }
+                  TransactionDetailsBottomSheet={
+                    this.refs.TransactionDetailsBottomSheet as any
+                  }
+                />
+              );
+            }}
+            renderHeader={() => (
+              <TouchableOpacity
+                activeOpacity={10}
+                onPress={() => {
+                  if (this.refs.bottomSheet as any)
+                    (this.refs.bottomSheet as any).snapTo(0);
+                }}
+                style={styles.transactionModalHeaderContainer}
+              >
+                <View style={styles.transactionModalHeaderHandle} />
+                <Text style={styles.transactionModalHeaderTitleText}>
+                  {'Transactions'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        ) : null}
 
-        {this.state.is_initiated ? (<BottomSheet
-          onCloseStart={async () => {
-            // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
-            // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
-          }}
-          enabledInnerScrolling={true}
-          ref={'TestAccountHelperBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('87%')
-              : hp('89%'),
-            // Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            //   ? hp('35%')
-            //   : hp('40%'),
-            //Platform.OS == 'android' ? hp('50%') : hp('90%'),
-          ]}
-          renderContent={() => (
-            <TestAccountHelpContents
-              titleClicked={() => {
-                if (this.refs.TestAccountHelperBottomSheet as any)
-                  (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              borderColor={Colors.blue}
-              backgroundColor={Colors.blue}
-              onPressHeader={() => {
-                if (isTestHelperDone) {
-                  if (this.refs.TestAccountHelperBottomSheet as any)
-                    (this.refs.TestAccountHelperBottomSheet as any).snapTo(1);
-                  setTimeout(() => {
-                    this.setState({ isTestHelperDone: false });
-                  }, 10);
-                } else {
+        {this.state.is_initiated ? (
+          <BottomSheet
+            onCloseStart={async () => {
+              // let isBuyHelperDone = await AsyncStorage.getItem('isBuyHelperDone');
+              // let isSellHelperDone = await AsyncStorage.getItem('isSellHelperDone');
+            }}
+            enabledInnerScrolling={true}
+            ref={'TestAccountHelperBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('87%')
+                : hp('89%'),
+              // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              //   ? hp('35%')
+              //   : hp('40%'),
+              //Platform.OS == 'android' ? hp('50%') : hp('90%'),
+            ]}
+            renderContent={() => (
+              <TestAccountHelpContents
+                titleClicked={() => {
                   if (this.refs.TestAccountHelperBottomSheet as any)
                     (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
-                }
-              }}
-            />
-          )}
-        />) : null}
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.blue}
+                backgroundColor={Colors.blue}
+                onPressHeader={() => {
+                  if (isTestHelperDone) {
+                    if (this.refs.TestAccountHelperBottomSheet as any)
+                      (this.refs.TestAccountHelperBottomSheet as any).snapTo(1);
+                    setTimeout(() => {
+                      this.setState({ isTestHelperDone: false });
+                    }, 10);
+                  } else {
+                    if (this.refs.TestAccountHelperBottomSheet as any)
+                      (this.refs.TestAccountHelperBottomSheet as any).snapTo(0);
+                  }
+                }}
+              />
+            )}
+          />
+        ) : null}
 
-        {this.state.is_initiated ? (<BottomSheet
-          enabledInnerScrolling={true}
-          ref={'SecureAccountHelperBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('87%')
-              : hp('89%'),
-          ]}
-          renderContent={() => (
-            <SavingsAccountHelpContents
-              titleClicked={() => {
-                if (this.refs.SecureAccountHelperBottomSheet as any)
-                  (this.refs.SecureAccountHelperBottomSheet as any).snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              borderColor={Colors.blue}
-              backgroundColor={Colors.blue}
-              onPressHeader={() => {
-                if (isSecureAccountHelperDone) {
-                  if (this.refs.SecureAccountHelperBottomSheet as any)
-                    (this.refs.SecureAccountHelperBottomSheet as any).snapTo(1);
-                  setTimeout(() => {
-                    this.setState({ isSecureAccountHelperDone: false });
-                  }, 10);
-                } else {
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'SecureAccountHelperBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('87%')
+                : hp('89%'),
+            ]}
+            renderContent={() => (
+              <SavingsAccountHelpContents
+                titleClicked={() => {
                   if (this.refs.SecureAccountHelperBottomSheet as any)
                     (this.refs.SecureAccountHelperBottomSheet as any).snapTo(0);
-                }
-              }}
-            />
-          )}
-        />) : null}
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.blue}
+                backgroundColor={Colors.blue}
+                onPressHeader={() => {
+                  if (isSecureAccountHelperDone) {
+                    if (this.refs.SecureAccountHelperBottomSheet as any)
+                      (this.refs.SecureAccountHelperBottomSheet as any).snapTo(
+                        1,
+                      );
+                    setTimeout(() => {
+                      this.setState({ isSecureAccountHelperDone: false });
+                    }, 10);
+                  } else {
+                    if (this.refs.SecureAccountHelperBottomSheet as any)
+                      (this.refs.SecureAccountHelperBottomSheet as any).snapTo(
+                        0,
+                      );
+                  }
+                }}
+              />
+            )}
+          />
+        ) : null}
 
-        {this.state.is_initiated ? (<BottomSheet
-          enabledInnerScrolling={true}
-          ref={'RegularAccountHelperBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('87%')
-              : hp('89%'),
-          ]}
-          renderContent={() => (
-            <CheckingAccountHelpContents
-              titleClicked={() => {
-                if (this.refs.RegularAccountHelperBottomSheet as any)
-                  (this.refs.RegularAccountHelperBottomSheet as any).snapTo(0);
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              borderColor={Colors.blue}
-              backgroundColor={Colors.blue}
-              onPressHeader={() => {
-                if (isRegularAccountHelperDone) {
-                  if (this.refs.RegularAccountHelperBottomSheet as any)
-                    (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
-                      1,
-                    );
-                  setTimeout(() => {
-                    this.setState({ isRegularAccountHelperDone: false });
-                  }, 10);
-                } else {
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'RegularAccountHelperBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('87%')
+                : hp('89%'),
+            ]}
+            renderContent={() => (
+              <CheckingAccountHelpContents
+                titleClicked={() => {
                   if (this.refs.RegularAccountHelperBottomSheet as any)
                     (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
                       0,
                     );
-                }
-              }}
-            />
-          )}
-        />) : null}
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.blue}
+                backgroundColor={Colors.blue}
+                onPressHeader={() => {
+                  if (isRegularAccountHelperDone) {
+                    if (this.refs.RegularAccountHelperBottomSheet as any)
+                      (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                        1,
+                      );
+                    setTimeout(() => {
+                      this.setState({ isRegularAccountHelperDone: false });
+                    }, 10);
+                  } else {
+                    if (this.refs.RegularAccountHelperBottomSheet as any)
+                      (this.refs.RegularAccountHelperBottomSheet as any).snapTo(
+                        0,
+                      );
+                  }
+                }}
+              />
+            )}
+          />
+        ) : null}
 
-        {this.state.is_initiated ? (<BottomSheet
-          enabledInnerScrolling={true}
-          ref={'TransactionDetailsBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('88%')
-              : hp('88%'),
-          ]}
-          renderContent={() => (
-            <TransactionDetails
-              item={transactionItem}
-              serviceType={serviceType}
-              getServiceType={this.getServiceType}
-              onPressKnowMore={() => {
-                this.props.setTransactionHelper(true);
-                //AsyncStorage.setItem('isTransactionHelperDone', 'true');
-                (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
-                  1,
-                );
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              borderColor={Colors.white}
-              backgroundColor={Colors.white}
-              onPressHeader={() => {
-                if (this.refs.TransactionDetailsBottomSheet as any)
-                  (this.refs.TransactionDetailsBottomSheet as any).snapTo(0);
-              }}
-            />
-          )}
-        />) : null}
-
-
-        {this.state.is_initiated ? (<BottomSheet
-          enabledInnerScrolling={true}
-          ref={'TransactionDetailsHelperBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && deviceInfoModule.hasNotch()
-              ? hp('87%')
-              : hp('89%'),
-            // Platform.OS == 'ios' && DeviceInfo.hasNotch()
-            //   ? hp('35%')
-            //   : hp('40%'),
-          ]}
-          renderContent={() => (
-            <TransactionHelperModalContents
-              titleClicked={() => {
-                (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
-                  0,
-                );
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              borderColor={Colors.blue}
-              backgroundColor={Colors.blue}
-              onPressHeader={() => {
-                if (isHelperDone) {
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'TransactionDetailsBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp('88%')
+                : hp('88%'),
+            ]}
+            renderContent={() => (
+              <TransactionDetails
+                item={transactionItem}
+                serviceType={serviceType}
+                getServiceType={this.getServiceType}
+                onPressKnowMore={() => {
+                  this.props.setTransactionHelper(true);
+                  //AsyncStorage.setItem('isTransactionHelperDone', 'true');
                   (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
                     1,
                   );
-                  setTimeout(() => {
-                    this.setState({ isHelperDone: false });
-                  }, 10);
-                } else {
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.white}
+                backgroundColor={Colors.white}
+                onPressHeader={() => {
+                  if (this.refs.TransactionDetailsBottomSheet as any)
+                    (this.refs.TransactionDetailsBottomSheet as any).snapTo(0);
+                }}
+              />
+            )}
+          />
+        ) : null}
+
+        {this.state.is_initiated ? (
+          <BottomSheet
+            enabledInnerScrolling={true}
+            ref={'TransactionDetailsHelperBottomSheet'}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && deviceInfoModule.hasNotch()
+                ? hp('87%')
+                : hp('89%'),
+              // Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              //   ? hp('35%')
+              //   : hp('40%'),
+            ]}
+            renderContent={() => (
+              <TransactionHelperModalContents
+                titleClicked={() => {
                   (this.refs.TransactionDetailsHelperBottomSheet as any).snapTo(
                     0,
                   );
-                }
-              }}
-            />
-          )}
-        />) : null}
+                }}
+              />
+            )}
+            renderHeader={() => (
+              <SmallHeaderModal
+                borderColor={Colors.blue}
+                backgroundColor={Colors.blue}
+                onPressHeader={() => {
+                  if (isHelperDone) {
+                    (this.refs
+                      .TransactionDetailsHelperBottomSheet as any).snapTo(1);
+                    setTimeout(() => {
+                      this.setState({ isHelperDone: false });
+                    }, 10);
+                  } else {
+                    (this.refs
+                      .TransactionDetailsHelperBottomSheet as any).snapTo(0);
+                  }
+                }}
+              />
+            )}
+          />
+        ) : null}
       </View>
     );
   }
@@ -1722,8 +1753,8 @@ const styles = StyleSheet.create({
       Platform.OS == 'ios' && DeviceInfo.hasNotch()
         ? 50
         : Platform.OS == 'android'
-          ? 43
-          : 40,
+        ? 43
+        : 40,
     borderTopLeftRadius: 10,
     borderLeftColor: Colors.borderColor,
     borderLeftWidth: 1,

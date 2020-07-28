@@ -49,8 +49,8 @@ import DeviceInfo from 'react-native-device-info';
 export default function NewWalletQuestion(props) {
   let [message, setMessage] = useState('Creating your wallet');
   let [subTextMessage, setSubTextMessage] = useState(
-    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it'
-  )
+    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
+  );
   const [Elevation, setElevation] = useState(10);
   const [isLoaderStart, setIsLoaderStart] = useState(false);
   const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
@@ -75,62 +75,64 @@ export default function NewWalletQuestion(props) {
   let [tempAns, setTempAns] = useState('');
   const [isEditable, setIsEditable] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
-  const { isInitialized, loading } = useSelector(state => state.setupAndAuth);
+  const { isInitialized, loading } = useSelector((state) => state.setupAndAuth);
   const [loaderBottomSheet, setLoaderBottomSheet] = useState(React.createRef());
-  const [confirmAnswerTextInput, setConfirmAnswerTextInput] = useState(React.createRef());
+  const [confirmAnswerTextInput, setConfirmAnswerTextInput] = useState(
+    React.createRef(),
+  );
   const [visibleButton, setVisibleButton] = useState(false);
-  const accounts = useSelector(state => state.accounts);
+  const accounts = useSelector((state) => state.accounts);
   const testAccService = accounts[TEST_ACCOUNT].service;
 
-  const [balances, setBalances] = useState({
-    testBalance: 0,
-    regularBalance: 0,
-    secureBalance: 0,
-    accumulativeBalance: 0,
-  });
-  const [transactions, setTransactions] = useState([]);
-  useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
-      : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
+  // const [balances, setBalances] = useState({
+  //   testBalance: 0,
+  //   regularBalance: 0,
+  //   secureBalance: 0,
+  //   accumulativeBalance: 0,
+  // });
+  // const [transactions, setTransactions] = useState([]);
+  // useEffect(() => {
+  //   const testBalance = accounts[TEST_ACCOUNT].service
+  //     ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
+  //     accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //     : 0;
+  //   const regularBalance = accounts[REGULAR_ACCOUNT].service
+  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
+  //     accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
+  //     : 0;
+  //   const secureBalance = accounts[SECURE_ACCOUNT].service
+  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
+  //     accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
+  //       .unconfirmedBalance
+  //     : 0;
+  //   const accumulativeBalance = regularBalance + secureBalance;
 
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : [];
-    const regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-        .transactionDetails
-      : [];
+  //   const testTransactions = accounts[TEST_ACCOUNT].service
+  //     ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
+  //     : [];
+  //   const regularTransactions = accounts[REGULAR_ACCOUNT].service
+  //     ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
+  //       .transactionDetails
+  //     : [];
 
-    const secureTransactions = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-        .transactionDetails
-      : [];
-    const accumulativeTransactions = [
-      ...testTransactions,
-      ...regularTransactions,
-      ...secureTransactions,
-    ];
+  //   const secureTransactions = accounts[SECURE_ACCOUNT].service
+  //     ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
+  //       .transactionDetails
+  //     : [];
+  //   const accumulativeTransactions = [
+  //     ...testTransactions,
+  //     ...regularTransactions,
+  //     ...secureTransactions,
+  //   ];
 
-    setBalances({
-      testBalance,
-      regularBalance,
-      secureBalance,
-      accumulativeBalance,
-    });
-    setTransactions(accumulativeTransactions);
-  }, [accounts]);
+  //   setBalances({
+  //     testBalance,
+  //     regularBalance,
+  //     secureBalance,
+  //     accumulativeBalance,
+  //   });
+  //   setTransactions(accumulativeTransactions);
+  // }, [accounts]);
 
   // useEffect(() => {
   //   (async () => {
@@ -187,7 +189,7 @@ export default function NewWalletQuestion(props) {
     })();
   }, [testAccService]);
 
-  const exchangeRates = useSelector(state => state.accounts.exchangeRates);
+  const exchangeRates = useSelector((state) => state.accounts.exchangeRates);
   useEffect(() => {
     if (!exchangeRates) {
       dispatch(calculateExchangeRate());
@@ -230,7 +232,7 @@ export default function NewWalletQuestion(props) {
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
       props.navigation.navigate('HomeNav');
     }
-  }, [isInitialized, exchangeRates, balances, transactions]);
+  }, [isInitialized]);
 
   const setConfirm = () => {
     setConfirmAnswer(tempAns);
@@ -243,7 +245,7 @@ export default function NewWalletQuestion(props) {
     }
   };
 
-  const setBackspace = event => {
+  const setBackspace = (event) => {
     if (event.nativeEvent.key == 'Backspace') {
       setTimeout(() => {
         setAnsError('');
@@ -300,30 +302,25 @@ export default function NewWalletQuestion(props) {
     setTimeout(() => {
       setMessage('Bootstrapping Accounts');
       setSubTextMessage(
-        'Hexa has a multi-account model which lets you better manage your Bitcoin (sats)'
-      )
+        'Hexa has a multi-account model which lets you better manage your Bitcoin (sats)',
+      );
       setTimeout(() => {
         setMessage('Filling Test Account with test sats');
         setSubTextMessage(
-          'Preloaded Test Account is the best place to start your Bitcoin journey'
-        )
+          'Preloaded Test Account is the best place to start your Bitcoin journey',
+        );
         setTimeout(() => {
           setMessage('Generating Recovery Keys');
           setSubTextMessage(
-            'Recovery Keys help you restore your Hexa wallet in case your phone is lost'
-          )
+            'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+          );
         }, 3000);
       }, 3000);
     }, 3000);
   };
 
   const renderLoaderModalContent = useCallback(() => {
-    return (
-      <LoaderModal
-        headerText={message}
-        messageText={subTextMessage}
-      />
-    );
+    return <LoaderModal headerText={message} messageText={subTextMessage} />;
   }, [message, subTextMessage]);
 
   const renderLoaderModalHeader = () => {
@@ -479,17 +476,19 @@ export default function NewWalletQuestion(props) {
                       value={hideShowAnswer ? answerMasked : answer}
                       autoCompleteType="off"
                       textContentType="none"
-                      returnKeyType='next'
+                      returnKeyType="next"
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
-                      onSubmitEditing={() => (confirmAnswerTextInput as any).current.focus()}
+                      onSubmitEditing={() =>
+                        (confirmAnswerTextInput as any).current.focus()
+                      }
                       keyboardType={
                         Platform.OS == 'ios'
                           ? 'ascii-capable'
                           : 'visible-password'
                       }
-                      onChangeText={text => {
+                      onChangeText={(text) => {
                         text = text.replace(/[^a-z]/g, '');
                         setAnswer(text);
                         setAnswerMasked(text);
@@ -523,7 +522,7 @@ export default function NewWalletQuestion(props) {
                           }, 2);
                         }
                       }}
-                      onKeyPress={e => {
+                      onKeyPress={(e) => {
                         if (e.nativeEvent.key === 'Backspace') {
                           setTimeout(() => {
                             setAnswer('');
@@ -532,7 +531,7 @@ export default function NewWalletQuestion(props) {
                         }
                       }}
                     />
-                    {answer ?
+                    {answer ? (
                       <TouchableWithoutFeedback
                         onPress={() => {
                           setHdeShowAnswer(!hideShowAnswer);
@@ -545,7 +544,7 @@ export default function NewWalletQuestion(props) {
                           name={hideShowAnswer ? 'eye-off' : 'eye'}
                         />
                       </TouchableWithoutFeedback>
-                      : null}
+                    ) : null}
                   </View>
                   <View
                     style={{
@@ -578,15 +577,15 @@ export default function NewWalletQuestion(props) {
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
-                      onKeyPress={event => {
+                      onKeyPress={(event) => {
                         setBackspace(event);
                       }}
-                      onChangeText={text => {
+                      onChangeText={(text) => {
                         text = text.replace(/[^a-z]/g, '');
                         setTempAns(text);
                         setConfirmAnswerMasked(text);
                       }}
-                      onSubmitEditing={event => setConfirm()}
+                      onSubmitEditing={(event) => setConfirm()}
                       onFocus={() => {
                         setDropdownBoxOpenClose(false);
                         setConfirmAnswerInputStyle(styles.inputBoxFocused);
@@ -608,7 +607,7 @@ export default function NewWalletQuestion(props) {
                         setConfirm();
                       }}
                     />
-                    {confirmAnswer ?
+                    {confirmAnswer ? (
                       <TouchableWithoutFeedback
                         onPress={() => {
                           setHideShowConfirmAnswer(!hideShowConfirmAnswer);
@@ -622,12 +621,12 @@ export default function NewWalletQuestion(props) {
                           name={hideShowConfirmAnswer ? 'eye-off' : 'eye'}
                         />
                       </TouchableWithoutFeedback>
-                      : null}
+                    ) : null}
                   </View>
                 </View>
               ) : (
-                  <View style={{ marginTop: 15 }} />
-                )}
+                <View style={{ marginTop: 15 }} />
+              )}
               <View
                 style={{
                   marginLeft: 20,
@@ -651,8 +650,8 @@ export default function NewWalletQuestion(props) {
         </ScrollView>
         <View style={{ ...styles.bottomButtonView }}>
           {answer.trim() == confirmAnswer.trim() &&
-            confirmAnswer.trim() &&
-            answer.trim()
+          confirmAnswer.trim() &&
+          answer.trim()
             ? setButtonVisible()
             : null}
           <View style={styles.statusIndicatorView}>
@@ -675,7 +674,7 @@ export default function NewWalletQuestion(props) {
           </View>
         ) : null}
         <BottomSheet
-          onCloseEnd={() => { }}
+          onCloseEnd={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

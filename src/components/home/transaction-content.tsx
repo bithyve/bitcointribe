@@ -163,7 +163,15 @@ const TransactionsContent = ({
                         {UsNumberFormat(item.amount)}
                       </Text>
                       <Text style={styles.transactionModalAmountUnitText}>
-                        {item.confirmations < 6 ? item.confirmations : '6+'}
+                        {item.accountType === 'Test Account'
+                          ? item.confirmations < 6
+                            ? item.confirmations
+                            : item.confirmations === '-' // for testnet faucet tx
+                            ? item.confirmations
+                            : '6+'
+                          : item.confirmations < 6
+                          ? item.confirmations
+                          : '6+'}
                       </Text>
                       <Ionicons
                         name="ios-arrow-forward"
