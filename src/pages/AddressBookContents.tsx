@@ -173,10 +173,6 @@ class AddressBookContents extends PureComponent<
   updateAddressBook = async () => {
     const { regularAccount, trustedContactsService } = this.props;
     let { trustedContactsInfo } = this.props;
-    if (!trustedContactsInfo) {
-      let TrustedContactsInfo = await AsyncStorage.getItem("TrustedContactsInfo")
-      trustedContactsInfo = JSON.stringify(JSON.parse(TrustedContactsInfo))
-    }
     let myKeepers = [];
     let imKeepers = [];
     let otherTrustedContact = [];
@@ -407,29 +403,29 @@ class AddressBookContents extends PureComponent<
           ) : null}
         </View>
         <View style={styles.getImageView}>
-        {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? <View>
-          {!(contact.hasXpub || contact.hasTrustedAddress) &&
-            (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
-            !contact.hasTrustedChannel ? (
-              <View
-                style={{
-                  width: wp('15%'),
-                  height: wp('6%'),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: Colors.borderColor,
-                  marginRight: 10,
-                  borderRadius: 5,
-                }}
-              >
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontSize: RFValue(10),
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  Expired
+          {!contact.hasTrustedChannel || contactsType !== "I'm Keeper of" ? <View>
+            {!(contact.hasXpub || contact.hasTrustedAddress) &&
+              (Date.now() - contact.initiatedAt > config.TC_REQUEST_EXPIRY &&
+                !contact.hasTrustedChannel ? (
+                  <View
+                    style={{
+                      width: wp('15%'),
+                      height: wp('6%'),
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      backgroundColor: Colors.borderColor,
+                      marginRight: 10,
+                      borderRadius: 5,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontSize: RFValue(10),
+                        fontFamily: Fonts.FiraSansRegular,
+                      }}
+                    >
+                      Expired
                 </Text>
                   </View>
                 ) : (
