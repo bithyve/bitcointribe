@@ -30,7 +30,7 @@ const TransactionsContent = ({
   setTabBarZIndex,
   transactionLoading,
   isFromAccount,
-  infoBoxInfoText
+  infoBoxInfoText,
 }) => {
   if (transactionLoading) {
     return (
@@ -42,30 +42,17 @@ const TransactionsContent = ({
         >
           {[1, 2, 3, 4, 5].map((value) => {
             return (
-              <View
-                key={value}
-                style={styles.view}
-              >
+              <View key={value} style={styles.view}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={styles.view1}
-                  />
+                  <View style={styles.view1} />
                   <View>
-                    <View
-                      style={styles.view2}
-                    />
-                    <View
-                      style={styles.view3}
-                    />
+                    <View style={styles.view2} />
+                    <View style={styles.view3} />
                   </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <View
-                    style={styles.view4}
-                  />
-                  <View
-                    style={styles.view1}
-                  />
+                  <View style={styles.view4} />
+                  <View style={styles.view1} />
                 </View>
               </View>
             );
@@ -73,18 +60,18 @@ const TransactionsContent = ({
         </View>
         <View style={{ backgroundColor: Colors.white }}>
           <View
-            style={{...styles.viewTransaction,
-    marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,}}
+            style={{
+              ...styles.viewTransaction,
+              marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
+            }}
           >
-            <Text
-              style={styles.viewTransactionText}
-            >
+            <Text style={styles.viewTransactionText}>
               View your transactions here
             </Text>
-            <Text
-              style={styles.textNote}
-            >
-              {infoBoxInfoText ? infoBoxInfoText :'All your recent transactions across the accounts appear here'}
+            <Text style={styles.textNote}>
+              {infoBoxInfoText
+                ? infoBoxInfoText
+                : 'All your recent transactions across the accounts appear here'}
             </Text>
           </View>
         </View>
@@ -109,9 +96,7 @@ const TransactionsContent = ({
                   <AppBottomSheetTouchableWrapper
                     onPress={
                       () => {
-                        (TransactionDetailsBottomSheet as any).snapTo(
-                          1,
-                        );
+                        (TransactionDetailsBottomSheet as any).snapTo(1);
                         setTimeout(() => {
                           setTransactionItem(item);
                           setTabBarZIndex(0);
@@ -144,7 +129,9 @@ const TransactionsContent = ({
                         style={{ justifyContent: 'center', marginLeft: 10 }}
                       >
                         <Text style={styles.transactionModalTitleText}>
-                          {item.accountType == FAST_BITCOINS ? "FastBitcoins" : item.accountType}{' '}
+                          {item.accountType == FAST_BITCOINS
+                            ? 'FastBitcoins'
+                            : item.accountType}{' '}
                         </Text>
                         <Text style={styles.transactionModalDateText}>
                           {moment(item.date).utc().format('DD MMMM YYYY')}{' '}
@@ -153,9 +140,7 @@ const TransactionsContent = ({
                     </View>
                     <View style={styles.transactionModalAmountView}>
                       {item.accountType == FAST_BITCOINS && (
-                        <View
-                          style={styles.view5}
-                        >
+                        <View style={styles.view5}>
                           <Image
                             source={require('../../assets/images/icons/fastbitcoin_dark.png')}
                             style={{
@@ -195,15 +180,15 @@ const TransactionsContent = ({
           {transactions.length <= 1 && (
             <View
               style={{
-                marginBottom: isFromAccount ? hp('3%') : AtCloseEnd ? hp('12%') + 15 : hp('30%') + 15,
-                ...styles.viewTransaction
+                marginBottom: isFromAccount
+                  ? hp('3%')
+                  : AtCloseEnd
+                  ? hp('12%') + 15
+                  : hp('30%') + 15,
+                ...styles.viewTransaction,
               }}
             >
-              <Text
-                style={{...styles.viewTransactionText,
-                  color: Colors.blue,
-                }}
-              >
+              <Text style={styles.viewTransactionText}>
                 View your transactions here
               </Text>
               <Text
@@ -213,41 +198,43 @@ const TransactionsContent = ({
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                {infoBoxInfoText ? infoBoxInfoText :'All your recent transactions across the accounts appear here'}
+                {infoBoxInfoText
+                  ? infoBoxInfoText
+                  : 'All your recent transactions across the accounts appear here'}
               </Text>
             </View>
           )}
         </View>
       );
-    }
-    else{
-      return <View style={styles.modalContentContainer}>
-        <View style={{ flex: 1 }}>
-        </View>
-        <View style={{ backgroundColor: Colors.white }}>
-          <View
-            style={{
-              ...styles.viewTransaction,
-              marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
-            }}
-          >
-            <Text
-              style={styles.viewTransactionText}
-            >
-              View your transactions here
-            </Text>
-            <Text
+    } else {
+      return (
+        <View style={styles.modalContentContainer}>
+          <View style={{ flex: 1 }}></View>
+          <View style={{ backgroundColor: Colors.white }}>
+            <View
               style={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue(12),
-                fontFamily: Fonts.FiraSansRegular,
+                ...styles.viewTransaction,
+                marginBottom: isFromAccount ? hp('3%') : hp('12%') + 15,
               }}
             >
-              {infoBoxInfoText ? infoBoxInfoText :'All your recent transactions across the accounts appear here'}
-            </Text>
+              <Text style={styles.viewTransactionText}>
+                View your transactions here
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue(12),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {infoBoxInfoText
+                  ? infoBoxInfoText
+                  : 'All your recent transactions across the accounts appear here'}
+              </Text>
+            </View>
           </View>
         </View>
-        </View>
+      );
     }
   }
 };
@@ -259,7 +246,7 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: Colors.white,
   },
-  view:{
+  view: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -268,7 +255,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderColor: Colors.borderColor,
   },
-  view1:{
+  view1: {
     backgroundColor: Colors.backgroundColor,
     height: wp('5%'),
     width: wp('5%'),
@@ -276,26 +263,26 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10,
   },
-  view2:{
+  view2: {
     backgroundColor: Colors.backgroundColor,
     height: wp('5%'),
     width: wp('25%'),
     borderRadius: 10,
   },
-  view3:{
+  view3: {
     backgroundColor: Colors.backgroundColor,
     height: wp('5%'),
     width: wp('35%'),
     marginTop: 5,
     borderRadius: 10,
   },
-  view4:{
+  view4: {
     backgroundColor: Colors.backgroundColor,
     height: wp('7%'),
     width: wp('20%'),
     borderRadius: 10,
   },
-  view5:{
+  view5: {
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: Colors.borderColor,
@@ -305,7 +292,7 @@ const styles = StyleSheet.create({
     height: wp('8%'),
     backgroundColor: Colors.white,
   },
-  viewTransaction:{
+  viewTransaction: {
     margin: 15,
     backgroundColor: Colors.backgroundColor,
     padding: 10,
@@ -313,13 +300,13 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderRadius: 7,
   },
-  textNote:{
+  textNote: {
     color: Colors.textColorGrey,
     fontSize: RFValue(12),
     fontFamily: Fonts.FiraSansRegular,
   },
-  viewTransactionText:{
-    color: Colors.black,
+  viewTransactionText: {
+    color: Colors.blue,
     fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
