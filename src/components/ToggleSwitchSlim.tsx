@@ -23,7 +23,7 @@ export default function ToggleSwitchSlim(props) {
     return (
       <MaterialCommunityIcons
         name={currencyName}
-        color={currencyColor == 'gray' ? Colors.currencyGray : Colors.blue}
+        color={currencyColor == 'light' ? Colors.white : Colors.blue}
         size={wp('3.8%')}
       />
     );
