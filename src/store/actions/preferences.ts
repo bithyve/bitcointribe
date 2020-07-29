@@ -1,5 +1,7 @@
 import { createAction } from 'redux-actions';
 import { UPDATE_APP_PREFERENCE } from '../constants'
+import { AsyncStorage } from 'react-native'
+import { updateTrustedContactInfoLocally } from '../actions/trustedContacts'
 
 export const CURRENCY_CODE = 'CURRENCY_CODE';
 export const CURRENCY_TOGGLE_VALUE = 'CURRENCY_TOGGLE_VALUE';
@@ -12,6 +14,9 @@ export const RECEIVE_HELPER_DONE = 'RECEIVE_HELPER_DONE';
 export const SEND_HELPER_DONE = 'SEND_HELPER_DONE';
 export const SAVING_WARNING = 'SAVING_WARNING';
 export const TWO_FA_SETUP = 'TWO_FA_SETUP';
+export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST';
+export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS';
+export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED';
 
 
 
@@ -93,3 +98,24 @@ export const setTwoFASetup = (data) => {
 
 const updatePereferenceRequest = createAction(UPDATE_APP_PREFERENCE);
 export const updatePreference = (payload) => dispatch => dispatch(updatePereferenceRequest(payload))
+
+
+
+const initAsyncMigrationRequest = createAction(INIT_ASYNC_MIGRATION_REQUEST);
+const initAsyncMigrationSuccess = createAction(INIT_ASYNC_MIGRATION_SUCCESS);
+const initAsyncMigrationFailed = createAction(INIT_ASYNC_MIGRATION_FAILED);
+
+
+
+
+export const initMigration = () => {
+  return async dispatch => {
+    dispatch(initAsyncMigrationRequest());
+    let data = await AsyncStorage.multiGet(["TrustedContactsInfo"])
+    if (data && data[0] && data[0][1]) {
+      let trustedContacts = data[0][1]
+      dispatch(updateTrustedContactInfoLocally(JSON.parse(trustedContacts)))
+    }
+    dispatch(initAsyncMigrationSuccess());
+  };
+}

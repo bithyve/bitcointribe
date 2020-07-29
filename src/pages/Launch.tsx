@@ -33,7 +33,8 @@ import { updatePreference } from '../store/actions/preferences';
 export default function Launch(props) {
   const dispatch = useDispatch();
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const preferences = useSelector((state) => state.preferences)
+  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
+
   useEffect(() => {
     dispatch(initializeDB());
   }, []);
@@ -49,6 +50,11 @@ export default function Launch(props) {
   let isContactOpen = false;
   let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {
+    // no need to trigger login screen if accounts are not synced yet
+    // which means user hasn't logged in yet
+    if (!accountsSynched) {
+      return
+    }
     AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
       (response) => {
         isContactOpen = JSON.parse(response[0][1]);
