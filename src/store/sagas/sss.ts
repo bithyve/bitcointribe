@@ -517,39 +517,55 @@ function* downloadMetaShareWorker({ payload }) {
       yield put(downloadedMShare(otp, true));
       yield put(updateMSharesHealth(updatedBackup));
     } else {
-      const updatedRecoveryShares = {};
+      let updatedRecoveryShares = {};
       let updated = false;
-      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((objectKey) => {
-        const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
-        if (
-          recoveryShare.REQUEST_DETAILS &&
-          recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
-        ) {
-          updatedRecoveryShares[objectKey] = {
-            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+
+      if (payload.replaceIndex === 0 || payload.replaceIndex) {
+        // replacing stored key w/ scanned from Guardian's help-restore
+        updatedRecoveryShares = {
+          ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+          [payload.replaceIndex]: {
+            REQUEST_DETAILS: { KEY: encryptedKey },
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
-          };
-          updated = true;
-        } else {
-          updatedRecoveryShares[objectKey] = recoveryShare;
-        }
-      });
-
-      if (!updated) {
-        if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
-          Alert.alert(
-            'Key Exists',
-            'Following key already exists for recovery',
-          );
-          return;
-        }
-        updatedRecoveryShares[metaShare.shareId] = {
-          META_SHARE: metaShare,
-          ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          },
         };
-        Toast('Share Downloaded');
+      } else {
+        Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(
+          (objectKey) => {
+            const recoveryShare =
+              DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
+            if (
+              recoveryShare.REQUEST_DETAILS &&
+              recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
+            ) {
+              updatedRecoveryShares[objectKey] = {
+                REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+                META_SHARE: metaShare,
+                ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+              };
+              updated = true;
+            } else {
+              updatedRecoveryShares[objectKey] = recoveryShare;
+            }
+          },
+        );
       }
+
+      // if (!updated) {
+      //   if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
+      //     Alert.alert(
+      //       'Key Exists',
+      //       'Following key already exists for recovery',
+      //     );
+      //     return;
+      //   }
+      //   updatedRecoveryShares[metaShare.shareId] = {
+      //     META_SHARE: metaShare,
+      //     ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+      //   };
+      //   Toast('Share Downloaded');
+      // }
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
