@@ -95,6 +95,13 @@ function* servicesEnricherWorker({ payload }) {
       throw new Error('Database missing; services encrichment failed');
     }
 
+    let dbVersion = database.VERSION
+    let appVersion = DeviceInfo.getVersion()
+    if (appVersion === "0.9") {
+      appVersion = "0.9.0"
+    }
+
+
     const {
       REGULAR_ACCOUNT,
       TEST_ACCOUNT,
@@ -105,13 +112,13 @@ function* servicesEnricherWorker({ payload }) {
 
     let services;
     let migrated = false;
-    if (!database.VERSION) { database.VERSION = '0.7.0' }
-    else if (database.VERSION === '0.9') { database.VERSION = '0.9.0' }
-    else if (database.VERSION === '1.0') { database.VERSION = '1.0.0' }
-    if (semver.gt(DeviceInfo.getVersion(), database.VERSION)) {
+    if (!database.VERSION) { dbVersion = '0.7.0' }
+    else if (database.VERSION === '0.9') { dbVersion = '0.9.0' }
+    else if (database.VERSION === '1.0') { dbVersion = '1.0.0' }
+    if (semver.gt(appVersion, dbVersion)) {
       if (
-        database.VERSION == '0.7.0' &&
-        semver.gte(DeviceInfo.getVersion(), '0.9.0')
+        dbVersion === '0.7.0' &&
+        semver.gte(appVersion, '0.9.0')
       ) {
         // version 0.7.0 support
         console.log('Migration running for 0.7.0');
@@ -143,7 +150,7 @@ function* servicesEnricherWorker({ payload }) {
         };
       }
 
-      if (semver.eq(DeviceInfo.getVersion(), '1.1.0')) {
+      if (semver.eq(appVersion, '1.1.0')) {
         // version 1.0 and lower support
 
         // re-derive primary extended keys (standardization)

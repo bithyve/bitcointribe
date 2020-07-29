@@ -311,7 +311,6 @@ export default function Login(props) {
           if (dbFetched) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
-
             setTimeout(() => {
               if (accountsSynched) {
                 loaderBottomSheet.current.snapTo(0);
