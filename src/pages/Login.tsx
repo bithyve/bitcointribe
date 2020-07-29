@@ -33,6 +33,7 @@ import DeviceInfo from 'react-native-device-info';
 import ErrorModalContents from '../components/ErrorModalContents';
 import ModalHeader from '../components/ModalHeader';
 import RelayServices from '../bitcoin/services/RelayService';
+import { initMigration } from '../store/actions/preferences';
 
 export default function Login(props) {
   let [message, setMessage] = useState('Satoshis or Sats');
@@ -200,11 +201,16 @@ export default function Login(props) {
     }
   }, [s3Service]);
 
+  const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
     // HC up-streaming
     if (DECENTRALIZED_BACKUP) {
-      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+      if (
+        Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length &&
+        !updatedHealth
+      ) {
         dispatch(updateMSharesHealth());
+        setUpdatedHealth(true);
       }
     }
   }, [DECENTRALIZED_BACKUP]);
@@ -296,22 +302,31 @@ export default function Login(props) {
     'trustedContactRequest',
   );
   const userKey = props.navigation.getParam('userKey');
+  const isMigrated = useSelector(state => state.preferences.isMigrated)
+  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
 
   useEffect(() => {
     if (isAuthenticated) {
+      // migrate async keys
+      if (!isMigrated) {
+        dispatch(initMigration())
+      }
       AsyncStorage.getItem('walletExists').then((exists) => {
         if (exists) {
           if (dbFetched) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
-              loaderBottomSheet.current.snapTo(0);
-              props.navigation.navigate('Home', {
-                custodyRequest,
-                recoveryRequest,
-                trustedContactRequest,
-                userKey,
-              });
+              if (accountsSynched) {
+                loaderBottomSheet.current.snapTo(0);
+                props.navigation.navigate('Home', {
+                  custodyRequest,
+                  recoveryRequest,
+                  trustedContactRequest,
+                  userKey,
+                });
+              }
+
             }, 2500);
             dispatch(startupSync());
           }
@@ -453,8 +468,8 @@ export default function Login(props) {
                     ) : passcode.length == 0 && passcodeFlag == true ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -482,8 +497,8 @@ export default function Login(props) {
                     ) : passcode.length == 1 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -511,8 +526,8 @@ export default function Login(props) {
                     ) : passcode.length == 2 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
                 <View
@@ -540,8 +555,8 @@ export default function Login(props) {
                     ) : passcode.length == 3 ? (
                       <Text style={styles.passcodeTextInputText}>{'|'}</Text>
                     ) : (
-                      ''
-                    )}
+                          ''
+                        )}
                   </Text>
                 </View>
               </View>
@@ -719,7 +734,7 @@ export default function Login(props) {
           </View>
         </View>
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={loaderBottomSheet}

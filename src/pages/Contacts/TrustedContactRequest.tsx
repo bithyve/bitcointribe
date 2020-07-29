@@ -140,7 +140,9 @@ export default function TrustedContactRequest(props) {
           <TextInput
             keyboardType={'numeric'}
             placeholderTextColor={Colors.borderColor}
-            placeholder={`${props.hint.charAt(0)}XXX XXX X${props.hint.substring(1)}`}
+            placeholder={`${props.hint.charAt(
+              0,
+            )}XXX XXX X${props.hint.substring(1)}`}
             onChangeText={(text) => {
               setPhoneNumber(text);
               if (text.length === 10) checkForValidation(text);
@@ -283,20 +285,14 @@ export default function TrustedContactRequest(props) {
         }}
       >
         <View>
-          <View style={{flexDirection: 'row', flex: 1}}>
+          <View style={{ flexDirection: 'row', flex: 1 }}>
             <View style={styles.successModalHeaderView}>
               {!props.isRecovery ? (
-                props.isPayment ? (
-                  <Text style={styles.modalTitleText}>
-                    {'Friends and Family Request'}
-                  </Text>
-                ) : (
-                  <Text style={styles.modalTitleText}>
-                    {props.isGuardian
-                      ? 'Friends and Family Request'
-                      : 'Keeper Request'}
-                  </Text>
-                )
+                <Text style={styles.modalTitleText}>
+                  {props.isGuardian
+                    ? 'Keeper Request'
+                    : 'Friends and Family Request'}
+                </Text>
               ) : (
                 <Text style={styles.modalTitleText}>Recovery Key Request</Text>
               )}
@@ -329,13 +325,29 @@ export default function TrustedContactRequest(props) {
               </View>
             </View>
           </View>
-          <View style={{width: '100%', height: 0.5, backgroundColor: Colors.borderColor, marginBottom: hp('3%')}}/>
-          {!props.isQR ? (<Text style={{...styles.modalTitleText, marginLeft: wp('8%'),
-                marginRight: wp('8%'),}}>{props.inputType === 'phone'
-                  ? 'Confirm your mobile number'
-                  : props.inputType === 'email'
-                  ? 'Confirm your email address'
-                  : null}</Text>) : null}
+          <View
+            style={{
+              width: '100%',
+              height: 0.5,
+              backgroundColor: Colors.borderColor,
+              marginBottom: hp('3%'),
+            }}
+          />
+          {!props.isQR ? (
+            <Text
+              style={{
+                ...styles.modalTitleText,
+                marginLeft: wp('8%'),
+                marginRight: wp('8%'),
+              }}
+            >
+              {props.inputType === 'phone'
+                ? 'Confirm your mobile number'
+                : props.inputType === 'email'
+                ? 'Confirm your email address'
+                : null}
+            </Text>
+          ) : null}
           {!props.isQR ? (
             <Text
               style={{
@@ -359,9 +371,9 @@ export default function TrustedContactRequest(props) {
                   : props.inputType === 'email'
                   ? 'email address, '
                   : null}
-                  <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
-                    to accept the request
-                  </Text>
+                <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
+                  to accept the request
+                </Text>
               </Text>
               {/* <Text style={{ fontFamily: Fonts.FiraSansMediumItalic }}>
                 {props.inputType === 'phone'
