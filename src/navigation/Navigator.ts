@@ -85,6 +85,7 @@ import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHisto
 import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
 import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistory';
 import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
+import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -215,6 +216,7 @@ const HomeNavigator = createStackNavigator(
     KeeperFeatures,
     TrustedContactHistoryKeeper,
     KeeperDeviceHistory,
+    PersonalCopyHistoryKeeper,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {

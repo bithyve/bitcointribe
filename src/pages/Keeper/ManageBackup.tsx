@@ -555,6 +555,13 @@ class ManageBackup extends Component<
                     selectedTitle: name,
                     isLevel2: isLevel2} );
                 }
+                if(type === 'pdf'){
+                  navigation.navigate("PersonalCopyHistoryKeeper", {
+                    selectedTime: this.getTime(new Date()),
+                    selectedStatus: 'Ugly',
+                    selectedTitle: name,
+                    isLevel2: isLevel2} );
+                }
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
               }
               }
