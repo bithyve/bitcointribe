@@ -298,6 +298,7 @@ export default function Login(props) {
   );
   const userKey = props.navigation.getParam('userKey');
   const isMigrated = useSelector(state => state.preferences.isMigrated)
+  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -310,14 +311,18 @@ export default function Login(props) {
           if (dbFetched) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
+
             setTimeout(() => {
-              loaderBottomSheet.current.snapTo(0);
-              props.navigation.navigate('Home', {
-                custodyRequest,
-                recoveryRequest,
-                trustedContactRequest,
-                userKey,
-              });
+              if (accountsSynched) {
+                loaderBottomSheet.current.snapTo(0);
+                props.navigation.navigate('Home', {
+                  custodyRequest,
+                  recoveryRequest,
+                  trustedContactRequest,
+                  userKey,
+                });
+              }
+
             }, 2500);
             dispatch(startupSync());
           }

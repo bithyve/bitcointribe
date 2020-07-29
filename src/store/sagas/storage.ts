@@ -105,13 +105,9 @@ function* servicesEnricherWorker({ payload }) {
 
     let services;
     let migrated = false;
-    if (!semver.valid(database.VERSION)) {
-      // handling exceptions: off standard versioning
-      if (!database.VERSION) database.VERSION = '0.7.0';
-      else if (database.VERSION === '0.9') database.VERSION = '0.9.0';
-      else if (database.VERSION === '1.0') database.VERSION = '1.0.0';
-    }
-
+    if (!database.VERSION) { database.VERSION = '0.7.0' }
+    else if (database.VERSION === '0.9') { database.VERSION = '0.9.0' }
+    else if (database.VERSION === '1.0') { database.VERSION = '1.0.0' }
     if (semver.gt(DeviceInfo.getVersion(), database.VERSION)) {
       if (
         database.VERSION == '0.7.0' &&
