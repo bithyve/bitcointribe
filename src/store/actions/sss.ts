@@ -61,10 +61,15 @@ export const uploadRequestedShare = (tag, encryptedKey, otp?) => {
   return { type: UPLOAD_REQUESTED_SHARE, payload: { tag, encryptedKey, otp } };
 };
 
-export const downloadMShare = (encryptedKey, otp?, downloadType?) => {
+export const downloadMShare = (
+  encryptedKey,
+  otp?,
+  downloadType?,
+  replaceIndex?,
+) => {
   return {
     type: DOWNLOAD_MSHARE,
-    payload: { otp, encryptedKey, downloadType },
+    payload: { otp, encryptedKey, downloadType, replaceIndex },
   };
 };
 

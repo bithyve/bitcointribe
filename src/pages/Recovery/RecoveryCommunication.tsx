@@ -251,7 +251,10 @@ export default function RecoveryCommunication(props) {
             );
           }
 
-          downloadSecret(null, recoveryRequest.publicKey);
+          downloadSecret(index, recoveryRequest.publicKey);
+          setTimeout(() => {
+            props.navigation.navigate('RestoreSelectedContactsList');
+          }, 1000);
           break;
 
         default:
@@ -264,7 +267,10 @@ export default function RecoveryCommunication(props) {
 
   const downloadSecret = useCallback(
     (shareIndex?, key?) => {
-      if (shareIndex) {
+      console.log({ shareIndex, key });
+      if (shareIndex && key) {
+        dispatch(downloadMShare(key, null, 'recovery', shareIndex));
+      } else if (shareIndex) {
         const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
 
         if (!META_SHARE) {

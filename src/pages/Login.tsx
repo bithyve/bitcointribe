@@ -200,11 +200,16 @@ export default function Login(props) {
     }
   }, [s3Service]);
 
+  const [updatedHealth, setUpdatedHealth] = useState(false);
   useEffect(() => {
     // HC up-streaming
     if (DECENTRALIZED_BACKUP) {
-      if (Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length) {
+      if (
+        Object.keys(DECENTRALIZED_BACKUP.UNDER_CUSTODY).length &&
+        !updatedHealth
+      ) {
         dispatch(updateMSharesHealth());
+        setUpdatedHealth(true);
       }
     }
   }, [DECENTRALIZED_BACKUP]);
