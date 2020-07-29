@@ -954,7 +954,7 @@ function* checkMSharesHealthWorker() {
   yield put(calculateOverallHealth(s3Service));
 
   if (res.status === 200) {
-    if (preFetchHealth !== postFetchHealth) {
+    if (preFetchHealth != postFetchHealth) {
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
