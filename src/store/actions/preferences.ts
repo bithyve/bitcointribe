@@ -114,19 +114,8 @@ export const initMigration = () => {
     let data = await AsyncStorage.multiGet(["TrustedContactsInfo"])
     if (data && data[0] && data[0][1]) {
       let trustedContacts = data[0][1]
-      updateTrustedContactInfoLocally(JSON.parse(trustedContacts))
+      dispatch(updateTrustedContactInfoLocally(JSON.parse(trustedContacts)))
     }
     dispatch(initAsyncMigrationSuccess());
-    // if (response) {
-    //   if (response) {
-    //     dispatch(initAsyncMigrationSuccess(response));
-    //   } else {
-    //     dispatch(initAsyncMigrationFailed(response));
-    //   }
-    // }
-    // if (error) {
-    //   dispatch(initAsyncMigrationFailed(error));
-    // }
-    // return { response, error };
   };
 }
