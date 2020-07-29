@@ -138,17 +138,9 @@ class ManageBackup extends Component<
     if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
     if(value.id === 2){
-      console.log("inside if1")
-      setTimeout(() => {
-        this.setState({isLevel2: true});  
-      }, 2);
-      
+      this.setState({isLevel2: true});
     } else{
-      console.log("inside else1")
-      setTimeout(() => {
-        this.setState({isLevel2: false});  
-      }, 2);
-      
+      this.setState({isLevel2: false})
     }
   };
 
@@ -495,15 +487,13 @@ class ManageBackup extends Component<
                               }}
                               onPress={()=>{
                                 if(value.id === 2){
-                                  console.log("inside if")
                                   this.setState({isLevel2: true});
                                 } else{
-                                  console.log("inside else")
                                   this.setState({isLevel2: false});
                                 }
                                 setTimeout(() => {
                                 (this.refs.keeperTypeBottomSheet as any).snapTo(1);
-                                }, 10);
+                                }, 2);
                               }}
                             >
                               <View
@@ -555,7 +545,15 @@ class ManageBackup extends Component<
                   navigation.navigate("TrustedContactHistoryKeeper", {
                     selectedTime: this.getTime(new Date()),
                     selectedStatus: 'Ugly',
-                    selectedTitle: name} );
+                    selectedTitle: name,
+                    isLevel2: isLevel2} );
+                }
+                if(type === 'device'){
+                  navigation.navigate("KeeperDeviceHistory", {
+                    selectedTime: this.getTime(new Date()),
+                    selectedStatus: 'Ugly',
+                    selectedTitle: name,
+                    isLevel2: isLevel2} );
                 }
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
               }

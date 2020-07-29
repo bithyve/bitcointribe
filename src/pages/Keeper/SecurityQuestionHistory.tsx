@@ -25,6 +25,9 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import moment from 'moment';
 import _ from 'underscore';
 import HistoryPageComponent from './HistoryPageComponent';
+import ModalHeader from '../../components/ModalHeader';
+import HealthCheckSecurityQuestion from '../ManageBackup/HealthCheckSecurityQuestion';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 const SecurityQuestionHistory = (props) => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
@@ -63,32 +66,32 @@ const SecurityQuestionHistory = (props) => {
   const next = props.navigation.getParam('next');
   const dispatch = useDispatch();
 
-  //   const renderSecurityQuestionContent = useCallback(() => {
-  //     return (
-  //       <HealthCheckSecurityQuestion
-  //         bottomSheetRef={SecurityQuestionBottomSheet}
-  //         onPressConfirm={async () => {
-  //           Keyboard.dismiss();
-  //           updateAutoHighlightFlags();
-  //           saveConfirmationHistory();
-  //           setTimeout(() => {
-  //             (SecurityQuestionBottomSheet as any).current.snapTo(0);
-  //           }, 2);
-  //           (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
-  //         }}
-  //       />
-  //     );
-  //   }, []);
+    const renderSecurityQuestionContent = useCallback(() => {
+      return (
+        <HealthCheckSecurityQuestion
+          bottomSheetRef={SecurityQuestionBottomSheet}
+          onPressConfirm={async () => {
+            Keyboard.dismiss();
+            updateAutoHighlightFlags();
+            saveConfirmationHistory();
+            setTimeout(() => {
+              (SecurityQuestionBottomSheet as any).current.snapTo(0);
+            }, 2);
+            (HealthCheckSuccessBottomSheet as any).current.snapTo(1);
+          }}
+        />
+      );
+    }, []);
 
-  //   const renderSecurityQuestionHeader = useCallback(() => {
-  //     return (
-  //       <ModalHeader
-  //         onPressHeader={() => {
-  //           (SecurityQuestionBottomSheet as any).current.snapTo(0);
-  //         }}
-  //       />
-  //     );
-  //   }, []);
+    const renderSecurityQuestionHeader = useCallback(() => {
+      return (
+        <ModalHeader
+          onPressHeader={() => {
+            (SecurityQuestionBottomSheet as any).current.snapTo(0);
+          }}
+        />
+      );
+    }, []);
 
   //   const renderHealthCheckSuccessModalContent = useCallback(() => {
   //     return (
@@ -245,24 +248,24 @@ const SecurityQuestionHistory = (props) => {
           // reshareInfo={
           //   'Want to send the Recovery Key again to the same destination? '
           // }
-          //   onPressConfirm={() => {
-          //     // ConfirmBottomSheet.current.snapTo(1);
-          //     // alert('confirm');
-          //     (SecurityQuestionBottomSheet as any).current.snapTo(1);
-          //   }}
+            onPressConfirm={() => {
+              // ConfirmBottomSheet.current.snapTo(1);
+              // alert('confirm');
+              (SecurityQuestionBottomSheet as any).current.snapTo(1);
+            }}
           //   onPressContinue={() => {
           //     (SecurityQuestionBottomSheet as any).current.snapTo(1);
           //   }}
         />
        </View>
-      {/* <BottomSheet
+       <BottomSheet
          enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[-30, hp('75%'), hp('90%')]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
       />
-      <BottomSheet
+     {/* <BottomSheet
          enabledGestureInteraction={false}
          enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet as any}

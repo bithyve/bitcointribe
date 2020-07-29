@@ -68,6 +68,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import ApproveSetup from './ApproveSetup';
 
 const TrustedContactHistory = (props) => {
+  
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
   const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
@@ -166,7 +167,7 @@ const TrustedContactHistory = (props) => {
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ]);
-
+  const isLevel2 = props.navigation.state.params ? props.navigation.state.params.isLevel2 : false;
   const overallHealth = useSelector((state) => state.sss.overallHealth);
   const [shared, setShared] = useState(false);
   const [activateReshare, setActivateReshare] = useState(
@@ -228,7 +229,11 @@ const TrustedContactHistory = (props) => {
         setChosenContact(selectedContacts[0]);
       }, 2);
       (trustedContactsBottomSheet as any).current.snapTo(0);
-      (ApproveSetupBottomSheet as any).current.snapTo(1);
+      if(!isLevel2){
+        (ApproveSetupBottomSheet as any).current.snapTo(1);  
+      } else{
+        (shareBottomSheet as any).current.snapTo(1);
+      }
       
     },
     [SelectedContacts, chosenContact],

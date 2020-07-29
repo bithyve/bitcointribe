@@ -35,7 +35,7 @@ export default function KeeperTypeModalContents(props) {
     type: '',
     name: '',
   });
-console.log("isLevel2", props.isLevel2)
+
   const [isLevel2, setIsLevel2] = useState(props.isLevel2 ? props.isLevel2 : false)
   const onKeeperSelect = (value) => {
     if (value.type != SelectedKeeperType.type) {
@@ -43,10 +43,8 @@ console.log("isLevel2", props.isLevel2)
     }
   };
   useEffect(() => {
-    if(props.isLevel2){
-      console.log("props.isLevel2", props.isLevel2)
+    console.log("props.isLevel2", props.isLevel2)
       setIsLevel2(props.isLevel2)
-    }
   }, [props.isLevel2]);
 
   return (

@@ -258,7 +258,7 @@ class KeeperFeatures extends Component<
         <View style={styles.bottomButtonView}>
           <TouchableOpacity
             onPress={() => {
-              navigation.goBack();
+              navigation.replace('ManageBackupKeeper')
             }}
             style={{
               ...styles.successModalButtonView,

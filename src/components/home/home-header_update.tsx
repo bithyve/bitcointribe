@@ -191,7 +191,11 @@ const HomeHeader = ({
           </Text>
         </ImageBackground>
         <TouchableOpacity
-          onPress={()=>navigation.navigate('ManageBackupKeeper')}
+          onPress={()=>{
+            //navigation.navigate('ManageBackup');
+            navigation.navigate('ManageBackupKeeper')
+          }
+          }
           style={styles.manageBackupMessageView}
         >
           <Text style={styles.manageBackupMessageTextHighlight}>

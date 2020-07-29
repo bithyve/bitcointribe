@@ -303,6 +303,25 @@ export default function QRModal(props) {
           />}
         </View>
       </ScrollView>
+      {props.isFromKeeperDeviceHistory && <View style={styles.bottomButtonView}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressContinue()}
+              style={{
+                ...styles.successModalButtonView,
+                shadowColor: Colors.shadowBlue,
+                backgroundColor: Colors.blue,
+              }}
+            >
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: Colors.white,
+                }}
+              >
+                Continue
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>}
     </View>
   );
 }
@@ -341,5 +360,28 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular
+  },
+  successModalButtonView: {
+    height: wp('13%'),
+    width: wp('35%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    marginLeft: wp('8%'),
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  bottomButtonView: {
+    height: 'auto',
+    paddingBottom: wp('8%'),
+    marginTop: wp('5%')
   },
 });
