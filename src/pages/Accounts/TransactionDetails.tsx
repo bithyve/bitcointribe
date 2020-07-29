@@ -403,7 +403,15 @@ export default function TransactionDetails(props) {
               marginTop: hp('0.5%'),
             }}
           >
-            {txDetails.confirmations < 6 ? txDetails.confirmations : '6+'}
+            {txDetails.accountType === 'Test Account'
+              ? txDetails.confirmations < 6
+                ? txDetails.confirmations
+                : txDetails.confirmations === '-' // for testnet faucet tx
+                ? txDetails.confirmations
+                : '6+'
+              : txDetails.confirmations < 6
+              ? txDetails.confirmations
+              : '6+'}
           </Text>
         </View>
       </View>
