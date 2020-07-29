@@ -1104,7 +1104,7 @@ class SendToContact extends Component<
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
-                  placeholder={'Add a Note ( Optional )'}
+                  placeholder={'Add a note to self (Optional)'}
                   value={note}
                   onChangeText={(text) => this.setState({ note: text })}
                   placeholderTextColor={Colors.borderColor}
