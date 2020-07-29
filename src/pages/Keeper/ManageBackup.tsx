@@ -206,7 +206,7 @@ class ManageBackup extends Component<
             <View>
               <Text style={styles.backupText}>Backup</Text>
               <Text style={styles.backupInfoText}>Security is</Text>
-              <Text style={styles.backupInfoText}>at level 1</Text>
+              <Text style={styles.backupInfoText}>at level {selectedId ? selectedId : 1}</Text>
             </View>
           </View>
           <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
