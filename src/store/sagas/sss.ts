@@ -1331,8 +1331,11 @@ function* restoreShareFromQRWorker({ payload }) {
     const { metaShare } = res.data;
     console.log({ metaShare });
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-    RECOVERY_SHARES[metaShare.meta.index] = {
-      META_SHARE: metaShare,
+    const updatedRecoveryShares = {
+      ...RECOVERY_SHARES,
+      [metaShare.meta.index]: {
+        META_SHARE: metaShare,
+      },
     };
 
     // let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
@@ -1355,7 +1358,7 @@ function* restoreShareFromQRWorker({ payload }) {
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
-      RECOVERY_SHARES,
+      RECOVERY_SHARES: updatedRecoveryShares,
     };
     console.log({ updatedBackup });
     yield call(insertDBWorker, {
@@ -1501,11 +1504,33 @@ function* recoverWalletWorker({ payload }) {
       let updatedPDFHealth = {};
       for (const share of restorationShares) {
         if (share.meta.index > 2) {
-          updatedPDFHealth[share.meta.index] = {
-            shareId: `placeHolderID${share.meta.index}`,
-            updatedAt: Date.now(),
+          updatedPDFHealth = {
+            ...updatedPDFHealth,
+            [share.meta.index]: {
+              shareId: `placeHolderID${share.meta.index}`,
+              updatedAt: Date.now(),
+            },
           };
         }
+      }
+
+      if (!updatedPDFHealth[3]) {
+        updatedPDFHealth = {
+          ...updatedPDFHealth,
+          [3]: {
+            shareId: 'placeHolderID3',
+            updatedAt: 0,
+          },
+        };
+      }
+      if (!updatedPDFHealth[4]) {
+        updatedPDFHealth = {
+          ...updatedPDFHealth,
+          [4]: {
+            shareId: 'placeHolderID4',
+            updatedAt: 0,
+          },
+        };
       }
       if (Object.keys(updatedPDFHealth).length)
         yield call(

@@ -32,33 +32,7 @@ export const serviceGenerator = async (
   const s3Service = new S3Service(primaryMnemonic);
   if (metaShares) {
     res = s3Service.restoreMetaShares(metaShares);
-
     if (res.status !== 200) throw new Error('Share restoration failed');
-
-    if (metaShares[3] || metaShares[4]) {
-      // recovered via PDF hence synching health for manage backup
-
-      const { pdfHealth } = s3Service.sss;
-      let storedPDFHealth = {
-        [3]: { shareId: 'placeHolderID3', updatedAt: 0 },
-        [4]: { shareId: 'placeHolderID3', updatedAt: 0 },
-      };
-      if (pdfHealth && pdfHealth[3]) {
-        storedPDFHealth[3] = {
-          shareId: pdfHealth[3].shareId,
-          updatedAt: Date.now(),
-        };
-      }
-
-      if (pdfHealth && pdfHealth[4]) {
-        storedPDFHealth[4] = {
-          shareId: pdfHealth[4].shareId,
-          updatedAt: Date.now(),
-        };
-      }
-
-      AsyncStorage.setItem('PDF Health', JSON.stringify(storedPDFHealth));
-    }
   } else {
     res = s3Service.generateShares(securityAns);
     if (res.status !== 200) throw new Error('Share generation failed');

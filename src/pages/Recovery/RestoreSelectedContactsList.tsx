@@ -133,14 +133,6 @@ export default function RestoreSelectedContactsList(props) {
 
   const dispatch = useDispatch();
 
-  const [balances, setBalances] = useState({
-    testBalance: 0,
-    regularBalance: 0,
-    secureBalance: 0,
-    accumulativeBalance: 0,
-  });
-  const [transactions, setTransactions] = useState([]);
-
   const { DECENTRALIZED_BACKUP, SERVICES, WALLET_SETUP } = useSelector(
     (state) => state.storage.database,
   );
@@ -152,49 +144,6 @@ export default function RestoreSelectedContactsList(props) {
     : null;
 
   const [metaShares, setMetaShares] = useState([]);
-
-  useEffect(() => {
-    const testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-        accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    const secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-          .unconfirmedBalance
-      : 0;
-    const accumulativeBalance = regularBalance + secureBalance;
-
-    const testTransactions = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.transactions.transactionDetails
-      : [];
-    const regularTransactions = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.transactions
-          .transactionDetails
-      : [];
-
-    const secureTransactions = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.transactions
-          .transactionDetails
-      : [];
-    const accumulativeTransactions = [
-      ...testTransactions,
-      ...regularTransactions,
-      ...secureTransactions,
-    ];
-
-    setBalances({
-      testBalance,
-      regularBalance,
-      secureBalance,
-      accumulativeBalance,
-    });
-    setTransactions(accumulativeTransactions);
-  }, [accounts]);
 
   useEffect(() => {
     // (ErrorBottomSheet as any).current.snapTo(1);
@@ -433,9 +382,9 @@ export default function RestoreSelectedContactsList(props) {
   const renderErrorModalHeader = () => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet as any).current.snapTo(0);
+      // }}
       />
     );
   };
@@ -459,9 +408,9 @@ export default function RestoreSelectedContactsList(props) {
   const renderErrorModalHeader1 = useCallback(() => {
     return (
       <ModalHeader
-        // onPressHeader={() => {
-        //   (ErrorBottomSheet1 as any).current.snapTo(0);
-        // }}
+      // onPressHeader={() => {
+      //   (ErrorBottomSheet1 as any).current.snapTo(0);
+      // }}
       />
     );
   }, []);
@@ -542,14 +491,14 @@ export default function RestoreSelectedContactsList(props) {
     })();
   }, [SERVICES, walletImageChecked]);
 
-  if (accounts.accountsSynched) {
-    (loaderBottomSheet as any).current.snapTo(0);
-    props.navigation.navigate('Home', {
-      exchangeRates,
-      balances,
-      transactions,
-    });
-  }
+  useEffect(() => {
+    if (accounts.accountsSynched) {
+      (loaderBottomSheet as any).current.snapTo(0);
+      props.navigation.navigate('Home', {
+        exchangeRates,
+      });
+    }
+  }, [accounts.accountsSynched]);
 
   const downloadSecret = useCallback(
     (shareIndex?, key?) => {
