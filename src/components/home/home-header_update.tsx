@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  AsyncStorage,
   ImageBackground,
   Image,
 } from 'react-native';
@@ -18,8 +17,7 @@ import CommonStyles from '../../common/Styles';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { UsNumberFormat } from '../../common/utilities';
 import MessageAsPerHealth from '../../components/home/messgae-health';
-import ToggleSwitch from '../../components/ToggleSwitch';
-import HomePageShield from '../../components/HomePageShield';
+import ToggleSwitch from '../../components/ToggleSwitchSlim';
 const currencyCode = [
   'BRL',
   'CNY',
