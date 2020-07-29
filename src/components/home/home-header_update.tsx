@@ -33,7 +33,6 @@ const currencyCode = [
 ];
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getCurrencyImageName } from '../../common/CommonFunctions/index';
-import { useDispatch, useSelector } from 'react-redux';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
@@ -68,7 +67,7 @@ const HomeHeader = ({
   setCurrencyToggleValue,
 }) => {
   return (
-    <View style={{ ...styles.headerViewContainer, flex: 1  }}>
+    <View style={{ ...styles.headerViewContainer, flex: 1 }}>
       <View style={{ flexDirection: 'row' }}>
         <ToggleSwitch
           currencyCodeValue={CurrencyCode}
@@ -121,7 +120,7 @@ const HomeHeader = ({
             style={{
               flexDirection: 'row',
               alignItems: 'flex-end',
-              marginBottom: wp('3%'),
+              // marginBottom: wp('3%'),
             }}
           >
             {switchOn ? (
@@ -146,12 +145,7 @@ const HomeHeader = ({
                 source={getCurrencyImageByRegion(CurrencyCode, 'light')}
               />
             )}
-            <Text
-              style={{
-                ...CommonStyles.homepageAmountText,
-                color: Colors.white,
-              }}
-            >
+            <Text style={styles.homeHeaderAmountText}>
               {switchOn
                 ? UsNumberFormat(balances.accumulativeBalance)
                 : exchangeRates
@@ -161,12 +155,7 @@ const HomeHeader = ({
                   ).toFixed(2)
                 : 0}
             </Text>
-            <Text
-              style={{
-                ...CommonStyles.homepageAmountUnitText,
-                color: Colors.white,
-              }}
-            >
+            <Text style={styles.homeHeaderAmountUnitText}>
               {switchOn ? 'sats' : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
@@ -175,17 +164,49 @@ const HomeHeader = ({
           /> */}
         </View>
       </View>
-      <View style={{ flexDirection: 'row', alignItems:'center', marginTop: 'auto' }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginTop: 'auto',
+        }}
+      >
         <ImageBackground
           source={require('../../assets/images/icons/Keeper_shield_white.png')}
-          style={{ width: wp('15%'), height: wp('20%'), justifyContent:'center', alignItems: 'center' }}
+          style={{
+            width: wp('15%'),
+            height: wp('20%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          <Text style={{color: Colors.blue, fontFamily: Fonts.FiraSansMedium, fontSize: RFValue(18)}}>1</Text>
+          <Text
+            style={{
+              color: Colors.blue,
+              fontFamily: Fonts.FiraSansMedium,
+              fontSize: RFValue(18),
+            }}
+          >
+            1
+          </Text>
         </ImageBackground>
-        <View style={{ marginLeft: wp('2%'), borderRadius: wp('13')/2, height: wp('13'), flex: 1, backgroundColor: Colors.deepBlue, flexDirection: 'row', alignItems: 'center', paddingLeft: wp('5%'), paddingRight: wp('5%') }}>
-          <Text style={{color: Colors.white, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue(13)}}>Add Keepers to<Text style={{fontFamily: Fonts.FiraSansRegular, fontSize: RFValue(12)}}> improve health</Text></Text>
-          <AntDesign style={{marginLeft: 'auto'}} name={'arrowright'} color={Colors.white} size={17} />
-        </View>
+        <TouchableOpacity
+          onPress={()=>navigation.navigate('ManageBackupKeeper')}
+          style={styles.manageBackupMessageView}
+        >
+          <Text style={styles.manageBackupMessageTextHighlight}>
+            Add Keepers
+            <Text style={styles.manageBackupMessageText}>
+              {' '}to improve health
+            </Text>
+          </Text>
+          <AntDesign
+            style={{ marginLeft: 'auto' }}
+            name={'arrowright'}
+            color={Colors.white}
+            size={17}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -199,15 +220,11 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
   },
-  headerTitleViewContainer: {
-    flex: 7,
-    justifyContent: 'space-between',
-  },
   headerTitleText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(25),
-    marginBottom: wp('3%'),
+    marginBottom: wp('2%'),
   },
   cardBitCoinImage: {
     width: wp('3%'),
@@ -216,23 +233,36 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginBottom: wp('0.7%'),
   },
-  headerButton: {
-    backgroundColor: Colors.homepageButtonColor,
-    height: hp('5%'),
-    width: wp('35%'),
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    justifyContent: 'center',
+  manageBackupMessageView: {
+    marginLeft: wp('2%'),
+    borderRadius: wp('13') / 2,
+    height: wp('13'),
+    flex: 1,
+    backgroundColor: Colors.deepBlue,
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingLeft: wp('5%'),
+    paddingRight: wp('5%'),
   },
-  headerButtonText: {
-    fontFamily: Fonts.FiraSansMedium,
+  manageBackupMessageTextHighlight: {
+    color: Colors.white,
+    fontFamily: Fonts.FiraSansMediumItalic,
     fontSize: RFValue(13),
+  },
+  manageBackupMessageText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(12),
+  },
+  homeHeaderAmountText: {
+    fontFamily: Fonts.FiraSansRegular, 
+    fontSize: RFValue(19), 
+    marginRight: 5,
     color: Colors.white,
   },
-  headerToggleSwitchContainer: {
-    flex: 3,
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
+  homeHeaderAmountUnitText: {
+    fontFamily: Fonts.FiraSansRegular, 
+    fontSize: RFValue(9),
+    marginBottom: 3,
+    color: Colors.white,
+  }
 });
