@@ -225,7 +225,7 @@ class ManageBackup extends Component<
                       selectedId && selectedId == value.id ? 10 : 0,
                     shadowOffset: { width: 5, height: 5 },
                     elevation: selectedId && selectedId == value.id ? 10 : 0,
-                    opacity: selectedId && selectedId == value.id ? 1 : 0.3,
+                    opacity: selectedId == value.id || selectedId==0 ? 1 : 0.3,
                   }}
                 >
                   <View style={styles.cardView}>
