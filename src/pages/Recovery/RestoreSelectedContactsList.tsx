@@ -66,7 +66,6 @@ import Toast from '../../components/Toast';
 
 export default function RestoreSelectedContactsList(props) {
   let [SecondaryDeviceRS, setSecondaryDeviceRS] = useState(null);
-  let [onRefresh, setOnRefresh] = useState(false);
   let [message, setMessage] = useState('Creating your wallet');
   const [Elevation, setElevation] = useState(10);
   const [selectedContacts, setSelectedContacts] = useState([]);
@@ -102,6 +101,8 @@ export default function RestoreSelectedContactsList(props) {
   const [ErrorBottomSheet1, setErrorBottomSheet1] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
+  const { downloadMetaShare } = useSelector((state) => state.sss.loading);
+
   const isWalletRecoveryFailed = useSelector(
     (state) => state.sss.walletRecoveryFailed,
   );
@@ -170,11 +171,11 @@ export default function RestoreSelectedContactsList(props) {
       }
     })();
     let temp = null;
-    onPullDown();
+    // onPullDown();
     let focusListener = props.navigation.addListener('didFocus', () => {
       getSelectedContactList();
       temp = setInterval(() => {
-        onPullDown();
+        // onPullDown();
       }, 30000);
     });
     let focusListener1 = props.navigation.addListener('didBlur', () => {
@@ -425,16 +426,20 @@ export default function RestoreSelectedContactsList(props) {
     (ErrorBottomSheet1 as any).current.snapTo(1);
     dispatch(walletRecoveryFailed(null));
   }
-  if (isErrorReceivingFailed) {
-    setTimeout(() => {
+
+  useEffect(() => {
+    if (isErrorReceivingFailed) {
       setErrorMessageHeader('Error receiving Recovery Key');
       setErrorMessage(
         'There was an error while receiving your Recovery Key, please try again',
       );
-    }, 2);
-    (ErrorBottomSheet1 as any).current.snapTo(1);
-    dispatch(ErrorReceiving(null));
-  }
+
+      setTimeout(() => {
+        (ErrorBottomSheet1 as any).current.snapTo(1);
+      }, 2);
+      dispatch(ErrorReceiving(null));
+    }
+  }, [isErrorReceivingFailed]);
 
   useEffect(() => {
     const shares: MetaShare[] = [];
@@ -523,48 +528,48 @@ export default function RestoreSelectedContactsList(props) {
     [RECOVERY_SHARES],
   );
 
-  const getQrCodeData = useCallback((qrData) => {
-    try {
-      const scannedData = JSON.parse(qrData);
-      switch (scannedData.type) {
-        case 'ReverseRecoveryQR':
-          const recoveryRequest = {
-            requester: scannedData.requester,
-            publicKey: scannedData.publicKey,
-            uploadedAt: scannedData.UPLOADED_AT,
-            isQR: true,
-          };
+  // const getQrCodeData = useCallback((qrData) => {
+  //   try {
+  //     const scannedData = JSON.parse(qrData);
+  //     switch (scannedData.type) {
+  //       case 'ReverseRecoveryQR':
+  //         const recoveryRequest = {
+  //           requester: scannedData.requester,
+  //           publicKey: scannedData.publicKey,
+  //           uploadedAt: scannedData.UPLOADED_AT,
+  //           isQR: true,
+  //         };
 
-          // if (recoveryRequest.requester !== WALLET_SETUP.walletName) {
-          //   Alert.alert(
-          //     'Invalid share',
-          //     "Following share doesn't belong to your wallet",
-          //   );
-          //   return;
-          // }
+  //         // if (recoveryRequest.requester !== WALLET_SETUP.walletName) {
+  //         //   Alert.alert(
+  //         //     'Invalid share',
+  //         //     "Following share doesn't belong to your wallet",
+  //         //   );
+  //         //   return;
+  //         // }
 
-          if (
-            Date.now() - recoveryRequest.uploadedAt >
-            config.TC_REQUEST_EXPIRY
-          ) {
-            Alert.alert(
-              `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
-              `Please ask your Guardian to initiate a new ${
-                recoveryRequest.isQR ? 'QR' : 'Link'
-              }`,
-            );
-          }
+  //         if (
+  //           Date.now() - recoveryRequest.uploadedAt >
+  //           config.TC_REQUEST_EXPIRY
+  //         ) {
+  //           Alert.alert(
+  //             `${recoveryRequest.isQR ? 'QR' : 'Link'} expired!`,
+  //             `Please ask your Guardian to initiate a new ${
+  //               recoveryRequest.isQR ? 'QR' : 'Link'
+  //             }`,
+  //           );
+  //         }
 
-          downloadSecret(null, recoveryRequest.publicKey);
-          break;
+  //         downloadSecret(null, recoveryRequest.publicKey);
+  //         break;
 
-        default:
-          break;
-      }
-    } catch (err) {
-      Toast('Invalid QR');
-    }
-  }, []);
+  //       default:
+  //         break;
+  //     }
+  //   } catch (err) {
+  //     Toast('Invalid QR');
+  //   }
+  // }, []);
 
   const updateStatusOnShareDownloadForTrustedContact = async () => {
     let mod = false;
@@ -671,11 +676,26 @@ export default function RestoreSelectedContactsList(props) {
   }
 
   const onPullDown = async () => {
-    if (SD_META_SHARE) {
-      setSecondaryDeviceRS(SD_META_SHARE);
+    let downloading = false;
+    if (
+      RECOVERY_SHARES[1] &&
+      RECOVERY_SHARES[1].REQUEST_DETAILS &&
+      !RECOVERY_SHARES[1].META_SHARE
+    ) {
+      downloading = true;
+      downloadSecret(1);
     }
+
+    if (
+      !downloading &&
+      RECOVERY_SHARES[2] &&
+      RECOVERY_SHARES[2].REQUEST_DETAILS &&
+      !RECOVERY_SHARES[2].META_SHARE
+    ) {
+      downloadSecret(2);
+    }
+
     updateStatusOnShareDownloadForTrustedContact();
-    setOnRefresh(false);
   };
 
   return (
@@ -697,9 +717,8 @@ export default function RestoreSelectedContactsList(props) {
       <ScrollView
         refreshControl={
           <RefreshControl
-            refreshing={onRefresh}
+            refreshing={downloadMetaShare}
             onRefresh={() => {
-              setOnRefresh(true);
               onPullDown();
             }}
           />
