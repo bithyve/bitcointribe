@@ -309,9 +309,10 @@ class SendConfirmation_updated extends Component<
         ? 'medium'
         : 'high';
 
-    const service: SecureAccount = this.props.accounts[this.serviceType]
-      .service;
-    if (service.secureHDWallet.secondaryXpriv) {
+    if (
+      this.serviceType === SECURE_ACCOUNT &&
+      this.props.accounts[this.serviceType].service.secondaryXpriv
+    ) {
       this.props.alternateTransferST2(this.serviceType, txPriority);
     } else {
       this.props.transferST2(this.serviceType, txPriority);
