@@ -53,6 +53,7 @@ import idx from 'idx';
 import DeviceInfo from 'react-native-device-info';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 
 interface SendConfirmationStateTypes {
   switchOn: boolean;
@@ -307,7 +308,10 @@ class SendConfirmation_updated extends Component<
         : sliderValueText === 'In the middle'
         ? 'medium'
         : 'high';
-    if (this.sweepSecure) {
+
+    const service: SecureAccount = this.props.accounts[this.serviceType]
+      .service;
+    if (service.secureHDWallet.secondaryXpriv) {
       this.props.alternateTransferST2(this.serviceType, txPriority);
     } else {
       this.props.transferST2(this.serviceType, txPriority);
@@ -362,11 +366,8 @@ class SendConfirmation_updated extends Component<
       : switchOn
       ? UsNumberFormat(value)
       : exchangeRates
-      ? (
-          (value / 1e8) *
-          exchangeRates[CurrencyCode].last
-        ).toFixed(2)
-      : null
+      ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
+      : null;
   };
 
   getCorrectCurrencySymbol = () => {
@@ -376,7 +377,7 @@ class SendConfirmation_updated extends Component<
       : switchOn
       ? 'sats'
       : CurrencyCode.toLocaleLowerCase();
-  }
+  };
 
   render() {
     const {
@@ -600,21 +601,23 @@ class SendConfirmation_updated extends Component<
               <View style={styles.sliderTextView}>
                 <Text style={styles.sliderText}>
                   {'Low Fee\n'} (
-                  {this.convertBitCoinToCurrency(transfer.stage1 && transfer.stage1.txPrerequisites
-                    ? transfer.stage1.txPrerequisites['low'].fee
-                    : '')}
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                      ? transfer.stage1.txPrerequisites['low'].fee
+                      : '',
+                  )}
                   {/* {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'} */}
-                  {' '+this.getCorrectCurrencySymbol()}
-                  )
+                  {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
                 <Text style={styles.sliderText}>
                   {'In the middle\n'} (
-                  {this.convertBitCoinToCurrency(transfer.stage1 && transfer.stage1.txPrerequisites
-                    ? transfer.stage1.txPrerequisites['medium'].fee
-                    : '')}
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                      ? transfer.stage1.txPrerequisites['medium'].fee
+                      : '',
+                  )}
                   {/* {' sats'} */}
-                  {' '+this.getCorrectCurrencySymbol()}
-                  )
+                  {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
                 <Text
                   style={{
@@ -623,12 +626,13 @@ class SendConfirmation_updated extends Component<
                   }}
                 >
                   {'Fast Transaction\n'} (
-                  {this.convertBitCoinToCurrency(transfer.stage1 && transfer.stage1.txPrerequisites
-                    ? transfer.stage1.txPrerequisites['high'].fee
-                    : '')}
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                      ? transfer.stage1.txPrerequisites['high'].fee
+                      : '',
+                  )}
                   {/* {' sats'} */}
-                  {' '+this.getCorrectCurrencySymbol()}
-                  )
+                  {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
               </View>
             </View>
