@@ -33,7 +33,8 @@ import { updatePreference } from '../store/actions/preferences';
 export default function Launch(props) {
   const dispatch = useDispatch();
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const accountsSynched = useSelector((state) => state.accounts.accountsSynched)
+
+
 
   useEffect(() => {
     dispatch(initializeDB());
@@ -46,12 +47,16 @@ export default function Launch(props) {
 
 
 
-  let isNavigate = false;
   let isContactOpen = false;
   let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
+    let walletExists = await AsyncStorage.getItem("walletExists")
+    if (!walletExists) {
+      return
+    }
+
     AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
       (response) => {
         isContactOpen = JSON.parse(response[0][1]);
@@ -68,16 +73,14 @@ export default function Launch(props) {
       AsyncStorage.multiSet(keyArray, () => { });
       return;
     }
-    // if (isNavigate) {
-    //   props.navigation.navigate('ReLogin');
-    // }
-    if (
-      Platform.OS == 'android'
-        ? nextAppState == 'active'
-        : nextAppState == 'inactive' || nextAppState == 'background'
-    ) {
+    if (Platform.OS === 'android' && nextAppState === 'background') {
       props.navigation.navigate('ReLogin');
-      // isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
+      return
+    }
+
+    if (Platform.OS === 'ios' && (nextAppState === 'inactive' || nextAppState == 'background')) {
+      props.navigation.navigate('ReLogin');
+      return
     }
   };
 
