@@ -1050,7 +1050,7 @@ class ContactDetailsNew extends PureComponent<
                 backgroundColor={Colors.white}
                 title={'Note'}
                 infoText={
-                  'The details of your friend and Family will come here.'
+                  'The details of your contact will appear here.'
                 }
               />
             </View>
@@ -1130,7 +1130,7 @@ class ContactDetailsNew extends PureComponent<
                   backgroundColor={Colors.white}
                   title={'Note'}
                   infoText={
-                    'The details of your friend and Family will come here.'
+                    'The details of your contact will appear here.'
                   }
                 />
               )}

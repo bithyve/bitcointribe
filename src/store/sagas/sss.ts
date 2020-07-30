@@ -441,7 +441,7 @@ function* uploadRequestedShareWorker({ payload }) {
     //   'Upload successful!',
     //   "Requester's share has been uploaded to the relay.",
     // );
-    Toast(`${tag}'s share uploaded`);
+    Toast(`${tag}'s Recovery Key sent.`);
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(requestedShareUploaded(tag, false, res.err));
