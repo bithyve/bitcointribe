@@ -77,6 +77,8 @@ interface SendConfirmationPropsTypes {
   clearTransfer: any;
   alternateTransferST2: any;
   transferST2: any;
+  currencyCode: any;
+  currencyToggleValue: any;
 }
 class SendConfirmation_updated extends Component<
   SendConfirmationPropsTypes,
@@ -129,6 +131,7 @@ class SendConfirmation_updated extends Component<
       loading: accounts[this.serviceType].loading,
     });
     this.onChangeInTransfer();
+    this.setCurrencyCodeFromAsync();
   };
 
   componentDidUpdate = (prevProps) => {
@@ -343,6 +346,38 @@ class SendConfirmation_updated extends Component<
       (this.refs.SendSuccessBottomSheet as any).snapTo(1);
   };
 
+  setCurrencyCodeFromAsync = async () => {
+    let currencyToggleValueTmp = this.props.currencyToggleValue;
+    let currencyCodeTmp = this.props.currencyCode;
+    this.setState({
+      switchOn: currencyToggleValueTmp ? true : false,
+      CurrencyCode: currencyCodeTmp ? currencyCodeTmp : 'USD',
+    });
+  };
+
+  convertBitCoinToCurrency = (value) => {
+    const { switchOn, exchangeRates, CurrencyCode } = this.state;
+    return this.serviceType == TEST_ACCOUNT
+      ? UsNumberFormat(value)
+      : switchOn
+      ? UsNumberFormat(value)
+      : exchangeRates
+      ? (
+          (value / 1e8) *
+          exchangeRates[CurrencyCode].last
+        ).toFixed(2)
+      : null
+  };
+
+  getCorrectCurrencySymbol = () => {
+    const { switchOn, CurrencyCode } = this.state;
+    return this.serviceType == TEST_ACCOUNT
+      ? 't-sats'
+      : switchOn
+      ? 'sats'
+      : CurrencyCode.toLocaleLowerCase();
+  }
+
   render() {
     const {
       switchOn,
@@ -475,9 +510,26 @@ class SendConfirmation_updated extends Component<
                   />
                 </View>
                 <View style={styles.totalAmountView} />
-                <Text style={styles.amountText}>{totalAmount}</Text>
+                <Text style={styles.amountText}>
+                  {this.serviceType == TEST_ACCOUNT
+                    ? UsNumberFormat(totalAmount)
+                    : switchOn
+                    ? UsNumberFormat(totalAmount)
+                    : exchangeRates
+                    ? (
+                        (totalAmount / 1e8) *
+                        exchangeRates[CurrencyCode].last
+                      ).toFixed(2)
+                    : null}
+                  {/* {totalAmount} */}
+                </Text>
                 <Text style={styles.amountUnitText}>
-                  {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}
+                  {/* {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'} */}
+                  {this.serviceType == TEST_ACCOUNT
+                    ? ' t-sats'
+                    : switchOn
+                    ? ' sats'
+                    : ' ' + CurrencyCode.toLocaleLowerCase()}
                 </Text>
               </View>
             </View>
@@ -548,17 +600,21 @@ class SendConfirmation_updated extends Component<
               <View style={styles.sliderTextView}>
                 <Text style={styles.sliderText}>
                   {'Low Fee\n'} (
-                  {transfer.stage1 && transfer.stage1.txPrerequisites
+                  {this.convertBitCoinToCurrency(transfer.stage1 && transfer.stage1.txPrerequisites
                     ? transfer.stage1.txPrerequisites['low'].fee
-                    : ''}
-                  {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'})
+                    : '')}
+                  {/* {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'} */}
+                  {' '+this.getCorrectCurrencySymbol()}
+                  )
                 </Text>
                 <Text style={styles.sliderText}>
                   {'In the middle\n'} (
-                  {transfer.stage1 && transfer.stage1.txPrerequisites
+                  {this.convertBitCoinToCurrency(transfer.stage1 && transfer.stage1.txPrerequisites
                     ? transfer.stage1.txPrerequisites['medium'].fee
-                    : ''}
-                  {' sats'})
+                    : '')}
+                  {/* {' sats'} */}
+                  {' '+this.getCorrectCurrencySymbol()}
+                  )
                 </Text>
                 <Text
                   style={{
@@ -567,10 +623,12 @@ class SendConfirmation_updated extends Component<
                   }}
                 >
                   {'Fast Transaction\n'} (
-                  {transfer.stage1 && transfer.stage1.txPrerequisites
+                  {this.convertBitCoinToCurrency(transfer.stage1 && transfer.stage1.txPrerequisites
                     ? transfer.stage1.txPrerequisites['high'].fee
-                    : ''}
-                  {' sats'})
+                    : '')}
+                  {/* {' sats'} */}
+                  {' '+this.getCorrectCurrencySymbol()}
+                  )
                 </Text>
               </View>
             </View>
@@ -788,6 +846,8 @@ const mapStateToProps = (state) => {
     exchangeRates: idx(state, (_) => _.accounts.exchangeRates),
     accounts: idx(state, (_) => _.accounts) || [],
     WALLET_SETUP: idx(state, (_) => _.storage.database.WALLET_SETUP) || '',
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
+    currencyToggleValue: idx(state, (_) => _.preferences.currencyToggleValue),
   };
 };
 

@@ -8,6 +8,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
@@ -94,6 +95,9 @@ export default function TrustedContactRequest(props) {
         <View style={styles.textboxView}>
           <TextInput
             autoCapitalize={'none'}
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
             keyboardType={'email-address'}
             placeholderTextColor={Colors.borderColor}
             placeholder={`${props.hint.charAt(0)}XXXX@XXX${props.hint.substring(
@@ -139,6 +143,9 @@ export default function TrustedContactRequest(props) {
           <View style={styles.separatorView} /> */}
           <TextInput
             keyboardType={'numeric'}
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            onSubmitEditing={Keyboard.dismiss}
             placeholderTextColor={Colors.borderColor}
             placeholder={`${props.hint.charAt(
               0,
