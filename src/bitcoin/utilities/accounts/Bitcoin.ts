@@ -346,7 +346,8 @@ export default class Bitcoin {
               confirmations:
                 accountType === 'Test Account' &&
                 tx.transactionType === 'Received' &&
-                addressInfo.Address === externalAddresses[0]
+                addressInfo.Address === externalAddresses[0] &&
+                tx.NumberofConfirmations < 1
                   ? '-'
                   : tx.NumberofConfirmations,
               status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
