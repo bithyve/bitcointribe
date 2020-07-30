@@ -52,9 +52,6 @@ export default function Launch(props) {
   const handleAppStateChange = async (nextAppState) => {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
-    if (!accountsSynched) {
-      return
-    }
     AsyncStorage.multiGet(['isContactOpen', 'isCameraOpen']).then(
       (response) => {
         isContactOpen = JSON.parse(response[0][1]);
@@ -71,17 +68,16 @@ export default function Launch(props) {
       AsyncStorage.multiSet(keyArray, () => { });
       return;
     }
-    if (isNavigate) {
-      props.navigation.navigate('ReLogin');
-    }
+    // if (isNavigate) {
+    //   props.navigation.navigate('ReLogin');
+    // }
     if (
       Platform.OS == 'android'
         ? nextAppState == 'active'
         : nextAppState == 'inactive' || nextAppState == 'background'
     ) {
-      isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
-    } else {
-      isNavigate = false;
+      props.navigation.navigate('ReLogin');
+      // isNavigate = true; // producing a subtle delay to let deep link event listener make the first move
     }
   };
 
