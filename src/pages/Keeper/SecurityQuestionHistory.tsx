@@ -253,6 +253,9 @@ const SecurityQuestionHistory = (props) => {
               // alert('confirm');
               (SecurityQuestionBottomSheet as any).current.snapTo(1);
             }}
+            onPressChangeQuestion={()=>{
+              props.navigation.navigate('NewOwnQuestions');
+            }}
           //   onPressContinue={() => {
           //     (SecurityQuestionBottomSheet as any).current.snapTo(1);
           //   }}

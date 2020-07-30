@@ -222,13 +222,12 @@ const HistoryPageComponent = (props) => {
 
       <View
         style={{
-          alignItems:'center',
           justifyContent: 'center',
           height: hp('20%'),
           backgroundColor: Colors.white,
         }}
       >
-        <TouchableOpacity
+        {/* <TouchableOpacity
             onPress={() => {
               props.onPressConfirm();
             }}
@@ -256,9 +255,14 @@ const HistoryPageComponent = (props) => {
             >
               Confirm Question
             </Text>
-            </TouchableOpacity>
-        {/* <View style={styles.bottomButtonInnerView}>
-          <TouchableOpacity onPress={() => {}} style={styles.buttonInnerView}>
+            </TouchableOpacity> */}
+        <View style={styles.bottomButtonInnerView}>
+          <TouchableOpacity
+            onPress={() => {
+              props.onPressConfirm();
+            }}
+            style={styles.buttonInnerView}
+          >
             <Text style={styles.buttonText}>Confirm Question</Text>
           </TouchableOpacity>
           <View
@@ -268,10 +272,10 @@ const HistoryPageComponent = (props) => {
               backgroundColor: Colors.white,
             }}
           />
-          <TouchableOpacity style={styles.buttonInnerView} onPress={() => {}}>
+          <TouchableOpacity style={styles.buttonInnerView} onPress={() => {props.onPressChangeQuestion()}}>
             <Text style={styles.buttonText}>Change Question</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
       </View>
     </View>
   );

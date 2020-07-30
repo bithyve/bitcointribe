@@ -86,6 +86,7 @@ import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
 import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistory';
 import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
 import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
+import NewOwnQuestions from '../pages/NewOwnQuestions';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -103,6 +104,7 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     ShareRecoveryOTP,
+    NewOwnQuestions,
     RecoveryQrScanner: QrScanner,
     UpdateApp: {
       screen: UpdateApp,
@@ -217,6 +219,7 @@ const HomeNavigator = createStackNavigator(
     TrustedContactHistoryKeeper,
     KeeperDeviceHistory,
     PersonalCopyHistoryKeeper,
+    NewOwnQuestions,
     UpdateApp: {
       screen: UpdateApp,
       navigationOptions: {
