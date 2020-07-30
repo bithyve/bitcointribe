@@ -204,7 +204,7 @@ PODS:
     - React
   - RNGestureHandler (1.3.0):
     - React
-  - RNLocalize (1.4.0):
+  - RNLocalize (1.4.1):
     - React
   - RNOS (1.2.6):
     - React
@@ -509,7 +509,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 5be12a5bfbb8da3528c43ee4373abd9c30d04616
   RNFirebase: f20e5e4ceaa632aebb1a29a9a91022ae0469c633
   RNGestureHandler: 5329a942fce3d41c68b84c2c2276ce06a696d8b0
-  RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
+  RNLocalize: 49634a6a605dcdeb319e9c42a5c2f1aec508694b
   RNOS: 6f2f9a70895bbbfbdad7196abd952e7b01d45027
   RNReanimated: b2ab0b693dddd2339bd2f300e770f6302d2e960c
   RNScreens: f28b48b8345f2f5f39ed6195518291515032a788
