@@ -502,8 +502,6 @@ export function* trustedChannelsSyncWorker() {
     DHInfos = [];
   }
 
-  const preSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
-
   const contacts: Contacts = trustedContacts.tc.trustedContacts;
   for (const contactName of Object.keys(contacts)) {
     let { trustedChannel, ephemeralChannel, encKey } = contacts[contactName];
@@ -689,11 +687,17 @@ export function* trustedChannelsSyncWorker() {
     }
   }
 
+  const preSyncTC = yield call(AsyncStorage.getItem, 'preSyncTC');
   const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
 
-  if (preSyncTC !== postSyncTC) {
+  if (
+    Object.keys(trustedContacts.tc.trustedContacts).length &&
+    (!preSyncTC || preSyncTC !== postSyncTC)
+  ) {
     console.log('Updating WI...');
     yield put(updateWalletImage());
+
+    yield call(AsyncStorage.setItem, 'preSyncTC', postSyncTC);
   }
 
   const { SERVICES } = yield select((state) => state.storage.database);
