@@ -714,8 +714,8 @@ function* testcoinsWorker({ payload }) {
   const res = yield call(service.getTestcoins);
   console.log({ res });
   if (res.status === 200) {
-    console.log('testcoins received');
-    yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
+    // console.log('testcoins received');
+    // yield call(AsyncStorage.setItem, 'Received Testcoins', 'true');
     // yield delay(3000); // 3 seconds delay for letting the transaction get broadcasted in the network
     // yield call(fetchBalance, payload.serviceType); // synchronising calls for efficiency
     // yield put(fetchTransactions(payload.serviceType, service));
@@ -727,6 +727,8 @@ function* testcoinsWorker({ payload }) {
       [payload.serviceType]: JSON.stringify(service),
     };
     yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+
+    yield put(accountsSynched(true)); // initial sync: test-acc only (turns the amount text to black)
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     throw new Error('Failed to get testcoins');

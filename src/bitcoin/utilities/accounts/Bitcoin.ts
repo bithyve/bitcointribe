@@ -297,6 +297,15 @@ export default class Bitcoin {
       for (const addressSpecificUTXOs of Utxos) {
         for (const utxo of addressSpecificUTXOs) {
           const { value, Address, status } = utxo;
+
+          if (
+            accountType === 'Test Account' &&
+            Address === externalAddresses[0]
+          ) {
+            balances.balance += value; // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            continue;
+          }
+
           if (status.confirmed) balances.balance += value;
           else if (
             internalAddresses.length &&
@@ -334,7 +343,13 @@ export default class Bitcoin {
             this.categorizeTx(tx, ownedAddresses, accountType);
             const transaction = {
               txid: tx.txid,
-              confirmations: tx.NumberofConfirmations,
+              confirmations:
+                accountType === 'Test Account' &&
+                tx.transactionType === 'Received' &&
+                addressInfo.Address === externalAddresses[0] &&
+                tx.NumberofConfirmations < 1
+                  ? '-'
+                  : tx.NumberofConfirmations,
               status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
               fee: tx.fee,
               date: tx.Status.block_time

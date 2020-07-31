@@ -441,7 +441,7 @@ function* uploadRequestedShareWorker({ payload }) {
     //   'Upload successful!',
     //   "Requester's share has been uploaded to the relay.",
     // );
-    Toast(`${tag}'s share uploaded`);
+    Toast(`${tag}'s Recovery Key sent.`);
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
     yield put(requestedShareUploaded(tag, false, res.err));
@@ -517,39 +517,55 @@ function* downloadMetaShareWorker({ payload }) {
       yield put(downloadedMShare(otp, true));
       yield put(updateMSharesHealth(updatedBackup));
     } else {
-      const updatedRecoveryShares = {};
+      let updatedRecoveryShares = {};
       let updated = false;
-      Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach((objectKey) => {
-        const recoveryShare = DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
-        if (
-          recoveryShare.REQUEST_DETAILS &&
-          recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
-        ) {
-          updatedRecoveryShares[objectKey] = {
-            REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+
+      if (payload.replaceIndex === 0 || payload.replaceIndex) {
+        // replacing stored key w/ scanned from Guardian's help-restore
+        updatedRecoveryShares = {
+          ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+          [payload.replaceIndex]: {
+            REQUEST_DETAILS: { KEY: encryptedKey },
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
-          };
-          updated = true;
-        } else {
-          updatedRecoveryShares[objectKey] = recoveryShare;
-        }
-      });
-
-      if (!updated) {
-        if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
-          Alert.alert(
-            'Key Exists',
-            'Following key already exists for recovery',
-          );
-          return;
-        }
-        updatedRecoveryShares[metaShare.shareId] = {
-          META_SHARE: metaShare,
-          ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+          },
         };
-        Toast('Share Downloaded');
+      } else {
+        Object.keys(DECENTRALIZED_BACKUP.RECOVERY_SHARES).forEach(
+          (objectKey) => {
+            const recoveryShare =
+              DECENTRALIZED_BACKUP.RECOVERY_SHARES[objectKey];
+            if (
+              recoveryShare.REQUEST_DETAILS &&
+              recoveryShare.REQUEST_DETAILS.KEY === encryptedKey
+            ) {
+              updatedRecoveryShares[objectKey] = {
+                REQUEST_DETAILS: recoveryShare.REQUEST_DETAILS,
+                META_SHARE: metaShare,
+                ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+              };
+              updated = true;
+            } else {
+              updatedRecoveryShares[objectKey] = recoveryShare;
+            }
+          },
+        );
       }
+
+      // if (!updated) {
+      //   if (DECENTRALIZED_BACKUP.RECOVERY_SHARES[metaShare.shareId]) {
+      //     Alert.alert(
+      //       'Key Exists',
+      //       'Following key already exists for recovery',
+      //     );
+      //     return;
+      //   }
+      //   updatedRecoveryShares[metaShare.shareId] = {
+      //     META_SHARE: metaShare,
+      //     ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+      //   };
+      //   Toast('Share Downloaded');
+      // }
 
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
@@ -954,7 +970,7 @@ function* checkMSharesHealthWorker() {
   yield put(calculateOverallHealth(s3Service));
 
   if (res.status === 200) {
-    if (preFetchHealth !== postFetchHealth) {
+    if (preFetchHealth != postFetchHealth) {
       const { SERVICES } = yield select((state) => state.storage.database);
       const updatedSERVICES = {
         ...SERVICES,
@@ -1331,8 +1347,11 @@ function* restoreShareFromQRWorker({ payload }) {
     const { metaShare } = res.data;
     console.log({ metaShare });
     const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP;
-    RECOVERY_SHARES[metaShare.meta.index] = {
-      META_SHARE: metaShare,
+    const updatedRecoveryShares = {
+      ...RECOVERY_SHARES,
+      [metaShare.meta.index]: {
+        META_SHARE: metaShare,
+      },
     };
 
     // let storedPDFHealth = yield call(AsyncStorage.getItem, 'PDF Health');
@@ -1355,7 +1374,7 @@ function* restoreShareFromQRWorker({ payload }) {
 
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
-      RECOVERY_SHARES,
+      RECOVERY_SHARES: updatedRecoveryShares,
     };
     console.log({ updatedBackup });
     yield call(insertDBWorker, {
@@ -1501,11 +1520,33 @@ function* recoverWalletWorker({ payload }) {
       let updatedPDFHealth = {};
       for (const share of restorationShares) {
         if (share.meta.index > 2) {
-          updatedPDFHealth[share.meta.index] = {
-            shareId: `placeHolderID${share.meta.index}`,
-            updatedAt: Date.now(),
+          updatedPDFHealth = {
+            ...updatedPDFHealth,
+            [share.meta.index]: {
+              shareId: `placeHolderID${share.meta.index}`,
+              updatedAt: Date.now(),
+            },
           };
         }
+      }
+
+      if (!updatedPDFHealth[3]) {
+        updatedPDFHealth = {
+          ...updatedPDFHealth,
+          [3]: {
+            shareId: 'placeHolderID3',
+            updatedAt: 0,
+          },
+        };
+      }
+      if (!updatedPDFHealth[4]) {
+        updatedPDFHealth = {
+          ...updatedPDFHealth,
+          [4]: {
+            shareId: 'placeHolderID4',
+            updatedAt: 0,
+          },
+        };
       }
       if (Object.keys(updatedPDFHealth).length)
         yield call(
@@ -1572,6 +1613,10 @@ function* updateWalletImageWorker({ payload }) {
 
   if (walletImageHashes) {
     const currentDBHash = hash(DECENTRALIZED_BACKUP);
+    console.log({
+      previousDBHash: hashesWI.DECENTRALIZED_BACKUP,
+      currentDBHash,
+    });
     if (
       !hashesWI.DECENTRALIZED_BACKUP ||
       currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
@@ -1581,6 +1626,10 @@ function* updateWalletImageWorker({ payload }) {
     }
 
     const currentSHash = hash(SERVICES);
+    console.log({
+      previousSHash: hashesWI.SERVICES,
+      currentSHash,
+    });
     if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
       walletImage['SERVICES'] = SERVICES;
       hashesWI.SERVICES = currentSHash;
@@ -1589,6 +1638,10 @@ function* updateWalletImageWorker({ payload }) {
     const ASYNC_DATA = yield call(asyncDataToBackup);
     if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
+      console.log({
+        previousAsyncHash: hashesWI.ASYNC_DATA,
+        currentAsyncHash,
+      });
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
         walletImage['ASYNC_DATA'] = ASYNC_DATA;
         hashesWI.ASYNC_DATA = currentAsyncHash;

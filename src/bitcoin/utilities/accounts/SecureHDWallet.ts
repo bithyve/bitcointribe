@@ -28,6 +28,7 @@ export default class SecureHDWallet extends Bitcoin {
     secret: string;
   };
   public secondaryMnemonic: string;
+  public secondaryXpriv: string;
   public xpubs: {
     primary: string;
     secondary: string;
@@ -55,7 +56,6 @@ export default class SecureHDWallet extends Bitcoin {
   private nextFreeAddressIndex: number;
   private nextFreeChangeAddressIndex: number;
   private primaryXpriv: string;
-  private secondaryXpriv: string;
   private multiSigCache;
   private signingEssentialsCache;
   private gapLimit: number;
