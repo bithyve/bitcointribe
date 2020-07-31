@@ -78,10 +78,16 @@ class ManageBackup extends Component<
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
           isSetupDone: true,
-          keeper1Done: false,
-          keeper1Name: '',
-          keeper2Done: false,
-          keeper2Name: '',
+          keeper1: {
+            name: '',
+            keeper1Done: false,
+            type: '',
+          },
+          keeper2: {
+            name: '',
+            keeper2Done: false,
+            type: '',
+          },
           id: 1,
         },
         {
@@ -93,10 +99,16 @@ class ManageBackup extends Component<
           infoRed: 'Keepers need your attention',
           infoGreen: 'All Keepers are accessible',
           isSetupDone: true,
-          keeper1Done: true,
-          keeper1Name: 'Add Primary Keeper',
-          keeper2Done: false,
-          keeper2Name: '',
+          keeper1: {
+            name: 'iPad Pro',
+            keeper1Done: true,
+            type: 'device',
+          },
+          keeper2: {
+            name: 'mac Pro',
+            keeper2Done: true,
+            type: 'friends',
+          },
           id: 2,
         },
         {
@@ -109,26 +121,31 @@ class ManageBackup extends Component<
           infoGreen: 'All Keepers are accessible',
           manageText: 'Setup',
           isSetupDone: false,
-          keeper1Done: false,
-          keeper1Name: '',
-          keeper2Done: false,
-          keeper2Name: '',
+          keeper1: {
+            name: '',
+            keeper1Done: false,
+            type: '',
+          },
+          keeper2: {
+            name: '',
+            keeper2Done: false,
+            type: '',
+          },
           id: 3,
         },
       ],
-      isLevel2: false
+      isLevel2: false,
     };
-    
   }
 
   setSelectedCards = () => {
     const { levelData } = this.state;
-    for(let a= 0; a < levelData.length; a++){
-      console.log("levelData.status", levelData[a].status);
-      if(levelData[a].status == 'ugly')
+    for (let a = 0; a < levelData.length; a++) {
+      console.log('levelData.status', levelData[a].status);
+      if (levelData[a].status == 'ugly')
         this.setState({ selectedId: levelData[a].id });
     }
-  }
+  };
 
   componentDidMount = () => {
     this.setSelectedCards();
@@ -137,10 +154,10 @@ class ManageBackup extends Component<
   selectId = (value) => {
     if (value != this.state.selectedId) this.setState({ selectedId: value });
     else this.setState({ selectedId: 0 });
-    if(value.id === 2){
-      this.setState({isLevel2: true});
-    } else{
-      this.setState({isLevel2: false})
+    if (value.id === 2) {
+      this.setState({ isLevel2: true });
+    } else {
+      this.setState({ isLevel2: false });
     }
   };
 
@@ -152,7 +169,7 @@ class ManageBackup extends Component<
   };
 
   render() {
-    const { levelData, selectedId,isLevel2} = this.state;
+    const { levelData, selectedId, isLevel2 } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -206,7 +223,9 @@ class ManageBackup extends Component<
             <View>
               <Text style={styles.backupText}>Backup</Text>
               <Text style={styles.backupInfoText}>Security is</Text>
-              <Text style={styles.backupInfoText}>at level {selectedId ? selectedId : 1}</Text>
+              <Text style={styles.backupInfoText}>
+                at level {selectedId ? selectedId : 1}
+              </Text>
             </View>
           </View>
           <View style={{ flex: 1, alignItems: 'center', position: 'relative' }}>
@@ -225,7 +244,8 @@ class ManageBackup extends Component<
                       selectedId && selectedId == value.id ? 10 : 0,
                     shadowOffset: { width: 5, height: 5 },
                     elevation: selectedId && selectedId == value.id ? 10 : 0,
-                    opacity: selectedId == value.id || selectedId==0 ? 1 : 0.3,
+                    opacity:
+                      selectedId == value.id || selectedId == 0 ? 1 : 0.3,
                   }}
                 >
                   <View style={styles.cardView}>
@@ -392,10 +412,15 @@ class ManageBackup extends Component<
                                 borderWidth: 0.5,
                                 marginLeft: 'auto',
                               }}
-                              onPress={()=> navigation.navigate('SecurityQuestionHistoryKeeper',{
-                                selectedTime: this.getTime(new Date()),
-                                selectedStatus: 'Ugly',
-                              })}
+                              onPress={() =>
+                                navigation.navigate(
+                                  'SecurityQuestionHistoryKeeper',
+                                  {
+                                    selectedTime: this.getTime(new Date()),
+                                    selectedStatus: 'Ugly',
+                                  },
+                                )
+                              }
                             >
                               <ImageBackground
                                 source={require('../../assets/images/icons/questionMark.png')}
@@ -439,24 +464,48 @@ class ManageBackup extends Component<
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
                                 borderColor: Colors.red,
-                                borderWidth: 0.5,
+                                borderWidth: value.keeper1.keeper1Done
+                                  ? 0
+                                  : 0.5,
                               }}
-                              onPress={()=>{
-                                if(value.id === 2){
-                                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1)
-                                } else{
-                                  (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                              onPress={() => {
+                                if (value.id === 2) {
+                                  (this.refs
+                                    .SetupPrimaryKeeperBottomSheet as any).snapTo(
+                                    1,
+                                  );
+                                } else {
+                                  (this.refs
+                                    .keeperTypeBottomSheet as any).snapTo(1);
                                 }
                               }}
                             >
-                              <View
-                                style={{
-                                  backgroundColor: Colors.red,
-                                  width: wp('2%'),
-                                  height: wp('2%'),
-                                  borderRadius: wp('2%') / 2,
-                                }}
-                              />
+                              {value.keeper1.keeper1Done &&
+                              (value.keeper1.type == 'device' ||
+                                value.keeper1.type == 'friends') ? (
+                                <Image
+                                  source={
+                                    value.keeper1.type == 'device'
+                                      ? require('../../assets/images/icons/icon_ipad_blue.png')
+                                      : require('../../assets/images/icons/pexels-photo.png')
+                                  }
+                                  style={{
+                                    width: wp('6%'),
+                                    height: wp('6%'),
+                                    resizeMode: 'contain',
+                                    borderRadius: wp('6%') / 2,
+                                  }}
+                                />
+                              ) : (
+                                <View
+                                  style={{
+                                    backgroundColor: Colors.red,
+                                    width: wp('2%'),
+                                    height: wp('2%'),
+                                    borderRadius: wp('2%') / 2,
+                                  }}
+                                />
+                              )}
                               <Text
                                 style={{
                                   ...styles.cardButtonText,
@@ -468,7 +517,9 @@ class ManageBackup extends Component<
                                 }}
                               >
                                 {value.isSetupDone
-                                  ? value.keeper1Name
+                                  ? value.keeper1.name
+                                  : value.id == 2
+                                  ? 'Add Primary Keeper'
                                   : 'Add Keeper'}
                               </Text>
                             </TouchableOpacity>
@@ -482,28 +533,49 @@ class ManageBackup extends Component<
                                 paddingLeft: wp('3%'),
                                 paddingRight: wp('3%'),
                                 borderColor: Colors.red,
-                                borderWidth: 0.5,
+                                borderWidth: value.keeper2.keeper2Done
+                                  ? 0
+                                  : 0.5,
                                 marginLeft: wp('4%'),
                               }}
-                              onPress={()=>{
-                                if(value.id === 2){
-                                  this.setState({isLevel2: true});
-                                } else{
-                                  this.setState({isLevel2: false});
+                              onPress={() => {
+                                if (value.id === 2) {
+                                  this.setState({ isLevel2: true });
+                                } else {
+                                  this.setState({ isLevel2: false });
                                 }
                                 setTimeout(() => {
-                                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                                  (this.refs
+                                    .keeperTypeBottomSheet as any).snapTo(1);
                                 }, 2);
                               }}
                             >
-                              <View
-                                style={{
-                                  backgroundColor: Colors.red,
-                                  width: wp('2%'),
-                                  height: wp('2%'),
-                                  borderRadius: wp('2%') / 2,
-                                }}
-                              />
+                              {value.keeper2.keeper2Done &&
+                              (value.keeper2.type == 'device' ||
+                                value.keeper2.type == 'friends') ? (
+                                <Image
+                                  source={
+                                    value.keeper2.type == 'device'
+                                      ? require('../../assets/images/icons/icon_ipad_blue.png')
+                                      : require('../../assets/images/icons/pexels-photo.png')
+                                  }
+                                  style={{
+                                    width: wp('6%'),
+                                    height: wp('6%'),
+                                    resizeMode: 'contain',
+                                    borderRadius: wp('6%') / 2,
+                                  }}
+                                />
+                              ) : (
+                                <View
+                                  style={{
+                                    backgroundColor: Colors.red,
+                                    width: wp('2%'),
+                                    height: wp('2%'),
+                                    borderRadius: wp('2%') / 2,
+                                  }}
+                                />
+                              )}
                               <Text
                                 style={{
                                   ...styles.cardButtonText,
@@ -514,8 +586,8 @@ class ManageBackup extends Component<
                                   marginLeft: wp('3%'),
                                 }}
                               >
-                                {value.isSetupDone && value.keeper2Done
-                                  ? value.keeper2Name
+                                {value.isSetupDone && value.keeper2.keeper2Done
+                                  ? value.keeper2.name
                                   : 'Add Keeper'}
                               </Text>
                             </TouchableOpacity>
@@ -540,31 +612,33 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <KeeperTypeModalContents
-              onPressSetup={(type, name) =>{
-                if(type === 'contact'){
-                  navigation.navigate("TrustedContactHistoryKeeper", {
+              onPressSetup={(type, name) => {
+                if (type === 'contact') {
+                  navigation.navigate('TrustedContactHistoryKeeper', {
                     selectedTime: this.getTime(new Date()),
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
-                    isLevel2: isLevel2} );
+                    isLevel2: isLevel2,
+                  });
                 }
-                if(type === 'device'){
-                  navigation.navigate("KeeperDeviceHistory", {
+                if (type === 'device') {
+                  navigation.navigate('KeeperDeviceHistory', {
                     selectedTime: this.getTime(new Date()),
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
-                    isLevel2: isLevel2} );
+                    isLevel2: isLevel2,
+                  });
                 }
-                if(type === 'pdf'){
-                  navigation.navigate("PersonalCopyHistoryKeeper", {
+                if (type === 'pdf') {
+                  navigation.navigate('PersonalCopyHistoryKeeper', {
                     selectedTime: this.getTime(new Date()),
                     selectedStatus: 'Ugly',
                     selectedTitle: name,
-                    isLevel2: isLevel2} );
+                    isLevel2: isLevel2,
+                  });
                 }
-                (this.refs.keeperTypeBottomSheet as any).snapTo(0)
-              }
-              }
+                (this.refs.keeperTypeBottomSheet as any).snapTo(0);
+              }}
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
               }
@@ -607,7 +681,6 @@ class ManageBackup extends Component<
             />
           )}
         />
-        
       </View>
     );
   }

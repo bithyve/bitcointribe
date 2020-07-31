@@ -35,7 +35,7 @@ export default function ApproveSetup(props) {
           <View style={styles.grayBox}>
             <View style={styles.grayBoxImageView}>
               <Image
-                source={require('../../assets/images/icons/icon_secondarydevice.png')}
+                source={require('../../assets/images/icons/icon_ipad.png')}
                 style={styles.grayBoxImage}
               />
             </View>
@@ -79,7 +79,6 @@ export default function ApproveSetup(props) {
           </View>
         </ScrollView>
         <BottomInfoBox
-          backgroundColor={Colors.white}
           title={'Note'}
           infoText={
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.'
@@ -93,7 +92,7 @@ export default function ApproveSetup(props) {
 const styles = StyleSheet.create({
   modalContentContainer: {
     height: '100%',
-    backgroundColor: Colors.backgroundColor1,
+    backgroundColor: Colors.white,
   },
   successModalHeaderView: {
     marginRight: wp('8%'),
@@ -116,7 +115,7 @@ const styles = StyleSheet.create({
     marginTop: wp('7%'),
     marginBottom: wp('7%'),
     borderRadius: 10,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
     alignSelf: 'center',
     width: wp('90%'),
     height: wp('25%'),

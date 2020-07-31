@@ -64,6 +64,37 @@ const HomeHeader = ({
   onSwitchToggle,
   setCurrencyToggleValue,
 }) => {
+  const getMessage = (health, keeper) => {
+    if(!health){
+      return (
+        <View style={{flexDirection: 'row', width: wp('57%')}}>
+          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
+            Add Keeper
+          </Text>
+          <Text style={styles.manageBackupMessageText}> to improve health</Text>
+        </View>
+      );
+    }
+    else if(health=='ugly'){
+      return (
+        <View style={{flexDirection: 'row', width: wp('57%') }}>
+          <Text style={styles.manageBackupMessageTextHighlight}>
+            {keeper}
+          </Text>
+          <Text numberOfLines={1} style={styles.manageBackupMessageText}> needs your attention</Text>
+        </View>
+      );
+    }
+    else if(health=='good'){
+      return (
+        <View style={{flexDirection: 'row', width: wp('57%')}}>
+          <Text style={styles.manageBackupMessageText}>Your wallet is now </Text>
+          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>secure</Text>
+        </View>
+      );
+    }
+  };
+  
   return (
     <View style={{ ...styles.headerViewContainer, flex: 1 }}>
       <View style={{ flexDirection: 'row' }}>
@@ -189,19 +220,12 @@ const HomeHeader = ({
           </Text>
         </ImageBackground>
         <TouchableOpacity
-          onPress={()=>{
-            //navigation.navigate('ManageBackup');
-            navigation.navigate('ManageBackupKeeper')
-          }
-          }
+          onPress={() => {
+            navigation.navigate('ManageBackupKeeper');
+          }}
           style={styles.manageBackupMessageView}
         >
-          <Text style={styles.manageBackupMessageTextHighlight}>
-            Add Keepers
-            <Text style={styles.manageBackupMessageText}>
-              {' '}to improve health
-            </Text>
-          </Text>
+          {getMessage('good', 'Security Question')}
           <AntDesign
             style={{ marginLeft: 'auto' }}
             name={'arrowright'}
@@ -254,17 +278,18 @@ const styles = StyleSheet.create({
   manageBackupMessageText: {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(12),
+    color: Colors.white,
   },
   homeHeaderAmountText: {
-    fontFamily: Fonts.FiraSansRegular, 
-    fontSize: RFValue(19), 
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(19),
     marginRight: 5,
     color: Colors.white,
   },
   homeHeaderAmountUnitText: {
-    fontFamily: Fonts.FiraSansRegular, 
+    fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(9),
     marginBottom: 3,
     color: Colors.white,
-  }
+  },
 });
