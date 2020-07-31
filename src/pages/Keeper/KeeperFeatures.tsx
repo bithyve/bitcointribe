@@ -121,9 +121,28 @@ class KeeperFeatures extends Component<
               />
             </TouchableOpacity>
             <View style={{ justifyContent: 'center', width: wp('80%') }}>
+              <View style={{flexDirection: 'row'}}>
               <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
                 {'Setup Primary Keeper\non a Personal Device'}
               </Text>
+              <TouchableOpacity
+              style={{ marginLeft: 'auto', marginRight: wp('1%') }}
+              onPress={() => {}}
+            >
+              <Text
+                    onPress={() => {}}
+                    style={{
+                      color: Colors.textColorGrey,
+                        fontSize: RFValue(12),
+                        marginLeft: 'auto',
+                        textAlign: 'center',
+                        padding: 10
+                    }}
+                  >
+                    Know more
+                  </Text>
+                  </TouchableOpacity>
+              </View>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
                 Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit
                 amet, consetetur Lorem ipsum dolor sit amet, consetetur

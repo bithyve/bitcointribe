@@ -585,11 +585,14 @@ class ManageBackup extends Component<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('40%')
-              : hp('50%'),
+              ? hp('50%')
+              : hp('60%'),
           ]}
           renderContent={() => (
             <SetupPrimaryKeeper
+            onPressOk={()=>{navigation.navigate('KeeperFeatures');
+            (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)}
+          }
             onPressContinue={() =>
               {navigation.navigate('KeeperFeatures');
                 (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)}
