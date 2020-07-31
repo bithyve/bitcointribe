@@ -490,6 +490,7 @@ export function* trustedChannelsSyncWorker() {
   const regularService: RegularAccount = yield select(
     (state) => state.accounts[REGULAR_ACCOUNT].service,
   );
+  const preSyncReg = JSON.stringify(regularService);
   const testService: TestAccount = yield select(
     (state) => state.accounts[TEST_ACCOUNT].service,
   );
@@ -689,26 +690,27 @@ export function* trustedChannelsSyncWorker() {
 
   const preSyncTC = yield call(AsyncStorage.getItem, 'preSyncTC');
   const postSyncTC = JSON.stringify(trustedContacts.tc.trustedContacts);
+  const postSyncReg = JSON.stringify(regularService);
 
   if (
     Object.keys(trustedContacts.tc.trustedContacts).length &&
-    (!preSyncTC || preSyncTC !== postSyncTC)
+    (!preSyncTC || preSyncTC !== postSyncTC || preSyncReg !== postSyncReg)
   ) {
+    const { SERVICES } = yield select((state) => state.storage.database);
+    const updatedSERVICES = {
+      ...SERVICES,
+      REGULAR_ACCOUNT: JSON.stringify(regularService),
+      TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+    };
+    yield call(insertDBWorker, {
+      payload: { SERVICES: updatedSERVICES },
+    });
+
     console.log('Updating WI...');
     yield put(updateWalletImage());
 
     yield call(AsyncStorage.setItem, 'preSyncTC', postSyncTC);
   }
-
-  const { SERVICES } = yield select((state) => state.storage.database);
-  const updatedSERVICES = {
-    ...SERVICES,
-    REGULAR_ACCOUNT: JSON.stringify(regularService),
-    TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-  };
-  yield call(insertDBWorker, {
-    payload: { SERVICES: updatedSERVICES },
-  });
 
   yield put(switchTCLoading('trustedChannelsSync'));
 }
