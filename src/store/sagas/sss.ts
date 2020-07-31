@@ -1613,6 +1613,10 @@ function* updateWalletImageWorker({ payload }) {
 
   if (walletImageHashes) {
     const currentDBHash = hash(DECENTRALIZED_BACKUP);
+    console.log({
+      previousDBHash: hashesWI.DECENTRALIZED_BACKUP,
+      currentDBHash,
+    });
     if (
       !hashesWI.DECENTRALIZED_BACKUP ||
       currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
@@ -1622,6 +1626,10 @@ function* updateWalletImageWorker({ payload }) {
     }
 
     const currentSHash = hash(SERVICES);
+    console.log({
+      previousSHash: hashesWI.SERVICES,
+      currentSHash,
+    });
     if (!hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES) {
       walletImage['SERVICES'] = SERVICES;
       hashesWI.SERVICES = currentSHash;
@@ -1630,6 +1638,10 @@ function* updateWalletImageWorker({ payload }) {
     const ASYNC_DATA = yield call(asyncDataToBackup);
     if (Object.keys(ASYNC_DATA).length) {
       const currentAsyncHash = hash(ASYNC_DATA);
+      console.log({
+        previousAsyncHash: hashesWI.ASYNC_DATA,
+        currentAsyncHash,
+      });
       if (!hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA) {
         walletImage['ASYNC_DATA'] = ASYNC_DATA;
         hashesWI.ASYNC_DATA = currentAsyncHash;
