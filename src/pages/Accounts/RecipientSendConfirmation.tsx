@@ -12,6 +12,7 @@ import {
   StatusBar,
   BackHandler,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -25,6 +26,18 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
 
 function RecipientSendConfirmation(props) {
+  const currencyCode = useSelector((state) => state.preferences.currencyCode);
+  const currencyToggleValue = useSelector((state) => state.preferences.currencyToggleValue);
+
+  const getCorrectAmountCurrency = () => {
+    const switchOn = currencyToggleValue ? true : false;
+    if(!switchOn) {
+      return props.item.currencyAmount && (props.item.currencyAmount + ' ' + currencyCode.toLocaleLowerCase());
+    } else {
+      return props.item.bitcoinAmount && props.item.bitcoinAmount + (props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats');
+    }
+  }
+
   return (
     <TouchableOpacity
       onPress={() => props.onPressElement()}
@@ -134,11 +147,12 @@ function RecipientSendConfirmation(props) {
                 // paddingTop: 3,
               }}
             >
-              {props.item.bitcoinAmount
+              {getCorrectAmountCurrency()}
+              {/* {props.item.bitcoinAmount
                 ? `${props.item.bitcoinAmount}` + `${props.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'}`
                 : '$ ' + props.item.currencyAmount
                 ? props.item.currencyAmount
-                : ''}
+                : ''} */}
             </Text>
           ) : null}
         </View>

@@ -33,7 +33,6 @@ import Slider from 'react-native-slider';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import ModalHeader from '../../components/ModalHeader';
 import SendConfirmationContent from './SendConfirmationContent';
-import RecipientComponent from './RecipientComponent';
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter';
 import moment from 'moment';
 import {
@@ -54,6 +53,8 @@ import DeviceInfo from 'react-native-device-info';
 import TestAccountHelperModalContents from '../../components/Helper/TestAccountHelperModalContents';
 import SmallHeaderModal from '../../components/SmallHeaderModal';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
+import RecipientSendConfirmation from './RecipientSendConfirmation';
+import RadioButton from '../../components/RadioButton';
 
 interface SendConfirmationStateTypes {
   switchOn: boolean;
@@ -381,6 +382,12 @@ class SendConfirmation_updated extends Component<
       : CurrencyCode.toLocaleLowerCase();
   };
 
+  onPrioritySelect = (priority) => {
+    this.setState({
+      sliderValueText: priority,
+    });
+  }
+
   render() {
     const {
       switchOn,
@@ -482,8 +489,12 @@ class SendConfirmation_updated extends Component<
           </View>
           {transfer.details && transfer.details.length > 0 ? (
             <ScrollView>
+              <View style={{flex: 1, flexDirection: 'row', marginRight: wp('8%'), marginLeft: wp('8%')}}>
+                <Text style={{...styles.tableHeadingText, width: '50%', marginLeft: 10}}>To</Text>
+                <Text style={{...styles.tableHeadingText, width: '50%', justifyContent: 'flex-end', textAlign: 'center'}}>Amount</Text>
+              </View>
               {transfer.details.map((item) => (
-                <RecipientComponent
+                <RecipientSendConfirmation
                   onPressElement={() => {
                     if (item.note) {
                       if (SelectedContactId == item.selectedContact.id)
@@ -542,11 +553,94 @@ class SendConfirmation_updated extends Component<
             <Text style={styles.transactionPriorityText}>
               Transaction Priority
             </Text>
-            <Text style={styles.transactionPriorityInfoText}>
+            {/* <Text style={styles.transactionPriorityInfoText}>
               Set priority for your transaction
-            </Text>
+            </Text> */}
+            <View style={styles.priorityTableHeadingContainer}>
+              <View style={{ flex: 1, paddingLeft: 10}}>
+                <Text style={styles.tableHeadingText}>Priority</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.tableHeadingText}>Arrival Time</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={{...styles.tableHeadingText, textAlign: 'center'}}>Fee</Text>
+              </View>
+            </View>
+            <View style={styles.priorityTableContainer}>
+              <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+                <RadioButton
+                  size={20}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('High')}
+                  onpress={() => this.onPrioritySelect('High Fee')}
+                />
+                <Text style={{...styles.priorityTableText, marginLeft: 10}}>High</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>10 - 20 minutes</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                    ? transfer.stage1.txPrerequisites['high'].fee
+                    : '',
+                  )}{' ' + this.getCorrectCurrencySymbol()}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.priorityTableContainer}>
+              <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+                <RadioButton
+                  size={20}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('Medium')}
+                  onpress={() => this.onPrioritySelect('Medium Fee')}
+                />
+                <Text style={{...styles.priorityTableText, marginLeft: 10}}>Medium</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                    ? transfer.stage1.txPrerequisites['medium'].fee
+                    : '',
+                  )}{' ' + this.getCorrectCurrencySymbol()}
+                </Text>
+              </View>
+            </View>
+            <View style={{...styles.priorityTableContainer, borderBottomWidth: 0}}>
+              <View style={{...styles.priorityDataContainer, justifyContent: 'flex-start'}}>
+                <RadioButton
+                  size={20}
+                  color={Colors.lightBlue}
+                  borderColor={Colors.borderColor}
+                  isChecked={this.state.sliderValueText.includes('Low')}
+                  onpress={() => this.onPrioritySelect('Low Fee')}
+                />
+                <Text style={{...styles.priorityTableText, marginLeft: 10}}>Low</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>20 - 40 minutes</Text>
+              </View>
+              <View style={styles.priorityDataContainer}>
+                <Text style={styles.priorityTableText}>
+                  {this.convertBitCoinToCurrency(
+                    transfer.stage1 && transfer.stage1.txPrerequisites
+                    ? transfer.stage1.txPrerequisites['low'].fee
+                    : '')}{' ' + this.getCorrectCurrencySymbol()}
+                </Text>
+              </View>
+            </View>
+            
 
-            <View
+            {/* <View
               style={{
                 ...styles.textBoxView,
                 flexDirection: 'column',
@@ -608,7 +702,6 @@ class SendConfirmation_updated extends Component<
                       ? transfer.stage1.txPrerequisites['low'].fee
                       : '',
                   )}
-                  {/* {this.serviceType == TEST_ACCOUNT ? ' t-sats' : ' sats'} */}
                   {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
                 <Text style={styles.sliderText}>
@@ -618,7 +711,6 @@ class SendConfirmation_updated extends Component<
                       ? transfer.stage1.txPrerequisites['medium'].fee
                       : '',
                   )}
-                  {/* {' sats'} */}
                   {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
                 <Text
@@ -633,20 +725,11 @@ class SendConfirmation_updated extends Component<
                       ? transfer.stage1.txPrerequisites['high'].fee
                       : '',
                   )}
-                  {/* {' sats'} */}
                   {' ' + this.getCorrectCurrencySymbol()})
                 </Text>
               </View>
-            </View>
+            </View> */}
           </View>
-          {/* <View style={{ marginTop: hp('3%') }}>
-            <BottomInfoBox
-              title={'Note'}
-              infoText={
-                'When you want to send bitcoin, you need the address of the receiver. For this you can either scan a QR code from their wallet/app or copy their address into the address field'
-              }
-            />
-          </View> */}
 
           <View style={styles.bottomButtonView}>
             <TouchableOpacity
@@ -957,11 +1040,11 @@ const styles = StyleSheet.create({
     marginTop: hp('2%'),
     marginRight: wp('6%'),
     marginLeft: wp('6%'),
-    borderTopWidth: 1,
+    // borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1.5%'),
+    paddingBottom: hp('1%'),
+    // paddingTop: hp('1.5%'),
   },
   totalAmountText: {
     color: Colors.blue,
@@ -1006,7 +1089,7 @@ const styles = StyleSheet.create({
   },
   transactionPriorityText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue(18),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
@@ -1036,5 +1119,40 @@ const styles = StyleSheet.create({
     marginBottom: hp('5%'),
     marginLeft: wp('6%'),
     marginRight: wp('6%'),
+  },
+  tableHeadingText: {
+    color: Colors.greyTextColor,
+    fontSize: RFValue(10),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  priorityTableText: {
+    fontSize: RFValue(12),
+    lineHeight: RFValue(12),
+    color: Colors.greyTextColor,
+    textAlign: 'center',
+  },
+  priorityTableHeadingContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    marginTop: hp('2%'),
+    paddingBottom: hp('1.5%')
+  },
+  priorityTableContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderColor: Colors.borderColor,
+    marginTop: hp('1.5%'),
+    paddingBottom: hp('1.5%')
+  },
+  priorityDataContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
