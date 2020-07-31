@@ -67,27 +67,27 @@ const HomeHeader = ({
   const getMessage = (health, keeper) => {
     if(!health){
       return (
-        <View style={{flexDirection: 'row', width: wp('57%')}}>
+        <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
           <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
             Add Keeper
           </Text>
-          <Text style={styles.manageBackupMessageText}> to improve health</Text>
+          <Text numberOfLines={1} style={{...styles.manageBackupMessageText, flex: 1}}> to improve health</Text>
         </View>
       );
     }
     else if(health=='ugly'){
       return (
-        <View style={{flexDirection: 'row', width: wp('57%') }}>
+        <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
           <Text style={styles.manageBackupMessageTextHighlight}>
             {keeper}
           </Text>
-          <Text numberOfLines={1} style={styles.manageBackupMessageText}> needs your attention</Text>
+          <Text numberOfLines={1} style={{...styles.manageBackupMessageText, flex: 1}}> needs your attention</Text>
         </View>
       );
     }
     else if(health=='good'){
       return (
-        <View style={{flexDirection: 'row', width: wp('57%')}}>
+        <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
           <Text style={styles.manageBackupMessageText}>Your wallet is now </Text>
           <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>secure</Text>
         </View>
@@ -225,7 +225,7 @@ const HomeHeader = ({
           }}
           style={styles.manageBackupMessageView}
         >
-          {getMessage('good', 'Security Question')}
+          {getMessage('ugly', 'Security Question')}
           <AntDesign
             style={{ marginLeft: 'auto' }}
             name={'arrowright'}

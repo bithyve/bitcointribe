@@ -44,6 +44,7 @@ interface ManageBackupStateTypes {
   levelData: any;
   selectedId: any;
   isLevel2: boolean;
+  securityAtLevel: any;
 }
 
 interface ManageBackupPropsTypes {
@@ -68,6 +69,7 @@ class ManageBackup extends Component<
     this.NoInternetBottomSheet = React.createRef();
     this.unsubscribe = null;
     this.state = {
+      securityAtLevel: 0,
       selectedId: 0,
       levelData: [
         {
@@ -141,10 +143,12 @@ class ManageBackup extends Component<
   setSelectedCards = () => {
     const { levelData } = this.state;
     for (let a = 0; a < levelData.length; a++) {
-      console.log('levelData.status', levelData[a].status);
       if (levelData[a].status == 'ugly')
         this.setState({ selectedId: levelData[a].id });
     }
+    let level = 1;
+    if(levelData.findIndex(value=>value.status=='ugly' || value.status=='')) level = levelData[levelData.findIndex(value=>value.status=='ugly' || value.status=='')-1].id
+    this.setState({securityAtLevel: level })
   };
 
   componentDidMount = () => {
@@ -169,7 +173,7 @@ class ManageBackup extends Component<
   };
 
   render() {
-    const { levelData, selectedId, isLevel2 } = this.state;
+    const { levelData, selectedId, isLevel2, securityAtLevel } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -224,7 +228,7 @@ class ManageBackup extends Component<
               <Text style={styles.backupText}>Backup</Text>
               <Text style={styles.backupInfoText}>Security is</Text>
               <Text style={styles.backupInfoText}>
-                at level {selectedId ? selectedId : 1}
+                at level {securityAtLevel ? securityAtLevel : 1}
               </Text>
             </View>
           </View>
@@ -254,6 +258,7 @@ class ManageBackup extends Component<
                         <View
                           style={{
                             ...styles.cardHealthImageView,
+                            elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
                             backgroundColor:
                               value.status == 'ugly'
                                 ? Colors.red
@@ -437,6 +442,7 @@ class ManageBackup extends Component<
                                     position: 'absolute',
                                     top: 0,
                                     right: 0,
+                                    borderRadius: wp('1%')/2
                                   }}
                                 />
                               </ImageBackground>
@@ -764,7 +770,6 @@ const styles = StyleSheet.create({
   },
   cardHealthImageView: {
     backgroundColor: Colors.red,
-    elevation: 10,
     shadowColor: Colors.deepBlue,
     shadowOpacity: 1,
     shadowOffset: { width: 0, height: 3 },
