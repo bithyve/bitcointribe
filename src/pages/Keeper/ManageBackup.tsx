@@ -243,7 +243,7 @@ class ManageBackup extends Component<
                     shadowOpacity:
                       selectedId && selectedId == value.id ? 10 : 0,
                     shadowOffset: { width: 5, height: 5 },
-                    elevation: selectedId && selectedId == value.id ? 10 : 0,
+                    elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
                     opacity:
                       selectedId == value.id || selectedId == 0 ? 1 : 0.3,
                   }}
@@ -279,7 +279,7 @@ class ManageBackup extends Component<
                         </View>
                       ) : (
                         <Image
-                          source={require('../../assets/images/icons/Spaner.png')}
+                          source={require('../../assets/images/icons/icon_setup.png')}
                           style={{
                             borderRadius: wp('7%') / 2,
                             width: wp('7%'),
