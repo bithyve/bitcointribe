@@ -905,12 +905,18 @@ function* updateMSharesHealthWorker({ payload }) {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put(switchS3Loader('updateMSharesHealth'));
 
+  const trustedContactsService: TrustedContactsService = yield select(
+    (state) => state.trustedContacts.service,
+  );
+
   let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
   if (!DECENTRALIZED_BACKUP) {
     DECENTRALIZED_BACKUP = yield select(
       (state) => state.storage.database.DECENTRALIZED_BACKUP,
     );
   }
+
+  const SERVICES = yield select((state) => state.storage.database.SERVICES);
 
   const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
   const metaShares = Object.keys(UNDER_CUSTODY).map(
@@ -936,17 +942,36 @@ function* updateMSharesHealthWorker({ payload }) {
           if (info.removeShare) {
             if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
               delete UNDER_CUSTODY[tag];
+
+              for (const contactName of Object.keys(
+                trustedContactsService.tc.trustedContacts,
+              )) {
+                const contact =
+                  trustedContactsService.tc.trustedContacts[contactName];
+                if (contact.walletID === info.walletId) {
+                  contact.isWard = false;
+                }
+              }
             }
           }
         }
       }
     });
+
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
+    };
+
     const updatedBackup = {
       ...DECENTRALIZED_BACKUP,
       UNDER_CUSTODY,
     };
     yield call(insertDBWorker, {
-      payload: { DECENTRALIZED_BACKUP: updatedBackup },
+      payload: {
+        DECENTRALIZED_BACKUP: updatedBackup,
+        SERVICES: updatedSERVICES,
+      },
     });
   } else {
     if (res.err === 'ECONNABORTED') requestTimedout();
