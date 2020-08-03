@@ -47,6 +47,7 @@ export default function Launch(props) {
 
 
 
+  // Commented for now
   let isContactOpen = false;
   let isCameraOpen = false;
   const handleAppStateChange = async (nextAppState) => {

@@ -317,16 +317,13 @@ export default function Login(props) {
             dispatch(updateWalletImage());
             dispatch(calculateExchangeRate());
             setTimeout(() => {
-              if (accountsSynched) {
-                loaderBottomSheet.current.snapTo(0);
-                props.navigation.navigate('Home', {
-                  custodyRequest,
-                  recoveryRequest,
-                  trustedContactRequest,
-                  userKey,
-                });
-              }
-
+              loaderBottomSheet.current.snapTo(0);
+              props.navigation.navigate('Home', {
+                custodyRequest,
+                recoveryRequest,
+                trustedContactRequest,
+                userKey,
+              });
             }, 2500);
             dispatch(startupSync());
           }
